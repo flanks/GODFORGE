@@ -693,6 +693,22 @@ fn landmark_label(d: &Decor) -> Option<&'static str> {
     }
 }
 
+/// Label of a grand monument (a map's skyline).
+fn mark_name(m: MapMark) -> String {
+    let s = match m {
+        MapMark::GreatBrazier => "ForgeFire".to_string(),
+        MapMark::FallenWeapon => "FallenArms".to_string(),
+        other => format!("{other:?}"),
+    };
+    s.chars().fold(String::new(), |mut out, c| {
+        if c.is_ascii_uppercase() && !out.is_empty() && !out.ends_with(' ') {
+            out.push(' ');
+        }
+        out.push(c.to_ascii_uppercase());
+        out
+    })
+}
+
 fn district_name(k: DistrictKind) -> String {
     format!("{k:?}").chars().fold(String::new(), |mut s, c| {
         if c.is_ascii_uppercase() && !s.is_empty() {
@@ -913,6 +929,12 @@ pub struct MapStats {
     pub passes: usize,
     pub pois: usize,
     pub seals: u32,
+    /// POIs the template's quotas ask for (plus the gate).
+    pub pois_wanted: usize,
+    /// Room-grammar compositions stamped into region slots (open fields excluded).
+    pub comps: usize,
+    /// Grand monuments standing on crossroads hubs (the skyline).
+    pub monuments: usize,
     pub camps: usize,
     pub obstacles: usize,
     pub pits: usize,
@@ -940,6 +962,9 @@ pub fn map_stats(room: &RoomDef, map: &MapLayout, ms: f32) -> MapStats {
         passes: map.passes.len(),
         pois: map.pois.len(),
         seals: map.pois.iter().map(|p| p.seals as u32).sum(),
+        pois_wanted: 1 + room.expedition.as_ref().map_or(0, |x| x.pois.iter().map(|q| q.count as usize).sum()),
+        comps: room.districts.iter().filter(|d| !matches!(d.kind, DistrictKind::Field | DistrictKind::Plaza)).count(),
+        monuments: map.regions.iter().filter(|r| r.landmark.is_some()).count(),
         camps: map.camps.len(),
         obstacles: room.obstacles.len(),
         pits: map.pits.len(),
@@ -952,7 +977,7 @@ pub fn map_stats(room: &RoomDef, map: &MapLayout, ms: f32) -> MapStats {
 
 fn map_stats_line(s: &MapStats) -> String {
     format!(
-        "GEN {:.1}MS  LAND {:.0}%  ROAD {:.0}%  PIT {:.0}%  UNREACHED {:.1}%  REGIONS {}  ROADS {}  PASSES {}  POIS {}  SEALS {}  CAMPS {}  OBST {}  PITS {}  DECOR {}  RELAXED {}  REPAIRS {}  HASH {:016X}",
+        "GEN {:.1}MS  LAND {:.0}%  ROAD {:.0}%  PIT {:.0}%  UNREACHED {:.1}%  REGIONS {}  ROADS {}  PASSES {}  POIS {}/{}  SEALS {}  COMPS {}  MONUMENTS {}  CAMPS {}  OBST {}  PITS {}  DECOR {}  RELAXED {}  REPAIRS {}  HASH {:016X}",
         s.ms,
         s.land * 100.0,
         s.road * 100.0,
@@ -962,7 +987,10 @@ fn map_stats_line(s: &MapStats) -> String {
         s.roads,
         s.passes,
         s.pois,
+        s.pois_wanted,
         s.seals,
+        s.comps,
+        s.monuments,
         s.camps,
         s.obstacles,
         s.pits,
@@ -1044,6 +1072,15 @@ fn render_map(db: &ContentDb, room: &RoomDef, map: &MapLayout, s: f32, labels: b
         segment(&mut cv, &v, ps.at - n, ps.at + n, 2.0 * px, INK, 1.0);
         segment(&mut cv, &v, ps.at - n, ps.at + n, 1.2 * px, col, 1.0);
     }
+    // Room-grammar compositions in their region slots (open fields stay unmarked).
+    for d in &room.districts {
+        if matches!(d.kind, DistrictKind::Field | DistrictKind::Plaza) {
+            continue;
+        }
+        let (c, hh) = ((d.min + d.max) * 0.5, (d.max - d.min) * 0.5);
+        boxf(&mut cv, &v, c, hh, district_color(d.kind), 0.06);
+        box_outline(&mut cv, &v, c, hh, 1.0 * px, district_color(d.kind), 0.45);
+    }
     draw_layout(&mut cv, &v, room, &p);
     for c in &map.camps {
         if c.elite.is_some() {
@@ -1071,9 +1108,22 @@ fn render_map(db: &ContentDb, room: &RoomDef, map: &MapLayout, s: f32, labels: b
             let q = v.px(at);
             cv.label(q.x as i64 - (text.len() as i64 * 6 * ls) / 2, q.y as i64 + dy, text, ls, c);
         };
+        if s >= 3.0 {
+            for d in &room.districts {
+                if matches!(d.kind, DistrictKind::Field | DistrictKind::Plaza) {
+                    continue;
+                }
+                let q = v.px(Vec2::new(d.min.x, d.max.y));
+                cv.label(q.x as i64 + 3, q.y as i64 + 3, &district_name(d.kind), 1, district_color(d.kind));
+            }
+        }
         for (r, reg) in map.regions.iter().enumerate() {
             let name = theme_of(r as u8).map_or_else(|| format!("REGION {r}"), |t| t.name.to_ascii_uppercase());
-            centred(&mut cv, reg.site, -3 * ls, &name, TEXT);
+            let dy = if reg.landmark.is_some() { -(9 + 8 * ls) } else { -3 * ls };
+            centred(&mut cv, reg.site, dy, &name, TEXT);
+            if let Some(m) = reg.landmark {
+                centred(&mut cv, reg.site, 9, &mark_name(m), hex("#FFE8A0"));
+            }
         }
         for poi in &map.pois {
             let mut text = poi.kind.name().to_ascii_uppercase();
@@ -1091,6 +1141,9 @@ fn render_map(db: &ContentDb, room: &RoomDef, map: &MapLayout, s: f32, labels: b
     }
     cv
 }
+
+/// Width of one column of a biome map's legend.
+const MAP_LEGEND_COL: usize = 215;
 
 fn map_legend(db: &ContentDb, room: &RoomDef, map: &MapLayout, width: usize, height: usize) -> Canvas {
     let mut cv = Canvas::new(width, height, Rgb(0.09, 0.08, 0.08));
@@ -1140,19 +1193,39 @@ fn map_legend(db: &ContentDb, room: &RoomDef, map: &MapLayout, width: usize, hei
                 row(&mut cv, hex(&t.map_color).scale(1.25), &format!("{}  {n}", t.name.to_ascii_uppercase()), &mut y);
             }
         }
-        y += 8;
     }
+    // Second column: the compositions, then the decor vocabulary.
+    let (x2, mut y) = (MAP_LEGEND_COL as i64 + 12, 38i64);
+    let row2 = |cv: &mut Canvas, col: Rgb, name: &str, y: &mut i64| {
+        cv.rect(x2, *y, x2 + 14, *y + 10, col, 1.0);
+        cv.text(x2 + 20, *y + 1, name, 1, TEXT);
+        *y += 14;
+    };
+    let mut comps: BTreeMap<String, (Rgb, usize)> = BTreeMap::new();
+    for d in &room.districts {
+        if !matches!(d.kind, DistrictKind::Field | DistrictKind::Plaza) {
+            comps.entry(district_name(d.kind)).or_insert((district_color(d.kind), 0)).1 += 1;
+        }
+    }
+    let fields = room.districts.iter().filter(|d| d.kind == DistrictKind::Field).count();
+    cv.text(x2, y, "COMPOSITIONS", 1, DIM);
+    y += 16;
+    for (name, (col, n)) in &comps {
+        row2(&mut cv, *col, &format!("{name}  {n}"), &mut y);
+    }
+    row2(&mut cv, district_color(DistrictKind::Field), &format!("OPEN FIELD  {fields}"), &mut y);
+    y += 8;
     let mut seen: BTreeMap<&'static str, (Rgb, usize)> = BTreeMap::new();
     for d in &room.decor {
         let (name, col) = decor_key(d, &p);
         seen.entry(name).or_insert((col, 0)).1 += 1;
     }
     if !seen.is_empty() && y < height as i64 - 40 {
-        cv.text(12, y, "DECOR  (* LANDMARK)", 1, DIM);
+        cv.text(x2, y, "DECOR  (* LANDMARK)", 1, DIM);
         y += 16;
         for (name, (col, n)) in &seen {
-            row(&mut cv, *col, &format!("{name}  {n}"), &mut y);
-            if y > height as i64 - 20 {
+            row2(&mut cv, *col, &format!("{name}  {n}"), &mut y);
+            if y > height as i64 - 16 {
                 break;
             }
         }
@@ -1415,7 +1488,7 @@ pub fn preview_room(
         None => (render_room(db, &room, scale, true), stats_line(&stats(&room))),
     };
     let title_h = 34;
-    let legend_w = 250;
+    let legend_w = if room.map.is_some() { MAP_LEGEND_COL * 2 } else { 250 };
     let mut cv = Canvas::new(img.w + legend_w, img.h + title_h, Rgb(0.09, 0.08, 0.08));
     cv.text(10, 8, &format!("{}  SEED {seed}", room.key), 2, TEXT);
     cv.text(
@@ -1592,7 +1665,7 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
         return Ok(());
     }
     println!(
-        "{:<22} {:>9} {:>8} {:>6} {:>5} {:>7} {:>5} {:>5} {:>6} {:>6} {:>5} {:>6} {:>7} {:>7}  hash",
+        "{:<22} {:>9} {:>8} {:>6} {:>5} {:>7} {:>5} {:>7} {:>6} {:>6} {:>5} {:>6} {:>5} {:>6} {:>7} {:>7}  hash",
         "template",
         "seed",
         "gen ms",
@@ -1602,6 +1675,8 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
         "regs",
         "pois",
         "seals",
+        "comps",
+        "mons",
         "camps",
         "obst",
         "pits",
@@ -1618,7 +1693,7 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
             };
             let s = map_stats(&room, map, ms);
             println!(
-                "{:<22} {:>9} {:>8.1} {:>6.1} {:>5.1} {:>7.2} {:>5} {:>5} {:>6} {:>6} {:>5} {:>6} {:>7} {:>7}  {:016x}",
+                "{:<22} {:>9} {:>8.1} {:>6.1} {:>5.1} {:>7.2} {:>5} {:>7} {:>6} {:>6} {:>5} {:>6} {:>5} {:>6} {:>7} {:>7}  {:016x}",
                 k,
                 seed,
                 s.ms,
@@ -1626,8 +1701,10 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
                 s.pit * 100.0,
                 s.unreached * 100.0,
                 s.regions,
-                s.pois,
+                format!("{}/{}", s.pois, s.pois_wanted),
                 s.seals,
+                s.comps,
+                s.monuments,
                 s.camps,
                 s.obstacles,
                 s.pits,
@@ -1637,6 +1714,9 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
             );
             if s.repairs > 0 {
                 failures.push(format!("{k} seed {seed}: {} reachability repairs", s.repairs));
+            }
+            if s.pois < s.pois_wanted {
+                failures.push(format!("{k} seed {seed}: placed {} of {} POIs", s.pois, s.pois_wanted));
             }
             if s.relaxed > 0 {
                 failures.push(format!("{k} seed {seed}: {} relaxed POI placements", s.relaxed));
