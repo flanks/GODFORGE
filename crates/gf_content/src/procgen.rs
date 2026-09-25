@@ -2027,7 +2027,7 @@ fn forecourt(b: &mut Builder, plaza: f32, at: Vec2, e: Vec2) {
 fn colossus(b: &mut Builder, plaza: f32) {
     let r = q(b.rl(2.6, 3.3));
     let dirs = [10u8, 14, 9, 15, 11, 13, 6, 2];
-    let start = b.lay.range_u32(0, 2) as usize;
+    let start = b.lay.range_u32(0, dirs.len() as u32) as usize;
     for i in 0..dirs.len() {
         let k = dirs[(start + i) % dirs.len()];
         for extra in [3.0f32, 5.0, 7.5] {
@@ -2158,6 +2158,15 @@ fn dress_heart(b: &mut Builder, plaza: f32, kind: RoomKind) {
         b.decal(Decor::FloorInlay { at: Vec2::ZERO, radius: q(plaza - 0.8), rot, variant: 0, god: 0 });
     } else {
         b.decal(Decor::FloorInlay { at: Vec2::ZERO, radius: q(plaza - 0.9), rot, variant: 0, god: 0 });
+        // The heart of the mosaic speaks the biome: a forge god's sigil, a rune ring, a clockface,
+        // a chaos glyph.
+        let (variant, god) = match b.biome {
+            Biome::Cinder => (3, 0),
+            Biome::Verdant => (1, 4),
+            Biome::Spire => (2, 3),
+            Biome::Unmaking => (4, 2),
+        };
+        b.decal(Decor::FloorInlay { at: Vec2::ZERO, radius: 2.5, rot: rot.wrapping_add(2), variant, god });
     }
     for k in [2u8, 6, 10, 14] {
         b.brazier(rot16_dir(k) * (plaza + 0.3));
@@ -2415,9 +2424,20 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
                 kind = if attempt == 0 && Some(i) == signature {
                     motifs[b.lay.range_u32(0, motifs.len() as u32) as usize]
                 } else {
+                    // Never repeat a district while an unused one remains.
+                    let spent = |k: &DistrictKind| used.contains(k) || *k == failed;
+                    let fresh = pool.iter().any(|(k, _)| !spent(k));
                     let w: Vec<f32> = pool
                         .iter()
-                        .map(|(k, w)| if used.contains(k) || *k == failed { w * 0.03 } else { *w })
+                        .map(|(k, w)| {
+                            if !spent(k) {
+                                *w
+                            } else if fresh {
+                                0.0
+                            } else {
+                                w * 0.5
+                            }
+                        })
                         .collect();
                     pool[b.lay.weighted_index(&w).unwrap_or(0)].0
                 };
@@ -2437,8 +2457,8 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     }
     // 4. A fallen colossus beside the plaza, then solitary ruins up to the density budget.
     let p_colossus = match t.kind {
-        RoomKind::Combat | RoomKind::Elite => 0.55,
-        RoomKind::Anvil => 0.3,
+        RoomKind::Combat | RoomKind::Elite => 0.4,
+        RoomKind::Anvil => 0.25,
         _ => 0.0,
     };
     if b.lay.chance(p_colossus) {
