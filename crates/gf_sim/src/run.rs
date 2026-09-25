@@ -1,19 +1,129 @@
 //! Run structure (§4): biomes × rooms, reward doors, room rewards, the boss, victory and defeat.
+//!
+//! A biome map (OPEN_WORLD.md §5.1) is a room of kind `Expedition`: `load_room` spawns its POIs
+//! and objective state, `room_flow` leaves it alone (it never "clears"), and the party leaves it
+//! through the Boss Gate (`poi::expedition_flow`), which queues the `Onward` door into the next
+//! step, the biome's authored boss arena. Rewards for cleared rooms and completed POIs share one
+//! payout path, [`grant_reward`].
 
-use crate::boons::make_offer;
+use crate::boons::offer_boon;
 use crate::components::*;
 use crate::damage::roll_part;
 use crate::enemies::spawn_enemy;
 use crate::resources::*;
 use gf_content::ContentDb;
 use gf_content::procgen;
-use gf_content::schema::{RoomKind, RunStep};
+use gf_content::schema::{MapLayout, Phase, RoomDef, RoomKind, RunStep, TileKind};
 use gf_core::ids::{BiomeId, EnemyId, RoomId};
+use gf_core::movement::Arena;
+use gf_core::poi::PoiKind;
 use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
+use gf_core::stats::PlayerStats;
 use gf_engine::prelude::*;
 use gf_net::{AnvilState, DoorReward, GameEvent, PlayerAction, RunPhase};
 use std::sync::Arc;
+
+/// Where the party enters the current room: the template's `player_spawn`, or, on the run's first
+/// room when it is a biome map and `--start-at <kind>` is set, beside the first POI of that kind.
+/// `load_room` sets it; `players::spawn_player` reads it.
+#[derive(Resource, Clone, Copy, Debug, Default)]
+pub struct RoomEntry(pub Vec2);
+
+/// The entry of `room`, beside the first POI of kind `start_at` when that is given (QA).
+fn entry_point(room: &RoomDef, start_at: Option<PoiKind>) -> Vec2 {
+    let site = start_at.and_then(|kind| room.map.as_ref()?.pois.iter().find(|p| p.kind == kind).copied());
+    match site {
+        // Just outside its ring, on the side facing the Landing.
+        Some(site) => site.at + (room.player_spawn - site.at).normalize_or(Vec2::NEG_Y) * (site.radius + 2.5),
+        None => room.player_spawn,
+    }
+}
+
+/// One player's share of a reward (OPEN_WORLD.md §5.4): the payout paths of today's door rewards,
+/// shared by cleared rooms (`room_flow`) and completed POIs (`poi::poi_update`).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Payout {
+    /// `count` owner-bound part pickups beside the player, each at least `min` rarity (the
+    /// `PartCache` / `EliteChallenge` path; Reliquary, Lair and Warlord caches).
+    Parts { count: u32, min: Rarity },
+    /// Godshards straight into the wallet (the `ShardCache` path; Veins and cache bonuses).
+    Shards(u32),
+    /// Heal this fraction of max HP × healing received (the `Healing` path; Springs).
+    Heal(f32),
+    /// A boon offer from this god, queued behind an open one (the `Boon` path; Shrines).
+    Boon(u16),
+}
+
+impl Payout {
+    /// What a cleared room pays each player for the door that led to it.
+    pub fn of_door(reward: DoorReward, db: &ContentDb, tuning: &Tuning) -> Option<Payout> {
+        let drops = &db.game.drops;
+        match reward {
+            DoorReward::PartCache => Some(Payout::Parts { count: drops.cache_parts as u32, min: Rarity::Common }),
+            DoorReward::EliteChallenge => {
+                Some(Payout::Parts { count: drops.cache_parts as u32 + 1, min: Rarity::Common })
+            }
+            DoorReward::ShardCache => Some(Payout::Shards((drops.cache_shards as f32 * tuning.enemy.loot) as u32)),
+            DoorReward::Healing => Some(Payout::Heal(0.4)),
+            DoorReward::Boon { god } => Some(Payout::Boon(god)),
+            DoorReward::Anvil | DoorReward::Onward => None,
+        }
+    }
+}
+
+/// What a reward grant rolls with and spawns through.
+pub struct RewardCtx<'a> {
+    pub content: &'a ContentDb,
+    pub phase: Phase,
+    pub tuning: &'a Tuning,
+    pub rngs: &'a mut Rngs,
+    pub ids: &'a mut NetIds,
+    pub arena: &'a Arena,
+}
+
+/// The player receiving a payout.
+pub struct Recipient<'a> {
+    pub slot: u8,
+    pub at: Vec2,
+    pub stats: &'a PlayerStats,
+    pub vitals: &'a mut Vitals,
+    pub choice: &'a mut BoonChoice,
+    pub arsenal: &'a mut Arsenal,
+}
+
+/// Pay one player their share of a reward.
+pub fn grant_reward(ctx: &mut RewardCtx, commands: &mut Commands, payout: Payout, to: Recipient) {
+    match payout {
+        Payout::Parts { count, min } => {
+            for _ in 0..count {
+                let (part, rarity) = roll_part(ctx.content, ctx.phase, &mut ctx.rngs.loot, to.stats.luck, min);
+                let inst = to.arsenal.instance(part, rarity);
+                commands.spawn((
+                    Replicated(ctx.ids.alloc()),
+                    Pos(ctx.arena.resolve(to.at + ctx.rngs.loot.unit_vec2() * 1.5, 0.3)),
+                    RoomScoped,
+                    Pickup { loot: Loot::Part(inst), owner: Some(to.slot), life: 120.0 },
+                ));
+            }
+        }
+        Payout::Shards(n) => to.arsenal.wallet.godshards += n,
+        Payout::Heal(frac) => {
+            to.vitals.hp =
+                (to.vitals.hp + to.stats.max_hp * frac * ctx.tuning.enemy.healing_received).min(to.stats.max_hp);
+        }
+        Payout::Boon(god) => offer_boon(
+            ctx.content,
+            ctx.phase,
+            &mut ctx.rngs.boons,
+            god,
+            to.choice,
+            &to.arsenal.boons,
+            ctx.tuning.party,
+            to.stats.luck,
+        ),
+    }
+}
 
 /// Room kind a door reward leads to.
 pub fn kind_for_reward(reward: DoorReward) -> RoomKind {
@@ -129,6 +239,11 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     let arena = Arc::new(room.arena());
     world.resource_mut::<Grid>().0.reset(room.half_extents, 2.0);
     world.insert_resource(ArenaRes(arena.clone()));
+    // `--start-at` applies to the run's first room only.
+    let first = world.resource::<RunState>().room_serial == 0;
+    let start_at = if first { world.resource::<SimSettings>().start_at } else { None };
+    let entry = entry_point(&room, start_at);
+    world.insert_resource(RoomEntry(entry));
 
     let (rooms_in_biome, biome_idx) = {
         let run = world.resource::<RunState>();
@@ -140,9 +255,13 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     let growth = (1.0 + rt.budget_growth_per_room * rooms_in_biome as f32) * rt.budget_mult;
     let hp_mult =
         (1.0 + rt.hp_growth_per_room * rooms_in_biome as f32) * (1.0 + rt.hp_growth_per_biome * biome_idx as f32);
+    // A biome map's horde is the horde director's (per player cluster): its encounter holds a
+    // token budget that is never spent, so `encounter_left` stays 1.0 and the bots' room mop-up
+    // never fires there.
+    let budget = if room.map.is_some() { 1.0 } else { e.budget * growth * count };
     world.insert_resource(Encounter {
-        budget_left: e.budget * growth * count,
-        budget_total: (e.budget * growth * count).max(1.0),
+        budget_left: budget,
+        budget_total: budget.max(1.0),
         elapsed: 0.0,
         duration: e.duration,
         rate_start: e.rate_start,
@@ -157,7 +276,13 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
         stall: 0.0,
     });
 
-    // Fixed spawns (mini-bosses, bosses, elite challenges).
+    // Fixed spawns (mini-bosses, bosses, elite challenges). A boss arena reached through a biome
+    // map's gate applies the gate's HP multiplier (`boss_hp_mult` × Unworthy), once.
+    let boss_hp = if room.kind == RoomKind::Boss {
+        std::mem::replace(&mut world.resource_mut::<RunState>().next_boss_hp, 1.0)
+    } else {
+        1.0
+    };
     let fixed: Vec<EnemyId> = e.fixed.iter().filter_map(|k| db.enemies.id(k)).map(EnemyId).collect();
     if !fixed.is_empty() {
         let tuning = {
@@ -171,7 +296,7 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
             let mut commands = world.commands();
             for (i, def) in fixed.iter().enumerate() {
                 let p = arena.resolve(at + Vec2::new(i as f32 * 3.0 - (fixed.len() - 1) as f32 * 1.5, 0.0), 1.0);
-                spawn_enemy(&mut commands, &mut ids, &db, &tuning, hp_mult, *def, p, &mut rngs.director);
+                spawn_enemy(&mut commands, &mut ids, &db, &tuning, hp_mult * boss_hp, *def, p, &mut rngs.director);
             }
         }
         world.flush();
@@ -185,22 +310,25 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
         world.spawn((Replicated(net), Pos(at), RoomScoped, AnvilStation::dormant()));
     }
 
-    // A biome map: its points of interest and objective state (rooms keep an inactive stage).
+    // A biome map: its points of interest, objective state and horde flow grid (rooms keep an
+    // inactive stage and no flow grid).
     match room.map.as_ref() {
         Some(map) => {
             crate::poi::spawn_pois(world, map);
-            let required = room.expedition.as_ref().map_or(0, |x| x.seals_required);
-            world.insert_resource(Expedition { active: true, required, ..Default::default() });
+            world.insert_resource(expedition_for(&room, map));
+            world.insert_resource(flow_grid(map, &arena));
         }
-        None => world.insert_resource(Expedition::default()),
+        None => {
+            world.insert_resource(Expedition::default());
+            world.insert_resource(Flow::default());
+        }
     }
 
     // Move the party to the entrance.
     let mut players = world.query::<(&Player, &mut Pos, &mut Mover, &mut Kit, &mut Arsenal, &Stats)>();
     for (player, mut pos, mut mover, mut kit, mut arsenal, stats) in players.iter_mut(world) {
-        let offset =
-            [Vec2::ZERO, Vec2::new(-1.6, 0.0), Vec2::new(1.6, 0.0), Vec2::new(0.0, -1.6)][player.slot as usize % 4];
-        let p = arena.resolve(room.player_spawn + offset, stats.0.radius);
+        let offset = crate::players::SPAWN_OFFSETS[player.slot as usize % 4];
+        let p = arena.resolve(entry + offset, stats.0.radius);
         pos.0 = p;
         mover.0.pos = p;
         mover.0.vel = Vec2::ZERO;
@@ -209,6 +337,7 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
         kit.rush = None;
         kit.pending = None;
         arsenal.wallet.charges = 0;
+        arsenal.charges_from = None;
     }
     let mut run = world.resource_mut::<RunState>();
     run.room = room_id;
@@ -219,6 +348,65 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     run.doors_spawned = false;
     run.cleared_timer = 0.0;
     run.transition = 0.8;
+}
+
+/// A fresh objective state for biome map `map` of template `room` (§5.2): the Seals the gate
+/// needs, one sleeping camp per `map.camps` (each holding its pack plus its elite leader), and an
+/// empty explored-tile bitset.
+fn expedition_for(room: &RoomDef, map: &MapLayout) -> Expedition {
+    let tiles = map.tiles.w as usize * map.tiles.h as usize;
+    Expedition {
+        active: true,
+        required: room.expedition.as_ref().map_or(0, |x| x.seals_required),
+        camps: map
+            .camps
+            .iter()
+            .map(|c| CampRuntime { state: CampState::Asleep, left: c.count.saturating_add(c.elite.is_some() as u8) })
+            .collect(),
+        explored: vec![0; tiles.div_ceil(64)],
+        ..Default::default()
+    }
+}
+
+/// The horde's flow grid over `map`'s tiles (§5.6), with every field empty (unreached). Step
+/// cost per tile: road 8, plaza and bridge 9, ground 10, plus 40 where obstacles cover more than
+/// half the tile (3 or 4 of 4 sample points); void and liquid are impassable (`u8::MAX`).
+fn flow_grid(map: &MapLayout, arena: &Arena) -> Flow {
+    let t = &map.tiles;
+    let quarter = t.size * 0.25;
+    let samples = [
+        Vec2::new(-quarter, -quarter),
+        Vec2::new(quarter, -quarter),
+        Vec2::new(-quarter, quarter),
+        Vec2::splat(quarter),
+    ];
+    let mut cost = Vec::with_capacity(t.kind.len());
+    for y in 0..t.h {
+        for x in 0..t.w {
+            let base: u8 = match t.kind[t.index(x, y)] {
+                TileKind::Road => 8,
+                TileKind::Plaza | TileKind::Bridge => 9,
+                TileKind::Ground => 10,
+                TileKind::Void | TileKind::Liquid => {
+                    cost.push(u8::MAX);
+                    continue;
+                }
+            };
+            let c = t.center(x, y);
+            let covered = samples.iter().filter(|s| arena.blocks_shot(c + **s)).count();
+            cost.push(if covered > 2 { base + 40 } else { base });
+        }
+    }
+    let n = cost.len();
+    Flow {
+        w: t.w,
+        h: t.h,
+        origin: t.origin,
+        cost,
+        dist: std::array::from_fn(|_| vec![u16::MAX; n]),
+        src: [None; 4],
+        next: 0,
+    }
 }
 
 /// Room cleared → rewards → doors; the final boss → victory.
@@ -247,6 +435,8 @@ pub fn room_flow(
     run.transition = (run.transition - dt).max(0.0);
     let rt = &content.game.run;
     match run.phase {
+        // A biome map never clears: the party leaves it through its gate (`poi::expedition_flow`).
+        RunPhase::Combat if run.room_kind == RoomKind::Expedition => {}
         RunPhase::Combat => {
             let anvil_done = anvils.iter().all(|a| !matches!(a.state, AnvilState::Dormant | AnvilState::Kindling));
             let alive = enemies.iter().any(|e| e.hp > 0.0);
@@ -259,44 +449,25 @@ pub fn room_flow(
             run.rooms_in_biome += 1;
             run.ember += rt.ember_per_room * tuning.enemy.ember_mult;
             events.0.push(GameEvent::RoomCleared);
-            let drops = &content.game.drops;
-            let reward = run.reward.take();
-            for (p, pos, stats, mut vitals, mut choice, mut arsenal, _) in &mut players {
-                match reward {
-                    Some(DoorReward::PartCache) | Some(DoorReward::EliteChallenge) => {
-                        let n = drops.cache_parts + if reward == Some(DoorReward::EliteChallenge) { 1 } else { 0 };
-                        for _ in 0..n {
-                            let (part, rarity) =
-                                roll_part(&content, settings.phase, &mut rngs.loot, stats.0.luck, Rarity::Common);
-                            let inst = arsenal.instance(part, rarity);
-                            commands.spawn((
-                                Replicated(ids.alloc()),
-                                Pos(arena.0.resolve(pos.0 + rngs.loot.unit_vec2() * 1.5, 0.3)),
-                                RoomScoped,
-                                Pickup { loot: Loot::Part(inst), owner: Some(p.slot), life: 120.0 },
-                            ));
-                        }
-                    }
-                    Some(DoorReward::ShardCache) => {
-                        arsenal.wallet.godshards += (drops.cache_shards as f32 * tuning.enemy.loot) as u32;
-                    }
-                    Some(DoorReward::Healing) => {
-                        vitals.hp =
-                            (vitals.hp + stats.0.max_hp * 0.4 * tuning.enemy.healing_received).min(stats.0.max_hp);
-                    }
-                    Some(DoorReward::Boon { god }) => {
-                        choice.god = Some(god);
-                        choice.offer = make_offer(
-                            &content,
-                            settings.phase,
-                            &mut rngs.boons,
-                            god,
-                            &arsenal.boons,
-                            tuning.party,
-                            stats.0.luck,
-                        );
-                    }
-                    _ => {}
+            if let Some(payout) = run.reward.take().and_then(|r| Payout::of_door(r, &content, &tuning)) {
+                let mut ctx = RewardCtx {
+                    content: &content,
+                    phase: settings.phase,
+                    tuning: &tuning,
+                    rngs: &mut rngs,
+                    ids: &mut ids,
+                    arena: &arena.0,
+                };
+                for (p, pos, stats, mut vitals, mut choice, mut arsenal, _) in &mut players {
+                    let to = Recipient {
+                        slot: p.slot,
+                        at: pos.0,
+                        stats: &stats.0,
+                        vitals: &mut vitals,
+                        choice: &mut choice,
+                        arsenal: &mut arsenal,
+                    };
+                    grant_reward(&mut ctx, &mut commands, payout, to);
                 }
             }
             // Last room of the biome: onward to the next biome, or victory.

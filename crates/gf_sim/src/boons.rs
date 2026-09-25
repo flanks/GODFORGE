@@ -1,5 +1,9 @@
 //! Boon doors (§7): 3-choice offers from one god, Duo boons once both gods are held, Legendaries
 //! gated on commitment to a god, Team boons in co-op, limited rerolls.
+//!
+//! A player holds one open offer at a time. Offers that arrive while one is open (a shrine
+//! completed mid-choice on a biome map, OPEN_WORLD.md §5.4) wait in `BoonChoice.queue` and open,
+//! in order, as each pick is made.
 
 use crate::components::*;
 use crate::resources::*;
@@ -60,6 +64,42 @@ pub fn make_offer(
     offer
 }
 
+/// Queue an offer from `god` and open it at once when no offer is open.
+#[allow(clippy::too_many_arguments)]
+pub fn offer_boon(
+    db: &ContentDb,
+    phase: Phase,
+    rng: &mut GfRng,
+    god: u16,
+    choice: &mut BoonChoice,
+    owned: &[(BoonId, Rarity)],
+    party: u8,
+    luck: f32,
+) {
+    choice.queue.push(u8::try_from(god).unwrap_or(u8::MAX));
+    next_offer(db, phase, rng, choice, owned, party, luck);
+}
+
+/// With no offer open, open the next queued one (skipping gods with nothing left to offer).
+pub fn next_offer(
+    db: &ContentDb,
+    phase: Phase,
+    rng: &mut GfRng,
+    choice: &mut BoonChoice,
+    owned: &[(BoonId, Rarity)],
+    party: u8,
+    luck: f32,
+) {
+    while choice.offer.is_empty() && !choice.queue.is_empty() {
+        let god = choice.queue.remove(0) as u16;
+        if god as usize >= db.gods.len() {
+            continue;
+        }
+        choice.god = Some(god);
+        choice.offer = make_offer(db, phase, rng, god, owned, party, luck);
+    }
+}
+
 pub fn boon_actions(
     content: Res<Content>,
     settings: Res<SimSettings>,
@@ -83,6 +123,15 @@ pub fn boon_actions(
                 choice.offer.clear();
                 kit.dirty = true;
                 events.0.push(GameEvent::BoonTaken { slot: player.slot, boon: boon.0 });
+                next_offer(
+                    &content,
+                    settings.phase,
+                    &mut rngs.boons,
+                    &mut choice,
+                    &arsenal.boons,
+                    tuning.party,
+                    stats.0.luck,
+                );
             }
             Some((_, PlayerAction::RerollBoons)) => {
                 if choice.rerolls > 0

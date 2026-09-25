@@ -1,6 +1,13 @@
 //! Anvil stations (§6): interact to light → hold-the-anvil wave (progress only while a player
-//! stands in the ring) → the anvil runs hot and every player gets forge charges → spent.
+//! stands in the ring) → the anvil runs hot and grants forge charges → spent.
 //! Forge actions are validated and applied host-side through `gf_core::forge`.
+//!
+//! Charges are per anvil (OPEN_WORLD.md §5.3): a Hot anvil grants `charges_per_anvil` to each
+//! living player who stands within `radius + 1` of it (once per player per anvil) and records
+//! itself in their `Arsenal.charges_from`. Going Spent takes charges only from the players whose
+//! charges it granted, so on a biome map one anvil cooling never empties a partner's wallet at
+//! another. A biome map's anvil also carries a `Poi`; `poi::poi_update` turns its lifecycle into
+//! Seals, the breaker and completion.
 
 use crate::components::*;
 use crate::resources::*;
@@ -46,19 +53,19 @@ pub fn anvil_update(
     content: Res<Content>,
     tuning: Res<Tuning>,
     mut events: ResMut<Events>,
-    mut anvils: Query<(&Pos, &mut AnvilStation)>,
-    mut players: Query<(&Pos, &PlayerInput, &Life, &mut Arsenal), With<Player>>,
+    mut anvils: Query<(Entity, &Pos, &mut AnvilStation)>,
+    mut players: Query<(&Player, &Pos, &PlayerInput, &Life, &mut Arsenal)>,
 ) {
     let dt = clock.gdt();
     let t = &content.game.anvil;
     let mut focus = false;
-    for (pos, mut anvil) in &mut anvils {
+    for (entity, pos, mut anvil) in &mut anvils {
         let inside: Vec<bool> =
-            players.iter().map(|(p, _, life, _)| life.state.is_alive() && p.0.distance(pos.0) <= t.radius).collect();
+            players.iter().map(|(_, p, _, life, _)| life.state.is_alive() && p.0.distance(pos.0) <= t.radius).collect();
         match anvil.state {
             AnvilState::Dormant => {
                 let lit =
-                    players.iter().zip(&inside).any(|((_, input, _, _), inside)| *inside && input.new.interact > 0);
+                    players.iter().zip(&inside).any(|((_, _, input, ..), inside)| *inside && input.new.interact > 0);
                 if lit {
                     anvil.state = AnvilState::Kindling;
                     events.0.push(GameEvent::AnvilLit);
@@ -73,28 +80,42 @@ pub fn anvil_update(
                     anvil.progress = 1.0;
                     anvil.state = AnvilState::Hot;
                     anvil.forge_left = t.forge_window;
-                    for (.., mut arsenal) in &mut players {
-                        arsenal.wallet.charges = content.game.forge.charges_per_anvil;
-                    }
+                    anvil.granted = 0;
                     events.0.push(GameEvent::AnvilHot);
                 }
             }
             AnvilState::Hot => {
                 anvil.forge_left -= dt;
                 // Forge focus: everyone at the anvil with the forge open slows time (solo = focus).
-                let all_forging = players
-                    .iter()
-                    .zip(&inside)
-                    .all(|((_, input, life, _), inside)| !life.state.is_alive() || (*inside && input.cmd.forge_open));
+                let all_forging = players.iter().zip(&inside).all(|((_, _, input, life, _), inside)| {
+                    !life.state.is_alive() || (*inside && input.cmd.forge_open)
+                });
                 focus |= all_forging && inside.iter().any(|i| *i);
                 if anvil.forge_left <= 0.0 {
                     anvil.state = AnvilState::Spent;
+                    // Only the charges this anvil granted burn out with it.
                     for (.., mut arsenal) in &mut players {
-                        arsenal.wallet.charges = 0;
+                        if arsenal.charges_from == Some(entity) {
+                            arsenal.wallet.charges = 0;
+                            arsenal.charges_from = None;
+                        }
                     }
                 }
             }
             AnvilState::Spent => {}
+        }
+        // A Hot anvil (including the tick it lit up) grants its charges to each living player who
+        // comes within `radius + 1`, once per player.
+        if anvil.state == AnvilState::Hot {
+            let reach = t.radius + 1.0;
+            for (player, p, _, life, mut arsenal) in &mut players {
+                let bit = 1u8 << (player.slot & 7);
+                if anvil.granted & bit == 0 && life.state.is_alive() && p.0.distance(pos.0) <= reach {
+                    anvil.granted |= bit;
+                    arsenal.wallet.charges = content.game.forge.charges_per_anvil;
+                    arsenal.charges_from = Some(entity);
+                }
+            }
         }
     }
     clock.scale = if focus { t.forge_focus_time_scale } else { 1.0 };
