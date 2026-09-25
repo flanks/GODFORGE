@@ -1,0 +1,350 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\cinderling_v2.glb",
+  "key": "cinderling_v2",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 1278,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "cinderling_v2_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 125082
+   },
+   {
+    "name": "cinderling_v2_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 220619
+   }
+  ],
+  "materials": [
+   "M_cinderling_v2"
+  ],
+  "sockets": {
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.251,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.1209,
+     0.1938
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     0.7846,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.1709,
+     0.5536
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.4878,
+    0.0,
+    -0.4293
+   ],
+   "max": [
+    0.5132,
+    0.6346,
+    0.5836
+   ]
+  },
+  "height_m": 0.635,
+  "height_vs_hero": 0.288,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "cinderling_v2_idle@loop",
+   "cinderling_v2_move@loop",
+   "cinderling_v2_windup",
+   "cinderling_v2_attack",
+   "cinderling_v2_hit",
+   "cinderling_v2_death",
+   "cinderling_v2_spawn"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 210.9,
+   "p10": 120.5,
+   "p90": 233.5
+  },
+  "coverage": 0.553,
+  "zones": [
+   "crust",
+   "coal",
+   "maw",
+   "fang",
+   "cyst"
+  ],
+  "decals": 24,
+  "basecolor": "art/enemies/cinderling/textures/cinderling_v2_basecolor.png",
+  "emissive": "art/enemies/cinderling/textures/cinderling_v2_emissive.png",
+  "emissive_texels": 99659,
+  "seconds": 40.1
+ },
+ "skin": {
+  "vertices": 807,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 412,
+   "head": 371,
+   "legs_a": 0,
+   "legs_b": 0,
+   "tail": 24
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "lid_crust",
+   "zone": "crust",
+   "bone": "head",
+   "faces": 168
+  },
+  {
+   "id": 1,
+   "name": "lid_maw",
+   "zone": "maw",
+   "bone": "head",
+   "faces": 98
+  },
+  {
+   "id": 2,
+   "name": "jaw_coal",
+   "zone": "coal",
+   "bone": "body",
+   "faces": 277
+  },
+  {
+   "id": 3,
+   "name": "jaw_maw",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 98
+  },
+  {
+   "id": 4,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 5,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 6,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 7,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 8,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 9,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 10,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 11,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 12,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 13,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 14,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  }
+ ],
+ "tris_blender": 1278,
+ "clips": [
+  {
+   "name": "cinderling_v2_idle@loop",
+   "frames": [
+    0,
+    52
+   ],
+   "seconds": 1.733,
+   "loop": true
+  },
+  {
+   "name": "cinderling_v2_move@loop",
+   "frames": [
+    0,
+    13
+   ],
+   "seconds": 0.433,
+   "loop": true
+  },
+  {
+   "name": "cinderling_v2_windup",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "cinderling_v2_attack",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "cinderling_v2_hit",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": false
+  },
+  {
+   "name": "cinderling_v2_death",
+   "frames": [
+    0,
+    27
+   ],
+   "seconds": 0.9,
+   "loop": false
+  },
+  {
+   "name": "cinderling_v2_spawn",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  }
+ ]
+}

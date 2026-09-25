@@ -1,0 +1,199 @@
+{
+ "kind": "enemy",
+ "key": "cinderling_v2",
+ "tier": "swarm",
+ "tris": 1278,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "cinderling_v2_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 125082
+  },
+  {
+   "name": "cinderling_v2_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 220619
+  }
+ ],
+ "sockets": {
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.251,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.1209,
+    0.1938
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    0.7846,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    0.1709,
+    0.5536
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "cinderling_v2_idle@loop",
+  "cinderling_v2_move@loop",
+  "cinderling_v2_windup",
+  "cinderling_v2_attack",
+  "cinderling_v2_hit",
+  "cinderling_v2_death",
+  "cinderling_v2_spawn"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.4878,
+   0.0,
+   -0.4293
+  ],
+  "max": [
+   0.5132,
+   0.6346,
+   0.5836
+  ]
+ },
+ "size_m": 0.635,
+ "glb": "assets/models/enemies/cinderling_v2.glb",
+ "glb_bytes": 462368,
+ "glb_sha256": "c4377f2af5dc43e6e7d6685d83e6c66bc3db2eae5e6d894518fbcdba4fd0cd0b",
+ "source_blend": "art/enemies/cinderling/source/cinderling_v2.blend",
+ "build_script": "tools/blender/gf_assets/enemies/cinderling.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "cinderling",
+ "variant": "v2",
+ "variant_name": "Heavy-brow",
+ "variant_set": [
+  "cinderling",
+  "cinderling_v1",
+  "cinderling_v2"
+ ],
+ "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named {file_stem}_{clip}. Pick one of variant_set per spawn (cinderling.glb alone is complete).",
+ "mirrored": false,
+ "faction": "unmade",
+ "verb": "HOP",
+ "move_cycle_m": 0.85,
+ "move_note": "one hop per move@loop cycle: play it at speed / move_cycle_m cycles per second (row speed 3.2 m/s -> about 3.8 hops/s). The hop is in place; root only lifts (0.13 m apex).",
+ "clip_notes": {
+  "windup": "squash low, rear back, the lid (head) opens over the white-hot maw; ends on the loaded pose",
+  "attack": "a pounce-chomp: leaps ~0.4 m forward in place-relative root motion, the lid snaps shut at frame 5 (the contact hit), lands and returns to rest",
+  "death": "swells, the lid bursts off and falls behind, the growth breaks away, the coal slumps and crumbles to ash (scale 0.02, held); burst / ember VFX at fx_core are the engine's",
+  "spawn": "extra clip for Summon (the Slag King's furnace): pops from a curled ember to full size"
+ },
+ "rig_note": "GF_Swarm_v1: body = jaw half + maw bowl (squash/stretch by scale, base kept on the ground); head = the lid hinged at the back (rotate -X opens the mouth); tail = the obsidian growth; legs_a / legs_b unweighted (a blob has no legs)",
+ "content_row": {
+  "key": "cinderling",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "phase": "P0",
+  "hp": 30,
+  "speed": 3.2,
+  "radius": 0.42,
+  "scale": 1.0,
+  "contact_damage": 8,
+  "mass": 1.0,
+  "behavior": "Chaser",
+  "color": "#E0662B",
+  "shape": "Blob",
+  "pack": "(3, 6)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 210.9,
+   "p10": 120.5,
+   "p90": 233.5
+  },
+  "coverage": 0.553
+ },
+ "skin": {
+  "vertices": 807,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 412,
+   "head": 371,
+   "legs_a": 0,
+   "legs_b": 0,
+   "tail": 24
+  }
+ }
+}

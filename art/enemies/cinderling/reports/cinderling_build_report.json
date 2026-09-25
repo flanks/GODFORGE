@@ -1,0 +1,343 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\cinderling.glb",
+  "key": "cinderling",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 1186,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "cinderling_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 103350
+   },
+   {
+    "name": "cinderling_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 193238
+   }
+  ],
+  "materials": [
+   "M_cinderling"
+  ],
+  "sockets": {
+   "head_top": {
+    "translation": [
+     0.0,
+     0.8554,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.1634,
+     0.1166
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.2134,
+     0.4911
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.2789,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.4721,
+    0.0,
+    -0.4441
+   ],
+   "max": [
+    0.4834,
+    0.7054,
+    0.5211
+   ]
+  },
+  "height_m": 0.705,
+  "height_vs_hero": 0.321,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "cinderling_idle@loop",
+   "cinderling_move@loop",
+   "cinderling_windup",
+   "cinderling_attack",
+   "cinderling_hit",
+   "cinderling_death",
+   "cinderling_spawn"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 222.8,
+   "p10": 131.1,
+   "p90": 255.5
+  },
+  "coverage": 0.611,
+  "zones": [
+   "crust",
+   "coal",
+   "maw",
+   "fang",
+   "cyst"
+  ],
+  "decals": 30,
+  "basecolor": "art/enemies/cinderling/textures/cinderling_basecolor.png",
+  "emissive": "art/enemies/cinderling/textures/cinderling_emissive.png",
+  "emissive_texels": 83085,
+  "seconds": 32.9
+ },
+ "skin": {
+  "vertices": 747,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 393,
+   "head": 336,
+   "legs_a": 0,
+   "legs_b": 0,
+   "tail": 18
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "lid_crust",
+   "zone": "crust",
+   "bone": "head",
+   "faces": 160
+  },
+  {
+   "id": 1,
+   "name": "lid_maw",
+   "zone": "maw",
+   "bone": "head",
+   "faces": 98
+  },
+  {
+   "id": 2,
+   "name": "jaw_coal",
+   "zone": "coal",
+   "bone": "body",
+   "faces": 272
+  },
+  {
+   "id": 3,
+   "name": "jaw_maw",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 98
+  },
+  {
+   "id": 4,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 5,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 6,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 7,
+   "name": "fang_jaw",
+   "zone": "fang",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 8,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 9,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 10,
+   "name": "fang_lid",
+   "zone": "fang",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 11,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 12,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 13,
+   "name": "growth_shard",
+   "zone": "cyst",
+   "bone": "tail",
+   "faces": 6
+  }
+ ],
+ "tris_blender": 1186,
+ "clips": [
+  {
+   "name": "cinderling_idle@loop",
+   "frames": [
+    0,
+    48
+   ],
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "cinderling_move@loop",
+   "frames": [
+    0,
+    12
+   ],
+   "seconds": 0.4,
+   "loop": true
+  },
+  {
+   "name": "cinderling_windup",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "cinderling_attack",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "cinderling_hit",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": false
+  },
+  {
+   "name": "cinderling_death",
+   "frames": [
+    0,
+    27
+   ],
+   "seconds": 0.9,
+   "loop": false
+  },
+  {
+   "name": "cinderling_spawn",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  }
+ ]
+}
