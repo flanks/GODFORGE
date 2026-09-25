@@ -1,0 +1,314 @@
+{
+ "export": {
+  "file": "assets/models/enemies/anvil_brute.glb",
+  "key": "anvil_brute",
+  "kind": "enemy",
+  "tier": "elite",
+  "extensions_used": [],
+  "tris": 5804,
+  "budget": [
+   4000,
+   8000
+  ],
+  "textures": [
+   {
+    "name": "anvil_brute_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 299162
+   },
+   {
+    "name": "anvil_brute_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 1039648
+   }
+  ],
+  "materials": [
+   "M_anvil_brute"
+  ],
+  "sockets": {
+   "fx_core": {
+    "translation": [
+     -0.0,
+     1.72,
+     -0.0
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     -0.0,
+     1.62,
+     0.3
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     -0.0,
+     1.45,
+     0.95
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     -0.0,
+     1.6,
+     0.9
+    ],
+    "forward": [
+     -0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     -0.0,
+     3.0,
+     -0.0
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -1.1728,
+    0.0,
+    -0.6541
+   ],
+   "max": [
+    1.3791,
+    2.8093,
+    1.0877
+   ]
+  },
+  "height_m": 2.809,
+  "height_vs_hero": 1.277,
+  "joints": [
+   "root",
+   "pelvis",
+   "spine_01",
+   "spine_02",
+   "spine_03",
+   "clavicle_L",
+   "upperarm_L",
+   "lowerarm_L",
+   "hand_L",
+   "plate_cuff_L",
+   "plate_cuff_L_crk",
+   "plate_cuff_L_crk_1",
+   "plate_cuff_L_crk_2",
+   "clavicle_R",
+   "plate_pauldron",
+   "plate_pauldron_crk",
+   "plate_pauldron_crk_1",
+   "plate_pauldron_crk_2",
+   "upperarm_R",
+   "lowerarm_R",
+   "hand_R",
+   "plate_cuff_R",
+   "plate_cuff_R_crk",
+   "plate_cuff_R_crk_1",
+   "plate_cuff_R_crk_2",
+   "neck",
+   "head",
+   "plate_helm",
+   "plate_helm_crk",
+   "plate_helm_crk_1",
+   "plate_helm_crk_2",
+   "plate_back",
+   "plate_back_crk",
+   "plate_back_crk_1",
+   "plate_back_crk_2",
+   "plate_back_crk_3",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "toe_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R",
+   "toe_R"
+  ],
+  "clips": [
+   "anvil_brute_idle@loop",
+   "anvil_brute_move@loop",
+   "anvil_brute_windup",
+   "anvil_brute_attack",
+   "anvil_brute_charge@loop",
+   "anvil_brute_hit",
+   "anvil_brute_death",
+   "anvil_brute_plates_break"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 115.8,
+   "p10": 104.6,
+   "p90": 123.3
+  },
+  "coverage": 0.463,
+  "zones": [
+   "obsidian",
+   "flesh",
+   "iron",
+   "iron_crk",
+   "crack",
+   "ichor"
+  ],
+  "broad_zones": [
+   "iron",
+   "iron_crk"
+  ],
+  "decals": 18,
+  "basecolor": "art/enemies/anvil_brute/textures/anvil_brute_basecolor.png",
+  "emissive": "art/enemies/anvil_brute/textures/anvil_brute_emissive.png",
+  "emissive_texels": 182657,
+  "seconds": 30.2
+ },
+ "clips": [
+  {
+   "name": "anvil_brute_idle@loop",
+   "frames": [
+    0,
+    60
+   ],
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "anvil_brute_move@loop",
+   "frames": [
+    0,
+    24
+   ],
+   "seconds": 0.8,
+   "loop": true
+  },
+  {
+   "name": "anvil_brute_windup",
+   "frames": [
+    0,
+    27
+   ],
+   "seconds": 0.9,
+   "loop": false
+  },
+  {
+   "name": "anvil_brute_attack",
+   "frames": [
+    0,
+    16
+   ],
+   "seconds": 0.533,
+   "loop": false
+  },
+  {
+   "name": "anvil_brute_charge@loop",
+   "frames": [
+    0,
+    12
+   ],
+   "seconds": 0.4,
+   "loop": true
+  },
+  {
+   "name": "anvil_brute_hit",
+   "frames": [
+    0,
+    10
+   ],
+   "seconds": 0.333,
+   "loop": false
+  },
+  {
+   "name": "anvil_brute_death",
+   "frames": [
+    0,
+    48
+   ],
+   "seconds": 1.6,
+   "loop": false
+  },
+  {
+   "name": "anvil_brute_plates_break",
+   "frames": [
+    0,
+    24
+   ],
+   "seconds": 0.8,
+   "loop": false
+  }
+ ],
+ "review": {
+  "turn_front": "art/enemies/anvil_brute/work/review/anvil_brute_turn_front.png",
+  "turn_34_front": "art/enemies/anvil_brute/work/review/anvil_brute_turn_34_front.png",
+  "turn_side": "art/enemies/anvil_brute/work/review/anvil_brute_turn_side.png",
+  "turn_back": "art/enemies/anvil_brute/work/review/anvil_brute_turn_back.png",
+  "turn_34_back": "art/enemies/anvil_brute/work/review/anvil_brute_turn_34_back.png",
+  "turn_top": "art/enemies/anvil_brute/work/review/anvil_brute_turn_top.png",
+  "ingame": "art/enemies/anvil_brute/work/review/anvil_brute_ingame_22.png",
+  "ingame_sil": "art/enemies/anvil_brute/work/review/anvil_brute_ingame_22_sil.png",
+  "sheet": "art/enemies/anvil_brute/reports/anvil_brute_review.png",
+  "clips": "art/enemies/anvil_brute/reports/anvil_brute_clips.png",
+  "plates": "art/enemies/anvil_brute/reports/anvil_brute_plates.png",
+  "hero_shot": "art/enemies/anvil_brute/reports/anvil_brute_34.png",
+  "scale": "art/enemies/anvil_brute/reports/anvil_brute_scale.png"
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "asset": "anvil_brute",
+ "kind": "enemy",
+ "tier": "elite",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/anvil_brute.glb",
+    "assets/models/enemies/anvil_brute.meta.json",
+    "art/enemies/anvil_brute/source/anvil_brute.blend",
+    "art/enemies/anvil_brute/textures/anvil_brute_basecolor.png",
+    "art/enemies/anvil_brute/textures/anvil_brute_emissive.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_review.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_clips.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_plates.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_scale.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_34.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/anvil_brute.py (model with intact + cracked plates, NPR paint, GF_AnvilBrute_v1 rig, 8 clips, export + validation, review sheets)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}

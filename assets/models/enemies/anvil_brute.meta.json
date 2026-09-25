@@ -1,0 +1,415 @@
+{
+ "kind": "enemy",
+ "key": "anvil_brute",
+ "tier": "elite",
+ "tris": 5804,
+ "tris_budget": [
+  4000,
+  8000
+ ],
+ "textures": [
+  {
+   "name": "anvil_brute_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 299162
+  },
+  {
+   "name": "anvil_brute_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 1039648
+  }
+ ],
+ "sockets": {
+  "fx_core": {
+   "translation": [
+    -0.0,
+    1.72,
+    -0.0
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    -0.0,
+    1.62,
+    0.3
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    -0.0,
+    1.45,
+    0.95
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    -0.0,
+    1.6,
+    0.9
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    -0.0,
+    3.0,
+    -0.0
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  }
+ },
+ "clips": [
+  "anvil_brute_idle@loop",
+  "anvil_brute_move@loop",
+  "anvil_brute_windup",
+  "anvil_brute_attack",
+  "anvil_brute_charge@loop",
+  "anvil_brute_hit",
+  "anvil_brute_death",
+  "anvil_brute_plates_break"
+ ],
+ "skeleton": "GF_AnvilBrute_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -1.1728,
+   0.0,
+   -0.6541
+  ],
+  "max": [
+   1.3791,
+   2.8093,
+   1.0877
+  ]
+ },
+ "size_m": 2.809,
+ "glb": "assets/models/enemies/anvil_brute.glb",
+ "glb_bytes": 2163236,
+ "glb_sha256": "728d9f3095e006c110ad3ab652273475f5b893963ddf912e0c36087ab0da1f09",
+ "source_blend": "art/enemies/anvil_brute/source/anvil_brute.blend",
+ "build_script": "tools/blender/gf_assets/enemies/anvil_brute.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "faction": "unmade",
+ "rig": {
+  "armature": "GF_AnvilBrute_v1",
+  "bones": 44,
+  "core": "GF_Hero_v1 core names and parents (23 bones, docs/ART_PIPELINE.md section 5)",
+  "extra_bones": [
+   "plate_back",
+   "plate_back_crk",
+   "plate_back_crk_1",
+   "plate_back_crk_2",
+   "plate_back_crk_3",
+   "plate_pauldron",
+   "plate_pauldron_crk",
+   "plate_pauldron_crk_1",
+   "plate_pauldron_crk_2",
+   "plate_helm",
+   "plate_helm_crk",
+   "plate_helm_crk_1",
+   "plate_helm_crk_2",
+   "plate_cuff_L",
+   "plate_cuff_L_crk",
+   "plate_cuff_L_crk_1",
+   "plate_cuff_L_crk_2",
+   "plate_cuff_R",
+   "plate_cuff_R_crk",
+   "plate_cuff_R_crk_1",
+   "plate_cuff_R_crk_2"
+  ],
+  "skinning": "rigid: every part on one bone",
+  "rest_pose": "the idle stance (hunched, knuckles planted)",
+  "axes": "bone +Y along the bone, +Z toward the front (Ashen Covenant roll convention)"
+ },
+ "plate_states": {
+  "plates": {
+   "back": {
+    "parent": "spine_03",
+    "intact_joint": "plate_back",
+    "cracked_joint": "plate_back_crk",
+    "fragments": [
+     "plate_back_crk_1",
+     "plate_back_crk_2",
+     "plate_back_crk_3"
+    ]
+   },
+   "pauldron": {
+    "parent": "clavicle_R",
+    "intact_joint": "plate_pauldron",
+    "cracked_joint": "plate_pauldron_crk",
+    "fragments": [
+     "plate_pauldron_crk_1",
+     "plate_pauldron_crk_2"
+    ]
+   },
+   "helm": {
+    "parent": "head",
+    "intact_joint": "plate_helm",
+    "cracked_joint": "plate_helm_crk",
+    "fragments": [
+     "plate_helm_crk_1",
+     "plate_helm_crk_2"
+    ]
+   },
+   "cuff_L": {
+    "parent": "lowerarm_L",
+    "intact_joint": "plate_cuff_L",
+    "cracked_joint": "plate_cuff_L_crk",
+    "fragments": [
+     "plate_cuff_L_crk_1",
+     "plate_cuff_L_crk_2"
+    ]
+   },
+   "cuff_R": {
+    "parent": "lowerarm_R",
+    "intact_joint": "plate_cuff_R",
+    "cracked_joint": "plate_cuff_R_crk",
+    "fragments": [
+     "plate_cuff_R_crk_1",
+     "plate_cuff_R_crk_2"
+    ]
+   }
+  },
+  "states": {
+   "intact": "plate_<p> scale 1, plate_<p>_crk scale 0",
+   "cracked": "plate_<p> 0, plate_<p>_crk 1",
+   "stripped": "both 0"
+  },
+  "rule": "Set these joint scales every frame AFTER the animation system and before transform propagation: every clip keys the plate joints (at scale 1, plates_break at the cracked state), so the client's state wins. 0 may be 0.001 (the clips use 0.001). Keep a plate cracked while plates_break plays.",
+  "sim_signals": "EntityFlags::PLATED while plate_hp is left; GameEvent::PlatesShattered when it runs out; GameEvent::Hit per hit (amount after resist, element) for a client-side plate-wear estimate.",
+  "suggested": "spawn intact; while PLATED, estimate wear = sum of Hit amounts x 1.5 for Kinetic (resisted) and x 0.5 for other elements (gf_core::damage::apply_plating), and crack plates in crack_order as wear / plate_hp passes crack_at; on PlatesShattered set every plate cracked, play plates_break once (it flings the fragments), then hold stripped; a brute without PLATED is stripped",
+  "fallback": "with no client support both layers stay at scale 1: the intact plates hide the cracked copies (inset 3-7 %), so the model reads intact",
+  "crack_at": [
+   0.15,
+   0.35,
+   0.55,
+   0.7,
+   0.85
+  ],
+  "crack_order": [
+   "back",
+   "pauldron",
+   "helm",
+   "cuff_L",
+   "cuff_R"
+  ]
+ },
+ "clip_roles": {
+  "anvil_brute_idle@loop": "hunched on its knuckles, the chest heaves and lifts the anvil, the visor looks around",
+  "anvil_brute_move@loop": "knuckle walk: fists and feet planted in diagonal pairs, the torso rolls under the anvil",
+  "anvil_brute_windup": "the overhead slam wind-up: gathers, rears up on its legs, both fists clasped overhead (3.8 m) (anticipation; the engine draws the red-white charge telegraph); ends on the loaded pose",
+  "anvil_brute_attack": "the slam that launches the charge: both fists hammer the ground in front (impact at 0.17 s, sockets impact_L/R) and it drives forward into the charge posture",
+  "anvil_brute_charge@loop": "the charge: a head-down bounding gallop behind the anvil (play while the sim's CHARGING flag is set)",
+  "anvil_brute_hit": "a flinch back; the plates rattle with the chest",
+  "anvil_brute_death": "jolts, sags to its knees and crashes face-down onto its fists under the anvil (held)",
+  "anvil_brute_plates_break": "the plates shatter (GameEvent::PlatesShattered): it rears up roaring, arms flung wide, and the cracked fragments fly off, tumble and vanish; plate_* joints are keyed hidden"
+ },
+ "clip_aliases": {
+  "walk@loop": "anvil_brute_move@loop",
+  "slam": "anvil_brute_attack",
+  "slam_windup": "anvil_brute_windup",
+  "plate_shatter": "anvil_brute_plates_break"
+ },
+ "clip_seconds": {
+  "anvil_brute_idle@loop": 2.0,
+  "anvil_brute_move@loop": 0.8,
+  "anvil_brute_windup": 0.9,
+  "anvil_brute_attack": 0.533,
+  "anvil_brute_charge@loop": 0.4,
+  "anvil_brute_hit": 0.333,
+  "anvil_brute_death": 1.6,
+  "anvil_brute_plates_break": 0.8
+ },
+ "clip_playback": {
+  "windup": "time-stretch to the Charger windup (0.9 s), hold the last frame",
+  "attack": "play when CHARGING starts (0.55 s = the charge duration: the slam launches the charge)",
+  "charge@loop": "loop while CHARGING after attack ends (visual cadence, 1.0-1.5x; not stride matched)",
+  "plates_break": "one-shot on GameEvent::PlatesShattered, layered or played as a reaction; then stripped"
+ },
+ "move_cycle_m": 1.448,
+ "sockets_detail": {
+  "hit_center": {
+   "bone": "spine_03",
+   "blender_pos": [
+    0.0,
+    -0.3,
+    1.62
+   ],
+   "gltf_pos": [
+    0.0,
+    1.62,
+    0.3
+   ]
+  },
+  "fx_core": {
+   "bone": "spine_03",
+   "blender_pos": [
+    0.0,
+    0.0,
+    1.72
+   ],
+   "gltf_pos": [
+    0.0,
+    1.72,
+    -0.0
+   ]
+  },
+  "head_top": {
+   "bone": "spine_03",
+   "blender_pos": [
+    0.0,
+    0.0,
+    3.0
+   ],
+   "gltf_pos": [
+    0.0,
+    3.0,
+    -0.0
+   ]
+  },
+  "fx_mouth": {
+   "bone": "head",
+   "blender_pos": [
+    0.0,
+    -0.9,
+    1.6
+   ],
+   "gltf_pos": [
+    0.0,
+    1.6,
+    0.9
+   ]
+  },
+  "attack_origin": {
+   "bone": "spine_03",
+   "blender_pos": [
+    0.0,
+    -0.95,
+    1.45
+   ],
+   "gltf_pos": [
+    0.0,
+    1.45,
+    0.95
+   ]
+  },
+  "impact_L": {
+   "bone": "hand_L",
+   "blender_pos": [
+    0.97,
+    -0.84,
+    0.12
+   ],
+   "gltf_pos": [
+    0.97,
+    0.12,
+    0.84
+   ]
+  },
+  "impact_R": {
+   "bone": "hand_R",
+   "blender_pos": [
+    -0.9,
+    -0.78,
+    0.15
+   ],
+   "gltf_pos": [
+    -0.9,
+    0.15,
+    0.78
+   ]
+  }
+ },
+ "footprint": {
+  "collider_radius_m": 1.17,
+  "row": "radius 0.9 x scale 1.3",
+  "model_span_m": [
+   2.552,
+   1.742
+  ]
+ },
+ "content_row": {
+  "class": "Elite",
+  "biome": "cinder_wastes",
+  "plating": "(resist: {Kinetic: 0.5}, plate_hp: 260.0)",
+  "behavior": "Charger(range: 9.0, windup: 0.9, speed: 13.0, duration: 0.55, cooldown: 3.5, damage: 34.0, width: 1.4)",
+  "color": "#7A7F8C",
+  "shape": "Brute",
+  "scale": 1.3
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 115.8,
+   "p10": 104.6,
+   "p90": 123.3
+  },
+  "coverage": 0.463
+ }
+}
