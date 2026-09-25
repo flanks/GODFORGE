@@ -1,0 +1,152 @@
+{
+ "kind": "weapon",
+ "key": "thundercoil_launcher",
+ "tier": "two_handed",
+ "tris": 3856,
+ "tris_budget": [
+  2000,
+  4000
+ ],
+ "textures": [
+  {
+   "name": "thundercoil_launcher_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 209493
+  },
+  {
+   "name": "thundercoil_launcher_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 777444
+  }
+ ],
+ "sockets": {
+  "grip_L": {
+   "translation": [
+    0.0,
+    0.052,
+    -0.441
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.1,
+    -0.634
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "grip_R": {
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "glow_core": {
+   "translation": [
+    0.0,
+    0.1,
+    -0.27
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  }
+ },
+ "clips": [],
+ "skeleton": null,
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = palm centre of the main hand, -Z = barrel/forward, +Y = up, +X = right; attach as a child of the hand socket / aim pivot with an identity transform.",
+ "bounds_m": {
+  "min": [
+   -0.102,
+   -0.115,
+   -0.763
+  ],
+  "max": [
+   0.102,
+   0.2053,
+   0.3853
+  ]
+ },
+ "size_m": 1.148,
+ "glb": "assets/models/weapons/thundercoil_launcher.glb",
+ "glb_bytes": 1148736,
+ "glb_sha256": "9c8a1447de3fb52b90e6df9d3518653e52beb399f7e38eeb10393cb031b9501c",
+ "source_blend": "art/weapons/thundercoil_launcher/source/thundercoil_launcher.blend",
+ "build_script": "art/weapons/thundercoil_launcher/source/thundercoil_launcher_build.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "chassis": {
+  "damage_type": "Storm",
+  "style": "Orb",
+  "tags": [
+   "storm",
+   "splash",
+   "selene"
+  ],
+  "wielder": "selene"
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 781.9,
+   "p10": 733.7,
+   "p90": 826.6
+  },
+  "coverage": 0.388,
+  "emissive_fraction_of_painted": 0.161
+ }
+}
