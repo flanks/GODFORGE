@@ -1,10 +1,19 @@
 [package]
 name = "gf_net"
+description = "GODFORGE netcode: host-authoritative protocol, delta snapshots, transports (loopback, UDP; Steam SDR adapter point)."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[dependencies]
+gf_core = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+crossbeam-channel = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true
