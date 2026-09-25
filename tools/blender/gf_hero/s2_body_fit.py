@@ -34,8 +34,9 @@ import numpy as np  # noqa: E402
 from mathutils import Vector  # noqa: E402
 from mathutils.bvhtree import BVHTree  # noqa: E402
 
-from s2lib import (get_co, get_edges, get_normals, log, mesh_stats, mirror_map, opt, read_json, save_blend,  # noqa: E402
-                   script_args, select_only, set_co, smooth_field, symmetrize, tangential_relax, write_json)
+from s2lib import (canonical_edge_verts, get_co, get_edges, get_normals, log, mesh_stats, mirror_map, opt, read_json,  # noqa: E402
+                   save_blend, script_args, select_only, set_co, smooth_field, sort_new_edges, sort_new_faces,
+                   symmetrize, tangential_relax, write_json)
 
 argv = script_args(__doc__)
 if len(argv) < 5:
@@ -473,6 +474,7 @@ if hf:
 eye_r = mh["eye_radius"] * eye_scale * 0.62
 bm = bmesh.new()
 bm.from_mesh(me)
+nf0, ne0 = len(bm.faces), len(bm.edges)
 for c in eyes:
     geom = bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=6, radius=eye_r)
     for v in geom["verts"]:
@@ -480,8 +482,11 @@ for c in eyes:
     ev = geom["verts"]
     for f in {f for v in ev for f in v.link_faces}:
         f.smooth = True
+sort_new_faces(bm, nf0)            # create_uvsphere orders its faces and edges by memory address (s2lib)
+sort_new_edges(bm, ne0)
 bm.to_mesh(me)
 bm.free()
+canonical_edge_verts(me, ne0)
 report["eyes"] = {"centres": [[round(float(x), 4) for x in e] for e in eyes], "radius_m": round(float(eye_r), 4)}
 
 body.name = "BODY"

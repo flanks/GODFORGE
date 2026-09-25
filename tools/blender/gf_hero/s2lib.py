@@ -164,6 +164,45 @@ def connected_parts(bm):
     return list(parts.values())
 
 
+# Some bmesh ops order the faces and edges they make, or the slots they free (which later faces refill), by memory
+# address: bmesh.ops.create_uvsphere (Blender 5.2, its internal weld) and bmesh.ops.bevel. The vertices and the faces
+# themselves come out the same every run, only their order changes, and that changed the mesh's face-corner order on
+# every rebuild, and with it the UV unwrap and (the packer is chaotic in face order) sometimes the whole atlas.
+# sort_new_faces / sort_new_edges / canonical_edge_verts put those elements in an order of their vertex indices.
+
+def sort_new_faces(bm, first):
+    """Faces from index `first` on (the ones made since len(bm.faces) was `first`) in the order of their vertex index
+    lists. Earlier faces, all vertices and each face's own loop order stay as they are."""
+    bm.verts.index_update()
+    bm.faces.index_update()
+    keys = {f: [v.index for v in f.verts] for f in bm.faces if f.index >= first}
+    rank = {f: i for i, f in enumerate(sorted(keys, key=keys.get))}
+    bm.faces.sort(key=lambda f: first + rank[f] if f in rank else f.index)
+    bm.faces.index_update()
+
+
+def sort_new_edges(bm, first):
+    """Edges from index `first` on in the order of their (sorted) vertex index pairs; earlier edges stay put."""
+    bm.verts.index_update()
+    bm.edges.index_update()
+    keys = {e: sorted(v.index for v in e.verts) for e in bm.edges if e.index >= first}
+    rank = {e: i for i, e in enumerate(sorted(keys, key=keys.get))}
+    bm.edges.sort(key=lambda e: first + rank[e] if e in rank else e.index)
+    bm.edges.index_update()
+
+
+def canonical_edge_verts(me, first=0):
+    """Store the edges of mesh me from index `first` on as (lower, higher) vertex index. Which end an edge lists
+    first means nothing to Blender (each loop keeps its own vertex and edge) and changes no UV, but the weld inside
+    bmesh.ops.create_uvsphere picks it by memory address, so the saved edges differed from run to run."""
+    ev = np.empty(len(me.edges) * 2, dtype=np.int32)
+    me.edges.foreach_get("vertices", ev)
+    ev = ev.reshape(-1, 2)
+    ev[first:] = np.sort(ev[first:], axis=1)
+    me.edges.foreach_set("vertices", ev.ravel())
+    me.update()
+
+
 def mesh_stats(obj):
     """Triangles, face-size histogram and topology defects of a mesh object (base mesh, no modifiers)."""
     me = obj.data

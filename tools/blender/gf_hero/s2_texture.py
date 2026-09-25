@@ -97,8 +97,14 @@ smart = [bpy.data.objects[n] for n in cfg.get("smart_objects", [])]
 hidden_faces = UV.unwrap_all(objs, body, smart, [], density_hidden=cfg["uv"]["hidden_density"], margin_px=cfg["uv"]["margin_px"], size=SIZE,
                              hidden_reach=cfg["uv"].get("hidden_reach", 0.03), hidden_start=cfg["uv"].get("hidden_start", 1e-4))
 for t, s_ in copies.items():
-    # same construction order (e.g. the fist variant of a gauntlet) -> identical loops -> copy the UVs
-    if len(t.data.loops) != len(s_.data.loops):
+    # same construction order (e.g. the fist variant of a gauntlet) -> identical loops -> copy the UVs; the corners
+    # must match vertex for vertex (an equal count alone let a reordered face ring take another face's UVs)
+    cv_t = np.empty(len(t.data.loops), dtype=np.int32)
+    cv_s = np.empty(len(s_.data.loops), dtype=np.int32)
+    if len(cv_t) == len(cv_s):
+        t.data.loops.foreach_get("vertex_index", cv_t)
+        s_.data.loops.foreach_get("vertex_index", cv_s)
+    if len(cv_t) != len(cv_s) or not np.array_equal(cv_t, cv_s):
         raise SystemExit("uv_copy: %s and %s differ in topology" % (t.name, s_.name))
     uv = np.empty(len(s_.data.loops) * 2, dtype=np.float32)
     s_.data.uv_layers.active.data.foreach_get("uv", uv)

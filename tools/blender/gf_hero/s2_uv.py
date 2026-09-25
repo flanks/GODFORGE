@@ -112,11 +112,14 @@ def body_seams(obj, cfg):
     region_verts = {}
     for f in bm.faces:
         region_verts.setdefault(reg[f.index], set()).update(f.verts)
+    # the same verts in index order: min() / max() below keep the first of equal keys, and a set's order
+    # follows memory addresses, so a tie would pick a different cut end on every run
+    region_list = {r: sorted(vs, key=lambda v: v.index) for r, vs in region_verts.items()}
     cuts = {}
 
     def boundary_verts(rname):
-        return [v for v in region_verts[rname] if any(e.seam or e.is_boundary for e in v.link_edges
-                                                       if any(reg[f.index] == rname for f in e.link_faces))]
+        return [v for v in region_list[rname] if any(e.seam or e.is_boundary for e in v.link_edges
+                                                     if any(reg[f.index] == rname for f in e.link_faces))]
 
     def cut(rname, start_key, goal_key, goal_on_boundary=True):
         vs = region_verts.get(rname)
@@ -124,7 +127,7 @@ def body_seams(obj, cfg):
             return
         bnd = boundary_verts(rname)
         s = min(bnd, key=start_key)
-        cand = bnd if goal_on_boundary else list(vs)
+        cand = bnd if goal_on_boundary else region_list[rname]
         cand = [v for v in cand if v is not s]
         g = min(cand, key=goal_key)
         path = _shortest_path(bm, s, g, vs)
@@ -146,8 +149,8 @@ def body_seams(obj, cfg):
         # eyeball: meridian from the top pole to the bottom pole
         ev = region_verts.get("eye_" + side)
         if ev:
-            top = max(ev, key=lambda v: v.co.z)
-            bot = min(ev, key=lambda v: v.co.z)
+            top = max(region_list["eye_" + side], key=lambda v: v.co.z)
+            bot = min(region_list["eye_" + side], key=lambda v: v.co.z)
             for e in _shortest_path(bm, top, bot, ev):
                 e.seam = True
     bm.to_mesh(me)

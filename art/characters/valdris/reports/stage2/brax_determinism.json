@@ -1,0 +1,45 @@
+{
+ "purpose": "Follow-up to brax_regression.json: find and fix the face-corner nondeterminism of the shared stage-2 scripts (s2_body_fit.py, and the SASH corner order of s2_parts.py) so that identical inputs rebuild identical meshes and byte-identical textures.",
+ "date": "2026-09-26",
+ "method": "Headless Blender 5.2 runs in a scratch copy of the repo (tools/blender/gf_hero + Brax's configs, source GLB and references; bake_device CPU set in the scratch copies of the two stage2_texture.json files). Per-object hashes of the vertex positions, edge vertex pairs, corner_vert and corner_edge arrays; step-by-step probe hashes inside the scripts; bmesh ops tested in isolation (30 calls each, memory layout varied between calls); a UV-only harness (s2_texture.py cut after the UV pack) to measure what reorderings do to the atlas. Nothing under art/characters/brax/ or art/weapons/ was written.",
+ "source": {
+  "extra_loop_block": "not the cause: probe hashes after every subdivide_edges / triangulate / join_triangles, after the arm step and the hand frames were identical in 7 runs of s2_body_fit.py",
+  "bmesh.ops.create_uvsphere": "the cause in s2_body_fit.py (the eyeballs) and s2_parts.py (the SASH knot). In Blender 5.2 the op makes the same vertices every call but orders its edges and faces by memory address (11 edge/face orders in 30 calls; icosphere, cone, circle and cube: 1). 7 fit runs gave 4 different BODY corner orders; only the 120 eyeball faces (4045-4164) move, each a permutation inside its block of 6. 3 parts runs gave 3 SASH corner orders; only the knot's 60 faces (224-283) move, the tails' faces never do.",
+  "bmesh.ops.bevel": "the cause in the anvil_gauntlets weapon (s2_gauntlet.py, the strap bars' G.box(bevel=0.004)): the bevel frees the bars' old face slots in memory-address order and the next faces made in the same bmesh (the wrist ring) refill them, so 6 faces (1320-1325) change places from run to run (a cyclic shift of one pattern). In isolation the bevel is stable; bevel followed by more faces gave 4 orders in 30 calls.",
+  "python_sets": "s2_uv.body_seams took min() / max() over Python sets of BMVerts (cut ends of the UV seams): a tie would resolve by memory address. No tie occurs for Brax or Valdris (seams identical before / after), fixed anyway. The remaining set iterations (G.faces_of, the eyeball smooth flag, zone tagging) only set per-face values and cannot change any order.",
+  "uv_copy": "s2_texture.py copied the gauntlet UVs to the fist variant by loop index after checking only the loop count; with the bevel nondeterminism the open and fist builds of one run could differ in those 6 faces (seen once: GAUNTLET_R vs GAUNTLET_FIST_R), which gives the fist variant the wrong UVs there. The committed anvil_gauntlets_stage2.blend is not affected (its fist variants match corner for corner)."
+ },
+ "fix": {
+  "s2lib.py": "sort_new_faces(bm, first) / sort_new_edges(bm, first): the faces / edges made since a count was taken, reordered in place (BMElemSeq.sort) by their vertex indices; earlier elements, every vertex and each face's own loop order untouched. canonical_edge_verts(me, first): those edges stored (lower, higher) vertex index (the uvsphere weld also picks each edge's direction by memory address; the direction changes no UV, tested by reversing every edge of BODY and SASH).",
+  "s2_body_fit.py": "the eyeball spheres' faces and edges sorted after both are made (vertices: still the op's, same order as before)",
+  "s2_parts.py": "the SASH knot's faces sorted right after the op (before the tails, which keep their places), its edges after the tails",
+  "s2_gauntlet.py": "faces and edges from the strap bars on sorted at the end of build()",
+  "s2_uv.py": "seam cut ends picked from the region's vertices in index order",
+  "s2_texture.py": "uv_copy requires identical corner_vert arrays, not just equal loop counts"
+ },
+ "results": {
+  "s2_body_fit.py 5 runs": "identical positions, edges, corner_vert, corner_edge and report; positions and report identical to HEAD's",
+  "s2_parts.py 3 runs": "every part identical; report and SASH vertex positions identical to HEAD's",
+  "s2_weapon.py 3 runs": "identical; each fist variant matches its open variant corner for corner; report identical to HEAD's",
+  "s2_body_base.py 3 runs (unchanged script)": "identical to each other and to the work file used for the fit tests",
+  "Brax chain twice (prepare, base, fit, parts, weapon, texture, weapon_texture; CPU bakes)": {
+   "reports": "blockout_prepare, body_fit, parts, texture (Brax) and parts, texture (weapon): identical",
+   "meshes": "body, parts, stage2 production, weapon parts and weapon production blends: identical mesh layout (positions, edges, corners) and identical UVs",
+   "brax_basecolor.png": "identical, sha256 fabc2eed180fc412...",
+   "brax_emissive.png": "identical, sha256 47055ed0d570ee67...",
+   "brax_normal.png": "identical, sha256 b14533967b62efa3...",
+   "anvil_gauntlets_basecolor.png": "identical, sha256 28745316e0cb66d4...",
+   "anvil_gauntlets_emissive.png": "identical, sha256 8c8e9804f010246d...",
+   "anvil_gauntlets_normal.png": "identical, sha256 3c619a16e15661f1..."
+  }
+ },
+ "compatibility": {
+  "Brax": "vertex order unchanged, so the UV atlas is unchanged: against a HEAD-script run on the same inputs (CPU) the new textures differ in 9 base colour pixels (max 14 levels), 1 emissive pixel and 0 normal pixels (the eyeball / knot islands), texture.json identical. Against the committed textures (baked with OPTIX): 1113 / 1 / 81 pixels, where the HEAD-script CPU run itself is 1106 / 0 / 81.",
+  "anvil_gauntlets": "a rebuild re-lays the weapon's atlas once (about 89% of base colour pixels move; the model looks the same, UVs and textures change together). The UV packer is chaotic in face order: of the orders the HEAD scripts produced by chance, the committed one packs as it does, but no order-independent rule tried here (sorted among their slots, the canonical cyclic shift, sorted from the bars on) lands on that pack. The committed weapon files stay consistent with each other until the weapon is rebuilt.",
+  "Valdris": "fit + conform (s2_body_fit.py, s2_valdris_body.py) on the same inputs: body_fit.json (as the conform step rewrites it) and body_conform.json identical to HEAD's, conformed body positions identical; body_seams identical; unwrapping the Valdris parts work file with its eyeball faces sorted moves no other UV by more than 1e-7 (same atlas)."
+ },
+ "notes": [
+  "One chain run's texture step crashed (exit -1, no Python traceback) while the machine was busy; the same step on the same intermediates then ran cleanly and matched the other run byte for byte.",
+  "tools/blender/gf_assets/gfa_model.py also calls bmesh.ops.create_uvsphere (enemy models); not covered here."
+ ]
+}

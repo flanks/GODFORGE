@@ -24,6 +24,7 @@ import numpy as np
 from mathutils import Vector
 
 import s2_geom as G
+from s2lib import sort_new_edges, sort_new_faces
 
 
 class Field:
@@ -233,6 +234,7 @@ def build(bm, gc, side, field, seeds_tx, rng, report, variant="open", arm_extent
         return p + n * (h * 0.9 + sf["lift"])
     xa, xb = sf["x"]
     w, dx = sf["half_width"], sf["corner_dx"]
+    nf0, ne0 = len(bm.faces), len(bm.edges)      # the bevelled bars free face slots in memory-address order (see the end)
     hexp = [(xa, 0.0), (xa + dx, -w), (xb - dx, -w), (xb, 0.0), (xb - dx, w), (xa + dx, w)]
     for k in range(6):
         (xa_, ya_), (xb_, yb_) = hexp[k], hexp[(k + 1) % 6]
@@ -303,4 +305,8 @@ def build(bm, gc, side, field, seeds_tx, rng, report, variant="open", arm_extent
         pos = pos + d * (L + fg["gap"])
         hgt *= fg["taper"]
         wid *= fg["taper"]
+    # the strap bars' bevel rebuilds their faces and frees the old slots in memory-address order; every face made
+    # after it refills them, so from the bars on the faces and edges are put in an order of their vertices alone
+    sort_new_faces(bm, nf0)
+    sort_new_edges(bm, ne0)
     return report
