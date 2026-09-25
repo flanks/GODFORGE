@@ -1,0 +1,333 @@
+{
+ "export": {
+  "file": "assets/models/enemies/molten_hexer.glb",
+  "key": "molten_hexer",
+  "kind": "enemy",
+  "tier": "elite",
+  "extensions_used": [],
+  "tris": 4520,
+  "budget": [
+   4000,
+   8000
+  ],
+  "textures": [
+   {
+    "name": "molten_hexer_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 286875
+   },
+   {
+    "name": "molten_hexer_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 767379
+   }
+  ],
+  "materials": [
+   "M_molten_hexer"
+  ],
+  "sockets": {
+   "hit_center": {
+    "translation": [
+     0.0,
+     1.45,
+     0.0
+    ],
+    "forward": [
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     2.95,
+     0.1
+    ],
+    "forward": [
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     2.54,
+     0.34
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     2.56,
+     0.76
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     -0.0,
+     2.5774,
+     0.3649
+    ],
+    "forward": [
+     -0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.835,
+    -0.0236,
+    -0.6749
+   ],
+   "max": [
+    0.8162,
+    2.753,
+    1.1086
+   ]
+  },
+  "height_m": 2.777,
+  "height_vs_hero": 1.262,
+  "joints": [
+   "root",
+   "crucible",
+   "crown",
+   "crown_spin",
+   "rune_0",
+   "rune_1",
+   "rune_2",
+   "rune_3",
+   "rune_4",
+   "rune_5",
+   "molten",
+   "pelvis",
+   "spine_01",
+   "spine_02",
+   "spine_03",
+   "clavicle_L",
+   "upperarm_L",
+   "lowerarm_L",
+   "hand_L",
+   "clavicle_R",
+   "upperarm_R",
+   "lowerarm_R",
+   "hand_R",
+   "neck",
+   "head",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "toe_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R",
+   "toe_R",
+   "pool"
+  ],
+  "clips": [
+   "molten_hexer_idle@loop",
+   "molten_hexer_move@loop",
+   "molten_hexer_windup",
+   "molten_hexer_attack",
+   "molten_hexer_hit",
+   "molten_hexer_death",
+   "molten_hexer_channel@loop",
+   "molten_hexer_beam_sweep@loop",
+   "molten_hexer_channel",
+   "molten_hexer_beam",
+   "molten_hexer_sweep@loop"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 192.2,
+   "p10": 59.3,
+   "p90": 204.8
+  },
+  "coverage": 0.453,
+  "zones": [
+   "slag",
+   "arm",
+   "obsidian",
+   "bone",
+   "iron",
+   "molten",
+   "core",
+   "rune",
+   "void",
+   "pool"
+  ],
+  "decals": 17,
+  "basecolor": "art/enemies/molten_hexer/textures/molten_hexer_basecolor.png",
+  "emissive": "art/enemies/molten_hexer/textures/molten_hexer_emissive.png",
+  "emissive_texels": 212025,
+  "seconds": 35.8
+ },
+ "clips": [
+  {
+   "name": "molten_hexer_idle@loop",
+   "frames": [
+    0,
+    72
+   ],
+   "seconds": 2.4,
+   "loop": true
+  },
+  {
+   "name": "molten_hexer_move@loop",
+   "frames": [
+    0,
+    24
+   ],
+   "seconds": 0.8,
+   "loop": true
+  },
+  {
+   "name": "molten_hexer_windup",
+   "frames": [
+    0,
+    18
+   ],
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_attack",
+   "frames": [
+    0,
+    25
+   ],
+   "seconds": 0.833,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_hit",
+   "frames": [
+    0,
+    10
+   ],
+   "seconds": 0.333,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_death",
+   "frames": [
+    0,
+    56
+   ],
+   "seconds": 1.867,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_channel@loop",
+   "frames": [
+    0,
+    30
+   ],
+   "seconds": 1.0,
+   "loop": true
+  },
+  {
+   "name": "molten_hexer_beam_sweep@loop",
+   "frames": [
+    0,
+    60
+   ],
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "molten_hexer_channel",
+   "frames": [
+    0,
+    30
+   ],
+   "seconds": 1.0,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_beam",
+   "frames": [
+    0,
+    25
+   ],
+   "seconds": 0.833,
+   "loop": false
+  },
+  {
+   "name": "molten_hexer_sweep@loop",
+   "frames": [
+    0,
+    60
+   ],
+   "seconds": 2.0,
+   "loop": true
+  }
+ ],
+ "review": {
+  "turn_front": "art/enemies/molten_hexer/work/review/molten_hexer_turn_front.png",
+  "turn_34_front": "art/enemies/molten_hexer/work/review/molten_hexer_turn_34_front.png",
+  "turn_side": "art/enemies/molten_hexer/work/review/molten_hexer_turn_side.png",
+  "turn_back": "art/enemies/molten_hexer/work/review/molten_hexer_turn_back.png",
+  "turn_34_back": "art/enemies/molten_hexer/work/review/molten_hexer_turn_34_back.png",
+  "turn_top": "art/enemies/molten_hexer/work/review/molten_hexer_turn_top.png",
+  "ingame": "art/enemies/molten_hexer/work/review/molten_hexer_ingame_22.png",
+  "ingame_sil": "art/enemies/molten_hexer/work/review/molten_hexer_ingame_22_sil.png",
+  "sheet": "art/enemies/molten_hexer/reports/molten_hexer_review.png",
+  "clips": "art/enemies/molten_hexer/reports/molten_hexer_clips.png",
+  "hero_shot": "art/enemies/molten_hexer/reports/molten_hexer_34.png",
+  "scale": "art/enemies/molten_hexer/reports/molten_hexer_scale.png"
+ }
+}

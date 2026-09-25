@@ -1,0 +1,33 @@
+{
+ "asset": "molten_hexer",
+ "kind": "enemy",
+ "tier": "elite",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/molten_hexer.glb",
+    "assets/models/enemies/molten_hexer.meta.json",
+    "art/enemies/molten_hexer/source/molten_hexer.blend",
+    "art/enemies/molten_hexer/textures/molten_hexer_basecolor.png",
+    "art/enemies/molten_hexer/textures/molten_hexer_emissive.png",
+    "art/enemies/molten_hexer/reports/molten_hexer_review.png",
+    "art/enemies/molten_hexer/reports/molten_hexer_clips.png",
+    "art/enemies/molten_hexer/reports/molten_hexer_scale.png",
+    "art/enemies/molten_hexer/reports/molten_hexer_34.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/molten_hexer.py (model, NPR paint, GF_MoltenHexer_v1 rig, 8 clips + 3 aliases, export + validation, review sheets)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}

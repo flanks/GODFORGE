@@ -1,0 +1,249 @@
+{
+ "kind": "enemy",
+ "key": "molten_hexer",
+ "tier": "elite",
+ "tris": 4520,
+ "tris_budget": [
+  4000,
+  8000
+ ],
+ "textures": [
+  {
+   "name": "molten_hexer_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 286875
+  },
+  {
+   "name": "molten_hexer_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 767379
+  }
+ ],
+ "sockets": {
+  "hit_center": {
+   "translation": [
+    0.0,
+    1.45,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    2.95,
+    0.1
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    2.54,
+    0.34
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    2.56,
+    0.76
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    -0.0,
+    2.5774,
+    0.3649
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  }
+ },
+ "clips": [
+  "molten_hexer_idle@loop",
+  "molten_hexer_move@loop",
+  "molten_hexer_windup",
+  "molten_hexer_attack",
+  "molten_hexer_hit",
+  "molten_hexer_death",
+  "molten_hexer_channel@loop",
+  "molten_hexer_beam_sweep@loop",
+  "molten_hexer_channel",
+  "molten_hexer_beam",
+  "molten_hexer_sweep@loop"
+ ],
+ "skeleton": "GF_MoltenHexer_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.835,
+   -0.0236,
+   -0.6749
+  ],
+  "max": [
+   0.8162,
+   2.753,
+   1.1086
+  ]
+ },
+ "size_m": 2.777,
+ "glb": "assets/models/enemies/molten_hexer.glb",
+ "glb_bytes": 1683036,
+ "glb_sha256": "ee1928b41dfed44bff2bdc01d5847ce70fb984cf78418db730f728d3a35840bf",
+ "source_blend": "art/enemies/molten_hexer/source/molten_hexer.blend",
+ "build_script": "tools/blender/gf_assets/enemies/molten_hexer.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "faction": "unmade",
+ "rig": {
+  "armature": "GF_MoltenHexer_v1",
+  "bones": 34,
+  "core": "GF_Hero_v1 core names and parents (23 bones, docs/ART_PIPELINE.md section 5); the legs are hidden under the robe and swing its front panels",
+  "extra_bones": [
+   "crucible",
+   "molten",
+   "crown",
+   "crown_spin",
+   "rune_0",
+   "rune_1",
+   "rune_2",
+   "rune_3",
+   "rune_4",
+   "rune_5",
+   "pool"
+  ],
+  "skinning": "rigid: every part on one bone (slag robe tiers, arms, the floating crucible and runes)",
+  "rest_pose": "the idle stance (the crucible held over the cowl)",
+  "axes": "bone +Y along the bone, +Z toward the front (Ashen Covenant roll convention)",
+  "crown_spin": "the rune ring turns about crown_spin's local +Y; the clips bake the spin (a multiple of 120 deg per clip: the glyphs repeat every two runes). The client may add spin on top."
+ },
+ "clip_roles": {
+  "molten_hexer_idle@loop": "hovering stance: the crucible bobs over the cowl, the rune ring turns slowly (120 deg a loop), the melt breathes",
+  "molten_hexer_move@loop": "glide: leaning in, the front robe panels step, the crucible trails and the ring tilts back",
+  "molten_hexer_windup": "the channel begins: it rears back and hoists the crucible, the ring pulls in tight and whirls (ends loaded)",
+  "molten_hexer_attack": "the beam: the crucible is thrust forward and tipped, the ring swings upright in front of the lip (the beam passes through it), a hold, then back to the stance",
+  "molten_hexer_hit": "flinch: the crucible jolts, the runes are flung outward",
+  "molten_hexer_death": "the tower sags and sinks into itself, the crucible slips and spills on its side, the runes drop into the spreading pool (held)",
+  "molten_hexer_channel@loop": "the long channel pose: loaded and trembling, the ring whirling (240 deg a loop), the melt surging (play after windup while the sim holds the windup)",
+  "molten_hexer_beam_sweep@loop": "the beam held and dragged across the arena: the fire pose with the torso and the focus yawing +-28 deg, the ring spinning fast"
+ },
+ "clip_aliases": {
+  "molten_hexer_channel": "molten_hexer_channel@loop",
+  "molten_hexer_beam": "molten_hexer_attack",
+  "molten_hexer_sweep@loop": "molten_hexer_beam_sweep@loop"
+ },
+ "clip_seconds": {
+  "molten_hexer_idle@loop": 2.4,
+  "molten_hexer_move@loop": 0.8,
+  "molten_hexer_windup": 0.6,
+  "molten_hexer_attack": 0.833,
+  "molten_hexer_hit": 0.333,
+  "molten_hexer_death": 1.867,
+  "molten_hexer_channel@loop": 1.0,
+  "molten_hexer_beam_sweep@loop": 2.0,
+  "molten_hexer_channel": 1.0,
+  "molten_hexer_beam": 0.833,
+  "molten_hexer_sweep@loop": 2.0
+ },
+ "clip_events_s": {
+  "molten_hexer_attack": {
+   "beam_fire_s": 0.233,
+   "beam_end_s": 0.5
+  },
+  "molten_hexer_death": {
+   "crucible_lands_s": 0.867
+  }
+ },
+ "move_cycle_m": 1.92,
+ "caster_mapping": "Caster windup (the sim holds still under the line telegraph) -> windup (0.6 s), then channel@loop until the beam lands -> attack (the fire key at 0.23 s). A held or sweeping beam -> beam_sweep@loop. Beam VFX from attack_origin (the focus ring), spill and drip VFX at fx_mouth, the glow and the death burst at fx_core.",
+ "footprint": {
+  "collider_radius_m": 0.682,
+  "row": "radius 0.62 x scale 1.1",
+  "model_span_m": [
+   1.651,
+   1.783
+  ]
+ },
+ "content_row": {
+  "class": "Elite",
+  "biome": "cinder_wastes",
+  "behavior": "Caster(range: 13.0, windup: 1.2, width: 1.2, length: 14.0, damage: 36.0, cooldown: 3.8, keep_distance: 9.0)",
+  "color": "#FF4D6D",
+  "shape": "Spire",
+  "scale": 1.1
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 192.2,
+   "p10": 59.3,
+   "p90": 204.8
+  },
+  "coverage": 0.453,
+  "emissive_texels": 212025
+ }
+}
