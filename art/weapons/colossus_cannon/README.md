@@ -19,9 +19,44 @@ python tools/blender/gf_assets/gfa_validate.py assets/models/weapons/colossus_ca
 
 ![held by the 2.2 m mannequin, seen through the 55° game camera](reports/colossus_cannon_held.png)
 
+![both hands on the cannon: the right forearm in the sleeve, the left hand on the brace handle](reports/colossus_cannon_held_close.png)
+
 The full review sheet is [reports/colossus_cannon_review.png](reports/colossus_cannon_review.png). It has a
 turnaround, close-ups, the hold seen through the game camera, the in-game camera at 1x and 3x, the silhouettes
-and the textures. The 3/4 back view is [reports/colossus_cannon_34_back.png](reports/colossus_cannon_34_back.png).
+and the textures. The 3/4 back view is [reports/colossus_cannon_34_back.png](reports/colossus_cannon_34_back.png),
+and the paint up close (drum staves and sleeve) is [reports/colossus_cannon_detail.png](reports/colossus_cannon_detail.png).
+
+## Revision 2 (art review, 7/10)
+
+The art review had two must-fix items. Both are fixed, and `meta.json` records them under `revisions` and
+`grip_L_reach`.
+
+* **`grip_L` was out of reach.** The off-hand handle sat on the drum's left flank, about 0.95 m from the
+  left shoulder. A 2.2 m hero reaches about 0.76 m (GF_Hero_v1 on Brax: upper arm 0.33 m, forearm
+  0.325 m, wrist to palm 0.09 m, scaled). The drum handle is gone. `grip_L` is now a **brace handle on
+  the sleeve's upper-left**, slung between two lugs that ride on the two straps: an iron bar with gold
+  end caps and a war-red wrap. It moved from Blender grip space (-0.312, 0.23, 0) to (-0.186, -0.115, 0.108),
+  which is glTF (-0.312, 0, -0.23) to (-0.186, 0.108, 0.115). That is 0.13 m in toward the barrel axis and
+  0.35 m back toward the body. The review hold changed with it: the right elbow is tucked in front of
+  the right chest, 0.18 m right of the centre line, 0.18 m forward and 1.47 m up, instead of hanging
+  0.43 m out to the side. The cannon therefore rides close to the body's centre line, and the handle
+  sits on it, 0.45 m in front of the shoulders. Left shoulder to `grip_L` is now **0.58 m** for the review
+  mannequin and 0.60 m for a GF_Hero_v1 shoulder, so the elbow stays comfortably bent. The left hand
+  steadies the cannon arm, the classic arm-cannon brace.
+* **The gunmetal streaked like procedural brushed metal.** `gfa_paint` gave every facet its own value
+  and broke every sharp-edge highlight into fbm dabs. On the lathes and on the long, parallel stave
+  bevels, those terms added up to thin, regular, light horizontal lines. The dark-iron drum core's octagon
+  edges, which show between the staves, added more. Both zones are now painted by the new
+  `tools/blender/gf_assets/gfa_brush.py`:
+  - **a few broad value planes per part**: normals snap to the part's own principal axes, so a stave
+    face is one value, a chamfer merges into a neighbour, and a lathe splits into four broad planes with
+    brushy borders;
+  - **tapered brush strokes** on about 40 % of each part's own edge length, 0.2 m apart on average,
+    with a lighter glint core. They are independent per part, so the staves on either side of a gap never
+    line up into pinstripes.
+
+  Brush noise and soot spots are gone from the gunmetal. The gold, leather, shells and glows are painted
+  exactly as before.
 
 ## Brief
 
@@ -50,7 +85,7 @@ blockout close-ups in `art/characters/valdris/reports/blockout/`.
   go around the collar, so the burst reads from the front, the side and the top. Both are painted
   decals and cost no triangles.
 * **Details:**
-  - the off-hand side handle on the drum's left flank (`grip_L`);
+  - the off-hand **brace handle** on the sleeve's upper-left, between the two straps (`grip_L`; revision 2);
   - a steam vent with a glowing grille on the barrel's right side (`eject`);
   - a raised spine plate on the sleeve top;
   - Valdris's **anvil sigil** in forge gold on the top stave between the clamps, facing the game camera.
@@ -91,12 +126,12 @@ blockout close-ups in `art/characters/valdris/reports/blockout/`.
 
 | | |
 |---|---|
-| Triangles | 3,344 (two-handed / heavy budget 2,000-4,000); 53 parts in 7 paint zones |
-| Textures | base colour 1024², emissive 1024² (PNG, embedded); texel density about 285 px/m (median), atlas coverage 38 % |
+| Triangles | 3,414 (two-handed / heavy budget 2,000-4,000); 55 parts in 7 paint zones |
+| Textures | base colour 1024², emissive 1024² (PNG, embedded); texel density about 282 px/m (median), atlas coverage 37 %; gunmetal and iron painted with `gfa_brush` |
 | Material | one material, `M_colossus_cannon`: roughness 0.85, metallic 0, single-sided; emissive strength 1.0 (the engine scales it) |
-| Size | 1.16 m long, 0.59 m wide (the side handle to the vent), 0.64 m tall |
-| GLB | 1.04 MB, no compression extensions (safe for bevy_gltf 0.20) |
-| Sockets (glTF) | `grip_R` (0, 0, 0) · `grip_L` (-0.312, 0, -0.23), the left-flank handle · `muzzle` (0, 0, -0.80), the bore face · `glow_core` (0, 0, -0.23), the breech chamber · `eject` (0.212, 0.07, -0.49), the right vent, its +Y (glTF -Z) pointing out right, up and back |
+| Size | 1.16 m long, 0.51 m wide (over the drum hoops), 0.64 m tall |
+| GLB | 0.94 MB, no compression extensions (safe for bevy_gltf 0.20) |
+| Sockets (glTF) | `grip_R` (0, 0, 0) · `grip_L` (-0.186, 0.108, 0.115), the sleeve's brace handle (0.58 m from the left shoulder in the review hold) · `muzzle` (0, 0, -0.80), the bore face · `glow_core` (0, 0, -0.23), the breech chamber · `eject` (0.212, 0.07, -0.49), the right vent, its +Y (glTF -Z) pointing out right, up and back |
 
 **Grip frame.** The origin is the right palm centre on the inner handle. Blender +Y is the barrel
 (glTF -Z) and +Z is up. The sleeve and barrel axis runs through the palm. The forearm lies along -Y inside
@@ -110,7 +145,7 @@ the sleeve (inner radius 0.10 m), and the elbow is about 0.38 m behind the palm,
 | `source/colossus_cannon_build.py` | yes: the build script (regenerates everything) |
 | `source/colossus_cannon.blend` | yes (LFS); textures referenced relatively |
 | `textures/colossus_cannon_basecolor.png`, `_emissive.png` | yes (LFS) |
-| `reports/colossus_cannon_review.png`, `_34.png`, `_34_back.png`, `_held.png`, `build_report.json` | yes |
+| `reports/colossus_cannon_review.png`, `_34.png`, `_34_back.png`, `_detail.png`, `_held.png`, `_held_close.png`, `build_report.json` | yes |
 | `work/` (every review render, the sheet layout) | no (`.gitignore`) |
 
 ## Open points for the user's review
@@ -118,12 +153,12 @@ the sleeve (inner radius 0.10 m), and the elbow is about 0.38 m behind the palm,
 * **The hold pose is an arm-cannon pose.** The weapon only sits right when the right forearm points
   along the aim inside the sleeve. That belongs to the GF_Hero_v1 aim animation and to the
   `weapon_socket_R` orientation (WEAPONS.md section 7). A rifle-style hold would push the forearm
-  through the drum. The review renders use a custom hold: the upper arm hangs, the forearm is level
-  along the aim, and the elbow sits at the cuff.
-* **`grip_L` reach.** In the review hold, the left hand reaches about 0.95 m from its shoulder to the
-  drum's side handle. That is longer than a 2.2 m hero's arm, so the IK will need the cannon carried
-  closer to the body's centre line. The other option is to leave the left hand free, as in the concept,
-  where his left fist is free. The socket exists because the two-handed tier requires it.
+  through the drum. The review renders use a custom hold (revision 2): the right elbow is tucked in front
+  of the right chest, the forearm is level along the aim, the elbow sits at the cuff, and the left hand
+  holds the brace handle. The aim animation should match it.
+* **`grip_L` reach (fixed in revision 2).** The brace handle is 0.58 m from the left shoulder in that
+  hold. If you prefer the concept's free left fist, the handle can simply be ignored by the IK; the
+  socket stays because the two-handed tier requires it.
 * **Size against other heroes.** It is tuned to read as siege artillery on Valdris, a 2.3 m
   juggernaut. On a slimmer hero it may look oversized. See "Size" above for the constants that scale it.
 * **Ember versus enemy molten.** The ember rim `#E2561A` is close to the Unmade "molten" orange

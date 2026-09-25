@@ -5,7 +5,7 @@
   "kind": "weapon",
   "tier": "two_handed",
   "extensions_used": [],
-  "tris": 3344,
+  "tris": 3414,
   "budget": [
    2000,
    4000
@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 52981
+    "bytes": 58890
    },
    {
     "name": "colossus_cannon_basecolor",
@@ -29,7 +29,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 803571
+    "bytes": 706384
    }
   ],
   "materials": [
@@ -45,11 +45,11 @@
    "colossus_cannon"
   ],
   "sockets": {
-   "muzzle": {
+   "grip_R": {
     "translation": [
-     0.0,
-     0.0,
-     -0.8
+     0,
+     0,
+     0
     ],
     "forward": [
      0,
@@ -64,43 +64,9 @@
    },
    "grip_L": {
     "translation": [
-     -0.312,
-     0.0,
-     -0.23
-    ],
-    "forward": [
-     0,
-     0,
-     -1
-    ],
-    "up": [
-     0,
-     1,
-     0
-    ]
-   },
-   "glow_core": {
-    "translation": [
-     0.0,
-     0.0,
-     -0.23
-    ],
-    "forward": [
-     0,
-     0,
-     -1
-    ],
-    "up": [
-     0,
-     1,
-     0
-    ]
-   },
-   "grip_R": {
-    "translation": [
-     0,
-     0,
-     0
+     -0.1862,
+     0.1075,
+     0.115
     ],
     "forward": [
      0,
@@ -129,11 +95,45 @@
      0.9469,
      -0.078
     ]
+   },
+   "glow_core": {
+    "translation": [
+     0.0,
+     0.0,
+     -0.23
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.0,
+     -0.8
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
    }
   },
   "bounds": {
    "min": [
-    -0.3345,
+    -0.254,
     -0.311,
     -0.803
    ],
@@ -146,16 +146,28 @@
   "length_m": 1.156,
   "errors": [],
   "warnings": [],
-  "ok": true
+  "ok": true,
+  "grip_L_reach": {
+   "shoulder_to_grip_L_m": 0.582,
+   "shoulder_to_grip_L_m_gf_hero": 0.595,
+   "arm_reach_m": 0.761,
+   "grip_L_world_m": [
+    -0.006,
+    0.445,
+    1.577
+   ],
+   "hold": "right elbow in front of the right chest (0.18 m right of the centre line, 0.18 m forward, 1.47 m up), forearm along the aim inside the sleeve; hero 2.2 m",
+   "revision_1": "the drum's left-flank handle (-0.312, 0.23, 0 Blender grip space) with the upper arm hanging 0.43 m right of the centre line: 0.95 m from the left shoulder"
+  }
  },
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 285.1,
-   "p10": 246.6,
-   "p90": 300.1
+   "median": 282.3,
+   "p10": 246.3,
+   "p90": 298.3
   },
-  "coverage": 0.381,
+  "coverage": 0.372,
   "zones": [
    "gunmetal",
    "iron",
@@ -165,10 +177,14 @@
    "glow_bore",
    "glow_vent"
   ],
+  "broad_zones": [
+   "gunmetal",
+   "iron"
+  ],
   "decals": 4,
   "basecolor": "art/weapons/colossus_cannon/textures/colossus_cannon_basecolor.png",
   "emissive": "art/weapons/colossus_cannon/textures/colossus_cannon_emissive.png",
-  "emissive_texels": 29053,
-  "seconds": 28.7
+  "emissive_texels": 29877,
+  "seconds": 30.5
  }
 }

@@ -2,7 +2,7 @@
  "kind": "weapon",
  "key": "colossus_cannon",
  "tier": "two_handed",
- "tris": 3344,
+ "tris": 3414,
  "tris_budget": [
   2000,
   4000
@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 52981
+   "bytes": 58890
   },
   {
    "name": "colossus_cannon_basecolor",
@@ -26,15 +26,15 @@
     1024
    ],
    "format": "png",
-   "bytes": 803571
+   "bytes": 706384
   }
  ],
  "sockets": {
-  "muzzle": {
+  "grip_R": {
    "translation": [
-    0.0,
-    0.0,
-    -0.8
+    0,
+    0,
+    0
    ],
    "forward": [
     0,
@@ -49,43 +49,9 @@
   },
   "grip_L": {
    "translation": [
-    -0.312,
-    0.0,
-    -0.23
-   ],
-   "forward": [
-    0,
-    0,
-    -1
-   ],
-   "up": [
-    0,
-    1,
-    0
-   ]
-  },
-  "glow_core": {
-   "translation": [
-    0.0,
-    0.0,
-    -0.23
-   ],
-   "forward": [
-    0,
-    0,
-    -1
-   ],
-   "up": [
-    0,
-    1,
-    0
-   ]
-  },
-  "grip_R": {
-   "translation": [
-    0,
-    0,
-    0
+    -0.1862,
+    0.1075,
+    0.115
    ],
    "forward": [
     0,
@@ -114,6 +80,40 @@
     0.9469,
     -0.078
    ]
+  },
+  "glow_core": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.23
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.8
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
   }
  },
  "clips": [],
@@ -122,7 +122,7 @@
  "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = palm centre of the main hand, -Z = barrel/forward, +Y = up, +X = right; attach as a child of the hand socket / aim pivot with an identity transform.",
  "bounds_m": {
   "min": [
-   -0.3345,
+   -0.254,
    -0.311,
    -0.803
   ],
@@ -134,8 +134,8 @@
  },
  "size_m": 1.156,
  "glb": "assets/models/weapons/colossus_cannon.glb",
- "glb_bytes": 1030088,
- "glb_sha256": "fc8b2965b46bae8efe56f995a6055bf5971ec2797794b12115ab3137913588a9",
+ "glb_bytes": 941452,
+ "glb_sha256": "b1c49e3905add3167727461aa2284cd2cdcfc7656ef99891069e68b81306f786",
  "source_blend": "art/weapons/colossus_cannon/source/colossus_cannon.blend",
  "build_script": "art/weapons/colossus_cannon/source/colossus_cannon_build.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -156,14 +156,43 @@
    "valdris"
   ]
  },
- "mount": "arm: the right forearm lies along -Y inside the sleeve (elbow ~0.38 m behind the palm); grip_L is the drum's left-flank handle",
+ "mount": "arm: the right forearm lies along -Y inside the sleeve (elbow ~0.38 m behind the palm), carried close to the body's centre line; grip_L is the brace handle on the sleeve's upper-left, between the two straps",
+ "grip_L_reach": {
+  "shoulder_to_grip_L_m": 0.582,
+  "shoulder_to_grip_L_m_gf_hero": 0.595,
+  "arm_reach_m": 0.761,
+  "grip_L_world_m": [
+   -0.006,
+   0.445,
+   1.577
+  ],
+  "hold": "right elbow in front of the right chest (0.18 m right of the centre line, 0.18 m forward, 1.47 m up), forearm along the aim inside the sleeve; hero 2.2 m",
+  "revision_1": "the drum's left-flank handle (-0.312, 0.23, 0 Blender grip space) with the upper arm hanging 0.43 m right of the centre line: 0.95 m from the left shoulder"
+ },
+ "revisions": [
+  {
+   "rev": 1,
+   "date": "2026-09-25",
+   "change": "first build (commit cb41ae2)"
+  },
+  {
+   "rev": 2,
+   "date": "2026-09-25",
+   "reason": "art review 7/10, must-fix items",
+   "changes": [
+    "grip_L moved from the drum's left-flank side handle, Blender grip space (-0.312, 0.23, 0) = glTF (-0.312, 0, -0.23), to a brace handle on the sleeve's upper-left between the two straps, Blender (-0.186, -0.115, 0.107) = glTF (-0.186, 0.107, 0.115): 0.13 m in toward the barrel axis and 0.35 m back toward the body. The drum's side handle is gone. The review hold now carries the cannon in front of the chest (the right elbow tucked in front of the right chest), which puts the handle on the body's centre line 0.45 m in front of the shoulders. Left shoulder -> grip_L: 0.95 m before, ~0.58 m now (a 2.2 m hero reaches ~0.76 m).",
+    "gunmetal (and the dark-iron drum core that shows between the staves) repainted with a few broad value planes per part and tapered brush strokes on each part's own edges (tools/blender/gf_assets/gfa_brush.py) instead of per-facet planes, fbm edge dabs, brush noise and soot spots, which read as regular horizontal brushed-metal streaks up close."
+   ]
+  }
+ ],
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 285.1,
-   "p10": 246.6,
-   "p90": 300.1
+   "median": 282.3,
+   "p10": 246.3,
+   "p90": 298.3
   },
-  "coverage": 0.381
+  "coverage": 0.372,
+  "painter": "gfa_paint + gfa_brush broad zones ['gunmetal', 'iron']"
  }
 }

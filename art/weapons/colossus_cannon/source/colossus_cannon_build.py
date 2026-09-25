@@ -25,8 +25,11 @@ Design (docs/art/WEAPONS.md section 5, family HEAVY / SPLASH, verb THE LUMP):
     bell) with a gold ring and a big glowing ember bore;
   * the drum is a revolving shell housing: an octagon of eight bevelled gunmetal staves with the cream
     Kinetic shells recessed in the gaps (cream / dark stripes = "loaded drum");
-  * a braced side handle on the drum's left flank is the off-hand grip (grip_L, two-handed tier); a
-    steam vent with a glowing grille on the barrel's right side is the `eject` socket;
+  * the off-hand grip (grip_L, two-handed tier) is a BRACE HANDLE on the sleeve's upper-left, slung between
+    the two strap lugs over the right forearm: the left hand steadies the cannon arm in front of the chest
+    (revision 2, art review: the first build put it on the drum's left flank, 0.95 m from the left shoulder
+    and out of a 2.2 m hero's reach); a steam vent with a glowing grille on the barrel's right side is the
+    `eject` socket;
   * the "shell-burst ring": eight glowing radial slots on the muzzle face around the bore and eight
     glowing blast ports around the collar (painted decals, so they cost no triangles);
   * Valdris's anvil sigil in forge gold on the top stave between the clamps (faces the game camera);
@@ -40,6 +43,15 @@ Design (docs/art/WEAPONS.md section 5, family HEAVY / SPLASH, verb THE LUMP):
 Grip frame (docs/art/WEAPONS.md section 2): origin = palm centre of the right fist on the inner handle,
 +Y = barrel, +Z = up, +X = the weapon's right. The sleeve / barrel axis runs through the palm (the
 forearm lies along -Y inside the sleeve, the elbow at about y = -0.38).
+
+Hold (the review mannequin, and what the GF_Hero_v1 aim pose should do): the right upper arm swings in
+and forward so the elbow sits in front of the right chest and the forearm points along the aim; the
+cannon is carried close to the body's centre line (the palm ~0.18 m right of it at ~1.47 m), and the left
+hand takes the brace handle ~0.58 m from the left shoulder (a 2.2 m hero reaches ~0.76 m).
+
+Paint (revision 2, art review: "regular horizontal white streaks that look like procedural brushed metal"):
+the gunmetal zone is painted by tools/blender/gf_assets/gfa_brush.py - a few broad value planes per part
+and tapered brush strokes on the edges - instead of gfa_paint's per-facet planes, fbm dabs and spots.
 
 Adapted patterns: tools/blender/gf_assets/weapons/sunspike_shotgun.py (structure, paint recipes,
 review) and gfa_render.mannequin / ingame (the arm-mount hold below re-uses them).
@@ -57,6 +69,7 @@ import bmesh  # noqa: E402
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
+import gfa_brush as B  # noqa: E402
 import gfa_common as C  # noqa: E402
 import gfa_export as E  # noqa: E402
 import gfa_model as M  # noqa: E402
@@ -82,7 +95,13 @@ R_DRUM = 0.228                  # drum staves outer radius (octagon apothem)
 R_BARREL = 0.156
 R_COLLAR = 0.236                # muzzle collar outer radius
 
-GRIP_L = (-0.312, 0.23, AX)     # palm centre of the left hand on the side handle
+# off-hand brace handle on the sleeve's upper-left, between the two straps (revision 2; was the drum's
+# left-flank handle at (-0.312, 0.23, AX), out of reach)
+BRACE_ANG = 150.0               # around the barrel axis, from +X toward +Z (90 = top, 180 = the left)
+BRACE_R = 0.215                 # bar centre from the axis (finger clearance over the straps)
+BRACE_Y = (-0.19, -0.04)        # the lugs ride on the two straps
+GRIP_L = (round(BRACE_R * math.cos(math.radians(BRACE_ANG)), 4), sum(BRACE_Y) / 2,
+          round(AX + BRACE_R * math.sin(math.radians(BRACE_ANG)), 4))
 CORE = (0.0, 0.23, AX)          # the breech chamber (heat pulse / point light)
 EJECT = (0.212, 0.49, AX + 0.07)
 
@@ -193,8 +212,26 @@ def build_mesh(col):
     add(hoop(R_SLEEVE_IN - 0.004, R_SLEEVE + 0.026, 0.04, y0 + 0.012, sides=16, chamfer=0.01, inner=True),
         "gunmetal", "cuff")
     # two war-red straps with gold buckles on the upper right (the side the game camera sees)
-    strap(add, -0.04, R_SLEEVE + 0.01)
-    strap(add, -0.19, R_SLEEVE)
+    strap(add, BRACE_Y[1], R_SLEEVE + 0.01)
+    strap(add, BRACE_Y[0], R_SLEEVE)
+    # the off-hand brace handle (grip_L) on the upper-left, slung between two lugs that ride on the straps:
+    # gunmetal lugs, an iron bar with gold end caps, a war-red leather wrap where the left palm closes
+    for yh, rs in ((BRACE_Y[0], R_SLEEVE + 0.013), (BRACE_Y[1], R_SLEEVE + 0.023)):
+        r_top = BRACE_R + 0.026
+        lug = M.box((r_top - rs + 0.004, 0.036, 0.054), bevel=0.009)
+        M.chip_corners(lug, rng, count=1, depth=(0.003, 0.007))
+        M.xform(lug, matrix=_on_surface(BRACE_ANG, (r_top + rs - 0.004) / 2, yh))
+        add(lug, "gunmetal", "brace_lug")
+    hb = M.cylinder(0.018, BRACE_Y[1] - BRACE_Y[0] + 0.05, sides=6, axis="Y")
+    M.xform(hb, loc=GRIP_L)
+    add(hb, "iron", "brace_bar", shading="smooth")
+    for yy in (BRACE_Y[0] - 0.027, BRACE_Y[1] + 0.027):
+        capb = M.cylinder(0.024, 0.014, sides=8, axis="Y")
+        M.xform(capb, loc=(GRIP_L[0], yy, GRIP_L[2]))
+        add(capb, "gold", "brace_cap")
+    wrap = M.cylinder(0.025, BRACE_Y[1] - BRACE_Y[0] - 0.046, sides=6, axis="Y")
+    M.xform(wrap, loc=GRIP_L)
+    add(wrap, "leather", "brace_wrap", shading="smooth")
 
     # inner handle bar the right fist closes on (grip_R): iron bar across the sleeve interior
     bar = M.cylinder(0.02, 2 * R_SLEEVE_IN + 0.01, sides=6, axis="Z")
@@ -238,17 +275,6 @@ def build_mesh(col):
     add(M.studs([(sx * 0.057, yb, AX - R_DRUM - 0.035) for sx in (-1, 1) for yb in (dm - 0.075, dm + 0.075)],
                 [(-1, 0, 0), (-1, 0, 0), (1, 0, 0), (1, 0, 0)], 0.011, 0.008, sides=5), "gold", "bracket_rivet",
         shading="smooth")
-    # side handle for the off hand (grip_L) on the drum's left flank: two arms and a wrapped bar
-    for yh in (GRIP_L[1] - 0.105, GRIP_L[1] + 0.105):
-        arm = M.box((0.1, 0.044, 0.062), bevel=0.01)
-        M.xform(arm, loc=(-(R_DRUM + 0.04), yh, AX))
-        add(arm, "gunmetal", "handle_arm")
-    hb = M.cylinder(0.021, 0.25, sides=6, axis="Y")
-    M.xform(hb, loc=GRIP_L)
-    add(hb, "iron", "handle_bar", shading="smooth")
-    wrap = M.cylinder(0.026, 0.15, sides=6, axis="Y")
-    M.xform(wrap, loc=GRIP_L)
-    add(wrap, "leather", "handle_wrap", shading="smooth")
 
     # ---- barrel: one lathe (two segments), the third gold band between ---------------------------------------
     b0, b1 = BARREL_Y
@@ -297,11 +323,12 @@ def build_mesh(col):
 # ---- paint -------------------------------------------------------------------------------------------------------
 
 RECIPES = {
-    "gunmetal": P.zone(base=GUNMETAL["base"], shadow=GUNMETAL["shadow"], light=GUNMETAL["light"], planes=0.05,
-                       parts=0.07, edge=0.95, edge_width=0.0065, edge_breakup=0.35, cavity=0.75, cavity_width=0.007,
-                       ao=0.6, brush=0.05,
-                       gradient={"axis": (0, 1, 0), "range": (0.05, SLEEVE_Y[0]), "color": "shadow", "amount": 0.32},
-                       spots={"color": "#2E2831", "amount": 0.22, "freq": 8.0, "threshold": (0.6, 0.72)}),
+    # gunmetal: only base / shadow / light, the elbow gradient, AO and cavity are read from here; its value planes
+    # and edge strokes come from BROAD below (gfa_brush), which replaced the per-facet planes, fbm edge dabs,
+    # brush noise and soot spots that read as regular horizontal brushed-metal streaks (art review, revision 2)
+    "gunmetal": P.zone(base=GUNMETAL["base"], shadow=GUNMETAL["shadow"], light=GUNMETAL["light"], cavity=0.75,
+                       cavity_width=0.007, ao=0.6,
+                       gradient={"axis": (0, 1, 0), "range": (0.05, SLEEVE_Y[0]), "color": "shadow", "amount": 0.32}),
     "iron": P.zone(base="#2A2530", shadow="#0F0C12", light="#6E6474", planes=0.06, parts=0.04, edge=0.7,
                    edge_width=0.005, cavity=0.6, ao=0.5),
     "gold": P.zone(base="#D29C40", shadow="#6A4318", light="#FFE6A0", planes=0.09, parts=0.05, edge=0.9,
@@ -317,6 +344,17 @@ RECIPES = {
     "glow_vent": P.zone(base="#FF9A40", edge=0.0, cavity=0.0, ao=0.0,
                         emit={"core": "#FFE2A0", "hot": "#FF8A2A", "color": EMBER["rim"], "mode": "radial",
                               "center": (R_BARREL + 0.042, EJECT[1], EJECT[2]), "radius": 0.05, "base_mix": 0.3}),
+}
+
+
+# a few broad painted value planes per part + tapered brush strokes on the edges (tools/blender/gf_assets/gfa_brush.py)
+BROAD = {
+    "gunmetal": B.broad(levels=(-0.35, -0.12, 0.12, 0.35), wobble=0.3, wobble_freq=6.0, inner=0.04, stroke=0.7,
+                        stroke_width=0.011, stroke_len=0.2, stroke_cover=0.4, glint=0.45),
+    # the dark iron drum core shows between the staves along the whole drum: its octagon edges were the
+    # brightest of the regular streaks, so it gets the same treatment, quieter
+    "iron": B.broad(levels=(-0.25, -0.08, 0.08, 0.22), wobble=0.3, wobble_freq=6.0, inner=0.03, stroke=0.55,
+                    stroke_width=0.008, stroke_len=0.2, stroke_cover=0.3, glint=0.3),
 }
 
 
@@ -370,17 +408,52 @@ def decals():
 
 # ---- arm-mount hold for the review (the forearm lies inside the sleeve) ------------------------------------------
 
+# GF_Hero_v1 arm (Brax, 2.155 m, art/characters/brax/reports/stage3/landmarks.json): upperarm 0.33 +
+# lowerarm 0.325 + wrist -> palm centre 0.09 m, scaled to the 2.2 m review hero
+ARM_REACH = (0.33 + 0.3252 + 0.09) * SPEC.HERO_HEIGHT / 2.155
+
+
 def armmount_hold(aim_dir, height=SPEC.HERO_HEIGHT):
-    """(grip-frame world matrix, elbow world point) for a mannequin at the origin aiming along aim_dir:
-    the upper arm hangs from the right shoulder, the forearm points along the aim inside the sleeve."""
+    """(grip-frame world matrix, elbow world point) for a mannequin at the origin aiming along aim_dir.
+    Revision 2 (art review): the right upper arm swings in and forward (~0.36 m, the GF_Hero_v1 upper arm)
+    so the elbow sits in front of the right chest, the forearm points along the aim inside the sleeve and
+    the cannon is carried close to the body's centre line, where the left hand reaches the brace handle.
+    (Revision 1 hung the upper arm straight down, 0.43 m right of the centre line at 1.27 m.)"""
     s = height / 2.2
     a = Vector(aim_dir)
     a.z = 0
     a.normalize()
     right = a.cross(Vector((0, 0, 1)))
-    elbow = right * 0.43 * s + a * 0.12 * s + Vector((0, 0, 1.27 * s))
+    elbow = right * 0.18 * s + a * 0.18 * s + Vector((0, 0, 1.47 * s))
     palm = elbow + a * 0.38 * s
     return C.frame_from_axes(palm, a, (0, 0, 1)), elbow
+
+
+def left_shoulder(aim_dir, height=SPEC.HERO_HEIGHT):
+    """The review mannequin's left shoulder joint (gfa_render.mannequin: x 0.36, z 1.70 at 2.2 m)."""
+    s = height / 2.2
+    a = Vector(aim_dir)
+    a.z = 0
+    a.normalize()
+    right = a.cross(Vector((0, 0, 1)))
+    return -right * 0.36 * s + Vector((0, 0, 1.70 * s))
+
+
+def grip_l_reach():
+    """Left shoulder -> grip_L distance (m) in the review hold, for the mannequin and for Brax's shoulder
+    (x 0.27, z 1.765 at 2.155 m, scaled to 2.2 m), against the GF_Hero_v1 arm reach."""
+    hold, _ = armmount_hold((0.0, 1.0, 0.0))
+    gl = hold @ Vector(GRIP_L)
+    k = SPEC.HERO_HEIGHT / 2.155
+    brax_sh = Vector((-0.27 * k, -0.035 * k, 1.765 * k))     # Brax faces -Y; this hold faces +Y
+    return {"shoulder_to_grip_L_m": round((gl - left_shoulder((0.0, 1.0, 0.0))).length, 3),
+            "shoulder_to_grip_L_m_gf_hero": round((gl - brax_sh).length, 3),
+            "arm_reach_m": round(ARM_REACH, 3),
+            "grip_L_world_m": [round(v, 3) for v in gl],
+            "hold": "right elbow in front of the right chest (0.18 m right of the centre line, 0.18 m forward, "
+                    "1.47 m up), forearm along the aim inside the sleeve; hero 2.2 m",
+            "revision_1": "the drum's left-flank handle (-0.312, 0.23, 0 Blender grip space) with the upper arm "
+                          "hanging 0.43 m right of the centre line: 0.95 m from the left shoulder"}
 
 
 def armmount_mannequin(aim_dir, grip_mat, elbow, grip_l):
@@ -413,7 +486,7 @@ def review(root, mesh, reports, work, tex_dir, rep):
     out["sil_front"] = R.silhouette([mesh], os.path.join(work, "%s_sil_front.png" % KEY), (0, 1, 0.0001), size=260)
     saved = root.matrix_world.copy()
     sockets = {c.name: c for c in root.children if c.type == "EMPTY"}
-    ing, held = [], []
+    ing, held, held_close = [], [], []
     pitch = math.radians(SPEC.GAME_PITCH_DEG)
     game_dir = Vector((0.0, -math.cos(pitch), math.sin(pitch)))
     for i, aim_dir in enumerate(((1.0, 0.0, 0.0), (0.6, -0.8, 0.0), (-0.5, 0.85, 0.0))):
@@ -428,8 +501,12 @@ def review(root, mesh, reports, work, tex_dir, rep):
         R.setup_cycles(scene, 14)
         fl = bpy.data.objects.get("GFA_FLOOR")
         with R.toon_preview([mesh, man], ink=0.009, flat={man.name: R.MANNEQUIN}):
-            R.aim(scene, Vector((0.25, 0.1, 1.15)), game_dir, 2.9)
+            R.aim(scene, Vector((0.1, 0.2, 1.2)), game_dir, 2.9)
             held.append(R.render(scene, os.path.join(work, "%s_held_%d.png" % (KEY, i)), 560))
+            if i < 2:
+                # both hands on the cannon, closer (the left palm on the brace handle)
+                R.aim(scene, (hold.translation + gl) * 0.5 + Vector((0, 0, -0.05)), game_dir, 1.45)
+                held_close.append(R.render(scene, os.path.join(work, "%s_held_close_%d.png" % (KEY, i)), 560))
         C.remove_objects([man])
     root.matrix_world = saved
     bpy.context.view_layer.update()
@@ -444,6 +521,9 @@ def review(root, mesh, reports, work, tex_dir, rep):
             c, w, h = R.frame(pts, d)
             R.aim(scene, c, d, max(w, h) * 1.08)
             out["close_" + name] = R.render(scene, os.path.join(reports, "%s_%s.png" % (KEY, name)), 800)
+        # paint detail: the drum staves and the sleeve up close (where revision 1 streaked)
+        R.aim(scene, Vector((-0.02, 0.06, AX + 0.04)), (-0.62, 0.45, 0.64), 0.62)
+        out["close_detail"] = R.render(scene, os.path.join(reports, "%s_detail.png" % KEY), 800)
     tex = R._thumbs([os.path.join(tex_dir, KEY + "_basecolor.png"), os.path.join(tex_dir, KEY + "_emissive.png")], work)
     ppm = SPEC.SCREEN_H / SPEC.GAME_VIEW_HEIGHTS[0]
     notes = [
@@ -451,7 +531,13 @@ def review(root, mesh, reports, work, tex_dir, rep):
             rep["tris"], " + ".join("%dpx" % t["px"][0] for t in rep["textures"]), rep["length_m"],
             ", ".join(sorted(rep["sockets"]))),
         "Grip frame: origin = right palm centre on the inner handle (the forearm lies along -Y inside the sleeve), "
-        "Blender +Y = barrel (glTF -Z), +Z = up. grip_L = left-flank handle, muzzle = bore face, eject = right vent.",
+        "Blender +Y = barrel (glTF -Z), +Z = up. grip_L = the sleeve's brace handle, muzzle = bore face, eject = right vent.",
+        "Revision 2: grip_L moved from the drum's left flank to the sleeve's upper-left brace handle; left shoulder -> "
+        "grip_L %.2f m (GF_Hero_v1 shoulder %.2f m; arm reach %.2f m; revision 1: 0.95 m)." % (
+            rep["grip_L_reach"]["shoulder_to_grip_L_m"], rep["grip_L_reach"]["shoulder_to_grip_L_m_gf_hero"],
+            rep["grip_L_reach"]["arm_reach_m"]),
+        "Revision 2: gunmetal and the iron drum core repainted with broad value planes and brush strokes "
+        "(gfa_brush) instead of the streaky per-facet planes and edge dabs.",
         "Status: %s (the user gives the final visual approval)." % rep.get("status", SPEC.STATUS_AI_FINAL),
     ]
     layout = {
@@ -462,10 +548,14 @@ def review(root, mesh, reports, work, tex_dir, rep):
         "sections": [
             {"label": "Turnaround - toon preview of the final textures (engine-like ramp, rim, ink; emissive x1.6)",
              "height": 250, "images": [{"path": v, "label": k.replace("turn_", "")} for k, v in out.items() if k.startswith("turn_")]},
-            {"label": "Close-up, 3/4 front and 3/4 back (toon preview)", "height": 400,
-             "images": [{"path": out["close_34"], "label": "34_front"}, {"path": out["close_34_back"], "label": "34_back"}]},
-            {"label": "Held at the grip frame by the 2.2 m mannequin (forearm in the sleeve), seen through the 55 deg game camera",
-             "height": 330, "images": [{"path": p, "label": "aim %d" % i} for i, p in enumerate(held)]},
+            {"label": "Close-up, 3/4 front and 3/4 back, and the paint up close (drum staves and sleeve; toon preview)",
+             "height": 400,
+             "images": [{"path": out["close_34"], "label": "34_front"}, {"path": out["close_34_back"], "label": "34_back"},
+                        {"path": out["close_detail"], "label": "paint detail"}]},
+            {"label": "Held by the 2.2 m mannequin (forearm in the sleeve, left hand on the brace handle, carried in front "
+                      "of the chest), seen through the 55 deg game camera",
+             "height": 300, "images": [{"path": p, "label": "aim %d" % i} for i, p in enumerate(held)]
+                + [{"path": p, "label": "aim %d, hands close-up" % i} for i, p in enumerate(held_close)]},
             {"label": "In-game camera: orthographic, 55 deg pitch, view height %.0f m = 1080 px (%.1f px/m) - 1x true size, then 3x nearest"
                       % (SPEC.GAME_VIEW_HEIGHTS[0], ppm),
              "height": None, "images": sum([[{"path": r["color"], "label": "aim %d, 1x" % i},
@@ -486,12 +576,33 @@ def review(root, mesh, reports, work, tex_dir, rep):
         out["ingame_sil_%d" % i] = r["sil"]
     for i, p in enumerate(held):
         out["held_%d" % i] = p
+    for i, p in enumerate(held_close):
+        out["held_close_%d" % i] = p
     out["sheet"] = R.contact_sheet(layout, os.path.join(reports, "%s_review.png" % KEY), work)
     shutil.copyfile(held[1], os.path.join(reports, "%s_held.png" % KEY))
+    shutil.copyfile(held_close[0], os.path.join(reports, "%s_held_close.png" % KEY))
     return out
 
 
 # ---- main ----------------------------------------------------------------------------------------------------------
+
+REVISIONS = [
+    {"rev": 1, "date": "2026-09-25", "change": "first build (commit cb41ae2)"},
+    {"rev": 2, "date": "2026-09-25", "reason": "art review 7/10, must-fix items",
+     "changes": [
+         "grip_L moved from the drum's left-flank side handle, Blender grip space (-0.312, 0.23, 0) = glTF "
+         "(-0.312, 0, -0.23), to a brace handle on the sleeve's upper-left between the two straps, Blender "
+         "(%.3f, %.3f, %.3f) = glTF (%.3f, %.3f, %.3f): 0.13 m in toward the barrel axis and 0.35 m back toward "
+         "the body. The drum's side handle is gone. The review hold now carries the cannon in front of the "
+         "chest (the right elbow tucked in front of the right chest), which puts the handle on the body's "
+         "centre line 0.45 m in front of the shoulders. Left shoulder -> grip_L: 0.95 m before, ~0.58 m now "
+         "(a 2.2 m hero reaches ~0.76 m)." % (GRIP_L[0], GRIP_L[1], GRIP_L[2], GRIP_L[0], GRIP_L[2], -GRIP_L[1]),
+         "gunmetal (and the dark-iron drum core that shows between the staves) repainted with a few broad "
+         "value planes per part and tapered brush strokes on each part's own edges "
+         "(tools/blender/gf_assets/gfa_brush.py) instead of per-facet planes, fbm edge dabs, brush noise and "
+         "soot spots, which read as regular horizontal brushed-metal streaks up close."]},
+]
+
 
 def main():
     argv = C.script_args()
@@ -512,8 +623,8 @@ def main():
 
     pack = C.pack_dir(KIND, KEY)
     tex_dir = os.path.join(pack, "textures")
-    paint_rep = P.paint_asset(mesh, KEY, RECIPES, tex_dir, size=size, decals=decals(), ao_distance=0.04,
-                              ao_samples=24, seed=7)
+    paint_rep = B.paint_asset(mesh, KEY, RECIPES, tex_dir, size=size, decals=decals(), broad=BROAD,
+                              ao_distance=0.04, ao_samples=24, seed=7)
     blend = os.path.join(pack, "source", KEY + ".blend")
     C.save_blend(blend)
     bpy.ops.file.make_paths_relative()
@@ -521,12 +632,21 @@ def main():
     b1 = blend + "1"
     if os.path.exists(b1):
         os.remove(b1)
+    reach = grip_l_reach()
+    C.log("grip_L reach: %.3f m from the mannequin's left shoulder, %.3f m from a GF_Hero_v1 shoulder "
+          "(arm reach %.3f m)" % (reach["shoulder_to_grip_L_m"], reach["shoulder_to_grip_L_m_gf_hero"],
+                                  reach["arm_reach_m"]))
     rep = E.export_asset(KIND, KEY, TIER, root, source_blend=blend, build_script=os.path.abspath(__file__),
                          extra={"chassis": {"damage_type": "Kinetic", "style": "Shell", "fire": "Auto",
                                             "tags": ["heavy", "splash", "valdris"]},
                                 "mount": "arm: the right forearm lies along -Y inside the sleeve (elbow ~0.38 m "
-                                         "behind the palm); grip_L is the drum's left-flank handle",
-                                "paint": {k: paint_rep[k] for k in ("size", "texel_density_px_per_m", "coverage")}})
+                                         "behind the palm), carried close to the body's centre line; grip_L is "
+                                         "the brace handle on the sleeve's upper-left, between the two straps",
+                                "grip_L_reach": reach,
+                                "revisions": REVISIONS,
+                                "paint": dict({k: paint_rep[k] for k in ("size", "texel_density_px_per_m", "coverage")},
+                                              painter="gfa_paint + gfa_brush broad zones %s" % paint_rep["broad_zones"])})
+    rep["grip_L_reach"] = reach
     reports = os.path.join(pack, "reports")
     if not C.flag(argv, "--no-review"):
         work = C.ensure_dir(os.path.join(pack, "work", "review"))

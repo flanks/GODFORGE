@@ -32,6 +32,7 @@ fails to get a device, retry.
 | `gfa_shell.py` | bmesh | **hollow armour**: `thick_patch(fn, nu, nv, thickness, keep=...)` builds a closed plate from a surface function and returns the outer skin + rims and the inner skin separately (paint the inside as a void). Surfaces `rev_fn` (revolve an (r, z) profile), `cap_fn` (dome), `grid_fn` (bent plate); keep-masks `jagged_keep` (torn edges), `bite_keep` (a bite out of a rim). Added by `enemies/forge_warden.py` |
 | `gfa_rig_dedicated.py` | bpy | **dedicated rigs** (elites, bosses): `build_armature` from a bone table (GF_Hero_v1 core names in `HERO_CORE`, forward roll convention), `validate_core`, `skin_rigid` for any bone set, world-space posing (`aim_bone`, `two_bone_ik`, `set_matrix`, `rest_frame_now`), `Keys` (pose-to-pose parameter keys with easing), `bake_clip` (solve every frame, then key it; stashed like gfa_rig clips). Added by `enemies/forge_warden.py` |
 | `gfa_boss.py` | bpy, bmesh | **bosses and big assets**: `build_rig` (bone table, all bones up with roll 0 = the creature frame, optional tilted bones), `skin_rigid` for any bone set, `cull_hidden_faces` (deletes faces buried inside a closed part on the same bone), `paint_scaled` (paints at e.g. 1/8 scale so the painter's brush features become boss-sized; recipes and decals stay in real metres), `alias_clip` (a second glTF name for a clip), review renders `ingame_frame` (true-pixel 16:9 crop of the game camera), `size_compare` (front view, hero mannequin, measuring pole), `clip_frames` (key-pose strips), `flat_views` (fast Workbench modelling previews). Added by `enemies/slag_king.py` |
+| `gfa_brush.py` | bpy, bmesh, numpy | **broad-plane painter**, opt-in per zone: `paint_asset(..., broad={zone: broad(...)})` takes `gfa_paint.paint_asset`'s arguments and repaints the named zones with a few broad value planes per part (normals snapped to the part's own PCA frame, hashed value steps, brushy borders) and tapered brush strokes on each part's own convex edges (3-D noise on the edge line, per-part offset). Use it for metal that streaks under `gfa_paint`'s per-facet planes and edge dabs (lathes, long parallel bevels). `GFA_BRUSH_DEBUG=1` paints the strokes red. Added by `art/weapons/colossus_cannon` |
 | `gfa_export.py` | bpy | **`export_asset(kind, key, tier, root, ...)`**: prepares transforms, exports the GLB (+Y up, no compression, embedded PNGs, NLA tracks as clips), validates, writes `<key>.meta.json`, exits 1 on failure |
 | `gfa_validate.py` | nothing (stdlib) | re-checks any shipped GLB against the contract; CLI; exit 1 on errors |
 
@@ -98,6 +99,12 @@ renders flat zone colours in about 10 s, for fast silhouette iterations.
 
 Decals: `decal_lines(lines, frame, width, zones, color, rim, emit, mapping="planar" | "cylinder")`.
 They are 2D polylines from `crack_lines`, `rune_band` or `sunburst`, projected along the frame's +Z.
+
+`gfa_brush.broad(...)` keys (only for zones passed as `broad=`; the zone's `gfa_paint` recipe still
+gives `base`/`shadow`/`light`, `gradient`, `ao`, `cavity`): `levels` (value steps per plane, < 0 toward
+the shadow, > 0 toward the light), `wobble`/`wobble_freq` (brushy plane borders), `inner`/`inner_freq`
+(soft drift inside a plane), `stroke`, `stroke_width` (half-width, m), `stroke_len` (m), `stroke_cover`
+(fraction of the edge length), `stroke_taper`, `glint`, `glint_color`, `edge_min_angle`.
 
 Only **sharp** edges count as edges. `Assembly.add(shading="auto")` marks edges above 35°,
 `shading="smooth"` only creases above 60°: round sides with no edge strokes, but crisp caps.
