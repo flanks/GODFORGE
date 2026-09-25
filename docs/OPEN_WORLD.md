@@ -104,11 +104,14 @@ hotspots, but its answers are too thin for AAA maps and split co-op:
 
 | Biome | Phase | Size (u) | Screens | Regions | Anvil / Warlord / Lair / Shrine / Reliquary / Vein | Spring / Watchfire | Seals avail / req | Gate force | Camps | Target (humans) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Cinder Wastes | P0/P1 | 432 × 272 | 9.6 × 9.7 | 5 × 3 | 3 / 1 / 2 / 3 / 2 / 2 | 3 / 4 | 14 / 6 | 12:00 | ~29 | 8–10 min + boss 2–3 |
+| Cinder Wastes | P0/P1 | 432 × 272 | 9.6 × 9.7 | 5 × 3 | 3 / 1 / 2 / 3 / 2 / 2 | 3 / 4 | 14 / 7 | 12:00 | ~29 | 8–10 min + boss 2–3 |
 | Verdant Ruin | EA | 448 × 280 | 10 × 10 | 5 × 3 | 3 / 1 / 3 / 3 / 2 / 2 | 3 / 4 | 15 / 7 | 13:00 | ~31 | 9–11 + 3 |
 | Hollow Spire | EA | 448 × 288 | 10 × 10.3 | 5 × 4 | 3 / 1 / 3 / 3 / 3 / 2 | 3 / 4 | 16 / 7 | 13:00 | ~32 | 9–11 + 3 |
 | The Unmaking | V1 | 480 × 304 | 10.7 × 10.9 | 6 × 4 | 4 / 1 / 3 / 3 / 3 / 3 | 3 / 4 | 18 / 8 | 14:00 | ~36 | 10–12 + 3–4 |
 
+* **Cinder's `seals_required` is 7**, raised from 6 by the phase-2 bot run: with 6 the seed-7 bot
+  cleared the map in 5.4 sim-min, under the 6–10 band of §11, because the Warlord and the boss die
+  in seconds to bot builds. With 7 it takes 6.1 sim-min.
 * **Slice** (Cinder plus boss): 10–13 min for humans, 7–9 for bots. Acceptance #5 ("finish run 1 or
   die at boss 1 within 25 min") holds.
 * **EA run** (3 biomes): 33–40 min for humans, 25–30 for bots. This is the top of NEXT_SESSION's 20–35
@@ -410,7 +413,7 @@ pub struct ExpeditionDef {
     pub pois: Vec<PoiQuota>,               // { kind: PoiKind, count: u8, seals: u8 }
     pub camps: CampDef,                    // { per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15) }
     pub landmarks: Vec<(MapMark, f32)>,
-    pub seals_required: u8,                // 6
+    pub seals_required: u8,                // 7 (Cinder)
     pub gate_requires_warlord: bool,       // true
     pub gate_force_minute: f32,            // 12.0
     pub boss_hp_mult: f32,                 // 1.35 = today's boss after 7 rooms (hp_growth_per_room 0.05 × 7)
@@ -544,7 +547,7 @@ Anvil hold time, radius and forge window stay in the existing `anvil` block. `Ca
                  (kind: Spring, count: 3, seals: 0)],          // Watchfire quota added in phase 3
           camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
           landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8), (SealedGate, 0.5)],
-          seals_required: 6, gate_requires_warlord: true, gate_force_minute: 12.0, boss_hp_mult: 1.35,
+          seals_required: 7, gate_requires_warlord: true, gate_force_minute: 12.0, boss_hp_mult: 1.35,
           threat_start_minute: 0.0,
           threat: [ /* §2.5 */ ],
       ),

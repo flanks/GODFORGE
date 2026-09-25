@@ -1254,7 +1254,7 @@
             camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
             // Grand monuments for regions without a major POI (phase 4 adds FallenWeapon).
             landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8), (SealedGate, 0.5)],
-            seals_required: 6,
+            seals_required: 7,
             gate_requires_warlord: true,
             gate_force_minute: 12.0,
             // Today's boss after 7 rooms (hp_growth_per_room 0.05 × 7).

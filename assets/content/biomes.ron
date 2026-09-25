@@ -25,7 +25,7 @@
         ],
         minibosses: ["the_bellows"],
         boss: "slag_king",
-        sequence: [Fixed(Combat), Door, Door, Door, Fixed(MiniBoss), Door, Door, Fixed(Boss)],
+        sequence: [Fixed(Expedition), Fixed(Boss)],
         min_anvils: 2,
     ),
     (
