@@ -431,8 +431,8 @@ pub fn validate(db: &ContentDb) -> Vec<Issue> {
         if db.biomes.id(&room.biome).is_none() {
             r.err("rooms", &room.key, format!("unknown biome `{}`", room.biome));
         }
-        let arena = gf_core::movement::Arena { half_extents: room.half_extents, obstacles: room.obstacles.clone() };
-        if !arena.in_bounds(room.player_spawn) || room.obstacles.iter().any(|o| o.contains(room.player_spawn, 0.5)) {
+        let arena = gf_core::movement::Arena::new(room.half_extents, room.obstacles.clone(), Vec::new());
+        if !arena.in_bounds(room.player_spawn) || !arena.walkable(room.player_spawn, 0.5) {
             r.err("rooms", &room.key, "player_spawn must be inside the arena and clear of obstacles");
         }
         if room.kind == RoomKind::Anvil && room.anvil.is_none() {

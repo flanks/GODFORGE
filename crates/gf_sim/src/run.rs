@@ -127,7 +127,7 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     for e in scoped {
         world.despawn(e);
     }
-    let arena = Arena { half_extents: room.half_extents, obstacles: room.obstacles.clone() };
+    let arena = Arena::new(room.half_extents, room.obstacles.clone(), Vec::new());
     world.resource_mut::<Grid>().0.reset(room.half_extents, 2.0);
     world.insert_resource(ArenaRes(arena.clone()));
 
