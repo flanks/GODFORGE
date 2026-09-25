@@ -226,6 +226,13 @@ impl Gen<'_> {
         self.db.biomes.by_key(&self.biome_key)
     }
 
+    /// Say what the generator gave up on when `GODFORGE_WORLDGEN_TRACE` is set (output-neutral).
+    pub(crate) fn trace(&self, what: impl FnOnce() -> String) {
+        if std::env::var_os("GODFORGE_WORLDGEN_TRACE").is_some() {
+            eprintln!("worldgen: {}", what());
+        }
+    }
+
     /// Count one relaxed placement; `GODFORGE_WORLDGEN_TRACE=1` says which (output-neutral).
     pub(crate) fn relax(&mut self, what: impl FnOnce() -> String) {
         self.relaxed = self.relaxed.saturating_add(1);
@@ -376,6 +383,6 @@ mod tests {
         let layout = map.map.as_ref().expect("a biome map");
         assert_eq!(layout.hash, layout_hash(&map.obstacles, &layout.pits, &layout.pois, map.player_spawn, layout.gate));
         assert_eq!(generate(&db, &t, 7).map.as_ref().map(|m| m.hash), Some(layout.hash), "not deterministic");
-        assert_eq!(layout.hash, 0xcef4_b07e_a6b9_acd1, "golden hash moved: {:#018x}", layout.hash);
+        assert_eq!(layout.hash, 0x1e23_89a1_8dcf_a64a, "golden hash moved: {:#018x}", layout.hash);
     }
 }

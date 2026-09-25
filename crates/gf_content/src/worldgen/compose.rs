@@ -26,9 +26,9 @@ use gf_core::poi::PoiKind;
 use glam::Vec2;
 
 /// Slots cut per region.
-const SLOTS: usize = 4;
+const SLOTS: usize = 5;
 /// Largest slot side (tiles): bigger open ground is split over several slots.
-const SLOT_CAP: usize = 12;
+const SLOT_CAP: usize = 10;
 /// Smallest slot (tiles, either orientation): 16 × 12 u once shrunk by `PAD`.
 const SLOT_MIN: (usize, usize) = (5, 4);
 /// Region border band (tile steps from its edge) where the density top-up crowds its ruins.
@@ -205,8 +205,8 @@ fn clearing(g: &Gen, b: &mut Builder, k: usize) {
         }
         _ => {}
     }
-    // Arches where the roads enter the major clearings.
-    if p.site.kind.is_major() || p.site.kind == PoiKind::Shrine {
+    // Arches where the roads (and spurs) enter the clearing.
+    {
         let width = q(g.x.roads.width);
         for d in &ways {
             for extra in [1.5f32, 3.0] {
@@ -425,6 +425,7 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
         let rot = rot_of(g.landing - site);
         let (o, d) = monument(b, mark, site, rot, true);
         if !force(g, b, &[o], d, Some(site)) {
+            g.trace(|| format!("region {r}: no room for its {mark:?} at {site}"));
             g.regions[r].landmark = None;
         }
     }
@@ -445,6 +446,7 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
         let flip = b.lay.chance(0.5);
         let f = Frame::of(slot.rect, slot.back, Vec2::ZERO, flip);
         let mut kind = DistrictKind::Field;
+        let mut footprint = slot.rect;
         if !is_field[i] {
             let mut failed: Option<DistrictKind> = None;
             for _attempt in 0..2 {
@@ -457,6 +459,7 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
                     kind = pool[p].0;
                     used.push(kind);
                     comps.push(rect);
+                    footprint = rect;
                     break;
                 }
                 failed = Some(pool[p].0);
@@ -465,7 +468,7 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
         if kind == DistrictKind::Field {
             field(b, f);
         }
-        districts.push(District { kind, min: slot.rect.min, max: slot.rect.max });
+        districts.push(District { kind, min: qv(footprint.min), max: qv(footprint.max) });
     }
 
     // e) Density top-up: compact ruins at the composition skirts and along the region's border band

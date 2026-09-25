@@ -3,7 +3,7 @@
 //! region.
 
 use super::tiles::{self, around, noise};
-use super::{Adj, Gen, LANDING_R, RegionGen, TILE};
+use super::{Adj, Gen, HUB_R, LANDING_R, RegionGen, TILE};
 use crate::procgen::qv;
 use crate::schema::TileKind;
 use gf_core::rng::GfRng;
@@ -282,20 +282,40 @@ fn landing(g: &mut Gen) {
     let site = g.regions[lr].site;
     let inset = g.x.coast.depth as f32 * TILE + LANDING_R + 8.0;
     let (sx, sy) = ((hx / 3.0 - 12.0).max(0.0), (hy / 3.0 - 12.0).max(0.0));
-    let start = match g.landing_edge {
-        0 => Vec2::new(site.x.clamp(-sx, sx), -hy + inset),
-        1 => Vec2::new(site.x.clamp(-sx, sx), hy - inset),
-        2 => Vec2::new(-hx + inset, site.y.clamp(-sy, sy)),
-        _ => Vec2::new(hx - inset, site.y.clamp(-sy, sy)),
+    // A point `along` the edge's middle third, `depth` in from the edge.
+    let at = |along: f32, depth: f32| match g.landing_edge {
+        0 => Vec2::new(along.clamp(-sx, sx), -hy + depth),
+        1 => Vec2::new(along.clamp(-sx, sx), hy - depth),
+        2 => Vec2::new(-hx + depth, along.clamp(-sy, sy)),
+        _ => Vec2::new(hx - depth, along.clamp(-sy, sy)),
     };
+    let toward = if g.landing_edge < 2 { site.x } else { site.y };
     let t = &g.tiles;
-    let fits = |p: Vec2| {
+    let fits = |p: Vec2, apart: f32| {
         let i = tiles::tile_at(t, p);
         t.kind[i].is_land()
             && t.region[i] as usize == lr
+            && p.distance(site) >= apart
             && tiles::disc(t, p, LANDING_R + 2.0).iter().all(|&j| t.kind[j].is_land())
     };
-    g.landing = (0..=40).map(|k| qv(start + (site - start) * (k as f32 / 40.0))).find(|p| fits(*p)).unwrap_or(qv(site));
+    // Nearest the site's line on the calm edge, clear of the region's crossroads hub; else walk in
+    // toward the site.
+    let apart = LANDING_R + HUB_R + 8.0;
+    let mut best: Option<(f32, Vec2)> = None;
+    for k in 0..=24 {
+        for d in 0..5 {
+            let s = if k % 2 == 0 { k as f32 * 2.0 } else { -(k as f32 + 1.0) * 2.0 };
+            let p = qv(at(toward + s, inset + d as f32 * TILE));
+            let cost = s.abs() + d as f32 * TILE;
+            if fits(p, apart) && best.is_none_or(|(c, _)| cost < c) {
+                best = Some((cost, p));
+            }
+        }
+    }
+    let start = at(toward, inset);
+    g.landing = best.map(|b| b.1).unwrap_or_else(|| {
+        (0..=40).map(|k| qv(start + (site - start) * (k as f32 / 40.0))).find(|p| fits(*p, 0.0)).unwrap_or(qv(site))
+    });
 }
 
 /// Themes (§3.2 step 3): the Landing region takes `start_theme`; the rest pick by weight, avoiding

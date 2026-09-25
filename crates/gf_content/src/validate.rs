@@ -705,6 +705,15 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
     if x.quota(PoiKind::Shrine) > gods {
         err(format!("{} shrines but only {gods} gods up to {}", x.quota(PoiKind::Shrine), phase.name()));
     }
+    // Majors take one region site each, never the Landing's (the gate is one of them).
+    let majors = 1 + [PoiKind::Anvil, PoiKind::Warlord, PoiKind::Lair].iter().map(|k| x.quota(*k)).sum::<u32>();
+    let sites = x.regions.0 as u32 * x.regions.1 as u32;
+    if majors + 1 > sites {
+        err(format!(
+            "{majors} major POIs (gate, anvils, Warlord, lairs) need {} regions, the grid has {sites}",
+            majors + 1
+        ));
+    }
     if x.seals_available() < x.seals_required as u32 + 2 {
         err(format!(
             "quotas offer {} Seals: need seals_required + 2 = {} of slack",
@@ -715,6 +724,9 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
     // ── terrain ──
     if x.coast.period == 0 {
         err("coast.period must be ≥ 1".into());
+    }
+    if x.coast.depth as u32 + x.coast.amp as u32 > 8 {
+        err("coast.depth + coast.amp must be ≤ 8 tiles (32 u): region sites keep inland of the coast".into());
     }
     if !(0.0..=1.0).contains(&x.barriers.chance) || x.barriers.kinds.iter().any(|(_, w)| !finite_positive(*w)) {
         err("barriers: chance must be within 0..=1 and kind weights positive".into());

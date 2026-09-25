@@ -97,11 +97,7 @@ impl Placer {
     /// Is `at` a legal clearing of `plaza` for `kind` in region `region`, with every spacing
     /// scaled by `scale`?
     fn legal(&self, g: &Gen, kind: PoiKind, at: Vec2, plaza: f32, region: usize, scale: f32, w: &Want) -> bool {
-        let t = &g.tiles;
-        let zone = tiles::disc(t, at, plaza + 2.0);
-        if zone.is_empty() || zone.iter().any(|&i| !t.kind[i].is_land() || t.region[i] as usize != region) {
-            return false;
-        }
+        // Cheap distance checks first; the tile scan last.
         if !w.near_landing && at.distance(g.landing) < FROM_LANDING * scale {
             return false;
         }
@@ -111,10 +107,19 @@ impl Placer {
         if !w.near_landing && at.distance(g.regions[region].site) < FROM_SITE {
             return false;
         }
+        if !g.pois.iter().all(|p| p.site.at.distance(at) >= spacing(kind, p.site.kind) * scale) {
+            return false;
+        }
+        // Every site still without a major becomes a crossroads hub: keep its plaza whole.
+        if g.regions.iter().any(|r| r.major.is_none() && r.area > 0 && at.distance(r.site) < plaza + HUB_R + 4.0) {
+            return false;
+        }
         if g.roads.iter().any(|r| r.pass.distance(at) < plaza + 2.0) {
             return false;
         }
-        g.pois.iter().all(|p| p.site.at.distance(at) >= spacing(kind, p.site.kind) * scale)
+        let t = &g.tiles;
+        let zone = tiles::disc(t, at, plaza + 2.0);
+        !zone.is_empty() && zone.iter().all(|&i| t.kind[i].is_land() && t.region[i] as usize == region)
     }
 
     /// Place one minor POI; returns its position and the road point its spur leaves from.
@@ -142,15 +147,16 @@ impl Placer {
                     if region != c.region {
                         continue;
                     }
-                    // Off-road clearings stand beside their own road and clear of every other.
-                    let crowded = self.lanes.iter().any(|&(road, l)| {
-                        let d = point_seg(at, l.from, l.to);
-                        if road == c.road { d < o.abs() - 0.5 } else { d < plaza + l.width * 0.5 - 0.5 }
-                    });
-                    if o != 0.0 && crowded {
+                    if !self.legal(g, w.kind, at, plaza, region, scale, &w) {
                         continue;
                     }
-                    if self.legal(g, w.kind, at, plaza, region, scale, &w) {
+                    // Off-road clearings stand beside their own road and clear of every other.
+                    let crowded = o != 0.0
+                        && self.lanes.iter().any(|&(road, l)| {
+                            let d = point_seg(at, l.from, l.to);
+                            if road == c.road { d < o.abs() - 0.5 } else { d < plaza + l.width * 0.5 - 0.5 }
+                        });
+                    if !crowded {
                         ok.push((at, region));
                         break;
                     }
@@ -487,6 +493,7 @@ fn hubs(g: &mut Gen, rng: &mut GfRng) {
         // Clear of every POI clearing.
         let site = g.regions[r].site;
         if g.pois.iter().any(|p| p.site.at.distance(site) < p.plaza + HUB_R + 4.0) {
+            g.trace(|| format!("region {r}: a POI clearing crowds its hub"));
             continue;
         }
         let w: Vec<f32> =
@@ -496,16 +503,22 @@ fn hubs(g: &mut Gen, rng: &mut GfRng) {
         used.push(mark);
         g.regions[r].landmark = Some(mark);
         let stop = HUB_R * 0.75;
+        // A stub ending inside the hub collapses onto its outer end (the plaza carries the way).
         let trim = |l: &mut Lane| {
             for (end, other) in [(true, l.to), (false, l.from)] {
                 let p = if end { l.from } else { l.to };
-                if p == site && p.distance(other) > stop + 2.0 {
-                    let moved = qv(site + (other - site) * (stop / p.distance(other)));
-                    if end {
-                        l.from = moved;
-                    } else {
-                        l.to = moved;
-                    }
+                if p != site {
+                    continue;
+                }
+                let moved = if p.distance(other) > stop + 2.0 {
+                    qv(site + (other - site) * (stop / p.distance(other)))
+                } else {
+                    other
+                };
+                if end {
+                    l.from = moved;
+                } else {
+                    l.to = moved;
                 }
             }
         };
