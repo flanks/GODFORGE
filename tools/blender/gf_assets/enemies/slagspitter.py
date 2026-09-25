@@ -1,9 +1,9 @@
-"""Slagspitter - the Cinder Wastes swarm SPIRE (The Unmade): a squat cone of cooled slag with a molten maw on
-top. It lobs molten slag where you are about to be. Built, painted, rigged on GF_Swarm_v1, animated, exported
-and reviewed from code.
+"""Slagspitter - the Cinder Wastes swarm SPIRE (The Unmade): a leaning chimney of cooled slag on a narrow skirt,
+with a molten maw in its off-centre mortar muzzle. It lobs molten slag where you are about to be. Built, painted,
+rigged on GF_Swarm_v1, animated, exported and reviewed from code.
 
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b --factory-startup --python-exit-code 1 \
-      -P tools/blender/gf_assets/enemies/slagspitter.py -- [--size 512] [--no-review] [--preview]
+      -P tools/blender/gf_assets/enemies/slagspitter.py -- [--size 512] [--no-review] [--preview] [--lite]
   ... -P tools/blender/gf_assets/enemies/slagspitter.py -- --crowd      (after the build and the clinker family:
                                                                           40 slagspitters + clinkers, game camera)
 
@@ -14,20 +14,24 @@ footprint is ~1.05-1.45 m (docs/art/ENEMIES.md section 2); the swarm tier keeps 
 
 Design (docs/art/ENEMIES.md sections 3-5; the user's enemy pack; brief, decisions and metrics in
 art/enemies/slagspitter/README.md):
-  * verb LOB: a squat lava cone - six thick slag crust plates over a molten core, on three stubby toes. The
-    seams between the plates widen toward the top, so the core glows through as cracks radiating from the maw;
-    each plate's top edge rises into one jagged tooth that curls in over the maw (low in front, a tall crown at
-    the back). The molten glob in the crater is the `head` bone: in the wind-up the cone squats and tilts back
-    to aim while the glob swells up out of the maw (the one bright shape at game size that says "about to
-    throw"); the attack springs the cone up and the glob leaves the maw (attack_origin), then the cone recoils
-    and the maw refills. (The first blockout, a stack of concentric tiers, read as a beehive / cake.)
-  * value plan at game size: slag plates darker than the #3A2C24 floor, framed by light brush strokes on each
-    plate's own edges (gfa_brush broad zones) and the hot seams between them; the crust teeth a step lighter;
-    the glob the brightest spot, its hot centre small, a band of dark cooling crust round its base
-    (crust_pass); two teal Unmade fissures; a flat molten tongue spilling over the low front plate;
-  * Unmade asymmetry: the neck leans forward and to one side, a slag blister bulges from the right front, a
-    cluster of black obsidian shards erupts from the back left, three toes (two on the left, one big one on the
-    right), the maw breached in front;
+  * verb LOB: a slag spire - six thick slag crust plates over a molten core, on three stubby toes, pinching from
+    a narrow skirt into a slim chimney that curves off-centre (to the right) and flares into a mortar muzzle
+    about 1 m up. The seams between the plates widen toward the top, so the core glows through as cracks
+    running up to the maw; each plate's top edge rises into one jagged tooth over the muzzle (low in front, a
+    crown at the back). The molten glob in the muzzle is the `head` bone: in the wind-up the spire squats and
+    tilts back to aim while the glob swells up out of the maw (the one bright shape at game size that says
+    "about to throw"); the attack springs the spire up and the glob leaves the maw (attack_origin), then the
+    spire recoils and the maw refills. (The first blockout, a stack of concentric tiers, read as a beehive /
+    cake; the first build, a squat cone, read as a round mound at the game camera - the cinderling's class.)
+  * value plan at game size (art review fix): the planes the 55 deg camera sees are lifted above the #3A2C24
+    floor (value_pass: up-facing slag and crust planes lifted toward the slag light, per-plate value steps,
+    long cooled-flow streaks), bold light lip strokes along every plate's top edge frame the muzzle, light
+    brush strokes on each plate's own edges (gfa_brush broad zones) and the hot seams between them; the glob
+    the brightest spot, its hot centre small, a band of dark cooling crust round its base (crust_pass); two
+    teal Unmade fissures; a flat molten tongue spilling down the chimney from the low front plate;
+  * Unmade asymmetry: the chimney curves off-centre to the right, a slag blister bulges from the right front,
+    a cluster of black obsidian shards erupts from the back left (a counter-diagonal to the chimney), three
+    toes (two on the left, one big one on the right), the maw breached in front;
   * palette: THE UNMADE (gfa_spec.FACTIONS): slag, molten (the Slag King's glow ramp, pale-peach hot spot, no
     gold), obsidian, ichor teal. The row colour #C24A1C only warms the slag toward the maw (hot slag). No
     player colours, no red-white (the build's review audits both textures).
@@ -54,7 +58,7 @@ sys.path.insert(0, os.path.join(HERE, ".."))
 sys.path.insert(0, HERE)
 import bmesh  # noqa: E402
 import bpy  # noqa: E402
-from mathutils import Euler, Matrix, Vector  # noqa: E402
+from mathutils import Euler, Matrix, Quaternion, Vector  # noqa: E402
 
 import gfa_common as C  # noqa: E402
 import gfa_model as M  # noqa: E402
@@ -74,49 +78,60 @@ ZONES = ["slag", "crust", "core", "molten", "spill", "obsidian", "under"]
 ZONE_PREVIEW = {"slag": "#4A362C", "crust": "#8C6A52", "core": "#C8400C", "molten": "#FF8A30", "spill": "#FF6B1A",
                 "obsidian": "#231F2C", "under": "#1A1310"}
 
-# ---- the cone: slag crust plates over a molten core ---------------------------------------------------------------
-# The outer flank radius r_out(z): a concave volcano flank, wide skirt on the ground, a thick neck at the maw.
-BASE_R, NECK_R, CONE_H, FLANK_EXP = 0.555, 0.290, 0.70, 1.75
-PLATE_TWIST = 0.32                 # rad per metre of height: the seams wind a little round the cone
-PLATE_T = 0.045                    # crust plate thickness
+# ---- the spire: slag crust plates over a molten core, rising into a leaning mortar chimney ------------------------
+# Art review fix (6/10): the first build was a squat cone (0.845 m tall, a 1.11 m skirt, a thick 0.58 m neck). At the
+# 55 deg camera its outline was a round mound - the cinderling's silhouette class. The Spire now has a spire: a
+# narrower skirt that pinches into a slim chimney, which curves off-centre to the creature's right (and a little
+# forward) and flares into a mortar muzzle about 1 m up. From the game camera the neck rises clear of the skirt's
+# outline, so the read is a leaning chimney with a glowing muzzle, not a lump with a glowing top.
+# The outer flank radius r_out(z): a concave skirt pinching into the chimney, which flares again at the muzzle.
+BASE_R, NECK_R, SKIRT_H, FLANK_EXP = 0.41, 0.165, 0.50, 2.3
+MUZZLE_FLARE, MUZZLE_Z = 0.05, (0.62, 0.90)      # the mortar muzzle flares out toward the lip
+TOP_Z = 0.90                       # the chimney's lip height (the plates' teeth rise above it, to ~1.05 m)
+LEAN_X, LEAN_FWD, LEAN_EXP = -0.30, 0.03, 1.6    # the chimney curves to the creature's right (-X) and a little
+                                                 # forward (-Y): an off-centre mortar neck, bending like a horn
+PLATE_TWIST = 0.32                 # rad per metre of height: the seams wind a little round the spire
+PLATE_T = 0.042                    # crust plate thickness
 GAP0, GAP1 = 3.0, 9.5              # seam between two plates (deg) at the ground / at the top: the seams widen
                                    # toward the maw, so the molten core shows as glowing cracks radiating from it
 DOME = 0.075                       # each plate bows out across its width (every plate reads as its own form)
-LEAN_X = -0.05                     # the neck leans to the creature's right (-X) ...
-NECK_FWD = 0.22                    # ... and forward (-Y): the mortar muzzle points toward the target
-BULGE_TH, BULGE_Z, BULGE_A = math.radians(215.0), 0.16, 0.09      # a slag blister (right front, low)
+BULGE_TH, BULGE_Z, BULGE_A = math.radians(215.0), 0.14, 0.10      # a slag blister (right front, low)
 # plates: (angle from, angle to (deg, counter-clockwise from +X; front = 270), top height, tooth height, tooth
 # position across the plate 0..1, inward curl of the tooth (m)). The front plate is low: the maw breaches there
-# and the molten glob spills over it (the one bright shape the camera sees face-on).
+# and the molten glob spills over it; the tallest teeth are a jagged crown at the back of the muzzle.
 PLATES = [
-    (242.0, 298.0, 0.505, 0.030, 0.40, 0.00),     # front: the breach
-    (298.0, 350.0, 0.615, 0.090, 0.30, 0.05),     # front left
-    (350.0, 425.0, 0.645, 0.165, 0.66, 0.07),     # left / back left (the widest)
-    (425.0, 488.0, 0.665, 0.235, 0.42, 0.09),     # back (the tallest tooth: a jagged crown behind the glow)
-    (488.0, 548.0, 0.640, 0.150, 0.52, 0.07),     # back right
-    (548.0, 602.0, 0.600, 0.080, 0.65, 0.05),     # right
+    (242.0, 298.0, 0.835, 0.025, 0.40, 0.00),     # front: the breach
+    (298.0, 350.0, 0.895, 0.060, 0.30, 0.020),    # front left
+    (350.0, 425.0, 0.915, 0.095, 0.66, 0.030),    # left / back left (the widest)
+    (425.0, 488.0, 0.925, 0.125, 0.42, 0.040),    # back (the tallest tooth: a jagged crown behind the glow)
+    (488.0, 548.0, 0.910, 0.085, 0.52, 0.030),    # back right
+    (548.0, 602.0, 0.885, 0.050, 0.65, 0.020),    # right
 ]
-PLATE_NU, PLATE_NV = 4, 4
+PLATE_NU, PLATE_NV = 5, 6
+PLATE_NOISE = (0.012, 6.5)         # knobbly cooled slag: the facets catch the light as broken planes (was 5 mm)
 CORE_SIDES = 12
-LIP_Z = 0.600                      # the core's crater lip (under the plate teeth, above the front breach)
-THROAT = [(0.225, 0.625), (0.190, 0.600), (0.0, 0.582)]    # over the lip into the crater (under the glob)
+LIP_Z = 0.885                      # the core's crater lip (under the plate teeth, above the front breach)
+THROAT = [(0.140, LIP_Z + 0.022), (0.114, LIP_Z), (0.0, LIP_Z - 0.020)]   # over the lip into the crater
 
 # the molten glob (head bone): a lumpy dome in the crater, its top a little above the lip
-GLOB_R, GLOB_H, GLOB_Z = 0.182, 0.108, 0.628
-HEAD_PIVOT_Z = 0.585               # the crater floor: scaling the head grows the glob up out of the maw
-BODY_Z = 0.20                      # body pivot (centre of mass of a squat cone); legs share it
+GLOB_R, GLOB_H, GLOB_Z = 0.138, 0.085, LIP_Z + 0.024
+HEAD_PIVOT_Z = LIP_Z - 0.018       # the crater floor: scaling the head grows the glob up out of the maw
+BODY_Z = 0.24                      # body pivot (centre of mass of the spire); legs share it
 
 # toes: (name, angle deg, size, bone). Two on the left, one big one on the right (the Unmade 2 + 1).
-TOES = [("L", 322.0, 1.0, "legs_a"), ("B", 80.0, 0.9, "legs_a"), ("R", 214.0, 1.2, "legs_b")]
-# obsidian shards breaking out of the back-left seam (tail): (angle deg, height, length, base radius, tilt deg)
-SHARDS = [(42.0, 0.36, 0.44, 0.08, 34.0), (58.0, 0.27, 0.28, 0.06, 50.0), (26.0, 0.24, 0.18, 0.046, 58.0)]
+TOES = [("L", 322.0, 1.15, "legs_a"), ("B", 80.0, 1.05, "legs_a"), ("R", 214.0, 1.35, "legs_b")]
+TOE_OUT = 1.05                     # toe centre radius / BASE_R (was 0.95 under the wider first-build skirt)
+# obsidian shards breaking out of the back-left seam (tail): (angle deg, height, length, base radius, tilt deg).
+# They lean out opposite the chimney (a counter-diagonal), lower and shorter than it, so the chimney stays the
+# one tall shape in the outline.
+SHARDS = [(42.0, 0.24, 0.34, 0.07, 42.0), (60.0, 0.17, 0.22, 0.052, 56.0), (24.0, 0.15, 0.15, 0.04, 62.0)]
 # the overflow: molten slag spilling from the maw over the low front plate
-SPILL = (0.42, 0.44, 0.042)        # (u across the front plate, lowest v on it, radius)
+SPILL = (0.42, 0.56, 0.034)        # (u across the front plate, lowest v on it, radius)
 
 TEAL = {"color": "#2FBFA8", "core": "#B8FFE8"}
 HOT_SLAG = "#5A2412"               # the row colour #C24A1C pulled into the slag shadow: hot slag near the maw
-PALETTE = [("slag", "#231A17"), ("slag stroke", "#7A5A48"), ("crust", "#3E2E25"), ("crust stroke", "#B08A68"),
-           ("hot slag", HOT_SLAG), ("seam glow", "#9A2A08"), ("molten rim", "#C23C0C"), ("molten", "#FF6B1A"),
+PALETTE = [("slag", "#231A17"), ("slag top plane", "#654838"), ("slag stroke", "#8E6656"), ("crust", "#3E2E25"),
+           ("crust stroke", "#B88E74"), ("lip stroke", "#C8A07A"), ("hot slag", HOT_SLAG), ("seam glow", "#9A2A08"), ("molten rim", "#C23C0C"), ("molten", "#FF6B1A"),
            ("hot spot", "#FFC88A"), ("cooled crust", "#2A1510"), ("obsidian", "#1A1720"), ("teal glow", "#2FBFA8"),
            ("row tint", ROW["color"])]
 
@@ -131,8 +146,8 @@ def smooth01(e0, e1, x):
 
 
 def r_out(z):
-    t = max(0.0, min(1.0, z / CONE_H))
-    return NECK_R + (BASE_R - NECK_R) * (1.0 - t) ** FLANK_EXP
+    t = max(0.0, min(1.0, z / SKIRT_H))
+    return NECK_R + (BASE_R - NECK_R) * (1.0 - t) ** FLANK_EXP + MUZZLE_FLARE * smooth01(MUZZLE_Z[0], MUZZLE_Z[1], z)
 
 
 def lump(th, z, amount=1.0):
@@ -144,7 +159,10 @@ def lump(th, z, amount=1.0):
 
 
 def center(z):
-    return LEAN_X * z, -NECK_FWD * max(0.0, z - 0.30)
+    """The spire's axis at height z: it curves off-centre (right and a little forward) like a horn."""
+    s = max(0.0, z) / TOP_Z
+    k = s ** LEAN_EXP
+    return LEAN_X * k, -LEAN_FWD * k
 
 
 def pos(r, z, th, amount=1.0):
@@ -213,7 +231,7 @@ class Build:
     def core(self, a):
         """The molten core: a closed cone just inside the plates, over the crater lip into the throat. It shows
         through the seams, over the low front plate and inside the maw (its paint glows hotter toward the maw)."""
-        prof = [(r_out(z) - PLATE_T - 0.008, z) for z in (0.0, 0.12, 0.25, 0.38, 0.50, 0.60)]
+        prof = [(r_out(z) - PLATE_T - 0.008, z) for z in (0.0, 0.10, 0.21, 0.33, 0.47, 0.62, 0.76)]
         prof += [(r_out(LIP_Z) - PLATE_T + 0.004, LIP_Z - 0.035), (r_out(LIP_Z) - PLATE_T - 0.012, LIP_Z)]
         prof += THROAT
         bm = bmesh.new()
@@ -247,13 +265,18 @@ class Build:
         """Six thick crust plates, each bowed out, the seams between them widening toward the top, the top
         edge rising into one jagged tooth that curls in over the maw."""
         self.plate_tops = []
+        self.lips = []                                 # the outer top edge of every plate, after the noise
         for pi, (a0, a1, top, tooth, tu, curl) in enumerate(PLATES):
             fn = plate_fn(pi)
             outer, inner = S.thick_patch(fn, PLATE_NU, PLATE_NV, PLATE_T, inner=True)
             inner.free()                               # the inside skin faces the core, 8 mm away: never seen
             for vtx in outer.verts:                    # the bottom rim's inner edge is offset along the skirt's
                 vtx.co.z = max(0.0, vtx.co.z)          # up-tilted normal, below the ground: flatten it onto z = 0
-            M.noise_displace(outer, 0.005, freq=7.0, seed=SEED + 31 * pi, mask=lambda v: smooth01(0.01, 0.05, v.co.z))
+            lip = [min(outer.verts, key=lambda vv, q=fn(i / PLATE_NU, 1.0): (vv.co - q).length)
+                   for i in range(PLATE_NU + 1)]
+            M.noise_displace(outer, PLATE_NOISE[0], freq=PLATE_NOISE[1], seed=SEED + 31 * pi,
+                             mask=lambda v: smooth01(0.01, 0.05, v.co.z))
+            self.lips.append([vv.co.copy() for vv in lip])
             ztop = top + tooth
             ztop_edge = top - 0.03
             cut = ztop_edge - (top / PLATE_NV) * 0.55
@@ -288,15 +311,20 @@ class Build:
         cx, cy = center(LIP_Z)
         top = fn(u0, 1.0)
         into = Vector((top.x - cx, top.y - cy, 0.0)).normalized()
-        p_in = Vector((cx, cy, LIP_Z + 0.005)) + into * 0.16
+        p_in = Vector((cx, cy, LIP_Z + 0.008)) + into * 0.085
         pts, radii = [p_in], [rad * 1.15]
         flat = [(0.55, 1.5)]
-        for k, (u, v) in enumerate(((u0, 1.0), (u0 + 0.03, 0.84), (u0 + 0.05, 0.64), (u0 + 0.04, v_end))):
+        # (u, v, stand-off along the plate normal, radius, flattening): dense along the chimney, so the tongue
+        # hugs the muzzle flare and the pinched neck instead of bridging them like a plank
+        run = [(u0, 1.0, 0.35, 1.2, (0.5, 1.6)), (u0 + 0.02, 0.93, 0.3, 1.1, (0.5, 1.6)),
+               (u0 + 0.03, 0.85, 0.25, 1.0, (0.45, 1.5)), (u0 + 0.045, 0.76, 0.22, 0.85, (0.45, 1.4)),
+               (u0 + 0.05, 0.67, 0.18, 0.6, (0.45, 1.3)), (u0 + 0.04, v_end, 0.0, 0.001, (1.0, 1.0))]
+        for u, v, off, rr, fl in run:
             p = fn(u, v)
             n = fn_normal(fn, u, v)
-            pts.append(p + n * rad * (0.35, 0.25, 0.2, 0.0)[k])
-            radii.append(rad * (1.25, 1.0, 0.75, 0.001)[k])
-            flat.append(((0.5, 1.6), (0.45, 1.5), (0.45, 1.3), (1.0, 1.0))[k])
+            pts.append(p + n * rad * off)
+            radii.append(rad * rr)
+            flat.append(fl)
         # a flat tongue of lava: thin along the plate normal, wide across it (up = the plate's outward normal)
         up = fn_normal(fn, u0, 0.8)
         a.add(M.tube(pts, radii, sides=6, up=tuple(up), scale_xy=flat), "spill", bone="body", name="spill",
@@ -306,8 +334,9 @@ class Build:
         for name, deg, s, bone in TOES:
             th = math.radians(deg)
             radial = Vector((math.cos(th), math.sin(th), 0.0))
-            # a low wedge tucked under the skirt: only its blunt tip and claw show past the plates
-            c = Vector((center(0.0)[0], center(0.0)[1], 0.0)) + radial * (BASE_R * 0.95)
+            # a low wedge tucked under the skirt: only its blunt tip and claw show past the plates. TOE_OUT sets
+            # them a little past the narrowed skirt, so the tripod keeps the collider's footprint (>= 2.2 x r)
+            c = Vector((center(0.0)[0], center(0.0)[1], 0.0)) + radial * (BASE_R * TOE_OUT)
             c.z = 0.03 * s
             bm = M.sphere(1.0, 7, 4)
             for v in bm.verts:
@@ -370,7 +399,8 @@ class Build:
                 "tail": tuple(self.tail_pivot)}
 
     def sockets(self):
-        return [("body", "hit_center", (0.0, 0.0, 0.40)),
+        hc = center(0.42)
+        return [("body", "hit_center", (hc[0], hc[1], 0.42)),
                 ("body", "fx_core", tuple(self.glob_c)),
                 ("body", "fx_mouth", tuple(self.maw_pt + Vector((0, 0, 0.04)))),
                 ("head", "attack_origin", tuple(self.glob_top + Vector((0, 0, 0.03)))),
@@ -405,29 +435,29 @@ def recipes(b):
     strokes on each plate's own edges; base / shadow / light, gradient, AO and cavity still come from here."""
     import gfa_paint as P
     maw = tuple(b.glob_c)
-    # the crust plates: slag darker than the #3A2C24 floor (a dark mass framed by light strokes and hot seams),
-    # warming to hot slag toward the maw
-    slag = P.zone(base="#231A17", shadow="#0C0908", light="#7A5A48", cavity=0.8, cavity_width=0.01, ao=0.6,
-                  ao_range=(0.22, 0.62), gradient={"center": maw, "range": (0.42, 0.14), "color": HOT_SLAG,
+    # the crust plates: dark slag in shadow, warming to hot slag just under the muzzle. (The planes the camera
+    # sees are lifted afterwards by value_pass(): TOP_LIFT, the art review's figure/ground fix.)
+    slag = P.zone(base="#231A17", shadow="#0C0908", light=SLAG_LIGHT, cavity=0.8, cavity_width=0.01, ao=0.6,
+                  ao_range=(0.22, 0.62), gradient={"center": maw, "range": (0.32, 0.10), "color": HOT_SLAG,
                                                    "amount": 0.35})
     # the plate tops and teeth round the maw: cooled crust, a value step above the slag (it frames the glow)
-    crust = P.zone(base="#3E2E25", shadow="#140C09", light="#B08A68", cavity=0.8, cavity_width=0.008, ao=0.5,
+    crust = P.zone(base="#3E2E25", shadow="#140C09", light=CRUST_LIGHT, cavity=0.8, cavity_width=0.008, ao=0.5,
                    gradient={"center": maw, "range": (0.30, 0.16), "color": "#7A2E14", "amount": 0.45})
     # the molten core: glows through the seams (deep red low down, orange higher), hottest in the breach and throat
     core = P.zone(base="#5A1A08", shadow="#2A0A04", light="#C8400C", planes=0.04, parts=0.0, brush=0.04, edge=0.0,
                   cavity=0.0, ao=0.0,
                   emit={"color": "#4A1204", "hot": "#9A2A08", "core": "#E0600F", "mode": "radial", "center": maw,
-                        "radius": 0.75, "base_mix": 0.1})
+                        "radius": 0.95, "base_mix": 0.1})
     # the glob: the Slag King's molten ramp; a small pale-hot (not gold) spot right on top
     molten = P.zone(base="#FF6B1A", shadow="#7A1E05", light="#FF9A4A", planes=0.03, parts=0.0, brush=0.05, edge=0.0,
                     cavity=0.0, ao=0.0,
                     emit={"color": "#C23C0C", "hot": "#FF6B1A", "core": "#FFC88A", "mode": "radial",
-                          "center": tuple(b.glob_top), "radius": 0.22, "base_mix": 0.15})
+                          "center": tuple(b.glob_top), "radius": 0.17, "base_mix": 0.15})
     # the overflow tongue: hot where it leaves the maw, cooling toward the drip
     spill = P.zone(base="#E0500F", shadow="#7A1E05", light="#FF9A4A", planes=0.03, parts=0.0, brush=0.05, edge=0.0,
                    cavity=0.0, ao=0.0,
                    emit={"color": "#7A2006", "hot": "#D2480E", "core": "#FF7A22", "mode": "plane", "axis": (0, 0, -1),
-                         "range": (-LIP_Z - 0.02, -0.30), "base_mix": 0.1})
+                         "range": (-LIP_Z - 0.02, -0.48), "base_mix": 0.1})
     obsidian = P.faction_zone("unmade", "obsidian", planes=0.16, parts=0.1, edge=1.0, edge_width=0.01,
                               edge_breakup=0.25, cavity=0.6, light="#6A6680")
     under = P.zone(base="#1A1310", shadow="#0C0908", light="#2E211C", edge=0.0, cavity=0.0, ao=0.3)
@@ -469,7 +499,7 @@ def crust_pass(b):
             if zmin is not None:
                 k = k * P.smoothstep(zmin, zmin + 0.04, p[:, 2])
             if zname == "spill":
-                k = k * P.smoothstep(LIP_Z - 0.02, 0.36, p[:, 2])          # the tongue cools toward its tip
+                k = k * P.smoothstep(LIP_Z - 0.02, 0.56, p[:, 2])          # the tongue cools toward its tip
             k = k.astype(np.float32)
             base[m] = P.mix(base[m], P.hex3(CRUST_COLOR), k * 0.9)
             emis[m] = emis[m] * (1.0 - 0.92 * k)[:, None]
@@ -484,10 +514,140 @@ def crust_pass(b):
 
 def broad_zones():
     import gfa_brush as BR
-    return {"slag": BR.broad(levels=(-0.4, -0.18, 0.04, 0.2), wobble=0.25, wobble_freq=6.0, inner=0.07, inner_freq=4.5,
+    return {"slag": BR.broad(levels=(-0.6, -0.3, 0.0, 0.22), wobble=0.25, wobble_freq=6.0, inner=0.07, inner_freq=4.5,
                              stroke=0.85, stroke_width=0.011, stroke_len=0.12, stroke_cover=0.55, glint=0.35),
-            "crust": BR.broad(levels=(-0.25, -0.06, 0.1, 0.26), wobble=0.25, wobble_freq=7.0, inner=0.05, stroke=1.0,
+            "crust": BR.broad(levels=(-0.4, -0.12, 0.1, 0.28), wobble=0.25, wobble_freq=7.0, inner=0.05, stroke=1.0,
                               stroke_width=0.012, stroke_len=0.1, stroke_cover=0.65, glint=0.5)}
+
+
+# ---- figure / ground (art review fix) -------------------------------------------------------------------------------
+# The first build's slag body sat on the Cinder floor's value (median L* 22.6 against floors of 17-27, 36 % of its
+# pixels within +-7 L* of the floor): only the crater read. Two painted passes fix that, after the broad painter and
+# before the decals (value_pass wraps gfa_brush.apply_decals for this build's one paint call; the shared toolkit is
+# unchanged, as with the Slag King's and the clinker's fixes):
+#   * TOP PLANES: the slag and crust planes the 55 deg camera looks at are lifted toward the faction's slag light -
+#     up-facing planes fully, side planes part of the way (the toon ramp still darkens the shadow side, so every form
+#     gets a lit and a dark plane on either side of the floor value). The lift keeps the painted darks (cavities,
+#     contact shadows) proportionally dark and skips texels that are already light (the brush strokes);
+#   * LIP STROKES: a bold light stroke, about one game pixel wide, along the top edge of every crust plate (the
+#     muzzle's lip and its teeth) over a mid-tone halo: the chimney's mouth is framed by a broken light ring.
+SLAG_LIGHT, CRUST_LIGHT = "#8E6656", "#B88E74"      # broad-painter edge strokes (were #7A5A48 / #B08A68)
+TOP_LIFT = {  # zone -> (lifted colour of the up-facing planes, side-plane share, amount)
+    "slag": ("#654838", 0.4, 1.0),
+    "crust": ("#704F3E", 0.35, 1.0),
+}
+PLATE_LIFT = (1.0, 0.8, 0.95, 0.74, 0.9, 0.8)      # per plate (PLATES order): share of the lift
+FLOW = (13.0, 2.0, 0.55, 0.5)    # slag streaks: (frequency across, along (/m), dark amount, light amount)
+LIP = {"color": "#C8A07A", "halo": "#8A6650", "width": 0.0125, "halo_width": 0.026, "zones": ("crust", "slag")}
+
+
+def lip_samples(lips, step=0.002):
+    """Points along the outer top edge of every crust plate (the muzzle's lip with its teeth; Build.lips, the
+    mesh's own edge vertices), their plate index and their position u (0..1) along the lip."""
+    import numpy as np
+    pts, plate, us = [], [], []
+    for pi, poly in enumerate(lips):
+        seg = [(a_ - b_).length for a_, b_ in zip(poly[1:], poly[:-1])]
+        total, acc = sum(seg), 0.0
+        for a_, b_, ln in zip(poly[:-1], poly[1:], seg):
+            n = max(1, int(ln / step))
+            for i in range(n):
+                t = i / n
+                pts.append(tuple(a_.lerp(b_, t)))
+                plate.append(pi)
+                us.append((acc + t * ln) / total)
+            acc += ln
+        pts.append(tuple(poly[-1]))
+        plate.append(pi)
+        us.append(1.0)
+    return np.array(pts, dtype=np.float32), np.array(plate), np.array(us, dtype=np.float32)
+
+
+def plate_of(p):
+    """Index of the crust plate (PLATES) over each point (N, 3): its angle round the spire's axis at its height,
+    unwound by the plates' twist."""
+    import numpy as np
+    z = p[:, 2]
+    s_ = np.maximum(z, 0.0) / TOP_Z
+    k = s_ ** LEAN_EXP
+    th = np.degrees(np.arctan2(p[:, 1] + LEAN_FWD * k, p[:, 0] - LEAN_X * k) - PLATE_TWIST * z) % 360.0
+    out = np.zeros(len(p), dtype=np.int64)
+    for pi, (a0, a1, *_rest) in enumerate(PLATES):
+        a0m = a0 % 360.0
+        span = a1 - a0
+        out[((th - a0m) % 360.0) < span] = pi
+    return out
+
+
+def lift_top_planes(P, base, pos, nrm, Z, zones_order, recipes_, seed=0):
+    import numpy as np
+    for zname, (col, side, amt) in TOP_LIFT.items():
+        if zname not in zones_order:
+            continue
+        m = np.nonzero(Z == zones_order.index(zname))[0]
+        if not len(m):
+            continue
+        c, p, nz = base[m], pos[m], nrm[m, 2]
+        brush = P.spread01(P.fbm(p, 5.0, 2, seed=seed + 511))          # ~20 cm brush patches break the boundary
+        nb = nz + (brush - 0.5) * 0.3
+        k = side * P.smoothstep(-0.4, -0.05, nb) + (1.0 - side) * P.smoothstep(0.22, 0.48, nb)
+        lum = c @ np.array([0.3, 0.59, 0.11], dtype=np.float32)
+        k = k * amt * (1.0 - P.smoothstep(0.26, 0.42, lum))
+        k = k * P.smoothstep(0.035, 0.1, p[:, 2])          # the toes and the skirt's foot stay dark (contact)
+        # every plate takes its own share of the lift, so neighbouring slabs differ by a value step (broad
+        # painted planes: a single even lift read as one glazed clay pot)
+        k = k * np.asarray(PLATE_LIFT, dtype=np.float32)[plate_of(p)]
+        b0 = np.maximum(P.hex3(recipes_[zname]["base"]), 1e-3)
+        lifted = c * (P.hex3(col) / b0)[None, :]
+        c = P.mix(c, lifted, k)
+        if zname == "slag":
+            # cooled flows: long, soft streaks down the spire (8 cm wide, ~0.5 m long; 4 game px, so they read
+            # as a grain of dribbled slag, not as noise), darker in the troughs, a little lighter on the crests
+            st = P.anisotropic(p, (0.0, 0.0, 1.0), FLOW[0], FLOW[1], seed=seed + 531)
+            c = P.mix(c, c * 0.62, P.smoothstep(0.42, 0.24, st) * FLOW[2])
+            c = P.mix(c, np.minimum(c * 1.25, 1.0), P.smoothstep(0.62, 0.8, st) * FLOW[3] * k)
+        base[m] = c
+
+
+def paint_lip_strokes(P, lips, base, pos, Z, zones_order, seed=0):
+    import numpy as np
+    zi = [zones_order.index(z) for z in LIP["zones"] if z in zones_order]
+    m = np.nonzero(np.isin(Z, zi))[0]
+    if not len(m):
+        return
+    import gfa_brush as BR
+    pts, plate, us = lip_samples(lips)
+    d, idx = BR._kd_nearest(pts, pos[m])
+    u, pl = us[idx], plate[idx]
+    rng = random.Random(SEED + 707)
+    gaps = [rng.uniform(0.25, 0.75) for _ in PLATES]                  # one break per lip, off-centre
+    gap = np.array(gaps, dtype=np.float32)[pl]
+    load = P.smoothstep(0.0, 0.1, u) * P.smoothstep(1.0, 0.9, u) * P.smoothstep(0.035, 0.07, np.abs(u - gap))
+    wob = 0.75 + 0.5 * P.spread01(P.fbm(pos[m], 26.0, 2, seed=seed + 707))
+    w = LIP["width"] * wob * (0.45 + 0.55 * load)
+    halo = P.smoothstep(LIP["halo_width"], LIP["halo_width"] * 0.5, d) * load
+    line = P.smoothstep(w, w * 0.55, d) * P.smoothstep(0.02, 0.3, load)
+    c = P.mix(base[m], P.hex3(LIP["halo"]), halo * 0.6)
+    base[m] = P.mix(c, P.hex3(LIP["color"]), line)
+
+
+@contextmanager
+def value_pass(b, recipes_, seed=SEED):
+    """Within the block, gfa_brush's decal pass first runs the figure / ground passes (after the broad repaint)."""
+    import gfa_brush as BR
+    import gfa_paint as P
+    orig = BR.apply_decals
+
+    def apply_decals(base, emis, P_, Nt, Z, zones_order, decals_):
+        lift_top_planes(P, base, P_, Nt, Z, zones_order, recipes_, seed)
+        paint_lip_strokes(P, b.lips, base, P_, Z, zones_order, seed)
+        return orig(base, emis, P_, Nt, Z, zones_order, decals_)
+
+    BR.apply_decals = apply_decals
+    try:
+        yield
+    finally:
+        BR.apply_decals = orig
 
 
 def _frame_on(fn, u, v):
@@ -594,7 +754,7 @@ def make_clips(arm, b, skirt):
     def move(t):
         w = tau * t
         la, lb = max(0.0, sin(w)), max(0.0, -sin(w))
-        roll = 9.0 * sin(w)
+        roll = 7.0 * sin(w)
         p = {"body": body(rot=(4.0 + 1.5 * sin(2 * w), 3.0 * sin(w), roll), sq=1.0 - 0.02 * cos(2 * w),
                           up=0.018 * (1 - cos(2 * w)) / 2),
              "head": {"rot": (2.0 * sin(2 * w), 0.0, -5.0 * sin(w - 0.6)), "scale": 1.0 + 0.04 * sin(2 * w + 1.0)},
@@ -608,13 +768,16 @@ def make_clips(arm, b, skirt):
     dip = {"body": body(rot=(5.0, 0.0, 0.0), sq=0.93, wide=1.04), "head": {"scale": 0.88, "loc": (0, -0.01, 0)},
            "tail": {"rot": (4.0, 0.0, 0.0)}}
     loaded = {"body": body(rot=(-10.0, 0.0, -2.0), sq=0.86, wide=1.07),
-              "head": {"scale": (1.3, 1.75, 1.3), "loc": (0.0, 0.06, 0.02)}, "tail": {"rot": (-16.0, 0.0, -5.0)}}
+              "head": {"rot": (0.0, 0.0, 9.0), "scale": (1.3, 1.75, 1.3), "loc": (-0.02, 0.06, 0.02)},
+              "tail": {"rot": (-16.0, 0.0, -5.0)}}
     loaded2 = {"body": body(rot=(-12.0, 0.0, -3.0), sq=0.84, wide=1.08),
-               "head": {"scale": (1.38, 1.95, 1.38), "loc": (0.0, 0.08, 0.02)}, "tail": {"rot": (-20.0, 0.0, -6.0)}}
+               "head": {"rot": (0.0, 0.0, 11.0), "scale": (1.38, 1.95, 1.38), "loc": (-0.03, 0.08, 0.02)},
+               "tail": {"rot": (-20.0, 0.0, -6.0)}}
     fire = {"body": body(rot=(-6.0, 0.0, 0.0), sq=1.13, wide=0.94),
-            "head": {"scale": (1.05, 1.45, 1.05), "loc": (0.0, 0.34, 0.12)}, "tail": {"rot": (-6.0, 0.0, 0.0)}}
+            "head": {"rot": (0.0, 0.0, 12.0), "scale": (1.05, 1.45, 1.05), "loc": (-0.1, 0.34, 0.12)},
+            "tail": {"rot": (-6.0, 0.0, 0.0)}}
     away = {"body": body(rot=(6.0, 0.0, 1.0), sq=1.05, wide=0.97),
-            "head": {"scale": 0.02, "loc": (0.0, 0.8, 0.3)}, "tail": {"rot": (8.0, 0.0, 2.0)}}
+            "head": {"scale": 0.02, "loc": (-0.22, 0.8, 0.3)}, "tail": {"rot": (8.0, 0.0, 2.0)}}
     recoil = {"body": body(rot=(8.0, 0.0, 2.0), sq=0.9, wide=1.05),
               "head": {"scale": 0.02, "loc": (0.0, -0.03, 0.0)}, "tail": {"rot": (12.0, 0.0, 4.0)}}
     refill = {"body": body(rot=(2.0, 0.0, 0.0), sq=0.98, wide=1.01),
@@ -762,15 +925,8 @@ def ingame_poses(arm, mesh, work, view_height=SPEC.GAME_VIEW_HEIGHTS[0], px=80):
     return out
 
 
-def review(arm, mesh, rep, reports, work, tex, notes):
-    RIG.unmute_none(arm)
-    bpy.context.view_layer.update()
-    out = {}
-    turn = R.turnaround([mesh], work, KEY, R.CREATURE_VIEWS, size=400)
-    height = rep.get("height_m") or 0.8
-    lo, hi = C.world_bounds([mesh])
-    size_p = size_compare(mesh, work, height, max(hi.x - lo.x, hi.y - lo.y))
-    strips = clip_strips(arm, mesh, work)
+def ingame_pair(arm, mesh, work):
+    """The game camera at TRUE 1080p size beside the hero mannequin: facing the camera and turned away."""
     ing = []
     for label, yaw in (("facing the camera", -30.0), ("turned away", 150.0)):
         arm.rotation_euler = (0.0, 0.0, math.radians(yaw))
@@ -781,6 +937,32 @@ def review(arm, mesh, rep, reports, work, tex, notes):
                      view_height=SPEC.GAME_VIEW_HEIGHTS[0], mannequin_obj=man, target=(-0.6, 0.0, 0.55))
         C.remove_objects([man])
         ing.append((label, r))
+    arm.rotation_euler = (0.0, 0.0, 0.0)
+    bpy.context.view_layer.update()
+    return ing
+
+
+def lite_review(arm, mesh, work):
+    """--lite: only the paint-iteration renders (the in-game pair and the close-ups), no sheets."""
+    RIG.unmute_none(arm)
+    bpy.context.view_layer.update()
+    ingame_pair(arm, mesh, work)
+    fl = bpy.data.objects.get("GFA_FLOOR")
+    if fl:
+        C.remove_objects([fl])
+    close_ups(arm, mesh, work)
+
+
+def review(arm, mesh, rep, reports, work, tex, notes):
+    RIG.unmute_none(arm)
+    bpy.context.view_layer.update()
+    out = {}
+    turn = R.turnaround([mesh], work, KEY, R.CREATURE_VIEWS, size=400)
+    height = rep.get("height_m") or 0.8
+    lo, hi = C.world_bounds([mesh])
+    size_p = size_compare(mesh, work, height, max(hi.x - lo.x, hi.y - lo.y))
+    strips = clip_strips(arm, mesh, work)
+    ing = ingame_pair(arm, mesh, work)
     arm.rotation_euler = (0.0, 0.0, math.radians(-30.0))
     poses = ingame_poses(arm, mesh, work)
     arm.rotation_euler = (0.0, 0.0, 0.0)
@@ -793,8 +975,8 @@ def review(arm, mesh, rep, reports, work, tex, notes):
     ppm = SPEC.SCREEN_H / SPEC.GAME_VIEW_HEIGHTS[0]
     layout = {
         "title": "Slagspitter  (slagspitter.glb)",
-        "subtitle": "The Unmade | Swarm Spire, Cinder Wastes | Lobber | verb LOB: a squat slag cone whose molten glob "
-                    "swells out of the maw and is thrown | GF_Swarm_v1",
+        "subtitle": "The Unmade | Swarm Spire, Cinder Wastes | Lobber | verb LOB: a leaning slag chimney whose molten "
+                    "glob swells out of the off-centre mortar muzzle and is thrown | GF_Swarm_v1",
         "width": 1600,
         "sections": [
             {"label": "Turnaround (rest pose) - toon preview of the final textures (engine-like ramp, rim, ink; emissive x1.6)",
@@ -831,12 +1013,13 @@ def review(arm, mesh, rep, reports, work, tex, notes):
     clips_layout = {"title": "Slagspitter - clip key frames", "subtitle": "GF_Swarm_v1 | %s" % ", ".join(
         c["name"].replace(KEY + "_", "") + " %.2fs" % c["seconds"] for c in RIG.clips_report(arm)),
         "width": 1600, "sections": rows, "notes": [
-            "windup: the cone squats and tilts back to aim while the molten glob (head bone) swells out of the maw; "
-            "it ends on the loaded pose (the client time-stretches it).",
-            "attack: the cone springs up, the glob leaves the maw on frame %d (attack_origin) and shrinks to nothing - "
-            "the engine's projectile takes over - then the cone recoils and the maw refills." % MOTION["lob_release_frame"],
-            "death: the glob swells and bursts (engine VFX at fx_core), the obsidian shards blow off, the cone slumps "
-            "into a puddle and shrinks away."]}
+            "windup: the spire squats and tilts back to aim while the molten glob (head bone) swells out of the "
+            "muzzle; it ends on the loaded pose (the client time-stretches it).",
+            "attack: the spire springs up, the glob leaves the muzzle on frame %d (attack_origin) and shrinks to "
+            "nothing - the engine's projectile takes over - then the spire recoils and the maw refills."
+            % MOTION["lob_release_frame"],
+            "death: the glob swells and bursts (engine VFX at fx_core), the obsidian shards blow off, the spire "
+            "slumps into a puddle and shrinks away."]}
     out["clips_sheet"] = R.contact_sheet(clips_layout, os.path.join(reports, "%s_clips.png" % KEY), work)
     out.update({"turn": turn, "size": size_p, "ingame": ing, "poses": poses})
     return out
@@ -854,8 +1037,9 @@ def build_full(b, mesh, col, pack, work, size, argv):
     skirt = [v.co.copy() for v in mesh.data.vertices if v.co.z < 0.012
              and any(g.group == body_vg and g.weight > 0 for g in v.groups)]
     import gfa_brush as BR
-    with crust_pass(b):
-        paint_rep = BR.paint_asset(mesh, KEY, recipes(b), tex_dir, size=size, decals=decals(b), broad=broad_zones(),
+    rec = recipes(b)
+    with crust_pass(b), value_pass(b, rec):
+        paint_rep = BR.paint_asset(mesh, KEY, rec, tex_dir, size=size, decals=decals(b), broad=broad_zones(),
                                    ao_distance=0.06, ao_samples=16, edge_min_angle=30.0, margin_px=3, uv_angle=66.0,
                                    seed=SEED, uv_zone_scale={"under": 0.2, "core": 0.75})
     arm = RIG.build_swarm_rig(b.pivots(), col=col)
@@ -894,6 +1078,10 @@ def build_full(b, mesh, col, pack, work, size, argv):
     C.write_json(os.path.join(reports, "%s_build_report.json" % KEY),
                  {"export": {k: rep[k] for k in rep if k not in ("nodes",)}, "paint": paint_rep, "skin": skin,
                   "parts": b.parts, "tris_blender": b.tris, "clips": RIG.clips_report(arm)})
+    if C.flag(argv, "--lite"):
+        lite_review(arm, mesh, work)
+        C.log("DONE (lite)", KEY)
+        return
     if not C.flag(argv, "--no-review"):
         tex = [os.path.join(tex_dir, KEY + "_basecolor.png"), os.path.join(tex_dir, KEY + "_emissive.png")]
         RIG.unmute_none(arm)
@@ -973,7 +1161,12 @@ def spawn(v, loc, yaw, clip=None, frame=0.0):
         if mod.type == "ARMATURE":
             mod.object = a2
     a2.location = loc
-    a2.rotation_euler = (0.0, 0.0, yaw)
+    # the glTF importer leaves its objects in QUATERNION mode (rotation_euler would be ignored - the first crowd
+    # render had every copy facing the same way): turn the imported rest rotation about world Z
+    q0 = v["arm"].rotation_quaternion.copy() if v["arm"].rotation_mode == "QUATERNION" else \
+        v["arm"].rotation_euler.to_quaternion()
+    a2.rotation_mode = "QUATERNION"
+    a2.rotation_quaternion = Quaternion((0.0, 0.0, 1.0), yaw) @ q0
     for pb in a2.pose.bones:
         pb.rotation_mode = "QUATERNION"
         pb.rotation_quaternion = (1, 0, 0, 0)
@@ -1021,33 +1214,11 @@ def upscale(src, dst, k):
     return dst
 
 
-def crowd_main():
-    """40 slagspitters hanging back at lob range among 24 clinkers (all four looks) swarming two heroes, through the
-    game camera at TRUE 1080p pixel size; plus a lineup (slagspitter, the four clinkers, the hero) at 1x and 3x."""
-    C.reset_scene(fps=FPS)
-    pack = C.pack_dir(KIND, KEY)
-    work = C.ensure_dir(os.path.join(pack, "work", "crowd"))
-    reports = C.ensure_dir(os.path.join(pack, "reports"))
-    ss = import_glb(KEY)
-    cl = [import_glb(k) for k in CLINKERS]
-    for i, v in enumerate([ss] + cl):
-        v["arm"].location = (200.0 + 5 * i, 200.0, 0.0)
-    bpy.context.view_layer.update()
+def horde_render(ss, cl, work, stem="crowd", four_player=True):
+    """The horde: two heroes, clinkers swarming close, slagspitters ringed at lob range (keep_distance 7 m), through
+    the game camera at TRUE 1080p pixel size. The layout, poses and yaws are seeded (the same for any slagspitter GLB:
+    enemies/slagspitter_fix_sheet.py renders the pre-fix one in it). ss / cl: import_glb() dicts."""
     out = {}
-    # 1. lineup through the game camera
-    made = []
-    made += spawn(ss, (0.0, 0.0, 0.0), math.radians(-20))
-    for i, v in enumerate(cl):
-        made += spawn(v, (1.1 + 0.85 * i, 0.15, 0.0), math.radians(-25))
-    man = R.mannequin(aim_dir=(0.3, -1.0, 0.0))
-    man.location = (-1.25, 0.2, 0.0)
-    bpy.context.view_layer.update()
-    meshes = [o for o in made if o.type == "MESH"]
-    out["lineup"] = game_render(meshes + [man], {man.name: R.MANNEQUIN}, os.path.join(work, "lineup_1x.png"), 290, 110,
-                                (1.0, 0.1, 0.45), ink=0.01)
-    clear_copies(made)
-    C.remove_objects([man])
-    # 2. the horde: two heroes, clinkers swarming close, slagspitters ringed at lob range (keep_distance 7 m)
     rng = random.Random(9)
     heroes = [Vector((-0.8, 0.9, 0.0)), Vector((0.9, 1.4, 0.0))]
     mans = []
@@ -1104,19 +1275,52 @@ def crowd_main():
     meshes = [o for o in made if o.type == "MESH"]
     flat = {m.name: R.MANNEQUIN for m in mans}
     tgt = (hc.x, hc.y + 0.6, 0.3)
-    out["crowd"] = game_render(meshes + mans, flat, os.path.join(work, "crowd_1x.png"), 900, 700, tgt,
-                               sil_path=os.path.join(work, "crowd_1x_sil.png"))
-    out["crowd_sil"] = os.path.join(work, "crowd_1x_sil.png")
-    out["crowd28"] = game_render(meshes + mans, flat, os.path.join(work, "crowd_1x_28.png"), 710, 550, tgt,
-                                 view_h=SPEC.GAME_VIEW_HEIGHTS[-1])
+    out["crowd"] = game_render(meshes + mans, flat, os.path.join(work, "%s_1x.png" % stem), 900, 700, tgt,
+                               sil_path=os.path.join(work, "%s_1x_sil.png" % stem))
+    out["crowd_sil"] = os.path.join(work, "%s_1x_sil.png" % stem)
+    if four_player:
+        out["crowd28"] = game_render(meshes + mans, flat, os.path.join(work, "%s_1x_28.png" % stem), 710, 550,
+                                     tgt, view_h=SPEC.GAME_VIEW_HEIGHTS[-1])
     clear_copies(made)
     C.remove_objects(mans)
+    out["phases"] = phases
+    return out
+
+
+def crowd_main():
+    """40 slagspitters hanging back at lob range among 24 clinkers (all four looks) swarming two heroes, through the
+    game camera at TRUE 1080p pixel size; plus a lineup (slagspitter, the four clinkers, the hero) at 1x and 3x."""
+    C.reset_scene(fps=FPS)
+    pack = C.pack_dir(KIND, KEY)
+    work = C.ensure_dir(os.path.join(pack, "work", "crowd"))
+    reports = C.ensure_dir(os.path.join(pack, "reports"))
+    ss = import_glb(KEY)
+    cl = [import_glb(k) for k in CLINKERS]
+    for i, v in enumerate([ss] + cl):
+        v["arm"].location = (200.0 + 5 * i, 200.0, 0.0)
+    bpy.context.view_layer.update()
+    out = {}
+    # 1. lineup through the game camera
+    made = []
+    made += spawn(ss, (0.0, 0.0, 0.0), math.radians(-20))
+    for i, v in enumerate(cl):
+        made += spawn(v, (1.1 + 0.85 * i, 0.15, 0.0), math.radians(-25))
+    man = R.mannequin(aim_dir=(0.3, -1.0, 0.0))
+    man.location = (-1.25, 0.2, 0.0)
+    bpy.context.view_layer.update()
+    meshes = [o for o in made if o.type == "MESH"]
+    out["lineup"] = game_render(meshes + [man], {man.name: R.MANNEQUIN}, os.path.join(work, "lineup_1x.png"), 290, 110,
+                                (1.0, 0.1, 0.45), ink=0.01)
+    clear_copies(made)
+    C.remove_objects([man])
+    # 2. the horde
+    out.update(horde_render(ss, cl, work))
     fl = bpy.data.objects.get("GFA_FLOOR")
     if fl:
         C.remove_objects([fl])
     crowd2x = upscale(out["crowd"], os.path.join(work, "crowd_2x.png"), 2)
     shutil.copyfile(crowd2x, os.path.join(reports, "%s_crowd.png" % KEY))
-    counts = {c: phases.count(c) for c in set(phases)}
+    counts = {c: out["phases"].count(c) for c in set(out["phases"])}
     sections = [
         {"label": "Lineup through the game camera (55 deg, %.1f px/m): slagspitter, the four clinker looks, the 2.2 m hero - "
                   "1x, then 3x nearest" % (SPEC.SCREEN_H / SPEC.GAME_VIEW_HEIGHTS[0]), "height": None,

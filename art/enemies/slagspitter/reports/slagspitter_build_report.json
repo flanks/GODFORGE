@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "swarm",
   "extensions_used": [],
-  "tris": 942,
+  "tris": 1230,
   "budget": [
    600,
    1500
@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 113180
+    "bytes": 120120
    },
    {
     "name": "slagspitter_basecolor",
@@ -29,69 +29,18 @@
      512
     ],
     "format": "png",
-    "bytes": 256631
+    "bytes": 295122
    }
   ],
   "materials": [
    "M_slagspitter"
   ],
   "sockets": {
-   "head_top": {
-    "translation": [
-     0.0,
-     1.2,
-     0.0
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "fx_core": {
-    "translation": [
-     -0.0314,
-     0.628,
-     0.0722
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
    "hit_center": {
     "translation": [
-     0.0,
-     0.4,
-     0.0
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "fx_mouth": {
-    "translation": [
-     -0.03,
-     0.67,
-     0.066
+     -0.0886,
+     0.42,
+     0.0089
     ],
     "forward": [
      -0.0,
@@ -106,9 +55,60 @@
    },
    "attack_origin": {
     "translation": [
-     -0.0314,
-     0.766,
-     0.0722
+     -0.3048,
+     1.024,
+     0.0305
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     -0.3048,
+     0.909,
+     0.0305
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     -0.292,
+     0.955,
+     0.0292
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     1.35,
+     0.0
     ],
     "forward": [
      -0.0,
@@ -124,18 +124,18 @@
   },
   "bounds": {
    "min": [
-    -0.6288,
+    -0.5725,
     0.0,
-    -0.69
+    -0.6232
    ],
    "max": [
-    0.5673,
-    0.8451,
-    0.594
+    0.5138,
+    1.0461,
+    0.438
    ]
   },
-  "height_m": 0.845,
-  "height_vs_hero": 0.384,
+  "height_m": 1.046,
+  "height_vs_hero": 0.476,
   "joints": [
    "root",
    "body",
@@ -159,11 +159,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 165.8,
-   "p10": 123.4,
-   "p90": 174.9
+   "median": 168.9,
+   "p10": 127.0,
+   "p90": 180.1
   },
-  "coverage": 0.456,
+  "coverage": 0.392,
   "zones": [
    "slag",
    "crust",
@@ -180,16 +180,16 @@
   "decals": 10,
   "basecolor": "art/enemies/slagspitter/textures/slagspitter_basecolor.png",
   "emissive": "art/enemies/slagspitter/textures/slagspitter_emissive.png",
-  "emissive_texels": 77917,
-  "seconds": 53.4
+  "emissive_texels": 102119,
+  "seconds": 14.9
  },
  "skin": {
-  "vertices": 603,
+  "vertices": 771,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 452,
+   "body": 620,
    "head": 52,
    "legs_a": 54,
    "legs_b": 27,
@@ -202,7 +202,7 @@
    "name": "core_core",
    "zone": "core",
    "bone": "body",
-   "faces": 120
+   "faces": 132
   },
   {
    "id": 1,
@@ -216,84 +216,84 @@
    "name": "plate0_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 3,
    "name": "plate0_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 4,
    "name": "plate1_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 5,
    "name": "plate1_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 6,
    "name": "plate2_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 7,
    "name": "plate2_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 8,
    "name": "plate3_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 9,
    "name": "plate3_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 10,
    "name": "plate4_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 11,
    "name": "plate4_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 12,
    "name": "plate5_crust",
    "zone": "crust",
    "bone": "body",
-   "faces": 10
+   "faces": 12
   },
   {
    "id": 13,
    "name": "plate5_slag",
    "zone": "slag",
    "bone": "body",
-   "faces": 22
+   "faces": 40
   },
   {
    "id": 14,
@@ -307,7 +307,7 @@
    "name": "spill",
    "zone": "spill",
    "bone": "body",
-   "faces": 26
+   "faces": 38
   },
   {
    "id": 16,
@@ -373,7 +373,7 @@
    "faces": 6
   }
  ],
- "tris_blender": 942,
+ "tris_blender": 1230,
  "clips": [
   {
    "name": "slagspitter_idle@loop",

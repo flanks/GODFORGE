@@ -3,7 +3,7 @@
  "kind": "enemy",
  "tier": "swarm",
  "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
