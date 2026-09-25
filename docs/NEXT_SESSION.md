@@ -14,6 +14,17 @@ cargo test --workspace                   # 130+ tests, all green at handoff
 `rust-toolchain.toml` pins Rust 1.96.0, so rustup installs it automatically. The engine is
 **Bevy `=0.20.0-rc.1`, exactly**. Don't bump it: the user insisted on this version.
 
+## Open-world biomes: the plan of record
+
+**Read [OPEN_WORLD.md](OPEN_WORLD.md) before starting map, run-flow, director, bot or HUD work.** The
+user has replaced the Hades-style room run with one huge generated map per biome (NIMRODS-style: fog
+of war, a minimap, POIs that grant Seals, a mandatory Warlord, a Boss Gate into the authored boss
+arena). The design is settled and split into five phases with file-owned parallel lanes (§10) and a
+per-phase proof (§11). It replaces requests 2 and 3 in §2 below. §3a (procedural arenas) and §3b (NPR
+materials) are already done (`e24c83e`, `69fa94b`, `63d2f3d`); the room layout grammar (`c0bddae`) is
+what the map generator composes regions from. Start with phase 1. The EA run-length target (§13
+there) needs the user's sign-off.
+
 ## 1. Where the project stands
 
 Read `README.md` and `docs/ARCHITECTURE.md` first. In short:
