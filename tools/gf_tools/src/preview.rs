@@ -1,23 +1,29 @@
-//! Top-down layout previews of generated arenas, so level design can be judged by looking:
+//! Top-down layout previews of generated arenas and biome maps, so level design can be judged by
+//! looking:
 //!
 //! ```text
 //! gf-content preview-room <template_key> <seed> <out.png> [--scale PX]
 //! gf-content preview-sheet <out.png> [--biome KEY] [--templates a,b] [--kinds combat,elite,anvil,treasure]
 //!                          [--seeds N] [--seed0 S] [--scale PX]
 //! gf-content layout-stats [--biome KEY] [--seeds N]
+//! gf-content layout-stats --maps [--biome KEY] [--seeds N]
 //! ```
 //!
 //! A pure software raster (signed-distance shapes with 1 px anti-aliasing and a 5×7 bitmap font),
 //! drawn in a readable map language rather than the game's look: obstacles in ink, decor by family,
-//! lanes as pale stripes, spawn green, plaza gold, gates cyan, landmarks labelled.
+//! lanes as pale stripes, spawn green, plaza gold, gates cyan, landmarks labelled. Biome maps add
+//! their tiles (region colours, roads, plazas, bridges, liquid, void, land cut off from the
+//! Landing in red), cliffs and region borders, passes, POIs by kind and camps.
 
 use gf_content::ContentDb;
 use gf_content::procgen;
 use gf_content::schema::*;
 use gf_core::movement::Obstacle;
+use gf_core::poi::PoiKind;
 use glam::Vec2;
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::time::Instant;
 
 // ───────────────────────────── raster ─────────────────────────────
 
@@ -391,6 +397,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::InvertedColumn { .. } => ("INVERTED COLUMN", hex("#B89AE8")),
         Decor::Rift { .. } => ("RIFT", hex("#FF4AD8")),
         Decor::Channel { .. } => ("CHANNEL", p.liquid),
+        Decor::FallenWeapon { .. } => ("FALLEN WEAPON *", hex("#C9B98E")),
         Decor::Bridge { .. } => ("BRIDGE", hex("#D8C8A8")),
         Decor::Pool { .. } => ("POOL", hex("#4A9AC8")),
         Decor::Paving { .. } => ("PAVING", p.ground.scale(3.2).mix(WHITE, 0.15)),
@@ -630,6 +637,28 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             segment(cv, v, at - d * (radius + 0.6), at + d * (radius + 0.6), 0.28, col, 1.0);
             segment(cv, v, at - d * (radius + 0.3), at + d * (radius + 0.3), 0.1, WHITE, 1.0);
         }
+        Decor::FallenWeapon { at, radius, height, rot, variant } => {
+            // The impact crater, then the weapon lying back along its lean (length ~ its height).
+            circle(cv, v, at, radius * 1.3, hex("#2A2420"), 0.6);
+            circle(cv, v, at, radius, col.scale(0.75), 1.0);
+            ring(cv, v, at, radius, 0.16, ink, 1.0);
+            let d = rot16_dir(rot);
+            let tip = at + d * (height * 0.45).max(radius + 1.0);
+            let w = match variant % 5 {
+                1 => 0.35,
+                2 => 0.18,
+                4 => 0.55,
+                _ => 0.28,
+            } * radius;
+            segment(cv, v, at, tip, w, col, 1.0);
+            let head = match variant % 5 {
+                1 => 0.9,
+                4 => 0.7,
+                _ => 0.45,
+            } * radius;
+            circle(cv, v, tip, head, col.scale(1.1), 1.0);
+            ring(cv, v, tip, head, 0.12, ink, 1.0);
+        }
         Decor::Brazier { at } => {
             circle(cv, v, at, 1.2, col, 0.2);
             circle(cv, v, at, 0.42, col, 1.0);
@@ -659,6 +688,7 @@ fn landmark_label(d: &Decor) -> Option<&'static str> {
         Decor::GreatBrazier { .. } => Some("FORGE FIRE"),
         Decor::SealedGate { .. } => Some("SEALED GATE"),
         Decor::SpiralStair { .. } => Some("SPIRAL STAIR"),
+        Decor::FallenWeapon { .. } => Some("FALLEN ARMS"),
         _ => None,
     }
 }
@@ -675,6 +705,31 @@ fn district_name(k: DistrictKind) -> String {
 
 /// Border band around the arena (outside the playable rectangle).
 const PAD: f32 = 4.0;
+
+/// Decor floor layers, then obstacles, then solids and props. Undressed obstacles are flagged
+/// magenta: every generated obstacle should carry a solid decor.
+fn draw_layout(cv: &mut Canvas, v: &View, room: &RoomDef, p: &Palette) {
+    let mut order: Vec<usize> = (0..room.decor.len()).collect();
+    order.sort_by_key(|&i| layer(&room.decor[i]));
+    let (floor_decor, rest): (Vec<usize>, Vec<usize>) = order.iter().partition(|&&i| layer(&room.decor[i]) < 4);
+    for &i in &floor_decor {
+        draw_decor(cv, v, &room.decor[i], p, i);
+    }
+    let solid: Vec<&Decor> = room.decor.iter().filter(|d| d.is_solid()).collect();
+    for o in &room.obstacles {
+        let c = match *o {
+            Obstacle::Circle { center, .. } | Obstacle::Box { center, .. } => center,
+        };
+        let col = if solid.iter().any(|d| d.covers(c)) { hex("#3A322C") } else { hex("#FF00FF") };
+        match *o {
+            Obstacle::Circle { center, radius } => circle(cv, v, center, radius, col, 1.0),
+            Obstacle::Box { center, half } => boxf(cv, v, center, half, col, 1.0),
+        }
+    }
+    for &i in &rest {
+        draw_decor(cv, v, &room.decor[i], p, i);
+    }
+}
 
 /// Render one room into a new canvas (map only, no legend).
 fn render_room(db: &ContentDb, room: &RoomDef, s: f32, labels: bool) -> Canvas {
@@ -738,28 +793,7 @@ fn render_room(db: &ContentDb, room: &RoomDef, s: f32, labels: bool) -> Canvas {
         segment(&mut cv, &v, l.from, l.to, l.width * 0.5, WHITE, 0.10);
         dashed(&mut cv, &v, l.from, l.to, 0.08, 0.6, WHITE, 0.35);
     }
-    // Decor floor layers, then obstacles, then solids and props.
-    let mut order: Vec<usize> = (0..room.decor.len()).collect();
-    order.sort_by_key(|&i| layer(&room.decor[i]));
-    let (floor_decor, rest): (Vec<usize>, Vec<usize>) = order.iter().partition(|&&i| layer(&room.decor[i]) < 4);
-    for &i in &floor_decor {
-        draw_decor(&mut cv, &v, &room.decor[i], &p, i);
-    }
-    let solid: Vec<&Decor> = room.decor.iter().filter(|d| d.is_solid()).collect();
-    for o in &room.obstacles {
-        let c = match *o {
-            Obstacle::Circle { center, .. } | Obstacle::Box { center, .. } => center,
-        };
-        // Undressed obstacles are flagged magenta: every generated obstacle should carry a solid decor.
-        let col = if solid.iter().any(|d| d.covers(c)) { hex("#3A322C") } else { hex("#FF00FF") };
-        match *o {
-            Obstacle::Circle { center, radius } => circle(&mut cv, &v, center, radius, col, 1.0),
-            Obstacle::Box { center, half } => boxf(&mut cv, &v, center, half, col, 1.0),
-        }
-    }
-    for &i in &rest {
-        draw_decor(&mut cv, &v, &room.decor[i], &p, i);
-    }
+    draw_layout(&mut cv, &v, room, &p);
     // Floor an elite cannot reach from the spawn (should be none): flagged red.
     for p in Grid::new(room).sealed(room.player_spawn, 1.0) {
         boxf(&mut cv, &v, p, Vec2::splat(Grid::CELL * 0.5), hex("#FF2020"), 0.85);
@@ -803,6 +837,335 @@ fn render_room(db: &ContentDb, room: &RoomDef, s: f32, labels: bool) -> Canvas {
         cv.label(q.x as i64 - 15 * ls, q.y as i64 + (1.8 * s) as i64, "SPAWN", ls, hex("#40E070"));
     }
     cv
+}
+
+// ───────────────────────────── biome maps ─────────────────────────────
+
+fn poi_color(p: &Palette, poi: &PoiSite) -> Rgb {
+    match poi.kind {
+        PoiKind::Anvil => hex("#FF8A2A"),
+        PoiKind::Warlord => hex("#FF3B30"),
+        PoiKind::Lair => hex("#B0303A"),
+        PoiKind::Shrine => poi.god.map_or(hex("#FFD36B"), |g| god_color(p, g)),
+        PoiKind::Reliquary => hex("#F0C040"),
+        PoiKind::Vein => hex("#40E8E0"),
+        PoiKind::Spring => hex("#5AA8FF"),
+        PoiKind::Watchfire => hex("#FFB040"),
+        PoiKind::Gate => hex("#40D8FF"),
+    }
+}
+
+const LANDING: Rgb = Rgb(0.25, 0.88, 0.44);
+const CAMP: Rgb = Rgb(0.55, 0.12, 0.12);
+const ELITE_RING: Rgb = Rgb(0.94, 0.75, 0.25);
+const UNREACHED: Rgb = Rgb(1.0, 0.12, 0.12);
+
+fn tile_color(kind: TileKind, region: Rgb, p: &Palette, abyss: Rgb) -> Rgb {
+    match kind {
+        TileKind::Void => abyss,
+        TileKind::Ground => region,
+        TileKind::Road => region.mix(hex("#D8B070"), 0.55),
+        TileKind::Plaza => region.mix(hex("#F0D8A0"), 0.6),
+        TileKind::Bridge => hex("#B89A70"),
+        TileKind::Liquid => p.liquid.scale(0.85),
+    }
+}
+
+/// Land tiles a walker reaches from `from` over land (4-neighbour; obstacles ignored): what a
+/// river or chasm without a bridge cuts off.
+fn reachable_tiles(t: &TileGrid, from: Vec2) -> Vec<bool> {
+    let mut seen = vec![false; t.kind.len()];
+    let Some(start) = t.tile_of(from) else { return seen };
+    let mut stack = vec![start];
+    while let Some((x, y)) = stack.pop() {
+        let i = t.index(x, y);
+        if seen[i] || !t.kind[i].is_land() {
+            continue;
+        }
+        seen[i] = true;
+        if x > 0 {
+            stack.push((x - 1, y));
+        }
+        if y > 0 {
+            stack.push((x, y - 1));
+        }
+        if x + 1 < t.w {
+            stack.push((x + 1, y));
+        }
+        if y + 1 < t.h {
+            stack.push((x, y + 1));
+        }
+    }
+    seen
+}
+
+/// A biome map's design readout (not a test).
+#[derive(Clone, Debug, Default)]
+pub struct MapStats {
+    pub ms: f32,
+    pub land: f32,
+    pub road: f32,
+    pub pit: f32,
+    /// Share of land tiles not reachable from the Landing over land.
+    pub unreached: f32,
+    pub regions: usize,
+    pub roads: usize,
+    pub passes: usize,
+    pub pois: usize,
+    pub seals: u32,
+    pub camps: usize,
+    pub obstacles: usize,
+    pub pits: usize,
+    pub decor: usize,
+    pub relaxed: u8,
+    pub repairs: u8,
+    pub hash: u64,
+}
+
+pub fn map_stats(room: &RoomDef, map: &MapLayout, ms: f32) -> MapStats {
+    let t = &map.tiles;
+    let n = t.kind.len().max(1) as f32;
+    let count = |f: &dyn Fn(TileKind) -> bool| t.kind.iter().filter(|k| f(**k)).count();
+    let land = count(&|k| k.is_land());
+    let reach = reachable_tiles(t, room.player_spawn);
+    let reached = reach.iter().filter(|r| **r).count();
+    MapStats {
+        ms,
+        land: land as f32 / n,
+        road: count(&|k| k == TileKind::Road) as f32 / n,
+        pit: count(&|k| k.is_pit()) as f32 / n,
+        unreached: 1.0 - reached as f32 / land.max(1) as f32,
+        regions: map.regions.len(),
+        roads: map.roads.len(),
+        passes: map.passes.len(),
+        pois: map.pois.len(),
+        seals: map.pois.iter().map(|p| p.seals as u32).sum(),
+        camps: map.camps.len(),
+        obstacles: room.obstacles.len(),
+        pits: map.pits.len(),
+        decor: room.decor.len(),
+        relaxed: map.relaxed,
+        repairs: map.repairs,
+        hash: map.hash,
+    }
+}
+
+fn map_stats_line(s: &MapStats) -> String {
+    format!(
+        "GEN {:.1}MS  LAND {:.0}%  ROAD {:.0}%  PIT {:.0}%  UNREACHED {:.1}%  REGIONS {}  ROADS {}  PASSES {}  POIS {}  SEALS {}  CAMPS {}  OBST {}  PITS {}  DECOR {}  RELAXED {}  REPAIRS {}  HASH {:016X}",
+        s.ms,
+        s.land * 100.0,
+        s.road * 100.0,
+        s.pit * 100.0,
+        s.unreached * 100.0,
+        s.regions,
+        s.roads,
+        s.passes,
+        s.pois,
+        s.seals,
+        s.camps,
+        s.obstacles,
+        s.pits,
+        s.decor,
+        s.relaxed,
+        s.repairs,
+        s.hash
+    )
+}
+
+/// Render a biome map: tiles by region and kind, coast and region borders, pits, roads and passes,
+/// the room-grammar layout, camps, POIs and the Landing. Markers keep a fixed pixel size, so the
+/// map reads at any scale.
+fn render_map(db: &ContentDb, room: &RoomDef, map: &MapLayout, s: f32, labels: bool) -> Canvas {
+    let p = palette(db, room);
+    let half = room.half_extents;
+    let w = ((half.x + PAD) * 2.0 * s).ceil() as usize;
+    let h = ((half.y + PAD) * 2.0 * s).ceil() as usize;
+    let abyss = p.deep.scale(0.45);
+    let mut cv = Canvas::new(w, h, abyss);
+    let v = View { cx: w as f32 * 0.5, cy: h as f32 * 0.5, s };
+    let px = 1.0 / s;
+    let themes: &[RegionTheme] = room.expedition.as_ref().map_or(&[], |x| &x.themes);
+    let theme_of = |r: u8| map.regions.get(r as usize).and_then(|reg| themes.get(reg.theme as usize));
+    let region_color = |r: u8| theme_of(r).map_or(p.ground.scale(2.4), |t| hex(&t.map_color).scale(1.25));
+    let t = &map.tiles;
+    let reach = reachable_tiles(t, room.player_spawn);
+    let hs = t.size * 0.5;
+    for y in 0..t.h {
+        for x in 0..t.w {
+            let i = t.index(x, y);
+            let c = t.center(x, y);
+            let (a, b) = (v.px(c + Vec2::new(-hs, hs)), v.px(c + Vec2::new(hs, -hs)));
+            let (x0, y0, x1, y1) = (a.x.round() as i64, a.y.round() as i64, b.x.round() as i64, b.y.round() as i64);
+            cv.rect(x0, y0, x1, y1, tile_color(t.kind[i], region_color(t.region[i]), &p, abyss), 1.0);
+            if t.kind[i].is_land() && !reach[i] {
+                cv.rect(x0, y0, x1, y1, UNREACHED, 0.45);
+            }
+        }
+    }
+    // Cliffs where land meets void or liquid (the grid edge counts as void), region borders.
+    let land = |x: i32, y: i32| {
+        x >= 0 && y >= 0 && x < t.w as i32 && y < t.h as i32 && t.kind[t.index(x as u16, y as u16)].is_land()
+    };
+    for y in 0..t.h as i32 {
+        for x in 0..t.w as i32 {
+            let c = t.center(x as u16, y as u16);
+            for (dx, dy) in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
+                let (nx, ny) = (x + dx, y + dy);
+                let d = Vec2::new(dx as f32, dy as f32);
+                let (e0, e1) = (c + (d + d.perp()) * hs, c + (d - d.perp()) * hs);
+                if land(x, y) && !land(nx, ny) {
+                    segment(&mut cv, &v, e0, e1, 0.9 * px + 0.1, INK, 0.9);
+                } else if (dx, dy) > (0, 0) && land(x, y) && land(nx, ny) {
+                    let (i, j) = (t.index(x as u16, y as u16), t.index(nx as u16, ny as u16));
+                    if t.region[i] != t.region[j] {
+                        segment(&mut cv, &v, e0, e1, 0.6 * px, INK, 0.35);
+                    }
+                }
+            }
+        }
+    }
+    // Pit boxes as merged by the generator.
+    for o in &map.pits {
+        if let Obstacle::Box { center, half } = *o {
+            box_outline(&mut cv, &v, center, half, 0.8 * px, p.accent, 0.35);
+        }
+    }
+    for l in &map.roads {
+        segment(&mut cv, &v, l.from, l.to, l.width * 0.5, hex("#F0D8A0"), 0.12);
+        dashed(&mut cv, &v, l.from, l.to, 0.7 * px, 2.0, hex("#F0D8A0"), 0.8);
+    }
+    for ps in &map.passes {
+        let n = rot16_dir(ps.along).perp() * (ps.width * 0.5);
+        let col = match ps.kind {
+            BarrierKind::Chasm | BarrierKind::River => hex("#D8C8A8"),
+            BarrierKind::Wall | BarrierKind::Ridge => hex("#E0C89A"),
+        };
+        segment(&mut cv, &v, ps.at - n, ps.at + n, 2.0 * px, INK, 1.0);
+        segment(&mut cv, &v, ps.at - n, ps.at + n, 1.2 * px, col, 1.0);
+    }
+    draw_layout(&mut cv, &v, room, &p);
+    for c in &map.camps {
+        if c.elite.is_some() {
+            ring(&mut cv, &v, c.at, 6.5 * px, 1.4 * px, ELITE_RING, 1.0);
+        }
+        circle(&mut cv, &v, c.at, 4.5 * px, CAMP, 1.0);
+        ring(&mut cv, &v, c.at, 4.5 * px, 1.2 * px, INK, 1.0);
+    }
+    for poi in &map.pois {
+        let col = poi_color(&p, poi);
+        ring(&mut cv, &v, poi.at, poi.radius, 1.5 * px, col, 0.9);
+        if poi.kind == PoiKind::Gate {
+            boxf(&mut cv, &v, poi.at, Vec2::splat(6.0 * px), col, 1.0);
+            box_outline(&mut cv, &v, poi.at, Vec2::splat(6.0 * px), 1.2 * px, INK, 1.0);
+        } else {
+            circle(&mut cv, &v, poi.at, 5.5 * px, col, 1.0);
+            ring(&mut cv, &v, poi.at, 5.5 * px, 1.2 * px, INK, 1.0);
+        }
+    }
+    ring(&mut cv, &v, room.player_spawn, 8.0 * px, 2.0 * px, LANDING, 1.0);
+    circle(&mut cv, &v, room.player_spawn, 4.0 * px, LANDING, 1.0);
+    if labels {
+        let ls = if s >= 5.0 { 2 } else { 1 };
+        let centred = |cv: &mut Canvas, at: Vec2, dy: i64, text: &str, c: Rgb| {
+            let q = v.px(at);
+            cv.label(q.x as i64 - (text.len() as i64 * 6 * ls) / 2, q.y as i64 + dy, text, ls, c);
+        };
+        for (r, reg) in map.regions.iter().enumerate() {
+            let name = theme_of(r as u8).map_or_else(|| format!("REGION {r}"), |t| t.name.to_ascii_uppercase());
+            centred(&mut cv, reg.site, -3 * ls, &name, TEXT);
+        }
+        for poi in &map.pois {
+            let mut text = poi.kind.name().to_ascii_uppercase();
+            if poi.kind == PoiKind::Shrine
+                && let Some(g) = poi.god.and_then(|g| db.gods.try_get(g as u16))
+            {
+                text = format!("{text} {}", g.name.to_ascii_uppercase());
+            }
+            if poi.seals > 0 {
+                text = format!("{text} +{}", poi.seals);
+            }
+            centred(&mut cv, poi.at, -(9 + 8 * ls), &text, poi_color(&p, poi));
+        }
+        centred(&mut cv, room.player_spawn, 11, "LANDING", LANDING);
+    }
+    cv
+}
+
+fn map_legend(db: &ContentDb, room: &RoomDef, map: &MapLayout, width: usize, height: usize) -> Canvas {
+    let mut cv = Canvas::new(width, height, Rgb(0.09, 0.08, 0.08));
+    let p = palette(db, room);
+    let mut y = 12i64;
+    cv.text(12, y, "LEGEND", 2, TEXT);
+    y += 26;
+    let row = |cv: &mut Canvas, col: Rgb, name: &str, y: &mut i64| {
+        cv.rect(12, *y, 30, *y + 12, col, 1.0);
+        cv.text(38, *y + 2, name, 1, TEXT);
+        *y += 17;
+    };
+    let ground = p.ground.scale(2.4);
+    row(&mut cv, LANDING, "LANDING (SPAWN)", &mut y);
+    for (kind, name) in [
+        (TileKind::Road, "ROAD"),
+        (TileKind::Plaza, "PLAZA (POI CLEARING)"),
+        (TileKind::Bridge, "BRIDGE"),
+        (TileKind::Liquid, "LIQUID (PIT)"),
+        (TileKind::Void, "VOID (PIT)"),
+    ] {
+        row(&mut cv, tile_color(kind, ground, &p, p.deep.scale(0.7)), name, &mut y);
+    }
+    row(&mut cv, UNREACHED, "LAND CUT OFF FROM LANDING", &mut y);
+    row(&mut cv, CAMP, "CAMP (GOLD RING: ELITE)", &mut y);
+    row(&mut cv, hex("#3A322C"), "OBSTACLE", &mut y);
+    row(&mut cv, hex("#FF00FF"), "UNDRESSED OBSTACLE", &mut y);
+    y += 8;
+    cv.text(12, y, "POIS", 1, DIM);
+    y += 16;
+    let mut kinds: Vec<PoiKind> = map.pois.iter().map(|q| q.kind).collect();
+    kinds.sort();
+    kinds.dedup();
+    for k in kinds {
+        let n = map.pois.iter().filter(|q| q.kind == k).count();
+        let sample = map.pois.iter().find(|q| q.kind == k).copied();
+        let col = sample.map_or(TEXT, |q| poi_color(&p, &q));
+        row(&mut cv, col, &format!("{}  {n}", k.name().to_ascii_uppercase()), &mut y);
+    }
+    y += 8;
+    if let Some(x) = &room.expedition {
+        cv.text(12, y, "REGIONS", 1, DIM);
+        y += 16;
+        for (i, t) in x.themes.iter().enumerate() {
+            let n = map.regions.iter().filter(|r| r.theme as usize == i).count();
+            if n > 0 {
+                row(&mut cv, hex(&t.map_color).scale(1.25), &format!("{}  {n}", t.name.to_ascii_uppercase()), &mut y);
+            }
+        }
+        y += 8;
+    }
+    let mut seen: BTreeMap<&'static str, (Rgb, usize)> = BTreeMap::new();
+    for d in &room.decor {
+        let (name, col) = decor_key(d, &p);
+        seen.entry(name).or_insert((col, 0)).1 += 1;
+    }
+    if !seen.is_empty() && y < height as i64 - 40 {
+        cv.text(12, y, "DECOR  (* LANDMARK)", 1, DIM);
+        y += 16;
+        for (name, (col, n)) in &seen {
+            row(&mut cv, *col, &format!("{name}  {n}"), &mut y);
+            if y > height as i64 - 20 {
+                break;
+            }
+        }
+    }
+    cv
+}
+
+/// Render any generated layout: a biome map or a room.
+fn render(db: &ContentDb, room: &RoomDef, s: f32, labels: bool) -> Canvas {
+    match &room.map {
+        Some(map) => render_map(db, room, map, s, labels),
+        None => render_room(db, room, s, labels),
+    }
 }
 
 // ───────────────────────────── stats ─────────────────────────────
@@ -1024,7 +1387,20 @@ fn resolve(db: &ContentDb, key: &str, seed: u32) -> Result<RoomDef, String> {
     Ok(procgen::resolve_room(db, id, seed))
 }
 
-/// Render one generated room; `ron_dump` also writes the full [`RoomDef`] next to the PNG.
+/// Resolve and time one layout (milliseconds).
+fn resolve_timed(db: &ContentDb, key: &str, seed: u32) -> Result<(RoomDef, f32), String> {
+    let t0 = Instant::now();
+    let room = resolve(db, key, seed)?;
+    Ok((room, t0.elapsed().as_secs_f32() * 1000.0))
+}
+
+/// Default pixels per world unit: rooms fill a screen at 10, a whole biome map at 3.
+pub fn default_scale(db: &ContentDb, key: &str) -> f32 {
+    if db.rooms.by_key(key).is_some_and(|t| t.kind == RoomKind::Expedition) { 3.0 } else { 10.0 }
+}
+
+/// Render one generated room or biome map; `ron_dump` also writes the full [`RoomDef`] next to
+/// the PNG (a map's tiles, POIs and camps are generated state and are not part of it).
 pub fn preview_room(
     db: &ContentDb,
     key: &str,
@@ -1033,32 +1409,36 @@ pub fn preview_room(
     scale: f32,
     ron_dump: bool,
 ) -> Result<(), String> {
-    let room = resolve(db, key, seed)?;
-    let map = render_room(db, &room, scale, true);
-    let st = stats(&room);
+    let (room, ms) = resolve_timed(db, key, seed)?;
+    let (img, line) = match &room.map {
+        Some(map) => (render_map(db, &room, map, scale, true), map_stats_line(&map_stats(&room, map, ms))),
+        None => (render_room(db, &room, scale, true), stats_line(&stats(&room))),
+    };
     let title_h = 34;
     let legend_w = 250;
-    let mut cv = Canvas::new(map.w + legend_w, map.h + title_h, Rgb(0.09, 0.08, 0.08));
+    let mut cv = Canvas::new(img.w + legend_w, img.h + title_h, Rgb(0.09, 0.08, 0.08));
     cv.text(10, 8, &format!("{}  SEED {seed}", room.key), 2, TEXT);
     cv.text(
         10,
         24,
         &format!(
-            "{} {:?}  {}X{} U   {}",
+            "{} {:?}  {}X{} U   {line}",
             room.biome,
             room.kind,
             room.half_extents.x * 2.0,
-            room.half_extents.y * 2.0,
-            stats_line(&st)
+            room.half_extents.y * 2.0
         ),
         1,
         DIM,
     );
-    cv.blit(&map, 0, title_h);
-    let lg = legend(db, &[&room], legend_w, map.h);
-    cv.blit(&lg, map.w, title_h);
+    cv.blit(&img, 0, title_h);
+    let lg = match &room.map {
+        Some(map) => map_legend(db, &room, map, legend_w, img.h),
+        None => legend(db, &[&room], legend_w, img.h),
+    };
+    cv.blit(&lg, img.w, title_h);
     cv.save_png(out)?;
-    println!("{}  {}", room.key, stats_line(&st));
+    println!("{}  {line}", room.key);
     println!("wrote {}", out.display());
     if ron_dump {
         let path = out.with_extension("ron");
@@ -1078,6 +1458,8 @@ pub struct SheetOptions {
     pub scale: f32,
 }
 
+/// Generated templates to show. Biome maps join only when asked for by kind or key: a sheet of
+/// rooms stays a sheet of rooms.
 fn pick_templates(db: &ContentDb, biome: Option<&str>, templates: &[String], kinds: &[RoomKind]) -> Vec<String> {
     if !templates.is_empty() {
         return templates.to_vec();
@@ -1086,7 +1468,7 @@ fn pick_templates(db: &ContentDb, biome: Option<&str>, templates: &[String], kin
         .iter()
         .filter(|r| procgen::is_generated_kind(r.kind))
         .filter(|r| biome.is_none_or(|b| r.biome == b))
-        .filter(|r| kinds.is_empty() || kinds.contains(&r.kind))
+        .filter(|r| if kinds.is_empty() { r.kind != RoomKind::Expedition } else { kinds.contains(&r.kind) })
         .map(|r| r.key.clone())
         .collect()
 }
@@ -1121,21 +1503,38 @@ pub fn preview_sheet(db: &ContentDb, o: &SheetOptions, out: &Path) -> Result<(),
     let mut all = Vec::new();
     for (ri, row) in rooms.iter().enumerate() {
         for (ci, room) in row.iter().enumerate() {
-            let map = render_room(db, room, o.scale, true);
+            let map = render(db, room, o.scale, true);
             let x = ci * cell_w + (cell_w - map.w) / 2;
             let y = title_h + ri * cell_h + 26 + (cell_h - 30 - map.h) / 2;
             cv.blit(&map, x, y);
-            let st = stats(room);
             cv.text((ci * cell_w + 6) as i64, (title_h + ri * cell_h + 4) as i64, &room.key, 1, TEXT);
-            let short = format!(
-                "OBST {}  BLOCK {:.1}%  OPEN {:.0}%  SEAL {:.1}%",
-                st.obstacles,
-                st.blocked * 100.0,
-                st.open * 100.0,
-                st.sealed_elite * 100.0
-            );
+            let (short, line) = match &room.map {
+                Some(m) => {
+                    let st = map_stats(room, m, 0.0);
+                    let short = format!(
+                        "POIS {}  CAMPS {}  OBST {}  UNREACHED {:.1}%  REPAIRS {}",
+                        st.pois,
+                        st.camps,
+                        st.obstacles,
+                        st.unreached * 100.0,
+                        st.repairs
+                    );
+                    (short, map_stats_line(&st))
+                }
+                None => {
+                    let st = stats(room);
+                    let short = format!(
+                        "OBST {}  BLOCK {:.1}%  OPEN {:.0}%  SEAL {:.1}%",
+                        st.obstacles,
+                        st.blocked * 100.0,
+                        st.open * 100.0,
+                        st.sealed_elite * 100.0
+                    );
+                    (short, stats_line(&st))
+                }
+            };
             cv.text((ci * cell_w + 6) as i64, (title_h + ri * cell_h + 14) as i64, &short, 1, DIM);
-            println!("{:<40} {}", room.key, stats_line(&st));
+            println!("{:<40} {line}", room.key);
             all.push(room);
         }
     }
@@ -1179,4 +1578,81 @@ pub fn layout_stats(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Result<(
         );
     }
     Ok(())
+}
+
+/// Worldgen budget per map (OPEN_WORLD.md §3.2): 400 ms in a debug build, 60 ms in release.
+const MAP_BUDGET_MS: f32 = if cfg!(debug_assertions) { 400.0 } else { 60.0 };
+
+/// `layout-stats --maps`: every shipped Expedition template × `seeds`, one row per map. Fails on
+/// any reachability repair, any relaxed POI placement, or a map over the generation budget.
+pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Result<(), String> {
+    let keys = pick_templates(db, biome, &[], &[RoomKind::Expedition]);
+    if keys.is_empty() {
+        println!("no Expedition templates{}", biome.map_or(String::new(), |b| format!(" in {b}")));
+        return Ok(());
+    }
+    println!(
+        "{:<22} {:>9} {:>8} {:>6} {:>5} {:>7} {:>5} {:>5} {:>6} {:>6} {:>5} {:>6} {:>7} {:>7}  hash",
+        "template",
+        "seed",
+        "gen ms",
+        "land%",
+        "pit%",
+        "unrch%",
+        "regs",
+        "pois",
+        "seals",
+        "camps",
+        "obst",
+        "pits",
+        "relaxed",
+        "repairs"
+    );
+    let mut failures = Vec::new();
+    for k in &keys {
+        for seed in 1..=seeds {
+            let (room, ms) = resolve_timed(db, k, seed)?;
+            let Some(map) = room.map.as_deref() else {
+                failures.push(format!("{k} seed {seed}: generated no map"));
+                continue;
+            };
+            let s = map_stats(&room, map, ms);
+            println!(
+                "{:<22} {:>9} {:>8.1} {:>6.1} {:>5.1} {:>7.2} {:>5} {:>5} {:>6} {:>6} {:>5} {:>6} {:>7} {:>7}  {:016x}",
+                k,
+                seed,
+                s.ms,
+                s.land * 100.0,
+                s.pit * 100.0,
+                s.unreached * 100.0,
+                s.regions,
+                s.pois,
+                s.seals,
+                s.camps,
+                s.obstacles,
+                s.pits,
+                s.relaxed,
+                s.repairs,
+                s.hash
+            );
+            if s.repairs > 0 {
+                failures.push(format!("{k} seed {seed}: {} reachability repairs", s.repairs));
+            }
+            if s.relaxed > 0 {
+                failures.push(format!("{k} seed {seed}: {} relaxed POI placements", s.relaxed));
+            }
+            if s.ms > MAP_BUDGET_MS {
+                failures.push(format!("{k} seed {seed}: generated in {:.0} ms (budget {MAP_BUDGET_MS} ms)", s.ms));
+            }
+        }
+    }
+    if failures.is_empty() {
+        println!("\n{} map(s): 0 repairs, 0 relaxed, all within {MAP_BUDGET_MS} ms", keys.len() as u32 * seeds);
+        Ok(())
+    } else {
+        for f in &failures {
+            eprintln!("  {f}");
+        }
+        Err(format!("{} map check(s) failed", failures.len()))
+    }
 }

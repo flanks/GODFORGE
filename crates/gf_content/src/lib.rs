@@ -9,6 +9,7 @@ pub mod db;
 pub mod procgen;
 pub mod schema;
 pub mod validate;
+pub mod worldgen;
 
 pub use db::{CONTENT_FILES, ContentDb, ContentSources, Keyed, Table, ron_options};
 pub use schema::*;
