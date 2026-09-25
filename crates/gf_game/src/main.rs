@@ -43,6 +43,7 @@ CLIENT OPTIONS
   --exit-after <secs>
   --window <W>x<H>  --no-vsync  --no-damage-numbers  --no-shake  --no-shadows
   --fps                        log FPS, mean/worst frame time and enemy count once a second
+  --horde <n>                  QA: hold n enemies on the field (look and frame time at peak horde)
 
 HEADLESS OPTIONS
   --bots <n>  --minutes <n>  --rtt <ms>  --loss <0..1>
@@ -151,6 +152,8 @@ fn main() {
         std::process::exit(if ok { 0 } else { 1 });
     }
 
+    // QA: a windowed session can hold a stress-sized horde (same knob as `--stress`).
+    let sim = SimConfig { stress_enemies: args.parse("--horde"), ..sim };
     let connect = if let Some(addr) = args.value("--join") {
         Connect::Join(addr.to_string())
     } else if args.flag("--host") {
