@@ -26,6 +26,7 @@ A full run takes about 1.5-2 minutes on the CPU (the UV unwrap is most of it). O
 | [reports/molten_hexer_review.png](reports/molten_hexer_review.png) | the standard toolkit review: rest-pose turnaround, 4 frames of every clip, the in-game camera at 1x / 3x with the silhouette, the textures and the palette |
 | [reports/molten_hexer_scale.png](reports/molten_hexer_scale.png) | the front lineup with the 2.2 m hero mannequin and height bars, 3/4 views of the idle and the beam firing, six key poses through the game camera at true 1080p pixel size (1x and 3x), the game-size silhouette, and the hexer among its biome-mates (forge_warden, six clinkers, two heroes) at 1x and 2x |
 | [reports/molten_hexer_clips.png](reports/molten_hexer_clips.png) | the key poses of all eight clips |
+| [reports/molten_hexer_review_fix.png](reports/molten_hexer_review_fix.png) | the art-review fixes, before and after: the turnaround, the Cinder flagstones at true pixel size with the floor-value mask, and the melt ramp with the gold-band check |
 
 ## Brief and content row
 
@@ -57,7 +58,12 @@ The task brief asks for these things:
 * **Faction: The Unmade.** "Slag and molten god-metal" is the Slag King's material, and it is his
   biome. The hexer is a priest of his court: slag, molten, obsidian and pale bone, with a few teal
   Unmade cracks. It never uses the player colours or red-white. The row colour `#FF4D6D` only
-  darkens the slag shadows toward a rose (`#0C0607`); the engine draws the telegraph.
+  darkens the slag shadows toward a rose (`#120C0E`); the engine draws the telegraph.
+* **The glow ramp skips forge gold.** Every glow runs white-hot `#FFF3D6` → peach `#FFC4A0` →
+  molten orange `#FF6B1A` → rim `#C8400C`. The Slag King's forge gold `#FFC24B` is never used, because it
+  sits dE 5 from the player gold `#FFC940`. The pour drip glows orange over a half-value base (gfa_paint
+  emit `stops`). With the glow colour as its base, the toon key light plus the ×1.6 emission washed it to
+  gold.
 * **Verb: THE BEAM. The gimmick is the beam focus.** A floating iron crucible full of white-hot
   melt is held over the cowl. It is ringed by a **crown of molten runes**: six glyphs, 0.3 m each,
   lying flat in a ring 1.44 m across and tilted 12° toward the camera.
@@ -68,17 +74,23 @@ The task brief asks for these things:
     - A = eihwaz, a stem hooked opposite ways at both ends;
     - B = thurisaz, a stem with a hooked barb.
 
-    They are bold molten strokes with a white-gold core line. Earlier drafts used an arrow and a fork
+    They are bold molten strokes with a peach-white core line. Earlier drafts used an arrow and a fork
     (they read as a UI radial menu), a zigzag (it read as a Storm bolt) and a crossed stem (it read
     as an X).
   - The glyphs repeat every two runes, so any 120° turn of the ring is seamless.
-* **The body is a spire of cooling slag**, a hooded tower 2.75 m tall.
-  - It has four stacked crust tiers: a shoulder cape and three skirts. Each tier leans its own way,
-    like a melting candle, and drips in tongues onto a dim molten pool.
-  - The front of the lowest skirt is split into two panels on the hidden legs, so the robe steps
+* **The body is a spire of cooling slag**, a hooded tower 2.75 m tall, in **three uneven tiers**.
+  Everything slumps toward the heavy slag arm, like a candle melting off true, so the hems run as
+  diagonals, not parallel rings.
+  - The cape is short and broad. It hangs longer under the slag arm and is hitched over the shard
+    shoulder. Its wide sloped top faces the 55° camera.
+  - The overrobe is ONE long crust tier (two of the old skirts merged). It sags to the right-front,
+    where one torn tongue nearly reaches the pool, and it is hitched short over the left-back. Its hem
+    is sheared toward the slag arm. Two bold molten fissures rise from the torn hem, so the long tier
+    reads as cooling slag, not cloth.
+  - The underskirt leans the other way. It shows as a wedge under the hitched-up side and puddles
+    onto a dim molten pool. Its front is split into two panels on the hidden legs, so the robe steps
     when it glides.
-  - Every tier has the same rhythm: a dark body, a light stroke along its lip, and an orange seam of
-    leaked molten right under the lip.
+  - Each tier leaks an orange seam of molten right under the lip of the tier above.
   - The cowl is tall and pointed, with an arched opening and an obsidian face split by one thin teal
     slit.
 * **Unmade asymmetry that survives game size.**
@@ -93,18 +105,23 @@ The task brief asks for these things:
   3. the thin seams and the ground line;
   4. the teal accents.
 
-  Tuning it took two measured fixes:
-  - When the slag was lit by the key light, it landed on the Cinder floor value: 28 % of the hexer's
-    pixels were within colour distance 18 of the floor in the 1x frame. The fix darkened the slag base
-    to `#1F1714` and lifts only the up-facing lips and the cape top to `#6A4E3C`. That is 8-12 % now
-    (the forge_warden has 10 %, the fixed Slag King 12 %).
-  - The first lift band caught the tier bodies (their normals face up only 20-27°), and its noise
-    broke the robe into camouflage patches. The band now sits between the tier bodies and the lips.
+  The body values are set against the real Cinder floor: mauve-brown flagstones at L\* 17-39 with
+  oxblood gaps at L\* 6.
+  - The slag body is a cool coal (`#3E3234`), a hue off the warm floor. It lightens up the overrobe
+    (`#504446`) under the cape, and the underskirt is a lighter cooled crust (`#564B4B`), so the
+    diagonal hem reads as a value step.
+  - The up-facing crust is lifted to ash (`#6E625C`). The cape and the shoulder boulder are the
+    planes the 55° camera sees first, so they get the palest ash (`#877A72`), above every floor stone.
+  - The lift band sits between the robe bodies (their normals face up only 10-25°) and the lips, with
+    little noise, so it never breaks a body into camouflage patches.
+  - The first build darkened the slag to near-black `#1F1714` to keep it off the flat floor tone.
+    On the flagstones that sank it into the gaps and dark stones (the art review below).
 * **Paint.** The toolkit painter (`gfa_paint`) runs once. This build wraps it for that one call with
-  its own passes, adapted from `enemies/slag_king.py`: top-plane lift, edge strokes from each part's
-  own creases only, a seam glow under every hem (driven by the real hem height of the tier above) and
-  a ground underglow. `gfa_paint` itself is unchanged. The glyphs' hot core lines are decals on both
-  faces of each rune.
+  its own passes, adapted from `enemies/slag_king.py`: per-part body values, a top-plane lift (with
+  wider, paler bands on the cape and the shoulder boulder), edge strokes from each part's own creases
+  only, a seam glow under every hem (driven by the real hem height of the tier above) and a ground
+  underglow. `gfa_paint` itself is unchanged. The glyphs' hot core lines and the overrobe's two
+  fissures are decals.
 
 ## Size and footprint
 
@@ -172,12 +189,37 @@ every clip boundary. The client may add spin to `crown_spin` on top.
 
 | | |
 |---|---|
-| Triangles | 4,520 (elite budget 4,000-8,000) |
+| Triangles | 4,800 (elite budget 4,000-8,000) |
 | Textures | base colour 1024² and emissive 1024² (PNG, embedded); one material `M_molten_hexer` |
-| UVs | 45 % coverage, texel density about 192 px/m median. The hidden inner skins and the pool are packed small (`uv_zone_scale`). |
+| UVs | 48 % coverage, texel density about 187 px/m median. The hidden inner skins and the pool are packed small (`uv_zone_scale`). |
 | GLB | about 1.7 MB, uncompressed (bevy_gltf 0.20 safe); `gfa_validate` OK with no warnings |
-| Parts | 63 parts in 10 paint zones: slag, arm, obsidian, bone, iron, molten, core, rune, void, pool |
-| Game read (1x, idle) | 8-12 % of the hexer's pixels within colour distance 18 of the floor; about 13 % bright (the melt and the runes) |
+| Parts | 61 parts in 10 paint zones: slag, arm, obsidian, bone, iron, molten, core, rune, void, pool |
+| Game read (1x, five poses) | 5-11 % of the hexer's pixels within ±7 L\* of the Cinder flagstone gaps or dark stones (median L\* 36-42) |
+| Gold check | 0 % of the emissive texels within dE 20 of the player gold `#FFC940` (the closest is dE 36); no rendered pixel in that band in any review frame |
+
+## Art review fix (6.5/10)
+
+The art review had two must-fix items. [reports/molten_hexer_review_fix.png](reports/molten_hexer_review_fix.png)
+shows both, before (commit `4a12556`) and after, with the same cameras and poses. It is made by
+`tools/blender/gf_assets/enemies/molten_hexer_fix_sheet.py -- --before <dir with the pre-fix GLB and emissive map>`.
+
+1. **The robe read as a tiered cake and was lost in the dark floor.** It was three stacked,
+   near-symmetric skirts under a cape, with parallel hems. 30-35 % of its pixels sat within ±7 L\* of
+   the flagstone gaps and the dark stones.
+   - Two skirts are merged into one long overrobe. The tiers now slump and lean with uneven,
+     diagonal, torn hems (see "The body" above).
+   - The slag is a cool coal instead of near-black, and the cape and shoulder tops are the palest ash.
+   - Near the gaps: 26-35 % → 0.4-1.0 % of the pixels. Near the dark stones: 33-39 % → 5-10 %.
+     Median L\*: 25-30 → 36-42.
+2. **The crucible's melt ramp passed through forge gold.** 5.4 % of the emissive texels were within
+   dE 20 of `#FFC940`, and the closest was dE 4.9.
+   - The ramp is now white-hot → peach → orange, and the rune core lines are peach-white.
+   - The pour drip glows over a half-value base.
+   - Gold texels: 5.4 % → 0 % (the closest is now dE 35.6). Rendered gold pixels: 0.17 % → 0 % in the
+     five game poses, and 616 → 0 in the 3/4 view.
+
+The skeleton, clips, sockets, the crucible and the rune crown are unchanged. The tris went from 4,520
+to 4,800.
 
 ## Files
 

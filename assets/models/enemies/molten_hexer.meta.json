@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "molten_hexer",
  "tier": "elite",
- "tris": 4520,
+ "tris": 4800,
  "tris_budget": [
   4000,
   8000
@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 286875
+   "bytes": 305279
   },
   {
    "name": "molten_hexer_basecolor",
@@ -26,25 +26,25 @@
     1024
    ],
    "format": "png",
-   "bytes": 767379
+   "bytes": 777373
   }
  ],
  "sockets": {
-  "hit_center": {
+  "fx_mouth": {
    "translation": [
     0.0,
-    1.45,
-    0.0
+    2.56,
+    0.76
    ],
    "forward": [
-    0.0,
     -0.0,
+    0.0,
     -1.0
    ],
    "up": [
     0.0,
     1.0,
-    -0.0
+    0.0
    ]
   },
   "head_top": {
@@ -81,23 +81,6 @@
     0.0
    ]
   },
-  "fx_mouth": {
-   "translation": [
-    0.0,
-    2.56,
-    0.76
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
   "attack_origin": {
    "translation": [
     -0.0,
@@ -111,6 +94,23 @@
    ],
    "up": [
     -0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    1.45,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
     1.0,
     -0.0
    ]
@@ -135,7 +135,7 @@
  "bounds_m": {
   "min": [
    -0.835,
-   -0.0236,
+   -0.0297,
    -0.6749
   ],
   "max": [
@@ -144,15 +144,15 @@
    1.1086
   ]
  },
- "size_m": 2.777,
+ "size_m": 2.783,
  "glb": "assets/models/enemies/molten_hexer.glb",
- "glb_bytes": 1683036,
- "glb_sha256": "ee1928b41dfed44bff2bdc01d5847ce70fb984cf78418db730f728d3a35840bf",
+ "glb_bytes": 1715716,
+ "glb_sha256": "a43da9abcf6ed3bf8f5295245eff7045fd086ffc9ecb875a8ba0e69d7787f4ca",
  "source_blend": "art/enemies/molten_hexer/source/molten_hexer.blend",
  "build_script": "tools/blender/gf_assets/enemies/molten_hexer.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
  "generator": "Blender 5.2.0 LTS",
- "built": "2026-09-25",
+ "built": "2026-09-26",
  "validation": {
   "ok": true,
   "errors": [],
@@ -239,11 +239,11 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 192.2,
-   "p10": 59.3,
-   "p90": 204.8
+   "median": 187.1,
+   "p10": 57.2,
+   "p90": 199.2
   },
-  "coverage": 0.453,
-  "emissive_texels": 212025
+  "coverage": 0.477,
+  "emissive_texels": 225139
  }
 }

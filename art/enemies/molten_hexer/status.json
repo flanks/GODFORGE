@@ -3,7 +3,7 @@
  "kind": "enemy",
  "tier": "elite",
  "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
@@ -19,9 +19,10 @@
     "art/enemies/molten_hexer/reports/molten_hexer_review.png",
     "art/enemies/molten_hexer/reports/molten_hexer_clips.png",
     "art/enemies/molten_hexer/reports/molten_hexer_scale.png",
-    "art/enemies/molten_hexer/reports/molten_hexer_34.png"
+    "art/enemies/molten_hexer/reports/molten_hexer_34.png",
+    "art/enemies/molten_hexer/reports/molten_hexer_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/molten_hexer.py (model, NPR paint, GF_MoltenHexer_v1 rig, 8 clips + 3 aliases, export + validation, review sheets)."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/molten_hexer.py (model, NPR paint, GF_MoltenHexer_v1 rig, 8 clips + 3 aliases, export + validation, review sheets). Art review fix (6.5/10): the stacked-cake robe is now three uneven tiers (a short ash cape, one long overrobe slumping toward the slag arm, an underskirt wedge) in values that clear the Cinder floor, and the glow ramp runs white-hot -> peach -> orange with no forge-gold band; before/after in reports/molten_hexer_review_fix.png (enemies/molten_hexer_fix_sheet.py)."
   },
   "2_user_approval": {
    "status": "pending_human",

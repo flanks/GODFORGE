@@ -24,13 +24,18 @@ Design (docs/art/ENEMIES.md sections 3, 4, 6; the Slag King's court, so THE UNMA
     lying flat in a 1.44 m ring round it, wider than the hem. When it channels, the ring contracts and whirls; when it
     fires, the crucible tips forward and the ring swings upright in front of the pour lip, a focus ring the
     beam passes through;
-  * the body: a crust cape and three stacked slag skirts (a spire of cooling crust, each tier leaning its own
-    way) that drip onto a dim molten pool; each tier leaks molten light from under the one above; a tall pointed
-    cowl, an obsidian face split by one teal slit;
+  * the body: a spire of cooling slag in THREE uneven tiers, never a stacked cake (art review 6.5/10): a short
+    broad ash cape, ONE long overrobe that slumps toward the heavy slag arm (its hem a diagonal, torn long at
+    the right-front, hitched short over the left-back, cracked by two molten fissures) and an underskirt wedge
+    leaning the other way, puddling onto a dim molten pool; each tier leaks molten light from under the one
+    above; a tall pointed cowl, an obsidian face split by one teal slit;
+  * values against the Cinder floor (mauve-brown flagstones L* 17-39, oxblood gaps L* 6): a cool coal robe,
+    pale ash on the cape and shoulder tops the 55 deg camera sees first, never near-black;
   * Unmade asymmetry that survives game size: a massive slag arm (right) with molten cracks against a thin pale
     bone arm (left), and a spray of teal-cracked obsidian shards off the left shoulder;
-  * palette (gfa_spec.FACTIONS["unmade"]): slag, obsidian, bone, molten (the Slag King ramp) and a few teal
-    cracks; the row colour #FF4D6D only as a faint dark rose in the slag shadows. No player colours, no
+  * palette (gfa_spec.FACTIONS["unmade"]): slag, obsidian, bone, molten and a few teal cracks. The glow ramp
+    runs white-hot -> peach -> orange and skips the forge-gold band (#FFC24B sits dE 5 from the player gold
+    #FFC940). The row colour #FF4D6D only as a faint dark rose in the slag shadows. No player colours, no
     red-white (the engine draws the telegraph).
 
 Footprint: radius 0.62 x scale 1.1 = 0.68 m collider; the hem is ~1.2 m across, the rune ring 1.44 m; the model
@@ -63,7 +68,7 @@ FPS = 30
 
 ZONES = ["slag", "arm", "obsidian", "bone", "iron", "molten", "core", "rune", "void", "pool"]
 PREVIEW = {"slag": "#4A382E", "arm": "#3E2E26", "obsidian": "#2A2634", "bone": "#A89A84", "iron": "#4A4650",
-           "molten": "#FF6B1A", "core": "#FFE6A8", "rune": "#FF8A2A", "void": "#160C0A", "pool": "#8A2E0C"}
+           "molten": "#FF6B1A", "core": "#FFF3D6", "rune": "#FF8A2A", "void": "#160C0A", "pool": "#8A2E0C"}
 GLOW_ZONES = ("molten", "core", "rune", "pool")
 
 # ---- landmarks (rest pose = the idle stance; metres, faces -Y, +X = the hexer's LEFT) ------------------------
@@ -157,26 +162,41 @@ def bumps(spec):
 
 
 def skirt(a, name, bone, z_top, r_top, z_hem, r_hem, tongues, theta=(-180.0, 180.0), nu=24, nv=3, t=0.035,
-          scallop=0.1, flare=0.05, sx=1.0, sy=1.0, zone="slag", seed=0.0, tilt=(0.0, 0.0), drips=()):
+          scallop=0.1, flare=0.05, sx=1.0, sy=1.0, zone="slag", seed=0.0, tilt=(0.0, 0.0), drips=(),
+          slant=(0.0, 0.0), tears=(), skew=(0.0, 0.0), z_min=0.012):
     """One hanging tier of the slag robe: a flared, thick cone from (z_top, r_top) down to a hem that drips in
     tongues (reaching z_hem) with scallops `scallop` higher between them, tilted (x, y deg) about its top like
     a melting candle. Outer skin `zone`, inner skin void. drips: [(theta deg, extra length m)] - thick slag
-    runnels running down the outside and hanging past the hem. Returns fn(theta deg, v) -> outer point."""
+    runnels running down the outside and hanging past the hem.
+    Uneven hems (the art-review fix: no stacked cake tiers): slant (amp m, theta deg) raises the hem by amp at
+    theta and lowers it by amp opposite (a hitched-up side and a sagging side); tears [(theta deg, half width
+    deg, extra m)] are torn tongues hanging `extra` below the hem; skew (dx, dy) shears the hem sideways
+    (the tier slumps off its axis). The hem never goes below z_min. Returns fn(theta deg, v) -> outer point."""
     tg = bumps(tongues)
+    tr = bumps([(a_, w_, 1.0) for a_, w_, _e in tears])
     th0, th1 = theta
     full = abs(th1 - th0) >= 359.9
     piv = Vector((0.0, 0.0, z_top))
     T = (Matrix.Translation(piv) @ Matrix.Rotation(math.radians(tilt[0]), 4, "X")
          @ Matrix.Rotation(math.radians(tilt[1]), 4, "Y") @ Matrix.Translation(-piv))
 
+    def tear(th):
+        best = 0.0
+        for a_, w_, e_ in tears:
+            d = (th - a_ + 180.0) % 360.0 - 180.0
+            best = max(best, e_ * math.exp(-(d / w_) ** 2))
+        return best
+
     def at(th, v):
         k = tg(th)
-        zb = z_hem + scallop * (1.0 - k)
+        zb = z_hem + scallop * (1.0 - k) + slant[0] * math.cos(math.radians(th - slant[1])) - tear(th)
+        zb = max(zb, z_min)
         z = z_top + (zb - z_top) * v
-        r = r_top + (r_hem - r_top) * (v ** 0.9) + flare * v ** 3 + 0.03 * k * v * v
+        kt = tr(th)
+        r = r_top + (r_hem - r_top) * (v ** 0.9) + flare * v ** 3 + 0.03 * max(k, kt) * v * v
         r *= 1.0 + 0.035 * math.sin(math.radians(th) * 3.0 + seed)
         rad = math.radians(th)
-        return T @ Vector((r * sx * math.cos(rad), r * sy * math.sin(rad), z))
+        return T @ Vector((r * sx * math.cos(rad) + skew[0] * v * v, r * sy * math.sin(rad) + skew[1] * v * v, z))
 
     def fn(u, v):
         return at(th0 + (th1 - th0) * u, v)
@@ -194,7 +214,7 @@ def skirt(a, name, bone, z_top, r_top, z_hem, r_hem, tongues, theta=(-180.0, 180
         pts.append(hem + Vector((0.0, 0.0, -extra * 0.6)) + (hem - pts[-2]).normalized() * 0.012)
         pts.append(hem + Vector((0.0, 0.0, -extra)))
         rad = [0.035, 0.05, 0.062, 0.07, 0.085, 0.0]
-        d = M.tube(M.catmull(pts, 2), [rad[min(len(rad) - 1, i // 2)] for i in range(2 * (len(pts) - 1) + 1)], sides=6)
+        d = M.tube(M.catmull(pts, 2), [rad[min(len(rad) - 1, i // 2)] for i in range(2 * (len(pts) - 1) + 1)], sides=8)
         a.add(d, zone, bone=bone, name=name + "_drip", shading="smooth")
     return at
 
@@ -206,32 +226,35 @@ def lumpy(bm, amount, freq, seed):
 
 # ---- the model ----------------------------------------------------------------------------------------------
 
-# tier hems (z) - the paint pass lights the band just below each hem with leaked molten
-HEMS = (0.46, 0.92)
-YOKE_HEM = 1.5
 HEM_FN = {}           # skirt name -> at(theta deg, v): filled by build_robe (the seam-glow paint pass reads it)
 
 
+# The robe is THREE uneven tiers, never a stacked cake (art review 6.5/10: the four similar symmetric tiers read
+# as a tiered cake / pagoda). Angles: 0 = the hexer's left (+X), -90 = front, 180 = its right (the slag arm).
+# Everything slumps toward the heavy slag arm (right-front), like a candle melting off true; the left - the shard
+# side - is hitched up short, so the three hems run as diagonals, not as parallel rings.
 def build_robe(a):
-    # T1, the lowest skirt, puddles wide onto the pool; split in three so the hidden legs can swing the front
-    # panels (a step under the robe). Few, long drip tongues (a candle of slag melting into its own pool)
-    t1 = dict(z_top=0.62, r_top=0.31, z_hem=0.0, r_hem=0.53, scallop=0.14, flare=0.07, nv=3, t=0.04,
+    # T1, the underskirt, puddles wide onto the pool; split in three so the hidden legs can swing the front panels
+    # (a step under the robe). It leans the other way (toward the left) and shows as a wedge under the hitched-up
+    # left side of the overrobe
+    t1 = dict(z_top=1.02, r_top=0.29, z_hem=0.0, r_hem=0.52, scallop=0.13, flare=0.07, nv=4, t=0.04,
               tongues=[(-110, 13, 1.0), (-35, 15, 1.0), (40, 13, 0.95), (105, 12, 1.0), (165, 14, 0.9),
-                       (-165, 10, 0.85)], seed=0.7, tilt=(0.0, 0.0))
-    skirt(a, "skirt1_fl", "thigh_L", theta=(-92.0, 12.0), nu=9, **t1)
-    skirt(a, "skirt1_fr", "thigh_R", theta=(-192.0, -88.0), nu=9, **t1)
-    skirt(a, "skirt1_b", "pelvis", theta=(8.0, 172.0), nu=12, **t1)
-    # T2 and T3: whole rings, each leaning its own way (the tower is melting out of true)
-    HEM_FN["skirt2"] = skirt(a, "skirt2", "pelvis", z_top=1.14, r_top=0.25, z_hem=HEMS[0], r_hem=0.41, scallop=0.12, flare=0.05, t=0.035,
-          tongues=[(-70, 14, 1.0), (10, 12, 0.9), (95, 14, 1.0), (175, 12, 0.95), (-140, 12, 0.8)], nu=24, seed=2.1,
-          tilt=(-3.0, -5.0))
-    HEM_FN["skirt3"] = skirt(a, "skirt3", "spine_02", z_top=1.6, r_top=0.26, z_hem=HEMS[1], r_hem=0.35, scallop=0.1, flare=0.04,
-          t=0.035, sx=1.12, sy=0.95, tongues=[(-100, 13, 1.0), (-20, 12, 0.85), (60, 13, 1.0), (140, 12, 0.9),
-                                              (-160, 11, 0.8)], nu=24, seed=4.0, tilt=(4.0, 4.0))
-    # the shoulder mantle: the top tier, a hunched crust cape that drips like the skirts below it (the cowl sits in
-    # its neck hole). Its sloped top faces the 55 deg camera and takes the lifted slag light
-    HEM_FN["yoke"] = skirt(a, "yoke", "spine_03", z_top=1.83, r_top=0.15, z_hem=YOKE_HEM, r_hem=0.37, scallop=0.07,
-                           flare=0.05, t=0.035, sx=1.18, sy=0.9, nu=24, seed=5.5, tilt=(0.0, -3.0),
+                       (-165, 10, 0.85)], seed=0.7, tilt=(0.0, 3.0), skew=(0.05, 0.0))
+    skirt(a, "skirt1_fl", "thigh_L", theta=(-92.0, 12.0), nu=10, **t1)
+    skirt(a, "skirt1_fr", "thigh_R", theta=(-192.0, -88.0), nu=10, **t1)
+    skirt(a, "skirt1_b", "pelvis", theta=(8.0, 172.0), nu=13, **t1)
+    # the overrobe: ONE long crust tier (two tiers merged), sagging to the right-front: torn long there (one
+    # tongue nearly reaches the pool), hitched short at the left-back, its hem sheared toward the slag arm
+    HEM_FN["robe"] = skirt(a, "robe", "spine_01", z_top=1.62, r_top=0.25, z_hem=0.5, r_hem=0.45, scallop=0.09,
+                           flare=0.08, t=0.035, nu=30, nv=5, sx=1.08, sy=0.96, seed=2.1, tilt=(-3.0, -8.0),
+                           slant=(0.32, 40.0), skew=(-0.09, -0.04), tears=[(-140.0, 10.0, 0.22), (-62.0, 7.0, 0.12)],
+                           tongues=[(-100, 13, 1.0), (-20, 11, 0.8), (60, 12, 0.9), (140, 13, 1.0), (175, 11, 0.9)])
+    # the shoulder mantle: the top tier, a SHORT broad hunched crust cape (the cowl sits in its neck hole), longer
+    # under the slag arm, hitched over the shard shoulder; its wide sloped top faces the 55 deg camera and takes the
+    # brightest slag light
+    HEM_FN["yoke"] = skirt(a, "yoke", "spine_03", z_top=1.84, r_top=0.15, z_hem=1.5, r_hem=0.46, scallop=0.06,
+                           flare=0.05, t=0.035, sx=1.2, sy=0.95, nu=26, nv=4, seed=5.5, tilt=(0.0, -4.0),
+                           slant=(0.07, -20.0), tears=[(172.0, 12.0, 0.15)],
                            tongues=[(-120, 13, 1.0), (-60, 12, 0.9), (0, 12, 1.0), (60, 12, 0.85), (115, 13, 1.0),
                                     (180, 12, 0.9)])
     # the right shoulder: a heavy slag boulder the big arm hangs from
@@ -444,14 +467,24 @@ def tris_of(obj):
 
 # ---- paint (The Unmade, ENEMIES.md section 4; the Slag King's slag and molten) --------------------------------
 
+# The slag values (art-review fix: the robe was a dark bell lost in the Cinder floor - 30-35 % of its pixels within
+# +-7 L* of the flagstone gaps (L* 6) and dark stones (L* 17)). The slag body is lifted to a cool coal (a hue off the
+# warm floor), the up-facing crust to pale ash (the cinderling's cooled-crust read) and the cape and shoulder tops -
+# the planes the 55 deg camera sees first - to the palest ash, above every floor stone (L* <= 39)
+SLAG_SHADOW, SLAG, ASH, ASH_PALE, ASH_EDGE = "#120C0E", "#3E3234", "#6E625C", "#877A72", "#B0A094"
+SLAG_UPPER, SLAG_UNDER = "#504446", "#564B4B"      # the upper overrobe, the underskirt (body-value pass)
+# The glow ramp (art-review fix): white-hot core -> PEACH -> orange -> molten rim. It never passes through forge gold
+# (#FFC24B sits dE 5 from the player gold #FFC940): every white-to-orange mix stays > dE 34 from #FFC940
+MOLTEN_RIM, MOLTEN, PEACH, WHITE_HOT = "#C8400C", "#FF6B1A", "#FFC4A0", "#FFF3D6"
+MOLTEN_BASE = "#80340F"          # the painted base under the flat molten glow (half value, see recipes())
 PALETTE = [  # (name, hex) for the review sheets
-    ("slag shadow", "#0C0607"), ("slag", "#1F1714"), ("slag top light", "#6A4E3C"), ("slag edge", "#9A7658"),
+    ("slag shadow", SLAG_SHADOW), ("slag", SLAG), ("slag top ash", ASH), ("cape ash", ASH_PALE), ("slag edge", ASH_EDGE),
     ("crucible bounce", "#7A3418"), ("obsidian", "#1A1720"), ("bone", "#A89A84"), ("iron", "#363337"),
-    ("iron rim", "#A49CA6"), ("molten rim", "#C8400C"), ("molten", "#FF6B1A"), ("forge gold", "#FFC24B"),
-    ("white-hot core", "#FFF3D6"), ("unmade teal", "#2FBFA8"),
+    ("iron rim", "#A49CA6"), ("molten rim", MOLTEN_RIM), ("molten", MOLTEN), ("peach", PEACH),
+    ("white-hot core", WHITE_HOT), ("unmade teal", "#2FBFA8"),
 ]
 TEAL = {"color": "#2FBFA8", "core": "#B8FFE8"}
-HOT = {"color": "#C8400C", "core": "#FFB040"}
+HOT = {"color": MOLTEN_RIM, "core": "#FFB890"}
 SHARD_BASE = Vector((0.3, 0.1, 1.66))
 
 
@@ -459,16 +492,14 @@ def recipes():
     import gfa_paint as P
     # warm bounce light from the crucible overhead onto the cowl, the mantle and the arms (painted, not lit)
     warm = {"center": tuple(CRUCIBLE), "range": (1.1, 0.3), "color": "#7A3418", "amount": 0.3}
-    # slag: faceted value planes, cavity darks, faint rose (the row colour #FF4D6D, darkened) in the shadows. The
+    # slag: faceted value planes, cavity darks, a cool coal body (SLAG) under pale ash tops (paint_extras). The
     # painter's own edge strokes are off (edge=0): paint_extras strokes only real creases of a part's OWN edges
-    # The base is darker than the Slag King's (#2B201B): lit by the key light that value landed on the floor, so the
-    # tier sides now sit clearly BELOW the floor and only the lifted lips and tops sit above it
     # The robe tiers are smooth cones: per-normal plane values and spots broke them into camouflage patches, so the
     # slag keeps only quiet planes, a low-frequency brush and deep contact shadows (the lips carry the value steps)
-    slag = P.zone(base="#1F1714", shadow="#0C0607", light="#8C6A52", planes=0.06, parts=0.07, brush=0.04,
+    slag = P.zone(base=SLAG, shadow=SLAG_SHADOW, light=ASH_PALE, planes=0.06, parts=0.07, brush=0.04,
                   brush_freq=2.0, cavity=0.8, cavity_width=0.012, ao=0.45, ao_range=(0.38, 0.72), edge=0.0,
                   gradient=warm)
-    arm = P.zone(base="#241A16", shadow="#140A0C", light="#8C6A52", planes=0.05, parts=0.06, brush=0.05,
+    arm = P.zone(base="#322828", shadow="#140A0C", light=ASH_PALE, planes=0.05, parts=0.06, brush=0.05,
                  brush_freq=3.0, cavity=0.7, cavity_width=0.012, ao=0.55, ao_range=(0.3, 0.65), edge=0.0, gradient=warm)
     # obsidian shards and the face: big faceted planes, bright broken edges; teal leaks where the shards break out
     obsidian = P.faction_zone("unmade", "obsidian", planes=0.16, parts=0.1, edge=1.0, edge_width=0.012,
@@ -485,14 +516,17 @@ def recipes():
                   brush_freq=3.0, cavity=0.8, cavity_width=0.008, ao=0.5, ao_range=(0.3, 0.65), edge=0.0,
                   gradient={"center": tuple(CRUCIBLE + Vector((0, 0, 0.1))), "range": (0.42, 0.12),
                             "color": "#6A2A14", "amount": 0.4})
-    molten = P.faction_zone("unmade", "molten", glow=True,
-                            emit={"color": "#C8400C", "hot": "#FF6B1A", "core": "#FFC24B", "mode": "flat",
-                                  "base_mix": 0.1})
-    core = P.faction_zone("unmade", "molten", glow=True,
-                          emit={"color": "#FF6B1A", "hot": "#FFC24B", "core": "#FFF3D6", "mode": "radial",
+    # molten and the white-hot melt: the ramp skips the gold band (the faction light #FFC24B is overridden too).
+    # The pour drip glows flat orange over a HALF-VALUE base (gfa_paint emit "stops", the cinderling's fix): with
+    # the glow colour as its base, the toon key light plus the x1.6 emission clipped red and rendered it gold
+    molten = P.faction_zone("unmade", "molten", glow=True, light=PEACH,
+                            emit={"color": MOLTEN_RIM, "hot": MOLTEN, "core": PEACH, "mode": "flat", "base_mix": 0.1,
+                                  "stops": [(0.0, MOLTEN, MOLTEN_BASE), (1.0, MOLTEN, MOLTEN_BASE)]})
+    core = P.faction_zone("unmade", "molten", glow=True, light=PEACH,
+                          emit={"color": MOLTEN, "hot": PEACH, "core": WHITE_HOT, "mode": "radial",
                                 "center": tuple(CRUCIBLE + Vector((0, 0, 0.07))), "radius": 0.25, "base_mix": 0.5})
     # the runes: saturated molten orange (the base darker than the glow, so it never washes out to salmon), hotter on
-    # the inner end; a white-gold core line runs down every stroke (decals)
+    # the inner end; a white-hot (peach-white, never gold) core line runs down every stroke (decals)
     rune = P.zone(base="#8A2A08", shadow="#3A0E05", light="#C8400C", planes=0.08, parts=0.04, brush=0.03,
                   brush_freq=6.0, edge=0.0, cavity=0.0, ao=0.0,
                   emit={"color": "#A8300A", "hot": "#E0520E", "core": "#FF7A1A", "mode": "axis",
@@ -539,8 +573,8 @@ def decals():
             y = tang * sgn
             fr = Matrix(((radial.x, y.x, z.x, o.x), (radial.y, y.y, z.y, o.y), (radial.z, y.z, z.z, o.z), (0, 0, 0, 1)))
             lines = [[(px, py * sgn) for px, py in ln] for ln in gl]
-            out.append(P.decal_lines(lines, fr, 0.024, zones=["rune"], color="#FFC24B", rim=None,
-                                     emit={"color": "#FFA030", "core": "#FFE6A8"}, depth=(-0.03, 0.03), facing=0.4))
+            out.append(P.decal_lines(lines, fr, 0.024, zones=["rune"], color="#FFB48A", rim=None,
+                                     emit={"color": MOLTEN, "core": "#FFC8A8"}, depth=(-0.03, 0.03), facing=0.4))
     # the big arm: a few BOLD molten cracks (never a web), read from the game camera
     for o, nrm, ang, L, sd in (((-0.56, -0.2, 2.02), (-0.7, -0.6, 0.35), -60, 0.26, 3),
                                ((-0.5, 0.05, 1.77), (-0.8, -0.2, 0.5), -100, 0.22, 4)):
@@ -555,35 +589,58 @@ def decals():
                               branches=1, branch_len=0.45, depth=1)
         out.append(P.decal_lines(lines, frame_at(o, nrm), 0.03, zones=["slag"], color="#2FBFA8", rim="#07060A",
                                  rim_width=0.065, emit=TEAL, depth=(-0.12, 0.12), facing=0.3))
+    # the overrobe: two BOLD molten cracks rising from its torn hem (the crust splitting as it sags toward the slag
+    # arm), so the one long tier is cooling slag, not cloth. Placed on the robe surface itself (build_robe's fn)
+    at = HEM_FN.get("robe")
+    if at is not None:
+        for th, v0, ang, L, sd in ((-124.0, 0.985, 98.0, 0.56, 21), (-50.0, 0.985, 84.0, 0.3, 23)):
+            o = at(th, v0)
+            n = (at(th + 1.0, v0) - at(th - 1.0, v0)).cross(at(th, v0 + 0.02) - at(th, v0 - 0.02)).normalized()
+            if n.dot(Vector((o.x, o.y, 0.0))) < 0.0:
+                n = -n
+            lines = M.crack_lines(random.Random(sd), start=(0.0, 0.0), direction=ang, length=L, step=0.06, jag=0.55,
+                                  branches=0, depth=0)        # single fissures: a forked crack reads as a glyph (Y)
+            out.append(P.decal_lines(lines, frame_at(o, n), 0.034, zones=["slag"], color=MOLTEN, rim="#07060A",
+                                     rim_width=0.075, emit=HOT, depth=(-0.14, 0.06), facing=0.3))
     return out
 
 
 # ---- figure / ground passes (adapted from enemies/slag_king.py) ----------------------------------------------
-# Lit by the key light, mid slag sits right on the Cinder Wastes floor value (#3A2C24). The slag base is therefore
-# darker (#1F1714) and painted passes separate the rest:
-#   * TOP PLANES: planes facing up (the hem lips, the mantle, the cowl top) are lifted toward the slag light
-#     #6A4E3C with a brushy boundary; the steep tier sides are NOT lifted (lifted part of the way they landed on the
-#     floor value: 28 % of the hexer within colour distance 18 of the floor), so they stay darker than the floor;
+# The Cinder floor is mauve-brown flagstones (L* 17-39) with oxblood gaps (L* 6), so a near-black slag drowned in
+# the gaps (the art review: 30-35 % of the hexer's pixels within +-7 L* of the gaps and dark stones). The slag
+# body is a cool coal (#3E3234, a hue off the warm floor) and painted passes separate the rest:
+#   * TOP PLANES: planes facing up (the hem lips, the cowl top) are lifted to ash #6E625C with a brushy
+#     boundary; the cape (the yoke) and the shoulder boulder - the broad planes the 55 deg camera sees first - get
+#     the palest ash #877A72 over a wider band, above every floor stone. The steep robe sides stay coal;
 #   * EDGE STROKES only on real creases of the texel's OWN part, weighted toward up-facing planes: every hem
-#     lip of the tower gets one light stroke along its top (the tiers read as stacked crust);
+#     lip of the tower gets one light stroke along its top;
 #   * SEAM GLOW: the band right under each tier's hem (and under the mantle) leaks the molten inside: a hot
 #     orange line under the lip cooling to a dim red band, the base warmed to a hot-slag red. This is the
 #     tower's rhythm: dark lip, lit edge, molten seam;
 #   * UNDERGLOW: the drip tongues standing in the pool heat up toward the ground.
-EDGE_SLAG = {"color": "#9A7658", "width": 0.02, "breakup": 0.3, "up": (-0.1, 0.5), "amount": 1.0, "min_angle": 40.0}
+EDGE_SLAG = {"color": ASH_EDGE, "width": 0.02, "breakup": 0.3, "up": (-0.1, 0.5), "amount": 1.0, "min_angle": 40.0}
 EXTRAS = {
-    # the tier bodies face up only 20-27 deg (normal z 0.35-0.45), the flared lips ~37 deg (0.55-0.6): the band sits
-    # between them, with little noise, so the lift never breaks a body into lifted / unlifted camouflage patches
-    "slag": {"top": ("#6A4E3C", 0.9), "top_band": (0.49, 0.6), "top_noise": 0.08, "side": 0.0, "edge": EDGE_SLAG,
+    # the robe bodies face up only 10-25 deg (normal z 0.2-0.4), the flared lips more: the band sits between them,
+    # with little noise, so the lift never breaks a body into lifted / unlifted camouflage patches. top_parts: the
+    # cape (normal z 0.6-0.75) and the shoulder boulder take the palest ash over a wider band (part, colour, amount,
+    # band); top_guard: texels already this bright (luma) are not lifted
+    "slag": {"top": (ASH, 0.9), "top_band": (0.46, 0.6), "top_noise": 0.08, "side": 0.0, "edge": EDGE_SLAG,
+             "top_guard": (0.34, 0.5),
+             "top_parts": {"yoke": (ASH_PALE, 1.0, (0.36, 0.56)), "pauldron_R": (ASH_PALE, 1.0, (0.1, 0.45)),
+                           "peak": (ASH, 0.9, (0.3, 0.55))},
+             # body values: the overrobe lightens upward under the cape (ash dust, the crucible's bounce); the
+             # underskirt wedge is a lighter cooled crust than the overrobe, so the diagonal hem reads as a value
+             # step, and the lower robe never sinks into the floor gaps
+             "body": {"robe": {"color": SLAG_UPPER, "z": (0.85, 1.45)}, "skirt1": {"color": SLAG_UNDER}},
              "seam": True, "under": True},
-    "arm": {"top": ("#5E4434", 0.75), "top_band": (0.3, 0.55), "side": 0.15, "edge": dict(EDGE_SLAG, width=0.016,
-                                                                                       amount=0.8)},
+    "arm": {"top": ("#76685F", 0.75), "top_band": (0.3, 0.55), "side": 0.15, "top_guard": (0.34, 0.5),
+            "edge": dict(EDGE_SLAG, width=0.016, amount=0.8)},
     "iron": {"edge": {"color": "#A49CA6", "width": 0.016, "breakup": 0.15, "up": (-0.3, 0.4), "amount": 0.95,
                       "min_angle": 25.0}},
 }
-SEAM = {"band": 0.11, "rim": "#C8400C", "hot": "#FF6B1A", "tint": "#6E2410", "emit": 0.7, "warm": 0.5}
+SEAM = {"band": 0.13, "rim": "#C8400C", "hot": "#FF6B1A", "tint": "#6E2410", "emit": 0.85, "warm": 0.5}
 UNDER = {"height": (0.16, 0.01), "rim": "#C8400C", "hot": "#FF6B1A", "tint": "#5A1C0C", "warm": 0.45}
-SEAM_BELOW = {"skirt1_fl": "skirt2", "skirt1_fr": "skirt2", "skirt1_b": "skirt2", "skirt2": "skirt3", "skirt3": "yoke"}
+SEAM_BELOW = {"skirt1_fl": "robe", "skirt1_fr": "robe", "skirt1_b": "robe", "robe": "yoke"}
 
 
 def part_crease_points(obj, min_angle, spacing=0.002, sharp_only_below=60.0):
@@ -646,16 +703,36 @@ def paint_extras(P, maps, zones_order, recipes_, base, emis, obj, seed=0):
         p, nz = pos[m], maps["snrm"][m, 2]
         c = base[m]
         brush = P.spread01(P.fbm(p, 4.0, 2, seed=seed + 501))
+        # body values per part (before the top lift): a flat tint, and a gradient up the part's height
+        for pname, bv in ex.get("body", {}).items():
+            sel = np.isin(part[m], [i for i, n in enumerate(names) if n == pname or n.startswith(pname + "_")])
+            if not sel.any():
+                continue
+            b0 = P.hex3(recipes_[zname]["base"])
+            k = np.full(int(sel.sum()), bv.get("amount", 1.0), dtype=np.float32)
+            if "z" in bv:
+                z0, z1 = bv["z"]
+                k = k * P.smoothstep(z0, z1, p[sel, 2] + (brush[sel] - 0.5) * 0.12)
+            ratio = P.hex3(bv["color"]) / np.maximum(b0, 1e-3)
+            c[sel] = c[sel] * (1.0 + (ratio - 1.0)[None, :] * k[:, None])
         if ex.get("top"):
             col, amt = ex["top"]
             b0 = P.hex3(recipes_[zname]["base"])
-            ratio = P.hex3(col) / np.maximum(b0, 1e-3)
             nb = nz + (brush - 0.5) * ex.get("top_noise", 0.3)
             lo_, hi_ = ex.get("top_band", (0.3, 0.52))
             k = ex.get("side", 0.0) * P.smoothstep(-0.3, 0.05, nb) + (1.0 - ex.get("side", 0.0)) * P.smoothstep(lo_, hi_, nb)
+            k = k * amt
+            tgt = np.repeat(P.hex3(col)[None], len(p), 0)
+            for pname, (pcol, pamt, (plo, phi)) in ex.get("top_parts", {}).items():
+                sel = np.isin(part[m], [i for i, n in enumerate(names) if n == pname])
+                if sel.any():
+                    k[sel] = pamt * P.smoothstep(plo, phi, nb[sel])
+                    tgt[sel] = P.hex3(pcol)
             lum = c @ np.array([0.3, 0.59, 0.11], dtype=np.float32)
-            k = k * amt * (1.0 - P.smoothstep(0.2, 0.36, lum))
-            c = c * (1.0 + (ratio - 1.0)[None, :] * k[:, None])
+            g0, g1 = ex.get("top_guard", (0.2, 0.36))
+            k = k * (1.0 - P.smoothstep(g0, g1, lum))
+            ratio = tgt / np.maximum(b0, 1e-3)[None, :]
+            c = c * (1.0 + (ratio - 1.0) * k[:, None])
         ed = ex.get("edge")
         if ed:
             if ed["min_angle"] not in crease:
@@ -1498,10 +1575,16 @@ def main():
     outputs = [C.rel(C.model_path(KIND, KEY)), C.rel(os.path.splitext(C.model_path(KIND, KEY))[0] + ".meta.json"),
                C.rel(blend), C.rel(os.path.join(tex_dir, KEY + "_basecolor.png")),
                C.rel(os.path.join(tex_dir, KEY + "_emissive.png"))]
-    outputs += [C.rel(os.path.join(reports, "%s_%s.png" % (KEY, n))) for n in ("review", "clips", "scale", "34")]
+    outputs += [C.rel(os.path.join(reports, "%s_%s.png" % (KEY, n))) for n in ("review", "clips", "scale", "34",
+                                                                                 "review_fix")]
     C.write_pack_status(KIND, KEY, outputs,
                         "Built from code by tools/blender/gf_assets/enemies/molten_hexer.py (model, NPR paint, "
-                        "GF_MoltenHexer_v1 rig, 8 clips + 3 aliases, export + validation, review sheets).", tier=TIER)
+                        "GF_MoltenHexer_v1 rig, 8 clips + 3 aliases, export + validation, review sheets). Art review "
+                        "fix (6.5/10): the stacked-cake robe is now three uneven tiers (a short ash cape, one long "
+                        "overrobe slumping toward the slag arm, an underskirt wedge) in values that clear the Cinder "
+                        "floor, and the glow ramp runs white-hot -> peach -> orange with no forge-gold band; "
+                        "before/after in reports/molten_hexer_review_fix.png (enemies/molten_hexer_fix_sheet.py).",
+                        tier=TIER)
     C.log("DONE", KEY)
 
 
