@@ -5,3 +5,6 @@
 !/screenshots/.gitkeep
 /saves/
 .DS_Store
+
+# Competitor screenshots used only as a local look reference: never committed (IP hygiene, README).
+/docs/media/reference/
