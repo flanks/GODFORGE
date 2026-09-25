@@ -1,0 +1,34 @@
+{
+ "asset": "the_bellows",
+ "kind": "enemy",
+ "tier": "miniboss",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/the_bellows.glb",
+    "assets/models/enemies/the_bellows.meta.json",
+    "art/enemies/the_bellows/source/the_bellows.blend",
+    "art/enemies/the_bellows/textures/the_bellows_basecolor.png",
+    "art/enemies/the_bellows/textures/the_bellows_emissive.png",
+    "art/enemies/the_bellows/reports/the_bellows_review.png",
+    "art/enemies/the_bellows/reports/the_bellows_ingame.png",
+    "art/enemies/the_bellows/reports/the_bellows_clips.png",
+    "art/enemies/the_bellows/reports/the_bellows_34.png",
+    "art/enemies/the_bellows/reports/the_bellows_verb.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/the_bellows.py (dedicated rig GF_Bellows_v1)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}

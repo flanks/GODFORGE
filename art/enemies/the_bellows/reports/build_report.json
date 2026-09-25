@@ -1,0 +1,263 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\the_bellows.glb",
+  "key": "the_bellows",
+  "kind": "enemy",
+  "tier": "miniboss",
+  "extensions_used": [],
+  "tris": 15576,
+  "budget": [
+   10000,
+   20000
+  ],
+  "textures": [
+   {
+    "name": "the_bellows_emissive",
+    "role": "emissive",
+    "px": [
+     2048,
+     2048
+    ],
+    "format": "png",
+    "bytes": 609876
+   },
+   {
+    "name": "the_bellows_basecolor",
+    "role": "base_color",
+    "px": [
+     2048,
+     2048
+    ],
+    "format": "png",
+    "bytes": 2412014
+   }
+  ],
+  "materials": [
+   "M_the_bellows"
+  ],
+  "sockets": {
+   "hit_center": {
+    "translation": [
+     0.0,
+     2.75,
+     -0.3
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     2.4193,
+     4.3746
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     2.5028,
+     3.182
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     5.4397,
+     0.0348
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     0.0,
+     2.4193,
+     4.3746
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -2.728,
+    -0.0052,
+    -4.63
+   ],
+   "max": [
+    2.728,
+    5.227,
+    4.3568
+   ]
+  },
+  "height_m": 5.232,
+  "height_vs_hero": 2.378,
+  "joints": [
+   "root",
+   "pelvis",
+   "front_thigh_L",
+   "front_shin_L",
+   "front_paw_L",
+   "front_thigh_R",
+   "front_shin_R",
+   "front_paw_R",
+   "head",
+   "mask_shard",
+   "hind_thigh_L",
+   "hind_shin_L",
+   "hind_paw_L",
+   "hind_thigh_R",
+   "hind_shin_R",
+   "hind_paw_R",
+   "lid",
+   "chimney_1",
+   "chimney_2",
+   "chimney_3",
+   "hatch_L",
+   "hatch_R",
+   "pleat_1",
+   "pleat_2",
+   "pleat_3",
+   "pleat_4",
+   "pleat_5"
+  ],
+  "clips": [
+   "the_bellows_idle@loop",
+   "the_bellows_move@loop",
+   "the_bellows_idle_p2@loop",
+   "the_bellows_move_p2@loop",
+   "the_bellows_windup",
+   "the_bellows_attack",
+   "the_bellows_hit",
+   "the_bellows_radial",
+   "the_bellows_summon",
+   "the_bellows_windup_p2",
+   "the_bellows_attack_p2",
+   "the_bellows_hit_p2",
+   "the_bellows_radial_p2",
+   "the_bellows_summon_p2",
+   "the_bellows_strike_ring",
+   "the_bellows_strike_ring_p2",
+   "the_bellows_strike_circle",
+   "the_bellows_phase2",
+   "the_bellows_death",
+   "the_bellows_inhale",
+   "the_bellows_breathe",
+   "the_bellows_inhale_p2",
+   "the_bellows_breathe_p2",
+   "the_bellows_walk@loop",
+   "the_bellows_blaze_idle@loop",
+   "the_bellows_phase_transition"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 2048,
+  "paint_scale": 0.25,
+  "texel_density_px_per_m": {
+   "median": 47.1,
+   "p10": 45.9,
+   "p90": 85.6
+  },
+  "coverage": 0.433,
+  "zones": [
+   "bronze",
+   "bronze_dark",
+   "trim",
+   "hide",
+   "porcelain",
+   "void",
+   "socket",
+   "fire",
+   "ember",
+   "eyes"
+  ],
+  "broad_zones": [
+   "bronze",
+   "bronze_dark"
+  ],
+  "decals": 5,
+  "basecolor": "art/enemies/the_bellows/textures/the_bellows_basecolor.png",
+  "emissive": "art/enemies/the_bellows/textures/the_bellows_emissive.png",
+  "emissive_texels": 609995,
+  "seconds": 41.4
+ },
+ "skin": {
+  "vertices": 8627,
+  "multi_bone": 0,
+  "per_bone": {
+   "pelvis": 562,
+   "pleat_1": 102,
+   "pleat_2": 102,
+   "pleat_3": 102,
+   "pleat_4": 102,
+   "pleat_5": 102,
+   "lid": 1173,
+   "hatch_L": 88,
+   "hatch_R": 88,
+   "chimney_1": 282,
+   "chimney_2": 282,
+   "chimney_3": 224,
+   "head": 1931,
+   "mask_shard": 203,
+   "front_thigh_L": 258,
+   "front_shin_L": 123,
+   "front_paw_L": 440,
+   "front_thigh_R": 258,
+   "front_shin_R": 123,
+   "front_paw_R": 440,
+   "hind_thigh_L": 258,
+   "hind_shin_L": 123,
+   "hind_paw_L": 440,
+   "hind_thigh_R": 258,
+   "hind_shin_R": 123,
+   "hind_paw_R": 440
+  }
+ }
+}
