@@ -2,6 +2,7 @@
 //! compilation, pickups, and the Soul-Tether life cycle.
 
 use crate::components::*;
+use crate::poi::Vacuum;
 use crate::resources::*;
 use gf_content::ContentDb;
 use gf_content::schema::{BoonKind, PassiveDef, Phase};
@@ -117,6 +118,12 @@ fn new_kit(db: &ContentDb, character: CharacterId) -> Kit {
     }
 }
 
+/// Where each slot stands at a room's entry (slot 0 on the spot, the others around it).
+pub const SPAWN_OFFSETS: [Vec2; 4] = [Vec2::ZERO, Vec2::new(-1.6, 0.0), Vec2::new(1.6, 0.0), Vec2::new(0.0, -1.6)];
+
+/// Where a player joining a biome map in progress appears around the ally they join.
+const JOIN_OFFSETS: [Vec2; 4] = [Vec2::new(0.0, -2.0), Vec2::new(-2.0, 0.0), Vec2::new(2.0, 0.0), Vec2::new(0.0, 2.0)];
+
 /// Spawn a player entity from a hub loadout.
 pub fn spawn_player(world: &mut World, slot: u8, name: &str, loadout: Loadout) -> Entity {
     let db = world.resource::<Content>().0.clone();
@@ -157,8 +164,24 @@ pub fn spawn_player(world: &mut World, slot: u8, name: &str, loadout: Loadout) -
     arsenal.discovered = recipes;
 
     let room = world.resource::<RoomLayout>().0.clone();
-    let offset = [Vec2::ZERO, Vec2::new(-1.6, 0.0), Vec2::new(1.6, 0.0), Vec2::new(0.0, -1.6)][slot as usize % 4];
-    let pos = world.resource::<ArenaRes>().0.resolve(room.player_spawn + offset, stats.radius);
+    let entry = world.get_resource::<crate::run::RoomEntry>().map_or(room.player_spawn, |e| e.0);
+    // Joining a biome map in progress: beside the living player nearest the entry, not back at
+    // the Landing a whole map away (§5.1).
+    let ally = if room.map.is_some() {
+        world
+            .query::<(&Player, &Pos, &Life)>()
+            .iter(world)
+            .filter(|(_, _, life)| life.state.is_alive())
+            .map(|(_, p, _)| p.0)
+            .min_by(|a, b| a.distance_squared(entry).total_cmp(&b.distance_squared(entry)))
+    } else {
+        None
+    };
+    let at = match ally {
+        Some(ally) => ally + JOIN_OFFSETS[slot as usize % 4],
+        None => entry + SPAWN_OFFSETS[slot as usize % 4],
+    };
+    let pos = world.resource::<ArenaRes>().0.resolve(at, stats.radius);
     let net = world.resource_mut::<NetIds>().alloc();
     let rekindles = db.game.revive.solo_rekindles;
     world
@@ -459,38 +482,95 @@ fn heal(vitals: &mut Vitals, max_hp: f32, amount: f32) {
     vitals.hp = (vitals.hp + amount).min(max_hp);
 }
 
+/// Hand a pickup's loot to a player: a part fills its empty build slot, else goes into the bag
+/// (salvaged into shards when the bag is full); shards go into the wallet; health heals.
+/// Returns what the pickup event shows.
+#[allow(clippy::too_many_arguments)]
+pub fn grant_pickup(
+    db: &ContentDb,
+    tuning: &Tuning,
+    loot: Loot,
+    stats: &PlayerStats,
+    vitals: &mut Vitals,
+    arsenal: &mut Arsenal,
+    run_stats: &mut RunStats,
+    kit: &mut Kit,
+) -> PickupKind {
+    match loot {
+        Loot::Part(part) => {
+            let slot_kind = db.part_slot(part.part).unwrap_or(Slot::Relic);
+            if arsenal.build.get(slot_kind).is_none() && !db.game.forge.locked_slots.contains(&slot_kind) {
+                arsenal.build.set(slot_kind, Some(part));
+                kit.dirty = true;
+            } else if let Err(part) = arsenal.bag.push(part) {
+                let shards = db.game.rarity.salvage_shards[part.rarity.index()];
+                arsenal.wallet.godshards += shards;
+            }
+            PickupKind::Part { rarity: part.rarity }
+        }
+        Loot::Shards(n) => {
+            arsenal.wallet.godshards += n;
+            run_stats.shards += n;
+            PickupKind::Shards(n.min(u16::MAX as u32) as u16)
+        }
+        Loot::Health(amount) => {
+            heal(vitals, stats.max_hp, amount * tuning.enemy.healing_received);
+            PickupKind::Health
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub fn collect_pickups(
     mut commands: Commands,
     clock: Res<SimClock>,
     content: Res<Content>,
     tuning: Res<Tuning>,
     run: Res<RunState>,
+    layout: Res<RoomLayout>,
     mut events: ResMut<Events>,
-    mut pickups: Query<(Entity, &mut Pos, &mut Pickup), Without<Player>>,
+    mut pickups: Query<(Entity, &mut Pos, &mut Pickup, Option<&Vacuum>), Without<Player>>,
     mut players: Query<
         (&Player, &Pos, &Stats, &Life, &mut Vitals, &mut Arsenal, &mut RunStats, &mut Kit),
         Without<Pickup>,
     >,
 ) {
     let dt = clock.gdt();
-    let rules = &content.game.forge;
     let cleared = run.phase == RunPhase::Cleared;
-    for (entity, mut pos, mut pickup) in &mut pickups {
+    let on_map = layout.0.map.is_some();
+    let owner_near = content.game.expedition.coop.part_owner_near;
+    for (entity, mut pos, mut pickup, pulled) in &mut pickups {
         let part = matches!(pickup.loot, Loot::Part(_));
-        // Parts wait out the fight: on a big field one can drop far off-screen mid-wave.
-        if !part || run.phase != RunPhase::Combat {
+        // Parts wait out the fight: on a big field one can drop far off-screen mid-wave. On a biome
+        // map the fight never ends, so a part waits while an eligible owner is near and ages once
+        // they have all moved on (§5.9).
+        let ages = if !part {
+            true
+        } else if on_map {
+            !players.iter().any(|(p, ppos, ..)| {
+                pickup.owner.is_none_or(|o| o == p.slot) && ppos.0.distance_squared(pos.0) <= owner_near * owner_near
+            })
+        } else {
+            run.phase != RunPhase::Combat
+        };
+        if ages {
             pickup.life -= dt;
         }
         if pickup.life <= 0.0 {
             commands.entity(entity).despawn();
             continue;
         }
-        // Once the room is cleared, leftover parts and shards fly to the party wherever they lie.
-        let vacuum = cleared && !matches!(pickup.loot, Loot::Health(_));
-        // Nearest eligible, living player within their magnet radius.
+        // Once the room is cleared, leftover parts and shards fly to the party wherever they lie;
+        // a completed POI pulls its loot to the player it was vacuumed to.
+        let to = pulled.map(|v| v.to).filter(|s| {
+            players.iter().any(|(p, _, _, life, ..)| p.slot == *s && life.state.is_alive())
+                && pickup.owner.is_none_or(|o| o == *s)
+        });
+        let vacuum = to.is_some() || (cleared && !matches!(pickup.loot, Loot::Health(_)));
+        // Nearest eligible, living player within their magnet radius (or the vacuum's target).
         let mut best: Option<(f32, u8)> = None;
         for (p, ppos, stats, life, ..) in &players {
-            if !life.state.is_alive() || pickup.owner.is_some_and(|o| o != p.slot) {
+            if !life.state.is_alive() || pickup.owner.is_some_and(|o| o != p.slot) || to.is_some_and(|s| s != p.slot) {
                 continue;
             }
             let d = ppos.0.distance(pos.0);
@@ -510,48 +590,35 @@ pub fn collect_pickups(
             pos.0 += dir * (speed * dt).min(dist);
             continue;
         }
-        let kind = match pickup.loot {
-            Loot::Part(part) => {
-                let slot_kind = content.part_slot(part.part).unwrap_or(Slot::Relic);
-                if arsenal.build.get(slot_kind).is_none() && !rules.locked_slots.contains(&slot_kind) {
-                    arsenal.build.set(slot_kind, Some(part));
-                    kit.dirty = true;
-                } else if let Err(part) = arsenal.bag.push(part) {
-                    let shards = content.game.rarity.salvage_shards[part.rarity.index()];
-                    arsenal.wallet.godshards += shards;
-                }
-                PickupKind::Part { rarity: part.rarity }
-            }
-            Loot::Shards(n) => {
-                arsenal.wallet.godshards += n;
-                run_stats.shards += n;
-                PickupKind::Shards(n.min(u16::MAX as u32) as u16)
-            }
-            Loot::Health(amount) => {
-                heal(&mut vitals, stats.0.max_hp, amount * tuning.enemy.healing_received);
-                PickupKind::Health
-            }
-        };
+        let kind =
+            grant_pickup(&content, &tuning, pickup.loot, &stats.0, &mut vitals, &mut arsenal, &mut run_stats, &mut kit);
         events.0.push(GameEvent::Pickup { slot: p.slot, kind });
         commands.entity(entity).despawn();
     }
 }
 
 /// Downed → tether revive / reforge; team wipe → defeat.
+///
+/// The Forge reforges a player beside the nearest living ally (`coop.reforge_offset` away), so a
+/// split party's fallen member rejoins a friend instead of the spot where they fell (§5.9). With
+/// no ally standing (a solo Rekindle), they reforge in place.
+#[allow(clippy::too_many_arguments)]
 pub fn life_update(
     clock: Res<SimClock>,
     content: Res<Content>,
     tuning: Res<Tuning>,
+    arena: Res<ArenaRes>,
     mut run: ResMut<RunState>,
     mut events: ResMut<Events>,
-    mut q: Query<(&Player, &Pos, &mut Life, &mut Vitals, &Stats, &mut Mover)>,
+    mut q: Query<(&Player, &mut Pos, &mut Life, &mut Vitals, &Stats, &mut Mover)>,
 ) {
     let dt = clock.gdt();
     let t = content.game.revive;
+    let reforge_offset = content.game.expedition.coop.reforge_offset;
     let alive: Vec<(u8, Vec2)> =
         q.iter().filter(|(_, _, l, ..)| l.state.is_alive()).map(|(p, pos, ..)| (p.slot, pos.0)).collect();
     let mut shield_for: Vec<u8> = Vec::new();
-    for (player, pos, mut life, mut vitals, stats, mut mover) in &mut q {
+    for (player, mut pos, mut life, mut vitals, stats, mut mover) in &mut q {
         if life.state.is_alive() {
             continue;
         }
@@ -570,6 +637,20 @@ pub fn life_update(
             LifeEvent::Reforged => {
                 vitals.hp = stats.0.max_hp * t.reforge_hp_frac * tuning.enemy.healing_received.max(0.5);
                 mover.0.iframes = 2.0;
+                let here = pos.0;
+                if let Some(ally) = alive
+                    .iter()
+                    .filter(|(s, _)| *s != player.slot)
+                    .map(|(_, p)| *p)
+                    .min_by(|a, b| a.distance_squared(here).total_cmp(&b.distance_squared(here)))
+                {
+                    let away = (here - ally).normalize_or(Vec2::NEG_Y);
+                    let at = arena.0.resolve(ally + away * reforge_offset, stats.0.radius);
+                    pos.0 = at;
+                    mover.0.pos = at;
+                    mover.0.vel = Vec2::ZERO;
+                    mover.0.dash_left = 0.0;
+                }
                 events.0.push(GameEvent::Revived { slot: player.slot, by: None });
             }
             LifeEvent::StartedReforge | LifeEvent::None => {}
