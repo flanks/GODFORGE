@@ -5,9 +5,10 @@
 //! gf-content import --check    # CI: fail if generated files are stale or content is invalid
 //! gf-content validate [--strict]   # full report incl. EA-scope warnings (no files written)
 //! gf-content audit [--write]   # 100-hour audit (§11.5 / acceptance #7)
-//! gf-content preview-room <template> <seed> <out.png> [--ron]  # top-down PNG (+ RoomDef dump)
+//! gf-content preview-room <template> <seed> <out.png> [--ron]  # top-down PNG (+ RoomDef dump); rooms and biome maps
 //! gf-content preview-sheet <out.png> --biome KEY --seeds N  # contact sheet: templates × seeds
 //! gf-content layout-stats [--biome KEY] [--seeds N]         # density / flow readout per kind
+//! gf-content layout-stats --maps [--biome KEY] [--seeds N]  # biome maps: fails on repairs, relaxations, budget
 //! ```
 
 mod audit;
@@ -171,9 +172,9 @@ fn usage() -> ExitCode {
     eprintln!(
         "usage: gf-content <import [--check] | validate [--strict] | audit [--write]\n\
          \x20                 | preview-room <template> <seed> <out.png> [--scale PX] [--ron]\n\
-         \x20                 | preview-sheet <out.png> [--biome KEY] [--templates a,b] [--kinds combat,elite,anvil,treasure]\n\
-         \x20                                [--seeds N] [--seed0 S] [--scale PX]\n\
-         \x20                 | layout-stats [--biome KEY] [--seeds N]>"
+         \x20                 | preview-sheet <out.png> [--biome KEY] [--templates a,b]\n\
+         \x20                                [--kinds combat,elite,anvil,treasure,expedition] [--seeds N] [--seed0 S] [--scale PX]\n\
+         \x20                 | layout-stats [--maps] [--biome KEY] [--seeds N]>"
     );
     ExitCode::FAILURE
 }
@@ -208,6 +209,7 @@ fn parse_kind(s: &str) -> Option<RoomKind> {
         "treasure" => Some(RoomKind::Treasure),
         "miniboss" => Some(RoomKind::MiniBoss),
         "boss" => Some(RoomKind::Boss),
+        "expedition" | "map" => Some(RoomKind::Expedition),
         _ => None,
     }
 }
@@ -218,9 +220,12 @@ fn cmd_preview_room(p: &Paths, args: &[String]) -> ExitCode {
     else {
         return usage();
     };
-    let scale = opt(args, "--scale").and_then(|s| s.parse().ok()).unwrap_or(10.0);
+    let scale: Option<f32> = opt(args, "--scale").and_then(|s| s.parse().ok());
     let ron = args.iter().any(|a| a == "--ron");
-    with_db(p, |db| preview::preview_room(db, key, seed, &PathBuf::from(out), scale, ron))
+    with_db(p, |db| {
+        let scale = scale.unwrap_or_else(|| preview::default_scale(db, key));
+        preview::preview_room(db, key, seed, &PathBuf::from(out), scale, ron)
+    })
 }
 
 fn cmd_preview_sheet(p: &Paths, args: &[String]) -> ExitCode {
@@ -242,8 +247,13 @@ fn cmd_preview_sheet(p: &Paths, args: &[String]) -> ExitCode {
 }
 
 fn cmd_layout_stats(p: &Paths, args: &[String]) -> ExitCode {
-    let seeds = opt(args, "--seeds").and_then(|s| s.parse().ok()).unwrap_or(40);
-    with_db(p, |db| preview::layout_stats(db, opt(args, "--biome"), seeds))
+    let maps = args.iter().any(|a| a == "--maps");
+    let seeds = opt(args, "--seeds").and_then(|s| s.parse().ok()).unwrap_or(if maps { 8 } else { 40 });
+    if maps {
+        with_db(p, |db| preview::layout_stats_maps(db, opt(args, "--biome"), seeds))
+    } else {
+        with_db(p, |db| preview::layout_stats(db, opt(args, "--biome"), seeds))
+    }
 }
 
 fn main() -> ExitCode {
