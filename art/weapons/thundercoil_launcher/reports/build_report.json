@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 209493
+    "bytes": 224199
    },
    {
     "name": "thundercoil_launcher_basecolor",
@@ -29,7 +29,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 777444
+    "bytes": 769012
    }
   ],
   "materials": [
@@ -44,11 +44,11 @@
    "thundercoil_launcher"
   ],
   "sockets": {
-   "grip_L": {
+   "glow_core": {
     "translation": [
      0.0,
-     0.052,
-     -0.441
+     0.1,
+     -0.27
     ],
     "forward": [
      0,
@@ -78,11 +78,11 @@
      0
     ]
    },
-   "grip_R": {
+   "grip_L": {
     "translation": [
-     0,
-     0,
-     0
+     0.0,
+     0.052,
+     -0.441
     ],
     "forward": [
      0,
@@ -95,11 +95,11 @@
      0
     ]
    },
-   "glow_core": {
+   "grip_R": {
     "translation": [
-     0.0,
-     0.1,
-     -0.27
+     0,
+     0,
+     0
     ],
     "forward": [
      0,
@@ -117,15 +117,15 @@
    "min": [
     -0.102,
     -0.115,
-    -0.763
+    -0.8031
    ],
    "max": [
     0.102,
-    0.2053,
-    0.3853
+    0.2118,
+    0.3473
    ]
   },
-  "length_m": 1.148,
+  "length_m": 1.15,
   "errors": [],
   "warnings": [],
   "ok": true
@@ -133,14 +133,15 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 781.9,
-   "p10": 733.7,
-   "p90": 826.6
+   "median": 725.6,
+   "p10": 673.3,
+   "p90": 774.7
   },
-  "coverage": 0.388,
+  "coverage": 0.349,
   "zones": [
    "iron",
    "brass",
+   "bronze",
    "copper",
    "coil",
    "tine",
@@ -152,8 +153,8 @@
   "decals": 7,
   "basecolor": "art/weapons/thundercoil_launcher/textures/thundercoil_launcher_basecolor.png",
   "emissive": "art/weapons/thundercoil_launcher/textures/thundercoil_launcher_emissive.png",
-  "emissive_texels": 65619,
-  "emissive_fraction_of_painted": 0.161,
-  "seconds": 18.5
+  "emissive_texels": 65185,
+  "emissive_fraction_of_painted": 0.178,
+  "seconds": 12.7
  }
 }

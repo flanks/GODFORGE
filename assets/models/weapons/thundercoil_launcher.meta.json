@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 209493
+   "bytes": 224199
   },
   {
    "name": "thundercoil_launcher_basecolor",
@@ -26,15 +26,15 @@
     1024
    ],
    "format": "png",
-   "bytes": 777444
+   "bytes": 769012
   }
  ],
  "sockets": {
-  "grip_L": {
+  "glow_core": {
    "translation": [
     0.0,
-    0.052,
-    -0.441
+    0.1,
+    -0.27
    ],
    "forward": [
     0,
@@ -64,11 +64,11 @@
     0
    ]
   },
-  "grip_R": {
+  "grip_L": {
    "translation": [
-    0,
-    0,
-    0
+    0.0,
+    0.052,
+    -0.441
    ],
    "forward": [
     0,
@@ -81,11 +81,11 @@
     0
    ]
   },
-  "glow_core": {
+  "grip_R": {
    "translation": [
-    0.0,
-    0.1,
-    -0.27
+    0,
+    0,
+    0
    ],
    "forward": [
     0,
@@ -107,18 +107,18 @@
   "min": [
    -0.102,
    -0.115,
-   -0.763
+   -0.8031
   ],
   "max": [
    0.102,
-   0.2053,
-   0.3853
+   0.2118,
+   0.3473
   ]
  },
- "size_m": 1.148,
+ "size_m": 1.15,
  "glb": "assets/models/weapons/thundercoil_launcher.glb",
- "glb_bytes": 1148736,
- "glb_sha256": "9c8a1447de3fb52b90e6df9d3518653e52beb399f7e38eeb10393cb031b9501c",
+ "glb_bytes": 1157952,
+ "glb_sha256": "f7ec899d70f704f5a9e235ed6c4c69559efd31ff3124ab074f18319cabca97c7",
  "source_blend": "art/weapons/thundercoil_launcher/source/thundercoil_launcher.blend",
  "build_script": "art/weapons/thundercoil_launcher/source/thundercoil_launcher_build.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -142,11 +142,11 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 781.9,
-   "p10": 733.7,
-   "p90": 826.6
+   "median": 725.6,
+   "p10": 673.3,
+   "p90": 774.7
   },
-  "coverage": 0.388,
-  "emissive_fraction_of_painted": 0.161
+  "coverage": 0.349,
+  "emissive_fraction_of_painted": 0.178
  }
 }

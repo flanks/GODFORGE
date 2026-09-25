@@ -14,15 +14,20 @@ Design (docs/art/WEAPONS.md section 5: family HEAVY/SPLASH, secondary tag storm 
   * the brief asks for SLENDER and ELEGANT, so the LUMP verb is carried by ONE mass only: a storm-glass
     orb (0.20 m across; with its cups 0.25 m, a fifth of the length) sitting in the breech between the
     hands, set in two small brass cups whose rims open into five calyx leaves each. Everything else is
-    thin: a bone swan-neck skeleton stock with a brass crescent butt (Selene = the moon), a slim
-    dark-iron receiver with a copper lightning inlay, a copper coil pack on the neck, a wooden forestock
-    sleeve, a tapering copper induction coil, and a round emitter muzzle (a copper halo ring + three
-    forward-swept conductor tines): the wide round muzzle of the splash family, forked like a conductor;
-  * value rhythm (checked at 1x in the 55 deg camera): pale bone stock -> dark iron receiver / dark wood
-    grip -> the glowing orb in bright brass -> dark sleeve -> copper coil -> copper halo, white-hot tine
-    tips and a glowing bore where the orbs leave;
+    thin: a smoked-bone swan-neck skeleton stock with a dark bronze crescent butt (Selene = the moon), a
+    slim dark-iron receiver with a copper lightning inlay, a copper coil pack on the neck, a wooden
+    forestock sleeve, a tapering copper induction coil, and a round emitter muzzle (a copper halo ring +
+    three thick forward-swept conductor prongs with blunt glowing electrode tips): the wide round muzzle
+    of the splash family, forked like a conductor;
+  * value rhythm (checked at 1x in the 55 deg camera): mid smoked-bone stock falling off to a dark bronze
+    butt -> dark iron receiver / dark wood grip -> the glowing orb in bright brass (the lead) -> dark
+    sleeve -> copper coil -> copper halo, white-hot prong tips and a glowing bore where the orbs leave;
   * Storm #3FD8FF lives in the EMISSIVE only: the orb's plasma wisps and crackle veins, the bore, the
-    tine tips (about 16 % of the surface). Base colour under glows is pale steel-white, never cyan;
+    front half of each prong (about 18 % of the surface). Base colour under glows is pale steel-white,
+    never cyan;
+  * rev 2 (art review 7/10): the pale bone stock was the largest light shape and pulled the eye to the
+    back at 1x -> darkened one value step with a fall-off toward the butt, bronze crescent, 4 cm shorter;
+    the needle tines were 1-2 px at 1x -> longer, ~60 % thicker, wider, blunt glowing tips (same tris);
   * palette: the warm metals of the player's arsenal (copper, bone-brass, dark iron, dark wood, bone) +
     a dark slate storm-glass.
 
@@ -63,14 +68,21 @@ SLEEVE = (0.392, 0.490)           # wooden forestock sleeve (left hand)
 COIL = (0.502, 0.582)             # barrel induction coil (tapering)
 HALO_Y, HALO_R = 0.630, 0.060     # copper halo ring at the muzzle
 MUZZLE_Y = 0.634                  # bore exit (the muzzle socket)
-TINE_TIP_Y = 0.762
+TINE_TIP_Y = 0.800                # rev 2: 0.762 -> 0.800, the prongs are longer, thicker and splay wider
+TINE_GLOW_Y = 0.712               # the tines glow from here to the tip (rev 2: was the last ~2 cm only)
+STOCK_CC_Y = -0.388               # crescent-butt arc centre (rev 2: -0.426 -> -0.388, a shorter stock)
 GRIP_L = (0.0, 0.441, AX - 0.048)  # palm centre of the left hand under the sleeve
 CORE = (0.0, CH_Y, AX)            # the orb's plasma core (glow_core)
 
-ZONES = ["iron", "brass", "copper", "coil", "tine", "wood", "bone", "glass", "glow_bore"]
+ZONES = ["iron", "brass", "bronze", "copper", "coil", "tine", "wood", "bone", "glass", "glow_bore"]
+# rev 2 (art review): the bone stock was the largest light shape and pulled the eye to the back at 1x.
+# It is now smoked bone one value step darker (#D2C3A5 -> #9A7F5C) that also falls off toward the butt,
+# and the crescent is dark bronze instead of bright brass: the orb and the muzzle lead the read.
+BONE = "#9A7F5C"
 PALETTE = [  # (name, hex) for the review sheet
-    ("bone", "#D2C3A5"), ("wood", "#45282A"), ("iron", "#2D2A38"), ("brass", "#C79E55"), ("copper", "#C0673A"),
-    ("storm glass", "#18202E"), ("glow rim", "#0E4E7E"), ("storm", "#3FD8FF"), ("core", "#F2FFFF"),
+    ("smoked bone", BONE), ("wood", "#45282A"), ("iron", "#2D2A38"), ("brass", "#C79E55"), ("bronze", "#8A6638"),
+    ("copper", "#C0673A"), ("storm glass", "#18202E"), ("glow rim", "#0E4E7E"), ("storm", "#3FD8FF"),
+    ("core", "#F2FFFF"),
 ]
 
 # glass colours (sRGB)
@@ -148,7 +160,7 @@ def petal(ang, side):
 def stock_curves():
     """Centre-lines of the upper and lower stock struts and the crescent arc (shared by the mesh and the
     pinstripe decals)."""
-    cc = Vector((0.0, -0.426, 0.030))         # crescent arc centre (y, z); the horns point back
+    cc = Vector((0.0, STOCK_CC_Y, 0.030))     # crescent arc centre (y, z); the horns point back
     cr = 0.105
 
     def arc(th):
@@ -199,7 +211,7 @@ def build_mesh(col):
     for i in range(n):
         t = abs(i / (n - 1) * 2 - 1)            # 1 at the horns, 0 in the middle
         sc.append((0.046 - 0.012 * t, 0.032 - 0.024 * t * t))
-    a.add(M.tube(cres, 1.0, profile=rect, up=(1, 0, 0), scale_xy=sc), "brass", name="crescent")
+    a.add(M.tube(cres, 1.0, profile=rect, up=(1, 0, 0), scale_xy=sc), "bronze", name="crescent")
 
     # -- trigger guard (iron strap) and trigger
     guard = M.catmull([(0, 0.022, AX - 0.062), (0, 0.036, AX - 0.122), (0, 0.072, AX - 0.136),
@@ -247,11 +259,18 @@ def build_mesh(col):
     a.add(lathe_y(bore, 16), "glow_bore", name="bore", shading="smooth")
     ring_pts = [radial(360.0 * i / 16, HALO_R, HALO_Y) for i in range(16)]
     a.add(M.tube(ring_pts, 0.0105, sides=5, closed=True, up=(0, 1, 0)), "copper", name="halo", shading="smooth")
+    # rev 2 (art review: the needle tines were 1-2 px at 1x): the prongs are longer (tip 0.762 -> 0.800),
+    # about 60 % thicker (base radius 0.0115 -> 0.0185), splay wider (0.083 -> 0.097 from the axis, the
+    # muzzle is now 0.23 m across) and end in a blunt electrode tip (radius 0.006) instead of a needle,
+    # so each glowing tip is a dot at game size. Same ring count, so the same triangle count.
+    radii = [0.0185, 0.0172, 0.0160, 0.0150, 0.0142, 0.0136, 0.0132, 0.0130, 0.0126, 0.0108, 0.0060]
     for ang in (90.0, 210.0, 330.0):
-        ctrl = [radial(ang, r, y) for r, y in ((HALO_R - 0.004, HALO_Y - 0.004), (0.074, HALO_Y + 0.024),
-                                                (0.083, HALO_Y + 0.059), (0.080, HALO_Y + 0.094),
-                                                (0.066, HALO_Y + 0.120), (0.052, TINE_TIP_Y))]
-        a.add(M.horn(M.catmull(ctrl, 2), 0.0115, 0.0012, sides=5), "tine", name="tine", shading="smooth")
+        ctrl = [radial(ang, r, y) for r, y in ((HALO_R - 0.006, HALO_Y - 0.006), (0.081, HALO_Y + 0.026),
+                                                (0.097, HALO_Y + 0.066), (0.096, HALO_Y + 0.106),
+                                                (0.084, HALO_Y + 0.142), (0.068, TINE_TIP_Y))]
+        pts = M.catmull(ctrl, 2)
+        assert len(pts) == len(radii)
+        a.add(M.tube(pts, radii, sides=5, cap=True), "tine", name="tine", shading="smooth")
 
     obj = a.to_object(col)
     C.log("mesh: %d parts, %d tris" % (len(a.parts), sum(len(p.vertices) - 2 for p in obj.data.polygons)))
@@ -270,13 +289,20 @@ RECIPES = {
                      edge_width=0.0035, cavity=0.6, ao=0.55),
     "coil": P.zone(base="#BD6536", shadow="#4E1A0E", light="#FFB885", planes=0.12, parts=0.0, edge=0.35,
                    edge_width=0.0025, cavity=0.3, ao=0.85, ao_range=(0.2, 0.55), brush=0.04),
+    # rev 2: the glow runs over the front half of each prong (was the last ~2 cm), storm blue -> Storm ->
+    # white-hot at the blunt tip, so the three tips read as bright dots at 1x
     "tine": P.zone(base="#C0673A", shadow="#5A2214", light="#FFBE8C", planes=0.1, edge=0.6, edge_width=0.003,
                    cavity=0.4, ao=0.4,
                    emit={"core": STORM_DEEP, "hot": STORM, "color": STORM_CORE, "mode": "plane",
-                         "axis": (0, 1, 0), "range": (0.735, TINE_TIP_Y), "fade": (0.3, 0.85), "base_mix": 0.75}),
-    "bone": P.zone(base="#D2C3A5", shadow="#76624E", light="#FBF3E2", planes=0.06, parts=0.04, edge=0.6,
-                   edge_width=0.0045, cavity=0.75, ao=0.6, stroke=(0, 1, 0), stroke_amount=0.28,
-                   stroke_freq=(120.0, 3.0), brush=0.06, brush_freq=9.0),
+                         "axis": (0, 1, 0), "range": (TINE_GLOW_Y, TINE_TIP_Y), "fade": (0.0, 0.3),
+                         "base_mix": 0.75}),
+    "bone": P.zone(base=BONE, shadow="#4A3826", light="#CDB690", planes=0.06, parts=0.04, edge=0.5,
+                   edge_width=0.004, cavity=0.75, ao=0.6, stroke=(0, 1, 0), stroke_amount=0.22,
+                   stroke_freq=(120.0, 3.0), brush=0.06, brush_freq=9.0,
+                   gradient={"axis": (0, 1, 0), "range": (-0.12, -0.33), "color": "shadow", "amount": 0.32}),
+    "bronze": P.zone(base="#8A6638", shadow="#3E2810", light="#D0AA68", planes=0.08, parts=0.0, edge=0.8,
+                     edge_width=0.004, cavity=0.7, ao=0.6,
+                     spots={"color": "#5A3E1E", "amount": 0.25, "freq": 16.0, "threshold": (0.62, 0.74)}),
     "wood": P.zone(base="#45282A", shadow="#1A0C0E", light="#7E4C45", planes=0.05, parts=0.04, edge=0.55,
                    edge_width=0.0045, cavity=0.7, ao=0.6, stroke=(0, 1, 0), stroke_amount=0.3,
                    stroke_freq=(80.0, 5.0)),
@@ -337,14 +363,15 @@ def decals():
         fr = Matrix(((u.x, v.x, z.x, 0), (u.y, v.y, z.y, 0.008), (u.z, v.z, z.z, AX - 0.004), (0, 0, 0, 1)))
         out.append(P.decal_lines(bolt_lines(sx), fr, 0.0055, zones=["iron"], color="#E28A52", rim="#0D0A12",
                                  rim_width=0.010, depth=(0.0, 0.06)))
-        # brass pinstripe inlaid along both bone struts (u = sx * y so the frame's +Z points out of this side)
+        # scrimshaw line inked along both bone struts (u = sx * y so the frame's +Z points out of this side);
+        # rev 2: dark ink instead of the brass pinstripe, which vanished into the darker smoked bone
         top, low, _ = stock_curves()
         fr0 = Matrix(((u.x, v.x, z.x, 0), (u.y, v.y, z.y, 0), (u.z, v.z, z.z, 0), (0, 0, 0, 1)))
         stripes = []
-        for curve, y_lo, y_hi in ((top, -0.325, -0.11), (low, -0.325, -0.075)):
+        for curve, y_lo, y_hi in ((top, -0.29, -0.11), (low, -0.29, -0.075)):
             stripes.append([(sx * p.y, p.z) for p in curve if y_lo <= p.y <= y_hi])
-        out.append(P.decal_lines(stripes, fr0, 0.0032, zones=["bone"], color="#B98A3E", rim="#5E4630",
-                                 rim_width=0.0065, depth=(0.0, 0.06)))
+        out.append(P.decal_lines(stripes, fr0, 0.0030, zones=["bone"], color="#2E2026", rim="#6A563F",
+                                 rim_width=0.0062, depth=(0.0, 0.06)))
     # an engraved frieze around each brass cup: two rings and a lightning zig-zag between them
     for side in (-1, 1):
         dy = side * 0.092
