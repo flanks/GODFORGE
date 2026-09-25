@@ -174,7 +174,8 @@ impl CurrentRoom {
 pub struct Prediction {
     pub state: Option<MoverState>,
     pending: VecDeque<(u32, MoveInput)>,
-    arena: Arena,
+    /// The room's collision world: replaced whole on a room change, never cloned per tick.
+    arena: Arc<Arena>,
     last_presses: Presses,
     /// Visual offset left by corrections, decays to zero (no snapping).
     pub error: Vec2,
@@ -233,7 +234,7 @@ fn poll_link(
                 link.fresh_events.extend(w.events.iter().copied());
                 let new_room = room.sync(&w.run, &cfg.content);
                 if new_room {
-                    pred.arena = Arena::new(room.def.half_extents, room.def.obstacles.clone(), Vec::new());
+                    pred.arena = Arc::new(Arena::new(room.def.half_extents, room.def.obstacles.clone(), Vec::new()));
                 }
                 if let Some(slot) = link.slot {
                     reconcile(&mut pred, &w, slot, &cfg, new_room);
@@ -305,9 +306,9 @@ fn send_command(
         return;
     }
     let mi = move_input(&sent, dash_edge, &me);
-    let arena = pred.arena.clone();
+    let pred = &mut *pred;
     if let Some(state) = pred.state.as_mut() {
-        step_mover(state, &mi, &cfg.content.game.movement, gf_core::SIM_DT * time_scale, &arena, me.radius);
+        step_mover(state, &mi, &cfg.content.game.movement, gf_core::SIM_DT * time_scale, &pred.arena, me.radius);
         pred.pending.push_back((sent.seq, mi));
         while pred.pending.len() > 240 {
             pred.pending.pop_front();

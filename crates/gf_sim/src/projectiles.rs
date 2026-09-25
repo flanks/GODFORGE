@@ -121,7 +121,7 @@ pub fn move_projectiles(
         let prev = pos.0;
         let next = prev + p.dir * p.speed * dt;
         p.life -= dt;
-        let blocked = arena.0.obstacles.iter().any(|o| o.contains(next, 0.0));
+        let blocked = arena.0.blocks_shot(next);
         if p.life <= 0.0 || blocked || !arena.0.in_bounds(next) {
             if !p.any_hit
                 && p.precision_enabled
@@ -358,7 +358,7 @@ pub fn move_enemy_shots(
         }
         s.life -= dt;
         let next = pos.0 + s.dir * s.speed * dt;
-        if s.life <= 0.0 || !arena.0.in_bounds(next) || arena.0.obstacles.iter().any(|o| o.contains(next, 0.0)) {
+        if s.life <= 0.0 || !arena.0.in_bounds(next) || arena.0.blocks_shot(next) {
             commands.entity(entity).despawn();
             continue;
         }

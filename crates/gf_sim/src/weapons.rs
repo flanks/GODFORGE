@@ -74,6 +74,7 @@ pub fn aim_and_fire(
     content: Res<Content>,
     grid: Res<Grid>,
     arena: Res<ArenaRes>,
+    mut occluders: Local<Vec<Obstacle>>,
     mut ids: ResMut<NetIds>,
     mut queue: ResMut<DamageQueue>,
     mut events: ResMut<Events>,
@@ -93,20 +94,10 @@ pub fn aim_and_fire(
         // Projectiles die on the ruins, so a foe behind one is not a target (beams and swings pass
         // through). Without this, AUTO pours fire into a pillar while a support elite shields
         // itself behind it, and the room never ends.
-        let occluders: Vec<Obstacle> = if matches!(fire, FireKind::Auto | FireKind::Charge) {
-            arena
-                .0
-                .obstacles
-                .iter()
-                .filter(|o| {
-                    let (c, r) = o.bounding_circle();
-                    c.distance_squared(pos.0) < (reach + r) * (reach + r)
-                })
-                .copied()
-                .collect()
-        } else {
-            Vec::new()
-        };
+        occluders.clear();
+        if matches!(fire, FireKind::Auto | FireKind::Charge) {
+            arena.0.occluders(pos.0, reach, &mut occluders);
+        }
         let mut candidates: Vec<TargetCandidate> = Vec::new();
         grid.0.for_each_in_circle(pos.0, reach, |e| {
             if let Ok((enemy, vel, rep)) = enemies.get(e.entity)

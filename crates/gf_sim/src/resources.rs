@@ -186,8 +186,9 @@ pub struct KillRecord {
 #[derive(Resource, Debug, Default)]
 pub struct Kills(pub Vec<KillRecord>);
 
+/// The current room's collision world, shared (never cloned per query or per tick).
 #[derive(Resource, Debug, Default)]
-pub struct ArenaRes(pub Arena);
+pub struct ArenaRes(pub Arc<Arena>);
 
 /// The current room's resolved layout (procedurally generated from the template + room seed, or
 /// the authored template itself). Everything room-shaped reads this, never `content.room(..)`.
