@@ -6,6 +6,7 @@
 use gf_client::{ClientConfig, ClientPlugin, Connect};
 use gf_content::{ContentDb, Phase, Severity, find_content_dir};
 use gf_core::aim::AimMode;
+use gf_core::poi::PoiKind;
 use gf_engine::prelude::*;
 use gf_net::{Loadout, NetConditions, RunPhase};
 use gf_sim::SimConfig;
@@ -33,6 +34,8 @@ GAME OPTIONS
   --seed <n>            run seed
   --room <key>[~seed]   QA: open the run in this room (e.g. cinder_anvil_hall); ~<hex> pins the
                         layout a report printed (cinder_gate~b5a1a1dd), ~0 = authored template
+  --start-at <poi>      QA: on a biome map, start the party beside the first POI of this kind
+                        (anvil, warlord, lair, shrine, reliquary, vein, spring, watchfire, gate)
   --name <name>
 
 CLIENT OPTIONS
@@ -46,8 +49,12 @@ CLIENT OPTIONS
   --horde <n>                  QA: hold n enemies on the field (look and frame time at peak horde)
 
 HEADLESS OPTIONS
-  --bots <n>  --minutes <n>  --rtt <ms>  --loss <0..1>
+  --bots <n>  --rtt <ms>  --loss <0..1>
+  --minutes <n>         cap (bot run default 75: a full run must end by then; stress default 2)
 ";
+
+/// Default sim-minute cap of a `--bot-run` (OPEN_WORLD.md §8.3: a run of biome maps).
+const BOT_RUN_MINUTES: u32 = 75;
 
 struct Args(Vec<String>);
 
@@ -96,11 +103,19 @@ fn main() {
     let seed = args.parse("--seed").unwrap_or_else(|| {
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map_or(7, |d| d.as_secs())
     });
+    let start_at = args.value("--start-at").map(|k| {
+        PoiKind::ALL.into_iter().find(|p| p.name().eq_ignore_ascii_case(k)).unwrap_or_else(|| {
+            let kinds: Vec<String> = PoiKind::ALL.iter().map(|p| p.name().to_lowercase()).collect();
+            eprintln!("error: unknown POI kind '{k}' (one of {})", kinds.join(", "));
+            std::process::exit(2);
+        })
+    });
     let sim = SimConfig {
         seed,
         phase,
         chaos_tier: args.parse("--chaos").unwrap_or(0),
         start_room: args.value("--room").map(str::to_string),
+        start_at,
         ..SimConfig::default()
     };
     let playable: Vec<u16> =
@@ -133,7 +148,7 @@ fn main() {
     if args.flag("--bot-run") || args.flag("--stress") {
         let stress = args.flag("--stress").then(|| args.parse("--stress").unwrap_or(400));
         let bots: usize = args.parse("--bots").unwrap_or(if stress.is_some() { 4 } else { 1 });
-        let minutes: u32 = args.parse("--minutes").unwrap_or(if stress.is_some() { 2 } else { 40 });
+        let minutes: u32 = args.parse("--minutes").unwrap_or(if stress.is_some() { 2 } else { BOT_RUN_MINUTES });
         let net = match args.parse::<u64>("--rtt") {
             Some(rtt) => NetConditions::rtt(rtt, rtt / 10, args.parse("--loss").unwrap_or(0.0)),
             None => NetConditions::ideal(),
@@ -223,7 +238,7 @@ fn main() {
 enum Gate {
     /// Stress scene: only the tick budget.
     Budget,
-    /// Time-boxed run: clear at least one room and don't wipe.
+    /// Time-boxed run: clear at least one room (or complete an objective) and don't wipe.
     Progress,
     /// Full run: end in victory or defeat (anything else is a stall).
     Finish,
@@ -231,8 +246,8 @@ enum Gate {
 
 /// Print a headless report; returns false when the run breaks a CI gate.
 fn print_report(r: &RunReport, gate: Gate) -> bool {
-    println!("outcome        {:?}", r.outcome);
-    println!("rooms cleared  {} (biome {} reached)", r.depth, r.biome_reached + 1);
+    println!("outcome        {:?}{}", r.outcome, if r.stalled { " (stalled)" } else { "" });
+    println!("depth          {} rooms and objectives (biome {} reached)", r.depth, r.biome_reached + 1);
     println!("kills          {}", r.kills);
     println!("ember          {}", r.ember);
     println!("sim time       {:.1} min in {:.1} s wall", r.sim_minutes, r.wall_seconds);
@@ -260,6 +275,13 @@ fn print_report(r: &RunReport, gate: Gate) -> bool {
         );
     }
     let mut ok = true;
+    if r.stalled {
+        eprintln!(
+            "FAIL: no objective progress for {} sim-minutes on a biome map (trace above)",
+            gf_sim::bot::STALL_MINUTES
+        );
+        ok = false;
+    }
     if r.p99_tick_ms > 16.667 {
         eprintln!("FAIL: host p99 tick {:.2} ms exceeds the 60 Hz budget", r.p99_tick_ms);
         ok = false;
@@ -270,7 +292,10 @@ fn print_report(r: &RunReport, gate: Gate) -> bool {
             ok = false;
         }
         Gate::Progress if r.outcome == RunPhase::Defeat || r.depth == 0 => {
-            eprintln!("FAIL: time-boxed run wiped or cleared no room ({:?}, depth {})", r.outcome, r.depth);
+            eprintln!(
+                "FAIL: time-boxed run wiped or cleared no room or objective ({:?}, depth {})",
+                r.outcome, r.depth
+            );
             ok = false;
         }
         _ => {}

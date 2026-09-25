@@ -28,7 +28,8 @@ fn solo_valdris_auto_clears_rooms_and_forges() {
     let report =
         run_headless(db.clone(), cfg, &[(loadout(&db, "valdris"), AimMode::Auto)], 60 * 60 * 4, NetConditions::ideal());
     assert!(report.kills > 100, "bot should be killing things: {report:#?}");
-    assert!(report.depth >= 2, "rooms should clear and doors lead onward: {report:#?}");
+    // Depth counts cleared rooms and completed biome-map objectives alike.
+    assert!(report.depth >= 2, "rooms should clear (or objectives complete) and the run lead onward: {report:#?}");
     assert!(report.bots[0].parts.len() >= 2, "the forge loop should have equipped parts: {report:#?}");
 }
 
@@ -99,7 +100,9 @@ fn survives_lossy_high_latency_links() {
 fn every_peer_rebuilds_the_hosts_procedural_arenas() {
     // The host replicates only (template, seed) per room; a client or bot rebuilding the layout
     // from the snapshot must get exactly the arena the host simulates, or prediction, bot
-    // steering and the rendered walls would disagree with the authoritative sim.
+    // steering and the rendered walls would disagree with the authoritative sim. A biome is a
+    // generated map and its boss arena (or a legacy door sequence of generated rooms), so a run
+    // visits at least two rooms, one of them generated.
     let db = content();
     let cfg = SimConfig { phase: Phase::P1, seed: 7, ..Default::default() };
     let (listener, connector) = loopback::listener(NetConditions::ideal());
@@ -126,6 +129,9 @@ fn every_peer_rebuilds_the_hosts_procedural_arenas() {
                 let layout = server.world().resource::<RoomLayout>();
                 assert_eq!(*layout.0, rebuilt, "room {} ({}) diverged on the client", run.room_serial, layout.0.key);
                 assert_eq!((run.room, run.room_seed), (host.room.0, host.room_seed));
+                // Biome maps: the replicated layout hash is the one every peer checks at runtime.
+                let hash = rebuilt.map.as_ref().map_or(0, |m| m.hash as u32);
+                assert_eq!(run.layout_hash, hash, "room {} ({}) layout hash", run.room_serial, rebuilt.key);
                 seen.insert(run.room_serial, (run.room, run.room_seed, rebuilt.kind));
             }
             let (cmd, action) = brain.think(w, &db);
@@ -139,10 +145,10 @@ fn every_peer_rebuilds_the_hosts_procedural_arenas() {
             break;
         }
     }
-    assert!(seen.len() >= 5, "the run should visit several rooms: {seen:?}");
+    assert!(seen.len() >= 2, "the run should visit several rooms: {seen:?}");
     let generated: Vec<u32> =
         seen.values().filter(|(_, _, kind)| procgen::is_generated_kind(*kind)).map(|(_, seed, _)| *seed).collect();
-    assert!(generated.len() >= 3, "{seen:?}");
+    assert!(!generated.is_empty(), "{seen:?}");
     assert!(generated.iter().all(|s| *s != 0), "generated rooms need a layout seed: {seen:?}");
     let mut distinct = generated.clone();
     distinct.sort_unstable();
