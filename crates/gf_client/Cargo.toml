@@ -1,10 +1,21 @@
 [package]
 name = "gf_client"
+description = "GODFORGE client: presentation, input, prediction, HUD and forge UI over the authoritative sim."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[dependencies]
+gf_core = { workspace = true }
+gf_content = { workspace = true }
+gf_net = { workspace = true }
+gf_sim = { workspace = true }
+gf_engine = { workspace = true, features = ["client"] }
+# Listed only so derive macros resolve; code imports through gf_engine.
+bevy = { workspace = true }
+glam = { workspace = true }
 
 [lints]
 workspace = true

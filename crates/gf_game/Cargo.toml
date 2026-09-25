@@ -1,10 +1,23 @@
 [package]
 name = "gf_game"
+description = "GODFORGE: The Last Arsenal — game executable (play, host, join, headless bot runs, stress)."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[[bin]]
+name = "godforge"
+path = "src/main.rs"
+
+[dependencies]
+gf_core = { workspace = true }
+gf_content = { workspace = true }
+gf_net = { workspace = true }
+gf_sim = { workspace = true }
+gf_client = { workspace = true }
+gf_engine = { workspace = true, features = ["client"] }
 
 [lints]
 workspace = true

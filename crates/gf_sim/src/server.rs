@@ -19,12 +19,17 @@ pub struct SimConfig {
     pub seed: u64,
     pub phase: Phase,
     pub chaos_tier: u8,
-    /// Snapshot every N ticks (1 = 60 Hz for loopback, 3 = 20 Hz for remote clients).
+    /// Snapshot every N ticks for the host's own (loopback) player: 1 = 60 Hz.
     pub snapshot_every: u8,
+    /// Snapshot every N ticks for remote players: 3 = 20 Hz (§14).
+    pub remote_snapshot_every: u8,
     pub max_players: usize,
     pub allow_join_in_progress: bool,
     /// Chaos stress scene: hold this many enemies alive (§20.7).
     pub stress_enemies: Option<u32>,
+    /// QA / art review: open the run in this room (content key) instead of the biome's
+    /// authored opening room.
+    pub start_room: Option<String>,
 }
 
 impl Default for SimConfig {
@@ -34,9 +39,11 @@ impl Default for SimConfig {
             phase: Phase::P1,
             chaos_tier: 0,
             snapshot_every: 1,
+            remote_snapshot_every: 3,
             max_players: 4,
             allow_join_in_progress: true,
             stress_enemies: None,
+            start_room: None,
         }
     }
 }
@@ -97,6 +104,7 @@ impl SimServer {
                 content_hash: content.hash,
                 tick_hz: gf_core::SIM_HZ as u16,
                 snapshot_every: cfg.snapshot_every.max(1),
+                remote_snapshot_every: cfg.remote_snapshot_every.max(1),
                 seed: cfg.seed,
                 max_players: cfg.max_players,
                 allow_join_in_progress: cfg.allow_join_in_progress,
@@ -106,7 +114,12 @@ impl SimServer {
         let tuning =
             compile_enemy_tuning(&party_scaling(&content.party_scaling, 1), &content.chaos_tiers, cfg.chaos_tier);
         app.insert_resource(Content(content))
-            .insert_resource(SimSettings { seed: cfg.seed, phase: cfg.phase, chaos_tier: cfg.chaos_tier })
+            .insert_resource(SimSettings {
+                seed: cfg.seed,
+                phase: cfg.phase,
+                chaos_tier: cfg.chaos_tier,
+                start_room: cfg.start_room.clone(),
+            })
             .insert_resource(SimClock {
                 tick: 0,
                 dt: gf_core::SIM_DT,

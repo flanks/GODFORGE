@@ -11,8 +11,11 @@ use std::collections::VecDeque;
 pub struct ServerConfig {
     pub content_hash: u64,
     pub tick_hz: u16,
-    /// Send a snapshot every N ticks (1 for loopback, 3 → 20 Hz for remote play).
+    /// Snapshot every N ticks for same-machine peers (1 = 60 Hz for the host's own player).
     pub snapshot_every: u8,
+    /// Snapshot every N ticks for remote peers (3 = 20 Hz, §14). Cosmetic events accumulate per
+    /// client between its snapshots, so a slower stream never drops one.
+    pub remote_snapshot_every: u8,
     pub seed: u64,
     pub max_players: usize,
     pub allow_join_in_progress: bool,
@@ -34,7 +37,15 @@ struct Client {
     last_cmd: PlayerCommand,
     ack_tick: Option<u32>,
     last_action: u16,
+    /// This client's snapshot interval in ticks.
+    every: u8,
+    /// Cosmetic events since this client's last snapshot.
+    pending_events: Vec<GameEvent>,
 }
+
+/// Cosmetic events buffered per client between snapshots (oldest dropped beyond this; they are
+/// hit sparks and toasts, never gameplay state).
+const MAX_PENDING_EVENTS: usize = 768;
 
 /// Snapshots kept for delta baselines.
 const HISTORY: usize = 64;
@@ -143,7 +154,7 @@ impl<T: ServerTransport> NetServer<T> {
                         nonce,
                         tick: self.tick,
                         tick_hz: self.cfg.tick_hz,
-                        snapshot_every: self.cfg.snapshot_every,
+                        snapshot_every: c.every,
                         seed: self.cfg.seed,
                     };
                     self.send(peer, Channel::Reliable, &welcome);
@@ -165,6 +176,12 @@ impl<T: ServerTransport> NetServer<T> {
                     return;
                 }
                 let slot = self.free_slot().expect("checked above");
+                let every = if self.transport.is_local(peer) {
+                    self.cfg.snapshot_every
+                } else {
+                    self.cfg.remote_snapshot_every
+                };
+                let every = every.max(1);
                 self.clients.push(Client {
                     peer,
                     slot,
@@ -175,6 +192,8 @@ impl<T: ServerTransport> NetServer<T> {
                     last_cmd: PlayerCommand::default(),
                     ack_tick: None,
                     last_action: 0,
+                    every,
+                    pending_events: Vec::new(),
                 });
                 self.clients.sort_by_key(|c| c.slot);
                 let welcome = ServerMsg::Welcome {
@@ -182,7 +201,7 @@ impl<T: ServerTransport> NetServer<T> {
                     nonce,
                     tick: self.tick,
                     tick_hz: self.cfg.tick_hz,
-                    snapshot_every: self.cfg.snapshot_every,
+                    snapshot_every: every,
                     seed: self.cfg.seed,
                 };
                 self.send(peer, Channel::Reliable, &welcome);
@@ -237,7 +256,8 @@ impl<T: ServerTransport> NetServer<T> {
         Some(cmd)
     }
 
-    /// Send this tick's snapshot to every client (respects `snapshot_every`).
+    /// Send this tick's snapshot to every client that is due (each client has its own rate).
+    /// Events are buffered per client and delivered with its next snapshot.
     pub fn broadcast(
         &mut self,
         tick: u32,
@@ -249,13 +269,24 @@ impl<T: ServerTransport> NetServer<T> {
     ) {
         self.tick = tick;
         self.last_bytes_sent = 0;
-        if !tick.is_multiple_of(self.cfg.snapshot_every.max(1) as u32) {
+        for c in &mut self.clients {
+            c.pending_events.extend_from_slice(events);
+            if c.pending_events.len() > MAX_PENDING_EVENTS {
+                let excess = c.pending_events.len() - MAX_PENDING_EVENTS;
+                c.pending_events.drain(..excess);
+            }
+        }
+        let targets: Vec<(PeerId, u8, Option<u32>, u32, u16, Vec<GameEvent>)> = self
+            .clients
+            .iter_mut()
+            .filter(|c| tick.is_multiple_of(c.every as u32))
+            .map(|c| (c.peer, c.slot, c.ack_tick, c.last_seq, c.last_action, std::mem::take(&mut c.pending_events)))
+            .collect();
+        if targets.is_empty() {
             return;
         }
         entities.sort_by_key(|e| e.id);
-        let targets: Vec<(PeerId, u8, Option<u32>, u32, u16)> =
-            self.clients.iter().map(|c| (c.peer, c.slot, c.ack_tick, c.last_seq, c.last_action)).collect();
-        for (peer, slot, ack, ack_seq, ack_action) in targets {
+        for (peer, slot, ack, ack_seq, ack_action, events) in targets {
             let base = ack.and_then(|a| self.history.iter().find(|(t, _)| *t == a));
             let (baseline, changed, removed) = match base {
                 Some((t, b)) => {
@@ -274,7 +305,7 @@ impl<T: ServerTransport> NetServer<T> {
                 private: private(slot),
                 changed,
                 removed,
-                events: events.to_vec(),
+                events,
             };
             self.last_bytes_sent += self.send(peer, Channel::Unreliable, &ServerMsg::Snapshot(Box::new(packet)));
         }

@@ -66,16 +66,27 @@ pub fn start_run(world: &mut World) {
     };
     // The opening room is the biome's first matching template (a stable, authored start).
     let key = db.biome(first).key.clone();
-    let room = db
+    let authored = db
         .rooms
         .enumerate()
         .find(|(_, r)| r.biome == key && r.kind == kind && r.phase <= phase)
         .map(|(i, _)| RoomId(i))
         .unwrap_or(RoomId(0));
+    // QA override: open in a named room (its biome becomes the current biome).
+    let requested = world.resource::<SimSettings>().start_room.clone();
+    let (room, biome_idx) = match requested.as_deref().and_then(|k| db.rooms.id(k)).map(RoomId) {
+        Some(r) => (r, biomes.iter().position(|b| db.biome(*b).key == db.room(r).biome).unwrap_or(0)),
+        None => {
+            if let Some(k) = requested {
+                warn!("unknown start room '{k}', using the authored opening");
+            }
+            (authored, 0)
+        }
+    };
     {
         let mut run = world.resource_mut::<RunState>();
         run.biomes = biomes;
-        run.biome_idx = 0;
+        run.biome_idx = biome_idx;
         run.step = 0;
         run.started = true;
         run.reward = Some(DoorReward::PartCache);

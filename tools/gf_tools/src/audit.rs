@@ -75,12 +75,9 @@ fn ember_per_run(db: &ContentDb) -> f32 {
     let kills_per_room = avg_room_budget(db) * 0.92;
     let elites_per_room = kills_per_room * 0.05;
     let swarm_kills = rooms * (kills_per_room - elites_per_room);
-    let per_kill = swarm_kills * rt.ember_per_kill[0] as f32 + rooms * elites_per_room * rt.ember_per_kill[1] as f32;
+    let per_kill = swarm_kills * rt.ember_per_kill[0] + rooms * elites_per_room * rt.ember_per_kill[1];
     let bosses = rooms_full * 0.12;
-    per_kill
-        + rooms * rt.ember_per_room as f32
-        + bosses * rt.ember_per_kill[2] as f32
-        + 0.3 * rt.ember_victory_bonus as f32
+    per_kill + rooms * rt.ember_per_room + bosses * rt.ember_per_kill[2] + 0.3 * rt.ember_victory_bonus
 }
 
 /// Probability a specific recipe is assembled incidentally in one run.

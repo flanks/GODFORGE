@@ -17,7 +17,8 @@ use gf_net::quant::{angle_to_u16, stick_to_i8, u16_to_dir};
 use gf_net::transport::loopback;
 use gf_net::*;
 use std::sync::Arc;
-use std::time::Instant;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::{Duration, Instant};
 
 /// Current position of a replicated entity at `tick` (extrapolates straight-line motion).
 pub fn entity_pos(e: &EntityView, tick: u32) -> Vec2 {
@@ -407,6 +408,11 @@ pub fn run_headless(
         .collect();
     let mut ticks = 0;
     let mut ended_at: Option<u32> = None;
+    // Simulated latency is wall-clock time, so a lossy/latent link must run in real time;
+    // an ideal link fast-forwards (a 25-minute run takes seconds).
+    let paced = !net.latency.is_zero() || !net.jitter.is_zero();
+    let step = Duration::from_secs_f64(1.0 / gf_core::SIM_HZ as f64);
+    let mut next_tick = Instant::now();
     let trace = std::env::var_os("GODFORGE_TRACE").is_some();
     let mut rooms: Vec<RoomTiming> = Vec::new();
     let mut room_start = (0u32, 0.0f32, 0u32, String::new());
@@ -425,6 +431,15 @@ pub fn run_headless(
                     client.queue_action(a);
                 }
                 client.send_command(cmd);
+            }
+        }
+        if paced {
+            next_tick += step;
+            let now = Instant::now();
+            if next_tick > now {
+                std::thread::sleep(next_tick - now);
+            } else {
+                next_tick = now;
             }
         }
         server.tick();
@@ -545,6 +560,62 @@ pub fn run_headless(
         max_snapshot_bytes: s.max_snapshot_bytes,
         bots,
     }
+}
+
+/// Bot teammates on their own thread, each connected through its transport like any other
+/// client. Fills a co-op party for play-testing, attract mode and screenshots. Returns the stop
+/// flag and the thread handle; bots leave the session when stopped.
+pub fn spawn_bot_party(
+    content: Arc<ContentDb>,
+    members: Vec<(Box<dyn ClientTransport>, Loadout, AimMode)>,
+    seed: u64,
+) -> (Arc<AtomicBool>, std::thread::JoinHandle<()>) {
+    let stop = Arc::new(AtomicBool::new(false));
+    let flag = stop.clone();
+    let handle = std::thread::Builder::new()
+        .name("gf-bot-party".into())
+        .spawn(move || {
+            let mut clients: Vec<(NetClient<Box<dyn ClientTransport>>, BotBrain, Option<Box<WorldSnapshot>>)> = members
+                .into_iter()
+                .enumerate()
+                .map(|(i, (transport, loadout, mode))| {
+                    let brain = BotBrain::new(0, mode, seed ^ ((i as u64 + 11) * 0x9E37_79B9));
+                    (NetClient::new(transport, format!("Bot {}", i + 2), loadout, content.hash), brain, None)
+                })
+                .collect();
+            let step = Duration::from_secs_f64(1.0 / gf_core::SIM_HZ as f64);
+            let mut next = Instant::now();
+            while !flag.load(Ordering::Relaxed) {
+                for (client, brain, latest) in &mut clients {
+                    for ev in client.poll() {
+                        match ev {
+                            ClientEvent::Welcome { slot, .. } => brain.slot = slot,
+                            ClientEvent::Snapshot(w) => *latest = Some(w),
+                            _ => {}
+                        }
+                    }
+                    if let Some(w) = latest.as_deref() {
+                        let (cmd, action) = brain.think(w, &content);
+                        if let Some(a) = action {
+                            client.queue_action(a);
+                        }
+                        client.send_command(cmd);
+                    }
+                }
+                next += step;
+                let now = Instant::now();
+                if next > now {
+                    std::thread::sleep(next - now);
+                } else {
+                    next = now;
+                }
+            }
+            for (client, _, _) in &mut clients {
+                client.leave();
+            }
+        })
+        .expect("spawn bot party thread");
+    (stop, handle)
 }
 
 /// Recompile a replicated player's weapon for reporting (chassis + equipped parts).

@@ -12,6 +12,7 @@ fn cfg(hash: u64) -> ServerConfig {
         content_hash: hash,
         tick_hz: 60,
         snapshot_every: 1,
+        remote_snapshot_every: 3,
         seed: 7,
         max_players: 4,
         allow_join_in_progress: true,
@@ -191,4 +192,66 @@ fn messages_round_trip_through_postcard() {
     };
     assert_eq!(decode::<ClientMsg>(&encode(&msg)).unwrap(), msg);
     assert!(decode::<ClientMsg>(&[0xFF, 0xFF, 0xFF]).is_err(), "garbage never panics");
+}
+
+#[test]
+fn remote_peers_stream_at_20hz_without_losing_events() {
+    // A loopback with simulated latency stands in for a remote link (1 ms each way).
+    let (lt, conn) = loopback::listener(NetConditions::rtt(2, 0, 0.0));
+    let mut server = NetServer::new(lt, cfg(9));
+    let mut client = NetClient::new(conn.connect(), "remote", Loadout::default(), 9);
+    let mut every = 0;
+    for _ in 0..500 {
+        client.poll();
+        server.poll();
+        std::thread::sleep(std::time::Duration::from_millis(1));
+        for ev in client.poll() {
+            if let ClientEvent::Welcome { snapshot_every, .. } = ev {
+                every = snapshot_every;
+            }
+        }
+        if every != 0 {
+            break;
+        }
+    }
+    assert_eq!(every, 3, "remote peers get the remote rate");
+
+    // One cosmetic event per tick; snapshots only go out every third tick.
+    for tick in 1..=30u32 {
+        let events = [GameEvent::PlayerHurt { slot: 0, amount: tick as u16 }];
+        server.broadcast(tick, &RunView::default(), &[], &mut |_| PrivateView::default(), vec![enemy(1, 0)], &events);
+    }
+    // The simulated link delays delivery, so keep polling until everything has landed.
+    let mut ticks = Vec::new();
+    let mut amounts = Vec::new();
+    for _ in 0..100 {
+        for ev in client.poll() {
+            if let ClientEvent::Snapshot(s) = ev {
+                ticks.push(s.tick);
+                amounts.extend(s.events.iter().filter_map(|e| match e {
+                    GameEvent::PlayerHurt { amount, .. } => Some(*amount),
+                    _ => None,
+                }));
+            }
+        }
+        if ticks.len() >= 10 {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(1));
+    }
+    assert_eq!(ticks, (1..=10).map(|i| i * 3).collect::<Vec<u32>>());
+    assert_eq!(amounts, (1..=30).collect::<Vec<u16>>(), "every event arrives, in order");
+}
+
+#[test]
+fn the_host_player_streams_at_full_rate() {
+    let (lt, conn) = loopback::listener(NetConditions::ideal());
+    let mut server = NetServer::new(lt, cfg(10));
+    let mut client = NetClient::new(conn.connect(), "host", Loadout::default(), 10);
+    connect(&mut server, &mut client);
+    for tick in 1..=6u32 {
+        tick_world(&mut server, tick, vec![enemy(1, tick as i16)]);
+    }
+    let snaps = client.poll().into_iter().filter(|e| matches!(e, ClientEvent::Snapshot(_))).count();
+    assert_eq!(snaps, 6);
 }

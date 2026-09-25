@@ -2947,6 +2947,15 @@ dependencies = [
 [[package]]
 name = "gf_client"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "gf_content",
+ "gf_core",
+ "gf_engine",
+ "gf_net",
+ "gf_sim",
+ "glam",
+]
 
 [[package]]
 name = "gf_content"
@@ -2979,6 +2988,14 @@ dependencies = [
 [[package]]
 name = "gf_game"
 version = "0.1.0"
+dependencies = [
+ "gf_client",
+ "gf_content",
+ "gf_core",
+ "gf_engine",
+ "gf_net",
+ "gf_sim",
+]
 
 [[package]]
 name = "gf_net"

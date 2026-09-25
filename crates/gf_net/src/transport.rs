@@ -27,9 +27,14 @@ pub enum ServerIncoming {
 pub trait ServerTransport: Send {
     fn send(&mut self, to: PeerId, channel: Channel, data: &[u8]);
     fn poll(&mut self) -> Option<ServerIncoming>;
+    /// Same-machine peer (the host's own player): streamed at the full snapshot rate.
+    fn is_local(&self, _peer: PeerId) -> bool {
+        false
+    }
 }
 
-pub trait ClientTransport: Send {
+/// `Sync` so a client can live in an engine resource.
+pub trait ClientTransport: Send + Sync {
     fn send(&mut self, channel: Channel, data: &[u8]);
     fn poll(&mut self) -> Option<Vec<u8>>;
 }
@@ -40,6 +45,9 @@ impl ServerTransport for Box<dyn ServerTransport> {
     }
     fn poll(&mut self) -> Option<ServerIncoming> {
         (**self).poll()
+    }
+    fn is_local(&self, peer: PeerId) -> bool {
+        (**self).is_local(peer)
     }
 }
 
@@ -124,6 +132,54 @@ impl<T> DelayQueue<T> {
     }
 }
 
+/// Two server transports behind one interface (e.g. the host's loopback player + UDP guests).
+/// Peer ids are interleaved: `a` gets even ids, `b` odd ids.
+pub struct CompositeServer {
+    pub a: Box<dyn ServerTransport>,
+    pub b: Box<dyn ServerTransport>,
+    turn: bool,
+}
+
+impl CompositeServer {
+    pub fn new(a: Box<dyn ServerTransport>, b: Box<dyn ServerTransport>) -> Self {
+        Self { a, b, turn: false }
+    }
+
+    fn wrap(ev: ServerIncoming, map: impl Fn(PeerId) -> PeerId) -> ServerIncoming {
+        match ev {
+            ServerIncoming::Connected(p) => ServerIncoming::Connected(map(p)),
+            ServerIncoming::Message(p, d) => ServerIncoming::Message(map(p), d),
+            ServerIncoming::Disconnected(p) => ServerIncoming::Disconnected(map(p)),
+        }
+    }
+}
+
+impl ServerTransport for CompositeServer {
+    fn send(&mut self, to: PeerId, channel: Channel, data: &[u8]) {
+        if to.is_multiple_of(2) { self.a.send(to / 2, channel, data) } else { self.b.send(to / 2, channel, data) }
+    }
+
+    fn is_local(&self, peer: PeerId) -> bool {
+        if peer.is_multiple_of(2) { self.a.is_local(peer / 2) } else { self.b.is_local(peer / 2) }
+    }
+
+    fn poll(&mut self) -> Option<ServerIncoming> {
+        self.turn = !self.turn;
+        let order: [bool; 2] = if self.turn { [true, false] } else { [false, true] };
+        for first in order {
+            let ev = if first {
+                self.a.poll().map(|e| Self::wrap(e, |p| p * 2))
+            } else {
+                self.b.poll().map(|e| Self::wrap(e, |p| p * 2 + 1))
+            };
+            if ev.is_some() {
+                return ev;
+            }
+        }
+        None
+    }
+}
+
 pub mod loopback {
     //! In-process transport. `listener()` returns the host end and a cloneable connector.
 
@@ -142,6 +198,9 @@ pub mod loopback {
         rx: Receiver<Up>,
         peers: std::collections::HashMap<PeerId, Sender<(Channel, Vec<u8>)>>,
         inbox: DelayQueue<ServerIncoming>,
+        /// Ideal conditions = the host's own player. A loopback with simulated latency or loss
+        /// stands in for a remote link, so test rigs exercise the remote snapshot rate.
+        local: bool,
     }
 
     #[derive(Clone)]
@@ -161,7 +220,12 @@ pub mod loopback {
     pub fn listener(cond: NetConditions) -> (LoopbackServer, LoopbackConnector) {
         let (tx, rx) = unbounded();
         (
-            LoopbackServer { rx, peers: Default::default(), inbox: DelayQueue::new(cond) },
+            LoopbackServer {
+                rx,
+                peers: Default::default(),
+                inbox: DelayQueue::new(cond),
+                local: cond.latency.is_zero() && cond.jitter.is_zero() && cond.loss <= 0.0,
+            },
             LoopbackConnector { tx, next: Arc::new(AtomicU32::new(1)), cond },
         )
     }
@@ -213,6 +277,10 @@ pub mod loopback {
                 }
             }
             self.inbox.pop_ready()
+        }
+
+        fn is_local(&self, _peer: PeerId) -> bool {
+            self.local
         }
     }
 
@@ -386,6 +454,29 @@ mod tests {
         assert!(matches!(server.poll(), Some(ServerIncoming::Connected(_))));
         assert!(matches!(server.poll(), Some(ServerIncoming::Message(_, d)) if d == b"kept"));
         assert_eq!(server.poll(), None);
+    }
+
+    #[test]
+    fn composite_routes_both_transports() {
+        let (a, conn_a) = loopback::listener(NetConditions::ideal());
+        let (b, conn_b) = loopback::listener(NetConditions::ideal());
+        let mut server = CompositeServer::new(Box::new(a), Box::new(b));
+        let mut ca = conn_a.connect();
+        let mut cb = conn_b.connect();
+        ca.send(Channel::Unreliable, b"from-a");
+        cb.send(Channel::Unreliable, b"from-b");
+        let mut peers = Vec::new();
+        while let Some(ev) = server.poll() {
+            if let ServerIncoming::Message(p, d) = ev {
+                peers.push((p, d));
+            }
+        }
+        assert_eq!(peers.len(), 2);
+        for (p, d) in &peers {
+            server.send(*p, Channel::Reliable, d);
+        }
+        assert_eq!(ca.poll(), Some(b"from-a".to_vec()));
+        assert_eq!(cb.poll(), Some(b"from-b".to_vec()));
     }
 
     #[test]

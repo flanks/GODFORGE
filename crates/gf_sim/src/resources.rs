@@ -33,6 +33,8 @@ pub struct SimSettings {
     /// Content phase this build plays (P0 prototype, P1 vertical slice, EA…).
     pub phase: Phase,
     pub chaos_tier: u8,
+    /// QA override for the opening room (content key).
+    pub start_room: Option<String>,
 }
 
 #[derive(Resource, Debug)]

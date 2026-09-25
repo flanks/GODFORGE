@@ -11,6 +11,7 @@ macro_rules! bitflags_lite {
             $($(#[$fm])* pub const $f: $name = $name($v);)*
             pub const fn empty() -> Self { $name(0) }
             pub const fn contains(self, other: $name) -> bool { self.0 & other.0 == other.0 }
+            pub const fn intersects(self, other: $name) -> bool { self.0 & other.0 != 0 }
             pub fn set(&mut self, other: $name, on: bool) {
                 if on { self.0 |= other.0 } else { self.0 &= !other.0 }
             }

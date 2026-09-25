@@ -225,6 +225,11 @@ pub struct PlayerView {
     pub character: u16,
     /// Exact mover state: client prediction replays inputs from here.
     pub mover: MoverState,
+    /// Movement stats the predictor needs to replay inputs exactly.
+    pub move_speed: f32,
+    pub dash_recharge: f32,
+    pub max_dash: u8,
+    pub radius: f32,
     pub height: f32,
     pub hp: f32,
     pub max_hp: f32,

@@ -21,7 +21,9 @@ pub mod transport;
 pub use client::{ClientEvent, NetClient};
 pub use protocol::*;
 pub use server::{NetServer, ServerConfig, SessionEvent};
-pub use transport::{Channel, ClientTransport, NetConditions, PeerId, ServerIncoming, ServerTransport};
+pub use transport::{
+    Channel, ClientTransport, CompositeServer, NetConditions, PeerId, ServerIncoming, ServerTransport,
+};
 
 use serde::Serialize;
 use serde::de::DeserializeOwned;
