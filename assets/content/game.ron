@@ -64,8 +64,83 @@
         rate_mult: 2.0,
     ),
     echo: (effectiveness: 0.35, orbit_radius: 2.2, leash: 9.0),
-    camera: (pitch_deg: 55.0, yaw_deg: 0.0, view_height: (22.0, 24.0, 26.0, 28.0), min_character_screen_frac: 0.06),
+    // `look_ahead`: on biome maps the camera leads the local player's move direction by this much.
+    camera: (pitch_deg: 55.0, yaw_deg: 0.0, view_height: (22.0, 24.0, 26.0, 28.0), min_character_screen_frac: 0.06, look_ahead: 2.5),
     vfx: (reduced_at: 450, silhouette_at: 900, particles: (1600, 700, 200), ally_effect_alpha: 0.55),
+    // Biome maps (OPEN_WORLD.md): how the horde, POIs, the Boss Gate and a split party play on a
+    // generated Expedition map. What a map *contains* (size, themes, quotas, the threat clock) is
+    // per biome in rooms.ron `<biome>_expedition`.
+    expedition: (
+        // Director v2 (§5.5–5.6), per player cluster. Spawns land on a rectangle ring just outside
+        // every player's view footprint; far stragglers are culled and refunded; flow fields route
+        // the horde over bridges. Threat-clock minutes gain `heat_per_objective` per objective.
+        horde: (
+            global_max_alive: 400,
+            cluster_link: 30.0,
+            census_bubble: 36.0,
+            rate_mult: 1.0,
+            view_pad: 4.0,
+            view_aspect: 2.0,
+            ring_margin: (3.0, 9.0),
+            spawn_clear: 20.0,
+            flow_detour: 1.6,
+            emerge_time: 0.4,
+            cull_distance: 56.0,
+            cull_after: 5.0,
+            hard_cull: 90.0,
+            refund: 1.0,
+            flow_refresh_ticks: 16,
+            direct_chase_tiles: 12,
+            event_ring: (18.0, 26.0),
+            event_share: 0.5,
+            // From minute 3, every 85–115 s: a 3 s warning, then 15 s at double rate from one side.
+            surge: (from_minute: 3.0, interval: (85.0, 115.0), warn: 3.0, duration: 15.0, rate_mult: 2.0, arc_deg: 90.0),
+            // Gate Frenzy, from the gate opening until the boss arena.
+            frenzy_rate: 1.4,
+            frenzy_density: 25.0,
+            heat_per_objective: 0.5,
+        ),
+        // Lair elites, the Warlord and camps: wake (spawn idle), aggro, leash home, anti-hide hunt.
+        guards: (wake: 34.0, aggro: 16.0, leash: 45.0, reset_after: 6.0, regen: 0.1, sleep: 70.0, hunt_after: 20.0, hunt_radius: 25.0),
+        // The Boss Gate: gather inside the ring (10 s, 2 s solo). Unworthy (forced open): boss HP
+        // +25 % per missing Seal, at most +75 %.
+        gate: (radius: 7.0, gather: 10.0, gather_solo: 2.0, revive_frac: 0.5, unworthy_hp_per_seal: 0.25, unworthy_cap: 0.75),
+        // One row per POI kind: its ring, its clearing, how it activates and what it pays.
+        // Hold `time: 0.0` means anvil.hold_time; `wave` multiplies the cluster's spawn rate while
+        // it is active; `breaker_at` spawns one biome elite at that progress.
+        pois: [
+            (kind: Anvil,     radius: 4.5,  plaza: 10.0, activation: Hold(time: 0.0, decay: 0.0, wave: 1.5, breaker_at: Some(0.6)),  reward: Forge),
+            (kind: Shrine,    radius: 4.0,  plaza: 8.0,  activation: Hold(time: 12.0, decay: 0.05, wave: 1.2, breaker_at: None),    reward: Boon),
+            (kind: Reliquary, radius: 4.0,  plaza: 8.0,  activation: Hold(time: 15.0, decay: 0.05, wave: 1.3, breaker_at: None),    reward: Parts(extra: 0, min_rarity: Common, shards: 0)),
+            (kind: Vein,      radius: 4.0,  plaza: 8.0,  activation: Hold(time: 20.0, decay: 0.03, wave: 1.4, breaker_at: Some(0.5)), reward: Shards(amount: 18)),
+            (kind: Lair,      radius: 14.0, plaza: 14.0, activation: Clear(elites: 2, wave: 0.8), reward: Parts(extra: 1, min_rarity: Common, shards: 10)),
+            (kind: Warlord,   radius: 18.0, plaza: 18.0, activation: Clear(elites: 0, wave: 0.6), reward: Parts(extra: 0, min_rarity: Rare, shards: 20)),
+            (kind: Spring,    radius: 3.0,  plaza: 6.0,  activation: Use,                  reward: Heal(frac: 0.4)),
+            (kind: Watchfire, radius: 2.5,  plaza: 5.0,  activation: Touch(channel: 1.0), reward: Reveal(radius: 80.0)),
+            (kind: Gate,      radius: 7.0,  plaza: 14.0, activation: Gate,                 reward: Onward),
+        ],
+        // No objective progress for this long (short of the required Seals): "The Forge whispers…".
+        stall_hint_secs: 150.0,
+        ember_per_objective: 3.0,
+        // Split-party rules (§5.9): presence, loot sharing, the hopeless tether, reforge-to-ally,
+        // part aging, the completion vacuum and the Forge Aegis around a Hot anvil.
+        coop: (
+            present_pad: 8.0,
+            loot_share_radius: 36.0,
+            tether_hopeless: 45.0,
+            hopeless_downed: 3.0,
+            reforge_offset: 2.0,
+            part_owner_near: 40.0,
+            vacuum_radius: 40.0,
+            aegis_pad: 1.0,
+        ),
+        // Stride: +25 % move speed after 2.5 s calm (no damage, no firing, no enemy within 12 u).
+        stride: (delay: 2.5, mult: 1.25, calm_radius: 12.0),
+        // Fog of war (client presentation): reveal radius around players, beacon sight range.
+        fog: (cell: 2.0, reveal: 32.0, feather: 6.0, beacon_sight: 45.0),
+        // Per-client interest management (§6.3), well beyond the ~30 u screen half-diagonal.
+        interest: (radius_in: 44.0, radius_out: 52.0, event_radius: 50.0, far_lod: 30.0),
+    ),
     // P1..P4 outline/aura: gold, cyan, violet, green (§12 color code).
     player_colors: ("#FFC940", "#3FD8FF", "#B06CFF", "#5BE37D"),
     // Enemy telegraphs are danger red-white, always.
