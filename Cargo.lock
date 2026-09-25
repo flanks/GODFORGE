@@ -3028,6 +3028,8 @@ dependencies = [
  "csv",
  "gf_content",
  "gf_core",
+ "glam",
+ "png",
  "ron",
  "serde",
 ]

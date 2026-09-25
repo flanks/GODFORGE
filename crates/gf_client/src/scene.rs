@@ -492,6 +492,9 @@ fn build_room(kit: &mut Kit, room: &RoomDef, look: &BiomeLook) {
                     Vec3::splat(ENV_INK * 2.0),
                 );
             }
+            // The env kit renders the rest of the procgen vocabulary; until then the obstacles
+            // they dress keep their greybox above.
+            _ => {}
         }
     }
 }

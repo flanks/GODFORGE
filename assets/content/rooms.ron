@@ -1,5 +1,8 @@
 // Handcrafted room templates (§9): procedural layout picks among these per biome and room kind.
 // Coordinates are ground-plane (x, y) in world units; +y is "north" (screen-up). Doors sit at `exits`.
+// Generated kinds (Combat, Elite, Anvil, Treasure) keep only their kind, biome, encounter, door count
+// and `motifs` (signature districts, see `DistrictKind`): `gf_content::procgen` composes the layout.
+// Preview one with `cargo run -p gf_tools -- preview-room <key> <seed> out.png`.
 [
     // ─────────────────────────── CINDER WASTES ───────────────────────────
     (
@@ -7,6 +10,7 @@
         biome: "cinder_wastes",
         kind: Combat,
         phase: P0,
+        motifs: [ColonnadeCourt],
         half_extents: (22.0, 15.0),
         obstacles: [
             Circle(center: (-9.0, 4.0), radius: 1.4),
@@ -30,6 +34,7 @@
         biome: "cinder_wastes",
         kind: Combat,
         phase: P0,
+        motifs: [ForgeHall, CrucibleYard],
         half_extents: (24.0, 16.0),
         obstacles: [
             Box(center: (-10.0, 0.0), half: (2.2, 2.2)),
@@ -55,6 +60,7 @@
         biome: "cinder_wastes",
         kind: Combat,
         phase: P1,
+        motifs: [SlagChannel],
         half_extents: (26.0, 17.0),
         obstacles: [
             Circle(center: (-14.0, 8.0), radius: 1.8),
@@ -80,6 +86,7 @@
         biome: "cinder_wastes",
         kind: Elite,
         phase: P1,
+        motifs: [CrucibleYard],
         half_extents: (22.0, 15.0),
         obstacles: [Circle(center: (-8.0, 0.0), radius: 1.5), Circle(center: (8.0, 0.0), radius: 1.5)],
         player_spawn: (0.0, -11.0),
@@ -101,6 +108,7 @@
         biome: "cinder_wastes",
         kind: Anvil,
         phase: P0,
+        motifs: [ForgeHall],
         half_extents: (22.0, 15.0),
         obstacles: [
             Circle(center: (8.5, 0.0), radius: 1.0),
@@ -126,6 +134,7 @@
         biome: "cinder_wastes",
         kind: Anvil,
         phase: P1,
+        motifs: [ColonnadeCourt],
         half_extents: (24.0, 16.0),
         obstacles: [Box(center: (-12.0, 6.0), half: (1.5, 3.0)), Box(center: (12.0, -6.0), half: (1.5, 3.0))],
         player_spawn: (0.0, -12.0),
@@ -144,6 +153,7 @@
         biome: "cinder_wastes",
         kind: Treasure,
         phase: P1,
+        motifs: [ColonnadeCourt],
         half_extents: (16.0, 11.0),
         obstacles: [Circle(center: (0.0, 3.0), radius: 1.0)],
         player_spawn: (0.0, -8.0),
@@ -198,6 +208,7 @@
         biome: "verdant_ruin",
         kind: Combat,
         phase: EA,
+        motifs: [RootTerrace],
         half_extents: (22.0, 15.0),
         obstacles: [
             Box(center: (-7.0, 6.0), half: (3.5, 0.8)),
@@ -223,6 +234,7 @@
         biome: "verdant_ruin",
         kind: Combat,
         phase: EA,
+        motifs: [ReflectingPool, Cloister],
         half_extents: (26.0, 16.0),
         obstacles: [
             Circle(center: (-15.0, 5.0), radius: 1.3),
@@ -257,6 +269,7 @@
         biome: "verdant_ruin",
         kind: Combat,
         phase: EA,
+        motifs: [FallenGiant],
         half_extents: (24.0, 17.0),
         obstacles: [
             Circle(center: (-13.0, 8.0), radius: 2.2),
@@ -284,6 +297,7 @@
         biome: "verdant_ruin",
         kind: Combat,
         phase: EA,
+        motifs: [Cloister, ReflectingPool],
         half_extents: (28.0, 15.0),
         obstacles: [
             Box(center: (-14.0, 4.0), half: (4.0, 0.8)),
@@ -310,6 +324,7 @@
         biome: "verdant_ruin",
         kind: Elite,
         phase: EA,
+        motifs: [ColonnadeCourt],
         half_extents: (24.0, 16.0),
         obstacles: [
             Circle(center: (-9.0, 3.0), radius: 1.5),
@@ -340,6 +355,7 @@
         biome: "verdant_ruin",
         kind: Elite,
         phase: EA,
+        motifs: [Cloister],
         half_extents: (22.0, 17.0),
         obstacles: [
             Box(center: (-8.0, 2.0), half: (1.0, 3.0)),
@@ -375,6 +391,7 @@
         biome: "verdant_ruin",
         kind: Anvil,
         phase: EA,
+        motifs: [Cloister],
         half_extents: (22.0, 15.0),
         obstacles: [
             Circle(center: (-6.0, 6.0), radius: 1.1),
@@ -403,6 +420,7 @@
         biome: "verdant_ruin",
         kind: Anvil,
         phase: EA,
+        motifs: [RootTerrace, FallenGiant],
         half_extents: (25.0, 16.0),
         obstacles: [
             Box(center: (-13.0, 5.0), half: (1.2, 3.5)),
@@ -431,6 +449,7 @@
         biome: "verdant_ruin",
         kind: Treasure,
         phase: EA,
+        motifs: [Cloister],
         half_extents: (20.0, 13.0),
         obstacles: [Circle(center: (-6.0, 3.0), radius: 1.0), Circle(center: (6.0, 3.0), radius: 1.0)],
         player_spawn: (0.0, -9.0),
@@ -504,6 +523,7 @@
         biome: "hollow_spire",
         kind: Combat,
         phase: EA,
+        motifs: [VoidChasm],
         half_extents: (28.0, 13.0),
         obstacles: [
             Circle(center: (-18.0, 4.0), radius: 1.6),
@@ -531,6 +551,7 @@
         biome: "hollow_spire",
         kind: Combat,
         phase: EA,
+        motifs: [ColonnadeCourt],
         half_extents: (24.0, 16.0),
         obstacles: [
             Circle(center: (-10.0, 4.0), radius: 2.0),
@@ -558,6 +579,7 @@
         biome: "hollow_spire",
         kind: Combat,
         phase: EA,
+        motifs: [BrokenStair],
         half_extents: (22.0, 17.0),
         obstacles: [
             Box(center: (-12.0, -6.0), half: (3.0, 1.0)),
@@ -583,6 +605,7 @@
         biome: "hollow_spire",
         kind: Combat,
         phase: EA,
+        motifs: [DebrisRing],
         half_extents: (26.0, 15.0),
         obstacles: [
             Circle(center: (-19.0, 6.0), radius: 1.3),
@@ -613,6 +636,7 @@
         biome: "hollow_spire",
         kind: Elite,
         phase: EA,
+        motifs: [ColonnadeCourt, VoidChasm],
         half_extents: (26.0, 15.0),
         obstacles: [
             Box(center: (0.0, 1.0), half: (7.0, 0.6)),
@@ -648,6 +672,7 @@
         biome: "hollow_spire",
         kind: Elite,
         phase: EA,
+        motifs: [DebrisRing, CrystalGarden],
         half_extents: (24.0, 17.0),
         obstacles: [
             Circle(center: (0.0, 4.0), radius: 2.6),
@@ -683,6 +708,7 @@
         biome: "hollow_spire",
         kind: Anvil,
         phase: EA,
+        motifs: [BrokenStair],
         half_extents: (22.0, 15.0),
         obstacles: [
             Box(center: (-9.0, 0.0), half: (0.8, 2.5)),
@@ -709,6 +735,7 @@
         biome: "hollow_spire",
         kind: Anvil,
         phase: EA,
+        motifs: [DebrisRing],
         half_extents: (25.0, 16.0),
         obstacles: [
             Circle(center: (-11.0, 7.0), radius: 1.8),
@@ -734,6 +761,7 @@
         biome: "hollow_spire",
         kind: Treasure,
         phase: EA,
+        motifs: [CrystalGarden],
         half_extents: (20.0, 13.0),
         obstacles: [Circle(center: (0.0, 4.0), radius: 1.2)],
         player_spawn: (0.0, -9.0),
@@ -810,6 +838,7 @@
         biome: "the_unmaking",
         kind: Combat,
         phase: V1,
+        motifs: [ShatteredIslands],
         half_extents: (24.0, 16.0),
         obstacles: [
             Box(center: (-12.0, 6.0), half: (2.5, 1.0)),
@@ -837,6 +866,7 @@
         biome: "the_unmaking",
         kind: Combat,
         phase: V1,
+        motifs: [VoidChasm],
         half_extents: (26.0, 14.0),
         obstacles: [
             Box(center: (-18.0, 2.0), half: (4.0, 0.7)),
@@ -863,6 +893,7 @@
         biome: "the_unmaking",
         kind: Combat,
         phase: V1,
+        motifs: [InvertedNave],
         half_extents: (22.0, 17.0),
         obstacles: [
             Circle(center: (-12.0, 9.0), radius: 1.2),
@@ -893,6 +924,7 @@
         biome: "the_unmaking",
         kind: Combat,
         phase: V1,
+        motifs: [ShatteredIslands, CrystalGarden],
         half_extents: (28.0, 18.0),
         obstacles: [
             Box(center: (-16.0, 8.0), half: (1.2, 1.2)),
@@ -924,6 +956,7 @@
         biome: "the_unmaking",
         kind: Elite,
         phase: V1,
+        motifs: [RiftField],
         half_extents: (24.0, 16.0),
         obstacles: [
             Circle(center: (-10.0, 0.0), radius: 1.6),
@@ -956,6 +989,7 @@
         biome: "the_unmaking",
         kind: Elite,
         phase: V1,
+        motifs: [InvertedNave],
         half_extents: (26.0, 15.0),
         obstacles: [
             Box(center: (-14.0, 0.0), half: (1.0, 3.0)),
@@ -988,6 +1022,7 @@
         biome: "the_unmaking",
         kind: Anvil,
         phase: V1,
+        motifs: [ShatteredIslands],
         half_extents: (22.0, 15.0),
         obstacles: [
             Box(center: (-8.0, 5.0), half: (1.0, 1.0)),
@@ -1015,6 +1050,7 @@
         biome: "the_unmaking",
         kind: Anvil,
         phase: V1,
+        motifs: [RiftField],
         half_extents: (25.0, 17.0),
         obstacles: [
             Box(center: (-3.0, 8.0), half: (3.0, 0.7)),
@@ -1040,6 +1076,7 @@
         biome: "the_unmaking",
         kind: Treasure,
         phase: V1,
+        motifs: [CrystalGarden],
         half_extents: (20.0, 13.0),
         obstacles: [
             Box(center: (-6.0, 3.0), half: (1.0, 1.0)),

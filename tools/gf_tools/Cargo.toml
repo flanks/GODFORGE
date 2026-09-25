@@ -1,6 +1,6 @@
 [package]
 name = "gf_tools"
-description = "GODFORGE content pipeline: spreadsheets → validated RON, validation reports, 100-hour audit."
+description = "GODFORGE content pipeline: spreadsheets → validated RON, validation reports, 100-hour audit, layout previews."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -17,6 +17,9 @@ gf_content = { workspace = true }
 serde = { workspace = true }
 ron = { workspace = true }
 csv = { workspace = true }
+glam = { workspace = true }
+# Layout previews (`preview-room` / `preview-sheet`): a tiny encoder, tools only.
+png = "0.18"
 
 [lints]
 workspace = true
