@@ -2,7 +2,7 @@
 
 use crate::spatial::SpatialGrid;
 use gf_content::ContentDb;
-use gf_content::schema::{Phase, RoomKind};
+use gf_content::schema::{Phase, RoomDef, RoomKind};
 use gf_core::damage::DamageType;
 use gf_core::ids::{BiomeId, BoonId, EnemyId, NetId, RoomId, SourceId};
 use gf_core::movement::Arena;
@@ -189,6 +189,17 @@ pub struct Kills(pub Vec<KillRecord>);
 #[derive(Resource, Debug, Default)]
 pub struct ArenaRes(pub Arena);
 
+/// The current room's resolved layout (procedurally generated from the template + room seed, or
+/// the authored template itself). Everything room-shaped reads this, never `content.room(..)`.
+#[derive(Resource, Debug, Clone)]
+pub struct RoomLayout(pub Arc<RoomDef>);
+
+impl Default for RoomLayout {
+    fn default() -> Self {
+        Self(Arc::new(RoomDef::placeholder()))
+    }
+}
+
 #[derive(Resource, Debug, Default)]
 pub struct Grid(pub SpatialGrid);
 
@@ -215,6 +226,8 @@ pub struct RunState {
     pub room: RoomId,
     pub room_kind: RoomKind,
     pub room_serial: u32,
+    /// Layout seed of the current room (0 = authored template), replicated in `RunView`.
+    pub room_seed: u32,
     pub phase: RunPhase,
     /// Reward granted when the current room is cleared.
     pub reward: Option<DoorReward>,
@@ -239,6 +252,7 @@ impl Default for RunState {
             room: RoomId(0),
             room_kind: RoomKind::Combat,
             room_serial: 0,
+            room_seed: 0,
             phase: RunPhase::Combat,
             reward: None,
             cleared_timer: 0.0,

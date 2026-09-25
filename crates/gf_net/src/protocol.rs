@@ -14,7 +14,7 @@ use gf_core::weapon::ProjectileStyle;
 use serde::{Deserialize, Serialize};
 
 /// Bump on any wire-incompatible change.
-pub const PROTOCOL_VERSION: u16 = 1;
+pub const PROTOCOL_VERSION: u16 = 2;
 /// Maximum players per session.
 pub const MAX_PLAYERS: usize = 4;
 /// Commands carried redundantly in every input packet (loss resilience).
@@ -178,6 +178,9 @@ pub struct RunView {
     pub room: u16,
     /// Changes whenever a new room loads (clients rebuild room geometry on change).
     pub room_serial: u32,
+    /// Layout seed of the current room: every peer rebuilds the identical arena with
+    /// `gf_content::procgen::resolve_room(db, room, room_seed)` (0 = the authored template).
+    pub room_seed: u32,
     /// Rooms cleared this run.
     pub depth: u16,
     pub step: u8,

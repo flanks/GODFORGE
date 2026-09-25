@@ -1,11 +1,14 @@
 //! Headless bot runs through the real netcode path (loopback): the nightly bot run in miniature.
 //! Crash-free play, the forge loop happening, rooms clearing, co-op, stress and determinism.
 
-use gf_content::{ContentDb, Phase, find_content_dir};
+use gf_content::{ContentDb, Phase, RoomKind, find_content_dir, procgen};
 use gf_core::aim::AimMode;
-use gf_net::{Loadout, NetConditions, RunPhase};
-use gf_sim::SimConfig;
-use gf_sim::bot::run_headless;
+use gf_net::transport::loopback;
+use gf_net::{ClientEvent, Loadout, NetClient, NetConditions, RunPhase};
+use gf_sim::bot::{BotBrain, run_headless};
+use gf_sim::resources::{RoomLayout, RunState};
+use gf_sim::{SimConfig, SimServer};
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 fn content() -> Arc<ContentDb> {
@@ -90,4 +93,89 @@ fn survives_lossy_high_latency_links() {
         NetConditions { loss: 0.1, ..NetConditions::ideal() },
     );
     assert!(r.kills > 20, "{r:#?}");
+}
+
+#[test]
+fn every_peer_rebuilds_the_hosts_procedural_arenas() {
+    // The host replicates only (template, seed) per room; a client or bot rebuilding the layout
+    // from the snapshot must get exactly the arena the host simulates, or prediction, bot
+    // steering and the rendered walls would disagree with the authoritative sim.
+    let db = content();
+    let cfg = SimConfig { phase: Phase::P1, seed: 7, ..Default::default() };
+    let (listener, connector) = loopback::listener(NetConditions::ideal());
+    let mut server = SimServer::new(db.clone(), cfg, Box::new(listener));
+    let mut client = NetClient::new(connector.connect(), "bot", loadout(&db, "valdris"), db.hash);
+    let mut brain = BotBrain::new(0, AimMode::Auto, 7);
+    // serial -> (template, seed, kind) as the client saw it.
+    let mut seen: BTreeMap<u32, (u16, u32, RoomKind)> = BTreeMap::new();
+    let mut latest = None;
+    for _ in 0..60 * 60 * 30 {
+        for ev in client.poll() {
+            match ev {
+                ClientEvent::Welcome { slot, .. } => brain.slot = slot,
+                ClientEvent::Snapshot(w) => latest = Some(w),
+                _ => {}
+            }
+        }
+        if let Some(w) = latest.as_deref() {
+            let run = &w.run;
+            let host = server.world().resource::<RunState>();
+            // Compare only while the host is still in the room the snapshot describes.
+            if run.room_serial == host.room_serial && !seen.contains_key(&run.room_serial) {
+                let rebuilt = procgen::resolve_room(&db, run.room, run.room_seed);
+                let layout = server.world().resource::<RoomLayout>();
+                assert_eq!(*layout.0, rebuilt, "room {} ({}) diverged on the client", run.room_serial, layout.0.key);
+                assert_eq!((run.room, run.room_seed), (host.room.0, host.room_seed));
+                seen.insert(run.room_serial, (run.room, run.room_seed, rebuilt.kind));
+            }
+            let (cmd, action) = brain.think(w, &db);
+            if let Some(a) = action {
+                client.queue_action(a);
+            }
+            client.send_command(cmd);
+        }
+        server.tick();
+        if matches!(server.run_phase(), RunPhase::Victory | RunPhase::Defeat) {
+            break;
+        }
+    }
+    assert!(seen.len() >= 5, "the run should visit several rooms: {seen:?}");
+    let generated: Vec<u32> =
+        seen.values().filter(|(_, _, kind)| procgen::is_generated_kind(*kind)).map(|(_, seed, _)| *seed).collect();
+    assert!(generated.len() >= 3, "{seen:?}");
+    assert!(generated.iter().all(|s| *s != 0), "generated rooms need a layout seed: {seen:?}");
+    let mut distinct = generated.clone();
+    distinct.sort_unstable();
+    distinct.dedup();
+    assert_eq!(distinct.len(), generated.len(), "no two rooms of a run share a layout: {seen:?}");
+    let bosses: Vec<_> = seen.values().filter(|(_, _, k)| matches!(k, RoomKind::Boss | RoomKind::MiniBoss)).collect();
+    assert!(!bosses.is_empty(), "the slice ends in a boss room: {seen:?}");
+    assert!(bosses.iter().all(|(_, seed, _)| *seed == 0), "hand-built arenas replicate seed 0: {seen:?}");
+}
+
+#[test]
+fn qa_room_requests_pin_or_generate_layouts() {
+    let db = content();
+    let gate = db.rooms.id("cinder_gate").expect("slice opening room");
+    let start = |room: &str| {
+        let cfg = SimConfig { seed: 7, start_room: Some(room.into()), ..Default::default() };
+        let (listener, connector) = loopback::listener(NetConditions::ideal());
+        let mut server = SimServer::new(db.clone(), cfg, Box::new(listener));
+        let mut client = NetClient::new(connector.connect(), "qa", loadout(&db, "valdris"), db.hash);
+        for _ in 0..30 {
+            client.poll();
+            server.tick();
+            if server.world().resource::<RunState>().started {
+                break;
+            }
+        }
+        let run = server.world().resource::<RunState>();
+        assert!(run.started, "the run starts once a player joins");
+        (run.room.0, run.room_seed, server.world().resource::<RoomLayout>().0.key.clone())
+    };
+    let (room, seed, key) = start("cinder_gate");
+    assert_eq!(room, gate);
+    assert_ne!(seed, 0, "a plain key is laid out from the run seed");
+    assert_eq!(start(&key), (room, seed, key.clone()), "a printed layout key reproduces that layout");
+    assert_eq!(start("cinder_gate~0"), (gate, 0, "cinder_gate".into()), "~0 is the authored template");
 }

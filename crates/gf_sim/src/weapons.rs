@@ -7,7 +7,8 @@ use crate::resources::*;
 use gf_core::aim::{AimInput, AimWeapon, TargetCandidate, solve};
 use gf_core::ids::SourceId;
 use gf_core::math::{dist_sq_point_segment, in_cone, lead_point, rotate};
-use gf_core::weapon::{FireKind, WeaponProfile};
+use gf_core::movement::Obstacle;
+use gf_core::weapon::{FireKind, WeaponProfile, pellet_offset_deg};
 use gf_engine::prelude::*;
 use gf_net::GameEvent;
 use gf_net::quant::angle_to_u16;
@@ -32,7 +33,7 @@ pub fn spawn_volley(commands: &mut Commands, ids: &mut NetIds, tick: u32, v: Vol
     let p = v.profile;
     let n = p.projectiles.max(1);
     for i in 0..n {
-        let off = if n == 1 { 0.0 } else { -p.spread_deg + 2.0 * p.spread_deg * i as f32 / (n - 1) as f32 };
+        let off = pellet_offset_deg(i, n, p.spread_deg);
         let dir = rotate(v.dir, (off + v.angle_offset_deg).to_radians());
         let pos = v.origin + dir * 0.6;
         commands.spawn((
@@ -72,6 +73,7 @@ pub fn aim_and_fire(
     clock: Res<SimClock>,
     content: Res<Content>,
     grid: Res<Grid>,
+    arena: Res<ArenaRes>,
     mut ids: ResMut<NetIds>,
     mut queue: ResMut<DamageQueue>,
     mut events: ResMut<Events>,
@@ -88,10 +90,28 @@ pub fn aim_and_fire(
 
         // ── target selection → aim solution → trigger ──
         let reach = profile.range * 1.15 + 1.0;
+        // Projectiles die on the ruins, so a foe behind one is not a target (beams and swings pass
+        // through). Without this, AUTO pours fire into a pillar while a support elite shields
+        // itself behind it, and the room never ends.
+        let occluders: Vec<Obstacle> = if matches!(fire, FireKind::Auto | FireKind::Charge) {
+            arena
+                .0
+                .obstacles
+                .iter()
+                .filter(|o| {
+                    let (c, r) = o.bounding_circle();
+                    c.distance_squared(pos.0) < (reach + r) * (reach + r)
+                })
+                .copied()
+                .collect()
+        } else {
+            Vec::new()
+        };
         let mut candidates: Vec<TargetCandidate> = Vec::new();
         grid.0.for_each_in_circle(pos.0, reach, |e| {
             if let Ok((enemy, vel, rep)) = enemies.get(e.entity)
                 && enemy.hp > 0.0
+                && !occluders.iter().any(|o| o.blocks_segment(pos.0, e.pos))
             {
                 candidates.push(TargetCandidate {
                     id: rep.0,

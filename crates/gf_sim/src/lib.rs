@@ -15,6 +15,7 @@ pub mod components;
 pub mod damage;
 pub mod director;
 pub mod enemies;
+pub mod nav;
 pub mod players;
 pub mod projectiles;
 pub mod resources;

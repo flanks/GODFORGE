@@ -43,6 +43,7 @@
         cache_parts: 2,
         cache_shards: 18,
         pickup_lifetime: 40.0,
+        clear_vacuum_speed: 28.0,
     ),
     run: (
         // Tuned by the 100-hour audit: ~390 Ember/run → Altar + trees ≥80% at ~55–75 h (§11.5).

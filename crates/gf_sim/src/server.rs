@@ -27,8 +27,9 @@ pub struct SimConfig {
     pub allow_join_in_progress: bool,
     /// Chaos stress scene: hold this many enemies alive (§20.7).
     pub stress_enemies: Option<u32>,
-    /// QA / art review: open the run in this room (content key) instead of the biome's
-    /// authored opening room.
+    /// QA / art review: open the run in this room instead of the biome's opening room. A content
+    /// key is laid out from the run seed; `key~seed` (hex, as reports print it) pins one layout
+    /// and `key~0` loads the authored template.
     pub start_room: Option<String>,
 }
 
@@ -136,6 +137,7 @@ impl SimServer {
             .insert_resource(PlayerHits::default())
             .insert_resource(Kills::default())
             .insert_resource(ArenaRes::default())
+            .insert_resource(RoomLayout::default())
             .insert_resource(Grid::default())
             .insert_resource(Tuning { enemy: tuning, party: 1 })
             .insert_resource(Overdrive::default())

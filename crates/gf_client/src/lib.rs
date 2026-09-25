@@ -9,6 +9,7 @@ pub mod camera;
 pub mod hud;
 pub mod input;
 pub mod net;
+pub mod offscreen;
 pub mod palette;
 pub mod scene;
 pub mod ui;
@@ -16,7 +17,7 @@ pub mod vfx;
 
 use gf_content::ContentDb;
 use gf_core::aim::AimMode;
-use gf_engine::client::take_screenshot;
+use gf_engine::client::{Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic, take_screenshot};
 use gf_engine::prelude::*;
 use gf_net::Loadout;
 use gf_sim::SimConfig;
@@ -53,6 +54,8 @@ pub struct ClientConfig {
     pub screen_shake: f32,
     /// Directional shadows (off for low tiers / software rendering).
     pub shadows: bool,
+    /// Log FPS / frame times and the replicated enemy count once a second (`--fps`).
+    pub fps: bool,
 }
 
 /// Wires every client system.
@@ -97,8 +100,24 @@ impl Plugin for ClientPlugin {
         scene::build(app);
         vfx::build(app);
         hud::build(app);
+        offscreen::build(app);
         ui::build(app);
+        if cfg.fps {
+            app.register_diagnostic(Diagnostic::new(ENEMIES).with_max_history_length(1).with_smoothing_factor(0.0))
+                .add_systems(Update, measure_horde.after(ClientSet::Net));
+            gf_engine::client::log_frame_times(app, &[ENEMIES]);
+        }
     }
+}
+
+/// Replicated enemies alive, logged next to the frame times by `--fps`.
+const ENEMIES: DiagnosticPath = DiagnosticPath::const_new("enemies");
+
+fn measure_horde(link: Res<net::Link>, mut diagnostics: Diagnostics) {
+    let Some(world) = link.latest.as_deref() else { return };
+    diagnostics.add_measurement(&ENEMIES, || {
+        world.entities.iter().filter(|e| matches!(e.kind, gf_net::EntityKind::Enemy { .. })).count() as f64
+    });
 }
 
 /// Scripted screenshots and timed exit (attract mode, CI smoke tests, store captures).

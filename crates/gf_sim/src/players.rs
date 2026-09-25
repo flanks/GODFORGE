@@ -15,7 +15,7 @@ use gf_core::stats::{PlayerStats, compile_player_stats};
 use gf_core::weapon::{WeaponProfile, compile};
 use gf_engine::prelude::*;
 use gf_net::quant::{QPos, i8_to_stick, u16_to_dir};
-use gf_net::{GameEvent, Loadout, PickupKind};
+use gf_net::{GameEvent, Loadout, PickupKind, RunPhase};
 use std::sync::Arc;
 
 /// Resolve a requested character to a playable one (falls back to the first playable).
@@ -155,8 +155,7 @@ pub fn spawn_player(world: &mut World, slot: u8, name: &str, loadout: Loadout) -
     arsenal.active_recipes = recipes.clone();
     arsenal.discovered = recipes;
 
-    let spawn = world.resource::<RunState>().room;
-    let room = db.room(spawn);
+    let room = world.resource::<RoomLayout>().0.clone();
     let offset = [Vec2::ZERO, Vec2::new(-1.6, 0.0), Vec2::new(1.6, 0.0), Vec2::new(0.0, -1.6)][slot as usize % 4];
     let pos = world.resource::<ArenaRes>().0.resolve(room.player_spawn + offset, stats.radius);
     let net = world.resource_mut::<NetIds>().alloc();
@@ -464,6 +463,7 @@ pub fn collect_pickups(
     clock: Res<SimClock>,
     content: Res<Content>,
     tuning: Res<Tuning>,
+    run: Res<RunState>,
     mut events: ResMut<Events>,
     mut pickups: Query<(Entity, &mut Pos, &mut Pickup), Without<Player>>,
     mut players: Query<
@@ -473,12 +473,19 @@ pub fn collect_pickups(
 ) {
     let dt = clock.gdt();
     let rules = &content.game.forge;
+    let cleared = run.phase == RunPhase::Cleared;
     for (entity, mut pos, mut pickup) in &mut pickups {
-        pickup.life -= dt;
+        let part = matches!(pickup.loot, Loot::Part(_));
+        // Parts wait out the fight: on a big field one can drop far off-screen mid-wave.
+        if !part || run.phase != RunPhase::Combat {
+            pickup.life -= dt;
+        }
         if pickup.life <= 0.0 {
             commands.entity(entity).despawn();
             continue;
         }
+        // Once the room is cleared, leftover parts and shards fly to the party wherever they lie.
+        let vacuum = cleared && !matches!(pickup.loot, Loot::Health(_));
         // Nearest eligible, living player within their magnet radius.
         let mut best: Option<(f32, u8)> = None;
         for (p, ppos, stats, life, ..) in &players {
@@ -486,7 +493,7 @@ pub fn collect_pickups(
                 continue;
             }
             let d = ppos.0.distance(pos.0);
-            if d <= stats.0.pickup_radius && best.is_none_or(|(bd, _)| d < bd) {
+            if (vacuum || d <= stats.0.pickup_radius) && best.is_none_or(|(bd, _)| d < bd) {
                 best = Some((d, p.slot));
             }
         }
@@ -498,7 +505,8 @@ pub fn collect_pickups(
         };
         if dist > 0.7 {
             let dir = (ppos.0 - pos.0).normalize_or_zero();
-            pos.0 += dir * (14.0 * dt).min(dist);
+            let speed = if vacuum { content.game.drops.clear_vacuum_speed.max(14.0) } else { 14.0 };
+            pos.0 += dir * (speed * dt).min(dist);
             continue;
         }
         let kind = match pickup.loot {

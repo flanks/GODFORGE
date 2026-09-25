@@ -9,7 +9,7 @@
 
 use crate::camera::w3;
 use crate::input::InputState;
-use crate::net::{Link, Prediction};
+use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{Look, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
 use crate::{ClientConfig, ClientSet};
 use gf_content::{ContentDb, Decor, EnemyShape, RoomDef};
@@ -141,7 +141,7 @@ pub struct SceneIndex {
     pub players: [Option<Entity>; 4],
     /// Live projectile / hazard / telegraph count (VFX LOD input).
     pub effect_count: u32,
-    room_serial: Option<u32>,
+    room_generation: Option<u32>,
     last_tick: Option<u32>,
     stamp: u32,
 }
@@ -237,6 +237,7 @@ fn rebuild_room(
     mut commands: Commands,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
+    current: Res<CurrentRoom>,
     mut pal: ResMut<Palette>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut mats: ResMut<Assets<StandardMaterial>>,
@@ -245,14 +246,14 @@ fn rebuild_room(
     old: Query<Entity, With<RoomGeometry>>,
 ) {
     let Some(world) = &link.latest else { return };
-    if index.room_serial == Some(world.run.room_serial) {
+    if current.generation == 0 || index.room_generation == Some(current.generation) {
         return;
     }
-    index.room_serial = Some(world.run.room_serial);
+    index.room_generation = Some(current.generation);
     for e in &old {
         commands.entity(e).despawn();
     }
-    let Some(room) = cfg.content.rooms.try_get(world.run.room) else { return };
+    let room = current.def.as_ref();
     let colors = cfg
         .content
         .biomes

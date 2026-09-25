@@ -6,6 +6,7 @@ use crate::damage::roll_part;
 use crate::enemies::spawn_enemy;
 use crate::resources::*;
 use gf_content::ContentDb;
+use gf_content::procgen;
 use gf_content::schema::{RoomKind, RunStep};
 use gf_core::ids::{BiomeId, EnemyId, RoomId};
 use gf_core::movement::Arena;
@@ -13,6 +14,7 @@ use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
 use gf_engine::prelude::*;
 use gf_net::{AnvilState, DoorReward, GameEvent, PlayerAction, RunPhase};
+use std::sync::Arc;
 
 /// Room kind a door reward leads to.
 pub fn kind_for_reward(reward: DoorReward) -> RoomKind {
@@ -72,15 +74,17 @@ pub fn start_run(world: &mut World) {
         .find(|(_, r)| r.biome == key && r.kind == kind && r.phase <= phase)
         .map(|(i, _)| RoomId(i))
         .unwrap_or(RoomId(0));
-    // QA override: open in a named room (its biome becomes the current biome).
+    // QA override: open in a named room (its biome becomes the current biome). `key` lays it out
+    // from the run seed like any other room; `key~seed` (hex, as reports print layout keys)
+    // reproduces one exact layout, and `key~0` loads the authored template verbatim.
     let requested = world.resource::<SimSettings>().start_room.clone();
-    let (room, biome_idx) = match requested.as_deref().and_then(|k| db.rooms.id(k)).map(RoomId) {
-        Some(r) => (r, biomes.iter().position(|b| db.biome(*b).key == db.room(r).biome).unwrap_or(0)),
+    let (room, biome_idx, fixed_seed) = match requested.as_deref().and_then(|k| parse_room_request(&db, k)) {
+        Some((r, seed)) => (r, biomes.iter().position(|b| db.biome(*b).key == db.room(r).biome).unwrap_or(0), seed),
         None => {
             if let Some(k) = requested {
                 warn!("unknown start room '{k}', using the authored opening");
             }
-            (authored, 0)
+            (authored, 0, None)
         }
     };
     {
@@ -91,13 +95,33 @@ pub fn start_run(world: &mut World) {
         run.started = true;
         run.reward = Some(DoorReward::PartCache);
     }
-    load_room(world, room);
+    let seed = fixed_seed.unwrap_or_else(|| next_room_seed(world));
+    load_room(world, room, seed);
 }
 
-/// Tear down the current room and build `room`.
-pub fn load_room(world: &mut World, room_id: RoomId) {
+/// `key` or `key~seed` (hex) → (template, fixed layout seed). `None` for an unknown key.
+pub fn parse_room_request(db: &ContentDb, request: &str) -> Option<(RoomId, Option<u32>)> {
+    let (key, seed) = match request.split_once('~') {
+        Some((key, seed)) => (key, Some(u32::from_str_radix(seed.trim_start_matches("0x"), 16).ok()?)),
+        None => (request, None),
+    };
+    Some((RoomId(db.rooms.id(key)?), seed))
+}
+
+/// Layout seed for the next room: derived from the run seed and the room counter, so a run's
+/// maps are reproducible from its seed yet never repeat.
+fn next_room_seed(world: &World) -> u32 {
+    procgen::room_seed(world.resource::<SimSettings>().seed, world.resource::<RunState>().room_serial)
+}
+
+/// Tear down the current room and build `room_id`, laid out from `seed` (0 = authored as-is).
+/// Hand-built kinds (bosses, mini-bosses) always use their template and replicate seed 0.
+pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     let db = world.resource::<Content>().0.clone();
-    let room = db.room(room_id).clone();
+    let generated = db.rooms.try_get(room_id.0).is_some_and(|r| procgen::is_generated_kind(r.kind));
+    let seed = if generated { seed } else { 0 };
+    let room = Arc::new(procgen::resolve_room(&db, room_id.0, seed));
+    world.insert_resource(RoomLayout(room.clone()));
     // Despawn everything room-scoped.
     let scoped: Vec<Entity> = world.query_filtered::<Entity, With<RoomScoped>>().iter(world).collect();
     for e in scoped {
@@ -185,6 +209,7 @@ pub fn load_room(world: &mut World, room_id: RoomId) {
     let mut run = world.resource_mut::<RunState>();
     run.room = room_id;
     run.room_kind = room.kind;
+    run.room_seed = seed;
     run.room_serial += 1;
     run.phase = RunPhase::Combat;
     run.doors_spawned = false;
@@ -202,6 +227,7 @@ pub fn room_flow(
     tuning: Res<Tuning>,
     enc: Res<Encounter>,
     arena: Res<ArenaRes>,
+    layout: Res<RoomLayout>,
     mut run: ResMut<RunState>,
     mut ids: ResMut<NetIds>,
     mut rngs: ResMut<Rngs>,
@@ -285,7 +311,7 @@ pub fn room_flow(
                 return;
             }
             run.doors_spawned = true;
-            let room = content.room(run.room);
+            let room = &layout.0;
             let biome = content.biome(run.biomes[run.biome_idx]);
             let next = biome.sequence.get(run.step + 1).copied();
             let rewards: Vec<DoorReward> = match next {
@@ -401,7 +427,8 @@ pub fn room_transition(world: &mut World) {
     };
     let room =
         world.resource_scope(|_, mut rngs: Mut<Rngs>| pick_room(&db, biome, kind, phase, avoid, &mut rngs.director));
-    load_room(world, room);
+    let seed = next_room_seed(world);
+    load_room(world, room, seed);
 }
 
 /// Safety net: anything that escaped the arena or went non-finite is removed.

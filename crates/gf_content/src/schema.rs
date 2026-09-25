@@ -96,7 +96,11 @@ pub struct DropTuning {
     pub cache_parts: u8,
     /// Godshards in a Godshard Cache room reward.
     pub cache_shards: u32,
+    /// Seconds a dropped pickup lasts. Parts don't age while the room is still being fought.
     pub pickup_lifetime: f32,
+    /// On a room clear, leftover parts and godshards fly to the party at this speed (u/s):
+    /// NIMRODS-scale fields scatter loot far off-screen.
+    pub clear_vacuum_speed: f32,
 }
 
 impl Default for DropTuning {
@@ -111,6 +115,7 @@ impl Default for DropTuning {
             cache_parts: 2,
             cache_shards: 18,
             pickup_lifetime: 40.0,
+            clear_vacuum_speed: 28.0,
         }
     }
 }

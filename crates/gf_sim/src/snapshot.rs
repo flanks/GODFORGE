@@ -296,6 +296,7 @@ pub fn run_view(world: &mut World) -> RunView {
         biome: run.biomes.get(run.biome_idx).map_or(0, |b| b.0),
         room: run.room.0,
         room_serial: run.room_serial,
+        room_seed: run.room_seed,
         depth: run.depth,
         step: run.step as u8,
         steps,

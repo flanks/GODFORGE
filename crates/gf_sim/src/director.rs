@@ -91,6 +91,7 @@ pub fn run_director(
     run: Res<RunState>,
     stress: Res<StressMode>,
     arena: Res<ArenaRes>,
+    layout: Res<RoomLayout>,
     mut enc: ResMut<Encounter>,
     mut ids: ResMut<NetIds>,
     mut rngs: ResMut<Rngs>,
@@ -102,7 +103,7 @@ pub fn run_director(
     if !run.started || run.is_over() || run.transition > 0.0 || run.biomes.is_empty() {
         return;
     }
-    let room = content.room(run.room);
+    let room = &layout.0;
     let biome = content.biome(run.biomes[run.biome_idx]);
     let player_pos: Vec<Vec2> = players.iter().filter(|(_, l)| l.state.is_alive()).map(|(p, _)| p.0).collect();
     let dt = clock.gdt();

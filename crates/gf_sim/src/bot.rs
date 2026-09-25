@@ -3,13 +3,15 @@
 //! nightly bot run (§14, §20.7) exercises exactly what players do.
 
 use crate::enemies::shape_contains;
+use crate::nav::NavGrid;
 use crate::server::{SimConfig, SimServer};
-use gf_content::ContentDb;
-use gf_content::schema::TelegraphShape;
+use gf_content::schema::{AbilityDef, AbilityStep, RoomDef, TelegraphShape};
+use gf_content::{ContentDb, procgen};
 use gf_core::aim::{AimMode, TargetBias};
 use gf_core::forge::{ForgeAction, Slot};
-use gf_core::ids::{EnemyId, PartId, RoomId};
+use gf_core::ids::{CharacterId, EnemyId, PartId};
 use gf_core::math::lead_point;
+use gf_core::movement::Obstacle;
 use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
 use gf_engine::prelude::*;
@@ -47,11 +49,69 @@ pub struct BotBrain {
     rng: GfRng,
     next_action_tick: u32,
     strafe: f32,
+    /// The current room's layout, rebuilt from its seed once per room (never per tick).
+    room: Option<RoomCache>,
+    /// Route to the current goal around the ruins (waypoints; the first is the next target).
+    path: Vec<Vec2>,
+    path_goal: Vec2,
+    path_tick: u32,
+}
+
+/// One room as a bot sees it: the layout every peer derives from (template, seed) and a
+/// walkability grid for routing.
+struct RoomCache {
+    /// (room serial, template, seed)
+    key: (u32, u16, u32),
+    def: Arc<RoomDef>,
+    nav: Arc<NavGrid>,
 }
 
 impl BotBrain {
     pub fn new(slot: u8, mode: AimMode, seed: u64) -> Self {
-        Self { slot, mode, presses: Presses::default(), rng: GfRng::new(seed), next_action_tick: 0, strafe: 1.0 }
+        Self {
+            slot,
+            mode,
+            presses: Presses::default(),
+            rng: GfRng::new(seed),
+            next_action_tick: 0,
+            strafe: 1.0,
+            room: None,
+            path: Vec::new(),
+            path_goal: Vec2::ZERO,
+            path_tick: 0,
+        }
+    }
+
+    /// The layout every peer derives from the replicated template + seed, and its nav grid.
+    fn room(&mut self, w: &WorldSnapshot, db: &ContentDb, radius: f32) -> (Arc<RoomDef>, Arc<NavGrid>) {
+        let key = (w.run.room_serial, w.run.room, w.run.room_seed);
+        if let Some(c) = self.room.as_ref().filter(|c| c.key == key) {
+            return (c.def.clone(), c.nav.clone());
+        }
+        let def = Arc::new(procgen::resolve_room(db, w.run.room, w.run.room_seed));
+        let nav = Arc::new(NavGrid::new(&def, radius + 0.15));
+        self.room = Some(RoomCache { key, def: def.clone(), nav: nav.clone() });
+        self.path.clear();
+        (def, nav)
+    }
+
+    /// Direction toward `goal`: straight when the way is clear, otherwise along an A* route
+    /// around the ruins, aiming at the farthest waypoint in sight.
+    fn route(&mut self, nav: &NavGrid, pos: Vec2, goal: Vec2, tick: u32) -> Vec2 {
+        if nav.clear_line(pos, goal) {
+            self.path.clear();
+            return (goal - pos).normalize_or_zero();
+        }
+        let moved = self.path_goal.distance(goal) > 1.5 && tick >= self.path_tick + 10;
+        if self.path.is_empty() || moved || tick >= self.path_tick + 90 {
+            self.path = nav.path(pos, goal).unwrap_or_default();
+            self.path_goal = goal;
+            self.path_tick = tick;
+        }
+        let next = self.path.iter().take(16).rposition(|p| nav.clear_line(pos, *p)).unwrap_or(0);
+        self.path.drain(..next);
+        let target = self.path.first().copied().unwrap_or(goal);
+        (target - pos).normalize_or_zero()
     }
 
     /// Decide this tick's command (and at most one reliable action) from a snapshot.
@@ -60,8 +120,8 @@ impl BotBrain {
         let Some(me) = w.players.iter().find(|p| p.slot == self.slot) else { return (cmd, None) };
         let pos = me.mover.pos;
         let tick = w.tick;
-        let half = db.rooms.try_get(w.run.room).map_or(Vec2::splat(20.0), |r| r.half_extents);
-        let _ = RoomId(w.run.room);
+        let (room, nav) = self.room(w, db, me.radius);
+        let half = room.half_extents;
 
         struct Foe {
             pos: Vec2,
@@ -174,6 +234,35 @@ impl BotBrain {
         {
             goal = Some((*p, 0.3));
         }
+        // Mop-up: once the spawns are spent, close in on the last few (ranged casters keep their
+        // distance behind ruins that eat shots from afar). Bosses are fought at range.
+        if goal.is_none()
+            && w.run.phase == RunPhase::Combat
+            && w.run.encounter_left <= 0.0
+            && foes.len() <= 3
+            && let Some(f) = foes
+                .iter()
+                .filter(|f| !f.boss)
+                .min_by(|a, b| a.pos.distance_squared(pos).total_cmp(&b.pos.distance_squared(pos)))
+        {
+            goal = Some((f.pos, f.radius + 2.5));
+        }
+
+        // Line of fire, by the host's rule: shots die on the ruins, so a foe behind one is not a
+        // target (the server's AUTO aim skips it too).
+        let chassis = &db.chassis_def(me.weapon.chassis).stats;
+        let fire_range = chassis.range * 1.05;
+        let occluders: Vec<Obstacle> = room
+            .obstacles
+            .iter()
+            .filter(|o| {
+                let (c, r) = o.bounding_circle();
+                c.distance(pos) < fire_range + r
+            })
+            .copied()
+            .collect();
+        let in_sight = |p: Vec2| p.distance(pos) < fire_range && !occluders.iter().any(|o| o.blocks_segment(pos, p));
+        let any_in_sight = foes.iter().any(|f| in_sight(f.pos));
 
         // ── movement: dodge telegraphs, keep distance, chase goals, stay off walls ──
         let mut repel = Vec2::ZERO;
@@ -192,19 +281,22 @@ impl BotBrain {
             boss_near |= f.boss && d < 12.0;
         }
         let mut dir = danger * 4.0 + repel;
-        if let Some((g, tol)) = goal {
-            let to = g - pos;
-            if to.length() > tol {
-                dir += to.normalize() * if in_danger { 0.5 } else { 2.0 };
-            }
+        // Travelling somewhere (a door, the anvil, loot, a straggler) routes around the ruins.
+        let mut routing = false;
+        if let Some((g, tol)) = goal
+            && g.distance(pos) > tol
+        {
+            dir += self.route(&nav, pos, g, tick) * if in_danger { 0.5 } else { 2.0 };
+            routing = true;
         }
-        if near_count == 0
+        if (near_count == 0 || !any_in_sight)
             && goal.is_none()
             && let Some(f) =
                 foes.iter().min_by(|a, b| a.pos.distance_squared(pos).total_cmp(&b.pos.distance_squared(pos)))
         {
-            // Hunt stragglers.
-            dir += (f.pos - pos).normalize_or_zero() * 1.5;
+            // Hunt stragglers, or work around the ruins to a clear shot.
+            dir += self.route(&nav, pos, f.pos, tick) * 1.5;
+            routing = true;
         }
         if near_count > 0 && goal.is_none() {
             centroid /= near_count as f32;
@@ -220,10 +312,9 @@ impl BotBrain {
         let edge = (pos.abs() - (half - Vec2::splat(3.0))).max(Vec2::ZERO);
         dir -= pos.signum() * edge * 1.5;
         let mut move_dir = dir.normalize_or_zero();
-        // Whisker steering around room obstacles (slide past pillars instead of pushing into them).
-        if let Some(room) = db.rooms.try_get(w.run.room)
-            && move_dir != Vec2::ZERO
-        {
+        // Whisker steering around room obstacles while fighting (slide past pillars instead of
+        // pushing into them); routes already keep clear of them.
+        if move_dir != Vec2::ZERO && !(routing && near_count == 0 && !in_danger) {
             let blocked =
                 |d: Vec2| room.obstacles.iter().any(|o| (1..=3).any(|k| o.contains(pos + d * (k as f32 * 0.8), 0.6)));
             if blocked(move_dir) {
@@ -239,8 +330,7 @@ impl BotBrain {
         cmd.move_dir = stick_to_i8(move_dir);
 
         // ── aiming ──
-        let chassis = &db.chassis_def(me.weapon.chassis).stats;
-        let target = foes.iter().filter(|f| f.pos.distance(pos) < chassis.range * 1.05).min_by(|a, b| {
+        let target = foes.iter().filter(|f| in_sight(f.pos)).min_by(|a, b| {
             let sa = a.pos.distance(pos) - if a.boss { 6.0 } else { 0.0 };
             let sb = b.pos.distance(pos) - if b.boss { 6.0 } else { 0.0 };
             sa.total_cmp(&sb)
@@ -273,9 +363,16 @@ impl BotBrain {
             if interact {
                 self.presses.interact = self.presses.interact.wrapping_add(1);
             }
-            if me.cooldowns[0] <= 0.0 && (near_count >= 3 || boss_near) {
+            // Abilities that plant you (Siege Stance) are suicide next to a boss that drops pools
+            // and slam trails on your head: plant only against the horde, and never mid-dodge.
+            let kit = db.kit(CharacterId(me.character));
+            let plants =
+                |a: &AbilityDef| a.steps.iter().any(|s| matches!(s, AbilityStep::Buff { root_self: true, .. }));
+            let may_plant = !boss_near && !in_danger;
+            let usable = |a: Option<&AbilityDef>| may_plant || !a.is_some_and(plants);
+            if me.cooldowns[0] <= 0.0 && (near_count >= 3 || boss_near) && usable(kit.map(|k| &k.active1)) {
                 self.presses.active1 = self.presses.active1.wrapping_add(1);
-            } else if me.cooldowns[1] <= 0.0 && (near_count >= 2 || boss_near) {
+            } else if me.cooldowns[1] <= 0.0 && (near_count >= 2 || boss_near) && usable(kit.map(|k| &k.active2)) {
                 self.presses.active2 = self.presses.active2.wrapping_add(1);
             }
             if me.ult >= 1.0 && (near_count >= 6 || boss_near) {
@@ -456,22 +553,41 @@ pub fn run_headless(
                         kills: run.kills - room_start.2,
                     });
                 }
-                room_start = (run.room_serial, time, run.kills, content.rooms.get(run.room.0).key.clone());
+                let key = world.resource::<crate::resources::RoomLayout>().0.key.clone();
+                room_start = (run.room_serial, time, run.kills, key);
+            }
+        }
+        if trace {
+            // Parts left to expire on the floor (bots should collect their loot on big fields).
+            let world = server.world_mut();
+            let dt = world.resource::<crate::resources::SimClock>().gdt();
+            let players: Vec<Vec2> = world
+                .query::<(&crate::components::Pos, &crate::components::Player)>()
+                .iter(world)
+                .map(|(p, _)| p.0)
+                .collect();
+            let mut q = world.query::<(&crate::components::Pos, &crate::components::Pickup)>();
+            for (pos, pickup) in q.iter(world) {
+                if matches!(pickup.loot, crate::components::Loot::Part(_)) && pickup.life > 0.0 && pickup.life <= dt {
+                    let d = players.iter().map(|p| p.distance(pos.0)).fold(f32::INFINITY, f32::min);
+                    eprintln!("    part expired at ({:.1},{:.1}), {d:.1} from the nearest player", pos.0.x, pos.0.y);
+                }
             }
         }
         if trace && ticks % (60 * 10) == 0 {
             let world = server.world_mut();
             let run = crate::snapshot::run_view(world);
             let players = crate::snapshot::player_views(world);
+            let room_key = world.resource::<crate::resources::RoomLayout>().0.key.clone();
             let enc = world.resource::<crate::resources::Encounter>();
             eprintln!(
-                "[{:>5.1}s] phase={:?} biome={} step={}/{} room={} depth={} kills={} alive={} budget={:.0}/{:.0} anvil={:?} hp={:?} pos={:?}",
+                "[{:>5.1}s] phase={:?} biome={} step={}/{} room={} depth={} kills={} alive={} budget={:.0}/{:.0} anvil={:?} hp={:?} pos={:?} build={:?}",
                 run.time,
                 run.phase,
                 run.biome,
                 run.step,
                 run.steps,
-                content.rooms.get(run.room).key,
+                room_key,
                 run.depth,
                 run.kills,
                 enc.alive,
@@ -480,11 +596,30 @@ pub fn run_headless(
                 run.anvil.map(|a| (a.state, (a.progress * 100.0) as u32)),
                 players.iter().map(|p| p.hp as i32).collect::<Vec<_>>(),
                 players.iter().map(|p| (p.mover.pos.x as i32, p.mover.pos.y as i32)).collect::<Vec<_>>(),
+                players
+                    .iter()
+                    .map(|p| p.weapon.equipped().map(|(_, part)| &part.rarity.name()[..1]).collect::<String>())
+                    .collect::<Vec<_>>(),
             );
             if enc.alive <= 3 {
                 let mut q =
                     world.query::<(&crate::components::Pos, &crate::components::Enemy, &crate::components::Brain)>();
+                {
+                    let mut pq = world.query::<(
+                        &crate::components::Pos,
+                        &crate::components::RunStats,
+                        &crate::components::Aim,
+                        &crate::components::Gun,
+                    )>();
+                    for (pp, st, aim, gun) in pq.iter(world) {
+                        eprintln!(
+                            "    PROBE player ({:.1},{:.1}) shots={} dmg={:.0} target={:?} dir={:?} firing={}",
+                            pp.0.x, pp.0.y, st.shots, st.damage, aim.target, aim.dir, gun.firing
+                        );
+                    }
+                }
                 for (pos, e, brain) in q.iter(world) {
+                    eprintln!("    PROBE shield={:.0}", e.shield);
                     eprintln!(
                         "    straggler {} at ({:.1},{:.1}) hp={:.0}/{:.0} state={:?} stun={:.1}",
                         content.enemy(e.def).key,

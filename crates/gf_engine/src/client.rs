@@ -7,6 +7,7 @@ use bevy::prelude::*;
 
 pub use bevy::camera::{Hdr, ScalingMode};
 pub use bevy::core_pipeline::tonemapping::Tonemapping;
+pub use bevy::diagnostic::{Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic};
 pub use bevy::input::touch::Touches;
 pub use bevy::light::NotShadowCaster;
 pub use bevy::picking::hover::Hovered;
@@ -28,6 +29,35 @@ pub fn default_plugins(title: &str, width: u32, height: u32, vsync: bool) -> bev
         }),
         ..default()
     })
+}
+
+/// Longest frame of the last second (ms): the number a frame budget is judged by.
+const WORST_FRAME: DiagnosticPath = DiagnosticPath::const_new("frame_time_worst");
+
+/// `--fps`: log FPS, the mean frame time, the worst frame of each second and any `extra` custom
+/// diagnostics once a second (frame-budget checks at peak horde).
+pub fn log_frame_times(app: &mut App, extra: &[DiagnosticPath]) {
+    use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+    let filter = [FrameTimeDiagnosticsPlugin::FPS, FrameTimeDiagnosticsPlugin::FRAME_TIME, WORST_FRAME]
+        .into_iter()
+        .chain(extra.iter().cloned())
+        .collect();
+    app.register_diagnostic(
+        Diagnostic::new(WORST_FRAME).with_suffix("ms").with_max_history_length(1).with_smoothing_factor(0.0),
+    )
+    .add_plugins((FrameTimeDiagnosticsPlugin::default(), LogDiagnosticsPlugin::filtered(filter)))
+    .add_systems(Update, measure_worst_frame);
+}
+
+fn measure_worst_frame(time: Res<Time<Real>>, mut diagnostics: Diagnostics, mut window: Local<(f32, f32)>) {
+    let dt = time.delta_secs();
+    window.0 += dt;
+    window.1 = window.1.max(dt);
+    if window.0 >= 1.0 {
+        let worst = f64::from(window.1) * 1000.0;
+        diagnostics.add_measurement(&WORST_FRAME, || worst);
+        *window = (0.0, 0.0);
+    }
 }
 
 /// Fixed-angle isometric 3/4 camera (§12): orthographic, HDR, bloom for gold/ichor emissives.

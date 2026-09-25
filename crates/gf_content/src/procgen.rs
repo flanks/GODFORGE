@@ -96,11 +96,17 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     let player_spawn = qv(Vec2::new(0.0, -half.y + 6.0));
     let gate_y = half.y - 1.5;
     let spread = rng.range_f32(0.36, 0.48);
-    let exits = vec![
-        qv(Vec2::new(-half.x * spread, gate_y)),
-        qv(Vec2::new(0.0, gate_y)),
-        qv(Vec2::new(half.x * spread, gate_y)),
-    ];
+    // The template decides how many reward doors the room offers (a pacing knob: more doors
+    // means more choice), the generator where the gates stand on the north rim.
+    let exits: Vec<Vec2> = match t.exits.len() {
+        0 | 1 => vec![qv(Vec2::new(0.0, gate_y))],
+        2 => vec![qv(Vec2::new(-half.x * spread, gate_y)), qv(Vec2::new(half.x * spread, gate_y))],
+        _ => vec![
+            qv(Vec2::new(-half.x * spread, gate_y)),
+            qv(Vec2::new(0.0, gate_y)),
+            qv(Vec2::new(half.x * spread, gate_y)),
+        ],
+    };
     let anvil = (t.kind == RoomKind::Anvil).then_some(Vec2::ZERO);
 
     // Keep-out: the entrance, the central plaza (mosaic / anvil) and the gates.
@@ -214,11 +220,11 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     // ── encounter: bigger fields hold bigger hordes ──
     let mut encounter = t.encounter.clone();
     if matches!(t.kind, RoomKind::Combat | RoomKind::Elite) {
-        encounter.budget *= 1.35;
-        encounter.duration *= 1.15;
-        encounter.rate_start *= 1.3;
-        encounter.rate_end *= 1.3;
-        encounter.max_alive = ((encounter.max_alive as f32) * 1.4).min(360.0) as u32;
+        encounter.budget *= 1.2;
+        encounter.duration *= 1.05;
+        encounter.rate_start *= 1.2;
+        encounter.rate_end *= 1.2;
+        encounter.max_alive = ((encounter.max_alive as f32) * 1.3).min(360.0) as u32;
     }
     // The swarm arrives from just off-screen around the party, with some pouring over the rim.
     let spawn_zones = vec![

@@ -3,6 +3,7 @@
 
 use crate::input::InputState;
 use crate::{ClientConfig, ClientSet, Connect};
+use gf_content::{ContentDb, RoomDef, procgen};
 use gf_core::movement::{Arena, MoveInput, MoverState, step_mover};
 use gf_engine::prelude::*;
 use gf_net::transport::{loopback, udp};
@@ -136,13 +137,44 @@ pub fn start_link(cfg: &ClientConfig) -> Link {
     }
 }
 
+/// The current room's layout, rebuilt locally from the replicated template + seed (the host never
+/// sends geometry). Updated in [`ClientSet::Net`] before anything reads it this frame.
+#[derive(Resource)]
+pub struct CurrentRoom {
+    /// (room serial, template, seed) the layout was built for.
+    key: Option<(u32, u16, u32)>,
+    /// Bumped on every layout change (0 = no room yet), so a new session that reuses a serial
+    /// still rebuilds.
+    pub generation: u32,
+    pub def: Arc<RoomDef>,
+}
+
+impl Default for CurrentRoom {
+    fn default() -> Self {
+        Self { key: None, generation: 0, def: Arc::new(RoomDef::placeholder()) }
+    }
+}
+
+impl CurrentRoom {
+    /// Rebuild when the snapshot names a different room. Returns true when the room changed.
+    pub fn sync(&mut self, run: &RunView, db: &ContentDb) -> bool {
+        let key = (run.room_serial, run.room, run.room_seed);
+        if self.key == Some(key) {
+            return false;
+        }
+        self.key = Some(key);
+        self.generation += 1;
+        self.def = Arc::new(procgen::resolve_room(db, run.room, run.room_seed));
+        true
+    }
+}
+
 /// Client-side prediction of the local player's movement.
 #[derive(Resource, Default)]
 pub struct Prediction {
     pub state: Option<MoverState>,
     pending: VecDeque<(u32, MoveInput)>,
     arena: Arena,
-    room_serial: u32,
     last_presses: Presses,
     /// Visual offset left by corrections, decays to zero (no snapping).
     pub error: Vec2,
@@ -166,12 +198,19 @@ pub fn build(app: &mut App) {
     let cfg = app.world().resource::<ClientConfig>().clone();
     app.insert_resource(start_link(&cfg))
         .init_resource::<Prediction>()
+        .init_resource::<CurrentRoom>()
         .add_systems(Update, poll_link.in_set(ClientSet::Net))
         .add_systems(FixedUpdate, send_command)
         .add_systems(Last, shutdown_on_exit);
 }
 
-fn poll_link(time: Res<Time>, cfg: Res<ClientConfig>, mut link: ResMut<Link>, mut pred: ResMut<Prediction>) {
+fn poll_link(
+    time: Res<Time>,
+    cfg: Res<ClientConfig>,
+    mut link: ResMut<Link>,
+    mut pred: ResMut<Prediction>,
+    mut room: ResMut<CurrentRoom>,
+) {
     link.fresh_events.clear();
     let now = time.elapsed_secs_f64();
     let dt = time.delta_secs().max(1e-4);
@@ -192,8 +231,12 @@ fn poll_link(time: Res<Time>, cfg: Res<ClientConfig>, mut link: ResMut<Link>, mu
             ClientEvent::Roster(r) => link.roster = r,
             ClientEvent::Snapshot(w) => {
                 link.fresh_events.extend(w.events.iter().copied());
+                let new_room = room.sync(&w.run, &cfg.content);
+                if new_room {
+                    pred.arena = Arena { half_extents: room.def.half_extents, obstacles: room.def.obstacles.clone() };
+                }
                 if let Some(slot) = link.slot {
-                    reconcile(&mut pred, &w, slot, &cfg);
+                    reconcile(&mut pred, &w, slot, &cfg, new_room);
                 }
                 link.latest = Some(Arc::new(*w));
                 link.received_at = now;
@@ -206,16 +249,12 @@ fn poll_link(time: Res<Time>, cfg: Res<ClientConfig>, mut link: ResMut<Link>, mu
     pred.error -= e * k;
 }
 
-fn reconcile(pred: &mut Prediction, w: &WorldSnapshot, slot: u8, cfg: &ClientConfig) {
+fn reconcile(pred: &mut Prediction, w: &WorldSnapshot, slot: u8, cfg: &ClientConfig, new_room: bool) {
     let Some(me) = w.players.iter().find(|p| p.slot == slot) else {
         pred.state = None;
         return;
     };
-    if w.run.room_serial != pred.room_serial {
-        pred.room_serial = w.run.room_serial;
-        if let Some(room) = cfg.content.rooms.try_get(w.run.room) {
-            pred.arena = Arena { half_extents: room.half_extents, obstacles: room.obstacles.clone() };
-        }
+    if new_room || pred.state.is_none() {
         pred.pending.clear();
         pred.state = Some(me.mover);
         pred.error = Vec2::ZERO;

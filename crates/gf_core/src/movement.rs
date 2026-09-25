@@ -59,6 +59,45 @@ impl Obstacle {
     pub fn contains(&self, p: Vec2, r: f32) -> bool {
         self.push_out(p, r) != p
     }
+
+    /// Conservative bounding circle (center, radius).
+    pub fn bounding_circle(&self) -> (Vec2, f32) {
+        match *self {
+            Obstacle::Circle { center, radius } => (center, radius),
+            Obstacle::Box { center, half } => (center, half.length()),
+        }
+    }
+
+    /// Does the segment `a`–`b` pass through this obstacle? Exact (projectiles die the moment
+    /// their center enters an obstacle, so this is line of fire for a shot).
+    pub fn blocks_segment(&self, a: Vec2, b: Vec2) -> bool {
+        match *self {
+            Obstacle::Circle { center, radius } => crate::math::dist_sq_point_segment(center, a, b) < radius * radius,
+            Obstacle::Box { center, half } => {
+                // Slab test in the box's frame.
+                let (a, d) = (a - center, b - a);
+                let (mut t0, mut t1) = (0.0f32, 1.0f32);
+                for (p, dd, h) in [(a.x, d.x, half.x), (a.y, d.y, half.y)] {
+                    if dd.abs() < 1e-8 {
+                        if p.abs() >= h {
+                            return false;
+                        }
+                        continue;
+                    }
+                    let (mut lo, mut hi) = ((-h - p) / dd, (h - p) / dd);
+                    if lo > hi {
+                        std::mem::swap(&mut lo, &mut hi);
+                    }
+                    t0 = t0.max(lo);
+                    t1 = t1.min(hi);
+                    if t0 >= t1 {
+                        return false;
+                    }
+                }
+                true
+            }
+        }
+    }
 }
 
 impl Arena {
@@ -254,6 +293,15 @@ mod tests {
         assert_eq!(r, Vec2::new(9.5, -9.5));
         assert!(arena.segment_blocked(Vec2::new(0.0, 0.0), Vec2::new(6.0, 0.0), 0.1));
         assert!(!arena.segment_blocked(Vec2::new(0.0, 5.0), Vec2::new(6.0, 5.0), 0.1));
+        // Exact line of fire agrees with the sampled test.
+        let [circle, square] = [arena.obstacles[0], arena.obstacles[1]];
+        assert!(circle.blocks_segment(Vec2::ZERO, Vec2::new(6.0, 0.5)));
+        assert!(!circle.blocks_segment(Vec2::ZERO, Vec2::new(6.0, 3.0)));
+        assert!(!circle.blocks_segment(Vec2::ZERO, Vec2::new(1.5, 0.0)), "stops short of it");
+        assert!(square.blocks_segment(Vec2::ZERO, Vec2::new(-6.0, 0.9)));
+        assert!(square.blocks_segment(Vec2::new(-3.0, 5.0), Vec2::new(-3.0, -5.0)), "straight down through it");
+        assert!(!square.blocks_segment(Vec2::ZERO, Vec2::new(-6.0, 4.0)));
+        assert!(!square.blocks_segment(Vec2::new(-5.0, 1.5), Vec2::new(-1.0, 1.5)), "skims past the top");
     }
 
     #[test]

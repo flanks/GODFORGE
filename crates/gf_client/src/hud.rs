@@ -4,7 +4,7 @@
 
 use crate::camera::{MainCamera, w3};
 use crate::input::{Device, InputState, Settings};
-use crate::net::{Link, Prediction};
+use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{element_color, hex, rarity_color};
 use crate::scene::{SceneIndex, Visual, door_label};
 use crate::{ClientConfig, ClientSet, UiFonts};
@@ -446,6 +446,7 @@ fn part_name(db: &ContentDb, part: gf_core::ids::PartId) -> String {
 fn update_labels(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
+    room: Res<CurrentRoom>,
     pred: Res<Prediction>,
     input: Res<InputState>,
     settings: Res<Settings>,
@@ -506,14 +507,14 @@ fn update_labels(
             }
             (Label::Room, Some(w), _) => {
                 let biome = db.biomes.try_get(w.run.biome).map_or("?", |b| b.name.as_str());
-                let kind = db.rooms.try_get(w.run.room).map_or("", |r| match r.kind {
+                let kind = match room.def.kind {
                     gf_content::RoomKind::Combat => "",
                     gf_content::RoomKind::Elite => " · Elite",
                     gf_content::RoomKind::Anvil => " · Anvil",
                     gf_content::RoomKind::MiniBoss => " · Mini-boss",
                     gf_content::RoomKind::Boss => " · BOSS",
                     gf_content::RoomKind::Treasure => " · Treasure",
-                });
+                };
                 let chaos =
                     if w.run.chaos_tier > 0 { format!(" · Chaos {}", w.run.chaos_tier) } else { String::new() };
                 format!("{biome}{kind} — room {}/{}{chaos}", w.run.step as u32 + 1, w.run.steps)

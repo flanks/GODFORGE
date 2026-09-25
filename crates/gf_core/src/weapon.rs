@@ -192,6 +192,21 @@ pub struct KillBlastFx {
     pub damage: f32,
 }
 
+/// Heading offset (degrees) of pellet `i` of an `n`-pellet volley with half-angle `spread_deg`.
+/// A fan spreads evenly across ±spread. A full circle (spread ≥ 180°, a nova) splits 360° evenly
+/// starting on the aim line: the fan formula would stack two pellets on the ±180° seam and leave
+/// the aimed direction empty for even counts, so a nova could never hit the target it aims at.
+pub fn pellet_offset_deg(i: u8, n: u8, spread_deg: f32) -> f32 {
+    let n = n.max(1);
+    if n == 1 {
+        0.0
+    } else if spread_deg >= 180.0 {
+        360.0 * i as f32 / n as f32
+    } else {
+        -spread_deg + 2.0 * spread_deg * i as f32 / (n - 1) as f32
+    }
+}
+
 /// Everything the simulation needs to fire and resolve a weapon.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct WeaponProfile {
@@ -751,6 +766,16 @@ mod tests {
             precision_zone: 0.45,
             ramp: None,
         }
+    }
+
+    #[test]
+    fn fans_spread_evenly_and_novas_keep_a_pellet_on_the_aim_line() {
+        let fan: Vec<f32> = (0..3).map(|i| pellet_offset_deg(i, 3, 12.0)).collect();
+        assert_eq!(fan, vec![-12.0, 0.0, 12.0]);
+        assert_eq!(pellet_offset_deg(0, 1, 40.0), 0.0);
+        // Six pellets in a full circle: 60° apart, one straight ahead, none doubled on the seam.
+        let nova: Vec<f32> = (0..6).map(|i| pellet_offset_deg(i, 6, 180.0)).collect();
+        assert_eq!(nova, vec![0.0, 60.0, 120.0, 180.0, 240.0, 300.0]);
     }
 
     #[test]

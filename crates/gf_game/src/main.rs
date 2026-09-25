@@ -31,7 +31,8 @@ GAME OPTIONS
   --phase p0|p1|ea|v1   content gate (default p1: the vertical slice)
   --chaos <tier>        Chaos Tier 0-20
   --seed <n>            run seed
-  --room <key>          QA: open the run in this room (e.g. cinder_anvil_hall)
+  --room <key>[~seed]   QA: open the run in this room (e.g. cinder_anvil_hall); ~<hex> pins the
+                        layout a report printed (cinder_gate~b5a1a1dd), ~0 = authored template
   --name <name>
 
 CLIENT OPTIONS
@@ -41,6 +42,7 @@ CLIENT OPTIONS
   --screenshot-after <secs>    --shots <n> --shot-interval <secs>
   --exit-after <secs>
   --window <W>x<H>  --no-vsync  --no-damage-numbers  --no-shake  --no-shadows
+  --fps                        log FPS, mean/worst frame time and enemy count once a second
 
 HEADLESS OPTIONS
   --bots <n>  --minutes <n>  --rtt <ms>  --loss <0..1>
@@ -200,6 +202,7 @@ fn main() {
         damage_numbers: !args.flag("--no-damage-numbers"),
         screen_shake: if args.flag("--no-shake") { 0.0 } else { 1.0 },
         shadows: !args.flag("--no-shadows"),
+        fps: args.flag("--fps"),
     };
     App::new()
         .add_plugins(gf_engine::client::default_plugins(

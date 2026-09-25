@@ -1,8 +1,8 @@
-//! Fixed-angle isometric 3/4 camera (§12): follows the local player, pulls back for co-op, stays
-//! inside the room, and shakes on big hits (budgeted and toggleable, §5).
+//! Fixed-angle isometric 3/4 camera (§12): follows the local player across open arenas, leans
+//! toward nearby allies, stays over the arena, and shakes on big hits (budgeted and toggleable, §5).
 
 use crate::input::Settings;
-use crate::net::{Link, Prediction};
+use crate::net::{CurrentRoom, Link, Prediction};
 use crate::{ClientConfig, ClientSet};
 use gf_engine::client::{iso_camera, key_light, set_view_height, vignette};
 use gf_engine::prelude::*;
@@ -72,12 +72,16 @@ fn shake_from_events(link: Res<Link>, mut shake: ResMut<Shake>) {
     }
 }
 
+/// Allies closer than this pull the camera toward them; farther ones get off-screen arrows.
+pub const ALLY_PULL_RADIUS: f32 = 12.0;
+
 #[allow(clippy::too_many_arguments)]
 fn follow(
     time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     pred: Res<Prediction>,
+    room: Res<CurrentRoom>,
     settings: Res<Settings>,
     mut shake: ResMut<Shake>,
     mut cams: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
@@ -89,22 +93,28 @@ fn follow(
     let party = world.players.len().clamp(1, 4);
     let mut view_h = cam.view_height[party - 1];
 
-    // Focus: the local player (predicted), pulled toward the party centroid in co-op.
+    // Focus: the local player (predicted). Arenas are open fields and every client has its own
+    // screen, so the camera stays on you and only leans toward allies fighting close by.
     let me = pred.state.map(|s| s.pos + pred.error).or_else(|| link.me().map(|m| m.mover.pos));
     let alive: Vec<Vec2> = world.players.iter().filter(|p| p.life.is_alive()).map(|p| p.mover.pos).collect();
-    let mut focus = me.unwrap_or(Vec2::ZERO);
-    if alive.len() > 1 {
-        let centroid = alive.iter().copied().sum::<Vec2>() / alive.len() as f32;
-        focus = focus.lerp(centroid, 0.5);
-        let spread = alive.iter().map(|p| p.distance(centroid)).fold(0.0, f32::max);
-        view_h = view_h.max(spread * 1.6 + 8.0).min(cam.view_height[3] + 8.0);
+    let mut focus = match me {
+        Some(me) => me,
+        None if !alive.is_empty() => alive.iter().copied().sum::<Vec2>() / alive.len() as f32,
+        None => Vec2::ZERO,
+    };
+    if let Some(me) = me {
+        let near: Vec<Vec2> = alive.iter().copied().filter(|p| p.distance(me) < ALLY_PULL_RADIUS).collect();
+        if near.len() > 1 {
+            let centroid = near.iter().copied().sum::<Vec2>() / near.len() as f32;
+            focus = me.lerp(centroid, 0.35);
+            let spread = near.iter().map(|p| p.distance(focus)).fold(0.0, f32::max);
+            view_h = view_h.max(spread * 1.5 + 10.0).min(cam.view_height[3] + 4.0);
+        }
     }
-    // Keep the view over the room.
-    if let Some(room) = cfg.content.rooms.try_get(world.run.room) {
-        let half_view = Vec2::new(view_h * 0.5 * 16.0 / 9.0, view_h * 0.5);
-        let limit = (room.half_extents + Vec2::splat(2.0) - half_view * Vec2::new(0.85, 0.7)).max(Vec2::ZERO);
-        focus = focus.clamp(-limit, limit);
-    }
+    // Keep the view over the arena (a little abyss past the rim is part of the look).
+    let half_view = Vec2::new(view_h * 0.5 * 16.0 / 9.0, view_h * 0.5);
+    let limit = (room.def.half_extents + Vec2::splat(2.0) - half_view * Vec2::new(0.85, 0.7)).max(Vec2::ZERO);
+    focus = focus.clamp(-limit, limit);
     if !shake.seeded {
         shake.focus = focus;
         shake.seeded = true;
