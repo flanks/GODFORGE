@@ -64,7 +64,8 @@ fn avg_room_budget(db: &ContentDb) -> f32 {
         .filter(|r| matches!(r.kind, RoomKind::Combat | RoomKind::Elite | RoomKind::Anvil))
         .map(|r| r.encounter.budget)
         .collect();
-    if combat.is_empty() { 60.0 } else { combat.iter().sum::<f32>() / combat.len() as f32 }
+    let avg = if combat.is_empty() { 60.0 } else { combat.iter().sum::<f32>() / combat.len() as f32 };
+    avg * db.game.run.budget_mult
 }
 
 fn ember_per_run(db: &ContentDb) -> f32 {

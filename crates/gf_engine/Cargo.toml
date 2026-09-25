@@ -1,10 +1,29 @@
 [package]
 name = "gf_engine"
+description = "GODFORGE engine isolation layer: the only crate that names Bevy directly."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
 
+[features]
+default = []
+# Windowed client: 3D renderer, UI, input devices, default font.
+client = [
+    "bevy/3d",
+    "bevy/ui",
+    "bevy/keyboard",
+    "bevy/mouse",
+    "bevy/touch",
+    "bevy/gamepad",
+    "bevy/default_font",
+    "bevy/png",
+]
+
 [dependencies]
-bevy = { workspace = true }
+# Headless baseline: ECS + app + math + logging. The simulation needs nothing more.
+bevy = { workspace = true, features = ["std", "bevy_log"] }
+
+[lints]
+workspace = true

@@ -1,10 +1,21 @@
 [package]
 name = "gf_sim"
+description = "GODFORGE authoritative simulation: headless Bevy ECS at a fixed 60 Hz, driven through gf_net."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[dependencies]
+gf_core = { workspace = true }
+gf_content = { workspace = true }
+gf_net = { workspace = true }
+gf_engine = { workspace = true }
+# Listed only so `#[derive(Component/Resource)]` can resolve its paths; code imports through
+# `gf_engine::prelude` and the version stays pinned in the workspace manifest.
+bevy = { workspace = true }
+glam = { workspace = true }
 
 [lints]
 workspace = true

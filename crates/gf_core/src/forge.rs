@@ -174,6 +174,8 @@ pub enum ForgeError {
     SlotMismatch { part: Slot, target: Slot },
     #[error("already Godforged")]
     MaxRarity,
+    #[error("the donor part is too weak to raise this part's rarity")]
+    DonorTooWeak,
     #[error("no forge charges left at this anvil")]
     NoCharges,
     #[error("need {need} godshards, have {have}")]
@@ -240,7 +242,16 @@ pub fn apply_action(
                 return Err(ForgeError::SlotLocked(slot));
             }
             let equipped = build.get(slot).ok_or(ForgeError::EmptySlot(slot))?;
-            let target = equipped.rarity.max(donor.rarity).next().ok_or(ForgeError::MaxRarity)?;
+            if equipped.rarity == Rarity::Godforged {
+                return Err(ForgeError::MaxRarity);
+            }
+            // Two parts → one of higher rarity: the lower input steps up one tier, but never below
+            // the higher input. A weaker donor that can't improve the part is refused.
+            let stepped = equipped.rarity.min(donor.rarity).next().ok_or(ForgeError::MaxRarity)?;
+            let target = stepped.max(equipped.rarity.max(donor.rarity));
+            if target <= equipped.rarity {
+                return Err(ForgeError::DonorTooWeak);
+            }
             spend_charge(wallet, rules.fuse_cost)?;
             bag.take(uid);
             let fused = PartInstance { rarity: target, ..equipped };
@@ -381,9 +392,9 @@ mod tests {
         let out =
             apply_action(ForgeAction::Fuse { uid: 3 }, &mut build, &mut bag, &mut wallet, &rules, &mut cat, &mut uid)
                 .unwrap();
-        // Common (equipped) + Rare (donor) → Epic, keeping the equipped identity.
+        // Common (equipped) + Rare (donor) → Rare, keeping the equipped identity.
         assert!(
-            matches!(out, ForgeOutcome::Fused { part, .. } if part.rarity == Rarity::Epic && part.part == PartId(0))
+            matches!(out, ForgeOutcome::Fused { part, .. } if part.rarity == Rarity::Rare && part.part == PartId(0))
         );
         assert_eq!(wallet.charges, 1);
         assert!(bag.find(3).is_none());
@@ -401,6 +412,22 @@ mod tests {
             apply_action(ForgeAction::Fuse { uid: 3 }, &mut build, &mut bag, &mut wallet, &rules, &mut cat, &mut uid);
         assert_eq!(err, Err(ForgeError::NoCharges));
         assert_eq!((build, bag, wallet), before, "errors leave state untouched");
+    }
+
+    #[test]
+    fn fusion_ladder_needs_matching_rarities() {
+        let (mut build, mut bag, mut wallet, rules, mut cat, mut uid) = setup();
+        wallet.charges = 9;
+        build.set(Slot::Core, Some(PartInstance { uid: 1, part: PartId(0), rarity: Rarity::Epic }));
+        // A Rare donor cannot lift an Epic part.
+        let err =
+            apply_action(ForgeAction::Fuse { uid: 3 }, &mut build, &mut bag, &mut wallet, &rules, &mut cat, &mut uid);
+        assert_eq!(err, Err(ForgeError::DonorTooWeak));
+        // Epic + Epic → Godforged.
+        bag.push(PartInstance { uid: 9, part: PartId(2), rarity: Rarity::Epic }).unwrap();
+        apply_action(ForgeAction::Fuse { uid: 9 }, &mut build, &mut bag, &mut wallet, &rules, &mut cat, &mut uid)
+            .unwrap();
+        assert_eq!(build.get(Slot::Core).unwrap().rarity, Rarity::Godforged);
     }
 
     #[test]

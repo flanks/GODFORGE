@@ -136,6 +136,10 @@ pub struct RunTuning {
     pub hp_growth_per_room: f32,
     /// Additional enemy HP multiplier per biome depth.
     pub hp_growth_per_biome: f32,
+    /// Global multiplier on every room's encounter budget (pacing lever).
+    pub budget_mult: f32,
+    /// Global multiplier on spawn rates (density lever).
+    pub rate_mult: f32,
 }
 
 impl Default for RunTuning {
@@ -152,6 +156,8 @@ impl Default for RunTuning {
             rate_growth_per_room: 0.1,
             hp_growth_per_room: 0.05,
             hp_growth_per_biome: 0.6,
+            budget_mult: 1.0,
+            rate_mult: 1.0,
         }
     }
 }
