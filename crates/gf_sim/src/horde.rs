@@ -383,25 +383,6 @@ fn poi_waves(
 pub struct StageWatch {
     /// `room_serial` of the map being watched.
     serial: u32,
-    /// `Expedition.time` as this system last left it (`None` on a new map).
-    time_seen: Option<f32>,
-    /// Another system advances `Expedition.time`: stop advancing it here.
-    time_elsewhere: bool,
-}
-
-/// Advance the stage clock unless another system does. `Expedition.time` belongs to the stage
-/// flow; until that system advances it, the horde keeps it running so the threat clock and the
-/// forced gate still move. The first time it sees the clock moved by someone else it stops for good.
-fn advance_stage_clock(watch: &mut StageWatch, ex: &mut Expedition, dt: f32) {
-    if watch.time_elsewhere {
-        return;
-    }
-    if watch.time_seen.is_some_and(|t| t.to_bits() != ex.time.to_bits()) {
-        watch.time_elsewhere = true;
-        return;
-    }
-    ex.time += dt;
-    watch.time_seen = Some(ex.time);
 }
 
 /// Clusters, census, threat and spawning (§5.5 steps 1–5).
@@ -424,12 +405,11 @@ pub fn run_horde(
     }
     let horde = &ctx.content.game.expedition.horde;
     let dt = ctx.clock.gdt();
+    // `Expedition.time` (the stage clock) is advanced by `poi::poi_update`, earlier in the tick.
     let arrived = watch.serial != ctx.run.room_serial;
     if arrived {
         watch.serial = ctx.run.room_serial;
-        watch.time_seen = None;
     }
-    advance_stage_clock(&mut watch, &mut ex, dt);
 
     // 3. The threat clock (sampled first: the HUD shows it even while nothing spawns).
     let (key, level, frac) = ctx.threat(&ex);

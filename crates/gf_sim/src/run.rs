@@ -13,7 +13,7 @@ use crate::enemies::spawn_enemy;
 use crate::resources::*;
 use gf_content::ContentDb;
 use gf_content::procgen;
-use gf_content::schema::{MapLayout, Phase, RoomDef, RoomKind, RunStep, TileKind};
+use gf_content::schema::{MapLayout, Phase, RoomDef, RoomKind, RunStep};
 use gf_core::ids::{BiomeId, EnemyId, RoomId};
 use gf_core::movement::Arena;
 use gf_core::poi::PoiKind;
@@ -310,19 +310,16 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
         world.spawn((Replicated(net), Pos(at), RoomScoped, AnvilStation::dormant()));
     }
 
-    // A biome map: its points of interest, objective state and horde flow grid (rooms keep an
-    // inactive stage and no flow grid).
+    // A biome map: its points of interest and objective state (rooms keep an inactive stage).
+    // The horde's flow grid is rebuilt by `flow::refresh_flow` when `room_serial` changes.
     match room.map.as_ref() {
         Some(map) => {
             crate::poi::spawn_pois(world, map);
             world.insert_resource(expedition_for(&room, map));
-            world.insert_resource(flow_grid(map, &arena));
         }
-        None => {
-            world.insert_resource(Expedition::default());
-            world.insert_resource(Flow::default());
-        }
+        None => world.insert_resource(Expedition::default()),
     }
+    world.insert_resource(Flow::default());
 
     // Move the party to the entrance.
     let mut players = world.query::<(&Player, &mut Pos, &mut Mover, &mut Kit, &mut Arsenal, &Stats)>();
@@ -365,47 +362,6 @@ fn expedition_for(room: &RoomDef, map: &MapLayout) -> Expedition {
             .collect(),
         explored: vec![0; tiles.div_ceil(64)],
         ..Default::default()
-    }
-}
-
-/// The horde's flow grid over `map`'s tiles (§5.6), with every field empty (unreached). Step
-/// cost per tile: road 8, plaza and bridge 9, ground 10, plus 40 where obstacles cover more than
-/// half the tile (3 or 4 of 4 sample points); void and liquid are impassable (`u8::MAX`).
-fn flow_grid(map: &MapLayout, arena: &Arena) -> Flow {
-    let t = &map.tiles;
-    let quarter = t.size * 0.25;
-    let samples = [
-        Vec2::new(-quarter, -quarter),
-        Vec2::new(quarter, -quarter),
-        Vec2::new(-quarter, quarter),
-        Vec2::splat(quarter),
-    ];
-    let mut cost = Vec::with_capacity(t.kind.len());
-    for y in 0..t.h {
-        for x in 0..t.w {
-            let base: u8 = match t.kind[t.index(x, y)] {
-                TileKind::Road => 8,
-                TileKind::Plaza | TileKind::Bridge => 9,
-                TileKind::Ground => 10,
-                TileKind::Void | TileKind::Liquid => {
-                    cost.push(u8::MAX);
-                    continue;
-                }
-            };
-            let c = t.center(x, y);
-            let covered = samples.iter().filter(|s| arena.blocks_shot(c + **s)).count();
-            cost.push(if covered > 2 { base + 40 } else { base });
-        }
-    }
-    let n = cost.len();
-    Flow {
-        w: t.w,
-        h: t.h,
-        origin: t.origin,
-        cost,
-        dist: std::array::from_fn(|_| vec![u16::MAX; n]),
-        src: [None; 4],
-        next: 0,
     }
 }
 
