@@ -1,0 +1,144 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\weapons\\serpent_smg.glb",
+  "key": "serpent_smg",
+  "kind": "weapon",
+  "tier": "one_handed",
+  "extensions_used": [],
+  "tris": 2370,
+  "budget": [
+   1000,
+   2500
+  ],
+  "textures": [
+   {
+    "name": "serpent_smg_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 86606
+   },
+   {
+    "name": "serpent_smg_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 987911
+   }
+  ],
+  "materials": [
+   "M_serpent_smg"
+  ],
+  "nodes": [
+   "glow_core",
+   "grip_R",
+   "muzzle",
+   "serpent_smg_mesh",
+   "serpent_smg"
+  ],
+  "sockets": {
+   "grip_R": {
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "glow_core": {
+    "translation": [
+     0.0,
+     0.095,
+     -0.378
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.095,
+     -0.528
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.0699,
+    -0.0983,
+    -0.528
+   ],
+   "max": [
+    0.0671,
+    0.1853,
+    0.2402
+   ]
+  },
+  "length_m": 0.768,
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 909.1,
+   "p10": 821.9,
+   "p90": 960.0
+  },
+  "coverage": 0.4,
+  "zones": [
+   "scales",
+   "head",
+   "bronze",
+   "gold",
+   "bone",
+   "iron",
+   "wood",
+   "wrap",
+   "drum_face",
+   "glow_eye",
+   "glow_throat",
+   "needle",
+   "quill"
+  ],
+  "decals": 2,
+  "basecolor": "art/weapons/serpent_smg/textures/serpent_smg_basecolor.png",
+  "emissive": "art/weapons/serpent_smg/textures/serpent_smg_emissive.png",
+  "emissive_texels": 104040,
+  "seconds": 13.7
+ }
+}

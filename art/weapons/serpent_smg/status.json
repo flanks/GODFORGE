@@ -1,0 +1,32 @@
+{
+ "asset": "serpent_smg",
+ "kind": "weapon",
+ "tier": "one_handed",
+ "pipeline": "docs/art/WEAPONS.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/weapons/serpent_smg.glb",
+    "assets/models/weapons/serpent_smg.meta.json",
+    "art/weapons/serpent_smg/source/serpent_smg.blend",
+    "art/weapons/serpent_smg/textures/serpent_smg_basecolor.png",
+    "art/weapons/serpent_smg/textures/serpent_smg_emissive.png",
+    "art/weapons/serpent_smg/reports/serpent_smg_review.png",
+    "art/weapons/serpent_smg/reports/serpent_smg_34.png",
+    "art/weapons/serpent_smg/reports/serpent_smg_held.png"
+   ],
+   "notes": "Built from code by art/weapons/serpent_smg/source/serpent_smg_build.py (gf_assets toolkit)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}
