@@ -1,16 +1,18 @@
-# Art-track working files that stay local (no Git LFS in this repo; nothing > 20 MB is committed).
-# Every ignored raw output is recorded (path, bytes, sha256) in art/characters/<char>/manifest.json.
+# Art-track files that stay local. Git LFS is enabled (repo .gitattributes, 2026-09-25): .blend, .glb and the
+# texture PNGs under art/**/textures/ go through LFS, so production sources are versioned. Nothing over 20 MB is
+# committed outside LFS (tools/comfy/check_art.py, CI: .github/workflows/art.yml). Every local-only file is
+# recorded (path, bytes, sha256) in its asset's manifest.json.
 
-# Raw generator output: TRELLIS.2 GLBs (60-90 MB) and the ComfyUI conditioning/mask previews.
-# The provenance JSON next to each GLB is small and IS committed.
+# Raw generator output: only a hero's SELECTED stage-1 GLB is committed (LFS, re-included below); the other
+# seeds and the ComfyUI conditioning/mask previews are scratch. The provenance JSON next to each GLB is committed.
 characters/*/source/*
 !characters/*/source/*.json
+!characters/brax/source/brax_trellis2_s202.glb
 
-# Scratch: full-resolution renders, mask checks, logs, heavy .blend files.
+# Scratch: full-resolution renders, mask checks, logs and the intermediate .blend files of the stage-2 chain
+# (tools/blender/gf_hero/run_stage2.py regenerates all of them from the committed inputs).
 characters/*/work/
-
-# Size cannot be expressed here: anything else over 20 MB (a huge PNG in references/ or reports/)
-# is rejected by tools/comfy/check_art.py (CI: .github/workflows/art.yml). Run it before committing.
+weapons/*/work/
 
 # Blender autosave / backup files anywhere under art/
 *.blend1
