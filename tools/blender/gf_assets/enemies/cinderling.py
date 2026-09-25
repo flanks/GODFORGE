@@ -45,6 +45,7 @@ sys.path.insert(0, os.path.join(HERE, ".."))
 import bmesh  # noqa: E402
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
+from mathutils.bvhtree import BVHTree  # noqa: E402
 
 import gfa_common as C  # noqa: E402
 import gfa_export as E  # noqa: E402
@@ -192,19 +193,27 @@ GLINT = "#6F6878"
 MOLTEN_RIM = "#C8400C"
 THROAT = "#6A1E06"                 # the throat's outer ring (behind the teeth): a deep smoulder, not a flare
 MOLTEN_HOT = "#FF6B1A"
-MOLTEN_CORE = "#FFCE9E"            # pale peach (hue 29 deg): never the player gold #FFC940 (hue 43 deg)
+MOLTEN_CORE = "#FFD9B0"            # the white-hot core's pale peach rim (hue 29 deg)
+MOLTEN_WHITE = "#FFF3D6"           # its centre. The throat steps straight from orange to these two: never the
+                                   # player gold #FFC940 (hue 43 deg), not even as a clipped mid band
+MAW_RADIUS = 0.28                  # the throat ramp's radius around fx_core (m)
+THROAT_BASE = 0.5                  # the value of the painted base under the orange throat bowl (x its glow)
 SEAM_CORE = "#FF8A3A"              # the seams' core: hot orange, a step below the maw's white-hot centre
 BURNT = "#120A08"
 TEAL = "#2FBFA8"
 PALETTE = [("coal", COAL), ("coal mid", COAL_MID), ("ash", ASH), ("ash light", ASH_LIGHT), ("glint", GLINT),
            ("molten rim", MOLTEN_RIM), ("molten hot", MOLTEN_HOT), ("molten core", MOLTEN_CORE),
-           ("row colour", ROW["color"]), ("cyst", "#20262C"), ("ichor", TEAL)]
+           ("white-hot", MOLTEN_WHITE), ("row colour", ROW["color"]), ("cyst", "#20262C"), ("ichor", TEAL)]
 UV_SCALE = {"maw": 0.55, "fang": 0.8, "cyst": 0.9}   # gfa_paint.unwrap zone_scale: the crown gets the pixels
 
 
 def mix_hex(a, b, t):
     ca, cb = C.hex_rgb(a), C.hex_rgb(b)
     return "#%02X%02X%02X" % tuple(int(round((x * (1 - t) + y * t) * 255)) for x, y in zip(ca, cb))
+
+
+def scale_hex(a, k):
+    return "#%02X%02X%02X" % tuple(int(round(min(1.0, x * k) * 255)) for x in C.hex_rgb(a))
 
 
 # ---- geometry helpers ---------------------------------------------------------------------------------------
@@ -445,11 +454,14 @@ class Build:
         self._jaw_pts = [v.co.copy() for f in jaw.faces if f.material_index != 1 for v in f.verts]
         # zones: the cut faces glow (maw); the skin is crust (lid) or coal (jaw)
         pieces = {"lid": (lid, "head", "crust"), "jaw": (jaw, "body", "coal")}
+        maw_tris = []
         for tag, (b, bone, skin) in pieces.items():
             parts = split_faces(b, lambda f: "maw" if f.material_index == 1 else skin)
             for z, piece in parts.items():
                 for f in piece.faces:
                     f.material_index = 0
+                if z == "maw":
+                    maw_tris += [[l.vert.co.copy() for l in lt] for lt in piece.calc_loop_triangles()]
                 a.add(piece, z, bone=bone, name="%s_%s" % (tag, z), shading="smooth" if z == "maw" else "auto",
                       sharp_angle=V["sharp"])
         # --- fangs: dark obsidian teeth on both rims, interlocking across the glowing gap ---
@@ -457,6 +469,11 @@ class Build:
         self.mouth_pt = Vector((0.0, min(p.y for p in jaw_rim) + 0.14, zf + 0.04))
         # the white-hot core sits deep in the throat: hidden under the lid at rest, blazing when it opens
         self.maw_core = Vector((0.0, min(p.y for p in jaw_rim) + 0.40, zf - 0.02))
+        # the throat floor: the nearest glowing surface to that core (normalised by the ramp radius); the pale
+        # peach core of the ramp is laid out from here, so every look shows the same white-hot pool
+        tree = BVHTree.FromPolygons([p for t in maw_tris for p in t], [(3 * i, 3 * i + 1, 3 * i + 2)
+                                                                        for i in range(len(maw_tris))])
+        self.maw_dmin = tree.find_nearest(self.maw_core)[3] / MAW_RADIUS
 
         def rim_at(pts, az, sign):
             near = [p for p in pts if abs(math.degrees(math.atan2(p.x, -p.y)) - az) < 7.0]
@@ -515,14 +532,38 @@ class Build:
                 ("body", "head_top", (0.0, 0.0, self.top + 0.15))]
 
     # -- paint --
+    def maw_stops(self):
+        """The throat's emission ramp over the distance from fx_core (normalised by MAW_RADIUS). A pool of
+        white-hot peach on the throat floor steps STRAIGHT from its rim to the hot orange in about 1.5 cm,
+        blended in linear light: the old core -> hot sRGB blend spread over half the radius dipped in blue, so
+        under the emission gain it clipped to a ring of player gold (#FFC24B band) round the core. Outside, the
+        unchanged hot -> ember-red smoulder (sampled from the old smoothstep), so the ring the rest grin shows
+        is the same.
+        The third entry is the painted base under the glow: the throat bowl faces the toon key light when the
+        lid opens, and a full-value orange base lit by it plus the emission washed the orange itself to gold
+        (#FFB83B). Under the orange bowl the base is half value (the glow carries the colour, as a self-lit
+        surface should); it returns to the glow colour by d 0.82, before the ring the rest pose shows."""
+        d0 = self.maw_dmin
+        hot_from = d0 + 0.17
+        stops = [(0.0, MOLTEN_WHITE), (d0 + 0.05, MOLTEN_WHITE), (d0 + 0.12, MOLTEN_CORE),
+                 (hot_from, MOLTEN_HOT, scale_hex(MOLTEN_HOT, THROAT_BASE))]
+        for i in range(11):
+            d = 0.55 + 0.045 * i
+            if d > hot_from + 0.01:
+                t = i / 10.0
+                em = mix_hex(MOLTEN_HOT, THROAT, t * t * (3 - 2 * t))
+                k = THROAT_BASE + (1.0 - THROAT_BASE) * min(1.0, max(0.0, (d - 0.55) / 0.27))
+                stops.append((d, em, scale_hex(em, k)))
+        return stops
+
     def recipes(self):
         warm = {"center": tuple(self.mouth_pt), "range": (0.34, 0.12), "color": "#6B2A12", "amount": 0.55}
         crust_facets = {"dir": (0, 0, 1), "soft": 0.08,
                         "stops": [(-1.0, COAL_DEEP), (0.05, COAL), (0.34, COAL_MID), (0.54, ASH_DARK), (0.74, ASH)]}
         coal_facets = {"dir": (0, 0, 1), "soft": 0.05,
                        "stops": [(-1.0, COAL_DEEP), (-0.2, COAL), (0.35, COAL_MID), (0.62, ASH_DARK)]}
-        maw = {"color": THROAT, "hot": MOLTEN_HOT, "core": MOLTEN_CORE, "mode": "radial",
-               "center": tuple(self.maw_core), "radius": 0.28, "base_mix": 0.05}
+        maw = {"color": THROAT, "mode": "radial", "stops": self.maw_stops(),
+               "center": tuple(self.maw_core), "radius": MAW_RADIUS, "base_mix": 0.05}
         return {
             # the lid: pale ash on every up-facing facet, coal on the flanks, bright broken strokes on the
             # knapped ridges (the value frame against the floor), warm bounce light around the maw

@@ -95,7 +95,7 @@ renders flat zone colours in about 10 s, for fast silhouette iterations.
 | `edge`, `edge_width`, `edge_breakup` | 0.75, 5 mm, 0.4 | brushy light strokes on convex sharp edges; the width wobbles and the stroke breaks up |
 | `gradient` | None | `{"axis" \| "center"[+"axis"], "range", "color", "amount"}`: planar, radial or cylindrical |
 | `spots` | None | patches (soot, verdigris, wet sheen) |
-| `emit` | None | `{"color" (rim), "hot", "core", "mode": flat \| radial \| axis \| plane, "center", "axis", "radius", "range", "fade", "base_mix", "strength"}` |
+| `emit` | None | `{"color" (rim), "hot", "core", "mode": flat \| radial \| axis \| plane, "center", "axis", "radius", "range", "fade", "base_mix", "strength"}`; an optional `"stops": [(d, hex[, base hex]), ...]` replaces core / hot / rim with an explicit ramp over the normalised distance, blended in linear light (a pale core that steps straight to its orange with no clipped gold band); the optional third entry is the painted base under the glow at that stop (default: the glow colour; a darker base keeps the toon key light from washing a lit glow toward yellow) |
 
 Decals: `decal_lines(lines, frame, width, zones, color, rim, emit, mapping="planar" | "cylinder")`.
 They are 2D polylines from `crack_lines`, `rune_band` or `sunburst`, projected along the frame's +Z.

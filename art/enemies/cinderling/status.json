@@ -33,9 +33,10 @@
     "art/enemies/cinderling/reports/cinderling_v2_review.png",
     "art/enemies/cinderling/reports/cinderling_v2_build_report.json",
     "art/enemies/cinderling/reports/cinderling_crowd_review.png",
-    "art/enemies/cinderling/reports/cinderling_crowd.png"
+    "art/enemies/cinderling/reports/cinderling_crowd.png",
+    "art/enemies/cinderling/reports/cinderling_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/cinderling.py (--variant base|v1|v2) and reviewed by enemies/cinderling_crowd.py (lineup with the clinker, 40-copy horde at true pixel size). Three looks of the content key cinderling, one GLB each, identical GF_Swarm_v1, sockets and clip suffixes."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/cinderling.py (--variant base|v1|v2) and reviewed by enemies/cinderling_crowd.py (lineup with the clinker, 40-copy horde at true pixel size). Three looks of the content key cinderling, one GLB each, identical GF_Swarm_v1, sockets and clip suffixes. Art review 7.5/10 must-fix done: the wind-up throat no longer shows a player-gold ring (pixels within dE 20 of #FFC940: 6.5-7.2 % -> 0.0 %); a pale peach pool (#FFF3D6 -> #FFD9B0) steps straight to the orange, over a half-value base (reports/cinderling_review_fix.png)."
   },
   "2_user_approval": {
    "status": "pending_human",

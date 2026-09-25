@@ -63,7 +63,10 @@ ZONE_DEFAULTS = {
                              #  flanks, lit table) replacing "base"; every other layer applies on top
     "emit": None,            # {"color": rim hex, "hot": hex, "core": hex, "mode": flat|radial|axis|plane,
                              #  "center": (x,y,z), "axis": (x,y,z), "radius": r, "range": (a,b), "base_mix": 0.3,
-                             #  "fade": (d0, d1) emission only beyond d0 (normalised distance), "strength": 1}
+                             #  "fade": (d0, d1) emission only beyond d0 (normalised distance), "strength": 1,
+                             #  "stops": [(d, hex[, base hex]), ...] optional explicit ramp over the normalised
+                             #  distance, blended in linear light; replaces core/hot/rim; the optional base hex
+                             #  is the painted base under the glow at that stop (default: the glow colour)}
 }
 
 
@@ -671,12 +674,32 @@ def paint(maps, zones_order, recipes, dist_convex, dist_concave, decals=(), seed
                 d = smoothstep(e["range"][0], e["range"][1], _field(p, {"axis": e["axis"]}))
             else:
                 d = np.full(n, 0.5, dtype=np.float32)
-            em = mix(mix(np.repeat(core[None], n, 0), hot, smoothstep(0.0, 0.55, d)), rim_c, smoothstep(0.55, 1.0, d))
-            em = em * (1 + 0.06 * (fbm(p, 20.0, 2, seed=seed + 77) * 2 - 1))[:, None]
+            under = None                     # the painted base under the glow (None: the glow colour itself)
+            if e.get("stops"):
+                # an explicit ramp [(d, hex[, base hex]), ...] from the centre out (replaces core -> hot -> rim),
+                # blended in linear light like the render's own filtering: a pale core steps straight to its
+                # orange without a saturated mid band (an sRGB blend dips in blue and clips to gold under
+                # emission). The optional third entry is the base colour under the glow at that stop (a darker
+                # tone keeps the toon key light from washing a lit glow toward yellow)
+                st = sorted(e["stops"], key=lambda s: s[0])
+                xs = np.array([s[0] for s in st], dtype=np.float32)
+
+                def ramp(hexes):
+                    cl = srgb_to_lin(np.stack([hex3(h) for h in hexes]))
+                    return lin_to_srgb(np.stack([np.interp(d, xs, cl[:, k]) for k in range(3)], 1)).astype(np.float32)
+                em = ramp([s[1] for s in st])
+                if any(len(s) > 2 for s in st):
+                    under = ramp([s[2] if len(s) > 2 else s[1] for s in st])
+            else:
+                em = mix(mix(np.repeat(core[None], n, 0), hot, smoothstep(0.0, 0.55, d)), rim_c,
+                         smoothstep(0.55, 1.0, d))
+            jitter = (1 + 0.06 * (fbm(p, 20.0, 2, seed=seed + 77) * 2 - 1))[:, None]
+            em = em * jitter
+            under = em if under is None else under * jitter
             f = smoothstep(e["fade"][0], e["fade"][1], d) if e.get("fade") else np.ones(n, dtype=np.float32)
             # emission only beyond fade[0] (fully on at fade[1]): glowing tips, hot rims
             emis[m] = em * (f * e.get("strength", 1.0))[:, None]
-            c = mix(c, mix(em, np.ones(3, dtype=np.float32), e.get("base_mix", 0.25)), f)
+            c = mix(c, mix(under, np.ones(3, dtype=np.float32), e.get("base_mix", 0.25)), f)
         base[m] = c
     # decals: painted lines, burnt rims, glowing channels
     for dec in decals:

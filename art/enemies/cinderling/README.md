@@ -57,10 +57,11 @@ heroes, so the same crack pattern repeats 40 times.
 * **Glow budget.** It is the most common fodder, and the player's Flame element is orange (`#FF7A1A`).
   So the rest glow is kept low: three or four tapered molten seams across the ash (a hot orange core
   `#FF8A3A`, a burnt lip, and a dim ember spill), plus the deep ember-red throat ring `#6A1E06` behind the
-  teeth. The only white-hot shape (`#FFCE9E`, a pale peach at hue 29°, never the player gold `#FFC940` at
-  hue 43°) is the throat revealed by the wind-up, the attack and the hit. The first pass carried about
-  20 % glow at rest, and a white-hot patch showed in every rest gap. At horde density that was a sea of
-  fire, and it stole the wind-up's contrast.
+  teeth. The only white-hot shape is the throat revealed by the wind-up, the attack and the hit: a pool
+  of pale peach (`#FFF3D6` at the centre, `#FFD9B0` at its rim) on the throat floor that steps straight to
+  the hot orange `#FF6B1A`, never through the player gold `#FFC940` (see "Review fix" below). The first
+  pass carried about 20 % glow at rest, and a white-hot patch showed in every rest gap. At horde density
+  that was a sea of fire, and it stole the wind-up's contrast.
 * **Seams, not a web.** Random-walk cracks read as letters on a 45 px dome ("Jf", "rK"), and a
   four-way split reads as a cross. The seams are drawn by hand per look (a Y, a keel split with a
   diagonal branch, a cracked brow arc). They are wobbled like a brush line and taper from about 40 mm
@@ -109,7 +110,7 @@ heroes, so the same crack pattern repeats 40 times.
 
 | File | Look | Mirrored | Tris | Height (× hero) | Footprint (× collider r 0.42) | Textures | Texel density (median) | Glow at rest / loaded (1x pixels) | Body brighter than the floor (1x) | move_cycle_m | GLB |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| cinderling | Grinning coal | no | 1186 | 0.70 m (0.32 x) | 0.96 x 0.97 m (2.3 x r) | 512 + 512 | 223 px/m | 14 % / 51 % | 88 % | 0.90 m | 0.40 MB |
+| cinderling | Grinning coal | no | 1186 | 0.70 m (0.32 x) | 0.96 x 0.97 m (2.3 x r) | 512 + 512 | 223 px/m | 14 % / 51 % | 88 % | 0.90 m | 0.41 MB |
 | cinderling_v1 | Split-crown | yes | 1192 | 0.74 m (0.34 x) | 0.94 x 0.94 m (2.2 x r) | 512 + 512 | 219 px/m | 13 % / 51 % | 82 % | 0.95 m | 0.39 MB |
 | cinderling_v2 | Heavy-brow | no | 1278 | 0.64 m (0.29 x) | 1.00 x 1.01 m (2.4 x r) | 512 + 512 | 211 px/m | 18 % / 54 % | 85 % | 0.85 m | 0.46 MB |
 
@@ -120,6 +121,38 @@ pixels, body = the non-glow creature pixels. The approved clinker scores 66 % on
 There is one material (base colour + emissive), no Draco or meshopt, and every file passes
 `gfa_validate.py`. The game camera shows about 49 px/m, so the 512 px textures (211-223 px/m median
 texel density) are oversampled roughly 4×.
+
+## Review fix: no gold ring in the throat
+
+The art review scored the cinderling 7.5/10 with one must-fix: in the wind-up, 7 % of the pixels sat within
+dE 20 of the player gold `#FFC940`, because the throat dwelt in the `#FFC24B` band as a gold ring round the
+white-hot core. There were two causes:
+
+* The old ramp blended core → hot in sRGB over half the 0.28 m radius, and the throat floor never reached the
+  peach core (the texture max was `#FFA364`). Under the ×1.6 emission gain, red clips first, so that light
+  orange showed as gold, then as pale yellow.
+* The painted base under the glow was the glow colour itself. The throat bowl faces the toon key light when
+  the lid opens, so the lit full-value orange base plus the emission washed the orange itself toward gold
+  (`#FFB83B`).
+
+The fix is in `cinderling.py` (`Build.maw_stops`), using the new additive `stops` option of the `gfa_paint`
+emit ramp. A pool of pale peach (`#FFF3D6` → `#FFD9B0`) is laid out from each look's throat floor (its
+distance to `fx_core`). It steps straight to the hot orange `#FF6B1A` in about 1.5 cm, blended in linear
+light. The base under the orange bowl is half value, and it returns to the glow colour by the ember-red
+ring that the rest pose shows.
+
+| Look | Gold pixels, wind-up loaded | Gold pixels, hit |
+|---|---|---|
+| Grinning coal | 6.8 % → 0.0 % | 3.2 % → 0.2 % |
+| Split-crown | 7.2 % → 0.0 % | 2.0 % → 0.1 % |
+| Heavy-brow | 6.5 % → 0.0 % | 4.5 % → 0.2 % |
+
+At rest, the 1x game-camera crops differ by only a handful of pixels. In close-ups, the rest gap shows the
+deep core as white instead of yellow. The glow and figure/ground shares are unchanged to within 0.3 points. In the 40-copy horde, the gold share drops from 1.4 % to 0.2 %; what remains is single 1 px
+pixels on the lit seam cores. See `reports/cinderling_review_fix.png`, which shows each look before
+(0b0e701) and after, with a gold-band mask, the hit poses, the rendered colour run from orange to the core,
+and the painted textures. It is regenerated with
+`python tools/blender/gf_assets/enemies/cinderling_fix_sheet.py <pre-fix work dir>`.
 
 ## Files
 
@@ -135,9 +168,10 @@ art/enemies/cinderling/
                                 size, the 40-cinderling horde mixed with 20 clinkers at true 1080p size (+
                                 silhouette, value-only, the 4-player 28 m view, 2x), the hop cycle per look
   reports/cinderling_crowd.png  the horde, 2x nearest
+  reports/cinderling_review_fix.png   the art-review fix, before / after (the throat's gold ring)
   work/                         local renders (git-ignored)
 assets/models/enemies/<key>.glb + <key>.meta.json
-tools/blender/gf_assets/enemies/cinderling.py, cinderling_crowd.py
+tools/blender/gf_assets/enemies/cinderling.py, cinderling_crowd.py, cinderling_fix_sheet.py
 ```
 
 ## Rebuild

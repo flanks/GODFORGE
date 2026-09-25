@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 101562
+    "bytes": 102711
    },
    {
     "name": "cinderling_v1_basecolor",
@@ -29,18 +29,18 @@
      512
     ],
     "format": "png",
-    "bytes": 182165
+    "bytes": 180865
    }
   ],
   "materials": [
    "M_cinderling_v1"
   ],
   "sockets": {
-   "fx_mouth": {
+   "fx_core": {
     "translation": [
      0.0,
-     0.2305,
-     0.4629
+     0.1805,
+     0.0929
     ],
     "forward": [
      -0.0,
@@ -53,11 +53,11 @@
      0.0
     ]
    },
-   "fx_core": {
+   "head_top": {
     "translation": [
      0.0,
-     0.1805,
-     0.0929
+     0.8952,
+     0.0
     ],
     "forward": [
      -0.0,
@@ -87,11 +87,11 @@
      0.0
     ]
    },
-   "head_top": {
+   "fx_mouth": {
     "translation": [
      0.0,
-     0.8952,
-     0.0
+     0.2305,
+     0.4629
     ],
     "forward": [
      -0.0,
@@ -143,11 +143,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 219.1,
-   "p10": 124.7,
-   "p90": 245.9
+   "median": 219.2,
+   "p10": 124.8,
+   "p90": 246.0
   },
-  "coverage": 0.566,
+  "coverage": 0.567,
   "zones": [
    "crust",
    "coal",
@@ -158,8 +158,8 @@
   "decals": 24,
   "basecolor": "art/enemies/cinderling/textures/cinderling_v1_basecolor.png",
   "emissive": "art/enemies/cinderling/textures/cinderling_v1_emissive.png",
-  "emissive_texels": 81802,
-  "seconds": 51.8
+  "emissive_texels": 81739,
+  "seconds": 34.5
  },
  "skin": {
   "vertices": 744,

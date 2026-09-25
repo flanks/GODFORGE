@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 103350
+   "bytes": 103660
   },
   {
    "name": "cinderling_basecolor",
@@ -26,7 +26,7 @@
     512
    ],
    "format": "png",
-   "bytes": 193238
+   "bytes": 195723
   }
  ],
  "sockets": {
@@ -125,8 +125,8 @@
  },
  "size_m": 0.705,
  "glb": "assets/models/enemies/cinderling.glb",
- "glb_bytes": 402380,
- "glb_sha256": "04478f4c9b176765bb2cc63195d4f279628aeae6a088e8288d46cdfb3db70b01",
+ "glb_bytes": 405172,
+ "glb_sha256": "f32b3c0edb5727526aaba14da111fed0194bf836114bb67c0957f78597d627ff",
  "source_blend": "art/enemies/cinderling/source/cinderling.blend",
  "build_script": "tools/blender/gf_assets/enemies/cinderling.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -177,9 +177,9 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 222.8,
+   "median": 222.9,
    "p10": 131.1,
-   "p90": 255.5
+   "p90": 255.6
   },
   "coverage": 0.611
  },

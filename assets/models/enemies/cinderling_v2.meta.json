@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 125082
+   "bytes": 126124
   },
   {
    "name": "cinderling_v2_basecolor",
@@ -26,14 +26,14 @@
     512
    ],
    "format": "png",
-   "bytes": 220619
+   "bytes": 221036
   }
  ],
  "sockets": {
-  "hit_center": {
+  "head_top": {
    "translation": [
     0.0,
-    0.251,
+    0.7846,
     0.0
    ],
    "forward": [
@@ -64,11 +64,11 @@
     0.0
    ]
   },
-  "head_top": {
+  "fx_mouth": {
    "translation": [
     0.0,
-    0.7846,
-    0.0
+    0.1709,
+    0.5536
    ],
    "forward": [
     -0.0,
@@ -81,11 +81,11 @@
     0.0
    ]
   },
-  "fx_mouth": {
+  "hit_center": {
    "translation": [
     0.0,
-    0.1709,
-    0.5536
+    0.251,
+    0.0
    ],
    "forward": [
     -0.0,
@@ -125,8 +125,8 @@
  },
  "size_m": 0.635,
  "glb": "assets/models/enemies/cinderling_v2.glb",
- "glb_bytes": 462368,
- "glb_sha256": "c4377f2af5dc43e6e7d6685d83e6c66bc3db2eae5e6d894518fbcdba4fd0cd0b",
+ "glb_bytes": 463928,
+ "glb_sha256": "c943dfe12a2ab6147ee9663e0ee7cefe15906fd760a4baabe79f6eeaa0f8d51e",
  "source_blend": "art/enemies/cinderling/source/cinderling_v2.blend",
  "build_script": "tools/blender/gf_assets/enemies/cinderling.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -177,9 +177,9 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 210.9,
-   "p10": 120.5,
-   "p90": 233.5
+   "median": 210.7,
+   "p10": 120.4,
+   "p90": 233.2
   },
   "coverage": 0.553
  },
