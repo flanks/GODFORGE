@@ -1,7 +1,8 @@
 # Brax — "The Furnace-Born" (hero key `brax`)
 
 EA playable brawler (`content/sheets/characters.csv` row `brax`; kit in `assets/content/kits.ron`):
-bare-knuckle demigod with forge-gauntlets (signature chassis `anvil_gauntlets`), colour `#FF7A3D`.
+bare-knuckle demigod with forge-gauntlets (signature chassis `anvil_gauntlets`, a separate weapon model in
+[`art/weapons/anvil_gauntlets/`](../../weapons/anvil_gauntlets/README.md) since 2026-09-25), colour `#FF7A3D`.
 Actives Cinder Uppercut and Furnace Rush, ultimate Meltdown, passive Heat Gauge.
 
 Pipeline: [`docs/ART_PIPELINE.md`](../../../docs/ART_PIPELINE.md). Current state: [`status.json`](status.json).
@@ -13,9 +14,9 @@ Nothing here is final. The Hades-II bar is a human gate at stage 5.
 | Stage | Status | Waiting on |
 |---|---|---|
 | 0 Concept & reference | **done** | Approved by the user (2026-09-25): the T-pose front and the full turnaround sheet [`references/BRAX_sheet_turnaround.png`](references/BRAX_sheet_turnaround.png) (A-pose front/side/back, gauntlet and face close-ups, chest-sigil detail, five colour swatches). The sheet is the authority for the side and back shapes, the back cracks, the gauntlet construction and the face. Optional, not blocking: a dedicated 3/4 turnaround and a colour script (prompts in [`turnaround_prompts.md`](turnaround_prompts.md)). The measured palette stays a `stand_in` for the materials the swatches do not cover. |
-| 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated; **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)). The GLBs stay local (gitignored, sha256 in `manifest.json`), are never shipped and never go to `assets/models/`. |
-| 2 Production mesh | not_started | Human retopo + hand-painted NPR textures (human gate). |
-| 3 Rig | not_started | The GF_Hero_v1 master skeleton, then a human weight-paint sign-off. |
+| 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated; **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)). s202 is committed through Git LFS; the other seeds stay local (sha256 in `manifest.json`). Never shipped, never in `assets/models/`. |
+| 2 Production mesh | **done** (made by AI, no human artist: the user's decision of 2026-09-25) · user approval **pending_human** | [`production/brax_stage2.blend`](production/brax_stage2.blend) + [`textures/`](textures/): 13,978 tris body set, bare fists (the gauntlets are the `anvil_gauntlets` weapon), 2048² NPR base colour + emissive. Report and checklist: [`reports/stage2_production_mesh.md`](reports/stage2_production_mesh.md); sheets in [`reports/stage2/`](reports/stage2/). Rebuild: `python tools/blender/gf_hero/run_stage2.py brax`. |
+| 3 Rig | not_started | The GF_Hero_v1 master skeleton (with `weapon_L` / `weapon_R` sockets at the recorded palm frames), then a human weight-paint sign-off. |
 | 4 Animation | not_started | Shared clip set + Brax's unique set (proposal in [`brief.md`](brief.md) §8). |
 | 5 Export & validate | not_started | `assets/models/characters/brax.glb`, then the final human Hades-II bar. |
 
@@ -35,10 +36,13 @@ Nothing here is final. The Hades-II bar is a human gate at stage 5.
 | Folder | Content | In git |
 |---|---|---|
 | `references/` | `BRAX_front_approved.png`: the user-approved front concept (T-pose, 1536x1024), copied verbatim from `docs/media/playable_characters/BRAX.png`. `brax_concept_front.png` is a byte-identical copy that stage 1 uses as its TRELLIS input (same sha256 `407114e7…`, so git stores one blob). `BRAX_sheet_turnaround.png`: the user-approved turnaround/detail sheet, copied verbatim from `docs/media/playable_characters/BRAX THE FURNACE-BORN .png` (sha256 `a74e23eb…`). Further approved sheets land here as `BRAX_<sheet>_approved.png`. | yes |
-| `source/` | raw TRELLIS.2 GLBs (`brax_trellis2_s<seed>.glb`, ~60-90 MB) + ComfyUI conditioning/mask previews | **no** (local; path/size/sha256 in `manifest.json`) |
+| `source/` | raw TRELLIS.2 GLBs (`brax_trellis2_s<seed>.glb`, ~60-90 MB) + ComfyUI conditioning/mask previews | the selected `brax_trellis2_s202.glb` **yes (Git LFS)**; the other seeds and the previews no (local; path/size/sha256 in `manifest.json`) |
+| `stage2_fit.json`, `stage2_parts.json`, `stage2_texture.json` | stage-2 inputs: landmarks and fit bands, part parameters, UV/paint settings | yes |
+| `production/` | `brax_stage2.blend`: the production mesh (body, hair, beard, belt, sash, skirt cloth + plates, wraps), material `M_brax` | yes (Git LFS) |
+| `textures/` | `brax_basecolor.png`, `brax_emissive.png` (2048², sRGB) | yes (Git LFS) |
 | `source/*.json` | one provenance record per GLB (graph sha256, patched inputs, seed, prompt id, timings, output hash) | yes |
-| `work/` | full-size renders, mask checks, logs | no |
-| `reports/` | `stage0_*.png` review sheets; `blockout_report.md` + review sheets in `reports/blockout/` | yes |
+| `work/` | full-size renders, mask checks, logs, the stage-2 intermediates (`brax_retopo_start.blend` = the prepared sculpt reference, body/parts files) | no (regenerated) |
+| `reports/` | `stage0_*.png` review sheets; `blockout_report.md` + `reports/blockout/`; `stage2_production_mesh.md` + `reports/stage2/` (sheets + fit/parts/texture JSON) | yes |
 
 **Everything in `source/` is a stage-1 SCULPT REFERENCE ONLY.** It is dense, unrigged and carries
 baked lighting in its texture; it is never copied to `assets/models/` and never shipped. The game

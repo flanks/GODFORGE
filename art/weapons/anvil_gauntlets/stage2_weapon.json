@@ -1,0 +1,243 @@
+{
+ "weapon": "anvil_gauntlets",
+ "_doc": "Parameters of the anvil_gauntlets chassis weapon (tools/blender/gf_hero/s2_weapon.py + s2_gauntlet.py). Authored around Brax in his T-pose (metres, Blender axes: Z up, hero faces -Y, +X = his left; the left gauntlet is given, the right one is its mirror), then re-expressed in each hand's weapon socket frame (origin = palm centre, +Y along the fingers, +Z out of the back of the hand) from the hero's body_fit report.",
+ "designed_on": "brax",
+ "seed": 7,
+ "palette": "art/characters/brax/palette.json",
+ "gauntlet": {
+  "_doc": "Arm axis at y=axis_y, z=axis_z (T-pose). Sculpt: elbow ring |x| 0.52-0.68 (dy 0.377, dz 0.357 max), forearm rock 0.68-0.95 (dy 0.34-0.35, dz 0.28-0.31), wrist ~0.97, hand 1.0-1.14, fingertips 1.34.",
+  "axis_y": 0.042,
+  "axis_z": 1.755,
+  "elbow_ring": {
+   "x": [
+    0.535,
+    0.668
+   ],
+   "r_out": 0.19,
+   "r_in_min": 0.13,
+   "ey": 1.05,
+   "ez": 0.98,
+   "segments": 6,
+   "phase_deg": 0
+  },
+  "cog": {
+   "angle_deg": 235,
+   "r_out": 0.046,
+   "r_in": 0.037,
+   "teeth": 9,
+   "thick": 0.026,
+   "hub": 0.02
+  },
+  "core": {
+   "x": [
+    0.62,
+    0.7,
+    0.8,
+    0.9,
+    0.99
+   ],
+   "ry": [
+    0.15,
+    0.15,
+    0.145,
+    0.128,
+    0.118
+   ],
+   "rz": [
+    0.138,
+    0.13,
+    0.12,
+    0.108,
+    0.1
+   ],
+   "rings": 7,
+   "segments": 16
+  },
+  "plates": {
+   "x": [
+    0.655,
+    0.97
+   ],
+   "r_ref": 0.14,
+   "around": 8,
+   "along": 4,
+   "jitter": 0.22,
+   "gap": 0.009,
+   "height": 0.028,
+   "chamfer": 0.009,
+   "dome": 0.004,
+   "tilt": 0.09,
+   "min_area": 0.0006
+  },
+  "wrist_band": {
+   "x": [
+    0.955,
+    1.008
+   ],
+   "r_in": 0.1,
+   "r_out": 0.137,
+   "ey": 1.05,
+   "ez": 0.94,
+   "segments": 6,
+   "phase_deg": 0
+  },
+  "hand": {
+   "sections": [
+    [
+     0.995,
+     0.112,
+     0.066
+    ],
+    [
+     1.07,
+     0.134,
+     0.074
+    ],
+    [
+     1.15,
+     0.138,
+     0.066
+    ]
+   ],
+   "chamfer": 0.024,
+   "top_plates": {
+    "x": [
+     1.0,
+     1.15
+    ],
+    "y": [
+     -0.125,
+     0.125
+    ],
+    "cols": 3,
+    "rows": 2,
+    "gap": 0.01,
+    "height": 0.018,
+    "chamfer": 0.007,
+    "jitter": 0.2
+   }
+  },
+  "fingers": {
+   "x0": 1.138,
+   "z_offset": -0.002,
+   "y": [
+    -0.098,
+    -0.033,
+    0.032,
+    0.096
+   ],
+   "lengths": [
+    [
+     0.092,
+     0.072,
+     0.063
+    ],
+    [
+     0.099,
+     0.076,
+     0.065
+    ],
+    [
+     0.094,
+     0.073,
+     0.063
+    ],
+    [
+     0.081,
+     0.063,
+     0.054
+    ]
+   ],
+   "width": [
+    0.06,
+    0.062,
+    0.06,
+    0.056
+   ],
+   "height": 0.074,
+   "taper": 0.93,
+   "curl_deg": [
+    3,
+    7,
+    9
+   ],
+   "gap": 0.003,
+   "bevel": 0.02
+  },
+  "knuckle": {
+   "x": 1.128,
+   "z": 0.07,
+   "half": [
+    0.024,
+    0.0,
+    0.012
+   ],
+   "width_scale": 0.95,
+   "bevel": 0.007
+  },
+  "thumb": {
+   "base": [
+    1.035,
+    -0.135,
+    -0.02
+   ],
+   "dir": [
+    0.62,
+    -0.76,
+    -0.12
+   ],
+   "lengths": [
+    0.081,
+    0.064,
+    0.055
+   ],
+   "width": 0.068,
+   "height": 0.064,
+   "bend": 0.35
+  },
+  "fist": {
+   "_doc": "closed-fist variant: the same segments curled under the palm, thumb across the front of the fingers",
+   "curl_deg": [
+    88,
+    92,
+    62
+   ],
+   "thumb_dirs": [
+    [
+     0.45,
+     -0.3,
+     -0.84
+    ],
+    [
+     0.35,
+     0.55,
+     -0.76
+    ],
+    [
+     0.1,
+     0.95,
+     -0.3
+    ]
+   ]
+  },
+  "strap_frame": {
+   "_doc": "angular (hexagonal) bronze strap frame along the back of the forearm ending in a ring on the back of the wrist (approved turnaround sheet)",
+   "x": [
+    0.675,
+    0.945
+   ],
+   "corner_dx": 0.06,
+   "half_width": 0.085,
+   "bar_width": 0.02,
+   "bar_height": 0.014,
+   "lift": 0.004,
+   "wrist_ring": {
+    "x": 0.975,
+    "r_out": 0.03,
+    "r_in": 0.016,
+    "thick": 0.012,
+    "segments": 10
+   }
+  }
+ }
+}

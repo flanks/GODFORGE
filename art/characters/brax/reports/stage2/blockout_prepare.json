@@ -1,0 +1,63 @@
+{
+ "source": "art/characters/brax/source/brax_trellis2_s202.glb",
+ "height_m": 2.2,
+ "raw": {
+  "vertices_split": 504319,
+  "triangles": 695432
+ },
+ "scale_factor": 2.68902,
+ "weld": {
+  "verts_before": 504319,
+  "verts_after": 338522
+ },
+ "parts_kept": [
+  287745,
+  25617,
+  24405
+ ],
+ "parts_dropped": {
+  "count": 31,
+  "verts": 755,
+  "largest": 233
+ },
+ "bounds_m": {
+  "min": [
+   -1.3437,
+   -0.3227,
+   0.0
+  ],
+  "max": [
+   1.3437,
+   0.3227,
+   2.2
+  ]
+ },
+ "span_over_height": 1.2215,
+ "stats": {
+  "name": "REF_blockout",
+  "vertices": 337767,
+  "faces": 693992,
+  "triangles": 693992,
+  "quads": 0,
+  "tri_faces": 693992,
+  "ngons": 0,
+  "quad_ratio": 0.0,
+  "boundary_edges": 419,
+  "nonmanifold_edges": 6741,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 3,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": [
+   "MAT_REF_blockout_trellis"
+  ]
+ },
+ "concept": {
+  "path": "art/characters/brax/references/BRAX_front_approved.png",
+  "m_per_px": 0.002275
+ },
+ "out": "art/characters/brax/work/brax_retopo_start.blend"
+}

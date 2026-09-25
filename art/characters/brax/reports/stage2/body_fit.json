@@ -1,0 +1,177 @@
+{
+ "base": "brax_s2_body_base.blend",
+ "reference": "brax_retopo_start.blend",
+ "tps": {
+  "landmarks": 37,
+  "residual_max_m": 5.835635641382453e-07,
+  "global_scale": 0.9796
+ },
+ "head_dark_threshold": 0.2764,
+ "mirror_pairs_missing": 0,
+ "fit": {
+  "iterations": 34,
+  "free_form_fitted_verts": 561,
+  "mean_abs_dist_m": 0.00345,
+  "p95_abs_dist_m": 0.02398,
+  "max_abs_dist_m": 0.04322,
+  "rigid_regions": {
+   "foot_L": {
+    "scale": [
+     1.001,
+     0.9998,
+     1.0013
+    ],
+    "translate_m": [
+     -0.0001,
+     -0.0,
+     0.0
+    ]
+   },
+   "foot_R": {
+    "scale": [
+     0.9955,
+     1.0003,
+     0.9993
+    ],
+    "translate_m": [
+     0.0,
+     -0.0,
+     0.0001
+    ]
+   }
+  }
+ },
+ "post_smooth_verts": [
+  375
+ ],
+ "extra_loops": [
+  {
+   "z": 0.6,
+   "edges_split": 20
+  },
+  {
+   "z": 0.555,
+   "edges_split": 24
+  },
+  {
+   "z": 0.648,
+   "edges_split": 22
+  }
+ ],
+ "limb_radial": {
+  "verts": 1072,
+  "slab_scale_min_max": [
+   1.0,
+   3.025
+  ],
+  "radius_before_m": [
+   0.0436,
+   0.0556,
+   0.0455,
+   0.0356,
+   0.0356,
+   0.034,
+   0.0313,
+   0.0267,
+   0.0273
+  ],
+  "radius_target_m": [
+   0.118,
+   0.1117,
+   0.107,
+   0.1045,
+   0.0992,
+   0.0932,
+   0.0848,
+   0.0758,
+   0.0678
+  ]
+ },
+ "hand_frames": {
+  "L": {
+   "origin": [
+    1.02219,
+    0.03232,
+    1.73268
+   ],
+   "x_axis": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "y_axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.925,
+   "knuckle_abs_x": 1.0606,
+   "hand_verts": 143
+  },
+  "R": {
+   "origin": [
+    -1.02219,
+    0.03232,
+    1.73268
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.925,
+   "knuckle_abs_x": 1.0606,
+   "hand_verts": 143
+  }
+ },
+ "eyes": {
+  "centres": [
+   [
+    0.034,
+    -0.078,
+    2.038
+   ],
+   [
+    -0.034,
+    -0.078,
+    2.038
+   ]
+  ],
+  "radius_m": 0.0124
+ },
+ "stats": {
+  "name": "BODY",
+  "vertices": 3827,
+  "faces": 4063,
+  "triangles": 7642,
+  "quads": 3579,
+  "tri_faces": 484,
+  "ngons": 0,
+  "quad_ratio": 0.881,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 3,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": []
+ }
+}

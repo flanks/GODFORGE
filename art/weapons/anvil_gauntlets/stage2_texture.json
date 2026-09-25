@@ -1,0 +1,30 @@
+{
+ "weapon": "anvil_gauntlets",
+ "_doc": "Texture stage settings for the anvil_gauntlets weapon (tools/blender/gf_hero/s2_texture.py + s2_paint.py). Its own 1024 atlas (the pair is ~5.7k tris; this keeps the texel density close to the hero's).",
+ "size": 1024,
+ "palette": "art/characters/brax/palette.json",
+ "sharp_angle_deg": 35,
+ "material_name": "M_anvil_gauntlets",
+ "emission_strength": 3.0,
+ "texture_names": {
+  "base_color": "anvil_gauntlets_basecolor",
+  "emissive": "anvil_gauntlets_emissive"
+ },
+ "objects": [
+  "GAUNTLET_L",
+  "GAUNTLET_R"
+ ],
+ "smart_objects": [
+  "GAUNTLET_L",
+  "GAUNTLET_R"
+ ],
+ "uv_copy": {
+  "GAUNTLET_FIST_L": "GAUNTLET_L",
+  "GAUNTLET_FIST_R": "GAUNTLET_R"
+ },
+ "uv": {
+  "hidden_density": 0.3,
+  "margin_px": 4
+ },
+ "paint": {}
+}

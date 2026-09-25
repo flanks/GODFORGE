@@ -1,0 +1,115 @@
+{
+ "hero": "brax",
+ "_doc": "Texture stage settings for tools/blender/gf_hero/s2_texture.py + s2_paint.py (metres, Blender axes).",
+ "sharp_angle_deg": 35,
+ "material_name": "M_brax",
+ "emission_strength": 3.0,
+ "texture_names": {
+  "base_color": "brax_basecolor",
+  "emissive": "brax_emissive"
+ },
+ "uv": {
+  "hidden_density": 0.3,
+  "margin_px": 4,
+  "body": {
+   "arm_x": 0.3,
+   "arm_min_z": 1.55,
+   "head_z_front": 1.905,
+   "head_z_back": 1.93,
+   "sole_z": 0.03,
+   "foot_z": 0.13,
+   "leg_z": 1.1,
+   "hand_x": 0.93
+  }
+ },
+ "cav": {
+  "smooth_iters": 6,
+  "cage": 0.03,
+  "max_ray": 0.08
+ },
+ "paint": {
+  "cav_line": [
+   0.56,
+   0.8
+  ],
+  "axis_y": 0.02,
+  "belt_mid_z": 1.395,
+  "belt_rivets": 22,
+  "sigil": {
+   "centre_z": 1.72,
+   "radius": 0.068,
+   "line_z": [
+    1.47,
+    1.84
+   ],
+   "width": 0.0065,
+   "rays": {
+    "count": 8,
+    "inner": 0.078,
+    "outer": 0.1,
+    "width": 0.004
+   }
+  },
+  "sash_key": {
+   "x0": 0.0,
+   "cell": 0.05,
+   "z_top": 0.9,
+   "z_bottom": 0.34,
+   "x_centre": 0.03,
+   "half_width": 0.042
+  },
+  "leg_axis_x": 0.33,
+  "leg_axis_y": 0.04,
+  "wrap_pitch": 0.075,
+  "arm_cracks": {
+   "_doc": "emissive lava cracks from the elbows down the forearms to the backs of the hands",
+   "abs_x": [
+    0.45,
+    0.62
+   ],
+   "freq": 24.0,
+   "width": 0.05,
+   "patch": [
+    0.42,
+    0.56
+   ],
+   "strength": 0.9
+  },
+  "cav_exclude_arms_abs_x": 0.5,
+  "spine": {
+   "_doc": "back: a glowing crack down the spine from the nape to the belt, branching across both shoulder blades (approved turnaround sheet)",
+   "z": [
+    1.42,
+    1.9
+   ],
+   "width": 0.006,
+   "branch_z": 1.73,
+   "branch_len": 0.2,
+   "branch_drop": 0.07,
+   "wobble": 0.006
+  }
+ },
+ "size": 2048,
+ "objects": [
+  "BODY",
+  "HAIR",
+  "BEARD",
+  "BELT",
+  "SASH",
+  "SKIRT_CLOTH",
+  "SKIRT_PLATES",
+  "WRAPS"
+ ],
+ "body_object": "BODY",
+ "shell_objects": [
+  "HAIR",
+  "BEARD"
+ ],
+ "smart_objects": [
+  "SKIRT_PLATES",
+  "WRAPS",
+  "SASH",
+  "BELT",
+  "SKIRT_CLOTH"
+ ]
+}

@@ -173,15 +173,30 @@ of the table above; where it differs from a proposal, the sheet wins.
 * **Still open (optional):** the Heat 0 / Heat max / Meltdown looks. The sheet's action panel shows the uppercut's
   flame burst but no lighting states; a colour script would settle them.
 
+### Weapons decision (2026-09-25, the user)
+
+Weapons come **off the hero bodies**: every chassis weapon is its own model per chassis, attached to hand
+sockets, so any hero can wield any chassis (the signature chassis is only the default).
+
+* **Brax's body** has bare forearms and hands (MakeHuman hand topology at game density, fist-capable loops).
+  His identity carries onto the arms: emissive lava cracks from the elbows down the forearms to the backs of the
+  hands, and short teal wrist wraps that match the ankle wraps. No rock on the body.
+* **The rock forge-gauntlets are the `anvil_gauntlets` weapon model** (`art/weapons/anvil_gauntlets/`): a rigid
+  left/right pair authored at Brax's size, with basalt plates over a lava core, the hexagonal bronze elbow cuff,
+  wrist band and strap frame of the approved sheet, knuckle plates and emissive lava cracks, in an open variant
+  (the concept) and a closed-fist variant. Attach frame per hand: origin at the palm centre, +Y along the fingers,
+  +Z out of the back of the hand; stage 3 adds `weapon_L` / `weapon_R` sockets there.
+* Budgets: the body set 15 to 25k tris; the gauntlet pair about 4 to 8k.
+
 ## 8. Notes for stages 1 to 4
 
 * **Stage 1 input.** The concept is dark basalt on a dark navy ground (rock L\* 13 against the
   background's L\* 11). Background removal must be checked for the gauntlets before any TRELLIS.2
   run, and the conditioning background must be neutral grey. The stage 1 tool already does both
   (`--mask-only`, `#808080`).
-* **Stage 2 budget (per the pipeline, about 15 to 25k tris).** A proposed split: gauntlets 35 %
-  (they are the silhouette), body and head 35 %, skirt and plates 20 %, sash and wraps 10 %.
-  Fingers are rigid segments, so they can be low-poly with clean splits at the joints.
+* **Stage 2 budget.** Superseded by the weapons decision above: the body set is 15 to 25k tris and the
+  gauntlets are a separate weapon of about 4 to 8k for the pair. Stage 2 was made by the AI pipeline
+  (no human artist, the user's decision of 2026-09-25); results in `reports/stage2_production_mesh.md`.
 * **Stage 3.** On GF_Hero_v1, the gauntlet plates are weighted rigidly per bone (hand, finger
   segments, forearm twist), not blended. The elbow ring stays rigid on the lower arm.
 * **Stage 4, Brax's unique clip set (proposal, 9 clips):** `brax_idle_signature@loop` (vent heat

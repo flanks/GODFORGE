@@ -1,0 +1,408 @@
+{
+ "weapon": "anvil_gauntlets",
+ "designed_on": "brax",
+ "objects": {
+  "GAUNTLET_L": {
+   "stats": {
+    "name": "GAUNTLET_L",
+    "vertices": 1566,
+    "faces": 1714,
+    "triangles": 2864,
+    "quads": 1150,
+    "tri_faces": 564,
+    "ngons": 0,
+    "quad_ratio": 0.671,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "wire_edges": 0,
+    "loose_verts": 0,
+    "degenerate_faces": 0,
+    "parts": 70,
+    "uv_layers": [],
+    "materials": [
+     "Z_skin",
+     "Z_hair",
+     "Z_beard",
+     "Z_eye",
+     "Z_rock",
+     "Z_lava",
+     "Z_bronze",
+     "Z_plates",
+     "Z_leather",
+     "Z_cloth",
+     "Z_sash",
+     "Z_wraps",
+     "Z_linen"
+    ]
+   },
+   "socket": "weapon_L",
+   "variant": "open",
+   "build": {
+    "core_ry_rz_after_clearance": [
+     [
+      0.1643,
+      0.138
+     ],
+     [
+      0.15,
+      0.13
+     ],
+     [
+      0.145,
+      0.12
+     ],
+     [
+      0.128,
+      0.108
+     ],
+     [
+      0.1275,
+      0.1
+     ]
+    ],
+    "elbow_ring_r_in_out": [
+     0.1843,
+     0.2143
+    ],
+    "wearer_forearm_radius_in_ring": 0.1516,
+    "core_clearance_over_wearer_m": [
+     0.015,
+     0.0203,
+     0.0355,
+     0.0694,
+     0.0545,
+     0.0423,
+     0.023
+    ],
+    "forearm_plates": 32
+   },
+   "socket_frame_tpose": {
+    "origin": [
+     1.02219,
+     0.03232,
+     1.73268
+    ],
+    "x_axis": [
+     0.0,
+     -1.0,
+     0.0
+    ],
+    "y_axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "z_axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "wrist_abs_x": 0.925,
+    "knuckle_abs_x": 1.0606,
+    "hand_verts": 143
+   }
+  },
+  "GAUNTLET_R": {
+   "stats": {
+    "name": "GAUNTLET_R",
+    "vertices": 1566,
+    "faces": 1714,
+    "triangles": 2864,
+    "quads": 1150,
+    "tri_faces": 564,
+    "ngons": 0,
+    "quad_ratio": 0.671,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "wire_edges": 0,
+    "loose_verts": 0,
+    "degenerate_faces": 0,
+    "parts": 70,
+    "uv_layers": [],
+    "materials": [
+     "Z_skin",
+     "Z_hair",
+     "Z_beard",
+     "Z_eye",
+     "Z_rock",
+     "Z_lava",
+     "Z_bronze",
+     "Z_plates",
+     "Z_leather",
+     "Z_cloth",
+     "Z_sash",
+     "Z_wraps",
+     "Z_linen"
+    ]
+   },
+   "socket": "weapon_R",
+   "variant": "open",
+   "build": {
+    "core_ry_rz_after_clearance": [
+     [
+      0.1643,
+      0.138
+     ],
+     [
+      0.15,
+      0.13
+     ],
+     [
+      0.145,
+      0.12
+     ],
+     [
+      0.128,
+      0.108
+     ],
+     [
+      0.1275,
+      0.1
+     ]
+    ],
+    "elbow_ring_r_in_out": [
+     0.1843,
+     0.2143
+    ],
+    "wearer_forearm_radius_in_ring": 0.1516,
+    "core_clearance_over_wearer_m": [
+     0.015,
+     0.0203,
+     0.0355,
+     0.0694,
+     0.0545,
+     0.0423,
+     0.023
+    ],
+    "forearm_plates": 32
+   },
+   "socket_frame_tpose": {
+    "origin": [
+     -1.02219,
+     0.03232,
+     1.73268
+    ],
+    "x_axis": [
+     0.0,
+     1.0,
+     -0.0
+    ],
+    "y_axis": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "z_axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "wrist_abs_x": 0.925,
+    "knuckle_abs_x": 1.0606,
+    "hand_verts": 143
+   }
+  },
+  "GAUNTLET_FIST_L": {
+   "stats": {
+    "name": "GAUNTLET_FIST_L",
+    "vertices": 1566,
+    "faces": 1714,
+    "triangles": 2864,
+    "quads": 1150,
+    "tri_faces": 564,
+    "ngons": 0,
+    "quad_ratio": 0.671,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "wire_edges": 0,
+    "loose_verts": 0,
+    "degenerate_faces": 0,
+    "parts": 70,
+    "uv_layers": [],
+    "materials": [
+     "Z_skin",
+     "Z_hair",
+     "Z_beard",
+     "Z_eye",
+     "Z_rock",
+     "Z_lava",
+     "Z_bronze",
+     "Z_plates",
+     "Z_leather",
+     "Z_cloth",
+     "Z_sash",
+     "Z_wraps",
+     "Z_linen"
+    ]
+   },
+   "socket": "weapon_L",
+   "variant": "fist",
+   "build": {
+    "core_ry_rz_after_clearance": [
+     [
+      0.1643,
+      0.138
+     ],
+     [
+      0.15,
+      0.13
+     ],
+     [
+      0.145,
+      0.12
+     ],
+     [
+      0.128,
+      0.108
+     ],
+     [
+      0.1275,
+      0.1
+     ]
+    ],
+    "elbow_ring_r_in_out": [
+     0.1843,
+     0.2143
+    ],
+    "wearer_forearm_radius_in_ring": 0.1516,
+    "core_clearance_over_wearer_m": [
+     0.015,
+     0.0203,
+     0.0355,
+     0.0694,
+     0.0545,
+     0.0423,
+     0.023
+    ],
+    "forearm_plates": 32
+   },
+   "socket_frame_tpose": {
+    "origin": [
+     1.02219,
+     0.03232,
+     1.73268
+    ],
+    "x_axis": [
+     0.0,
+     -1.0,
+     0.0
+    ],
+    "y_axis": [
+     1.0,
+     0.0,
+     0.0
+    ],
+    "z_axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "wrist_abs_x": 0.925,
+    "knuckle_abs_x": 1.0606,
+    "hand_verts": 143
+   }
+  },
+  "GAUNTLET_FIST_R": {
+   "stats": {
+    "name": "GAUNTLET_FIST_R",
+    "vertices": 1566,
+    "faces": 1714,
+    "triangles": 2864,
+    "quads": 1150,
+    "tri_faces": 564,
+    "ngons": 0,
+    "quad_ratio": 0.671,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "wire_edges": 0,
+    "loose_verts": 0,
+    "degenerate_faces": 0,
+    "parts": 70,
+    "uv_layers": [],
+    "materials": [
+     "Z_skin",
+     "Z_hair",
+     "Z_beard",
+     "Z_eye",
+     "Z_rock",
+     "Z_lava",
+     "Z_bronze",
+     "Z_plates",
+     "Z_leather",
+     "Z_cloth",
+     "Z_sash",
+     "Z_wraps",
+     "Z_linen"
+    ]
+   },
+   "socket": "weapon_R",
+   "variant": "fist",
+   "build": {
+    "core_ry_rz_after_clearance": [
+     [
+      0.1643,
+      0.138
+     ],
+     [
+      0.15,
+      0.13
+     ],
+     [
+      0.145,
+      0.12
+     ],
+     [
+      0.128,
+      0.108
+     ],
+     [
+      0.1275,
+      0.1
+     ]
+    ],
+    "elbow_ring_r_in_out": [
+     0.1843,
+     0.2143
+    ],
+    "wearer_forearm_radius_in_ring": 0.1516,
+    "core_clearance_over_wearer_m": [
+     0.015,
+     0.0203,
+     0.0355,
+     0.0694,
+     0.0545,
+     0.0423,
+     0.023
+    ],
+    "forearm_plates": 32
+   },
+   "socket_frame_tpose": {
+    "origin": [
+     -1.02219,
+     0.03232,
+     1.73268
+    ],
+    "x_axis": [
+     0.0,
+     1.0,
+     -0.0
+    ],
+    "y_axis": [
+     -1.0,
+     0.0,
+     0.0
+    ],
+    "z_axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "wrist_abs_x": 0.925,
+    "knuckle_abs_x": 1.0606,
+    "hand_verts": 143
+   }
+  }
+ },
+ "triangles_pair_open": 5728,
+ "triangles_pair_fist": 5728
+}

@@ -1,0 +1,126 @@
+{
+ "size": 1024,
+ "uv_copied": {
+  "GAUNTLET_FIST_L": "GAUNTLET_L",
+  "GAUNTLET_FIST_R": "GAUNTLET_R"
+ },
+ "uv_hidden_faces_packed_small": 0,
+ "texel_density_px_per_m": {
+  "GAUNTLET_L": {
+   "median": 300.3,
+   "p10": 273.8,
+   "p90": 319.4
+  },
+  "GAUNTLET_R": {
+   "median": 300.3,
+   "p10": 274.4,
+   "p90": 319.3
+  },
+  "_all": {
+   "median": 300.3,
+   "p10": 274.0,
+   "p90": 319.3
+  }
+ },
+ "uv_zero_area_faces": {},
+ "atlas_coverage": 0.3929,
+ "textures": {
+  "base_color": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_basecolor.png",
+  "emissive": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_emissive.png"
+ },
+ "stats": {
+  "GAUNTLET_L": {
+   "name": "GAUNTLET_L",
+   "vertices": 1566,
+   "faces": 1714,
+   "triangles": 2864,
+   "quads": 1150,
+   "tri_faces": 564,
+   "ngons": 0,
+   "quad_ratio": 0.671,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 70,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_anvil_gauntlets"
+   ]
+  },
+  "GAUNTLET_R": {
+   "name": "GAUNTLET_R",
+   "vertices": 1566,
+   "faces": 1714,
+   "triangles": 2864,
+   "quads": 1150,
+   "tri_faces": 564,
+   "ngons": 0,
+   "quad_ratio": 0.671,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 70,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_anvil_gauntlets"
+   ]
+  },
+  "GAUNTLET_FIST_L": {
+   "name": "GAUNTLET_FIST_L",
+   "vertices": 1566,
+   "faces": 1714,
+   "triangles": 2864,
+   "quads": 1150,
+   "tri_faces": 564,
+   "ngons": 0,
+   "quad_ratio": 0.671,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 70,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_anvil_gauntlets"
+   ]
+  },
+  "GAUNTLET_FIST_R": {
+   "name": "GAUNTLET_FIST_R",
+   "vertices": 1566,
+   "faces": 1714,
+   "triangles": 2864,
+   "quads": 1150,
+   "tri_faces": 564,
+   "ngons": 0,
+   "quad_ratio": 0.671,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 70,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_anvil_gauntlets"
+   ]
+  }
+ },
+ "triangles_total": 5728,
+ "triangles_variants": {
+  "GAUNTLET_FIST_L": 2864,
+  "GAUNTLET_FIST_R": 2864
+ }
+}

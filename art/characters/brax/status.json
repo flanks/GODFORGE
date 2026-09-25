@@ -202,16 +202,90 @@
    "notes": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. TRELLIS.2 (Pixal3D pruned) on the approved front, birefnet cut-out verified (full arm span and fingertips kept), 3 seeds (101/202/303) at the user's character settings (700k faces, 4096 px). s202 picked for its faceted gauntlet plates, head/beard and colour blocking; known defects (thin fingers, no lava-crack geometry or emissives, soft face, detached lower-leg shells under the skirt, fused cloth, baked lighting) are listed in reports/blockout_report.md section 6. The seed pick is an engineering judgement; the stage-2 artist may switch to s101 (single watertight surface) and should treat the concept and the approved sheets as the authority wherever the mesh disagrees."
   },
   "2_production_mesh": {
-   "status": "not_started",
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/run_stage2.py; no human artist",
+   "decision": "2026-09-25: no human artist for stage 2; the AI pipeline makes the production mesh at production quality (the user's decision, relayed by the workflow coordinator).",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "Human artist in Blender 5.2: manual retopo (~15-25k tris), clean shoulder/elbow/knee loops, UVs, hand-painted NPR textures (palette.json values, brief.md sections 4 and 6). Any automated retopo or decimation made so engineering can proceed is a stand_in."
+   "outputs": [
+    "art/characters/brax/production/brax_stage2.blend (Git LFS)",
+    "art/characters/brax/textures/brax_basecolor.png (2048x2048 sRGB, Git LFS)",
+    "art/characters/brax/textures/brax_emissive.png (2048x2048 sRGB, Git LFS)",
+    "art/characters/brax/stage2_fit.json",
+    "art/characters/brax/stage2_parts.json",
+    "art/characters/brax/stage2_texture.json",
+    "art/characters/brax/reports/stage2_production_mesh.md",
+    "art/characters/brax/reports/stage2/stage2_{turnaround,armed,closeups,wireframe,ingame,textures,vs_concept}.png",
+    "art/characters/brax/reports/stage2/{blockout_prepare,body_fit,parts,texture}.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage2.py",
+    "tools/blender/gf_hero/s2_prepare_blockout.py",
+    "tools/blender/gf_hero/s2_body_base.py",
+    "tools/blender/gf_hero/s2_body_fit.py",
+    "tools/blender/gf_hero/s2_parts.py",
+    "tools/blender/gf_hero/s2_geom.py",
+    "tools/blender/gf_hero/s2_uv.py",
+    "tools/blender/gf_hero/s2_paint.py",
+    "tools/blender/gf_hero/s2_texture.py",
+    "tools/blender/gf_hero/s2_review.py",
+    "tools/blender/gf_hero/s2lib.py",
+    "tools/comfy/stage2_sheets.py"
+   ],
+   "metrics": {
+    "triangles_body_set": 13978,
+    "triangles_per_part": {
+     "BODY": 7642,
+     "HAIR": 496,
+     "BEARD": 720,
+     "BELT": 524,
+     "SASH": 1076,
+     "SKIRT_CLOTH": 672,
+     "SKIRT_PLATES": 1440,
+     "WRAPS": 1408
+    },
+    "body_quad_ratio": 0.881,
+    "nonmanifold_edges": 0,
+    "boundary_edges": 0,
+    "texel_density_px_per_m_median": 519.4,
+    "atlas_coverage": 0.5201,
+    "surface_fit_mean_abs_m": 0.00345,
+    "front_iou_vs_concept_armed": 0.8673,
+    "front_iou_vs_concept_bare": 0.7656,
+    "height_m": 2.1957
+   },
+   "notes": "Production mesh made by the AI pipeline, not a stand-in: the CC0 MakeHuman hm08 topology (MPFB used as a tool only) reduced to game density with its joint loops, fitted to the approved sculpt reference (landmark warp + surface fit), extra knee loops, bare forearms and hands (weapons decision); separate closed parts (hair and beard shells, belt, sash with front and back tails, underskirt, 60 rigid skirt plates, ankle and wrist wraps); one 2048 atlas at one texel density; hand-painted NPR base colour + emissive (lava veins, chest sigil with rays, spine crack with shoulder-blade branches, forearm cracks, eyes) from palette.json. The review sheets are in reports/stage2/; honest findings and the acceptance checklist in reports/stage2_production_mesh.md. The remaining human gate is the user's visual approval (item user_visual_approval).",
+   "items": {
+    "production_mesh": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/production/brax_stage2.blend"
+     ]
+    },
+    "uvs_and_npr_textures": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/textures/brax_basecolor.png",
+      "art/characters/brax/textures/brax_emissive.png"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made mesh and textures (sheets in reports/stage2/). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "3_rig": {
    "status": "not_started",
    "human_signoff_required": true,
    "outputs": [],
-   "notes": "The GF_Hero_v1 master skeleton does not exist yet (docs/ART_PIPELINE.md describes the plan). Auto-rig plus hand weight-paint fixes; a human signs off the weight painting (shoulders, hands, face)."
+   "notes": "The GF_Hero_v1 master skeleton does not exist yet (docs/ART_PIPELINE.md describes the plan). Auto-rig plus hand weight-paint fixes; a human signs off the weight painting (shoulders, hands, face). Weapon sockets weapon_L / weapon_R (children of hand_L / hand_R) go at the frames in reports/stage2/body_fit.json hand_frames: origin palm centre, +Y along the fingers, +Z out of the back of the hand."
   },
   "4_animation": {
    "status": "not_started",
@@ -250,8 +324,9 @@
    "state": "pending_human"
   },
   {
-   "gate": "stage 2: human retopo and hand-painted NPR textures",
-   "state": "not_started"
+   "gate": "stage 2: the user's visual approval of the AI-made production mesh and textures (no human artist, 2026-09-25)",
+   "state": "pending_human",
+   "via": "art/characters/brax/reports/stage2/"
   },
   {
    "gate": "stage 3: weight-paint sign-off",
@@ -261,5 +336,15 @@
    "gate": "stage 5: final Hades-II bar",
    "state": "not_started"
   }
- ]
+ ],
+ "decisions": [
+  "2026-09-25: no human artist for stage 2; the AI pipeline makes the production mesh at production quality (the user's decision, relayed by the workflow coordinator).",
+  "2026-09-25: weapons come off the hero bodies; each chassis weapon is its own model attached to hand sockets (the user's decision, relayed by the workflow coordinator). Brax keeps bare forearms and hands; the rock forge-gauntlets are the anvil_gauntlets weapon (art/weapons/anvil_gauntlets/)."
+ ],
+ "signature_weapon": {
+  "chassis": "anvil_gauntlets",
+  "path": "art/weapons/anvil_gauntlets/",
+  "status": "art/weapons/anvil_gauntlets/status.json",
+  "sockets": "weapon_L / weapon_R (stage 3), frames in reports/stage2/body_fit.json hand_frames"
+ }
 }

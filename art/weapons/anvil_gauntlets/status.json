@@ -1,0 +1,115 @@
+{
+ "asset": "anvil_gauntlets",
+ "kind": "weapon",
+ "name": "Anvil Gauntlets (forge-gauntlets)",
+ "chassis": "anvil_gauntlets",
+ "designed_on": "brax",
+ "pipeline": "docs/ART_PIPELINE.md",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "decisions": [
+  "2026-09-25: weapons come off the hero bodies; each chassis weapon is its own model attached to hand sockets (the user's decision, relayed by the workflow coordinator). Brax keeps bare forearms and hands; the rock forge-gauntlets are the anvil_gauntlets weapon (art/weapons/anvil_gauntlets/).",
+  "2026-09-25: no human artist for stage 2; the AI pipeline makes the production mesh at production quality (the user's decision, relayed by the workflow coordinator)."
+ ],
+ "stages": {
+  "0_concept_reference": {
+   "status": "done",
+   "human_signoff_required": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-25",
+   "outputs": [
+    "art/characters/brax/references/BRAX_front_approved.png",
+    "art/characters/brax/references/BRAX_sheet_turnaround.png"
+   ],
+   "notes": "The gauntlets are designed on Brax's approved front and turnaround sheet (gauntlet close-ups: basalt segments with lava in every gap, knuckle plates, bronze elbow cuff and hexagonal strap frame ending in a wrist ring)."
+  },
+  "1_blockout": {
+   "status": "done",
+   "human_signoff_required": false,
+   "sculpt_reference_only": true,
+   "shipped": false,
+   "outputs": [
+    "art/characters/brax/source/brax_trellis2_s202.glb"
+   ],
+   "notes": "Brax's stage-1 TRELLIS.2 blockout (s202) gave the gauntlet dimensions (elbow ring, forearm, hand, fingertip reach). SCULPT REFERENCE ONLY."
+  },
+  "2_production_mesh": {
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude), tools/blender/gf_hero/s2_weapon.py + s2_gauntlet.py + s2_texture.py; no human artist",
+   "human_signoff_required": true,
+   "outputs": [
+    "art/weapons/anvil_gauntlets/production/anvil_gauntlets_stage2.blend (Git LFS)",
+    "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_basecolor.png (1024x1024, Git LFS)",
+    "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_emissive.png (1024x1024, Git LFS)",
+    "art/weapons/anvil_gauntlets/stage2_weapon.json",
+    "art/weapons/anvil_gauntlets/stage2_texture.json",
+    "art/weapons/anvil_gauntlets/reports/stage2_weapon.md",
+    "art/weapons/anvil_gauntlets/reports/stage2/stage2_weapon{,_wireframe,_textures}.png",
+    "art/weapons/anvil_gauntlets/reports/stage2/{parts,texture}.json"
+   ],
+   "metrics": {
+    "triangles": {
+     "GAUNTLET_L": 2864,
+     "GAUNTLET_R": 2864,
+     "GAUNTLET_FIST_L": 2864,
+     "GAUNTLET_FIST_R": 2864
+    },
+    "triangles_pair_open": 5728,
+    "texel_density_px_per_m_median": 300.3,
+    "atlas_coverage": 0.3929,
+    "core_clearance_over_wearer_m": [
+     0.015,
+     0.0203,
+     0.0355,
+     0.0694,
+     0.0545,
+     0.0423,
+     0.023
+    ]
+   },
+   "notes": "Rigid left/right pair, open (concept) and closed-fist variants with identical topology (shared UVs/texture). Authored in the weapon socket frame (origin palm centre, +Y along the fingers, +Z out of the back of the hand). All pieces closed and manifold.",
+   "items": {
+    "production_mesh": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI"
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "notes": "The user's visual approval (reports/stage2/)."
+    }
+   }
+  },
+  "3_rig": {
+   "status": "not_started",
+   "human_signoff_required": false,
+   "outputs": [],
+   "notes": "No skin: rigid. Stage 3 adds weapon_L / weapon_R sockets on GF_Hero_v1 at the documented frame; the objects parent to them with an identity local transform."
+  },
+  "4_animation": {
+   "status": "not_started",
+   "human_signoff_required": false,
+   "outputs": [],
+   "notes": "None of its own; open/fist variant swap is driven by the hero's punch clips."
+  },
+  "5_export_validate": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Headless export to assets/models/weapons/anvil_gauntlets.glb, uncompressed (bevy_gltf 0.20). The final Hades-II bar is a human gate."
+  }
+ },
+ "human_gates": [
+  {
+   "gate": "stage 2: the user's visual approval of the AI-made weapon model",
+   "state": "pending_human"
+  },
+  {
+   "gate": "stage 5: final Hades-II bar",
+   "state": "not_started"
+  }
+ ]
+}
