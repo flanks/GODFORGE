@@ -1,0 +1,175 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\weapons\\godsbane_rifle.glb",
+  "key": "godsbane_rifle",
+  "kind": "weapon",
+  "tier": "two_handed",
+  "extensions_used": [],
+  "tris": 3136,
+  "budget": [
+   2000,
+   4000
+  ],
+  "textures": [
+   {
+    "name": "godsbane_rifle_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 96813
+   },
+   {
+    "name": "godsbane_rifle_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 896885
+   }
+  ],
+  "materials": [
+   "M_godsbane_rifle"
+  ],
+  "nodes": [
+   "eject",
+   "glow_core",
+   "godsbane_rifle_mesh",
+   "grip_L",
+   "grip_R",
+   "muzzle",
+   "godsbane_rifle"
+  ],
+  "sockets": {
+   "eject": {
+    "translation": [
+     0.03,
+     0.097,
+     -0.075
+    ],
+    "forward": [
+     0.9119,
+     0.4104,
+     -0.0
+    ],
+    "up": [
+     -0.4104,
+     0.9119,
+     -0.0
+    ]
+   },
+   "grip_L": {
+    "translation": [
+     0.0,
+     0.027,
+     -0.4
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "grip_R": {
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.085,
+     -1.118
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "glow_core": {
+    "translation": [
+     0.0,
+     0.159,
+     -0.058
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.0449,
+    -0.1089,
+    -1.2
+   ],
+   "max": [
+    0.0715,
+    0.1865,
+    0.405
+   ]
+  },
+  "length_m": 1.605,
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 753.3,
+   "p10": 669.7,
+   "p90": 817.4
+  },
+  "coverage": 0.388,
+  "zones": [
+   "bone",
+   "leather",
+   "iron",
+   "gold",
+   "crystal",
+   "fang",
+   "glow_bore",
+   "glow_ring"
+  ],
+  "decals": 23,
+  "basecolor": "art/weapons/godsbane_rifle/textures/godsbane_rifle_basecolor.png",
+  "emissive": "art/weapons/godsbane_rifle/textures/godsbane_rifle_emissive.png",
+  "emissive_texels": 72346,
+  "seconds": 16.1
+ }
+}

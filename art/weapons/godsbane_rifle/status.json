@@ -1,0 +1,33 @@
+{
+ "asset": "godsbane_rifle",
+ "kind": "weapon",
+ "tier": "two_handed",
+ "pipeline": "docs/art/WEAPONS.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/weapons/godsbane_rifle.glb",
+    "assets/models/weapons/godsbane_rifle.meta.json",
+    "art/weapons/godsbane_rifle/source/godsbane_rifle.blend",
+    "art/weapons/godsbane_rifle/textures/godsbane_rifle_basecolor.png",
+    "art/weapons/godsbane_rifle/textures/godsbane_rifle_emissive.png",
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_review.png",
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_34.png",
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_hold_ingame_x4.png",
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_views.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/weapons/godsbane_rifle.py (launcher: art/weapons/godsbane_rifle/godsbane_rifle_build.py)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}
