@@ -11,7 +11,7 @@ use gf_core::aim::{AimMode, TargetBias};
 use gf_core::forge::{ForgeAction, Slot};
 use gf_core::ids::{CharacterId, EnemyId, PartId};
 use gf_core::math::lead_point;
-use gf_core::movement::Obstacle;
+use gf_core::movement::{Arena, Obstacle};
 use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
 use gf_engine::prelude::*;
@@ -89,7 +89,8 @@ impl BotBrain {
             return (c.def.clone(), c.nav.clone());
         }
         let def = Arc::new(procgen::resolve_room(db, w.run.room, w.run.room_seed));
-        let nav = Arc::new(NavGrid::new(&def, radius + 0.15));
+        let arena = Arena::new(def.half_extents, def.obstacles.clone(), Vec::new());
+        let nav = Arc::new(NavGrid::new(&arena, radius + 0.15));
         self.room = Some(RoomCache { key, def: def.clone(), nav: nav.clone() });
         self.path.clear();
         (def, nav)
