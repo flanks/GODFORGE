@@ -374,8 +374,11 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
             let local = select(q, q.yx, odd > 0.5);
             st = rect_stone(local, vec2(0.5, 1.0), seed + cell * 0.1);
         } else if pave == 2 {
-            // Tesserae: small square tiles.
-            st = rect_stone(q, vec2(0.34, 0.34), seed);
+            // Tesserae: small tiles laid in wavering running courses (opus tessellatum).
+            let row = floor(q.y / 0.34);
+            let shift = hash21(vec2(row, 11.0) + seed) * 0.34;
+            let wav = (noise2(vec2(q.x * 0.35, row * 0.5) + seed) - 0.5) * 0.12;
+            st = rect_stone(q + vec2(shift + wav, 0.0), vec2(0.37, 0.34), seed + vec2(row * 0.013, 0.0));
         } else {
             // Flagstones (0) or broken paving (3): running bond of large slabs.
             let row = floor(q.y / 0.9);
@@ -428,21 +431,21 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
         stone *= 1.05;
         if pave == 2 {
             // Tesserae mix in the accent and gold.
-            stone = mix(stone, fp.gold.rgb * 0.9, step(0.86, st.id.y) * 0.8);
-            stone = mix(stone, fp.accent.rgb * 0.35, step(0.93, st.id.x) * 0.6);
+            stone = mix(stone, fp.gold.rgb * 0.75, step(0.93, st.id.y) * 0.6);
+            stone = mix(stone, fp.accent.rgb * 0.3, step(0.97, st.id.x) * 0.5);
         }
     }
 
     // Worn paths and roads: lighter, smoother, dustier stone.
-    let polished = fp.stone.rgb * 1.3 * (0.94 + 0.12 * strokes) + vec3(0.01);
+    let polished = fp.stone.rgb * 1.16 * (0.94 + 0.12 * strokes) + vec3(0.006);
     stone = mix(stone, polished, worn * 0.55);
 
     // Painted bevel: the lip facing the key light catches it, the far lip falls into shadow.
     let off_n = st.offset / max(length(st.offset), 1.0e-3);
-    let gap_w = mix(0.02, 0.038, 1.0 - worn) * select(1.0, 1.25, region == 0) * select(1.0, 0.7, pave == 2);
+    let gap_w = mix(0.018, 0.032, 1.0 - worn) * select(1.0, 1.1, region == 0) * select(1.0, 0.7, pave == 2);
     let lip = 1.0 - smoothstep(gap_w, gap_w + 0.17, st.edge);
     let facing = dot(off_n, light_xz);
-    stone *= 1.0 + lip * (0.45 * max(facing, 0.0) - 0.4 * max(-facing, 0.0));
+    stone *= 1.0 + lip * (0.4 * max(facing, 0.0) - 0.28 * max(-facing, 0.0));
 
     // Cracks across some stones, and a few shattered ones.
     let crack_n = normalize(hash22(st.id * 31.0) - 0.5 + vec2(1.0e-3));
@@ -494,7 +497,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // Dirt sits lower: darker right against the stone lips.
     ground *= 0.6 + 0.4 * smoothstep(0.0, 0.6, st.edge + 0.15);
 
-    var color = stone * mix(0.6, 1.0, ao);
+    var color = stone * mix(0.72, 1.0, ao);
     color = mix(color, fp.mortar.rgb * 0.3, max(gap, max(crack, shard_gap * 0.9)));
     color = mix(ground, color, st.present);
 
@@ -603,9 +606,10 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let grime = smoothstep(0.55, 0.8, fbm(w * 0.2 + seed + vec2(5.0, 1.0))) * (1.0 - worn);
     color = mix(color, fp.mortar.rgb, grime * 0.4);
 
-    // Region tint (biome maps): a hue lean carried on vertex colours.
+    // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland,
+    // so the ground darkens toward cliffs and banks.
     @if(VERTEX_COLORS)
-    color = color * in.color.rgb;
+    color = color * in.color.rgb * mix(0.5, 1.0, smoothstep(0.0, 0.85, in.color.a));
 
     // ── fissures ──
     let heat = fp.shape.w;

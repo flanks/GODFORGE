@@ -18,7 +18,7 @@
 
 use crate::ClientSet;
 use crate::camera::{KEY_LIGHT_FROM, KeyLight, Shake, w3};
-use crate::envkit::{self, CHUNK, Colors, Ctx, Env, Flame, Key, MeshBuf, h01, lin};
+use crate::envkit::{self, CHUNK, Colors, Ctx, Env, Flame, Key, MeshBuf, Paint, h01, lin};
 use crate::materials::{
     ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_HOLES, FLOOR_INLAYS, FLOOR_PATHS, FLOOR_PAVING,
     Floor, FloorMaterial, FloorParams, ToonMaterial, ToonStyle, toon, toon_from_standard,
@@ -166,6 +166,15 @@ pub fn build(
     lights: &mut EnvLights,
 ) {
     let started = std::time::Instant::now();
+    // QA: GF_ENV_GALLERY=1 with a generated room (`--room cinder_foundry~5`) swaps its decor for
+    // one of every env-kit piece and variant, laid out in rows (and drops its obstacles).
+    let gallery_room;
+    let room = if room.map.is_none() && std::env::var_os("GF_ENV_GALLERY").is_some() {
+        gallery_room = RoomDef { decor: gallery(), obstacles: Vec::new(), ..room.clone() };
+        &gallery_room
+    } else {
+        room
+    };
     let colors = Colors::of(look);
     let gods: Vec<(Color, Color)> = db.gods.iter().map(|g| (hex(&g.color), hex(&g.color_secondary))).collect();
     let tops: Vec<(Vec2, Vec2, f32)> = room
@@ -278,6 +287,7 @@ pub fn build(
     });
 
     lights.flames = std::mem::take(&mut env.flames);
+    soften_clusters(&mut lights.flames);
     lights.lumens = look.brazier;
     lights.timer = 0.0;
     let verts: usize;
@@ -372,6 +382,40 @@ pub fn build(
     );
 }
 
+/// Braziers that stand in rings and rows (POI clearings, roads) would add up to a flood of
+/// warm light; each flame's power drops with the flames around it, so a cluster reads as one
+/// pool with a falloff and the dark between pools survives.
+fn soften_clusters(flames: &mut [Flame]) {
+    const NEAR: f32 = 11.0;
+    let mut cells: HashMap<(i32, i32), Vec<usize>> = HashMap::new();
+    let cell = |p: Vec3| ((p.x / NEAR).floor() as i32, (p.z / NEAR).floor() as i32);
+    for (i, f) in flames.iter().enumerate() {
+        cells.entry(cell(f.at)).or_default().push(i);
+    }
+    let weights: Vec<f32> = flames
+        .iter()
+        .enumerate()
+        .map(|(i, f)| {
+            let (cx, cz) = cell(f.at);
+            let mut near = 0.0;
+            for dx in -1..=1 {
+                for dz in -1..=1 {
+                    for &j in cells.get(&(cx + dx, cz + dz)).map_or(&[][..], |v| v.as_slice()) {
+                        let d = flames[j].at.distance(f.at);
+                        if j != i && d < NEAR {
+                            near += flames[j].power.min(1.0) * (1.0 - d / NEAR);
+                        }
+                    }
+                }
+            }
+            1.0 / (1.0 + 0.55 * near)
+        })
+        .collect();
+    for (f, w) in flames.iter_mut().zip(weights) {
+        f.power *= w;
+    }
+}
+
 /// Obstacles no solid decor dresses keep a stone stand-in (authored rooms, repairs).
 fn greybox(env: &mut Env, ctx: &Ctx, room: &RoomDef) {
     // Bucket the solid decor by 8 u cells so maps with thousands of pieces stay linear.
@@ -423,6 +467,136 @@ fn decor_bounds(d: &Decor) -> (Vec2, Vec2) {
             (a - Vec2::splat(4.0), a + Vec2::splat(4.0))
         }
     }
+}
+
+/// Every env-kit piece and its variants in rows (north to south: walls; columns, arches and
+/// set pieces; statues and heads; monuments and nature; fallen arms and props; clutter; floor
+/// paint), for looking at the kit up close (`GF_ENV_GALLERY`).
+fn gallery() -> Vec<Decor> {
+    use gf_content::schema::{ClutterKind as C, WallStyle as W};
+    let v = Vec2::new;
+    let mut out = Vec::new();
+    let mut row = |y: f32, step: f32, items: Vec<Box<dyn Fn(Vec2) -> Decor>>| {
+        let x0 = -step * (items.len() as f32 - 1.0) * 0.5;
+        for (i, f) in items.iter().enumerate() {
+            out.push(f(v(x0 + i as f32 * step, y)));
+        }
+    };
+    let wall = |style: W, half: Vec2, height: f32, variant: u8| -> Box<dyn Fn(Vec2) -> Decor> {
+        Box::new(move |at| Decor::Wall { at, half, height, style, variant })
+    };
+    row(
+        24.0,
+        10.0,
+        vec![
+            wall(W::Ruin, v(3.5, 0.6), 3.0, 0),
+            wall(W::Ruin, v(3.5, 0.6), 2.2, 1),
+            wall(W::Parapet, v(3.5, 0.5), 1.4, 0),
+            wall(W::Plinth, v(1.6, 1.6), 1.2, 0),
+            wall(W::Hedge, v(3.5, 0.8), 2.2, 0),
+            wall(W::Monolith, v(1.3, 0.8), 5.0, 0),
+            wall(W::Forge, v(3.5, 0.8), 3.5, 0),
+            wall(W::Forge, v(0.8, 3.0), 3.0, 1),
+        ],
+    );
+    let arch = |variant: u8| -> Box<dyn Fn(Vec2) -> Decor> {
+        Box::new(move |at| Decor::Arch {
+            from: at - v(3.2, 0.0),
+            to: at + v(3.2, 0.0),
+            pier: 0.7,
+            height: 4.5,
+            variant,
+        })
+    };
+    row(
+        14.0,
+        9.0,
+        vec![
+            Box::new(|at| Decor::Pillar { at, radius: 0.7, height: 4.5 }),
+            Box::new(|at| Decor::Pillar { at, radius: 0.7, height: 2.0 }),
+            arch(0),
+            arch(1),
+            arch(2),
+            arch(3),
+            Box::new(|at| Decor::SealedGate { at, half: v(3.4, 1.0), height: 5.0 }),
+            Box::new(|at| Decor::SpiralStair { at, radius: 2.5, height: 6.0, rot: 3 }),
+            Box::new(|at| Decor::InvertedColumn { at, radius: 0.8, height: 5.0 }),
+        ],
+    );
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = Vec::new();
+    for k in 0..4u8 {
+        items.push(Box::new(move |at| Decor::Statue { at, radius: 1.1, height: 3.6, rot: 12, god: k, variant: k }));
+    }
+    for k in 0..4u8 {
+        items.push(Box::new(move |at| Decor::ColossusHead { at, radius: 2.6, rot: 12 + k, variant: k }));
+    }
+    row(4.0, 8.0, items);
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = vec![
+        Box::new(|at| Decor::GreatAnvil { at, radius: 2.2, rot: 0 }),
+        Box::new(|at| Decor::Crucible { at, radius: 2.7 }),
+        Box::new(|at| Decor::GreatBrazier { at, radius: 1.8 }),
+        Box::new(|at| Decor::Rift { at, radius: 2.0, height: 4.0, rot: 4 }),
+    ];
+    for k in 0..3u8 {
+        items.push(Box::new(move |at| Decor::Boulder { at, radius: 1.5, variant: k }));
+    }
+    for k in 0..3u8 {
+        items.push(Box::new(move |at| Decor::Crystal { at, radius: 1.0, height: 3.0, rot: 5 * k, variant: k }));
+    }
+    row(-6.0, 7.5, items);
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = Vec::new();
+    for k in 0..5u8 {
+        items.push(Box::new(move |at| Decor::FallenWeapon { at, radius: 1.4, height: 8.0, rot: 5 + k, variant: k }));
+    }
+    for k in 0..3u8 {
+        items.push(Box::new(move |at| Decor::Tree { at, radius: 0.8, height: 5.0, variant: k }));
+    }
+    items.push(Box::new(|at| Decor::FallenTree { from: at - v(2.5, 0.8), to: at + v(2.5, 0.8), radius: 0.6 }));
+    items.push(Box::new(|at| Decor::FallenColumn { from: at - v(2.5, -0.8), to: at + v(2.5, -0.8), radius: 0.7 }));
+    row(-15.0, 7.5, items);
+    let kinds = [
+        C::Urns,
+        C::Crates,
+        C::WeaponRack,
+        C::Ingots,
+        C::Bones,
+        C::Candles,
+        C::Tomes,
+        C::Mushrooms,
+        C::Lanterns,
+        C::Shards,
+        C::Offerings,
+    ];
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = kinds
+        .iter()
+        .map(|&kind| -> Box<dyn Fn(Vec2) -> Decor> {
+            Box::new(move |at| Decor::Clutter { at, radius: 1.2, kind, count: 5, rot: 8 })
+        })
+        .collect();
+    items.push(Box::new(|at| Decor::Brazier { at }));
+    items.push(Box::new(|at| Decor::BrokenAnvil { at, scale: 1.2 }));
+    items.push(Box::new(|at| Decor::Banner { at, height: 3.5, rot: 12, god: 1 }));
+    row(-22.0, 5.2, items);
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = vec![
+        Box::new(|at| Decor::Channel { from: at - v(0.0, 2.5), to: at + v(0.0, 2.5), width: 1.6 }),
+        Box::new(|at| Decor::Pool { at, half: v(1.6, 1.2) }),
+        Box::new(|at| Decor::Bridge { from: at - v(2.2, 0.0), to: at + v(2.2, 0.0), width: 2.4 }),
+        Box::new(|at| Decor::Chains { from: at - v(2.0, 0.0), to: at + v(2.0, 0.0), height: 2.5 }),
+        Box::new(|at| Decor::Roots { from: at - v(2.0, 1.0), to: at + v(2.0, 1.0), width: 0.8 }),
+    ];
+    for k in 0..3u8 {
+        items.push(Box::new(move |at| Decor::Rubble { at, radius: 1.3, variant: k }));
+        items.push(Box::new(move |at| Decor::Overgrowth { at, radius: 1.4, variant: k }));
+        items.push(Box::new(move |at| Decor::Debris { at, radius: 1.0, height: 1.2, variant: k }));
+    }
+    row(-28.0, 5.4, items);
+    // The floor paint pieces sit along the east and west edges.
+    for (k, y) in [-8.0f32, 0.0, 8.0, 16.0].into_iter().enumerate() {
+        out.push(Decor::Paving { at: v(-37.0, y), half: v(2.5, 3.0), variant: k as u8 });
+        out.push(Decor::FloorInlay { at: v(37.0, y), radius: 2.6, rot: 0, variant: k as u8 + 1, god: k as u8 });
+    }
+    out.push(Decor::LavaCrack { from: v(-38.0, -20.0), to: v(-34.0, -12.0), width: 0.5 });
+    out
 }
 
 // ───────────────────────────── biome-map land ─────────────────────────────
@@ -564,10 +738,11 @@ fn land_field(map: &MapLayout, mask: &[Ground]) -> Field {
                     let c = t.center(x as u16, y as u16);
                     let q = (p - c).abs() - Vec2::splat(t.size * 0.5);
                     let sd = q.max(Vec2::ZERO).length() + q.x.max(q.y).min(0.0);
-                    d = smin(d, sd, 1.6);
+                    d = smin(d, sd, 2.6);
                 }
             }
-            let r = 0.3 + 0.55 * vnoise(p / 3.0, 0x5EA);
+            // Outward only: the lip meanders 0.35–1.5 u past the walkable tiles, at two scales.
+            let r = 0.35 + 0.75 * vnoise(p / 6.0, 0x5EA) + 0.4 * vnoise(p / 2.2, 0x5EB);
             f[j * w + i] = d - r;
         }
     }
@@ -678,12 +853,12 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
             let buf = &mut entry.0;
             // Polygon around the cell, counter-clockwise (sim): corner, crossing, corner, …
             let corners = [(i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1)];
-            let mut poly = [(Vec2::ZERO, 0u64, Vec2::ZERO, false); 8];
+            let mut poly = [(Vec2::ZERO, 0u64, Vec2::ZERO, false, 0.0f32); 8];
             let mut n = 0;
             for k in 0..4 {
                 let (ci, cj) = corners[k];
                 if inside[k] {
-                    poly[n] = (field.point(ci, cj), corner_key(ci, cj), Vec2::ZERO, false);
+                    poly[n] = (field.point(ci, cj), corner_key(ci, cj), Vec2::ZERO, false, field.at(ci, cj));
                     n += 1;
                 }
                 let next = (k + 1) % 4;
@@ -694,7 +869,7 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                         2 => edge_point(i, j + 1, true),
                         _ => edge_point(i, j, false),
                     };
-                    poly[n] = (p, key, g, true);
+                    poly[n] = (p, key, g, true, 0.0);
                     n += 1;
                 }
             }
@@ -702,10 +877,14 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                 continue;
             }
             let mut idx = [0u32; 8];
-            for (k, (p, key, _, _)) in poly[..n].iter().enumerate() {
+            for (k, (p, key, _, _, f)) in poly[..n].iter().enumerate() {
                 let s = &mut seen[slot(*key)];
                 if s.0 != chunk {
-                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, [p.x * 0.1, -p.y * 0.1], tint_at(*p)));
+                    // Alpha carries how far inland the vertex is (0 on the shore, 1 from 3 u in):
+                    // the floor darkens toward cliffs and banks.
+                    let mut col = tint_at(*p);
+                    col[3] = (-f / 3.0).clamp(0.0, 1.0);
+                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, [p.x * 0.1, -p.y * 0.1], col));
                 }
                 idx[k] = s.1;
             }
@@ -762,6 +941,20 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
             } else {
                 buf.quad(base, base + 1, base + 2, base + 3);
             }
+        }
+        // Crumbling edges: now and then a loose stone on the lip, half over the drop.
+        let pick = h01((ka as u32) ^ (ka >> 32) as u32, 0xED6E);
+        if !liquid && pick < 0.09 {
+            let rr = 0.22 + 0.4 * h01(ka as u32, 0xED6F);
+            let at = mid - out * (rr * 0.4);
+            env.rock(
+                Vec3::new(at.x, rr * 0.15, -at.y),
+                Quat::from_rotation_y(pick * 70.0),
+                Vec3::new(rr, rr * 0.6, rr * 0.85),
+                ka as u32,
+                0.45,
+                Paint::new(Key::Rock, mix(c.rock, c.dark, 0.2)).ink(0.032),
+            );
         }
     }
 
@@ -946,8 +1139,9 @@ fn map_floor_params(
     p.shape.x = room.half_extents.x;
     p.shape.y = room.half_extents.y;
     p.counts.w = 1.0;
-    // Paving thins out off the roads.
-    p.dirt.w = 0.3;
+    // Open country is bare ground with old paving in patches; roads and clearings are paved.
+    p.dirt.w = 0.14;
+    p.stone.w = 0.26;
     // POI clearings: a paved disc with a curb (inlay variant 5), first so they win the slots.
     let mut ni = 0;
     for poi in &map.pois {

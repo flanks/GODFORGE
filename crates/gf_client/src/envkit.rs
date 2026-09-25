@@ -613,6 +613,60 @@ impl Env {
         }
     }
 
+    /// A lump of foliage: a noise-displaced icosphere with smooth normals, dark underneath and
+    /// lit on the crown (vertex colours), with an ink hull. Several make a canopy with a
+    /// scalloped silhouette instead of faceted balls.
+    #[allow(clippy::too_many_arguments)]
+    pub fn foliage(&mut self, pos: Vec3, rot: Quat, radius: Vec3, seed: u32, under: Color, crown: Color, ink: f32) {
+        let (verts, faces) = &ICO.get_or_init(icospheres).1;
+        let disp: Vec<Vec3> = verts
+            .iter()
+            .enumerate()
+            .map(|(i, v)| {
+                let n = h01(i as u32, seed) - 0.5;
+                let m = h01(i as u32 / 4, seed ^ 0x3C) - 0.5;
+                *v * (1.0 + 0.3 * n + 0.18 * m)
+            })
+            .collect();
+        let (under, crown) = (lin(under), lin(crown));
+        for (key, grow) in [(Key::Cloth, 0.0), (Key::Ink, ink)] {
+            if key == Key::Ink && ink <= 0.0 {
+                continue;
+            }
+            let s = radius + Vec3::splat(grow);
+            let buf = self.buf(key);
+            let base = buf.pos.len() as u32;
+            for (i, v) in disp.iter().enumerate() {
+                let unit = verts[i];
+                let n = rot * (unit / radius).normalize_or(Vec3::Y);
+                let t = (unit.y * 0.55 + 0.45).clamp(0.0, 1.0);
+                let t = t * t * (3.0 - 2.0 * t);
+                let j = 0.92 + 0.16 * h01(i as u32, seed ^ 0x77);
+                let c = if key == Key::Ink {
+                    [1.0; 4]
+                } else {
+                    [
+                        (under[0] + (crown[0] - under[0]) * t) * j,
+                        (under[1] + (crown[1] - under[1]) * t) * j,
+                        (under[2] + (crown[2] - under[2]) * t) * j,
+                        1.0,
+                    ]
+                };
+                buf.vert(pos + rot * (*v * s), n, [0.75, 0.5], c);
+            }
+            for f in faces {
+                let [a, b, cc] = f.map(|i| pos + rot * (disp[i] * s));
+                let out = (b - a).cross(cc - a).dot((a + b + cc) / 3.0 - pos) >= 0.0;
+                let [ia, ib, ic] = f.map(|i| base + i as u32);
+                if out {
+                    buf.tri(ia, ib, ic);
+                } else {
+                    buf.tri(ia, ic, ib);
+                }
+            }
+        }
+    }
+
     /// A crystal: an n-sided prism of `radius` rising `height` to a pointed tip (`tip` tall),
     /// standing at `pos` and tilted by `rot`. Facets get baked light (it is unlit glow).
     #[allow(clippy::too_many_arguments)]
@@ -1439,37 +1493,44 @@ fn forge_trim(
     }
 }
 
+/// A balustrade: a stepped plinth over the whole footprint, pedestals every bay, turned
+/// balusters and a slim top rail, so the camera looks down between the balusters instead of
+/// onto one slab.
 fn parapet(env: &mut Env, c: &Colors, base: Vec3, rot: Quat, hl: f32, ht: f32, height: f32) {
     let trim = Paint::new(Key::Stone, c.trim).ink(INK);
     let stone = Paint::new(Key::Stone, c.stone).ink(INK_S);
-    let h = height.max(0.6);
-    env.block(base + Vec3::Y * 0.12, rot, Vec3::new(hl, 0.12, ht), 0.03, trim);
-    env.block(base + Vec3::Y * (h - 0.09), rot, Vec3::new(hl + 0.05, 0.09, ht + 0.06), 0.03, trim);
-    // Posts at the ends, balusters between.
-    for s in [-1.0f32, 1.0] {
-        env.block(
-            base + rot * Vec3::new(s * (hl - 0.18), h * 0.5, 0.0),
-            rot,
-            Vec3::new(0.18, h * 0.5 - 0.01, ht + 0.02),
-            0.03,
-            stone,
-        );
+    let h = height.max(0.7);
+    let rail = (ht * 0.6).clamp(0.14, 0.28);
+    let at = |x: f32, y: f32| base + rot * Vec3::new(x, y, 0.0);
+    env.block(at(0.0, 0.12), rot, Vec3::new(hl, 0.12, ht), 0.03, trim);
+    env.block(at(0.0, 0.3), rot, Vec3::new(hl - 0.06, 0.06, rail + 0.05), 0.02, stone);
+    env.block(at(0.0, h - 0.08), rot, Vec3::new(hl - 0.02, 0.08, rail + 0.06), 0.03, trim);
+    let bays = ((hl * 2.0) / 2.6).ceil().max(1.0) as i32;
+    let bay = (hl * 2.0 - 0.44) / bays as f32;
+    let post = Vec3::new(0.2, (h - 0.24) * 0.5, rail + 0.09);
+    for i in 0..=bays {
+        let x = -hl + 0.22 + bay * i as f32;
+        env.block(at(x, 0.24 + post.y), rot, post, 0.03, stone);
+        env.block(at(x, h + 0.04), rot, Vec3::new(0.25, 0.06, rail + 0.13), 0.02, trim);
     }
-    let n = ((hl * 2.0 - 0.5) / 0.42).floor().max(1.0) as i32;
-    let step = (hl * 2.0 - 0.5) / n as f32;
-    let bh = h - 0.42;
+    let bh = h - 0.52;
+    let k = rail / 0.28;
     let prof = [
-        (0.07, 0.0),
-        (0.1, bh * 0.08),
-        (0.07, bh * 0.2),
-        (0.13, bh * 0.45),
-        (0.06, bh * 0.8),
-        (0.09, bh * 0.92),
-        (0.09, bh),
+        (0.07 * k, 0.0),
+        (0.1 * k, bh * 0.08),
+        (0.07 * k, bh * 0.2),
+        (0.13 * k, bh * 0.45),
+        (0.06 * k, bh * 0.8),
+        (0.09 * k, bh * 0.92),
+        (0.09 * k, bh),
     ];
-    for i in 0..n {
-        let x = -hl + 0.25 + step * (i as f32 + 0.5);
-        env.lathe(base + rot * Vec3::new(x, 0.24, 0.0), rot, &prof, 8, (0, 0.0), Paint::new(Key::Stone, c.stone));
+    let per = ((bay - 0.4) / 0.36).floor().max(1.0) as i32;
+    let gap = (bay - 0.4) / per as f32;
+    for i in 0..bays {
+        for j in 0..per {
+            let x = -hl + 0.22 + bay * i as f32 + 0.2 + gap * (j as f32 + 0.5);
+            env.lathe(at(x, 0.36), rot, &prof, 8, (0, 0.0), Paint::new(Key::Stone, c.stone));
+        }
     }
 }
 
@@ -1495,16 +1556,23 @@ fn hedge(env: &mut Env, c: &Colors, base: Vec3, u: Vec3, t: Vec3, hl: f32, ht: f
         ];
         env.tube(&pts, &[0.16, 0.12, 0.08], 6, bark);
     }
-    let leaf = Paint::new(Key::Cloth, c.leaf).ink(INK_S);
+    let under = mix(c.leaf_dark, hex("#0A0E12"), 0.25);
     for i in 0..n * 2 {
         let x = -hl + (i as f32 + 0.5) * (hl / n as f32);
         let rr = v.r(0.5, 0.8);
-        env.ball(
+        let crown = if i % 3 == 0 {
+            mix(c.leaf, c.leaf_dark, 0.4)
+        } else {
+            lighten(vary(mix(c.leaf, c.leaf_dark, 0.15), v.f(), 0.1), 1.04)
+        };
+        env.foliage(
             base + u * x + t * v.r(-ht, ht) + Vec3::Y * (height * 0.8 + rr * 0.4),
             Quat::from_rotation_y(v.r(0.0, TAU)),
             Vec3::new(rr, rr * 0.7, rr),
-            8,
-            if i % 3 == 0 { Paint { color: lin(c.leaf_dark), ..leaf } } else { leaf },
+            v.seed ^ (i * 97 + 3),
+            under,
+            crown,
+            INK_S,
         );
     }
 }
@@ -2001,20 +2069,8 @@ fn crucible(env: &mut Env, c: &Colors, at: Vec2, r: f32) {
     // The pit: a curb ring around a molten pool.
     let curb = [(r - 0.1, 0.4), (r - 0.1, -0.5), (r + 0.45, -0.5), (r + 0.45, 0.3), (r + 0.3, 0.4), (r - 0.1, 0.4)];
     env.lathe(base, Quat::IDENTITY, &curb, 18, (0, 0.0), stone);
-    env.disc(base + Vec3::Y * 0.12, r - 0.05, 18, lin(hdr(c.flame_core, 0.5)), lin(c.molten), Key::Glow);
-    let mut v = Vr::new(at, 19);
-    for k in 0..5 {
-        let d = dir(k as f32 * 1.25 + v.f());
-        let rr = v.r(0.3, 0.55);
-        env.rock(
-            base + wd(d) * (r * v.r(0.3, 0.75)) + Vec3::Y * 0.1,
-            Quat::IDENTITY,
-            Vec3::new(rr, rr * 0.35, rr),
-            v.seed + k,
-            0.4,
-            Paint::new(Key::Rock, c.dark),
-        );
-    }
+    // A slag pool crusting over, the heat showing in the cracks.
+    coal_bed(env, c, base + Vec3::Y * 0.12, r - 0.05, hp(at, 19).to_bits());
     // The crucible hangs above it, brimming.
     let hang = 2.6;
     let bowl = [
@@ -2033,7 +2089,7 @@ fn crucible(env: &mut Env, c: &Colors, at: Vec2, r: f32) {
         (0, 0.0),
         Paint::new(Key::Metal, c.bronze),
     );
-    env.disc(base + Vec3::Y * (hang + 1.42), 0.64 * r, 14, lin(c.flame_core), lin(c.molten), Key::Glow);
+    coal_bed(env, c, base + Vec3::Y * (hang + 1.42), 0.64 * r, hp(at, 20).to_bits());
     // A pour spout dribbling into the pit.
     let lip = base + Vec3::new(0.72 * r, hang + 1.45, 0.0);
     env.tube(
@@ -2092,9 +2148,38 @@ fn great_brazier(env: &mut Env, c: &Colors, at: Vec2, r: f32) {
         (0, 0.0),
         Paint::new(Key::Metal, c.gold),
     );
-    env.disc(base + Vec3::Y * (bowl_y + 0.78), r * 0.95, 14, lin(hdr(c.flame_core, 0.6)), lin(c.molten), Key::Glow);
-    env.flame(base + Vec3::Y * (bowl_y + 0.7), 2.2 + r * 0.4, c, hp(at, 21).to_bits());
+    coal_bed(env, c, base + Vec3::Y * (bowl_y + 0.78), r * 0.95, hp(at, 22).to_bits());
+    let seed = hp(at, 21).to_bits();
+    env.flame(base + Vec3::Y * (bowl_y + 0.7), 2.0 + r * 0.45, c, seed);
+    for k in 0..3u32 {
+        let a = k as f32 / 3.0 * TAU + h01(seed, k) * 0.8;
+        let off = Vec3::new(a.cos(), 0.0, a.sin()) * (r * 0.5);
+        env.flame(base + off + Vec3::Y * (bowl_y + 0.72), 1.1 + r * 0.3, c, seed ^ ((k + 1) * 0x9E37));
+    }
     env.flames.push(Flame { at: base + Vec3::Y * (bowl_y + 2.0), color: c.flame, power: 2.6, range: 18.0 });
+}
+
+/// Burning coals filling a bowl of radius `r` at `top`: a molten bed glowing hot at the heart and
+/// dull at the rim, broken by dark clinker lumps, so it reads as fire and not as a lit plate.
+fn coal_bed(env: &mut Env, c: &Colors, top: Vec3, r: f32, seed: u32) {
+    env.disc(top, r, 14, lin(hdr(c.flame_core, 0.45)), lin(hdr(c.molten, 0.3)), Key::Glow);
+    // Crust plates cover most of the bed, so the fire shows in the cracks between them
+    // (spread by the golden angle for an even cover without a pattern).
+    let n = 14;
+    for k in 0..n {
+        let a = k as f32 * 2.399 + h01(seed, k) * 0.5;
+        let d = r * 0.88 * ((k as f32 + 0.5) / n as f32).sqrt();
+        let s = r * (0.2 + 0.1 * h01(seed, k + 80));
+        let col = mix(c.dark, hex("#140C0A"), 0.35 + 0.3 * h01(seed, k + 9));
+        env.rock(
+            top + Vec3::new(a.cos() * d, 0.02, a.sin() * d),
+            Quat::from_rotation_y(a),
+            Vec3::new(s, s * 0.28, s * 0.85),
+            seed ^ k,
+            0.3,
+            Paint::new(Key::Rock, col),
+        );
+    }
 }
 
 fn sealed_gate(env: &mut Env, c: &Colors, at: Vec2, half: Vec2, height: f32) {
@@ -2162,6 +2247,10 @@ fn sealed_gate(env: &mut Env, c: &Colors, at: Vec2, half: Vec2, height: f32) {
     }
 }
 
+/// A gateway arch spanning `from`–`to` (the pier centres): piers on plinths with impost
+/// capitals, a round (or, when the height is short, segmental) arch of voussoirs with a raised
+/// keystone, spandrels and an entablature of three stones under a projecting cornice.
+/// Variant 1 is broken; 2 adds a pediment; 3 hangs a caged lamp from the keystone.
 fn arch(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, pier: f32, height: f32, variant: u8) {
     let mut v = Vr::new(from, 23);
     let d = (to - from).normalize_or(Vec2::X);
@@ -2169,84 +2258,168 @@ fn arch(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, pier: f32, height: f32,
     let rot = face(Vec2::new(-d.y, d.x));
     let stone = vary(c.stone, v.f(), 0.05);
     let p = Paint::new(Key::Stone, stone).ink(INK);
-    let trim = Paint::new(Key::Stone, lighten(stone, 1.25)).ink(INK);
+    let trim = Paint::new(Key::Stone, lighten(stone, 1.22)).ink(INK);
     let mid = w3((from + to) * 0.5, 0.0);
+    let at3 = |x: f32, y: f32, z: f32| mid + rot * Vec3::new(x, y, z);
+    let variant = variant % 4;
     let broken = variant == 1;
-    for (i, at) in [from, to].into_iter().enumerate() {
-        let h = if broken && i == 1 { height * 0.55 } else { height };
-        let b = w3(at, 0.0);
-        env.block(b + Vec3::Y * 0.2, rot, Vec3::new(pier + 0.1, 0.2, pier + 0.1), 0.04, trim);
+    // Half depth of the arch body: a little thinner than the piers, which step out.
+    let depth = pier * 0.82;
+    let inner = (span * 0.5 - pier).max(0.6);
+    let attic = (0.3 + 0.06 * height).min(0.75);
+    let ring = (0.34 + inner * 0.07).min(0.6);
+    let crown = height - attic;
+    // A semicircle needs `inner` of rise; short arches go segmental (never flatter than a third).
+    let rise = (crown - ring - 1.9).clamp(inner * 0.34, inner);
+    let spring = crown - ring - rise;
+    for (i, s) in [-1.0f32, 1.0].into_iter().enumerate() {
+        let x = s * (inner + pier);
+        let h = if broken && i == 1 { spring * v.r(0.45, 0.7) } else { spring };
+        env.block(at3(x, 0.18, 0.0), rot, Vec3::new(pier + 0.12, 0.18, pier + 0.12), 0.04, trim);
         let start = env.mark();
-        env.block(b + Vec3::Y * (h * 0.5), rot, Vec3::new(pier, h * 0.5, pier), 0.05, p);
+        env.block(at3(x, 0.36 + (h - 0.36) * 0.5, 0.0), rot, Vec3::new(pier, (h - 0.36) * 0.5, pier), 0.05, p);
         if broken && i == 1 {
-            jag_top(env, start, h, 0.5, v.seed);
-        } else {
-            env.block(b + Vec3::Y * (h - 0.12), rot, Vec3::new(pier + 0.08, 0.12, pier + 0.08), 0.03, trim);
+            jag_top(env, start, h, 0.45, v.seed);
+            continue;
         }
+        // Impost capital where the arch springs.
+        env.block(at3(x, h - 0.12, 0.0), rot, Vec3::new(pier + 0.1, 0.12, pier + 0.1), 0.03, trim);
     }
-    let x = wd(d);
+    // The arch circle through both springers and the crown: centre height `cy`, radius `rr`.
+    let rr = (inner * inner + rise * rise) / (2.0 * rise);
+    let cy = spring + rise - rr;
+    let th = ((spring - cy) / rr).clamp(-1.0, 1.0).asin();
+    let sweep = PI - 2.0 * th;
+    let arc_len = sweep * (rr + ring * 0.5);
+    let n = (((arc_len / 0.62).round() as u32) | 1).clamp(7, 17);
+    let q = |a: f32, r: f32| Vec2::new(a.cos() * r, cy + a.sin() * r);
+    let stand = rot * Quat::from_rotation_x(-FRAC_PI_2);
+    let keep = if broken { n / 3 } else { n };
+    for k in 0..keep {
+        let a0 = PI - th - sweep * k as f32 / n as f32;
+        let a1 = PI - th - sweep * (k + 1) as f32 / n as f32;
+        let key = k == n / 2;
+        let out = if key { ring * 1.35 } else { ring };
+        let outline = [q(a0, rr), q(a1, rr), q(a1, rr + out), q(a0, rr + out)];
+        let tint = if key { lighten(stone, 1.3) } else { vary(stone, h01(k, v.seed), 0.07) };
+        let dz = if key { depth + 0.06 } else { depth };
+        env.extrude(mid, stand, &outline, -dz, dz, Paint::new(Key::Stone, tint).ink(INK_S));
+    }
     if broken {
-        // The lintel fell outward: one half leans on the standing pier's outer face, the other
-        // lies broken beyond the short pier (never across the lane the arch spans).
+        // The rest of the arch and its attic fell outward: one stretch leans on the standing
+        // pier, the rest lies broken beyond the stump (never across the lane the arch spans).
+        let x = wd(d);
         let lean = rot * Quat::from_rotation_z(-0.9);
-        env.block(
-            w3(from, 0.0) - x * (pier + 0.9) + Vec3::Y * 1.3,
-            lean,
-            Vec3::new(span * 0.24, 0.32, pier * 0.8),
-            0.05,
-            p,
-        );
+        env.block(w3(from, 0.0) - x * (pier + 0.9) + Vec3::Y * 1.3, lean, Vec3::new(span * 0.24, 0.32, depth), 0.05, p);
         env.block(
             w3(to, 0.0) + x * (pier + span * 0.25 + 0.4) + Vec3::Y * 0.3,
             rot * Quat::from_rotation_y(v.r(-0.4, 0.4)) * Quat::from_rotation_z(0.08),
-            Vec3::new(span * 0.22, 0.3, pier * 0.8),
+            Vec3::new(span * 0.22, 0.3, depth),
             0.05,
             p,
         );
         rubble(env, c, to + d * (pier + 1.0), 1.0, 0);
         return;
     }
-    let inner = span * 0.5 - pier;
-    let spring = height - 0.6 - inner;
-    if spring > 1.8 {
-        // A semicircular arch of voussoirs under an attic.
-        let n = 9;
-        let r_out = inner + 0.55;
-        for k in 0..n {
-            let a0 = PI * k as f32 / n as f32;
-            let a1 = PI * (k + 1) as f32 / n as f32;
-            let q = |a: f32, r: f32| Vec2::new(-a.cos() * r, a.sin() * r);
-            let outline = [q(a0, inner), q(a1, inner), q(a1, r_out), q(a0, r_out)];
-            // Local (x along the span, y up) extruded through the depth.
-            let pts: Vec<Vec2> = outline.iter().map(|p| Vec2::new(p.x, p.y)).collect();
-            let tint = if k == n / 2 { lighten(stone, 1.3) } else { vary(stone, h01(k, v.seed), 0.08) };
-            env.extrude(
-                mid + Vec3::Y * spring,
-                rot * Quat::from_rotation_x(-FRAC_PI_2),
-                &pts,
-                -pier * 0.9,
-                pier * 0.9,
-                Paint::new(Key::Stone, tint).ink(INK_S),
+    // Spandrels: vertical strips from the extrados up to the attic, and the block over each pier.
+    let fill = Paint::new(Key::Stone, lighten(stone, 0.9)).ink(INK_S);
+    let strips = (n / 2) as usize;
+    let half_w = inner + pier * 2.0;
+    let x_spring = (rr + ring) * th.cos();
+    for s in [-1.0f32, 1.0] {
+        let over = [
+            Vec2::new(s * half_w, spring),
+            Vec2::new(s * x_spring, spring),
+            Vec2::new(s * x_spring, crown),
+            Vec2::new(s * half_w, crown),
+        ];
+        env.extrude(mid, stand, &over, -depth, depth, fill);
+        for k in 0..strips {
+            let a0 = th + (PI * 0.5 - th) * k as f32 / strips as f32;
+            let a1 = th + (PI * 0.5 - th) * (k + 1) as f32 / strips as f32;
+            let (p0, p1) = (q(a0, rr + ring), q(a1, rr + ring));
+            if crown - p0.y.min(p1.y) < 0.04 {
+                continue;
+            }
+            let (x0, x1) = (s * p0.x, s * p1.x);
+            let strip = [Vec2::new(x0, p0.y), Vec2::new(x1, p1.y), Vec2::new(x1, crown), Vec2::new(x0, crown)];
+            env.extrude(mid, stand, &strip, -depth * 0.97, depth * 0.97, Paint { ink: 0.0, ..fill });
+        }
+    }
+    // Entablature: three stones with a raised keystone plaque, under a projecting cornice.
+    let third = half_w * 2.0 / 3.0;
+    for k in 0..3u32 {
+        let x = -half_w + third * (k as f32 + 0.5);
+        let tint = vary(stone, h01(k + 7, v.seed), 0.06);
+        env.block(
+            at3(x, crown + attic * 0.35, 0.0),
+            rot,
+            Vec3::new(third * 0.5 - 0.02, attic * 0.35, depth + 0.02),
+            0.03,
+            Paint::new(Key::Stone, tint).ink(INK),
+        );
+    }
+    // The cornice stays close to the wall's value (a pale plank would glare from above), and
+    // pedestals at its ends break the long top line.
+    let cornice = Paint::new(Key::Stone, lighten(stone, 1.06)).ink(INK);
+    env.block(
+        at3(0.0, crown + attic * 0.85, 0.0),
+        rot,
+        Vec3::new(half_w + 0.14, attic * 0.15, depth + 0.12),
+        0.03,
+        cornice,
+    );
+    env.block(at3(0.0, crown + attic * 0.4, 0.0), rot, Vec3::new(0.42, attic * 0.42, depth + 0.1), 0.03, trim);
+    if variant != 2 {
+        for s in [-1.0f32, 1.0] {
+            env.block(
+                at3(s * (half_w - 0.4), height + 0.16, 0.0),
+                rot,
+                Vec3::new(0.38, 0.16, depth * 0.85),
+                0.03,
+                trim,
             );
         }
-        env.block(mid + Vec3::Y * (height - 0.3), rot, Vec3::new(span * 0.5 + 0.1, 0.3, pier + 0.05), 0.04, trim);
-        // Spandrels between the arch and the attic.
-        for s in [-1.0f32, 1.0] {
-            let sp = height - 0.6 - spring;
-            env.block(
-                mid + rot * Vec3::new(s * (inner + 0.2), spring + sp * 0.62, 0.0),
-                rot,
-                Vec3::new(0.45, sp * 0.38, pier * 0.85),
-                0.03,
+    }
+    match variant {
+        2 => {
+            // A shallow pediment with an acroterion.
+            let ped = (half_w * 0.36).min(1.4);
+            env.extrude(
+                at3(0.0, height, 0.0),
+                stand,
+                &[Vec2::new(-half_w, 0.0), Vec2::new(half_w, 0.0), Vec2::new(0.0, ped)],
+                -depth,
+                depth,
                 p,
             );
+            env.lathe(
+                at3(0.0, height + ped - 0.1, 0.0),
+                rot,
+                &[(0.22, 0.0), (0.3, 0.2), (0.12, 0.45), (0.0, 0.55)],
+                8,
+                (0, 0.0),
+                trim,
+            );
         }
-    } else {
-        // A flat entablature: architrave, frieze with a keystone, cornice.
-        env.block(mid + Vec3::Y * (height - 0.75), rot, Vec3::new(span * 0.5, 0.25, pier * 0.9), 0.04, p);
-        env.block(mid + Vec3::Y * (height - 0.35), rot, Vec3::new(span * 0.5 + 0.05, 0.15, pier * 0.95), 0.03, p);
-        env.block(mid + Vec3::Y * (height - 0.1), rot, Vec3::new(span * 0.5 + 0.2, 0.1, pier + 0.1), 0.03, trim);
-        env.block(mid + Vec3::Y * (height - 0.7), rot, Vec3::new(0.25, 0.32, pier), 0.03, trim);
+        3 => {
+            // A caged lamp on a chain from the keystone.
+            let top = at3(0.0, rr + cy, 0.0);
+            let lamp = top - Vec3::Y * (rise * 0.45 + 0.5);
+            env.tube(&[top, lamp + Vec3::Y * 0.35], &[0.03], 4, Paint::new(Key::Metal, c.iron));
+            let iron = Paint::new(Key::Metal, c.iron).ink(INK_S);
+            env.lathe(
+                lamp,
+                Quat::IDENTITY,
+                &[(0.12, 0.35), (0.26, 0.3), (0.26, -0.2), (0.1, -0.32)],
+                6,
+                (0, 0.0),
+                iron,
+            );
+            env.ball(lamp, Quat::IDENTITY, Vec3::splat(0.18), 6, Paint::new(Key::Glow, c.flame));
+            env.flames.push(Flame { at: lamp, color: c.flame, power: 0.5, range: 8.0 });
+        }
+        _ => {}
     }
 }
 
@@ -2334,16 +2507,19 @@ fn tree_roots(env: &mut Env, base: Vec3, r: f32, n: u32, bark: Paint, v: &mut Vr
 
 fn leaf_clump(env: &mut Env, c: &Colors, at: Vec3, s: f32, v: &mut Vr) {
     let n = 3 + v.i(3);
+    let under = mix(c.leaf_dark, hex("#0A0E12"), 0.25);
     for k in 0..n {
         let off = Vec3::new(v.r(-1.0, 1.0), v.r(-0.3, 0.6), v.r(-1.0, 1.0)) * s * 0.7;
         let rr = s * v.r(0.6, 1.0);
-        let col = if (k + v.i(2)).is_multiple_of(3) { c.leaf_dark } else { vary(c.leaf, v.f(), 0.15) };
-        env.ball(
+        let crown = lighten(vary(mix(c.leaf, c.leaf_dark, 0.15), v.f(), 0.1), 1.04);
+        env.foliage(
             at + off,
             Quat::from_rotation_y(v.r(0.0, TAU)),
             Vec3::new(rr, rr * 0.72, rr),
-            7,
-            Paint::new(Key::Cloth, col).ink(INK_S),
+            v.seed ^ (k * 131 + 7),
+            under,
+            crown,
+            INK_S,
         );
     }
 }
@@ -2616,21 +2792,31 @@ pub fn bridge(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, width: f32, deep:
     let trim = Paint::new(Key::Stone, c.trim).ink(INK_S);
     let hw = width * 0.5;
     let mut v = Vr::new(from, 53);
-    // Deck: courses of pavers across the span, slightly humped; a curb along each edge.
-    let pieces = (len / 1.4).ceil().max(1.0) as u32;
-    for k in 0..pieces {
-        let t = (k as f32 + 0.5) / pieces as f32;
+    // Deck: courses of setts across the span, staggered like a laid road and slightly humped;
+    // a curb along each edge.
+    let courses = (len / 1.1).ceil().max(1.0) as u32;
+    let lane = hw - 0.3;
+    for k in 0..courses {
+        let t = (k as f32 + 0.5) / courses as f32;
         let s = -len * 0.5 + len * t;
         let hump = 0.12 * (1.0 - (2.0 * t - 1.0).powi(2));
-        let col = vary(lighten(c.stone, 1.1), v.f(), 0.08);
-        let piece = len / pieces as f32 * 0.5 - 0.02;
-        env.block(
-            w3(mid + d * s, -0.14 + hump),
-            rot,
-            Vec3::new(hw - 0.3, 0.2, piece),
-            0.0,
-            Paint::new(Key::Stone, col),
-        );
+        let piece = len / courses as f32 * 0.5 - 0.025;
+        let mut x = -lane;
+        let mut first = true;
+        while x < lane - 0.05 {
+            let w = if first { v.r(0.4, 1.3) } else { v.r(0.9, 1.6) }.min(lane - x);
+            let w = if lane - x - w < 0.4 { lane - x } else { w };
+            first = false;
+            let col = vary(mix(c.stone, c.trim, 0.25), v.f(), 0.1);
+            env.block(
+                w3(mid + d * s + n * (x + w * 0.5), -0.14 + hump),
+                rot,
+                Vec3::new(w * 0.5 - 0.025, 0.2, piece),
+                0.0,
+                Paint::new(Key::Stone, col),
+            );
+            x += w;
+        }
     }
     // Under-structure: a beam under the deck, and over a chasm two piers dropping into it.
     env.block(w3(mid, -0.62), rot, Vec3::new(hw - 0.3, 0.3, len * 0.5 - 0.2), 0.04, stone);
@@ -3381,20 +3567,42 @@ fn fallen_weapon(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, lean_to: V
             );
         }
     }
-    // The crater: heaved stones and cracks of light.
-    for k in 0..6 {
-        let d = dir(k as f32 / 6.0 * TAU + v.f());
-        let rr = r * v.r(0.2, 0.35);
-        env.rock(
-            base + wd(d) * r * v.r(0.8, 1.1) + Vec3::Y * rr * 0.2,
-            Quat::IDENTITY,
-            Vec3::new(rr, rr * 0.6, rr),
-            v.seed + k,
-            0.45,
-            Paint::new(Key::Rock, c.rock).ink(INK_S),
-        );
+    // The crater: a ring of heaved slabs and stones, scorched ground, and cracks of light
+    // running out from the wound.
+    env.disc(base + Vec3::Y * 0.02, r * 1.5, 14, lin(mix(c.dark, hex("#0C0808"), 0.5)), lin(c.dark), Key::Stone);
+    for k in 0..7 {
+        let d = dir(k as f32 / 7.0 * TAU + v.f() * 0.6);
+        let rr = r * v.r(0.22, 0.38);
+        let at = base + wd(d) * r * v.r(0.8, 1.15);
+        if k % 2 == 0 {
+            // A slab of the old floor, heaved up and tilted away from the impact.
+            let tilt = face(d) * Quat::from_rotation_x(-v.r(0.35, 0.7));
+            env.block(at + Vec3::Y * rr * 0.35, tilt, Vec3::new(rr * 1.1, rr * 0.22, rr * 0.8), 0.03, {
+                Paint::new(Key::Stone, vary(c.stone, v.f(), 0.08)).ink(INK_S)
+            });
+        } else {
+            env.rock(
+                at + Vec3::Y * rr * 0.2,
+                Quat::IDENTITY,
+                Vec3::new(rr, rr * 0.6, rr),
+                v.seed + k,
+                0.45,
+                Paint::new(Key::Rock, c.rock).ink(INK_S),
+            );
+        }
     }
-    env.disc(base + Vec3::Y * 0.03, r * 1.2, 14, lin(hdr(c.glow, 0.3)), [0.0; 4], Key::Glow);
+    let glow = Paint::new(Key::Glow, hdr(c.glow, 0.8));
+    for k in 0..5 {
+        let a = k as f32 / 5.0 * TAU + v.r(-0.4, 0.4);
+        let d = dir(a);
+        let len = r * v.r(1.0, 1.7);
+        let bend = dir(a + v.r(-0.5, 0.5));
+        let p0 = base + wd(d) * (r * 0.25) + Vec3::Y * 0.03;
+        let p1 = p0 + wd(d) * (len * 0.5);
+        let p2 = p1 + wd(bend) * (len * 0.5);
+        env.tube(&[p0, p1, p2], &[0.07, 0.05, 0.015], 4, glow);
+    }
+    env.disc(base + Vec3::Y * 0.04, r * 0.55, 10, lin(hdr(c.glow, 0.35)), [0.0; 4], Key::Glow);
 }
 
 // ───────────────────────────── room rim ─────────────────────────────
