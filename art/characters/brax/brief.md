@@ -155,6 +155,24 @@ Findings, measured in CIELAB:
 | What does Meltdown look like? | The gauntlets turn mostly emissive (core-yellow cracks widen), the chest sigil flares, the eyes go white-hot and heat shimmer rises from the fists. The scale is 1.25. | colour script |
 | Where are the sash tails and the ragged hem driven? | Short bone chains on the master skeleton's per-character extras, with spring motion at runtime. | stage 3 |
 
+### Settled by the approved turnaround sheet (2026-09-25)
+
+The user supplied [`references/BRAX_sheet_turnaround.png`](references/BRAX_sheet_turnaround.png). It settles most
+of the table above; where it differs from a proposal, the sheet wins.
+
+* **Back:** a glowing crack runs down the spine from the nape to the belt and branches across both shoulder
+  blades, brighter than the thin dim cracks proposed above. No second sigil. The scale skirt wraps all the way
+  round, and a teal sash tail also hangs at the back centre.
+* **Fist:** closed fists built from basalt segments with lava in every gap. Blocky knuckle plates glow at the
+  striking face. The bronze is a cuff at the elbow plus an angular (hexagonal) strap frame along the back of the
+  forearm that ends in a ring on the back of the wrist.
+* **Face:** a confident grin, glowing amber eyes, a full short beard and messy black hair.
+* **Chest sigil:** the ring and vertical line, with cracks radiating onto the pecs and shoulders.
+* **Colour swatches:** `#2A292B` rock, `#FA5F26` lava orange, `#FDA747` lava amber, `#472B23` dark brown,
+  `#025D67` teal (status.json item `colour_swatches`).
+* **Still open (optional):** the Heat 0 / Heat max / Meltdown looks. The sheet's action panel shows the uppercut's
+  flame burst but no lighting states; a colour script would settle them.
+
 ## 8. Notes for stages 1 to 4
 
 * **Stage 1 input.** The concept is dark basalt on a dark navy ground (rock L\* 13 against the

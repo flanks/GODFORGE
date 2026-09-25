@@ -17,12 +17,29 @@
    "in_git": true
   },
   {
+   "path": "art/characters/brax/references/BRAX_sheet_turnaround.png",
+   "bytes": 2547752,
+   "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+   "role": "approved turnaround sheet (user-supplied): A-pose front/side/back, gauntlets, face, sigil, swatches",
+   "in_git": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-25"
+  },
+  {
    "path": "docs/media/playable_characters/BRAX.png",
    "bytes": 1546089,
    "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
    "role": "the user's original of the approved front, outside the art tree",
-   "in_git": false,
-   "note": "untracked in git at the time of writing; the art track does not commit files outside its working area"
+   "in_git": true,
+   "note": "committed by the user in 1ef48b9 (Git LFS enable commit); byte-identical to the copy under references/"
+  },
+  {
+   "path": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+   "bytes": 2547752,
+   "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+   "role": "the user's original of the turnaround sheet, outside the art tree",
+   "in_git": true,
+   "note": "committed by the user in 1ef48b9 (Git LFS enable commit); byte-identical to the copy under references/"
   }
  ],
  "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The 'files' list below is written by tools/comfy/art_manifest.py (raw output that stays local).",

@@ -7,10 +7,11 @@
  "final": false,
  "stages": {
   "0_concept_reference": {
-   "status": "pending_human",
+   "status": "done",
    "human_signoff_required": true,
    "outputs": [
     "art/characters/brax/references/BRAX_front_approved.png",
+    "art/characters/brax/references/BRAX_sheet_turnaround.png",
     "art/characters/brax/brief.md",
     "art/characters/brax/turnaround_prompts.md",
     "art/characters/brax/palette.json",
@@ -18,7 +19,7 @@
     "art/characters/brax/reports/stage0_readability.png",
     "art/characters/brax/reports/stage0_palette_samples.png"
    ],
-   "notes": "The front is approved by the user. The side, 3/4, back, expression, gauntlet and colour-script sheets have ready-to-paste prompts and wait for a human to generate and approve them. The palette and colour callouts are measurements of the approved front, not new design.",
+   "notes": "Done 2026-09-25. The user supplied the T-pose front (TRELLIS input) and a full turnaround sheet (references/BRAX_sheet_turnaround.png: A-pose front/side/back, key art, gauntlet close-ups, face close-up, chest-sigil detail, five colour swatches). The sheet is the authority for the side and back shapes, the back crack pattern, the gauntlet construction and the face. Optional and not blocking: a dedicated 3/4 turnaround and a colour script with lighting/Heat/Meltdown states.",
    "items": {
     "front": {
      "status": "done",
@@ -27,65 +28,152 @@
      "approved_on": "2026-09-25",
      "source": "docs/media/playable_characters/BRAX.png",
      "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
-     "outputs": ["art/characters/brax/references/BRAX_front_approved.png"],
-     "notes": "The user supplied it as the approved front concept (1536x1024, T-pose, flat navy background). references/brax_concept_front.png is a byte-identical copy that the stage-1 track uses as TRELLIS input."
+     "outputs": [
+      "art/characters/brax/references/BRAX_front_approved.png"
+     ],
+     "notes": "The user supplied it as the approved front concept (1536x1024, T-pose, flat navy background). references/brax_concept_front.png is a byte-identical copy that the stage-1 track uses as TRELLIS input. The user's turnaround sheet (references/BRAX_sheet_turnaround.png, approved 2026-09-25) adds a relaxed A-pose front; the T-pose front stays the TRELLIS input and the proportion reference."
     },
     "side": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
-     "prompt": "art/characters/brax/turnaround_prompts.md#1-side-view-left-profile",
-     "notes": "Prompt ready. Generate it in ChatGPT with the front attached, check it against the acceptance list, and save it as references/BRAX_side_approved.png."
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+     "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+     "outputs": [
+      "art/characters/brax/references/BRAX_sheet_turnaround.png"
+     ],
+     "view": "top row, middle: right profile (he faces image-right, his right side toward the viewer), relaxed A-pose",
+     "notes": "Approved: user-supplied turnaround sheet (the user's file docs/media/playable_characters/BRAX THE FURNACE-BORN .png, copied verbatim); the user's approval was relayed by the workflow coordinator on 2026-09-25."
     },
     "three_quarter": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
      "prompt": "art/characters/brax/turnaround_prompts.md#2-front-three-quarter-view",
-     "notes": "Prompt ready."
+     "notes": "Optional. The approved sheet's key art (top-left, 3/4 front in a fighting stance) together with the front, side and back views covers what stage 2 needs; a dedicated 3/4 turnaround is not required.",
+     "optional": true
     },
     "back": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
-     "prompt": "art/characters/brax/turnaround_prompts.md#3-back-view",
-     "notes": "Prompt ready. It includes a proposed back design (cracks over the shoulder blades, no second sigil) that the approver confirms or changes first."
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+     "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+     "outputs": [
+      "art/characters/brax/references/BRAX_sheet_turnaround.png"
+     ],
+     "view": "top row, right: back view, relaxed A-pose. Settles the back: a glowing crack runs down the spine from the nape to the belt and branches across both shoulder blades; the scale skirt wraps all the way round; a teal sash tail also hangs at the back centre; no second sigil",
+     "notes": "Approved: user-supplied turnaround sheet (the user's file docs/media/playable_characters/BRAX THE FURNACE-BORN .png, copied verbatim); the user's approval was relayed by the workflow coordinator on 2026-09-25."
     },
     "expression": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
-     "prompt": "art/characters/brax/turnaround_prompts.md#4-expression-sheet",
-     "notes": "Prompt ready: 6 heads. Used for portraits, the codex and close-ups; the face is 1-2 px in gameplay."
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+     "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+     "outputs": [
+      "art/characters/brax/references/BRAX_sheet_turnaround.png"
+     ],
+     "view": "bottom row, left: face close-up, confident grin, glowing amber eyes, full short beard, messy black hair. One expression; more heads for portraits are optional",
+     "notes": "Approved: user-supplied turnaround sheet (the user's file docs/media/playable_characters/BRAX THE FURNACE-BORN .png, copied verbatim); the user's approval was relayed by the workflow coordinator on 2026-09-25."
     },
     "weapon_gauntlet": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
-     "prompt": "art/characters/brax/turnaround_prompts.md#5-gauntlet-weapon-sheet",
-     "notes": "Prompt ready: 8 orthographic views including the closed fist, which stage 3 needs for rigging the finger plates."
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+     "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+     "outputs": [
+      "art/characters/brax/references/BRAX_sheet_turnaround.png"
+     ],
+     "view": "bottom row, second: both gauntlets as closed fists. Settles the construction: basalt segments with lava in every gap, blocky knuckle plates that glow at the striking face, segmented fingers, a bronze cuff at the elbow, an angular (hexagonal) bronze strap frame along the back of the forearm ending in a bronze ring on the back of the wrist",
+     "notes": "Approved: user-supplied turnaround sheet (the user's file docs/media/playable_characters/BRAX THE FURNACE-BORN .png, copied verbatim); the user's approval was relayed by the workflow coordinator on 2026-09-25."
     },
     "color_script": {
-     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
      "prompt": "art/characters/brax/turnaround_prompts.md#6-colour-script",
-     "notes": "Prompt ready: flat, approved, game light, Heat 0, Heat max and Meltdown states. The measured palette item below stands in for this sheet's colour values until it is approved."
+     "notes": "Optional. The approved sheet carries five colour swatches (item colour_swatches). A dedicated colour script (game light, Heat 0 / Heat max, Meltdown) is still useful for the shader and VFX pass but no longer blocks stage 2; the prompt is kept in turnaround_prompts.md#6-colour-script.",
+     "optional": true
     },
     "palette": {
-     "status": "stand_in", "stand_in": true, "human_signoff_required": false,
+     "status": "stand_in",
+     "stand_in": true,
+     "human_signoff_required": false,
      "outputs": [
       "art/characters/brax/palette.json",
       "art/characters/brax/color_script.png",
       "art/characters/brax/reports/stage0_palette_samples.png"
      ],
      "tool": "tools/comfy/palette_extract.py art/characters/brax/palette_spec.json",
-     "notes": "Automated measurement of the approved front (13 swatches, shadow/base/highlight). The values are exact for the front plate, so engineering can use them for shader and UI colours now. This is a STAND-IN for the painted colour-script sheet, which it does not replace: it has no lighting states and no Heat or Meltdown looks."
+     "notes": "Automated measurement of the approved front (13 swatches, shadow/base/highlight). The values are exact for the front plate, so engineering can use them for shader and UI colours now. This is a STAND-IN for the painted colour-script sheet, which it does not replace: it has no lighting states and no Heat or Meltdown looks. Since 2026-09-25 the user-approved swatches (item colour_swatches) are the authority for the five key hues; this measured palette fills in the other materials."
     },
     "brief": {
-     "status": "done", "human_signoff_required": false,
-     "outputs": ["art/characters/brax/brief.md"],
-     "notes": "Built from the content rows, the approved front and measurements. The design proposals in section 7 are decided by the approver through the pending sheets."
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/brax/brief.md"
+     ],
+     "notes": "Built from the content rows, the approved front and measurements. Section 7's design proposals are settled by the approved turnaround sheet (addendum at the end of section 7)."
     },
     "turnaround_prompts": {
-     "status": "done", "human_signoff_required": false,
-     "outputs": ["art/characters/brax/turnaround_prompts.md"]
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/brax/turnaround_prompts.md"
+     ]
     },
     "readability_check": {
-     "status": "done", "human_signoff_required": false,
-     "outputs": ["art/characters/brax/reports/stage0_readability.png"],
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/brax/reports/stage0_readability.png"
+     ],
      "tool": "tools/comfy/readability_sheet.py brax art/characters/brax/references/BRAX_front_approved.png",
      "notes": "2D approximation: the front plate at 65/86 px, on the biome grounds and pasted into a client frame. Findings are in brief.md section 5. The real check through the 55-degree camera belongs to stage 1."
+    },
+    "colour_swatches": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX THE FURNACE-BORN .png",
+     "sha256": "a74e23eb231e704dfcf42c3e7fe70685017f3b14ae80ce0e03590e31b1d50967",
+     "outputs": [
+      "art/characters/brax/references/BRAX_sheet_turnaround.png"
+     ],
+     "swatches": [
+      {
+       "hex": "#2A292B",
+       "role": "rock / dark"
+      },
+      {
+       "hex": "#FA5F26",
+       "role": "lava orange"
+      },
+      {
+       "hex": "#FDA747",
+       "role": "lava amber (core)"
+      },
+      {
+       "hex": "#472B23",
+       "role": "dark brown (cloth, leather, hair)"
+      },
+      {
+       "hex": "#025D67",
+       "role": "teal (sash, wraps)"
+      }
+     ],
+     "notes": "The five swatch diamonds at the sheet's lower right (median of a 9x9 px patch at each centre). The measured palette.json (item palette, a stand_in) keeps the per-material shadow/base/highlight values; where the two disagree the approved swatches win."
     }
-   }
+   },
+   "approved_by": "user",
+   "approved_on": "2026-09-25"
   },
   "1_blockout": {
    "status": "done",
@@ -139,11 +227,39 @@
   }
  },
  "human_gates": [
-  {"gate": "stage 0: approve the side, 3/4, back, expression, gauntlet and colour-script sheets", "state": "pending_human"},
-  {"gate": "stage 0: confirm or change the back / fist / Heat / Meltdown proposals before generating", "state": "pending_human"},
-  {"gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)", "state": "pending_human"},
-  {"gate": "stage 2: human retopo and hand-painted NPR textures", "state": "not_started"},
-  {"gate": "stage 3: weight-paint sign-off", "state": "not_started"},
-  {"gate": "stage 5: final Hades-II bar", "state": "not_started"}
+  {
+   "gate": "stage 0: approve the side, back, expression, gauntlet and colour-swatch sheets",
+   "state": "done",
+   "approved_by": "user",
+   "approved_on": "2026-09-25",
+   "via": "references/BRAX_sheet_turnaround.png"
+  },
+  {
+   "gate": "stage 0: back design and fist construction",
+   "state": "done",
+   "approved_by": "user",
+   "approved_on": "2026-09-25",
+   "via": "references/BRAX_sheet_turnaround.png (spine crack + shoulder-blade branches; closed fists with knuckle plates and a bronze strap frame)"
+  },
+  {
+   "gate": "stage 0 (optional): colour script with Heat 0 / Heat max / Meltdown looks, and a 3/4 turnaround",
+   "state": "pending_human"
+  },
+  {
+   "gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "stage 2: human retopo and hand-painted NPR textures",
+   "state": "not_started"
+  },
+  {
+   "gate": "stage 3: weight-paint sign-off",
+   "state": "not_started"
+  },
+  {
+   "gate": "stage 5: final Hades-II bar",
+   "state": "not_started"
+  }
  ]
 }
