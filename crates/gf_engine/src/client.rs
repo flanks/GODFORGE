@@ -9,11 +9,17 @@ pub use bevy::camera::{Hdr, ScalingMode};
 pub use bevy::core_pipeline::tonemapping::Tonemapping;
 pub use bevy::diagnostic::{Diagnostic, DiagnosticPath, Diagnostics, RegisterDiagnostic};
 pub use bevy::input::touch::Touches;
-pub use bevy::light::NotShadowCaster;
+pub use bevy::light::{NotShadowCaster, NotShadowReceiver};
+// Custom materials (NPR shading, §12): `ExtendedMaterial<StandardMaterial, X>` + embedded WESL.
+pub use bevy::asset::embedded_asset;
+pub use bevy::ecs::system::SystemParam;
+pub use bevy::pbr::{ExtendedMaterial, MaterialExtension, MaterialPlugin};
 pub use bevy::picking::hover::Hovered;
 pub use bevy::post_process::bloom::Bloom;
 pub use bevy::render::render_resource::Face;
+pub use bevy::render::render_resource::{AsBindGroup, ShaderType};
 pub use bevy::render::view::screenshot::{Screenshot, save_to_disk};
+pub use bevy::shader::ShaderRef;
 pub use bevy::ui_widgets::{Activate, Button as UiButton};
 pub use bevy::window::{PresentMode, PrimaryWindow, WindowResolution};
 
@@ -172,6 +178,17 @@ pub fn world_to_screen(camera: &Camera, cam_tf: &GlobalTransform, world: Vec3) -
 pub fn cursor_to_ground(camera: &Camera, cam_tf: &GlobalTransform, cursor: Vec2) -> Option<Vec3> {
     let ray = camera.viewport_to_world(cam_tf, cursor).ok()?;
     ray.plane_intersection_point(Vec3::ZERO, InfinitePlane3d::new(Vec3::Y))
+}
+
+/// Indexed triangle-list mesh from raw attributes (procedural platforms, cliffs).
+pub fn triangle_mesh(positions: Vec<[f32; 3]>, normals: Vec<[f32; 3]>, uvs: Vec<[f32; 2]>, indices: Vec<u32>) -> Mesh {
+    use bevy::asset::RenderAssetUsages;
+    use bevy::mesh::{Indices, PrimitiveTopology};
+    Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::default())
+        .with_inserted_attribute(Mesh::ATTRIBUTE_POSITION, positions)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_NORMAL, normals)
+        .with_inserted_attribute(Mesh::ATTRIBUTE_UV_0, uvs)
+        .with_inserted_indices(Indices::U32(indices))
 }
 
 /// Build an sRGB RGBA8 texture from raw pixels (procedural painterly ground, VFX sprites).

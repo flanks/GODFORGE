@@ -8,6 +8,7 @@
 pub mod camera;
 pub mod hud;
 pub mod input;
+pub mod materials;
 pub mod net;
 pub mod offscreen;
 pub mod palette;
@@ -93,6 +94,7 @@ impl Plugin for ClientPlugin {
                 (ClientSet::Net, ClientSet::Input, ClientSet::Scene, ClientSet::Presentation).chain(),
             );
         app.add_systems(Last, automation);
+        materials::build(app);
         net::build(app);
         input::build(app);
         palette::build(app);
