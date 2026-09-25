@@ -1,0 +1,32 @@
+{
+ "asset": "slag_king",
+ "kind": "enemy",
+ "tier": "boss",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/slag_king.glb",
+    "assets/models/enemies/slag_king.meta.json",
+    "art/enemies/slag_king/source/slag_king.blend",
+    "art/enemies/slag_king/textures/slag_king_basecolor.png",
+    "art/enemies/slag_king/textures/slag_king_emissive.png",
+    "art/enemies/slag_king/reports/slag_king_review.png",
+    "art/enemies/slag_king/reports/slag_king_ingame.png",
+    "art/enemies/slag_king/reports/slag_king_clips.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/slag_king.py (dedicated rig GF_SlagKing_v1)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}

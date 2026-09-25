@@ -1,0 +1,261 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\slag_king.glb",
+  "key": "slag_king",
+  "kind": "enemy",
+  "tier": "boss",
+  "extensions_used": [],
+  "tris": 21543,
+  "budget": [
+   20000,
+   40000
+  ],
+  "textures": [
+   {
+    "name": "slag_king_emissive",
+    "role": "emissive",
+    "px": [
+     2048,
+     2048
+    ],
+    "format": "png",
+    "bytes": 687861
+   },
+   {
+    "name": "slag_king_basecolor",
+    "role": "base_color",
+    "px": [
+     2048,
+     2048
+    ],
+    "format": "png",
+    "bytes": 3729086
+   }
+  ],
+  "materials": [
+   "M_slag_king"
+  ],
+  "sockets": {
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     7.1638,
+     4.8583
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     0.0,
+     7.1638,
+     4.8583
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     6.9819,
+     3.668
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     7.2,
+     0.6
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     12.9435,
+     2.4825
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -7.5237,
+    -0.0258,
+    -5.0095
+   ],
+   "max": [
+    7.5237,
+    12.801,
+    6.3512
+   ]
+  },
+  "height_m": 12.827,
+  "height_vs_hero": 5.83,
+  "joints": [
+   "root",
+   "pelvis",
+   "spine_01",
+   "spine_02",
+   "arm2_upper_L",
+   "arm2_lower_L",
+   "arm2_hand_L",
+   "arm2_upper_R",
+   "arm2_lower_R",
+   "arm2_hand_R",
+   "head",
+   "crown",
+   "crown_spin",
+   "door",
+   "upperarm_L",
+   "lowerarm_L",
+   "hand_L",
+   "upperarm_R",
+   "lowerarm_R",
+   "hand_R",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R"
+  ],
+  "clips": [
+   "slag_king_idle@loop",
+   "slag_king_move@loop",
+   "slag_king_idle_p2@loop",
+   "slag_king_move_p2@loop",
+   "slag_king_windup",
+   "slag_king_attack",
+   "slag_king_hit",
+   "slag_king_windup_p2",
+   "slag_king_attack_p2",
+   "slag_king_hit_p2",
+   "slag_king_strike_circle",
+   "slag_king_slam_trail",
+   "slag_king_radial",
+   "slag_king_slam_trail_p2",
+   "slag_king_radial_p2",
+   "slag_king_door_open",
+   "slag_king_door_close",
+   "slag_king_roar",
+   "slag_king_phase2",
+   "slag_king_phase3",
+   "slag_king_strike_cone",
+   "slag_king_strike_line",
+   "slag_king_pools",
+   "slag_king_summon",
+   "slag_king_death",
+   "slag_king_walk@loop",
+   "slag_king_ground_pound",
+   "slag_king_sweep",
+   "slag_king_furnace_open",
+   "slag_king_phase2_idle@loop",
+   "slag_king_phase_transition"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 2048,
+  "texel_density_px_per_m": {
+   "median": 35.8,
+   "p10": 20.3,
+   "p90": 40.7
+  },
+  "coverage": 0.464,
+  "zones": [
+   "slag",
+   "crust",
+   "iron",
+   "steel",
+   "blade",
+   "molten",
+   "lava",
+   "core",
+   "obsidian",
+   "ichor"
+  ],
+  "decals": 13,
+  "basecolor": "art/enemies/slag_king/textures/slag_king_basecolor.png",
+  "emissive": "art/enemies/slag_king/textures/slag_king_emissive.png",
+  "emissive_texels": 485115,
+  "seconds": 39.1,
+  "paint_scale": 0.125
+ },
+ "skin": {
+  "vertices": 12168,
+  "multi_bone": 0,
+  "per_bone": {
+   "thigh_L": 274,
+   "shin_L": 249,
+   "foot_L": 69,
+   "thigh_R": 273,
+   "shin_R": 253,
+   "foot_R": 69,
+   "pelvis": 1150,
+   "spine_01": 204,
+   "spine_02": 2340,
+   "upperarm_L": 236,
+   "head": 1248,
+   "door": 353,
+   "crown_spin": 2055,
+   "lowerarm_L": 682,
+   "upperarm_R": 281,
+   "lowerarm_R": 682,
+   "hand_R": 202,
+   "hand_L": 366,
+   "arm2_upper_L": 234,
+   "arm2_lower_L": 228,
+   "arm2_hand_L": 129,
+   "arm2_upper_R": 234,
+   "arm2_lower_R": 228,
+   "arm2_hand_R": 129
+  }
+ }
+}

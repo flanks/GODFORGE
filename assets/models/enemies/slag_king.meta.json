@@ -1,0 +1,856 @@
+{
+ "kind": "enemy",
+ "key": "slag_king",
+ "tier": "boss",
+ "tris": 21543,
+ "tris_budget": [
+  20000,
+  40000
+ ],
+ "textures": [
+  {
+   "name": "slag_king_emissive",
+   "role": "emissive",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 687861
+  },
+  {
+   "name": "slag_king_basecolor",
+   "role": "base_color",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 3729086
+  }
+ ],
+ "sockets": {
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    7.1638,
+    4.8583
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    0.0,
+    7.1638,
+    4.8583
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    6.9819,
+    3.668
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    7.2,
+    0.6
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    12.9435,
+    2.4825
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "slag_king_idle@loop",
+  "slag_king_move@loop",
+  "slag_king_idle_p2@loop",
+  "slag_king_move_p2@loop",
+  "slag_king_windup",
+  "slag_king_attack",
+  "slag_king_hit",
+  "slag_king_windup_p2",
+  "slag_king_attack_p2",
+  "slag_king_hit_p2",
+  "slag_king_strike_circle",
+  "slag_king_slam_trail",
+  "slag_king_radial",
+  "slag_king_slam_trail_p2",
+  "slag_king_radial_p2",
+  "slag_king_door_open",
+  "slag_king_door_close",
+  "slag_king_roar",
+  "slag_king_phase2",
+  "slag_king_phase3",
+  "slag_king_strike_cone",
+  "slag_king_strike_line",
+  "slag_king_pools",
+  "slag_king_summon",
+  "slag_king_death",
+  "slag_king_walk@loop",
+  "slag_king_ground_pound",
+  "slag_king_sweep",
+  "slag_king_furnace_open",
+  "slag_king_phase2_idle@loop",
+  "slag_king_phase_transition"
+ ],
+ "skeleton": "GF_SlagKing_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -7.5237,
+   -0.0258,
+   -5.0095
+  ],
+  "max": [
+   7.5237,
+   12.801,
+   6.3512
+  ]
+ },
+ "size_m": 12.827,
+ "glb": "assets/models/enemies/slag_king.glb",
+ "glb_bytes": 7618820,
+ "glb_sha256": "892e65543c4c72c00b4b4af9d94858d4622ccee7bb871c0866147d67925a5303",
+ "source_blend": "art/enemies/slag_king/source/slag_king.blend",
+ "build_script": "tools/blender/gf_assets/enemies/slag_king.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "rig": {
+  "name": "GF_SlagKing_v1",
+  "bones": [
+   "root",
+   "pelvis",
+   "spine_01",
+   "spine_02",
+   "head",
+   "door",
+   "crown",
+   "crown_spin",
+   "upperarm_L",
+   "lowerarm_L",
+   "hand_L",
+   "arm2_upper_L",
+   "arm2_lower_L",
+   "arm2_hand_L",
+   "upperarm_R",
+   "lowerarm_R",
+   "hand_R",
+   "arm2_upper_R",
+   "arm2_lower_R",
+   "arm2_hand_R",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R"
+  ],
+  "rest": "every bone points up with roll 0 (creature frame: X left, Y up, Z forward) except crown and crown_spin, which point along the crown axis (local +Y = the spin axis)"
+ },
+ "boss_sockets": {
+  "hit_center": {
+   "bone": "spine_02",
+   "blender_pos": [
+    0.0,
+    -0.6,
+    7.2
+   ],
+   "gltf_pos": [
+    0.0,
+    7.2,
+    0.6
+   ]
+  },
+  "fx_core": {
+   "bone": "head",
+   "blender_pos": [
+    0.0,
+    -3.668,
+    6.982
+   ],
+   "gltf_pos": [
+    0.0,
+    6.982,
+    3.668
+   ]
+  },
+  "fx_mouth": {
+   "bone": "head",
+   "blender_pos": [
+    0.0,
+    -4.858,
+    7.164
+   ],
+   "gltf_pos": [
+    0.0,
+    7.164,
+    4.858
+   ]
+  },
+  "attack_origin": {
+   "bone": "head",
+   "blender_pos": [
+    0.0,
+    -4.858,
+    7.164
+   ],
+   "gltf_pos": [
+    0.0,
+    7.164,
+    4.858
+   ]
+  },
+  "head_top": {
+   "bone": "crown",
+   "blender_pos": [
+    0.0,
+    -2.482,
+    12.944
+   ],
+   "gltf_pos": [
+    0.0,
+    12.944,
+    2.482
+   ]
+  },
+  "crown_center": {
+   "bone": "crown",
+   "blender_pos": [
+    0.0,
+    -2.482,
+    10.344
+   ],
+   "gltf_pos": [
+    0.0,
+    10.344,
+    2.482
+   ]
+  },
+  "impact_R": {
+   "bone": "hand_R",
+   "blender_pos": [
+    -5.3,
+    -3.0,
+    0.3
+   ],
+   "gltf_pos": [
+    -5.3,
+    0.3,
+    3.0
+   ]
+  },
+  "impact_L": {
+   "bone": "hand_L",
+   "blender_pos": [
+    5.1,
+    -3.3,
+    0.6
+   ],
+   "gltf_pos": [
+    5.1,
+    0.6,
+    3.3
+   ]
+  },
+  "foot_L_fx": {
+   "bone": "foot_L",
+   "blender_pos": [
+    2.5,
+    -0.2,
+    0.0
+   ],
+   "gltf_pos": [
+    2.5,
+    0.0,
+    0.2
+   ]
+  },
+  "foot_R_fx": {
+   "bone": "foot_R",
+   "blender_pos": [
+    -2.5,
+    -0.5,
+    0.0
+   ],
+   "gltf_pos": [
+    -2.5,
+    0.0,
+    0.5
+   ]
+  },
+  "arm2_tip_L": {
+   "bone": "arm2_hand_L",
+   "blender_pos": [
+    6.35,
+    -5.05,
+    10.4
+   ],
+   "gltf_pos": [
+    6.35,
+    10.4,
+    5.05
+   ]
+  },
+  "arm2_tip_R": {
+   "bone": "arm2_hand_R",
+   "blender_pos": [
+    -6.35,
+    -5.05,
+    10.4
+   ],
+   "gltf_pos": [
+    -6.35,
+    10.4,
+    5.05
+   ]
+  },
+  "chimney_L": {
+   "bone": "spine_02",
+   "blender_pos": [
+    2.092,
+    2.937,
+    12.239
+   ],
+   "gltf_pos": [
+    2.092,
+    12.239,
+    -2.937
+   ]
+  },
+  "chimney_R": {
+   "bone": "spine_02",
+   "blender_pos": [
+    -1.772,
+    2.716,
+    11.746
+   ],
+   "gltf_pos": [
+    -1.772,
+    11.746,
+    -2.716
+   ]
+  }
+ },
+ "clip_info": {
+  "idle@loop": {
+   "frames": 96,
+   "seconds": 3.2,
+   "phase": 1,
+   "loop": true
+  },
+  "move@loop": {
+   "frames": 72,
+   "seconds": 2.4,
+   "phase": 1,
+   "loop": true,
+   "move_cycle_m": 4.45
+  },
+  "idle_p2@loop": {
+   "frames": 144,
+   "seconds": 4.8,
+   "phase": 2,
+   "loop": true
+  },
+  "move_p2@loop": {
+   "frames": 144,
+   "seconds": 4.8,
+   "phase": 2,
+   "loop": true,
+   "move_cycle_m": 9.4
+  },
+  "windup": {
+   "frames": 30,
+   "seconds": 1.0,
+   "phase": 1,
+   "events_s": {
+    "loaded": 1.0
+   },
+   "key_frames": [
+    0,
+    9,
+    24,
+    30
+   ]
+  },
+  "attack": {
+   "frames": 26,
+   "seconds": 0.867,
+   "phase": 1,
+   "events_s": {
+    "impact": 0.167
+   },
+   "key_frames": [
+    0,
+    5,
+    8,
+    13,
+    26
+   ]
+  },
+  "hit": {
+   "frames": 15,
+   "seconds": 0.5,
+   "phase": 1,
+   "events_s": {},
+   "key_frames": [
+    0,
+    3,
+    15
+   ]
+  },
+  "windup_p2": {
+   "frames": 30,
+   "seconds": 1.0,
+   "phase": 2,
+   "events_s": {
+    "loaded": 1.0
+   },
+   "key_frames": [
+    0,
+    9,
+    24,
+    30
+   ]
+  },
+  "attack_p2": {
+   "frames": 26,
+   "seconds": 0.867,
+   "phase": 2,
+   "events_s": {
+    "impact": 0.167
+   },
+   "key_frames": [
+    0,
+    5,
+    8,
+    13,
+    26
+   ]
+  },
+  "hit_p2": {
+   "frames": 15,
+   "seconds": 0.5,
+   "phase": 2,
+   "events_s": {},
+   "key_frames": [
+    0,
+    3,
+    15
+   ]
+  },
+  "strike_circle": {
+   "frames": 66,
+   "seconds": 2.2,
+   "phase": 1,
+   "events_s": {
+    "impact": 1.2
+   },
+   "key_frames": [
+    0,
+    10,
+    28,
+    31,
+    36,
+    39,
+    44,
+    66
+   ]
+  },
+  "slam_trail": {
+   "frames": 61,
+   "seconds": 2.033,
+   "phase": 1,
+   "events_s": {
+    "impact": 0.9,
+    "second_impact": 1.1
+   },
+   "key_frames": [
+    0,
+    8,
+    22,
+    25,
+    27,
+    30,
+    33,
+    36,
+    41,
+    61
+   ]
+  },
+  "radial": {
+   "frames": 48,
+   "seconds": 1.6,
+   "phase": 1,
+   "events_s": {
+    "release": 0.5
+   },
+   "key_frames": [
+    0,
+    12,
+    15,
+    19,
+    27,
+    48
+   ]
+  },
+  "slam_trail_p2": {
+   "frames": 60,
+   "seconds": 2.0,
+   "phase": 2,
+   "events_s": {
+    "impact": 0.867,
+    "second_impact": 1.067
+   },
+   "key_frames": [
+    0,
+    8,
+    21,
+    24,
+    26,
+    29,
+    32,
+    35,
+    40,
+    60
+   ]
+  },
+  "radial_p2": {
+   "frames": 48,
+   "seconds": 1.6,
+   "phase": 2,
+   "events_s": {
+    "release": 0.5
+   },
+   "key_frames": [
+    0,
+    12,
+    15,
+    19,
+    27,
+    48
+   ]
+  },
+  "door_open": {
+   "frames": 24,
+   "seconds": 0.8,
+   "phase": 1,
+   "events_s": {
+    "open": 0.567
+   },
+   "key_frames": [
+    0,
+    7,
+    17,
+    21,
+    24
+   ]
+  },
+  "door_close": {
+   "frames": 24,
+   "seconds": 0.8,
+   "phase": 1,
+   "events_s": {
+    "shut": 0.467
+   },
+   "key_frames": [
+    0,
+    8,
+    14,
+    18,
+    24
+   ]
+  },
+  "roar": {
+   "frames": 72,
+   "seconds": 2.4,
+   "phase": 1,
+   "events_s": {
+    "peak": 0.8
+   },
+   "key_frames": [
+    0,
+    14,
+    24,
+    28,
+    32,
+    36,
+    40,
+    44,
+    48,
+    52,
+    56,
+    60,
+    72
+   ]
+  },
+  "phase2": {
+   "frames": 90,
+   "seconds": 3.0,
+   "phase": "1to2",
+   "events_s": {
+    "burst": 1.467
+   },
+   "key_frames": [
+    0,
+    14,
+    17,
+    20,
+    23,
+    26,
+    29,
+    32,
+    35,
+    38,
+    41,
+    44,
+    50,
+    54,
+    62,
+    90
+   ]
+  },
+  "phase3": {
+   "frames": 72,
+   "seconds": 2.4,
+   "phase": "2to3",
+   "events_s": {
+    "peak": 0.733
+   },
+   "key_frames": [
+    0,
+    12,
+    22,
+    26,
+    30,
+    34,
+    38,
+    42,
+    46,
+    50,
+    72
+   ]
+  },
+  "strike_cone": {
+   "frames": 60,
+   "seconds": 2.0,
+   "phase": 2,
+   "events_s": {
+    "impact": 1.0
+   },
+   "key_frames": [
+    0,
+    9,
+    20,
+    26,
+    30,
+    34,
+    39,
+    60
+   ]
+  },
+  "strike_line": {
+   "frames": 84,
+   "seconds": 2.8,
+   "phase": 2,
+   "events_s": {
+    "impact": 1.0,
+    "pour_end": 2.0
+   },
+   "key_frames": [
+    0,
+    10,
+    26,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    84
+   ]
+  },
+  "pools": {
+   "frames": 54,
+   "seconds": 1.8,
+   "phase": 2,
+   "events_s": {
+    "release": 1.0
+   },
+   "key_frames": [
+    0,
+    8,
+    21,
+    26,
+    30,
+    34,
+    54
+   ]
+  },
+  "summon": {
+   "frames": 60,
+   "seconds": 2.0,
+   "phase": 2,
+   "events_s": {
+    "spawn": [
+     0.633,
+     1.0,
+     1.367
+    ]
+   },
+   "key_frames": [
+    0,
+    12,
+    19,
+    25,
+    30,
+    36,
+    41,
+    60
+   ]
+  },
+  "death": {
+   "frames": 105,
+   "seconds": 3.5,
+   "phase": 2,
+   "events_s": {
+    "collapse": 1.8
+   },
+   "key_frames": [
+    0,
+    8,
+    14,
+    30,
+    38,
+    54,
+    60,
+    66,
+    105
+   ]
+  }
+ },
+ "clip_aliases": {
+  "slag_king_walk@loop": "slag_king_move@loop",
+  "slag_king_ground_pound": "slag_king_strike_circle",
+  "slag_king_sweep": "slag_king_strike_cone",
+  "slag_king_furnace_open": "slag_king_door_open",
+  "slag_king_phase2_idle@loop": "slag_king_idle_p2@loop",
+  "slag_king_phase_transition": "slag_king_phase2"
+ },
+ "phases": {
+  "Molten Court": {
+   "below": 1.0,
+   "loops": [
+    "idle@loop",
+    "move@loop"
+   ],
+   "body": "door shut, two arms, crown still"
+  },
+  "Slagfall": {
+   "below": 0.6,
+   "enter": "phase2",
+   "loops": [
+    "idle_p2@loop",
+    "move_p2@loop"
+   ],
+   "body": "door burst open, four arms, crown spinning"
+  },
+  "Final Pour": {
+   "below": 0.25,
+   "enter": "phase3",
+   "loops": [
+    "idle_p2@loop",
+    "move_p2@loop"
+   ],
+   "body": "as Slagfall; the client pushes the emissive toward white and spins the crown faster"
+  }
+ },
+ "phase_switch": "Clips carry the phase: every clip keys every joint. Phase-1 clips hold arm2_upper_L/R at scale 0.001 (folded inside the chest) and the door shut; phase2 bursts the door and grows the arms; phase-2+ clips hold them. In phase >= 2 play '<clip>_p2' when it exists, else '<clip>'. The crown spin is procedural: after animation, rotate the joint crown_spin about its local +Y (75 deg/s in Slagfall, 150 deg/s in Final Pour, x2 during radial).",
+ "move_cycle_m": {
+  "move@loop": 4.45,
+  "move_p2@loop": 9.4
+ },
+ "paint": {
+  "size": 2048,
+  "texel_density_px_per_m": {
+   "median": 35.8,
+   "p10": 20.3,
+   "p90": 40.7
+  },
+  "coverage": 0.464,
+  "paint_scale": 0.125
+ },
+ "row": {
+  "hp": 28000,
+  "speed": 1.6,
+  "radius": 2.2,
+  "scale": 2.4,
+  "collider_radius_m": 5.28,
+  "mass": 30,
+  "color": "#6B2A14",
+  "shape": "Colossus"
+ }
+}

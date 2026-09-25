@@ -261,14 +261,24 @@ is no runtime variant system.
   | Slagfall | 60 % | Pools, Summon(cinderling ×8), SlamTrail, Strike(Cone) | `phase2`: the door bursts, the core is exposed, molten limbs split into four arms, the blade crown spins |
   | Final Pour | 25 % | Strike(Line), Radial, SlamTrail, Pools | `phase3`: the core pours; the crown glows white |
 
-* **Clips:** idle@loop (towering, door closed), move@loop, windup, attack, hit, death, phase2, phase3,
-  idle_p2@loop, move_p2@loop, slam_trail (ground pound walk), strike_circle (ground pound),
-  strike_cone (furnace breath), strike_line (the pour), radial (the crown sprays slag), pools (drips
-  flung wide), summon (the furnace spits cinderlings), door_open / door_close.
-* **Rig:** `GF_SlagKing_v1`. It has a door bone, a crown bone (spin), and four arm chains. The two
-  phase-2 arms are scaled to 0 until `phase2`.
-* **Colour:** slag black, molten orange `#FF6B1A`, forge gold `#FFC24B`, teal Unmade cracks `#2FBFA8`,
-  white-hot core `#FFF3D6`. Budget 20-40k tris, 2048 px.
+* **Clips (built):** idle@loop (towering, door closed), move@loop, windup, attack, hit, death, phase2,
+  phase3, idle_p2@loop, move_p2@loop, slam_trail (the anvil slams on the windup, the claw follows),
+  strike_circle (the two-fisted ground pound), strike_cone (the anvil sweep), strike_line (the pour),
+  radial (the crown sprays slag), pools (drips flung wide), summon (the furnace spits cinderlings),
+  door_open / door_close, roar. Phase-2 twins: windup_p2, attack_p2, hit_p2, slam_trail_p2,
+  radial_p2. The user's brief names are exported as aliases of the same actions: walk@loop,
+  ground_pound, sweep, furnace_open, phase2_idle@loop, phase_transition.
+* **Phase switching:** every clip keys every joint, so each clip carries its phase. Phase-1 clips hold
+  `arm2_upper_L/R` at scale 0.001 and the door shut; `phase2` bursts the door and grows the arms;
+  phase-2+ clips hold them. In phase ≥ 2 the client plays `<clip>_p2` when it exists, else `<clip>`.
+  The crown spin is procedural: rotate the `crown_spin` joint about its local +Y after animation
+  (75°/s in Slagfall, 150°/s in Final Pour). The Final Pour "white crown" is an emissive boost.
+  Details: art/enemies/slag_king/README.md and meta.json `phase_switch`.
+* **Rig:** `GF_SlagKing_v1`, 26 joints, rigid skin: `door` (bottom hinge), `crown` + `crown_spin`
+  (tilted along the crown axis), four arm chains (`upperarm/lowerarm/hand_L/R`,
+  `arm2_upper/lower/hand_L/R`), legs, `pelvis`, `spine_01/02`, `head`.
+* **Colour:** slag black, molten orange `#FF6B1A`, forge gold `#FFC24B` (only inside the molten glow
+  ramp), teal Unmade cracks `#2FBFA8`, white-hot core `#FFF3D6`. Built: 21.5k tris, 2048 px.
 
 ## 8. Build workflow and checks
 
