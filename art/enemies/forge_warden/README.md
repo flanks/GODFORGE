@@ -14,7 +14,9 @@ python tools/blender/gf_assets/gfa_validate.py assets/models/enemies/forge_warde
 ```
 
 One run takes about 30-50 s on the CPU. `--preview` renders the geometry in flat zone colours in about
-2 s, and `--poses [--pick] [--game]` adds the rig and clips (no paint, no export).
+2 s. `--look` paints the textures into `work/look/` (about 20 s, no rig and no export) and renders three
+checks: the 3/4 view, a close view down the 55° camera, and the game camera at true pixel size. Use it
+for the value hierarchy. `--poses [--pick] [--game]` adds the rig and clips (no paint, no export).
 
 ![3/4 view](reports/forge_warden_34.png)
 
@@ -23,6 +25,18 @@ One run takes about 30-50 s on the CPU. `--preview` renders the geometry in flat
 | [reports/forge_warden_review.png](reports/forge_warden_review.png) | the standard toolkit review: rest-pose turnaround, 4 frames of every clip, in-game camera 1x / 3x / silhouette, textures, palette |
 | [reports/forge_warden_scale.png](reports/forge_warden_scale.png) | front lineup with the 2.2 m hero mannequin and height bars, then six key poses through the game camera at true 1080p pixel size (1x) and 3x, plus the game-size silhouette |
 | [reports/forge_warden_clips.png](reports/forge_warden_clips.png) | the key poses of all eight clips (the contact sheet of key frames per clip) |
+| [reports/forge_warden_review_fix.png](reports/forge_warden_review_fix.png) | before and after the art review fixes, compared through the game camera (6x and 3x crops at 1x) and in the 3/4 view |
+
+## Art review fixes (2026-09-25, score 7/10)
+
+| Must-fix | Fix |
+|---|---|
+| The body and the halo shield were the same bright gold, so from the 55° camera the shield merged with the torso. | The body plates are repainted dark bronze `#5E5034` with verdigris shadows `#1B3029` and patina patches `#3D5E50`. The darker plates are `#3E3627`. All body gold (collar, diadem, crown, pauldron rims and ridges, flanges, buckle, spikes, the whole spear) moves to a new `trim` zone, a dull old gold `#86703F`. The new `gold` zone is only the halo ring, its rays and shards, the inner halo and the boss, at a slightly brighter `#D2B468`. Only the halo, the porcelain mask and the heart are bright now. |
+| The broken runes on the shield ring and the pauldrons broke into white speckle at game size. | The 12 runes on the ring and the pauldron runes and cracks are gone. The shield face carries six big two-stroke runes (0.12 m, lines 0.026 m). The bite, the back, the chest and the greaves keep a few bold cracks or single big runes. Every rune and crack is a cold-gold line `#C9AA56` with a dim emission (core `#6E5626`), never near-white. Only the mask's eyes keep the hot white-gold glow. |
+| The hollow-armour read was invisible at game size: it read as a solid golden paladin. | The husk is split open down the sternum: a jagged V from the collar to the belly lames, a little toward the warden's right (screen left, clear of the shield). The collar is open ±58° at the front, and the breastplate splits into two pectorals with ripped inner edges. The heart is bigger (radius 0.095 m, it was 0.075 m) and sits lower and further forward, at (-0.06, -0.02, 1.62). The 55° camera now looks down into a verdigris-black void, 15-20 px across at 1x, with the heart glowing in it. The void's emission is tightened to the skins right around the heart. |
+
+The rig, the clips, the sockets and the silhouette are unchanged, except that the `core` bone and the
+`fx_core` socket moved with the heart.
 
 ## Brief and content row
 
@@ -42,22 +56,24 @@ the eye slits, a huge broken-halo shield and a shattered spear. Its verb is **TH
 
   It is carried on the left arm, forward and out, 24° toward the left and leaning back 17°. From
   the 55° camera it therefore sticks out of the body's outline as a round, serrated disc: see the
-  game-size silhouette in the scale sheet. The halo ring is the brightest large metal on the model.
-  The dome is darker, so the ring reads as a halo even at 1x.
+  game-size silhouette in the scale sheet. The halo ring is the **only** bright metal on the model,
+  and the body behind it is dark bronze. The dome is darker too, so the ring reads as a halo even at
+  1x and never merges with the torso.
 * **Hollow armour, visibly.** Every plate is a real thick shell (`gfa_shell.thick_patch`) whose inner
   skin is painted as a verdigris-black void lit from within by a cold-gold heart that floats in the
   chest. The plates also leave gaps:
-  - the collar is open around a floating helm;
+  - the husk is **split open down the sternum**, a jagged V from the wide-open collar down into the
+    belly lames. This is the gap the game camera sees: it looks down into the void, where the heart
+    floats under the mask;
   - the belly lames are split at the front;
   - the waist is a gap;
   - the arm segments float apart;
   - the greaves and cuisses are open at the back;
-  - the cuirass has a torn hole in the back (the heart shows through it) and a bite at the lower
-    front-right.
+  - the cuirass has a torn hole in the back, and the heart shows through it.
 
   The helm's face opening is wider than the mask, so the darkness shows around it: there is no face
   behind.
-* **The head** is small and sunk between the pauldrons. It has a bronze dome, a gold diadem and a
+* **The head** is small and sunk between the pauldrons. It has a bronze dome, an old-gold diadem and a
   five-ray crown (a dead sun god). The porcelain mask is split into two halves along a jagged crack,
   on the bones `mask_L` and `mask_R`, so the death clip can break it apart last. Its closed eyes
   glow cold gold, with tears of light below them.
@@ -68,13 +84,16 @@ the eye slits, a huge broken-halo shield and a shattered spear. Its verb is **TH
 
   | Part | Colour |
   |---|---|
-  | armour (faded god-bronze) | `#7E6A3F`, verdigris shadows `#22382F`, light plane `#C2A35A` |
-  | darker secondary plates | `#4F4530` |
-  | shield face | `#5E5436` |
-  | halo gold | `#CDB066` → `#F4E6B0` |
+  | armour (dark god-bronze) | `#5E5034`, verdigris shadows `#1B3029`, patina `#3D5E50`, light plane `#8E7B4E` |
+  | darker secondary plates | `#3E3627` |
+  | body trim (old gold) | `#86703F` → `#B49A5A` |
+  | shield face | `#524A33` |
+  | halo gold (the only bright metal) | `#D2B468` → `#F6E9B8` |
   | porcelain | `#DCD6C9` |
-  | void | `#10201C`, glowing dim cold gold → dead ember → black |
-  | glows (cold gold) | `#8A6A28` → `#D4B45A` → `#FFF4D0` |
+  | void | verdigris-black `#0C1814`, dim cold gold `#6A5220` only right around the heart |
+  | heart | `#E0C470`, glowing `#B8963E` → `#E0C470` → `#FFF4D0` |
+  | runes and cracks | cold gold `#C9AA56`, dim emission `#3A2C10` → `#6E5626` |
+  | eyes (the one hot decal) | `#8A6A28` → `#D4B45A` → `#FFF4D0` |
 
   There are no player colours and no red-white. The gold stays below the saturation of the player
   gold `#FFC940`.
@@ -84,9 +103,14 @@ the eye slits, a huge broken-halo shield and a shattered spear. Its verb is **TH
   - brushy edge highlights and cavity darks;
   - the plates darken toward the feet.
 
-  Broken runes are cold-gold emissive decals: 12 around the halo ring and 10 on the shield face, plus
-  the pauldron tops, the back, the chest and the greaves. Glowing cracks run from the shield's bite,
-  the back hole and the chest. The porcelain has a hairline crack and no emission except the eyes.
+  The runes are few and big, at cold-gold value:
+  - six two-stroke glyphs on the dark shield face, and none on the bright halo ring;
+  - three on the back;
+  - one on each greave.
+
+  The pauldron tops, which face the camera, carry none. Single bold cracks leak dim light from the
+  shield's bite, the back hole and the torn sternum. The porcelain has a hairline crack and no
+  emission except the eyes.
 
 ## Size and footprint
 
@@ -151,11 +175,11 @@ the shipped names), `clip_roles` and `clip_seconds`.
 
 | | |
 |---|---|
-| Triangles | 7,666 (elite budget 4,000-8,000) |
+| Triangles | 7,526 (elite budget 4,000-8,000) |
 | Textures | base colour 1024² and emissive 1024² (PNG, embedded); one material `M_forge_warden` |
-| UVs | 36 % coverage, texel density about 148 px/m. The hidden void skins and thin rims are packed small, through the optional `uv_zone_scale` / `uv_small_islands` in `gfa_paint`. |
-| GLB | about 2.0 MB, uncompressed (bevy_gltf 0.20 safe); `gfa_validate` OK with no warnings |
-| Parts | 126 shell and detail parts in 7 paint zones: bronze, bronze_dark, gold, porcelain, void, glow, shield |
+| UVs | 36 % coverage, texel density about 149 px/m. The hidden void skins and thin rims are packed small, through the optional `uv_zone_scale` / `uv_small_islands` in `gfa_paint`. |
+| GLB | about 1.9 MB, uncompressed (bevy_gltf 0.20 safe); `gfa_validate` OK with no warnings |
+| Parts | 126 shell and detail parts in 8 paint zones: bronze, bronze_dark, gold (the halo only), trim, porcelain, void, glow, shield |
 
 ## Files
 

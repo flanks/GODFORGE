@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "elite",
   "extensions_used": [],
-  "tris": 7666,
+  "tris": 7526,
   "budget": [
    4000,
    8000
@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 120510
+    "bytes": 100181
    },
    {
     "name": "forge_warden_basecolor",
@@ -29,22 +29,22 @@
      1024
     ],
     "format": "png",
-    "bytes": 1116598
+    "bytes": 1047512
    }
   ],
   "materials": [
    "M_forge_warden"
   ],
   "sockets": {
-   "fx_core": {
+   "attack_origin": {
     "translation": [
-     0.0,
-     1.63,
-     -0.05
+     0.6775,
+     1.3987,
+     0.7189
     ],
     "forward": [
      0.0,
-     0.0,
+     -0.0,
      -1.0
     ],
     "up": [
@@ -87,6 +87,23 @@
      0.0
     ]
    },
+   "fx_core": {
+    "translation": [
+     -0.06,
+     1.62,
+     0.02
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     0.0
+    ]
+   },
    "head_top": {
     "translation": [
      -0.0,
@@ -96,23 +113,6 @@
     "forward": [
      0.0,
      0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "attack_origin": {
-    "translation": [
-     0.6775,
-     1.3987,
-     0.7189
-    ],
-    "forward": [
-     0.0,
-     -0.0,
      -1.0
     ],
     "up": [
@@ -185,25 +185,26 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 148.1,
-   "p10": 53.2,
-   "p90": 154.4
+   "median": 150.1,
+   "p10": 54.0,
+   "p90": 156.3
   },
   "coverage": 0.36,
   "zones": [
    "bronze",
    "bronze_dark",
    "gold",
+   "trim",
    "porcelain",
    "void",
    "glow",
    "shield"
   ],
-  "decals": 22,
+  "decals": 16,
   "basecolor": "art/enemies/forge_warden/textures/forge_warden_basecolor.png",
   "emissive": "art/enemies/forge_warden/textures/forge_warden_emissive.png",
-  "emissive_texels": 66164,
-  "seconds": 32.4
+  "emissive_texels": 65002,
+  "seconds": 26.8
  },
  "clips": [
   {

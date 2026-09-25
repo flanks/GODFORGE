@@ -2,9 +2,11 @@
 from code - model, hand-painted NPR textures, dedicated rig, clips, GLB export, validation, review sheets.
 
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b --factory-startup --python-exit-code 1 ^
-      -P tools/blender/gf_assets/enemies/forge_warden.py -- [--preview] [--poses] [--no-review] [--size 1024]
+      -P tools/blender/gf_assets/enemies/forge_warden.py -- [--preview] [--look] [--poses] [--no-review] [--size 1024]
 
   --preview   geometry only: flat zone colours, turnaround + in-game 1x (seconds, no bakes, no export)
+  --look      geometry + the final paint (textures into work/look/, not the pack): 3/4 view, close 55 deg view,
+              game camera at true pixel size + silhouette (no rig, no export) - the value-hierarchy check
   --poses     geometry + rig + clips, key-frame renders in flat colours (no bakes, no export);
               [--pick] a few key poses, [--game] through the game camera, [--zoom], [--clip <name>], [--size px]
   (default)   the full build: paint, rig, clips, save .blend, export + validate, review sheets, status.json
@@ -56,9 +58,12 @@ import gfa_shell as S  # noqa: E402
 KEY, KIND, TIER = "forge_warden", "enemy", "elite"
 RIG_NAME = "GF_ForgeWarden_v1"
 
-ZONES = ["bronze", "bronze_dark", "gold", "porcelain", "void", "glow", "shield"]
-PREVIEW = {"bronze": "#9C8045", "bronze_dark": "#5A4A2C", "gold": "#C9AD62", "porcelain": "#E9E3D6",
-           "void": "#15201D", "glow": "#F4E6B0", "shield": "#8C7443"}
+# Value hierarchy (art review, 2026-09-25): ONLY the halo ring ("gold"), the porcelain mask and the heart ("glow")
+# are bright. The body is dark bronze with verdigris shadows; its gold accents are a dull old-gold "trim" that
+# stays well below the halo, so from the 55 deg camera the shield never merges with the torso.
+ZONES = ["bronze", "bronze_dark", "gold", "trim", "porcelain", "void", "glow", "shield"]
+PREVIEW = {"bronze": "#5E5034", "bronze_dark": "#3E3627", "gold": "#D2B468", "trim": "#86703F",
+           "porcelain": "#E9E3D6", "void": "#15201D", "glow": "#F4E6B0", "shield": "#55503A"}
 
 # ---- landmarks (rest pose = the guard stance; metres, faces -Y, +X = the warden's LEFT) --------------------
 LM = {
@@ -112,7 +117,8 @@ SPEAR_DIR = Vector((-0.07, -0.08, 1.0)).normalized()
 SPEAR_BUTT = SPEAR_GRIP - SPEAR_DIR * 1.17
 SPEAR_TOP = SPEAR_GRIP + SPEAR_DIR * 0.8          # the snapped end of the shaft
 SPEAR_HEAD = SPEAR_TOP + SPEAR_DIR * 0.15         # the head floats this far above the splinters
-CORE_POS = Vector((0.0, 0.05, 1.63))              # the cold-gold heart floating in the hollow chest
+CORE_POS = Vector((-0.06, -0.02, 1.62))           # the cold-gold heart floating in the hollow chest, right
+                                                  # behind the split sternum (seen from the 55 deg camera)
 HEAD_C = Vector(LM["head"])
 MASK_C = HEAD_C + Vector((0.0, -0.162, 0.12))     # centre of the porcelain face's base ellipse
 MASK_RX, MASK_RY = 0.1, 0.14
@@ -211,14 +217,14 @@ def build_head(a):
     add_shell(a, fn, nu, nv, 0.024, "bronze", "head", "helm", keep=face_open, wrap_u=True, shading="smooth")
     # diadem: a gold band hugging the brow, carrying the radiant crown
     fn = S.rev_fn([(0.207, 0.19), (0.2, 0.255)], -90 - 70, -90 + 70, sy=1.12, matrix=Matrix.Translation(hc))
-    add_shell(a, fn, 8, 1, 0.022, "gold", "head", "diadem", inner_zone=None, shading="smooth")
+    add_shell(a, fn, 8, 1, 0.022, "trim", "head", "diadem", inner_zone=None, shading="smooth")
     # the crown: five flat rays fanning up from the brow like a dead god's sun crown
     for k, (deg, L, w) in enumerate(((0, 0.24, 0.055), (26, 0.18, 0.046), (-26, 0.18, 0.046), (50, 0.12, 0.04),
                                      (-50, 0.12, 0.04))):
         t = math.radians(deg)
         d = Vector((-math.sin(t) * 1.0, 0.18, math.cos(t))).normalized()
         base = hc + Vector((-math.sin(t) * 0.16, -0.19 + 0.06 * abs(math.sin(t)), 0.22 + 0.03 * math.cos(t)))
-        spike_at(a, base, d, w, L, "gold", "head", "crown", flat=0.34, x_hint=(math.cos(t), 0, math.sin(t)))
+        spike_at(a, base, d, w, L, "trim", "head", "crown", flat=0.34, x_hint=(math.cos(t), 0, math.sin(t)))
 
 
 def mask_fn():
@@ -259,16 +265,22 @@ def build_mask(a):
 
 
 def build_torso(a):
-    # collar (spine_03): standing gorget ring, open at the front, the head floats inside it
-    fn = S.rev_fn([(0.25, 2.0), (0.27, 2.08), (0.255, 2.15)], -90 + 26, 270 - 26, sy=0.92,
+    # collar (spine_03): standing gorget ring, WIDE open at the front where the sternum is torn away; the helm
+    # floats above the gap
+    fn = S.rev_fn([(0.25, 2.0), (0.27, 2.08), (0.255, 2.15)], -90 + 58, 270 - 58, sy=0.92,
                   matrix=Matrix.Translation((0, 0.04, 0)))
-    add_shell(a, fn, 14, 1, 0.022, "gold", "spine_03", "collar", inner_zone="void", shading="smooth")
-    # cuirass: a thick barrel, torn open at the lower front-right and the back (the hollow shows)
+    add_shell(a, fn, 12, 1, 0.022, "trim", "spine_03", "collar", inner_zone="void", shading="smooth",
+              keep=S.jagged_keep(12, 1, edges=("u0", "u1"), depth=1, seed=6, prob=0.5))
+    # cuirass: a thick barrel. THE HOLLOW READ (art review): the husk is split open down the front - the sternum
+    # torn out in one big jagged V from the collar that runs on down into the open belly lames - a little to the
+    # warden's right (screen left, clear of the shield), so the 55 deg game camera looks straight down into the
+    # void and sees the cold-gold heart floating in it. A second jagged hole tears the back.
     prof = [(0.33, 1.6), (0.44, 1.67), (0.5, 1.78), (0.505, 1.88), (0.46, 1.97), (0.36, 2.03), (0.25, 2.06)]
     nu, nv = 24, 6
-    tears = {   # column centre (deg) -> torn rows: a jagged hole in the back, a bite at the lower front-right
+    tears = {   # column centre (deg) -> torn rows (row 0 = z 1.6 ... row 5 = the shoulder top at z 2.06)
         82.5: (2, 3), 97.5: (1, 2, 3, 4), 112.5: (1, 2),
-        -127.5: (0,), -112.5: (0, 1, 2), -97.5: (0, 1),
+        -157.5: (5,), -142.5: (3, 4, 5), -127.5: (1, 2, 3, 4, 5), -112.5: (0, 1, 2, 3, 4, 5), -97.5: (0, 1, 2, 3, 4, 5),
+        -82.5: (1, 2, 3, 4, 5), -67.5: (3, 4, 5), -52.5: (5,),
     }
 
     def torn(i, j):
@@ -276,13 +288,13 @@ def build_torso(a):
         return j not in tears.get(th, ())
     fn = S.rev_fn(prof, -180, 180, sy=0.74, matrix=Matrix.Translation((0, 0.04, 0)), smooth=3)
     add_shell(a, fn, nu, nv, 0.035, "bronze", "spine_03", "cuirass", keep=torn, wrap_u=True, shading="smooth")
-    # breastplate overlay: a raised pectoral plate with a keel (layered edge), front only
-    fn = S.rev_fn([(0.47, 1.72), (0.522, 1.81), (0.52, 1.9), (0.47, 1.975)], -90 - 50, -90 + 50, sy=0.76,
-                  matrix=Matrix.Translation((0, 0.04, 0)), smooth=3)
-    add_shell(a, fn, 10, 4, 0.025, "bronze", "spine_03", "breastplate", inner_zone=None, shading="smooth",
-              keep=S.jagged_keep(10, 4, edges=("v0",), depth=1, seed=4, prob=0.4))
-    keel = M.tube([(0, -0.365, 1.74), (0, -0.395, 1.83), (0, -0.39, 1.91), (0, -0.35, 1.975)], 0.02, sides=4)
-    a.add(keel, "gold", bone="spine_03", name="keel", shading="flat")
+    # breastplate overlay: two raised pectoral plates left standing on either side of the torn sternum, their
+    # inner edges ripped
+    for k, (t0, t1, edge) in enumerate(((-178.0, -136.0, "u1"), (-74.0, -34.0, "u0"))):
+        fn = S.rev_fn([(0.47, 1.72), (0.522, 1.81), (0.52, 1.9), (0.47, 1.975)], t0, t1, sy=0.76,
+                      matrix=Matrix.Translation((0, 0.04, 0)), smooth=3)
+        add_shell(a, fn, 5, 4, 0.025, "bronze", "spine_03", "breastplate%d" % k, inner_zone=None, shading="smooth",
+                  keep=S.jagged_keep(5, 4, edges=("v0", edge), depth=1, seed=4 + k, prob=0.45))
     # belly lames (spine_02 / spine_01): split bands with the front open - the heart shows through
     fn = S.rev_fn([(0.35, 1.47), (0.37, 1.565)], -90 + 34, 270 - 34, sy=0.8, matrix=Matrix.Translation((0, 0.04, 0)))
     add_shell(a, fn, 14, 1, 0.03, "bronze_dark", "spine_02", "lame_a", shading="smooth",
@@ -294,24 +306,25 @@ def build_torso(a):
     add_shell(a, fn, 16, 1, 0.035, "bronze_dark", "pelvis", "belt", wrap_u=True, shading="smooth")
     buckle = M.cylinder(0.075, 0.04, sides=10, bevel=0.01, axis="Y")
     M.xform(buckle, loc=(0, -0.285, 1.29))
-    a.add(buckle, "gold", bone="pelvis", name="buckle", shading="smooth")
+    a.add(buckle, "trim", bone="pelvis", name="buckle", shading="smooth")
     br = M.ring(0.075, 0.1, 0.035, sides=12, axis="Y", angle=300, start_angle=120)
     M.xform(br, loc=(0, -0.285, 1.29))
-    a.add(br, "gold", bone="pelvis", name="buckle_ring", shading="smooth")
+    a.add(br, "trim", bone="pelvis", name="buckle_ring", shading="smooth")
     # back tasset (pelvis)
     fn = S.rev_fn([(0.37, 1.27), (0.41, 1.1), (0.45, 0.96)], 90 - 42, 90 + 42, sy=0.86,
                   matrix=Matrix.Translation((0, 0.035, 0)), smooth=2)
     add_shell(a, fn, 8, 3, 0.028, "bronze_dark", "pelvis", "tasset_back", shading="smooth", flip=True,
               keep=S.jagged_keep(8, 3, edges=("v1",), depth=1, seed=8))
-    # the heart: a cold-gold crystal floating in the hollow (core bone)
-    heart = M.ico(0.075, 1, scale=(0.9, 0.9, 1.45))
+    # the heart: a cold-gold crystal floating in the hollow (core bone), big enough to read through the torn
+    # sternum at game size
+    heart = M.ico(0.095, 1, scale=(0.9, 0.9, 1.45))
     M.xform(heart, loc=CORE_POS, rot=(0, 0, 20))
     a.add(heart, "glow", bone="core", name="heart", shading="flat")
     for k in range(3):
-        sh = M.spike(0.022, 0.07, sides=3, rot_offset=0)
+        sh = M.spike(0.028, 0.09, sides=3, rot_offset=0)
         ang = math.radians(40 + 120 * k)
         d = Vector((math.cos(ang), math.sin(ang), 0.35 if k % 2 else -0.4)).normalized()
-        M.xform(sh, matrix=frame_z(CORE_POS + d * 0.1, d))
+        M.xform(sh, matrix=frame_z(CORE_POS + d * 0.12, d))
         a.add(sh, "glow", bone="core", name="heart_shard", shading="flat")
 
 
@@ -327,12 +340,12 @@ def build_pauldron(a, sx):
               keep=S.jagged_keep(14, 4, edges=("v0",), depth=1, seed=11 if sx > 0 else 12, prob=0.35))
     # rolled gold rim around the dome's base, broken on the outer side
     rim = S.rev_fn([(0.298, -0.02), (0.31, 0.012), (0.3, 0.042)], 70, 70 + 320, sx=1.2, matrix=Mf)
-    add_shell(a, rim, 22, 1, 0.022, "gold", bone, "pauldron_rim", inner_zone=None, shading="smooth",
+    add_shell(a, rim, 22, 1, 0.022, "trim", bone, "pauldron_rim", inner_zone=None, shading="smooth",
               keep=S.jagged_keep(22, 1, edges=("u0", "u1"), depth=1, seed=51 if sx > 0 else 52))
     # a raised keel ridge over the top, front to back
     ridge = [Mf @ Vector((0.3 * 1.2 * math.sin(math.radians(t)) * 0.97, 0.0, 0.16 * math.cos(math.radians(t)) + 0.012))
              for t in range(-66, 67, 22)]
-    a.add(M.tube(ridge, 0.03, sides=3, up=tuple(axis)), "gold", bone=bone, name="pauldron_ridge", shading="flat")
+    a.add(M.tube(ridge, 0.03, sides=3, up=tuple(axis)), "trim", bone=bone, name="pauldron_ridge", shading="flat")
     # two lames below it, stepping out and down on the outer side
     Ml = frame_z(c + Vector((sx * 0.03, 0.0, -0.03)), Vector((sx * 0.3, 0.0, 1.0)).normalized(), (0, -1, 0))
     for k, (r, z0, z1) in enumerate(((0.3, -0.02, -0.115), (0.32, -0.105, -0.2))):
@@ -344,7 +357,7 @@ def build_pauldron(a, sx):
     # the haute-piece: a standing flange on the neck side of the dome
     fl = S.grid_fn(0.3, 0.15, bend_x=0.04, matrix=frame_z(c + Vector((-sx * 0.16, 0.0, 0.2)),
                                                           Vector((sx * 1.0, 0, 0.12)), (0, 0, 1)))
-    add_shell(a, fl, 6, 2, 0.025, "gold", bone, "flange", inner_zone=None, shading="auto",
+    add_shell(a, fl, 6, 2, 0.025, "trim", bone, "flange", inner_zone=None, shading="auto",
               keep=S.jagged_keep(6, 2, edges=("v1",), depth=1, seed=31 if sx > 0 else 32, prob=0.5))
 
 
@@ -361,7 +374,7 @@ def build_arm(a, sx):
     cf = frame_z(el + back * 0.04, back, (0, 0, 1))
     add_shell(a, S.cap_fn(0.11, 0.07, -180, 180, matrix=cf), 8, 2, 0.022, "bronze_dark", "lowerarm_" + side,
               "couter", inner_zone=None, wrap_u=True, shading="smooth")
-    spike_at(a, el + back * 0.1, back, 0.03, 0.09, "gold", "lowerarm_" + side, "couter_spike")
+    spike_at(a, el + back * 0.1, back, 0.03, 0.09, "trim", "lowerarm_" + side, "couter_spike")
     # vambrace: flared forearm shell (the cuff opens wide at the wrist)
     limb_tube(a, el + fd * 0.08, wr + fd * 0.02, 0.1, 0.14, "bronze", "lowerarm_" + side, "vambrace", nu=8, nv=2,
               t=0.024, flare=[(0.0, 0.098), (0.55, 0.11), (1.0, 0.145)])
@@ -393,7 +406,7 @@ def build_leg(a, sx):
     kf = frame_z(kn + Vector((0, -0.07, 0.0)), (0, -1, 0.15), (1, 0, 0))
     add_shell(a, S.cap_fn(0.12, 0.08, -180, 180, sy=1.15, matrix=kf), 8, 2, 0.024, "bronze", "shin_" + side, "poleyn",
               inner_zone=None, wrap_u=True, shading="smooth")
-    spike_at(a, kn + Vector((0, -0.14, 0.02)), (0, -1, 0.5), 0.028, 0.07, "gold", "shin_" + side, "poleyn_spike",
+    spike_at(a, kn + Vector((0, -0.14, 0.02)), (0, -1, 0.5), 0.028, 0.07, "trim", "shin_" + side, "poleyn_spike",
              x_hint=(1, 0, 0))
     # greave: open-backed flared shin shell
     d2 = (an - kn).normalized()
@@ -429,20 +442,20 @@ def build_spear(a):
     M.xform(gl, matrix=frame_z(SPEAR_TOP + SPEAR_DIR * 0.1, SPEAR_DIR))
     a.add(gl, "glow", bone=bone, name="spear_bind", shading="flat")
     # ferrule spike at the butt
-    spike_at(a, SPEAR_BUTT + SPEAR_DIR * 0.03, -SPEAR_DIR, 0.034, 0.14, "gold", bone, "ferrule", flat=1.0, sides=6)
+    spike_at(a, SPEAR_BUTT + SPEAR_DIR * 0.03, -SPEAR_DIR, 0.034, 0.14, "trim", bone, "ferrule", flat=1.0, sides=6)
     # bindings
     for t in (0.18, 1.02, 1.5, 1.84):
         r = M.cylinder(0.038, 0.05, sides=6)
         M.xform(r, matrix=frame_z(SPEAR_BUTT + SPEAR_DIR * t, SPEAR_DIR))
-        a.add(r, "gold", bone=bone, name="binding", shading="smooth")
+        a.add(r, "trim", bone=bone, name="binding", shading="smooth")
     # socket + wings
     sock = M.cylinder(0.042, 0.16, sides=8, radius_top=0.03, bevel=0.006)
     M.xform(sock, matrix=frame_z(SPEAR_HEAD + SPEAR_DIR * 0.06, SPEAR_DIR))
-    a.add(sock, "gold", bone=bone, name="socket", shading="smooth")
+    a.add(sock, "trim", bone=bone, name="socket", shading="smooth")
     side = Vector((1, 0, 0)) - SPEAR_DIR * SPEAR_DIR.x
     side.normalize()
     for s in (-1, 1):
-        spike_at(a, SPEAR_HEAD + SPEAR_DIR * 0.1, (side * s + SPEAR_DIR * 0.35).normalized(), 0.03, 0.13, "gold", bone,
+        spike_at(a, SPEAR_HEAD + SPEAR_DIR * 0.1, (side * s + SPEAR_DIR * 0.35).normalized(), 0.03, 0.13, "trim", bone,
                  "wing", flat=0.35, x_hint=tuple(SPEAR_DIR))
     # the broken leaf blade: bottom half of a broad blade, snapped along a jagged diagonal
     nu, nv = 6, 8
@@ -461,7 +474,7 @@ def build_spear(a):
     th = (lambda u, v: 0.028 * (1 - abs(2 * u - 1)) + 0.004)
     outer, inner = S.thick_patch(blade_fn, nu, nv, th, keep=snapped, inner=False)
     M.xform(outer, matrix=Matrix.Translation(face_n * 0.016))
-    a.add(outer, "gold", bone=bone, name="blade", shading="flat")
+    a.add(outer, "trim", bone=bone, name="blade", shading="flat")
 
 
 def build_shield(a):
@@ -898,40 +911,52 @@ def build_clips(arm, mesh):
 # ---- paint (Fallen Godworks, ENEMIES.md section 4) -----------------------------------------------------------------
 
 PALETTE = [  # (name, hex) for the review sheet
-    ("god-bronze", "#7E6A3F"), ("bronze light", "#C2A35A"), ("verdigris", "#22382F"), ("dark bronze", "#4F4530"),
-    ("shield face", "#5E5436"), ("halo gold", "#CDB066"), ("porcelain", "#D9D3C6"), ("void", "#10201C"), ("dead ember", "#8A3A1E"),
-    ("cold gold", "#D4B45A"), ("glow core", "#FFF4D0"),
+    ("dark bronze", "#5E5034"), ("bronze light", "#8E7B4E"), ("verdigris", "#1B3029"), ("patina", "#3D5E50"),
+    ("darker plates", "#3E3627"), ("old-gold trim", "#86703F"), ("shield face", "#524A33"), ("halo gold", "#D2B468"),
+    ("porcelain", "#D9D3C6"), ("void", "#10201C"), ("cold gold", "#D4B45A"), ("glow core", "#FFF4D0"),
 ]
-GLOW = {"color": "#8A6A28", "core": "#FFF4D0"}          # decal glow: cold gold rim -> white-gold core
+GLOW = {"color": "#8A6A28", "core": "#FFF4D0"}          # hot decal glow (the mask's eyes only): cold gold -> white-gold
+# Runes and cracks (art review): cold-gold VALUE, never near-white - a dim cold-gold emission over a cold-gold line,
+# so a few big strokes read as glyphs at game size instead of white speckle
+RUNE = "#C9AA56"
+RUNE_GLOW = {"color": "#3A2C10", "core": "#6E5626"}
 
 
 def recipes():
     P = _paint()
-    low_dark = {"axis": (0, 0, -1), "range": (-1.2, -0.15), "color": "#2A2A1C", "amount": 0.4}
+    low_dark = {"axis": (0, 0, -1), "range": (-1.2, -0.15), "color": "#1E241A", "amount": 0.45}
     return {
-        "bronze": P.zone(base="#7E6A3F", shadow="#22382F", light="#C2A35A", planes=0.1, parts=0.08, brush=0.05,
-                         brush_freq=3.0, edge=0.9, edge_width=0.016, edge_breakup=0.35, cavity=0.8, cavity_width=0.014,
-                         ao=0.7, ao_range=(0.2, 0.55), gradient=low_dark,
-                         spots={"color": "#4E7264", "amount": 0.5, "freq": 3.5, "threshold": (0.58, 0.68)}),
-        "bronze_dark": P.zone(base="#4F4530", shadow="#0E1A16", light="#8C7A4C", planes=0.08, parts=0.07, brush=0.05,
-                              brush_freq=3.0, edge=0.8, edge_width=0.013, edge_breakup=0.4, cavity=0.8, cavity_width=0.012,
-                              ao=0.7, ao_range=(0.2, 0.55), gradient=low_dark,
-                              spots={"color": "#2E4A40", "amount": 0.5, "freq": 5.0, "threshold": (0.58, 0.68)}),
-        "gold": P.zone(base="#CDB066", shadow="#6A5424", light="#F4E6B0", planes=0.08, parts=0.05, brush=0.04,
-                       brush_freq=4.0, edge=0.95, edge_width=0.013, edge_breakup=0.3, cavity=0.7, cavity_width=0.01,
-                       ao=0.55, ao_range=(0.25, 0.6),
-                       spots={"color": "#5E8374", "amount": 0.22, "freq": 6.0, "threshold": (0.64, 0.74)}),
+        # the body: dark god-bronze, verdigris in every shadow and contact, patina patches, muted edge light
+        "bronze": P.zone(base="#5E5034", shadow="#1B3029", light="#8E7B4E", planes=0.1, parts=0.08, brush=0.05,
+                         brush_freq=3.0, edge=0.85, edge_width=0.016, edge_breakup=0.35, cavity=0.85,
+                         cavity_width=0.014, ao=0.8, ao_range=(0.15, 0.5), gradient=low_dark,
+                         spots={"color": "#3D5E50", "amount": 0.6, "freq": 3.5, "threshold": (0.54, 0.66)}),
+        "bronze_dark": P.zone(base="#3E3627", shadow="#0C1613", light="#6A5E40", planes=0.08, parts=0.07, brush=0.05,
+                              brush_freq=3.0, edge=0.8, edge_width=0.013, edge_breakup=0.4, cavity=0.8,
+                              cavity_width=0.012, ao=0.75, ao_range=(0.15, 0.5), gradient=low_dark,
+                              spots={"color": "#274237", "amount": 0.55, "freq": 5.0, "threshold": (0.55, 0.67)}),
+        # the body's gold accents: tarnished old gold, a clear step below the halo
+        "trim": P.zone(base="#86703F", shadow="#3A2E17", light="#B49A5A", planes=0.08, parts=0.05, brush=0.04,
+                       brush_freq=4.0, edge=0.8, edge_width=0.012, edge_breakup=0.35, cavity=0.7, cavity_width=0.01,
+                       ao=0.6, ao_range=(0.2, 0.55),
+                       spots={"color": "#4A6A5A", "amount": 0.35, "freq": 6.0, "threshold": (0.6, 0.72)}),
+        # the halo: the one big bright metal on the model (clean, almost no patina)
+        "gold": P.zone(base="#D2B468", shadow="#7A6128", light="#F6E9B8", planes=0.06, parts=0.04, brush=0.035,
+                       brush_freq=4.0, edge=0.95, edge_width=0.014, edge_breakup=0.3, cavity=0.6, cavity_width=0.01,
+                       ao=0.45, ao_range=(0.3, 0.65),
+                       spots={"color": "#6E8C7A", "amount": 0.15, "freq": 5.0, "threshold": (0.66, 0.76)}),
         "porcelain": P.zone(base="#DCD6C9", shadow="#8C877E", light="#F6F2E8", planes=0.035, parts=0.02, brush=0.025,
                             brush_freq=6.0, edge=0.5, edge_width=0.006, cavity=0.45, cavity_width=0.006, ao=0.35,
                             ao_range=(0.3, 0.7)),
         "void": P.zone(base="#10201C", shadow="#07100D", light="#1C302A", planes=0.05, parts=0.0, brush=0.06,
                        brush_freq=4.0, edge=0.0, cavity=0.0, ao=0.0,
-                       emit={"core": "#7A6026", "hot": "#3A2410", "color": "#0A0604", "mode": "radial",
-                             "center": tuple(CORE_POS), "radius": 0.7, "base_mix": 0.0, "strength": 0.9}),
-        "glow": P.zone(base="#F4E6B0", edge=0.0, cavity=0.0, ao=0.0,
-                       emit={"core": "#FFF4D0", "hot": "#E8CF7A", "color": "#D4B45A", "mode": "radial",
-                             "center": tuple(CORE_POS), "radius": 0.16, "base_mix": 0.4}),
-        "shield": P.zone(base="#5E5436", shadow="#1C2C26", light="#968252", planes=0.07, parts=0.05, brush=0.05,
+                       # verdigris-black; only the skins right around the heart catch a dim cold-gold light
+                       emit={"core": "#6A5220", "hot": "#1C170C", "color": "#0C1814", "mode": "radial",
+                             "center": tuple(CORE_POS), "radius": 0.4, "base_mix": 0.0, "strength": 0.8}),
+        "glow": P.zone(base="#E0C470", edge=0.0, cavity=0.0, ao=0.0,
+                       emit={"core": "#FFF4D0", "hot": "#E0C470", "color": "#B8963E", "mode": "radial",
+                             "center": tuple(CORE_POS), "radius": 0.22, "base_mix": 0.1}),
+        "shield": P.zone(base="#524A33", shadow="#18261F", light="#857548", planes=0.07, parts=0.05, brush=0.05,
                          brush_freq=2.5, edge=0.9, edge_width=0.016, cavity=0.8, cavity_width=0.014, ao=0.6,
                          ao_range=(0.2, 0.55),
                          gradient={"center": tuple(SHIELD_C + SHIELD_N * 0.1), "range": (0.15, 0.6), "color": "#3E4A34",
@@ -971,22 +996,20 @@ def runes_on_arc(rng, radius, a0, a1, count, size, broken=0.4, strokes=3, gap=0.
 
 def decals():
     P = _paint()
-    rng = random.Random(17)
     out = []
-    # --- the shield: broken runes around the halo ring and the face, glowing cracks from the bite
+    # --- the shield (art review: the 12 small runes on the halo ring turned into white speckle at game size): the
+    # ring stays clean bright gold; SIX big two-stroke runes in cold gold sit on the dark face between the inner
+    # halo and the ring, and one bold crack runs from the bite
     ring_fr = SF @ Matrix.Translation((0, 0, 0.0))
-    lines = runes_on_arc(rng, (RING_R[0] + RING_R[1]) / 2, BREAK[1] + 8, BREAK[0] + 352, 12, 0.085, broken=0.4, gap=0.1)
-    out.append(P.decal_lines(lines, ring_fr, 0.017, zones=["gold"], color="#FFF1C4", rim="#4A3A1E", rim_width=0.02,
-                             emit=GLOW, depth=(-0.02, 0.1), facing=0.5))
-    lines = runes_on_arc(rng, 0.45, BREAK[1] + 14, BREAK[0] + 340, 10, 0.08, broken=0.45, gap=0.15)
-    out.append(P.decal_lines(lines, ring_fr, 0.016, zones=["shield"], color="#E9D696", rim="#1E2A22", rim_width=0.02,
-                             emit=GLOW, depth=(-0.03, 0.16), facing=0.3))
+    lines = runes_on_arc(random.Random(23), 0.447, BREAK[1] + 16, BREAK[0] + 344, 6, 0.12, broken=0.12, strokes=2)
+    out.append(P.decal_lines(lines, ring_fr, 0.026, zones=["shield"], color=RUNE, rim="#16201A", rim_width=0.038,
+                             emit=RUNE_GLOW, depth=(-0.03, 0.16), facing=0.3))
     mid = math.radians((BREAK[0] + BREAK[1]) / 2)
     start = (0.47 * math.cos(mid), 0.47 * math.sin(mid))
-    cr = M.crack_lines(rng, start=start, direction=math.degrees(mid) + 180, length=0.34, step=0.03, jag=0.5,
-                       branches=2, branch_len=0.5, depth=2)
-    out.append(P.decal_lines(cr, ring_fr, 0.018, zones=["shield"], color="#F4E6B0", rim="#10201C", rim_width=0.04,
-                             emit=GLOW, depth=(-0.03, 0.16), facing=0.3))
+    cr = M.crack_lines(random.Random(5), start=start, direction=math.degrees(mid) + 180, length=0.3, step=0.045,
+                       jag=0.4, branches=1, branch_len=0.45, depth=1)
+    out.append(P.decal_lines(cr, ring_fr, 0.024, zones=["shield"], color=RUNE, rim="#10201C", rim_width=0.042,
+                             emit=RUNE_GLOW, depth=(-0.03, 0.16), facing=0.3))
     # --- the mask: glowing eye slits with tears of light, a dark hairline crack along the split, the mouth
     mf = Matrix(((1, 0, 0, MASK_C.x), (0, 0, -1, MASK_C.y), (0, 1, 0, MASK_C.z), (0, 0, 0, 1)))
     eyes = []
@@ -1004,45 +1027,35 @@ def decals():
                              depth=(-0.02, 0.12), facing=0.05))
     out.append(P.decal_lines([[(-0.024, -0.08), (0.0, -0.084), (0.024, -0.08)]], mf, 0.0045, zones=["porcelain"],
                              color="#7A7266", depth=(-0.02, 0.12), facing=0.1))
-    # --- broken runes crawling over the plates (cold gold): pauldron tops (the camera sees them), the back,
-    # the breastplate, the greaves
-    for sx in (1, -1):
-        c = Vector((sx * 0.5, 0.07, 1.99))
-        axis = Vector((sx * 0.75, 0.0, 1.0)).normalized()
-        fr = _frame(c, axis, (0, -1, 0))
-        lines = runes_on_arc(rng, 0.2, 200 if sx > 0 else -20, 340 if sx > 0 else 120, 4, 0.09, broken=0.4)
-        out.append(P.decal_lines(lines, fr, 0.016, zones=["bronze"], color="#F4E6B0", rim="#2E2616", rim_width=0.022,
-                                 emit=GLOW, depth=(0.0, 0.3), facing=0.35))
-        cr = M.crack_lines(random.Random(30 + sx), start=(0.0, 0.0), direction=90 + sx * 40, length=0.22, step=0.025,
-                           branches=1, depth=1)
-        out.append(P.decal_lines(cr, fr, 0.014, zones=["bronze"], color="#E8CF7A", rim="#10201C", rim_width=0.03,
-                                 emit=GLOW, depth=(0.0, 0.3), facing=0.35))
+    # --- runes and cracks on the plates, all in cold gold (art review): the pauldron runes are dropped (their tops
+    # face the game camera and broke into speckle); the back keeps three big runes and three cracks leaking light
+    # around its torn hole, the chest two bold cracks from the torn sternum, each greave one big rune
     cyl = Matrix.Translation((0.0, 0.04, 0.0))
-    band = M.rune_band(rng, count=6, size=0.095, spacing=1.6, broken=0.4, origin=(-0.5 * 0.4, 1.86))
+    band = M.rune_band(random.Random(41), count=3, size=0.14, spacing=1.9, strokes=2, broken=0.1,
+                       origin=(-0.5 * 0.45, 1.86))
     # cylinder mapping: u = angle * radius, u = 0 on +X; the back of the torso is at +90 deg (u ~ +0.6)
     back = [[(p[0] + 0.5 * math.pi / 2 * 0.74 + 0.02, p[1]) for p in ln] for ln in band]
-    out.append(P.decal_lines(back, cyl, 0.016, zones=["bronze"], color="#F4E6B0", rim="#2E2616", rim_width=0.024,
-                             emit=GLOW, mapping="cylinder", radius=0.5 * 0.9))
-    front = [[(p[0] - 0.5 * math.pi / 2 * 0.74 - 0.35, p[1] - 0.02) for p in ln] for ln in band[:9]]
-    out.append(P.decal_lines(front, cyl, 0.016, zones=["bronze"], color="#F4E6B0", rim="#2E2616", rim_width=0.024,
-                             emit=GLOW, mapping="cylinder", radius=0.5 * 0.9))
+    out.append(P.decal_lines(back, cyl, 0.024, zones=["bronze"], color=RUNE, rim="#161E18", rim_width=0.036,
+                             emit=RUNE_GLOW, mapping="cylinder", radius=0.5 * 0.9))
     # cracks leaking light around the torn hole in the back (cylinder mapping; +90 deg = the back)
-    for k, (u0, v0, ang) in enumerate(((0.52, 1.72, 200), (0.95, 1.9, -20), (0.8, 1.66, -70), (0.6, 1.95, 110))):
-        cr = M.crack_lines(random.Random(60 + k), start=(u0, v0), direction=ang, length=0.2, step=0.025, branches=1,
-                           depth=1)
-        out.append(P.decal_lines(cr, cyl, 0.014, zones=["bronze"], color="#F4E6B0", rim="#10201C", rim_width=0.03,
-                                 emit=GLOW, mapping="cylinder", radius=0.45))
-    # chest crack leaking light
-    cr = M.crack_lines(random.Random(9), start=(-0.12, 1.94), direction=-70, length=0.3, step=0.025, branches=2, depth=1)
-    out.append(P.decal_lines(cr, _frame((0, 0.0, 0.0), (0, -1, 0), (1, 0, 0)), 0.015, zones=["bronze"], color="#F4E6B0",
-                             rim="#10201C", rim_width=0.024, emit=GLOW, depth=(0.2, 0.6), facing=0.3))
+    for k, (u0, v0, ang) in enumerate(((0.52, 1.72, 200), (0.95, 1.9, -20), (0.8, 1.66, -70))):
+        cr = M.crack_lines(random.Random(60 + k), start=(u0, v0), direction=ang, length=0.2, step=0.04, jag=0.35,
+                           branches=0, depth=0)
+        out.append(P.decal_lines(cr, cyl, 0.022, zones=["bronze"], color=RUNE, rim="#10201C", rim_width=0.038,
+                                 emit=RUNE_GLOW, mapping="cylinder", radius=0.45))
+    # the chest: two bold cracks running out from the torn sternum over the pectoral plates
+    chest = _frame((0, 0.0, 0.0), (0, -1, 0), (1, 0, 0))
+    for k, (x0, z0, ang) in enumerate(((-0.36, 1.84, 200), (0.16, 1.9, -25))):
+        cr = M.crack_lines(random.Random(9 + k), start=(x0, z0), direction=ang, length=0.2, step=0.04, jag=0.35,
+                           branches=0, depth=0)
+        out.append(P.decal_lines(cr, chest, 0.022, zones=["bronze"], color=RUNE, rim="#10201C", rim_width=0.036,
+                                 emit=RUNE_GLOW, depth=(0.2, 0.6), facing=0.3))
     for sx in (1, -1):
         kn, an = P_("knee_" + ("L" if sx > 0 else "R")), P_("ankle_" + ("L" if sx > 0 else "R"))
-        g = M.rune_glyph(rng, 0.1, 3, 0.4) + M.rune_glyph(rng, 0.08, 2, 0.5)
-        g = [[(p[0], p[1] + (0.0 if i < 3 else -0.1)) for p in ln] for i, ln in enumerate(g)]
-        fr = _frame(kn.lerp(an, 0.35) + Vector((0, -0.16, 0)), (0, -1, 0), (1, 0, 0))
-        out.append(P.decal_lines(g, fr, 0.016, zones=["bronze"], color="#F4E6B0", rim="#2E2616", rim_width=0.03,
-                                 emit=GLOW, depth=(-0.06, 0.12), facing=0.4))
+        g = M.rune_glyph(random.Random(70 + sx), 0.15, 2, 0.1)
+        fr = _frame(kn.lerp(an, 0.4) + Vector((0, -0.16, 0)), (0, -1, 0), (1, 0, 0))
+        out.append(P.decal_lines(g, fr, 0.024, zones=["bronze"], color=RUNE, rim="#161E18", rim_width=0.036,
+                                 emit=RUNE_GLOW, depth=(-0.06, 0.12), facing=0.4))
     # the spear: the snapped blade still glows along the break
     side = Vector((1, 0, 0)) - SPEAR_DIR * SPEAR_DIR.x
     side.normalize()
@@ -1052,8 +1065,8 @@ def decals():
         fr = Matrix(((side.x, SPEAR_DIR.x, face_n.x * sgn, base.x), (side.y, SPEAR_DIR.y, face_n.y * sgn, base.y),
                      (side.z, SPEAR_DIR.z, face_n.z * sgn, base.z), (0, 0, 0, 1)))
         brk = [[(-0.12, 0.29), (-0.04, 0.3), (0.0, 0.44), (0.03, 0.37), (0.07, 0.5), (0.11, 0.44)]]
-        out.append(P.decal_lines(brk, fr, 0.014, zones=["gold"], color="#FFF4D0", rim="#5A4A20", rim_width=0.03,
-                                 emit=GLOW, depth=(-0.06, 0.08), facing=0.3))
+        out.append(P.decal_lines(brk, fr, 0.018, zones=["trim"], color=RUNE, rim="#3A2E17", rim_width=0.032,
+                                 emit=RUNE_GLOW, depth=(-0.06, 0.08), facing=0.3))
     return out
 
 
@@ -1259,6 +1272,35 @@ def pose_renders(arm, mesh, out_dir, size=220, view=(0.75, -1.0, 0.45), scale=4.
     return out
 
 
+def paint_mesh(mesh, tex_dir, size=1024):
+    import gfa_paint as P
+    return P.paint_asset(mesh, KEY, recipes(), tex_dir, size=size, decals=decals(), ao_distance=0.12,
+                         ao_samples=24, seed=7, uv_angle=66.0, margin_px=3, uv_zone_scale={"void": 0.35},
+                         uv_small_islands=(0.0012, 0.45))
+
+
+def look(mesh, out_dir):
+    """Paint check without rig / clips / export (--look): the final textures on the rest pose, as the 3/4 beauty
+    view, a close view down the 55 deg game camera, and the game camera at TRUE 1080p pixel size next to the
+    2.2 m mannequin (+ its silhouette). The build's value-hierarchy loop."""
+    import gfa_render as R
+    import gfa_spec as SPEC
+    scene = bpy.context.scene
+    d55 = Vector((0.0, -math.cos(math.radians(SPEC.GAME_PITCH_DEG)), math.sin(math.radians(SPEC.GAME_PITCH_DEG))))
+    R.setup_cycles(scene, 12)
+    with R.toon_preview([mesh], ink=0.011):
+        R.aim(scene, Vector((0.12, -0.05, 1.36)), Vector((0.62, -1.0, 0.36)).normalized(), 3.05)
+        R.render(scene, os.path.join(out_dir, "look_34.png"), 640)
+        R.aim(scene, Vector((0.15, -0.1, 1.5)), d55, 2.9)
+        R.render(scene, os.path.join(out_dir, "look_top55.png"), 640)
+    man = R.mannequin(aim_dir=(-0.5, -0.8, 0.0))
+    man.location = (-2.1, 0.4, 0.0)
+    bpy.context.view_layer.update()
+    r = R.ingame([mesh], out_dir, "look", px=204, mannequin_obj=man, target=(-0.55, -0.1, 1.0))
+    C.remove_objects([man] + [o for o in (bpy.data.objects.get("GFA_FLOOR"),) if o])
+    return r
+
+
 def main():
     argv = C.script_args()
     C.reset_scene(fps=30)
@@ -1266,6 +1308,12 @@ def main():
     mesh, _parts = build_mesh(col)
     pack = C.pack_dir(KIND, KEY)
     work = C.ensure_dir(os.path.join(pack, "work", "preview"))
+    if C.flag(argv, "--look"):
+        tex_dir = C.ensure_dir(os.path.join(pack, "work", "look"))
+        paint_mesh(mesh, tex_dir, C.opt(argv, "--size", 1024, int))
+        look(mesh, tex_dir)
+        C.log("DONE look")
+        return
     if C.flag(argv, "--preview"):
         preview_materials(mesh)
         preview(mesh, work)
@@ -1301,15 +1349,12 @@ def main():
         C.log("DONE poses")
         return
     import gfa_export as E
-    import gfa_paint as P
     import gfa_render as R
     import gfa_rig as RIG
     import gfa_spec as SPEC
     size = C.opt(argv, "--size", 1024, int)
     tex_dir = os.path.join(pack, "textures")
-    paint_rep = P.paint_asset(mesh, KEY, recipes(), tex_dir, size=size, decals=decals(), ao_distance=0.12,
-                              ao_samples=24, seed=7, uv_angle=66.0, margin_px=3, uv_zone_scale={"void": 0.35},
-                              uv_small_islands=(0.0012, 0.45))
+    paint_rep = paint_mesh(mesh, tex_dir, size)
     blend = os.path.join(pack, "source", KEY + ".blend")
     C.save_blend(blend)
     bpy.ops.file.make_paths_relative()

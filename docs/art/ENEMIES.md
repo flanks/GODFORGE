@@ -100,6 +100,19 @@ How to paint the Godworks:
 * the gold is **faded**. Keep it below the saturation of the player gold `#FFC940` and never use a
   warm, saturated gold.
 
+Lessons from the forge_warden art review (judge them through the 55° camera at 1x):
+* **One bright metal per enemy.** Keep the body plates at dark bronze (about `#5E5034`) with verdigris
+  shadows and patina. Paint the body's gold accents as a dull old-gold trim (about `#86703F`). Only the
+  signature shape (the halo) and the focal glows (mask, heart) stay bright. When the body and the
+  signature shape share a value, they merge from above.
+* **Runes at game size:** paint a few big strokes (2 strokes per glyph, lines about 0.024 m wide), at
+  cold-gold value (`#C9AA56` line with a dim emission, core about `#6E5626`), on a dark surface. Small
+  runes with a white-gold core turn into white speckle. Never put runes on the surfaces that face the
+  camera (pauldron tops) or on the bright halo.
+* **Hollow reads need one big gap the camera sees.** A thin gap around a floating helm vanishes at 49
+  px/m. Tear one opening of 0.3-0.5 m where the 55° camera looks down into the void, and put the glow
+  in it.
+
 ## 5. GF_Swarm_v1, the shared swarm skeleton
 
 Six bones, identical in every swarm file, so a swarm clip can drive any swarm scene (Bevy builds
@@ -243,10 +256,18 @@ is no runtime variant system.
   `move@loop` (`move_cycle_m` 1.571), `windup`, `attack`, `hit`, `death` (the mask halves split last),
   `cast` (the halo is raised overhead) and the extra `shield_up`. The brief's `walk@loop`,
   `shield_bash` and `cast_shield` map to these through meta.json `clip_aliases`. Sockets: `hit_center`,
-  `fx_core`, `head_top`, `shield` and `attack_origin`. It is 2.79 m tall (1.27 ×) with 7.7k tris. Build
+  `fx_core`, `head_top`, `shield` and `attack_origin`. It is 2.79 m tall (1.27 ×) with 7.5k tris. Build
   script: `tools/blender/gf_assets/enemies/forge_warden.py`, which adds `gfa_shell.py` (hollow thick
   shells) and `gfa_rig_dedicated.py` (dedicated rigs, IK and prop-driven arms, per-frame clip baking).
   Brief, metrics and review sheets: [art/enemies/forge_warden/README.md](../../art/enemies/forge_warden/README.md).
+* **Art review fixes (2026-09-25, score 7/10).** Three must-fixes:
+  - The body is repainted dark verdigris bronze with an old-gold trim, so only the halo ring, the mask
+    and the heart stay bright.
+  - The runes on the halo ring and the pauldrons are gone. The shield face carries six big two-stroke
+    runes in cold gold instead.
+  - The husk is split open down the sternum, so the game camera sees the void and the cold-gold heart.
+
+  Before and after: `art/enemies/forge_warden/reports/forge_warden_review_fix.png`.
 
 ### E3 The Slag King → `slag_king` (Boss, Cinder Wastes, Unmade)
 
