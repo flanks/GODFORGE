@@ -18,8 +18,8 @@ use gf_engine::prelude::*;
 use gf_net::quant::{angle_to_u16, stick_to_i8, u16_to_dir};
 use gf_net::transport::loopback;
 use gf_net::*;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex, PoisonError};
 use std::time::{Duration, Instant};
 
 /// Current position of a replicated entity at `tick` (extrapolates straight-line motion).
@@ -55,15 +55,66 @@ pub struct BotBrain {
     path: Vec<Vec2>,
     path_goal: Vec2,
     path_tick: u32,
+    /// Scratch for this tick's line-of-fire blockers (kept to reuse its allocation).
+    occluders: Vec<Obstacle>,
 }
 
-/// One room as a bot sees it: the layout every peer derives from (template, seed) and a
-/// walkability grid for routing.
+/// (room serial, template, seed): one room instance, as the host replicates it.
+type RoomKey = (u32, u16, u32);
+
+/// One room as a bot sees it: the layout every peer derives from (template, seed), its
+/// collision arena and a walkability grid for routing.
 struct RoomCache {
-    /// (room serial, template, seed)
-    key: (u32, u16, u32),
+    key: RoomKey,
     def: Arc<RoomDef>,
+    arena: Arc<Arena>,
     nav: Arc<NavGrid>,
+}
+
+/// The last room any bot in this process resolved, shared so a party (a headless run's bots, or
+/// the windowed game's teammates and autopilot) generates and rasterizes each layout once. That
+/// matters on biome maps, where generation and the whole-map nav grid are the expensive part.
+static MAP_CACHE: Mutex<Option<MapEntry>> = Mutex::new(None);
+
+struct MapEntry {
+    /// The content set (address and hash) and the room, keyed like [`RoomCache`].
+    key: (usize, u64, RoomKey),
+    def: Arc<RoomDef>,
+    arena: Arc<Arena>,
+    /// One grid per clearance (as bits): heroes differ in radius.
+    navs: Vec<(u32, Arc<NavGrid>)>,
+}
+
+/// The collision world every peer derives from a layout.
+// Phase 2 swaps this for `RoomDef::arena()`, which adds a biome map's pits.
+fn room_arena(def: &RoomDef) -> Arena {
+    Arena::new(def.half_extents, def.obstacles.clone(), Vec::new())
+}
+
+/// The shared layout, arena and nav grid (for `clearance`) of `room`, building what is missing.
+fn shared_room(db: &ContentDb, room: RoomKey, clearance: f32) -> (Arc<RoomDef>, Arc<Arena>, Arc<NavGrid>) {
+    let key = (std::ptr::from_ref(db) as usize, db.hash, room);
+    // Held while building, so a bot on another thread waits for the layout instead of repeating it.
+    let mut cache = MAP_CACHE.lock().unwrap_or_else(PoisonError::into_inner);
+    let entry = match cache.take() {
+        Some(entry) if entry.key == key => entry,
+        _ => {
+            let def = Arc::new(procgen::resolve_room(db, room.1, room.2));
+            let arena = Arc::new(room_arena(&def));
+            MapEntry { key, def, arena, navs: Vec::new() }
+        }
+    };
+    let entry = cache.insert(entry);
+    let bits = clearance.to_bits();
+    let nav = match entry.navs.iter().find(|(b, _)| *b == bits) {
+        Some((_, nav)) => nav.clone(),
+        None => {
+            let nav = Arc::new(NavGrid::new(&entry.arena, clearance));
+            entry.navs.push((bits, nav.clone()));
+            nav
+        }
+    };
+    (entry.def.clone(), entry.arena.clone(), nav)
 }
 
 impl BotBrain {
@@ -79,21 +130,20 @@ impl BotBrain {
             path: Vec::new(),
             path_goal: Vec2::ZERO,
             path_tick: 0,
+            occluders: Vec::new(),
         }
     }
 
-    /// The layout every peer derives from the replicated template + seed, and its nav grid.
-    fn room(&mut self, w: &WorldSnapshot, db: &ContentDb, radius: f32) -> (Arc<RoomDef>, Arc<NavGrid>) {
+    /// The layout every peer derives from the replicated template + seed, its arena and nav grid.
+    fn room(&mut self, w: &WorldSnapshot, db: &ContentDb, radius: f32) -> (Arc<RoomDef>, Arc<Arena>, Arc<NavGrid>) {
         let key = (w.run.room_serial, w.run.room, w.run.room_seed);
         if let Some(c) = self.room.as_ref().filter(|c| c.key == key) {
-            return (c.def.clone(), c.nav.clone());
+            return (c.def.clone(), c.arena.clone(), c.nav.clone());
         }
-        let def = Arc::new(procgen::resolve_room(db, w.run.room, w.run.room_seed));
-        let arena = Arena::new(def.half_extents, def.obstacles.clone(), Vec::new());
-        let nav = Arc::new(NavGrid::new(&arena, radius + 0.15));
-        self.room = Some(RoomCache { key, def: def.clone(), nav: nav.clone() });
+        let (def, arena, nav) = shared_room(db, key, radius + 0.15);
+        self.room = Some(RoomCache { key, def: def.clone(), arena: arena.clone(), nav: nav.clone() });
         self.path.clear();
-        (def, nav)
+        (def, arena, nav)
     }
 
     /// Direction toward `goal`: straight when the way is clear, otherwise along an A* route
@@ -121,7 +171,7 @@ impl BotBrain {
         let Some(me) = w.players.iter().find(|p| p.slot == self.slot) else { return (cmd, None) };
         let pos = me.mover.pos;
         let tick = w.tick;
-        let (room, nav) = self.room(w, db, me.radius);
+        let (room, arena, nav) = self.room(w, db, me.radius);
         let half = room.half_extents;
 
         struct Foe {
@@ -249,19 +299,13 @@ impl BotBrain {
             goal = Some((f.pos, f.radius + 2.5));
         }
 
-        // Line of fire, by the host's rule: shots die on the ruins, so a foe behind one is not a
-        // target (the server's AUTO aim skips it too).
+        // Line of fire, by the host's rule: shots die on the ruins (and fly over pits), so a foe
+        // behind one is not a target (the server's AUTO aim skips it too).
         let chassis = &db.chassis_def(me.weapon.chassis).stats;
         let fire_range = chassis.range * 1.05;
-        let occluders: Vec<Obstacle> = room
-            .obstacles
-            .iter()
-            .filter(|o| {
-                let (c, r) = o.bounding_circle();
-                c.distance(pos) < fire_range + r
-            })
-            .copied()
-            .collect();
+        let mut occluders = std::mem::take(&mut self.occluders);
+        occluders.clear();
+        arena.occluders(pos, fire_range, &mut occluders);
         let in_sight = |p: Vec2| p.distance(pos) < fire_range && !occluders.iter().any(|o| o.blocks_segment(pos, p));
         let any_in_sight = foes.iter().any(|f| in_sight(f.pos));
 
@@ -313,11 +357,10 @@ impl BotBrain {
         let edge = (pos.abs() - (half - Vec2::splat(3.0))).max(Vec2::ZERO);
         dir -= pos.signum() * edge * 1.5;
         let mut move_dir = dir.normalize_or_zero();
-        // Whisker steering around room obstacles while fighting (slide past pillars instead of
-        // pushing into them); routes already keep clear of them.
+        // Whisker steering around obstacles and pits while fighting (slide past pillars and along
+        // chasm banks instead of pushing into them); routes already keep clear of them.
         if move_dir != Vec2::ZERO && !(routing && near_count == 0 && !in_danger) {
-            let blocked =
-                |d: Vec2| room.obstacles.iter().any(|o| (1..=3).any(|k| o.contains(pos + d * (k as f32 * 0.8), 0.6)));
+            let blocked = |d: Vec2| (1..=3).any(|k| !arena.walkable(pos + d * (k as f32 * 0.8), 0.6));
             if blocked(move_dir) {
                 let options = [0.6f32, -0.6, 1.2, -1.2, 1.8, -1.8];
                 let pref = self.strafe.signum();
@@ -354,6 +397,7 @@ impl BotBrain {
                 cmd.aim_dist = 64 * 6;
             }
         }
+        self.occluders = occluders;
 
         // ── buttons (press counters) ──
         let alive = me.life.is_alive();
