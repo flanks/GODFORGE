@@ -10,7 +10,8 @@ use gf_core::forge::{ForgeRules, Slot};
 use gf_core::modifier::Modifier;
 use gf_core::movement::{MoveTuning, Obstacle};
 use gf_core::overdrive::OverdriveTuning;
-use gf_core::rarity::RarityTable;
+use gf_core::poi::PoiKind;
+use gf_core::rarity::{Rarity, RarityTable};
 use gf_core::revive::ReviveTuning;
 use gf_core::scaling::{ChaosTierDef, PartyScaling};
 use gf_core::stats::CharacterBaseStats;
@@ -19,6 +20,7 @@ use gf_core::synergy::{SynergyEffect, SynergyTuning};
 use gf_core::weapon::ChassisStats;
 use glam::Vec2;
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 
 /// Production phase a row ships in (roadmap §16). Builds pick a maximum phase.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -193,11 +195,19 @@ pub struct CameraTuning {
     pub view_height: [f32; 4],
     /// Minimum character height as a fraction of screen height (readability rule §12: ≥ 6%).
     pub min_character_screen_frac: f32,
+    /// World units the camera leads the local player's move direction by (biome maps).
+    pub look_ahead: f32,
 }
 
 impl Default for CameraTuning {
     fn default() -> Self {
-        Self { pitch_deg: 55.0, yaw_deg: 0.0, view_height: [22.0, 24.0, 26.0, 28.0], min_character_screen_frac: 0.06 }
+        Self {
+            pitch_deg: 55.0,
+            yaw_deg: 0.0,
+            view_height: [22.0, 24.0, 26.0, 28.0],
+            min_character_screen_frac: 0.06,
+            look_ahead: 2.5,
+        }
     }
 }
 
@@ -229,6 +239,412 @@ impl Default for VfxBudget {
     }
 }
 
+// ───────────────────────────── game.ron: biome maps ─────────────────────────────
+
+/// Horde surges (OPEN_WORLD.md §2.5): a warning, then a burst of spawns from one side.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct SurgeTuning {
+    /// Stage minute of the first surge.
+    pub from_minute: f32,
+    /// Seconds between surges (uniform in the range).
+    pub interval: (f32, f32),
+    /// Seconds of warning (horn, edge flash) before the surge.
+    pub warn: f32,
+    pub duration: f32,
+    pub rate_mult: f32,
+    /// Width of the arc the surge spawns in (degrees; a dot-product test, never trig).
+    pub arc_deg: f32,
+}
+
+impl Default for SurgeTuning {
+    fn default() -> Self {
+        Self { from_minute: 3.0, interval: (85.0, 115.0), warn: 3.0, duration: 15.0, rate_mult: 2.0, arc_deg: 90.0 }
+    }
+}
+
+/// Horde director v2 (§5.5–5.6): per-cluster spawning around the party, far cull, flow fields.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct HordeTuning {
+    /// Hard cap on living enemies, map-wide.
+    pub global_max_alive: u32,
+    /// Players within this distance (single linkage) form one cluster.
+    pub cluster_link: f32,
+    /// Enemies within this distance of a cluster member count toward that cluster.
+    pub census_bubble: f32,
+    pub rate_mult: f32,
+    /// Added to the camera's view height when estimating a player's view footprint.
+    pub view_pad: f32,
+    /// Footprint width over height.
+    pub view_aspect: f32,
+    /// Spawn ring: this far beyond the view footprint (min, max).
+    pub ring_margin: (f32, f32),
+    /// Spawns stay at least this far from every player.
+    pub spawn_clear: f32,
+    /// A spawn is refused when the flow distance to it exceeds this × the straight distance (+8 u).
+    pub flow_detour: f32,
+    /// Seconds a spawned enemy rises from the ground.
+    pub emerge_time: f32,
+    /// A roaming enemy farther than this from every player starts its cull timer…
+    pub cull_distance: f32,
+    /// … and is culled after this many seconds out there,
+    pub cull_after: f32,
+    /// … or at once beyond this distance.
+    pub hard_cull: f32,
+    /// Fraction of a culled enemy's cost refunded to its cluster.
+    pub refund: f32,
+    /// Ticks for one full round of flow-field refreshes (one player slot per quarter).
+    pub flow_refresh_ticks: u16,
+    /// A target within this many clear tiles is chased directly instead of along the flow field.
+    pub direct_chase_tiles: u16,
+    /// Hold-wave spawns land on this ring around the POI (min, max).
+    pub event_ring: (f32, f32),
+    /// Share of a hold wave's spawns that use the event ring.
+    pub event_share: f32,
+    pub surge: SurgeTuning,
+    /// Gate Frenzy: rate multiplier and extra density once the gate opens.
+    pub frenzy_rate: f32,
+    pub frenzy_density: f32,
+    /// Threat-clock minutes added per completed objective.
+    pub heat_per_objective: f32,
+}
+
+impl Default for HordeTuning {
+    fn default() -> Self {
+        Self {
+            global_max_alive: 400,
+            cluster_link: 30.0,
+            census_bubble: 36.0,
+            rate_mult: 1.0,
+            view_pad: 4.0,
+            view_aspect: 2.0,
+            ring_margin: (3.0, 9.0),
+            spawn_clear: 20.0,
+            flow_detour: 1.6,
+            emerge_time: 0.4,
+            cull_distance: 56.0,
+            cull_after: 5.0,
+            hard_cull: 90.0,
+            refund: 1.0,
+            flow_refresh_ticks: 16,
+            direct_chase_tiles: 12,
+            event_ring: (18.0, 26.0),
+            event_share: 0.5,
+            surge: SurgeTuning::default(),
+            frenzy_rate: 1.4,
+            frenzy_density: 25.0,
+            heat_per_objective: 0.5,
+        }
+    }
+}
+
+/// Guards of lairs, the Warlord and camps (§5.3, §5.5): wake, aggro, leash, anti-hide.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GuardTuning {
+    /// Guards spawn (idle) when a player comes this close to their home.
+    pub wake: f32,
+    /// Idle guards attack a player this close (or when hit).
+    pub aggro: f32,
+    /// An awake guard goes home when every player has been beyond this for `reset_after` s.
+    pub leash: f32,
+    pub reset_after: f32,
+    /// Fraction of max HP regenerated per second while leashed home.
+    pub regen: f32,
+    /// An awake camp falls asleep (despawns, keeping what is left) with every player beyond this.
+    pub sleep: f32,
+    /// A guard untouched this many seconds while a player is within `hunt_radius` starts hunting.
+    pub hunt_after: f32,
+    pub hunt_radius: f32,
+}
+
+impl Default for GuardTuning {
+    fn default() -> Self {
+        Self {
+            wake: 34.0,
+            aggro: 16.0,
+            leash: 45.0,
+            reset_after: 6.0,
+            regen: 0.1,
+            sleep: 70.0,
+            hunt_after: 20.0,
+            hunt_radius: 25.0,
+        }
+    }
+}
+
+/// The Boss Gate (§5.3).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GateTuning {
+    /// Interact and gather inside this ring.
+    pub radius: f32,
+    /// Seconds of Gathering (party) and with a single player.
+    pub gather: f32,
+    pub gather_solo: f32,
+    /// Downed and reforging players are revived at this HP fraction when the party leaves.
+    pub revive_frac: f32,
+    /// Unworthy (forced gate): boss HP + this per missing Seal, capped at `unworthy_cap`.
+    pub unworthy_hp_per_seal: f32,
+    pub unworthy_cap: f32,
+}
+
+impl Default for GateTuning {
+    fn default() -> Self {
+        Self {
+            radius: 7.0,
+            gather: 10.0,
+            gather_solo: 2.0,
+            revive_frac: 0.5,
+            unworthy_hp_per_seal: 0.25,
+            unworthy_cap: 0.75,
+        }
+    }
+}
+
+/// How a POI is activated (§2.3).
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub enum PoiActivation {
+    /// Interact, then hold the ring: progress grows by `dt / time` while a living player is
+    /// inside and decays by `decay` per second while it is empty. `time` 0 = `anvil.hold_time`.
+    /// The breaker elite spawns at progress `breaker_at`.
+    Hold {
+        time: f32,
+        decay: f32,
+        wave: f32,
+        #[serde(default)]
+        breaker_at: Option<f32>,
+    },
+    /// Guards (`elites` biome elites and a pack, or the Warlord) must all die.
+    Clear { elites: u8, wave: f32 },
+    /// Interact once per player.
+    Use,
+    /// Stand in the ring for `channel` seconds.
+    Touch { channel: f32 },
+    /// Sealed → Open → Gathering (the Boss Gate only).
+    Gate,
+}
+
+/// What completing a POI pays (§2.4, §5.4).
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub enum PoiReward {
+    /// The anvil's forge window (charges per claimant).
+    Forge,
+    /// `cache_parts + extra` parts of at least `min_rarity` per present player, plus shards.
+    Parts { extra: u8, min_rarity: Rarity, shards: u32 },
+    /// Godshards to every player.
+    Shards { amount: u32 },
+    /// A boon offer from the shrine's god.
+    Boon,
+    /// Heal this fraction of max HP (× healing received).
+    Heal { frac: f32 },
+    /// Reveal the map within `radius`.
+    Reveal { radius: f32 },
+    /// Into the boss arena.
+    Onward,
+}
+
+/// One row of `expedition.pois`: how a POI kind plays.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PoiTuning {
+    pub kind: PoiKind,
+    /// Interaction / hold ring radius.
+    pub radius: f32,
+    /// Radius of the clearing (plaza tiles) generated around it.
+    pub plaza: f32,
+    pub activation: PoiActivation,
+    pub reward: PoiReward,
+}
+
+impl PoiTuning {
+    /// The shipped POI rows (OPEN_WORLD.md §4.2).
+    pub fn defaults() -> Vec<PoiTuning> {
+        use PoiActivation::*;
+        let row = |kind, radius, plaza, activation, reward| PoiTuning { kind, radius, plaza, activation, reward };
+        vec![
+            row(
+                PoiKind::Anvil,
+                4.5,
+                10.0,
+                Hold { time: 0.0, decay: 0.0, wave: 1.5, breaker_at: Some(0.6) },
+                PoiReward::Forge,
+            ),
+            row(
+                PoiKind::Shrine,
+                4.0,
+                8.0,
+                Hold { time: 12.0, decay: 0.05, wave: 1.2, breaker_at: None },
+                PoiReward::Boon,
+            ),
+            row(
+                PoiKind::Reliquary,
+                4.0,
+                8.0,
+                Hold { time: 15.0, decay: 0.05, wave: 1.3, breaker_at: None },
+                PoiReward::Parts { extra: 0, min_rarity: Rarity::Common, shards: 0 },
+            ),
+            row(
+                PoiKind::Vein,
+                4.0,
+                8.0,
+                Hold { time: 20.0, decay: 0.03, wave: 1.4, breaker_at: Some(0.5) },
+                PoiReward::Shards { amount: 18 },
+            ),
+            row(
+                PoiKind::Lair,
+                14.0,
+                14.0,
+                Clear { elites: 2, wave: 0.8 },
+                PoiReward::Parts { extra: 1, min_rarity: Rarity::Common, shards: 10 },
+            ),
+            row(
+                PoiKind::Warlord,
+                18.0,
+                18.0,
+                Clear { elites: 0, wave: 0.6 },
+                PoiReward::Parts { extra: 0, min_rarity: Rarity::Rare, shards: 20 },
+            ),
+            row(PoiKind::Spring, 3.0, 6.0, Use, PoiReward::Heal { frac: 0.4 }),
+            row(PoiKind::Watchfire, 2.5, 5.0, Touch { channel: 1.0 }, PoiReward::Reveal { radius: 80.0 }),
+            row(PoiKind::Gate, 7.0, 14.0, Gate, PoiReward::Onward),
+        ]
+    }
+}
+
+/// Split-party rules (§5.9).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CoopTuning {
+    /// "Present" at a POI's completion: within its radius + this.
+    pub present_pad: f32,
+    /// Personal part rolls only for players this close to the kill.
+    pub loot_share_radius: f32,
+    /// With no living ally this close, a downed player's timer is clamped to `hopeless_downed`.
+    pub tether_hopeless: f32,
+    pub hopeless_downed: f32,
+    /// A reforged player appears this far from the nearest living ally.
+    pub reforge_offset: f32,
+    /// Parts do not age while their owner is this close.
+    pub part_owner_near: f32,
+    /// POI completion pulls pickups within this radius to present players.
+    pub vacuum_radius: f32,
+    /// Forge Aegis: enemies are pushed out of a Hot anvil's radius + this.
+    pub aegis_pad: f32,
+}
+
+impl Default for CoopTuning {
+    fn default() -> Self {
+        Self {
+            present_pad: 8.0,
+            loot_share_radius: 36.0,
+            tether_hopeless: 45.0,
+            hopeless_downed: 3.0,
+            reforge_offset: 2.0,
+            part_owner_near: 40.0,
+            vacuum_radius: 40.0,
+            aegis_pad: 1.0,
+        }
+    }
+}
+
+/// Stride: a travel speed self-buff out of combat (§5.9).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct StrideTuning {
+    /// Seconds without taking damage, firing or an enemy within `calm_radius`.
+    pub delay: f32,
+    pub mult: f32,
+    pub calm_radius: f32,
+}
+
+impl Default for StrideTuning {
+    fn default() -> Self {
+        Self { delay: 2.5, mult: 1.25, calm_radius: 12.0 }
+    }
+}
+
+/// Fog of war (client presentation, §7.3).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct FogTuning {
+    /// Fog grid cell (world units).
+    pub cell: f32,
+    /// Radius revealed around each player, and its soft edge.
+    pub reveal: f32,
+    pub feather: f32,
+    /// POI beacons are sighted from this far through the fog.
+    pub beacon_sight: f32,
+}
+
+impl Default for FogTuning {
+    fn default() -> Self {
+        Self { cell: 2.0, reveal: 32.0, feather: 6.0, beacon_sight: 45.0 }
+    }
+}
+
+/// Per-client interest management (§6.3).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct InterestTuning {
+    /// Entities become relevant within `radius_in` and stay relevant until beyond `radius_out`.
+    pub radius_in: f32,
+    pub radius_out: f32,
+    /// Positional events farther than this are not sent.
+    pub event_radius: f32,
+    /// Enemies beyond this update every other snapshot.
+    pub far_lod: f32,
+}
+
+impl Default for InterestTuning {
+    fn default() -> Self {
+        Self { radius_in: 44.0, radius_out: 52.0, event_radius: 50.0, far_lod: 30.0 }
+    }
+}
+
+/// `game.ron: expedition` — how biome maps play (OPEN_WORLD.md §4.2). Every field has a default.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ExpeditionTuning {
+    pub horde: HordeTuning,
+    pub guards: GuardTuning,
+    pub gate: GateTuning,
+    /// One row per POI kind.
+    pub pois: Vec<PoiTuning>,
+    /// Seconds without objective progress (short of the required Seals) before the Forge whispers
+    /// a hint toward the nearest seal-bearing POI.
+    pub stall_hint_secs: f32,
+    pub ember_per_objective: f32,
+    pub coop: CoopTuning,
+    pub stride: StrideTuning,
+    pub fog: FogTuning,
+    pub interest: InterestTuning,
+}
+
+impl Default for ExpeditionTuning {
+    fn default() -> Self {
+        Self {
+            horde: HordeTuning::default(),
+            guards: GuardTuning::default(),
+            gate: GateTuning::default(),
+            pois: PoiTuning::defaults(),
+            stall_hint_secs: 150.0,
+            ember_per_objective: 3.0,
+            coop: CoopTuning::default(),
+            stride: StrideTuning::default(),
+            fog: FogTuning::default(),
+            interest: InterestTuning::default(),
+        }
+    }
+}
+
+impl ExpeditionTuning {
+    /// The tuning row of POI `kind` (validation guarantees one per kind in shipped content).
+    pub fn poi(&self, kind: PoiKind) -> Option<&PoiTuning> {
+        self.pois.iter().find(|p| p.kind == kind)
+    }
+}
+
 /// `game.ron` — global tuning knobs.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -246,6 +662,8 @@ pub struct GameTuning {
     pub echo: EchoTuning,
     pub camera: CameraTuning,
     pub vfx: VfxBudget,
+    /// Biome maps: horde director v2, POIs, the gate, split-party rules, fog and interest.
+    pub expedition: ExpeditionTuning,
     /// Player color code: P1..P4 outline/aura (gold, cyan, violet, green).
     pub player_colors: [String; 4],
     /// Enemy telegraph color (danger red-white, always).
@@ -800,6 +1218,9 @@ pub enum RoomKind {
     MiniBoss,
     Boss,
     Treasure,
+    /// A whole biome map (OPEN_WORLD.md): generated by `worldgen` from the template's
+    /// [`ExpeditionDef`], explored for Seals until the Boss Gate opens.
+    Expedition,
 }
 
 /// Where enemies enter a room.
@@ -1067,6 +1488,18 @@ pub enum Decor {
     /// segment from → to, `width` wide. Covers the `Obstacle::Box`es laid along it; the gaps between
     /// them are spanned by [`Decor::Bridge`]s.
     Channel { from: Vec2, to: Vec2, width: f32 },
+    /// Solid landmark ("Fallen Arms", biome maps): a colossal broken god-weapon driven into the
+    /// ground, `height` tall, leaning toward `rot`, its impact crater on `Obstacle::Circle { at, radius }`.
+    /// `variant`: 0 sword, 1 hammer, 2 spear, 3 bow, 4 cannon.
+    FallenWeapon {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        variant: u8,
+    },
 
     // ── visual only ──
     /// Visual: a walkable stone span over a channel from bank (`from`) to bank (`to`), `width` wide.
@@ -1167,6 +1600,7 @@ impl Decor {
                 | Decor::InvertedColumn { .. }
                 | Decor::Rift { .. }
                 | Decor::Channel { .. }
+                | Decor::FallenWeapon { .. }
         )
     }
 
@@ -1197,6 +1631,7 @@ impl Decor {
             | Decor::SpiralStair { at, .. }
             | Decor::InvertedColumn { at, .. }
             | Decor::Rift { at, .. }
+            | Decor::FallenWeapon { at, .. }
             | Decor::Pool { at, .. }
             | Decor::Paving { at, .. }
             | Decor::FloorInlay { at, .. }
@@ -1235,7 +1670,8 @@ impl Decor {
             | Decor::Crystal { at, .. }
             | Decor::SpiralStair { at, .. }
             | Decor::InvertedColumn { at, .. }
-            | Decor::Rift { at, .. } => p.distance(at) < 0.05,
+            | Decor::Rift { at, .. }
+            | Decor::FallenWeapon { at, .. } => p.distance(at) < 0.05,
             _ => false,
         }
     }
@@ -1378,8 +1814,16 @@ pub struct RoomDef {
     #[serde(default)]
     pub districts: Vec<District>,
     /// Generated rooms: processional lanes kept clear of obstacles (presentation paves them).
+    /// Biome maps: the roads.
     #[serde(default)]
     pub lanes: Vec<Lane>,
+    /// Expedition templates only: the biome map's configuration.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expedition: Option<Box<ExpeditionDef>>,
+    /// Generated biome maps only (never authored; not serialized): tiles, regions, roads, POIs,
+    /// camps and pits, shared as one `Arc` by the sim, the client and bots.
+    #[serde(skip)]
+    pub map: Option<Arc<MapLayout>>,
 }
 
 impl RoomDef {
@@ -1402,7 +1846,385 @@ impl RoomDef {
             rim: RimStyle::default(),
             districts: Vec::new(),
             lanes: Vec::new(),
+            expedition: None,
+            map: None,
         }
+    }
+}
+
+// ───────────────────────────── biome maps ─────────────────────────────
+
+/// Terrain barrier between two adjacent regions (§3.2 step 7).
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum BarrierKind {
+    /// Void tiles, 2 thick: a drop into the abyss (a pit; shots fly over).
+    Chasm,
+    /// Liquid tiles, 2–3 thick: slag, black water, star-sea, chaos (a pit; shots fly over).
+    River,
+    /// A line of solid wall blocks in the biome's style.
+    Wall,
+    /// A chain of boulders.
+    Ridge,
+}
+
+/// Grand monuments that give a map its skyline (§3.5), in the room grammar's vocabulary.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum MapMark {
+    Statue,
+    GreatBrazier,
+    SealedGate,
+    Tree,
+    SpiralStair,
+    InvertedColumn,
+    Rift,
+    Crystal,
+    ColossusHead,
+    GreatAnvil,
+    Crucible,
+    /// A colossal broken god-weapon ([`Decor::FallenWeapon`]).
+    FallenWeapon,
+}
+
+/// A region theme: what one Voronoi region of the map looks like and is built from.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct RegionTheme {
+    pub key: String,
+    /// Shown in the region banner ("The Slag Flats").
+    pub name: String,
+    pub weight: f32,
+    /// Room-grammar composition pool for this region's slots (pick weights).
+    pub districts: Vec<(DistrictKind, f32)>,
+    /// Share of slots left open as killing fields (0..=1).
+    pub fields: f32,
+    /// Floor-cover target of the density top-up (0.0..=0.08).
+    pub cover: f32,
+    /// `#RRGGBB`: the floor vertex tint and the minimap land colour.
+    pub tint: String,
+    pub map_color: String,
+    /// May host the Landing.
+    #[serde(default)]
+    pub open: bool,
+    /// Camp packs in this region (the biome's swarm when empty).
+    #[serde(default)]
+    pub camp_pool: Vec<WeightedKey>,
+}
+
+/// The coastline: void tiles eaten in from the map rectangle (tile units).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CoastDef {
+    /// Tiles that are always void along the border.
+    pub depth: u8,
+    /// Noise amplitude on top of `depth` (bays and headlands).
+    pub amp: u8,
+    /// Noise lattice period.
+    pub period: u8,
+}
+
+impl Default for CoastDef {
+    fn default() -> Self {
+        Self { depth: 2, amp: 3, period: 6 }
+    }
+}
+
+/// Barriers between adjacent regions.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct BarrierDef {
+    /// Chance a pair of adjacent regions is separated by a barrier.
+    pub chance: f32,
+    /// Barrier kinds and pick weights.
+    pub kinds: Vec<(BarrierKind, f32)>,
+}
+
+impl Default for BarrierDef {
+    fn default() -> Self {
+        Self { chance: 0.45, kinds: Vec::new() }
+    }
+}
+
+/// The road network between region sites.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RoadDef {
+    pub width: f32,
+    /// Chance each non-tree region adjacency also gets a road (loops).
+    pub loop_chance: f32,
+    /// Width of the pass (bridge or breach) where a road crosses a barrier.
+    pub pass_width: f32,
+}
+
+impl Default for RoadDef {
+    fn default() -> Self {
+        Self { width: 6.0, loop_chance: 0.3, pass_width: 8.0 }
+    }
+}
+
+/// How many POIs of a kind the map places, and the Seals each is worth.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PoiQuota {
+    pub kind: PoiKind,
+    pub count: u8,
+    #[serde(default)]
+    pub seals: u8,
+}
+
+/// Dormant enemy camps scattered over the map.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct CampDef {
+    /// One camp per this many square units of land.
+    pub per_area: f32,
+    /// Pack size range.
+    pub pack: (u8, u8),
+    /// Chance of an elite leader.
+    pub elite_chance: f32,
+    /// Shard pile dropped when cleared (range).
+    pub shards: (u16, u16),
+}
+
+impl Default for CampDef {
+    fn default() -> Self {
+        Self { per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15) }
+    }
+}
+
+/// One row of the threat clock (§2.5), for one solo cluster. Rows interpolate linearly.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ThreatKey {
+    pub minute: f32,
+    /// Living enemies the director keeps around the cluster.
+    pub density: f32,
+    /// Spawn weight per second.
+    pub rate: f32,
+    pub elite_chance: f32,
+    pub hp_mult: f32,
+}
+
+/// An Expedition template's biome-map configuration (`rooms.ron`, OPEN_WORLD.md §4.3).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ExpeditionDef {
+    /// Map size in world units: multiples of 8, at most 480 × 480 (`QPos` reaches ±256 u).
+    pub size: Vec2,
+    /// Region grid (jittered sites), columns × rows.
+    pub regions: (u8, u8),
+    pub themes: Vec<RegionTheme>,
+    /// The Landing region's theme (an `open` one).
+    pub start_theme: String,
+    pub coast: CoastDef,
+    pub barriers: BarrierDef,
+    pub roads: RoadDef,
+    pub pois: Vec<PoiQuota>,
+    pub camps: CampDef,
+    /// Grand monuments for regions without a major POI (pick weights).
+    pub landmarks: Vec<(MapMark, f32)>,
+    /// Seals that open the Boss Gate (the Warlord counts its own).
+    pub seals_required: u8,
+    pub gate_requires_warlord: bool,
+    /// Stage minute at which the gate is forced open (Unworthy).
+    pub gate_force_minute: f32,
+    /// The biome boss's HP multiplier when the party walks through the gate.
+    pub boss_hp_mult: f32,
+    /// Threat-clock minute the biome starts at (carries the madness forward across biomes).
+    pub threat_start_minute: f32,
+    pub threat: Vec<ThreatKey>,
+}
+
+impl Default for ExpeditionDef {
+    fn default() -> Self {
+        Self {
+            size: Vec2::new(432.0, 272.0),
+            regions: (5, 3),
+            themes: Vec::new(),
+            start_theme: String::new(),
+            coast: CoastDef::default(),
+            barriers: BarrierDef::default(),
+            roads: RoadDef::default(),
+            pois: Vec::new(),
+            camps: CampDef::default(),
+            landmarks: Vec::new(),
+            seals_required: 6,
+            gate_requires_warlord: true,
+            gate_force_minute: 12.0,
+            boss_hp_mult: 1.35,
+            threat_start_minute: 0.0,
+            threat: Vec::new(),
+        }
+    }
+}
+
+impl ExpeditionDef {
+    /// Total POIs of `kind` the quotas ask for.
+    pub fn quota(&self, kind: PoiKind) -> u32 {
+        self.pois.iter().filter(|q| q.kind == kind).map(|q| q.count as u32).sum()
+    }
+
+    /// Seals the quotas make available on the map.
+    pub fn seals_available(&self) -> u32 {
+        self.pois.iter().map(|q| q.seals as u32 * q.count as u32).sum()
+    }
+
+    /// Index of the theme with `key`.
+    pub fn theme(&self, key: &str) -> Option<usize> {
+        self.themes.iter().position(|t| t.key == key)
+    }
+}
+
+/// What a map tile is. Land is `Ground | Road | Plaza | Bridge`; `Void` and `Liquid` are pits
+/// (walkers are blocked, shots fly over).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum TileKind {
+    /// Off the map or a chasm: a drop into the abyss.
+    Void,
+    /// Open land, where room-grammar compositions may stand.
+    #[default]
+    Ground,
+    /// A paved road (kept clear of obstacles).
+    Road,
+    /// A POI clearing or the Landing.
+    Plaza,
+    /// A span over a pit where a road crosses it.
+    Bridge,
+    /// A river of the biome liquid.
+    Liquid,
+}
+
+impl TileKind {
+    /// Walkable terrain (obstacles aside).
+    pub const fn is_land(self) -> bool {
+        matches!(self, TileKind::Ground | TileKind::Road | TileKind::Plaza | TileKind::Bridge)
+    }
+
+    /// Blocks walkers: `Void` and `Liquid`.
+    pub const fn is_pit(self) -> bool {
+        !self.is_land()
+    }
+}
+
+/// The map's 4 u tile raster: land mask and region ownership, row-major from `origin` (the map's
+/// south-west corner), `x` east and `y` north.
+#[derive(Clone, Debug, PartialEq)]
+pub struct TileGrid {
+    pub w: u16,
+    pub h: u16,
+    /// Tile side (world units, 4.0).
+    pub size: f32,
+    pub origin: Vec2,
+    pub kind: Vec<TileKind>,
+    /// Owning region per tile.
+    pub region: Vec<u8>,
+}
+
+impl TileGrid {
+    /// Side of a map tile (world units).
+    pub const TILE: f32 = 4.0;
+
+    /// A `w × h` grid of `fill` tiles, all in region 0.
+    pub fn new(origin: Vec2, w: u16, h: u16, fill: TileKind) -> Self {
+        let n = w as usize * h as usize;
+        Self { w, h, size: Self::TILE, origin, kind: vec![fill; n], region: vec![0; n] }
+    }
+
+    #[inline]
+    pub fn index(&self, x: u16, y: u16) -> usize {
+        y as usize * self.w as usize + x as usize
+    }
+
+    /// Tile containing `p`, if it is on the grid.
+    pub fn tile_of(&self, p: Vec2) -> Option<(u16, u16)> {
+        let t = ((p - self.origin) / self.size).floor();
+        (t.x >= 0.0 && t.y >= 0.0 && t.x < self.w as f32 && t.y < self.h as f32).then_some((t.x as u16, t.y as u16))
+    }
+
+    /// Centre of tile (`x`, `y`) in world units.
+    pub fn center(&self, x: u16, y: u16) -> Vec2 {
+        self.origin + (Vec2::new(x as f32, y as f32) + Vec2::splat(0.5)) * self.size
+    }
+
+    /// Terrain under `p` (`Void` off the grid).
+    pub fn kind_at(&self, p: Vec2) -> TileKind {
+        self.tile_of(p).map_or(TileKind::Void, |(x, y)| self.kind[self.index(x, y)])
+    }
+}
+
+/// One Voronoi region of the map.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Region {
+    /// Index into the template's `themes`.
+    pub theme: u8,
+    /// The region's site (its centre of gravity for roads and major POIs).
+    pub site: Vec2,
+    /// The grand monument standing at the site, if any.
+    pub landmark: Option<MapMark>,
+}
+
+/// Where a road crosses a barrier: a bridge over a pit or a breach in a wall (a chokepoint).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Pass {
+    pub at: Vec2,
+    /// Direction the road runs through it.
+    pub along: Rot16,
+    pub width: f32,
+    pub kind: BarrierKind,
+}
+
+/// A generated POI.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PoiSite {
+    pub kind: PoiKind,
+    pub at: Vec2,
+    /// Interaction ring radius (from `expedition.pois`).
+    pub radius: f32,
+    pub seals: u8,
+    pub region: u8,
+    /// Shrines: the god (index into the gods table) whose boon it grants.
+    pub god: Option<u8>,
+    /// Warlords and lairs: the guard enemy fixed at generation (index into the enemies table).
+    pub guard: Option<u16>,
+}
+
+/// A dormant enemy camp.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct CampSite {
+    pub at: Vec2,
+    /// Pack enemy (index into the enemies table).
+    pub enemy: u16,
+    pub count: u8,
+    /// Elite leader, if any (index into the enemies table).
+    pub elite: Option<u16>,
+    /// Shard pile dropped when cleared.
+    pub shards: u16,
+}
+
+/// A generated biome map (`gf_content::worldgen`). Shared as `Arc` by the sim, the client and bots.
+#[derive(Clone, Debug, PartialEq)]
+pub struct MapLayout {
+    pub seed: u32,
+    /// FNV-64 over the quantized obstacles, pits, POI sites, player spawn and gate: every peer
+    /// compares it with the host's (`RunView.layout_hash`).
+    pub hash: u64,
+    pub tiles: TileGrid,
+    pub regions: Vec<Region>,
+    /// The road network (also copied to `RoomDef.lanes`).
+    pub roads: Vec<Lane>,
+    pub passes: Vec<Pass>,
+    /// Walker-only blockers merged from `Void` / `Liquid` tile runs.
+    pub pits: Vec<Obstacle>,
+    pub pois: Vec<PoiSite>,
+    /// Index of the Boss Gate in `pois`.
+    pub gate: u8,
+    pub camps: Vec<CampSite>,
+    /// POI placements that needed relaxed spacing.
+    pub relaxed: u8,
+    /// Reachability carves (obstacles removed or pits bridged) the generator had to make.
+    pub repairs: u8,
+}
+
+impl MapLayout {
+    /// The Boss Gate's site.
+    pub fn gate_site(&self) -> Option<&PoiSite> {
+        self.pois.get(self.gate as usize)
     }
 }
 

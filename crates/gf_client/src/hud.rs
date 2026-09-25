@@ -514,6 +514,7 @@ fn update_labels(
                     gf_content::RoomKind::MiniBoss => " · Mini-boss",
                     gf_content::RoomKind::Boss => " · BOSS",
                     gf_content::RoomKind::Treasure => " · Treasure",
+                    gf_content::RoomKind::Expedition => " · Expedition",
                 };
                 let chaos =
                     if w.run.chaos_tier > 0 { format!(" · Chaos {}", w.run.chaos_tier) } else { String::new() };

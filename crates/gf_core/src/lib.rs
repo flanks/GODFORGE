@@ -12,6 +12,7 @@
 //! - [`scaling`] — party-size scaling and Chaos Tier (Trials of the Forge) mutators.
 //! - [`movement`] — the shared kinematic step used by the host sim *and* client prediction.
 //! - [`overdrive`] / [`revive`] — co-op team meter and Soul-Tether revive state machine.
+//! - [`poi`] — biome-map points of interest: kinds and lifecycle states (content, sim and wire).
 
 pub mod aim;
 pub mod damage;
@@ -21,6 +22,7 @@ pub mod math;
 pub mod modifier;
 pub mod movement;
 pub mod overdrive;
+pub mod poi;
 pub mod rarity;
 pub mod revive;
 pub mod rng;
@@ -31,6 +33,7 @@ pub mod synergy;
 pub mod weapon;
 
 pub use glam::{Vec2, vec2};
+pub use poi::{PoiKind, PoiState};
 
 /// Fixed simulation rate. Everything time-based in the rules is expressed in seconds, but the
 /// authoritative sim and client prediction both step at exactly this rate.

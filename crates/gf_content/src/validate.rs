@@ -6,6 +6,8 @@ use crate::schema::*;
 use gf_core::aim::AimMode;
 use gf_core::forge::Slot;
 use gf_core::modifier::Modifier;
+use gf_core::poi::PoiKind;
+use glam::Vec2;
 use std::collections::{BTreeSet, HashMap};
 use std::fmt;
 
@@ -118,6 +120,7 @@ pub fn validate(db: &ContentDb) -> Vec<Issue> {
     if db.game.revive.downed_duration + db.game.revive.reforge_delay > 30.0 + 1e-3 {
         r.err("game", "revive", "no player may be out of the fight longer than 30 s (§10)");
     }
+    validate_expedition_tuning(&mut r, &db.game.expedition);
 
     // ── aim modes: exactly one per mode; the balance contract ──
     for mode in AimMode::ALL {
@@ -443,8 +446,15 @@ pub fn validate(db: &ContentDb) -> Vec<Issue> {
         {
             r.err("rooms", &room.key, "anvil outside the arena");
         }
-        if room.kind != RoomKind::Boss && room.exits.is_empty() {
+        // A biome map's exit is its generated Boss Gate.
+        if !matches!(room.kind, RoomKind::Boss | RoomKind::Expedition) && room.exits.is_empty() {
             r.err("rooms", &room.key, "non-boss rooms need at least one exit");
+        }
+        match (&room.expedition, room.kind == RoomKind::Expedition) {
+            (Some(x), true) => validate_expedition(&mut r, db, room, x),
+            (None, true) => r.err("rooms", &room.key, "Expedition templates need an `expedition` block"),
+            (Some(_), false) => r.err("rooms", &room.key, "only Expedition templates carry an `expedition` block"),
+            (None, false) => {}
         }
         if room.spawn_zones.is_empty() {
             r.err("rooms", &room.key, "rooms need at least one spawn zone");
@@ -499,6 +509,12 @@ pub fn validate(db: &ContentDb) -> Vec<Issue> {
             && !db.rooms.iter().any(|room| room.biome == b.key && room.kind == RoomKind::Anvil)
         {
             r.err("biomes", &b.key, "door rooms can lead to anvils: the biome needs an Anvil room");
+        }
+        // The map's gate leads into the biome's boss arena.
+        if b.sequence.contains(&RunStep::Fixed(RoomKind::Expedition))
+            && !db.rooms.iter().any(|room| room.biome == b.key && room.kind == RoomKind::Boss)
+        {
+            r.err("biomes", &b.key, "an Expedition sequence needs the biome's Boss room behind its gate");
         }
     }
 
@@ -559,6 +575,191 @@ pub fn validate(db: &ContentDb) -> Vec<Issue> {
 
     r.0.sort_by(|a, b| b.severity.cmp(&a.severity).then(a.table.cmp(b.table)).then(a.key.cmp(&b.key)));
     r.0
+}
+
+/// `game.ron: expedition` (OPEN_WORLD.md §4.4): one row per POI kind, rewards and activations on
+/// the kinds that can carry them, sane rings and guard leashes.
+fn validate_expedition_tuning(r: &mut Report, x: &ExpeditionTuning) {
+    for kind in PoiKind::ALL {
+        let n = x.pois.iter().filter(|p| p.kind == kind).count();
+        if n > 1 || (n == 0 && kind != PoiKind::Gate) {
+            r.err("game", &format!("expedition.pois.{}", kind.name()), format!("expected one row, found {n}"));
+        }
+    }
+    for p in &x.pois {
+        let key = format!("expedition.pois.{}", p.kind.name());
+        if !finite_positive(p.radius) || p.plaza < p.radius {
+            r.err("game", &key, "radius must be positive and plaza ≥ radius");
+        }
+        if p.reward == PoiReward::Forge && p.kind != PoiKind::Anvil {
+            r.err("game", &key, "only the Anvil pays Forge");
+        }
+        if p.reward == PoiReward::Boon && p.kind != PoiKind::Shrine {
+            r.err("game", &key, "only the Shrine pays Boon");
+        }
+        if (p.activation == PoiActivation::Gate) != (p.kind == PoiKind::Gate) {
+            r.err("game", &key, "Gate activation belongs to the Gate, and only there");
+        }
+        match p.activation {
+            PoiActivation::Hold { time, decay, wave, breaker_at } => {
+                if time < 0.0 || decay < 0.0 || wave < 0.0 || breaker_at.is_some_and(|b| !(0.0..1.0).contains(&b)) {
+                    r.err("game", &key, "hold time, decay and wave must be ≥ 0 and breaker_at within 0..1");
+                }
+            }
+            PoiActivation::Clear { wave, .. } if wave < 0.0 => r.err("game", &key, "wave must be ≥ 0"),
+            PoiActivation::Touch { channel } if !finite_positive(channel) => {
+                r.err("game", &key, "channel must be positive")
+            }
+            _ => {}
+        }
+    }
+    let g = &x.guards;
+    if g.leash <= g.wake || !finite_positive(g.wake) || !finite_positive(g.aggro) {
+        r.err("game", "expedition.guards", "wake and aggro must be positive and leash > wake");
+    }
+    if x.horde.global_max_alive == 0 {
+        r.err("game", "expedition.horde", "global_max_alive must be ≥ 1");
+    }
+    if !finite_positive(x.gate.radius) {
+        r.err("game", "expedition.gate", "radius must be positive");
+    }
+}
+
+/// An Expedition template's biome-map block (OPEN_WORLD.md §4.4).
+fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &ExpeditionDef) {
+    let key = room.key.as_str();
+    let mut err = |msg: String| r.err("rooms", key, msg);
+    // ── size and region grid ──
+    let multiple_of_8 = |v: f32| v.is_finite() && v > 0.0 && (v / 8.0).fract() == 0.0;
+    if !multiple_of_8(x.size.x) || !multiple_of_8(x.size.y) {
+        err(format!("expedition.size {:?} must be positive multiples of 8", x.size));
+    }
+    if room.half_extents != x.size * 0.5 {
+        err(format!("half_extents {:?} must be expedition.size / 2 ({:?})", room.half_extents, x.size * 0.5));
+    }
+    if x.size.x * 0.5 > 240.0 || x.size.y * 0.5 > 240.0 {
+        err(format!("expedition.size / 2 must be ≤ (240, 240) to fit QPos, got {:?}", x.size * 0.5));
+    }
+    let (rx, ry) = x.regions;
+    if !(2..=8).contains(&rx) || !(2..=8).contains(&ry) {
+        err(format!("regions {:?} must each be within 2..=8", x.regions));
+    } else {
+        let cell = x.size / Vec2::new(rx as f32, ry as f32);
+        if cell.x < 48.0 || cell.y < 48.0 {
+            err(format!("region cells must be ≥ 48 u, got {} × {}", cell.x, cell.y));
+        }
+    }
+    // ── themes ──
+    let biome = db.biomes.by_key(&room.biome);
+    let pack_ok = |k: &str| biome.is_some_and(|b| b.swarm.iter().chain(&b.elites).any(|w| w.key == k));
+    if x.themes.is_empty() {
+        err("expedition.themes must not be empty".into());
+    }
+    for (i, t) in x.themes.iter().enumerate() {
+        if !valid_key(&t.key) || x.themes[..i].iter().any(|o| o.key == t.key) {
+            err(format!("theme `{}`: keys must be unique lower_snake_case", t.key));
+        }
+        if !finite_positive(t.weight) {
+            err(format!("theme `{}`: weight must be positive", t.key));
+        }
+        if t.districts.iter().any(|(_, w)| !finite_positive(*w)) {
+            err(format!("theme `{}`: district weights must be positive", t.key));
+        }
+        if !(0.0..=1.0).contains(&t.fields) || !(0.0..=0.08).contains(&t.cover) {
+            err(format!("theme `{}`: fields must be within 0..=1 and cover within 0..=0.08", t.key));
+        }
+        for c in [&t.tint, &t.map_color] {
+            if parse_hex_color(c).is_none() {
+                err(format!("theme `{}`: colour `{c}` is not #RRGGBB", t.key));
+            }
+        }
+        for w in &t.camp_pool {
+            if !pack_ok(&w.key) || !finite_positive(w.weight) {
+                err(format!(
+                    "theme `{}`: camp_pool `{}` must be a {} swarm or elite enemy with a positive weight",
+                    t.key, w.key, room.biome
+                ));
+            }
+        }
+    }
+    match x.themes.iter().find(|t| t.key == x.start_theme) {
+        Some(t) if t.open => {}
+        Some(_) => err(format!("start_theme `{}` must be an `open` theme", x.start_theme)),
+        None => err(format!("start_theme `{}` is not one of the themes", x.start_theme)),
+    }
+    // ── quotas ──
+    if x.quota(PoiKind::Anvil) < 2 {
+        err(format!("needs at least 2 anvils, has {}", x.quota(PoiKind::Anvil)));
+    }
+    if x.quota(PoiKind::Gate) > 0 {
+        err("no Gate quota: every map has exactly one implicit gate".into());
+    }
+    if x.gate_requires_warlord && x.quota(PoiKind::Warlord) != 1 {
+        err(format!("the gate requires the Warlord: exactly one Warlord quota, found {}", x.quota(PoiKind::Warlord)));
+    }
+    if x.quota(PoiKind::Warlord) > 0 && biome.is_some_and(|b| b.minibosses.is_empty()) {
+        err(format!("a Warlord needs a mini-boss in {}'s `minibosses`", room.biome));
+    }
+    let phase = room.phase.max(Phase::P1);
+    let gods = db.gods.iter().filter(|g| g.phase <= phase).count() as u32;
+    if x.quota(PoiKind::Shrine) > gods {
+        err(format!("{} shrines but only {gods} gods up to {}", x.quota(PoiKind::Shrine), phase.name()));
+    }
+    if x.seals_available() < x.seals_required as u32 + 2 {
+        err(format!(
+            "quotas offer {} Seals: need seals_required + 2 = {} of slack",
+            x.seals_available(),
+            x.seals_required as u32 + 2
+        ));
+    }
+    // ── terrain ──
+    if x.coast.period == 0 {
+        err("coast.period must be ≥ 1".into());
+    }
+    if !(0.0..=1.0).contains(&x.barriers.chance) || x.barriers.kinds.iter().any(|(_, w)| !finite_positive(*w)) {
+        err("barriers: chance must be within 0..=1 and kind weights positive".into());
+    }
+    if !finite_positive(x.roads.width)
+        || !finite_positive(x.roads.pass_width)
+        || !(0.0..=1.0).contains(&x.roads.loop_chance)
+    {
+        err("roads: width and pass_width must be positive, loop_chance within 0..=1".into());
+    }
+    let c = &x.camps;
+    if !finite_positive(c.per_area)
+        || c.pack.0 == 0
+        || c.pack.0 > c.pack.1
+        || c.shards.0 > c.shards.1
+        || !(0.0..=1.0).contains(&c.elite_chance)
+    {
+        err("camps: per_area positive, 1 ≤ pack.min ≤ pack.max, shards.min ≤ shards.max, elite_chance within 0..=1"
+            .into());
+    }
+    if x.landmarks.iter().any(|(_, w)| !finite_positive(*w)) {
+        err("landmark weights must be positive".into());
+    }
+    if !finite_positive(x.gate_force_minute) || !finite_positive(x.boss_hp_mult) || x.threat_start_minute < 0.0 {
+        err("gate_force_minute and boss_hp_mult must be positive, threat_start_minute ≥ 0".into());
+    }
+    // ── threat clock ──
+    let cap = db.game.expedition.horde.global_max_alive as f32;
+    match x.threat.first() {
+        None => err("threat must not be empty".into()),
+        Some(k) if k.minute != 0.0 => err("the first threat row must be at minute 0".into()),
+        Some(_) => {}
+    }
+    if x.threat.windows(2).any(|w| w[1].minute <= w[0].minute || !w[1].minute.is_finite()) {
+        err("threat minutes must be strictly increasing".into());
+    }
+    for k in &x.threat {
+        let density_ok = (0.0..=cap).contains(&k.density);
+        if !density_ok || !finite_positive(k.rate) || !finite_positive(k.hp_mult) {
+            err(format!("threat row at minute {}: density within 0..={cap}, rate and hp_mult positive", k.minute));
+        }
+        if !(0.0..=1.0).contains(&k.elite_chance) {
+            err(format!("threat row at minute {}: elite_chance within 0..=1", k.minute));
+        }
+    }
 }
 
 #[cfg(test)]

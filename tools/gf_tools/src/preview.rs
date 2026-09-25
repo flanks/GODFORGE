@@ -391,6 +391,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::InvertedColumn { .. } => ("INVERTED COLUMN", hex("#B89AE8")),
         Decor::Rift { .. } => ("RIFT", hex("#FF4AD8")),
         Decor::Channel { .. } => ("CHANNEL", p.liquid),
+        Decor::FallenWeapon { .. } => ("FALLEN WEAPON *", hex("#C9B98E")),
         Decor::Bridge { .. } => ("BRIDGE", hex("#D8C8A8")),
         Decor::Pool { .. } => ("POOL", hex("#4A9AC8")),
         Decor::Paving { .. } => ("PAVING", p.ground.scale(3.2).mix(WHITE, 0.15)),
@@ -630,6 +631,28 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             segment(cv, v, at - d * (radius + 0.6), at + d * (radius + 0.6), 0.28, col, 1.0);
             segment(cv, v, at - d * (radius + 0.3), at + d * (radius + 0.3), 0.1, WHITE, 1.0);
         }
+        Decor::FallenWeapon { at, radius, height, rot, variant } => {
+            // The impact crater, then the weapon lying back along its lean (length ~ its height).
+            circle(cv, v, at, radius * 1.3, hex("#2A2420"), 0.6);
+            circle(cv, v, at, radius, col.scale(0.75), 1.0);
+            ring(cv, v, at, radius, 0.16, ink, 1.0);
+            let d = rot16_dir(rot);
+            let tip = at + d * (height * 0.45).max(radius + 1.0);
+            let w = match variant % 5 {
+                1 => 0.35,
+                2 => 0.18,
+                4 => 0.55,
+                _ => 0.28,
+            } * radius;
+            segment(cv, v, at, tip, w, col, 1.0);
+            let head = match variant % 5 {
+                1 => 0.9,
+                4 => 0.7,
+                _ => 0.45,
+            } * radius;
+            circle(cv, v, tip, head, col.scale(1.1), 1.0);
+            ring(cv, v, tip, head, 0.12, ink, 1.0);
+        }
         Decor::Brazier { at } => {
             circle(cv, v, at, 1.2, col, 0.2);
             circle(cv, v, at, 0.42, col, 1.0);
@@ -659,6 +682,7 @@ fn landmark_label(d: &Decor) -> Option<&'static str> {
         Decor::GreatBrazier { .. } => Some("FORGE FIRE"),
         Decor::SealedGate { .. } => Some("SEALED GATE"),
         Decor::SpiralStair { .. } => Some("SPIRAL STAIR"),
+        Decor::FallenWeapon { .. } => Some("FALLEN ARMS"),
         _ => None,
     }
 }

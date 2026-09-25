@@ -2615,6 +2615,8 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
         rim,
         districts,
         lanes: b.lanes,
+        expedition: None,
+        map: None,
     }
 }
 
