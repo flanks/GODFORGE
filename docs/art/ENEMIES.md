@@ -303,7 +303,21 @@ is no runtime variant system.
   (tilted along the crown axis), four arm chains (`upperarm/lowerarm/hand_L/R`,
   `arm2_upper/lower/hand_L/R`), legs, `pelvis`, `spine_01/02`, `head`.
 * **Colour:** slag black, molten orange `#FF6B1A`, forge gold `#FFC24B` (only inside the molten glow
-  ramp), teal Unmade cracks `#2FBFA8`, white-hot core `#FFF3D6`. Built: 21.5k tris, 2048 px.
+  ramp), teal Unmade cracks `#2FBFA8`, white-hot core `#FFF3D6`. Built: 25.0k tris, 2048 px.
+* **Art review fixes (2026-09-25, score 7/10).** Five must-fixes:
+  - Figure/ground: the up-facing slag planes are lifted to the slag light `#5E4434`, the side planes
+    part of the way. Edge strokes are brighter. The feet, shins and fists stand in a molten underglow:
+    a dim red band over a hot orange line at the ground.
+  - The crown and claw blades are dark sword steel, with a bright strip down each sharpened edge.
+    Five crown swords and the two middle claw swords show a grip and a crossguard.
+  - The limbs are a smooth-shaded `limb` zone with no facets and no triangle web of edge lines. They
+    carry six bold molten or teal cracks.
+  - Iron and steel are broad value planes with one brushy top-edge stroke, taken only from the part's
+    own edges, and no streaks. The rivets are iron.
+  - The furnace face scowls: its eye slits slope down to the centre under a V of iron brows, over a
+    jagged mouth of interlocking iron fangs.
+
+  Before and after: `art/enemies/slag_king/reports/slag_king_review_fix.png`.
 
 ## 8. Build workflow and checks
 

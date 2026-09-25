@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "slag_king",
  "tier": "boss",
- "tris": 21543,
+ "tris": 25006,
  "tris_budget": [
   20000,
   40000
@@ -16,7 +16,7 @@
     2048
    ],
    "format": "png",
-   "bytes": 687861
+   "bytes": 946990
   },
   {
    "name": "slag_king_basecolor",
@@ -26,15 +26,15 @@
     2048
    ],
    "format": "png",
-   "bytes": 3729086
+   "bytes": 3270279
   }
  ],
  "sockets": {
-  "fx_mouth": {
+  "head_top": {
    "translation": [
     0.0,
-    7.1638,
-    4.8583
+    12.9435,
+    2.4825
    ],
    "forward": [
     -0.0,
@@ -64,23 +64,6 @@
     0.0
    ]
   },
-  "fx_core": {
-   "translation": [
-    0.0,
-    6.9819,
-    3.668
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
   "hit_center": {
    "translation": [
     0.0,
@@ -98,11 +81,28 @@
     0.0
    ]
   },
-  "head_top": {
+  "fx_core": {
    "translation": [
     0.0,
-    12.9435,
-    2.4825
+    6.9819,
+    3.668
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    7.1638,
+    4.8583
    ],
    "forward": [
     -0.0,
@@ -160,14 +160,14 @@
   ],
   "max": [
    7.5237,
-   12.801,
-   6.3512
+   12.8054,
+   6.4279
   ]
  },
- "size_m": 12.827,
+ "size_m": 12.831,
  "glb": "assets/models/enemies/slag_king.glb",
- "glb_bytes": 7618820,
- "glb_sha256": "892e65543c4c72c00b4b4af9d94858d4622ccee7bb871c0866147d67925a5303",
+ "glb_bytes": 7549952,
+ "glb_sha256": "73d9f5e8fa95bdda543668956a3f72ab218cedc3497109e492755a0bef147821",
  "source_blend": "art/enemies/slag_king/source/slag_king.blend",
  "build_script": "tools/blender/gf_assets/enemies/slag_king.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -836,11 +836,11 @@
  "paint": {
   "size": 2048,
   "texel_density_px_per_m": {
-   "median": 35.8,
-   "p10": 20.3,
-   "p90": 40.7
+   "median": 36.0,
+   "p10": 20.8,
+   "p90": 41.1
   },
-  "coverage": 0.464,
+  "coverage": 0.468,
   "paint_scale": 0.125
  },
  "row": {

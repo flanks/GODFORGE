@@ -7,12 +7,14 @@ The Cinder Wastes boss, built end to end from code with no concept art and no ha
 
 ```text
 "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" -b --factory-startup --python-exit-code 1 ^
-    -P tools/blender/gf_assets/enemies/slag_king.py -- [--preview] [--no-review] [--quick] [--size 2048]
+    -P tools/blender/gf_assets/enemies/slag_king.py -- [--preview] [--no-review] [--quick] [--lite] [--size 2048]
 python tools/blender/gf_assets/gfa_validate.py assets/models/enemies/slag_king.glb
 ```
 
 One run takes about 2-4 minutes on the CPU: model, paint, rig, 25 clips, export, validation and the four
 review sheets. `--preview` builds only the mesh and renders flat zone-colour views in about 10 s.
+`--lite` does the full build but renders only the 3/4 hero shots and the in-game frames, with their two
+sheets in `work/review/` (about 1-2 minutes, for paint passes; `reports/` is left alone).
 
 ![phase 1 and phase 2, 3/4 front](reports/slag_king_34.png)
 
@@ -22,6 +24,30 @@ review sheets. `--preview` builds only the mesh and renders flat zone-colour vie
 | [reports/slag_king_ingame.png](reports/slag_king_ingame.png) | the game camera (orthographic, 55°, yaw 0) at true 1080p pixel size with four hero mannequins: phase 1 and phase 2 at view height 22 m, phase 1 at 28 m, game-size silhouettes |
 | [reports/slag_king_clips.png](reports/slag_king_clips.png) | key frames of all 25 clips (loops: 4 evenly spaced frames; one-shots: start, loaded, event, follow-through, end) |
 | [reports/slag_king_34.png](reports/slag_king_34.png) | 3/4 front of both phases (the first look) |
+| [reports/slag_king_review_fix.png](reports/slag_king_review_fix.png) | before and after the art-review fixes: 3/4 front, the game camera at 1x, the face at 2x |
+
+## Art review fixes (2026-09-25, score 7/10)
+
+The review listed five must-fixes. All five are done in the build script, and the sheets above are
+re-rendered:
+
+1. **The body melted into the floor.** The slag was almost the floor's value and hue, so on the arena
+   floor only the ink separated it. The top planes are now lifted and the edge strokes brighter, and
+   the lower body stands in a molten underglow (see "How it is painted"). In the phase-1 in-game frame
+   at 22 m, 12 % of the boss pixels are within colour distance 18 of the floor, down from 25 %. The
+   median boss luminance is 74, up from 62 (the floor is 46). The rest is mostly the dark side of the
+   key light, where the ink and the rim do the work.
+2. **The crown and the claw read as quartz or ice.** Every sword is now dark steel, with a bright strip
+   down each sharpened edge (the `sword()` helper), and the weld glow is cut back to the ring. Five
+   crown swords and the two middle claw swords show a grip and a crossguard.
+3. **The limbs read as procedural rock.** Arms, legs, knees, elbows, fists and the slag flows are
+   smooth-shaded, with rounder sub-3 lumps and no triangle web of edge lines. Six bold cracks, three
+   molten and three teal, replace the fine webs.
+4. **The iron had white scratchy streaks.** Iron and steel are broad value planes with one brushy
+   top-edge stroke, taken only from the part's own edges, and no streaks or spots. The rivets are iron.
+5. **The face read as a worried emoji.** The eye slits now slope down toward the centre under a V of
+   iron brows, the mouth is a jagged grate of interlocking fangs, and the latch moved off the face to
+   the frame edge.
 
 ## Brief
 
@@ -34,15 +60,19 @@ user's pack (E3) and docs/art/ENEMIES.md section 7 give the rest.
   **15.0 × 11.4 m** footprint, about 2.2 × the 5.28 m collider. It has knuckle-heavy gorilla
   proportions: short column legs, a huge shoulder hump, and forearms bigger than the upper arms.
 * **The head is a cast-iron furnace** slung low in front of the hump. Its face is a bottom-hinged
-  furnace door with glowing slits: two slanted eye slits over a three-bar grille mouth. The door
-  covers a pocket holding a **white-hot core**. A glowing flue on the furnace dome gives the crown a
-  hot centre from the 55° camera.
-* **The crown** is a floating halo of 11 broken sword blades and 11 snapped stubs, fused into a molten
-  ring. The steel is tempered bronze toward the ring and glows where the blades are welded in. It
-  rides its own joint (`crown_spin`), so the engine can spin it. From the game camera it is the first
-  thing you see: a sunburst with a hot eye over the furnace face.
+  furnace door with a **scowl**. Two glowing eye slits slope down toward the centre under a V of heavy
+  iron brows, over a jagged grate mouth: four iron fangs from above interlock with three from below
+  across a glowing slot, so the glow between them is a zigzag. The door covers a pocket holding a
+  **white-hot core**. A glowing flue on the furnace dome gives the crown a hot centre from the 55° camera.
+* **The crown** is a floating halo of 11 broken swords and 11 snapped stubs, fused into a molten ring.
+  Every blade is dark sword steel with a bright strip down each sharpened edge. Five of the swords sit
+  further out, so their grip and crossguard show outside the ring. The steel is tempered bronze toward
+  the ring and glows only in the weld. The crown is set half a step off the front, so no blade covers
+  the face from the game camera. It rides its own joint (`crown_spin`), so the engine can spin it. From
+  the game camera it is the first thing you see: a sunburst of swords with a hot eye over the furnace face.
 * **A thousand failed weapons:** the right fist is a whole broken **anvil** (face down, horn out and
-  forward: the ground-pound head). The left fist is a claw of four fused blades. A greatsword, a war
+  forward: the ground-pound head). The left fist is a claw of four fused swords; the two middle ones
+  stand out far enough to show their crossguards. A greatsword, a war
   axe, a war hammer and broken swords jut from the hump, and a spear runs through the right shoulder.
   Each forearm carries a blade. A broken anvil (its horn snapped off) is fused into the belly, and
   shackle chains hang from the belly and the wrists. Two **chimney stacks** on the hump glow at the
@@ -138,11 +168,11 @@ along the crown axis (tilted 7° back), so local +Y is the spin axis. The core n
 
 | | |
 |---|---|
-| Triangles | 21,543 (boss budget 20,000-40,000). 263 parts; 2,670 buried faces were culled inside the parts they sit in |
-| Textures | base colour 2048², emissive 2048² (PNG, embedded); 10 paint zones; UV coverage about 46-48 % (the packer varies slightly per run); texel density median 36 px/m, p90 41 (the game camera shows 39-49 px/m) |
+| Triangles | 25,006 (boss budget 20,000-40,000). 305 parts; 3,260 buried faces were culled inside the parts they sit in |
+| Textures | base colour 2048², emissive 2048² (PNG, embedded); 12 paint zones; UV coverage about 46-48 % (the packer varies slightly per run); texel density median 36 px/m, p90 41 (the game camera shows 39-49 px/m) |
 | Material | one, `M_slag_king`: base colour + emissive, roughness 0.85, metallic 0, single-sided |
 | Size | 12.8 m tall, footprint 15.0 × 11.4 m (glTF bounds in meta.json) |
-| GLB | about 7.6 MB (3.7 MB is the base-colour PNG); no compression extensions (bevy_gltf 0.20 safe) |
+| GLB | about 7.5 MB (3.3 MB is the base-colour PNG); no compression extensions (bevy_gltf 0.20 safe) |
 | Animations | 31 (25 clips + 6 aliases), 78 channels each (every joint keyed) |
 
 ## How it is painted
@@ -150,15 +180,34 @@ along the crown axis (tilted 7° back), so local +Y is the spin axis. The core n
 `gfa_boss.paint_scaled` runs the shared painter on the mesh at **1/8 scale**. The painter's fixed brush
 features (stroke wobble, dab break-up, emission noise) are tuned for 0.1-1 m weapons; at 1/8 scale
 they become boss-sized brush strokes. Recipes and decals are written in real metres and converted.
-The zones:
+The 12 zones:
 
-* slag: faceted value planes, broken warm edge strokes, cavity darks, and a row-colour heat tint
-  around the furnace;
-* iron and steel;
-* blade: tempered toward the ring and glowing at the welds;
+* slag: the body masses. Faceted value planes, cavity darks, and a row-colour heat tint around the
+  furnace;
+* limb: the same slag on the arms and legs, smooth-shaded and painted without facets, so the limbs
+  read as muscle, not rock;
+* iron and steel: broad value planes, no streaks and no spots. The rivets are iron;
+* blade: dark sword steel, tempered bronze toward the crown ring, glowing only in the weld;
+* edge: the bright sharpened-edge strips down both sides of every sword;
 * lava: the phase-2 arms, white-hot where they leave the body and cooling to dark crust at the claws;
-* molten, core, obsidian, ichor;
-* 13 crack decals, teal and molten.
+* crust, molten, core, obsidian, ichor;
+* 13 crack decals, teal and molten, and six bold ones on the limbs (0.13 m wide, one short branch).
+
+**The figure/ground pass** (`paint_extras` in the build script). The shared painter has no normal- or
+height-driven pass, and `gfa_paint.py` stays unchanged, so the script wraps `gfa_paint.paint` for its
+one paint call. The pass runs between the zones and the decals:
+
+* **Top planes.** On slag and limb, up-facing planes are lifted toward the slag light `#5E4434`, and
+  side planes 40 % of the way. The lift multiplies, so cavity darks stay dark, and it has a brushy
+  boundary. The plain slag `#2B201B`, lit by the toon ramp, landed right on the Cinder Wastes floor
+  value `#3A2C24`.
+* **Edge strokes.** Slag, limb, iron and steel get their edge strokes here; their painter strokes are
+  off. Slag counts only creases over 40°, so the triangles of a lump draw no web. A texel counts only
+  its own part's creases, because the painter's distance to any part painted a light halo around
+  every rivet. Strokes are weighted toward up-facing planes, so a band gets one stroke along its top.
+* **Molten underglow.** On slag and limb, the emissive has a dim molten-red band up to about 1.5 m,
+  broken like a brush stroke, over a hot orange line at the ground. Down-facing planes below 5-7 m
+  also get the dim band. The base colour under the glow warms to a hot-slag red.
 
 Small UV islands (rivets, chain links, beads) are packed at 55 % when the installed `gfa_paint`
 supports `uv_small_islands`.
@@ -173,6 +222,7 @@ supports `uv_small_islands`.
 | `art/enemies/slag_king/reports/*` | yes (each PNG < 2 MB) |
 | `art/enemies/slag_king/work/` | no (previews, per-view renders, sheet layouts) |
 | `tools/blender/gf_assets/enemies/slag_king.py` | the build script |
+| `tools/blender/gf_assets/enemies/slag_king_fix_sheet.py` | the before/after sheet of the art-review fixes (plain Python + PIL) |
 | `tools/blender/gf_assets/gfa_boss.py` | new shared helpers for elites and bosses: dedicated rigs, rigid skin on any bone set, buried-face culling, painting at a paint scale, clip aliases, true-pixel in-game frames, size comparison, key-pose clip strips |
 
 ## Open points

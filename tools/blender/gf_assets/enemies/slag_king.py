@@ -4,11 +4,12 @@ validation -> review sheets. docs/art/ENEMIES.md section 7 (E3) is the brief; ar
 records the decisions.
 
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b --factory-startup --python-exit-code 1 \
-      -P tools/blender/gf_assets/enemies/slag_king.py -- [--preview] [--size 2048] [--no-review] [--quick]
+      -P tools/blender/gf_assets/enemies/slag_king.py -- [--preview] [--size 2048] [--no-review] [--quick] [--lite]
 
   --preview   model only: flat zone-colour views + game-size silhouette in art/enemies/slag_king/work/preview
   --no-review skip the review renders (export + validation only)
   --quick     review with fewer clip frames
+  --lite      review only the 3/4 hero shots and the in-game frames (sheets in work/review; for paint passes)
 
 Content row (content/sheets/enemies.csv): slag_king, Boss, cinder_wastes, hp 28000, speed 1.6, radius 2.2,
 scale 2.4 (sim collider radius 5.28 m), mass 30, resist Flame 0.5, Boss(script "slag_king"), colour #6B2A14,
@@ -47,6 +48,7 @@ import math
 import os
 import random
 import sys
+from contextlib import contextmanager
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import bpy  # noqa: E402
@@ -59,9 +61,14 @@ import gfa_render as R  # noqa: E402
 import gfa_spec as SPEC  # noqa: E402
 
 KEY, KIND, TIER = "slag_king", "enemy", "boss"
+PAINT_SCALE = 0.125                          # painted at 1/8 scale (gfa_boss.paint_scaled): boss-sized brush strokes
 RIG_NAME = "GF_SlagKing_v1"
-ZONES = ["slag", "crust", "iron", "steel", "blade", "molten", "lava", "core", "obsidian", "ichor"]
-FLAT = {"slag": "#2A201C", "crust": "#3A2418", "iron": "#3C3844", "steel": "#9C98A4", "blade": "#B0ACB8", "molten": "#FF7A22", "lava": "#E0541A",
+# slag = the faceted body masses; limb = the same slag on the arms and legs, smooth-shaded and painted
+# without facets (the limbs read as muscle, not rock); blade = dark sword steel; edge = the bright
+# sharpened edges of every sword (separate strips, so a blade reads as a blade at 38 px/m).
+ZONES = ["slag", "limb", "crust", "iron", "steel", "blade", "edge", "molten", "lava", "core", "obsidian", "ichor"]
+FLAT = {"slag": "#2A201C", "limb": "#3A2C24", "crust": "#3A2418", "iron": "#3C3844", "steel": "#9C98A4",
+        "blade": "#4A4446", "edge": "#E0D8CC", "molten": "#FF7A22", "lava": "#E0541A",
         "core": "#FFF3D6", "obsidian": "#1A1720", "ichor": "#2FBFA8"}
 
 # ---- skeleton pivots (creature space: faces -Y, +X = its left, ground z = 0) -----------------------------
@@ -129,31 +136,53 @@ def limb(points, radii, sides=10, per=4, noise=0.1, freq=0.8, seed=0, scale_xy=N
     return b
 
 
-def blade(length, width=0.34, thick=0.08, broken=0.4, seed=0, guard=True, hilt=0.0, ridge=True):
-    """A broken sword blade along +Y from y = 0 (the guard) to y = length; width along X, thickness Z.
-    broken: how much of the tip is snapped off at an angle (0 = pointed). Returns (blade, guard|None)."""
+def sword(length, width=0.34, thick=0.08, broken=0.4, seed=0, guard=True, edge=0.17, guard_w=2.6):
+    """A broken sword along +Y from y = 0 (the guard) to y = length; width along X, thickness along Z;
+    broken = how much of the tip is snapped off at an angle (0 = pointed). Three parts: the dark core with
+    its raised ridge (the 'blade' zone), the two sharpened edges (the 'edge' zone: a thinner strip down
+    each side, so a bright line frames the dark steel from every angle - a blade, not a crystal) and the
+    crossguard (guard_w blade widths across). Returns (core, edges, guard | None)."""
     rng = random.Random(seed)
     tipw = width * (0.2 + 0.55 * broken)
     off = (0.5 if rng.random() < 0.5 else -0.5) * width * (0.25 + 0.3 * broken)
-    sec = [(0.0, width, thick, 0, 0), (length * 0.6, width * 0.97, thick * 0.92, 0, 0),
-           (length * 0.88, width * (0.92 if broken else 0.6), thick * 0.8, off * 0.2, 0),
-           (length, tipw, thick * 0.6, off, 0)]
-    b = M.loft_rect(sec, bevel=min(0.02, thick * 0.25), segments=1)
-    if ridge:
-        r_ = M.loft_rect([(y, w * 0.28, t * 1.7, cx, 0) for (y, w, t, cx, _cz) in sec[:-1]] +
-                         [(length * 0.97, tipw * 0.3, thick * 0.9, off, 0)], bevel=0.0)
-        b = M.merge(b, r_)
+    sec = [(0.0, width, thick, 0.0), (length * 0.6, width * 0.97, thick * 0.92, 0.0),
+           (length * 0.88, width * (0.92 if broken else 0.6), thick * 0.8, off * 0.2),
+           (length, tipw, thick * 0.6, off)]
+    core_k = 1.0 - 2.0 * edge
+    flat_ = M.loft_rect([(y, w * core_k, t, cx, 0.0) for (y, w, t, cx) in sec], bevel=min(0.02, thick * 0.2), segments=1)
+    ridge = M.loft_rect([(y, w * 0.26, t * 1.6, cx, 0.0) for (y, w, t, cx) in sec[:-1]] +
+                        [(length * 0.97, tipw * 0.3, thick * 0.85, off, 0.0)], bevel=0.0)
+    core = M.merge(flat_, ridge)
+    flat_.free()
+    ridge.free()
+    strips = []
+    for s in (-1.0, 1.0):
+        # each strip overlaps the core by a fifth of its width; its outer edge sits on the blade outline
+        strips.append(M.loft_rect([(y, w * edge * 1.25, t * 0.5, cx + s * (w * 0.5 - w * edge * 0.625), 0.0)
+                                   for (y, w, t, cx) in sec], bevel=0.0))
+    edges = M.merge(*strips)
+    for b_ in strips:
+        b_.free()
     g = None
     if guard:
-        g = M.box((width * 2.6, thick * 2.4, thick * 2.2), bevel=thick * 0.35)
-        M.xform(g, loc=(0, 0.0, 0))
-        if hilt > 0:
-            h = M.cylinder(thick * 0.9, hilt, sides=6, axis="Y")
-            M.xform(h, loc=(0, -hilt / 2, 0))
-            pm = M.ico(thick * 1.5, 0)
-            M.xform(pm, loc=(0, -hilt, 0))
-            g = M.merge(g, h, pm)
-    return b, g
+        g = M.box((width * guard_w, thick * 2.4, thick * 2.2), bevel=thick * 0.35)
+    return core, edges, g
+
+
+def slab(poly, y0, depth):
+    """A flat plate from a convex 2D outline [(x, z), ...] in an XZ plane: back face at y = y0, front
+    face at y0 - depth (it stands out toward -Y, the creature's front). Face features: eyes, fangs."""
+    import bmesh as _bm
+    bm = _bm.new()
+    back = [bm.verts.new((x, y0, z)) for x, z in poly]
+    front = [bm.verts.new((x, y0 - depth, z)) for x, z in poly]
+    n = len(poly)
+    bm.faces.new(front)
+    bm.faces.new(list(reversed(back)))
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((back[i], back[j], front[j], front[i]))
+    return M.recalc(bm)
 
 
 def place(bm, origin, direction, x_hint=(1, 0, 0)):
@@ -251,18 +280,30 @@ def build_mesh(col):
             containers.append(pid)
         return pid
 
+    def add_sword(sw, origin, direction, x_hint, bone, name, guard_zone="iron", head=False):
+        """Place a sword() (core, edges, guard) along `direction` at `origin` and add its three parts."""
+        core, edges, gd = sw
+        for part_, zone, nm in ((core, "blade", name), (edges, "edge", name + "_edge"), (gd, guard_zone, name + "_guard")):
+            if part_ is None:
+                continue
+            place(part_, origin, direction, x_hint)
+            if head:
+                M.xform(part_, matrix=head_matrix())
+            add(part_, zone, bone, nm)
+
     # ---------------- legs (short columns, bent knees, anvil-block feet) ----------------
+    # Every limb part is smooth-shaded 'limb' slag: no facets and no triangle web of edge / cavity lines.
     for side, sx in (("L", 1), ("R", -1)):
         dy = 0.0 if sx > 0 else -0.35            # asymmetric stance: the right foot a step ahead
         hip = Vector((sx * 2.1, 0.8 + dy * 0.3, 3.75))
         knee = Vector((sx * 2.6, -0.15 + dy, 2.0))
         ank = Vector((sx * 2.5, 0.35 + dy, 0.85))
-        add(limb([hip, (hip + knee) / 2 + Vector((sx * 0.15, 0, 0)), knee], [1.45, 1.3, 1.05], sides=14,
-                 noise=0.22, freq=0.75, seed=11 + sx), "slag", "thigh_" + side, "thigh_" + side, shading="smooth", container=True)
-        add(lump(knee + Vector((sx * 0.05, -0.25, 0.05)), (1.9, 1.8, 1.7), sub=2, noise=0.12, seed=13 + sx),
-            "slag", "shin_" + side, "knee_" + side, container=True)
-        add(limb([knee, (knee + ank) / 2, ank], [1.0, 1.08, 1.2], sides=14, noise=0.18, freq=0.8, seed=15 + sx),
-            "slag", "shin_" + side, "shin_" + side, shading="smooth", container=True)
+        add(limb([hip, (hip + knee) / 2 + Vector((sx * 0.15, 0, 0)), knee], [1.45, 1.3, 1.05], sides=16,
+                 noise=0.16, freq=0.75, seed=11 + sx), "limb", "thigh_" + side, "thigh_" + side, shading="smooth", container=True)
+        add(lump(knee + Vector((sx * 0.05, -0.25, 0.05)), (1.9, 1.8, 1.7), sub=3, noise=0.1, seed=13 + sx),
+            "limb", "shin_" + side, "knee_" + side, shading="smooth", container=True)
+        add(limb([knee, (knee + ank) / 2, ank], [1.0, 1.08, 1.2], sides=16, noise=0.14, freq=0.8, seed=15 + sx),
+            "limb", "shin_" + side, "shin_" + side, shading="smooth", container=True)
         # shin guard: a bent iron plate (a fused breastplate) over the front of the shin
         g = M.box((1.35, 0.22, 1.5), bevel=0.06, taper=(0.8, 1.0))
         M.xform(g, loc=(sx * 2.62, -0.95 + dy, 1.45), rot=(-14, 0, sx * -6))
@@ -281,16 +322,12 @@ def build_mesh(col):
         M.xform(tp, rot=(0, sx * 12, 0), loc=(sx * 3.45, 0.25 + dy * 0.3, 3.05))
         add(tp, "iron", "thigh_" + side, "thighplate_" + side)
         add(M.rivet_row((sx * 3.6, -0.3 + dy * 0.3, 3.45), (sx * 3.6, 0.8 + dy * 0.3, 3.45), 3, (sx, 0, 0.2), radius=0.08,
-                        height=0.06), "steel", "thigh_" + side, "thighplate_rivets")
+                        height=0.06), "iron", "thigh_" + side, "thighplate_rivets")
         add(M.rivet_row((sx * 2.3, -1.25 + dy, 2.0), (sx * 2.95, -1.25 + dy, 2.0), 3, (0, -1, 0.2), radius=0.07,
-                        height=0.05), "steel", "shin_" + side, "shinguard_rivets")
+                        height=0.05), "iron", "shin_" + side, "shinguard_rivets")
         # a broken blade driven into the thigh
-        bl, gd = blade(1.5, 0.3, 0.07, broken=0.6, seed=21 + sx)
-        place(bl, hip + Vector((sx * 0.9, 0.2, -0.5)), (sx * 0.8, 0.45, 0.35))
-        add(bl, "steel", "thigh_" + side, "thighblade_" + side)
-        if gd:
-            place(gd, hip + Vector((sx * 0.9, 0.2, -0.5)), (sx * 0.8, 0.45, 0.35))
-            add(gd, "iron", "thigh_" + side, "thighguard_" + side)
+        add_sword(sword(1.5, 0.3, 0.07, broken=0.6, seed=21 + sx), hip + Vector((sx * 0.9, 0.2, -0.5)),
+                  (sx * 0.8, 0.45, 0.35), (1, 0, 0), "thigh_" + side, "thighblade_" + side)
 
     # ---------------- pelvis / belly / waist ----------------
     add(lump((0, -0.25, 4.1), (4.6, 3.4, 3.0), sub=3, noise=0.2, seed=31), "slag", "pelvis", "belly", container=True)
@@ -343,10 +380,8 @@ def build_mesh(col):
             add(band, "iron", "spine_02", "chimney_band", shading="flat")
 
     # failed weapons fused into the hump: one greatsword, one war axe, one spear through the right shoulder
-    bl, gd = blade(3.3, 0.58, 0.12, broken=0.3, seed=71)
-    for part_, zone in ((bl, "steel"), (gd, "iron")):
-        place(part_, (0.75, 1.9, 9.9), (0.22, 0.5, 1.0), (1, 0, 0))
-        add(part_, zone, "spine_02", "greatsword")
+    add_sword(sword(3.3, 0.58, 0.12, broken=0.3, seed=71), (0.75, 1.9, 9.9), (0.22, 0.5, 1.0), (1, 0, 0),
+              "spine_02", "greatsword")
     hilt = M.cylinder(0.11, 1.0, sides=6, axis="Y")
     M.xform(hilt, loc=(0, -0.5, 0))
     place(hilt, (0.75, 1.9, 9.9), (0.22, 0.5, 1.0), (1, 0, 0))
@@ -368,10 +403,8 @@ def build_mesh(col):
     for o, d, L, w, br, sd in (((-2.4, 1.6, 9.9), (-0.3, 0.55, 1.0), 1.9, 0.4, 0.6, 76),
                                ((-0.9, 2.7, 9.3), (-0.2, 1.0, 0.45), 1.4, 0.34, 0.75, 77),
                                ((2.6, 1.9, 8.4), (0.7, 0.8, 0.2), 1.5, 0.36, 0.7, 78)):
-        bl, gd = blade(L, w, 0.1, broken=br, seed=sd)
-        for part_, zone in ((bl, "steel"), (gd, "iron")):
-            place(part_, o, d, (1, 0, 0) if abs(d[0]) < 0.5 else (0, 0, 1))
-            add(part_, zone, "spine_02", "back_blade")
+        add_sword(sword(L, w, 0.1, broken=br, seed=sd), o, d, (1, 0, 0) if abs(d[0]) < 0.5 else (0, 0, 1),
+                  "spine_02", "back_blade")
     hh = M.cylinder(0.12, 2.2, sides=6, axis="Y")
     M.xform(hh, loc=(0, 1.1, 0))
     hm_ = M.box((0.95, 0.6, 0.6), bevel=0.08, segments=2)
@@ -404,7 +437,10 @@ def build_mesh(col):
         ((2.95, 0.6, 1.4), (0.9, 1.0, 1.2), (0, 12, 0), "shin_L"), ((-2.9, 0.3, 1.4), (0.9, 1.0, 1.2), (0, -12, 0), "shin_R"),
     ]
     for i, (c_, sz, rt, bn) in enumerate(flows):
-        add(lump(c_, sz, sub=2, noise=0.1, freq=1.1, seed=300 + i, rot=rt), "slag", bn, "slag_flow")
+        # poured slag: smooth-shaded (a flat-shaded sub-2 ico painted a web of edge lines)
+        on_limb = bn.split("_")[0] in ("thigh", "shin", "upperarm", "lowerarm")
+        add(lump(c_, sz, sub=2, noise=0.1, freq=1.1, seed=300 + i, rot=rt), "limb" if on_limb else "slag", bn,
+            "slag_flow", shading="smooth")
 
     # belly molten drips
     for i, p in enumerate(((-1.1, -1.55, 2.95), (0.9, -1.4, 2.9), (1.9, -0.9, 3.05))):
@@ -437,12 +473,12 @@ def build_mesh(col):
     dpts = [(hx + 1.47 * 1.05 * math.cos(2 * math.pi * k / 14), hy + 0.2 + 1.47 * math.sin(2 * math.pi * k / 14), 8.98)
             for k in range(14)]
     head_part(M.studs(dpts, [(math.cos(2 * math.pi * k / 14), math.sin(2 * math.pi * k / 14), 0) for k in range(14)],
-                      0.08, 0.06), "steel", "dome_rivets")
+                      0.08, 0.06), "iron", "dome_rivets")
     head_part(M.rivet_row((hx - 1.15, DOOR_Y - 0.02, 6.1), (hx + 1.15, DOOR_Y - 0.02, 6.1), 6, (0, -1, 0), radius=0.08,
-                          height=0.06), "steel", "chin_rivets")
+                          height=0.06), "iron", "chin_rivets")
     for sx in (1, -1):
         head_part(M.rivet_row((sx * 1.2, DOOR_Y - 0.04, 6.45), (sx * 1.2, DOOR_Y - 0.04, 7.95), 4, (0, -1, 0),
-                              radius=0.08, height=0.06), "steel", "cheek_rivets")
+                              radius=0.08, height=0.06), "iron", "cheek_rivets")
     chin = M.box((2.7, 2.7, 0.5), bevel=0.1, taper=(1.0, 1.0))
     M.xform(chin, loc=(hx, hy + 0.1, 6.02))
     head_part(chin, "iron", "chin", container=True)
@@ -455,7 +491,7 @@ def build_mesh(col):
         M.xform(fl, loc=(sx * 1.55, hy - 0.2, 7.2))
         head_part(fl, "iron", "flange")
         head_part(M.rivet_row((sx * 1.64, hy - 1.0, 6.35), (sx * 1.64, hy - 1.0, 8.05), 4, (sx, 0, 0), radius=0.08,
-                              height=0.06), "steel", "flange_rivets")
+                              height=0.06), "iron", "flange_rivets")
     back = M.box((1.8, 1.4, 1.85), bevel=0.06)
     M.xform(back, loc=(hx, hy + 0.85, 7.17))
     head_part(back, "iron", "pocket_back", container=True)
@@ -474,7 +510,7 @@ def build_mesh(col):
     M.xform(rim, loc=(hx, DOOR_Y + 0.12, 8.12))
     head_part(rim, "iron", "rim_top")
     head_part(M.rivet_row((hx - 1.25, DOOR_Y + 0.02, 8.5), (hx + 1.25, DOOR_Y + 0.02, 8.5), 6, (0, -1, 0),
-                          radius=0.09, height=0.07), "steel", "brow_rivets")
+                          radius=0.09, height=0.07), "iron", "brow_rivets")
     # molten drips from the chin
     for i, xo in enumerate((-0.7, 0.15, 0.85)):
         d = drip((hx + xo, DOOR_Y + 0.35, 5.8), 0.6 + 0.3 * (i == 1), 0.15, seed=100 + i)
@@ -492,24 +528,31 @@ def build_mesh(col):
         M.xform(fb, loc=(hx + sx0, DOOR_Y - 0.05, sz0))
         frame.append(fb)
     head_part(M.merge(*frame), "iron", "door_frame", bone="door")
-    # the face: two slanted eye slits and a grille mouth of three slits (glowing)
-    slits = []
+    # the face, a SCOWL that reads at 38 px/m: two eye slits that slope DOWN toward the centre (inner ends
+    # low: angry, never worried) under a V of heavy iron brows, over a jagged grate mouth: iron fangs from
+    # above and below interlock across a glowing slot, so the glow between them is a zigzag.
+    y_face = DOOR_Y + 0.0                       # the door plate's front face
+    glow = []
     for sx in (1, -1):
-        e = M.box((0.62, 0.08, 0.16), bevel=0.02)
-        M.xform(e, rot=(0, sx * 16, 0), loc=(hx + sx * 0.42, DOOR_Y - 0.02, 7.62))
-        slits.append(e)
-    for k, z in enumerate((7.0, 6.72, 6.44)):
-        wv = 1.25 - 0.15 * k
-        m_ = M.box((wv, 0.08, 0.13), bevel=0.02)
-        M.xform(m_, loc=(hx, DOOR_Y - 0.02, z))
-        slits.append(m_)
-    head_part(M.merge(*slits), "molten", "door_slits", bone="door")
-    # latch handle
-    lh = M.box((0.5, 0.16, 0.14), bevel=0.03)
-    M.xform(lh, loc=(hx + 0.62, DOOR_Y - 0.14, 7.25))
+        eye = [(0.12, 7.34), (0.80, 7.66), (0.82, 7.86), (0.10, 7.56)]      # inner-bottom, outer-bottom, outer-top, inner-top
+        glow.append(slab([(hx + sx * x, z) for x, z in (eye if sx > 0 else list(reversed(eye)))], y_face, 0.07))
+    mouth = [(-0.74, 7.12), (0.74, 7.12), (0.64, 6.40), (-0.64, 6.40)]
+    glow.append(slab([(hx + x, z) for x, z in mouth], y_face, 0.05))
+    head_part(M.merge(*glow), "molten", "door_slits", bone="door")
+    brows, fangs = [], []
+    for sx in (1, -1):
+        brow = [(0.0, 7.60), (0.92, 7.95), (0.92, 8.08), (-0.02, 7.78)]
+        brows.append(slab([(hx + sx * x, z) for x, z in (brow if sx > 0 else list(reversed(brow)))], y_face, 0.2))
+    for x0 in (-0.54, -0.18, 0.18, 0.54):       # upper fangs, pointing down
+        fangs.append(slab([(hx + x0 - 0.13, 7.14), (hx + x0 + 0.13, 7.14), (hx + x0 + 0.02, 6.68)], y_face, 0.13))
+    for x0 in (-0.36, 0.0, 0.36):               # lower fangs, pointing up between them (the glow between = a zigzag)
+        fangs.append(slab([(hx + x0 + 0.12, 6.38), (hx + x0 + 0.01, 6.82), (hx + x0 - 0.12, 6.38)], y_face, 0.13))
+    head_part(M.merge(*brows), "iron", "door_brows", bone="door")
+    head_part(M.merge(*fangs), "iron", "door_fangs", bone="door")
+    # latch: a vertical bolt on the right frame edge (off the face, so it never reads as a nose or a mouth)
+    lh = M.box((0.16, 0.18, 0.5), bevel=0.03)
+    M.xform(lh, loc=(hx - 1.06, DOOR_Y - 0.08, 7.2))
     head_part(lh, "steel", "latch", bone="door")
-    head_part(M.rivet_row((hx - 0.85, DOOR_Y - 0.05, 7.95), (hx + 0.85, DOOR_Y - 0.05, 7.95), 5, (0, -1, 0),
-                          radius=0.06, height=0.05), "steel", "door_rivets", bone="door")
     # hinge knuckles
     for sx in (-0.6, 0.6):
         kn = M.cylinder(0.14, 0.4, sides=6, axis="X")
@@ -523,30 +566,37 @@ def build_mesh(col):
     head_part(ring, "iron", "crown_ring", bone="crown_spin", container=True)
     n = 11
     lengths = [2.5, 1.95, 2.35, 2.05, 2.6, 1.85, 2.45, 2.15, 1.95, 2.55, 1.9]
+    HILTED = (0, 2, 4, 7, 9)       # these swords sit further out: grip + crossguard show outside the ring
     for i in range(n):
-        ang = 2 * math.pi * i / n - math.pi / 2               # blade 0 points forward (-Y)
+        # half a step off the front: blades 0 and 10 flank the furnace face and no blade covers it from the
+        # game camera; a short steep stub sits over the brow instead
+        ang = 2 * math.pi * (i + 0.5) / n - math.pi / 2
         r_hat = Vector((math.cos(ang), math.sin(ang), 0))
         elev = math.radians(33 + 6 * (((i * 4) % 3) - 1))
         dvec = r_hat * math.cos(elev) + Vector((0, 0, 1)) * math.sin(elev)
         o = CROWN_UP + r_hat * 1.22 + Vector((0, 0, 0.1))
-        bl, gd = blade(lengths[i], 0.5, 0.11, broken=0.2 + 0.6 * ((i * 7) % 5) / 4, seed=120 + i)
         tang = (-math.sin(ang), math.cos(ang), 0)
-        place(bl, o, dvec, tang)
-        head_part(bl, "blade", "crown_blade", bone="crown_spin")
-        place(gd, o, dvec, tang)
-        head_part(gd, "iron", "crown_guard", bone="crown_spin")
+        br = 0.2 + 0.6 * ((i * 7) % 5) / 4
+        if i in HILTED:
+            push = 0.5
+            add_sword(sword(lengths[i] - 0.3, 0.5, 0.11, broken=br, seed=120 + i, guard_w=2.3), o + dvec * push, dvec,
+                      tang, "crown_spin", "crown_blade", guard_zone="steel", head=True)
+            grip = M.cylinder(0.075, push + 0.1, sides=6, axis="Y")
+            M.xform(grip, loc=(0, (push + 0.1) / 2 - 0.1, 0))
+            place(grip, o, dvec, tang)
+            head_part(grip, "iron", "crown_grip", bone="crown_spin")
+        else:
+            add_sword(sword(lengths[i], 0.5, 0.11, broken=br, seed=120 + i), o, dvec, tang, "crown_spin",
+                      "crown_blade", head=True)
         # a short broken stub between blades (inner ring, steeper): the crown of a thousand failed weapons
         mid = ang + math.pi / n
         r2 = Vector((math.cos(mid), math.sin(mid), 0))
         e2_ = math.radians(62 + 6 * ((i % 3) - 1))
         d2 = r2 * math.cos(e2_) + Vector((0, 0, 1)) * math.sin(e2_)
         o2 = CROWN_UP + r2 * 1.12 + Vector((0, 0, 0.12))
-        st, sg = blade(0.8 + 0.35 * ((i * 3) % 4) / 3, 0.36, 0.09, broken=0.85, seed=160 + i)
         tang2 = (-math.sin(mid), math.cos(mid), 0)
-        place(st, o2, d2, tang2)
-        head_part(st, "blade", "crown_stub", bone="crown_spin")
-        place(sg, o2, d2, tang2)
-        head_part(sg, "iron", "crown_stub_guard", bone="crown_spin")
+        add_sword(sword(0.8 + 0.35 * ((i * 3) % 4) / 3, 0.36, 0.09, broken=0.85, seed=160 + i), o2, d2, tang2,
+                  "crown_spin", "crown_stub", head=True)
         # a molten weld bead between blades
         bead = M.ico(0.2, 1, scale=(1.3, 1.0, 0.8))
         M.xform(bead, loc=CROWN_UP + Vector((math.cos(mid) * 1.44, math.sin(mid) * 1.44, -0.05)))
@@ -557,14 +607,14 @@ def build_mesh(col):
         sh_ = Vector(PIV["upperarm_" + side])
         el = Vector(PIV["lowerarm_" + side])
         wr = Vector(PIV["hand_" + side])
-        add(limb([sh_, (sh_ + el) / 2 + Vector((sx * 0.35, 0.25, 0)), el], [1.3, 1.15, 0.95], sides=15, noise=0.22, freq=0.75,
-                 seed=140 + sx), "slag", "upperarm_" + side, "upperarm_" + side, shading="smooth", container=True)
-        add(lump(sh_ + Vector((sx * 0.3, 0.1, -1.2)), (2.0, 2.0, 2.4), sub=2, noise=0.12, seed=142 + sx), "slag",
-            "upperarm_" + side, "bicep_" + side, container=True)
-        add(lump(el + Vector((sx * 0.05, 0.25, 0.0)), (1.95, 1.95, 1.9), sub=2, noise=0.1, seed=144 + sx), "slag",
-            "lowerarm_" + side, "elbow_" + side, container=True)
+        add(limb([sh_, (sh_ + el) / 2 + Vector((sx * 0.35, 0.25, 0)), el], [1.3, 1.15, 0.95], sides=16, noise=0.16, freq=0.75,
+                 seed=140 + sx), "limb", "upperarm_" + side, "upperarm_" + side, shading="smooth", container=True)
+        add(lump(sh_ + Vector((sx * 0.3, 0.1, -1.2)), (2.0, 2.0, 2.4), sub=3, noise=0.1, seed=142 + sx), "limb",
+            "upperarm_" + side, "bicep_" + side, shading="smooth", container=True)
+        add(lump(el + Vector((sx * 0.05, 0.25, 0.0)), (1.95, 1.95, 1.9), sub=3, noise=0.08, seed=144 + sx), "limb",
+            "lowerarm_" + side, "elbow_" + side, shading="smooth", container=True)
         mid = (el + wr) / 2 + Vector((sx * 0.2, 0.1, 0.1))
-        add(limb([el, mid, wr], [1.05, 1.35, 1.25], sides=16, noise=0.24, freq=0.7, seed=146 + sx), "slag",
+        add(limb([el, mid, wr], [1.05, 1.35, 1.25], sides=18, noise=0.17, freq=0.7, seed=146 + sx), "limb",
             "lowerarm_" + side, "forearm_" + side, shading="smooth", container=True)
         # iron bracer bands round the forearm (fused cuffs)
         for k, t in enumerate((0.45, 0.8)):
@@ -577,11 +627,8 @@ def build_mesh(col):
         add(chain(c0, 4, 0.3, seed=40 + sx), "iron", "lowerarm_" + side, "wrist_chain", shading="smooth")
         # one broken blade jutting from the back of the forearm
         o = el.lerp(wr, 0.5) + Vector((sx * 0.8, 0.8, 0.25))
-        bl, gd = blade(2.1, 0.44, 0.1, broken=0.55, seed=150 + sx)
-        dd = (sx * 0.6, 0.85, 0.45)
-        for part_, zone in ((bl, "steel"), (gd, "iron")):
-            place(part_, o, dd, (0, 0, 1))
-            add(part_, zone, "lowerarm_" + side, "arm_blade")
+        add_sword(sword(2.1, 0.44, 0.1, broken=0.55, seed=150 + sx), o, (sx * 0.6, 0.85, 0.45), (0, 0, 1),
+                  "lowerarm_" + side, "arm_blade")
         # molten drips under the forearm
         add(drip(el.lerp(wr, 0.55) + Vector((0, -0.4, -1.15)), 0.8, 0.17, seed=160 + sx), "molten",
             "lowerarm_" + side, "arm_drip", shading="smooth")
@@ -599,21 +646,27 @@ def build_mesh(col):
         for k, bm_ in enumerate(bms):
             M.xform(bm_, matrix=Ma)
             add(bm_, zone, "hand_R", "anvil_%s%d" % (zone, k), container=(zone == "iron" and k == 0))
-    add(lump(wr + Vector((0, -0.2, 0.25)), (1.9, 1.9, 1.3), sub=2, noise=0.1, seed=171), "slag", "hand_R", "wrist_R",
-        container=True)
+    add(lump(wr + Vector((0, -0.2, 0.25)), (1.9, 1.9, 1.3), sub=3, noise=0.08, seed=171), "limb", "hand_R", "wrist_R",
+        shading="smooth", container=True)
 
-    # left fist: a claw of four fused broken blades and a thumb
+    # left fist: a claw of four fused broken swords and a thumb; the two middle swords stand out of the fist
+    # far enough to show their crossguards (they read as swords, not crystals)
     wl = Vector(PIV["hand_L"])
-    palm = lump(wl + Vector((0.05, -0.45, -0.35)), (1.9, 2.1, 1.5), sub=2, noise=0.1, seed=181)
-    add(palm, "slag", "hand_L", "palm_L", container=True)
+    palm = lump(wl + Vector((0.05, -0.45, -0.35)), (1.9, 2.1, 1.5), sub=3, noise=0.08, seed=181)
+    add(palm, "limb", "hand_L", "palm_L", shading="smooth", container=True)
     for k, ox in enumerate((-0.55, -0.18, 0.2, 0.58)):
         o = wl + Vector((ox, -1.25, -0.55))
+        dcl = Vector((ox * 0.25, -0.55, -1.0)).normalized()
         L = (1.35, 1.6, 1.55, 1.2)[k]
-        bl, gd = blade(L, 0.3, 0.09, broken=0.15, seed=185 + k)
-        place(bl, o, (ox * 0.25, -0.55, -1.0), (1, 0, 0))
-        add(bl, "steel", "hand_L", "claw_blade")
-        place(gd, o, (ox * 0.25, -0.55, -1.0), (1, 0, 0))
-        add(gd, "iron", "hand_L", "claw_guard")
+        if k in (1, 2):
+            add_sword(sword(L - 0.3, 0.3, 0.09, broken=0.15, seed=185 + k, guard_w=2.6), o + dcl * 0.42, dcl,
+                      (1, 0, 0), "hand_L", "claw_blade", guard_zone="steel")
+            grip = M.cylinder(0.06, 0.5, sides=6, axis="Y")
+            M.xform(grip, loc=(0, 0.17, 0))
+            place(grip, o, dcl, (1, 0, 0))
+            add(grip, "iron", "hand_L", "claw_grip")
+        else:
+            add_sword(sword(L, 0.3, 0.09, broken=0.15, seed=185 + k), o, dcl, (1, 0, 0), "hand_L", "claw_blade")
     th = M.horn([wl + Vector((-0.75, -0.55, -0.4)), wl + Vector((-1.1, -1.0, -0.9)), wl + Vector((-1.0, -1.35, -1.6))],
                 0.28, 0.05, sides=5)
     add(th, "steel", "hand_L", "thumb")
@@ -627,7 +680,7 @@ def build_mesh(col):
         pl = M.box((2.3 - 0.35 * k, 2.4 - 0.3 * k, 0.28), bevel=0.06, taper=(0.9, 0.9))
         M.xform(pl, rot=(8 * (k - 1), -22 - 6 * k, 5 * k), loc=(-3.95 - 0.12 * k, -0.35 + 0.1 * k, 9.2 + 0.26 * k))
         add(pl, "iron", "upperarm_R", "pauldron_%d" % k)
-    add(M.rivet_row((-3.2, -1.3, 9.35), (-4.4, -1.3, 8.95), 4, (0, -0.5, 0.8), radius=0.09, height=0.07), "steel",
+    add(M.rivet_row((-3.2, -1.3, 9.35), (-4.4, -1.3, 8.95), 4, (0, -0.5, 0.8), radius=0.09, height=0.07), "iron",
         "upperarm_R", "pauldron_rivets")
 
     # ---------------- phase-2 molten arms (scaled to ~0 until Slagfall) ----------------
@@ -715,30 +768,42 @@ def recipes():
     door_c = tuple(hm((0.0, DOOR_Y, 7.2)))
     crown_c = tuple(CROWN_C)
     core_c = tuple(hm((HC.x, HC.y - 0.45, 7.17)))
-    slag = P.zone(base="#2B201B", shadow="#0C0908", light="#5E4434", planes=0.16, parts=0.07, brush=0.07,
-                  brush_freq=0.55, cavity=0.85, cavity_width=0.09, ao=0.65, ao_range=(0.22, 0.62), edge=0.9,
-                  edge_width=0.075, edge_breakup=0.42,
+    # slag, limb, iron and steel carry NO painter edge strokes (edge=0): the painter strokes every convex edge
+    # over 20 deg, which drew the triangle web on the slag and scratchy double lines on every bevel. Their
+    # strokes are painted by paint_extras (EXTRAS[zone]["edge"]): only real creases, mostly on up-facing
+    # planes, one stroke wider than the bevel.
+    # slag body: faceted value planes, cavity darks, the row tint round the furnace
+    slag = P.zone(base="#2B201B", shadow="#0C0908", light="#8C6A52", planes=0.16, parts=0.07, brush=0.06,
+                  brush_freq=0.55, cavity=0.85, cavity_width=0.09, ao=0.65, ao_range=(0.22, 0.62), edge=0.0,
                   gradient={"center": door_c, "range": (6.5, 2.0), "color": "#6B2A14", "amount": 0.45},
                   spots={"color": "#3E1E14", "amount": 0.45, "freq": 0.45, "threshold": (0.56, 0.7)},
-                  stroke=(0, 0, -1), stroke_amount=0.08, stroke_freq=(1.4, 0.2))
+                  stroke=(0, 0, -1), stroke_amount=0.05, stroke_freq=(1.4, 0.2))
+    # limbs: the same slag, smooth: soft planes, no facet values; big soft contact shadows
+    limb_ = P.zone(base="#2B201B", shadow="#0C0908", light="#8C6A52", planes=0.04, parts=0.06, brush=0.05,
+                   brush_freq=0.45, cavity=0.7, cavity_width=0.08, ao=0.7, ao_range=(0.25, 0.6), edge=0.0,
+                   spots={"color": "#3E1E14", "amount": 0.4, "freq": 0.4, "threshold": (0.56, 0.7)})
     crust = P.zone(base="#3A2418", shadow="#140A07", light="#8A5234", planes=0.14, parts=0.08, brush=0.06,
                    brush_freq=0.9, cavity=0.8, cavity_width=0.06, ao=0.5, edge=0.95, edge_width=0.06,
                    edge_breakup=0.35, spots={"color": "#7A2A10", "amount": 0.5, "freq": 1.2, "threshold": (0.55, 0.68)})
-    iron = P.zone(base="#363337", shadow="#0E0D10", light="#8A8589", planes=0.1, parts=0.06, brush=0.05,
-                  brush_freq=0.8, cavity=0.9, cavity_width=0.05, ao=0.6, ao_range=(0.25, 0.65), edge=0.95,
-                  edge_width=0.05, edge_breakup=0.3,
-                  gradient={"center": door_c, "range": (3.2, 1.0), "color": "#7A3418", "amount": 0.4},
-                  spots={"color": "#4E2A20", "amount": 0.35, "freq": 0.9, "threshold": (0.6, 0.72)})
-    steel = P.zone(base="#77716C", shadow="#2A2628", light="#E2D8C8", planes=0.14, parts=0.1, brush=0.05,
-                   brush_freq=1.0, cavity=0.75, cavity_width=0.035, ao=0.5, edge=1.0, edge_width=0.04,
-                   edge_breakup=0.3, stroke=(0, 0, 1), stroke_amount=0.1, stroke_freq=(3.0, 0.4))
-    # crown blades: warm dark steel, temper-bronze toward the fused ring, glowing where they are welded in
-    blade = P.zone(base="#7A726C", shadow="#2A2426", light="#E8DCC8", planes=0.16, parts=0.12, brush=0.05,
-                   brush_freq=1.0, cavity=0.7, cavity_width=0.035, ao=0.45, edge=1.0, edge_width=0.045,
-                   edge_breakup=0.28,
-                   gradient={"center": crown_c, "range": (3.4, 1.6), "color": "#8E4E22", "amount": 0.55},
-                   emit={"color": "#C8400C", "hot": "#FF6B1A", "core": "#FFC24B", "mode": "radial",
-                         "center": crown_c, "radius": 3.4, "fade": (0.62, 0.4), "base_mix": 0.35})
+    # iron bands, plates and rivets: broad value planes (no spots, no streaks, a quiet low-frequency brush)
+    # and one brushy top-edge stroke (paint_extras)
+    iron = P.zone(base="#363337", shadow="#0E0D10", light="#6E6970", planes=0.16, parts=0.07, brush=0.025,
+                  brush_freq=0.35, cavity=0.85, cavity_width=0.06, ao=0.6, ao_range=(0.25, 0.65), edge=0.0,
+                  gradient={"center": door_c, "range": (3.2, 1.0), "color": "#7A3418", "amount": 0.4})
+    steel = P.zone(base="#77716C", shadow="#2A2628", light="#B4AA9E", planes=0.16, parts=0.08, brush=0.025,
+                   brush_freq=0.4, cavity=0.7, cavity_width=0.04, ao=0.5, edge=0.0)
+    # sword steel: DARK blued steel (the bright line is the separate 'edge' zone), temper-bronze toward the
+    # crown ring, glowing only in the weld right at the ring
+    weld = {"color": "#C8400C", "hot": "#FF6B1A", "core": "#FFC24B", "mode": "radial", "center": crown_c,
+            "radius": 3.4, "fade": (0.5, 0.44), "base_mix": 0.2}
+    blade = P.zone(base="#3A3539", shadow="#121014", light="#6E6870", planes=0.1, parts=0.08, brush=0.025,
+                   brush_freq=0.5, cavity=0.7, cavity_width=0.04, ao=0.45, edge=0.35, edge_width=0.05,
+                   edge_breakup=0.3,
+                   gradient={"center": crown_c, "range": (2.4, 1.7), "color": "#6E3C1C", "amount": 0.55}, emit=weld)
+    # the sharpened edges: bright cold-warm steel, flat, one value (so a blade has a bright outline)
+    edge_ = P.zone(base="#CFC5B6", shadow="#6A625C", light="#F4ECDF", planes=0.05, parts=0.04, brush=0.02,
+                   brush_freq=0.5, cavity=0.2, cavity_width=0.02, ao=0.25, edge=0.5, edge_width=0.03,
+                   edge_breakup=0.4, emit=weld)
     # the phase-2 molten limbs: white-hot where they leave the body, cooling to dark crust at the claws
     lava = P.zone(base="#35180F", shadow="#0E0605", light="#7A3A20", planes=0.1, parts=0.05, brush=0.08,
                   brush_freq=1.2, cavity=0.6, cavity_width=0.05, ao=0.3, edge=0.8, edge_width=0.06, edge_breakup=0.4,
@@ -754,8 +819,8 @@ def recipes():
                               edge_breakup=0.25, cavity=0.6, cavity_width=0.03, brush_freq=1.2,
                               light="#6A6680")
     ichor = P.faction_zone("unmade", "ichor", glow=True)
-    return {"slag": slag, "crust": crust, "iron": iron, "steel": steel, "blade": blade, "molten": molten, "lava": lava,
-            "core": core, "obsidian": obsidian, "ichor": ichor}
+    return {"slag": slag, "limb": limb_, "crust": crust, "iron": iron, "steel": steel, "blade": blade, "edge": edge_,
+            "molten": molten, "lava": lava, "core": core, "obsidian": obsidian, "ichor": ichor}
 
 
 def decals():
@@ -768,22 +833,197 @@ def decals():
         ((-2.5, -2.2, 6.4), (-0.5, -1.0, 0.1), 250, 2.2, 2, teal, 0.075),
         ((0.6, 1.3, 10.3), (0.0, 0.3, 1.0), 20, 3.2, 3, teal, 0.08),
         ((-0.8, 3.0, 7.8), (0.0, 1.0, 0.2), -100, 2.6, 4, teal, 0.075),
-        ((3.3, -0.4, 3.3), (0.7, -0.7, 0.0), -80, 1.6, 5, teal, 0.06),
-        ((-5.9, -1.2, 3.8), (-0.8, -0.55, 0.25), -95, 1.7, 6, teal, 0.06),
         ((1.9, -1.8, 4.4), (0.4, -1.0, 0.0), -60, 1.5, 7, teal, 0.06),
         ((3.6, 0.9, 8.9), (0.5, 0.3, 1.0), 200, 2.0, 8, teal, 0.07),
         ((0.0, -0.9, 9.3), (0.0, -0.35, 1.0), 180, 2.6, 11, hot, 0.085),
         ((-0.6, -2.0, 4.7), (0.0, -1.0, 0.1), -90, 1.6, 12, hot, 0.07),
         ((-3.3, -0.9, 9.6), (-0.2, -0.3, 1.0), 160, 1.8, 13, hot, 0.07),
-        ((5.3, -0.9, 4.2), (0.8, -0.5, 0.2), -85, 1.5, 14, hot, 0.06),
-        ((-2.9, 0.3, 2.6), (-0.8, -0.6, 0.0), -80, 1.3, 15, hot, 0.06),
     ]
     for o, nrm, ang, L, sd, em, w in spec:
         lines = M.crack_lines(random.Random(sd), start=(0.0, 0.0), direction=ang, length=L, step=0.16, jag=0.5,
                               branches=2, branch_len=0.45, depth=2)
         out.append(P.decal_lines(lines, frame_at(o, nrm), w, zones=["slag"], color=em["color"], rim="#07060A",
                                  rim_width=w * 2.6, emit=em, depth=(-1.4, 1.4), facing=0.3))
+    # the limbs: a FEW BOLD cracks (wide, long steps, one short branch) instead of fine webs, one per limb
+    # read from the game camera: molten on the creature's left, Unmade teal on its right
+    limbs = [  # (origin, normal, direction deg, length, seed, emit)
+        ((5.35, -1.35, 4.3), (0.7, -0.7, 0.15), -80, 2.4, 21, hot),        # forearm L
+        ((-5.45, -1.35, 4.2), (-0.7, -0.7, 0.15), -100, 2.4, 22, teal),    # forearm R
+        ((4.45, -1.15, 7.2), (0.45, -1.0, 0.15), -95, 2.0, 23, hot),       # upper arm / bicep L
+        ((-4.45, -1.15, 7.2), (-0.45, -1.0, 0.15), -85, 2.0, 24, teal),    # upper arm / bicep R
+        ((3.35, -0.55, 3.2), (0.6, -0.8, 0.0), -75, 1.9, 25, teal),        # thigh L
+        ((-3.3, -0.85, 2.9), (-0.6, -0.8, 0.0), -105, 1.9, 26, hot),       # thigh / knee R
+    ]
+    for o, nrm, ang, L, sd, em in limbs:
+        lines = M.crack_lines(random.Random(sd), start=(0.0, 0.0), direction=ang, length=L, step=0.3, jag=0.35,
+                              branches=1, branch_len=0.4, depth=1)
+        out.append(P.decal_lines(lines, frame_at(o, nrm), 0.13, zones=["limb", "slag"], color=em["color"],
+                                 rim="#07060A", rim_width=0.3, emit=em, depth=(-1.4, 1.4), facing=0.3))
     return out
+
+
+# ---- figure / ground passes ------------------------------------------------------------------------------
+# The slag (#2B201B) is the same value and hue as the Cinder Wastes floor (#3A2C24): lit by the toon ramp
+# it lands right on the floor value, so only the ink separated the body. Two painted passes fix that:
+#   * TOP PLANES: planes facing up (what the 55 deg camera mostly sees) are lifted toward the slag light
+#     #5E4434, with a brushy break-up of the boundary. The lift multiplies, so the painted cavity darks stay
+#     dark, and it skips texels that are already light (the edge strokes);
+#   * MOLTEN UNDERGLOW: the lowest metres of the body (feet, shins, fists near the ground) and the faces
+#     turned down glow in the emissive in two broken painted bands, a dim molten red cooling upward over a
+#     hot orange line at the ground, and the base colour under them warms to a hot-slag red: the body
+#     stands in its own heat.
+# The same pass paints the EDGE STROKES of slag, limb, iron and steel (their painter strokes are off): only
+# creases that really bend (slag and limbs: over 40 deg, so the triangles of a lump draw no web), only the
+# texel's OWN part's creases (the painter measures to any part, so every rivet painted a light halo on its
+# plate), weighted toward up-facing planes (a band gets one stroke along its top, not a line on every bevel).
+# gfa_paint.paint has no normal- or height-driven pass and stays unchanged (other assets build with it), so
+# this build wraps it for its one paint call (extra_paint_passes): the zones paint as usual, these passes
+# run, then the decals go on top (the decal loop is the one from gfa_paint.paint).
+SLAG_EDGE = {"color": "#8C6A52", "width": 0.11, "breakup": 0.32, "up": (-0.1, 0.5), "amount": 1.0, "min_angle": 40.0}
+EXTRAS = {  # zone -> top-plane lift (target colour, amount), underglow strength, edge stroke
+    "slag": {"top": ("#5E4434", 0.85), "under": 1.0, "edge": SLAG_EDGE},
+    "limb": {"top": ("#5E4434", 0.8), "under": 1.0, "edge": dict(SLAG_EDGE, width=0.1, amount=0.9)},
+    "iron": {"edge": {"color": "#78727B", "width": 0.13, "breakup": 0.18, "up": (-0.25, 0.45), "amount": 0.9,
+                      "min_angle": 20.0}},
+    "steel": {"edge": {"color": "#C4BAAC", "width": 0.09, "breakup": 0.18, "up": (-0.25, 0.45), "amount": 0.9,
+                       "min_angle": 20.0}},
+}
+UNDER = {"rim": "#C8400C", "hot": "#FF6B1A", "tint": "#6E2410", "height": (2.0, 0.15), "down": 0.6,
+         "down_below": 7.0, "warm_emit": 0.4}
+
+
+def part_crease_points(obj, min_angle, spacing=0.002, sharp_only_below=60.0):
+    """Convex crease samples of obj grouped by part id {part: [Vector, ...]}. The painter's rule for which
+    edges count (gfa_paint.edge_points), but an edge counts only inside ONE part: rivets, chain links and
+    crossguards never paint a light halo onto the plate or the slag they sit on."""
+    import bmesh as _bm
+    from collections import defaultdict
+    bm = _bm.new()
+    bm.from_mesh(obj.data)
+    layer = bm.faces.layers.int.get("gfa_part")
+    out = defaultdict(list)
+    lim, big = math.radians(min_angle), math.radians(sharp_only_below)
+    for e in bm.edges:
+        if not e.is_manifold:
+            continue
+        ang = e.calc_face_angle_signed(0.0)
+        if ang <= 0 or ang < lim or (e.smooth and ang < big):
+            continue
+        f0, f1 = e.link_faces
+        if f0[layer] != f1[layer]:
+            continue
+        p0, p1 = e.verts[0].co.copy(), e.verts[1].co.copy()
+        n = max(1, int((p1 - p0).length / spacing))
+        out[f0[layer]].extend(p0.lerp(p1, (i + 0.5) / n) for i in range(n))
+    bm.free()
+    return out
+
+
+def part_edge_dist(P, crease, pos, part, cap=0.05):
+    """Distance from each texel (pos, part) to the nearest convex crease of its OWN part."""
+    import numpy as np
+    d = np.full(len(pos), cap, dtype=np.float32)
+    for pid in np.unique(part):
+        pts = crease.get(int(pid))
+        if pts:
+            idx = np.nonzero(part == pid)[0]
+            d[idx] = P._kd_dist(pts, pos[idx], cap)
+    return d
+
+
+def paint_extras(P, maps, zones_order, recipes_, base, emis, scale, obj, seed=0):
+    import numpy as np
+    pos = maps["pos"] / scale                                    # real metres (the paint runs at 1/8 scale)
+    Z = maps["zone"]
+    wobble = P.spread01(P.fbm(maps["pos"], 30.0, 2, seed=seed + 5))   # the painter's own stroke wobble / dabs
+    dabs = P.spread01(P.fbm(maps["pos"], 11.0, 2, seed=seed + 6))
+    crease = {}                                                  # min_angle -> {part: convex crease samples}
+    for zname, ex in EXTRAS.items():
+        if zname not in zones_order:
+            continue
+        m = Z == zones_order.index(zname)
+        if not m.any():
+            continue
+        p, nz = pos[m], maps["snrm"][m, 2]
+        c = base[m]
+        brush = P.spread01(P.fbm(p, 0.55, 2, seed=seed + 501))  # ~2 m brush patches
+        if ex.get("top"):
+            col, amt = ex["top"]
+            b0 = P.hex3(recipes_[zname]["base"])
+            ratio = P.hex3(col) / np.maximum(b0, 1e-3)
+            # three painted values per form: top planes fully lifted, side planes 40 % (lit, a plain side plane
+            # lands on the floor value), undersides not at all
+            nb = nz + (brush - 0.5) * 0.35
+            k = 0.4 * P.smoothstep(-0.3, 0.05, nb) + 0.6 * P.smoothstep(0.3, 0.52, nb)
+            lum = c @ np.array([0.3, 0.59, 0.11], dtype=np.float32)
+            k = k * amt * (1.0 - P.smoothstep(0.2, 0.36, lum))
+            c = c * (1.0 + (ratio - 1.0)[None, :] * k[:, None])
+        ed = ex.get("edge")
+        if ed:
+            if ed["min_angle"] not in crease:
+                crease[ed["min_angle"]] = part_crease_points(obj, ed["min_angle"])
+            d = part_edge_dist(P, crease[ed["min_angle"]], maps["pos"][m], maps["part"][m])
+            ew = ed["width"] * scale * (0.35 + 1.1 * wobble[m])
+            k = P.smoothstep(ew, ew * 0.3, d)
+            k = k * P.smoothstep(ed["breakup"] - 0.12, ed["breakup"] + 0.12, dabs[m])
+            k = k * P.smoothstep(ed["up"][0], ed["up"][1], nz) * ed["amount"]
+            c = P.mix(c, P.hex3(ed["color"]), k)
+        if ex.get("under"):
+            z0, z1 = UNDER["height"]
+            h = np.clip((z0 - p[:, 2]) / (z0 - z1), 0.0, 1.0)       # linear: 1 at the ground, 0 at z0
+            down = P.smoothstep(-0.15, -0.65, nz) * P.smoothstep(UNDER["down_below"], UNDER["down_below"] - 2.0, p[:, 2])
+            heat = np.maximum(h, down * UNDER["down"])
+            brush2 = P.spread01(P.fbm(p, 0.8, 2, seed=seed + 502))
+            warm = P.smoothstep(0.3, 0.55, heat + (brush2 - 0.5) * 0.45)    # painted bands, not an airbrushed fade
+            hot = P.smoothstep(0.9, 0.97, h + (brush2 - 0.5) * 0.08)       # a hot line along the ground only
+            c = P.mix(c, P.hex3(UNDER["tint"]), warm * 0.6)
+            c = P.mix(c, P.hex3(UNDER["rim"]), hot * 0.35)
+            e = P.mix(np.repeat(P.hex3(UNDER["rim"])[None] * UNDER["warm_emit"], len(p), 0) * warm[:, None],
+                      P.hex3(UNDER["hot"]), hot)
+            emis[m] = np.maximum(emis[m], e * ex["under"])
+        base[m] = c
+    return base, emis
+
+
+def apply_decals(P, maps, zones_order, base, emis, decals_):
+    """The decal loop of gfa_paint.paint (painted lines, burnt rims, glowing channels)."""
+    import numpy as np
+    Z = maps["zone"]
+    for dec in decals_:
+        target = np.ones(len(Z), dtype=bool) if not dec["zones"] else np.isin(Z, [zones_order.index(z) for z in dec["zones"]])
+        idx = np.nonzero(target)[0]
+        line, rimm = P._decal_masks(dec, maps["pos"][idx], maps["tnrm"][idx])
+        if dec["rim"]:
+            base[idx] = P.mix(base[idx], P.hex3(dec["rim"]), rimm * 0.75)
+        if dec["color"]:
+            base[idx] = P.mix(base[idx], P.hex3(dec["color"]), line)
+        if dec["emit"]:
+            ec = P.hex3(dec["emit"]["color"])
+            core = P.hex3(dec["emit"].get("core", dec["emit"]["color"]))
+            glow = P.mix(np.repeat(ec[None], len(idx), 0), core, P.smoothstep(0.5, 1.0, line))
+            emis[idx] = np.maximum(emis[idx], glow * np.maximum(line, rimm * 0.25)[:, None])
+    return base, emis
+
+
+@contextmanager
+def extra_paint_passes(scale, obj):
+    """Within the block, gfa_paint.paint also runs paint_extras() (between the zones and the decals).
+    obj = the mesh being painted (its crease edges are sampled at the paint scale, like the painter's)."""
+    import numpy as np
+    import gfa_paint as P
+    orig = P.paint
+
+    def paint(maps, zones_order, recipes_, dist_convex, dist_concave, decals=(), seed=0):
+        base, emis = orig(maps, zones_order, recipes_, dist_convex, dist_concave, (), seed)
+        paint_extras(P, maps, zones_order, recipes_, base, emis, scale, obj, seed=seed)
+        apply_decals(P, maps, zones_order, base, emis, decals)
+        return np.clip(base, 0, 1), np.clip(emis, 0, 1)
+
+    P.paint = paint
+    try:
+        yield
+    finally:
+        P.paint = orig
 
 
 # ---- rig ----------------------------------------------------------------------------------------------
@@ -1215,7 +1455,37 @@ def key_poses(info, n=5):
     return pick if len(pick) <= n else pick[:n - 1] + [keys[-1]]
 
 
-def review(mesh, arm, rep, paint_rep, clips, quick=False):
+def first_look_sheets(hero, ing, out_dir, work):
+    """The two sheets the user sees first: the 3/4 hero shots and the in-game camera at true pixel size."""
+    R.contact_sheet({"title": "The Slag King - Molten Court (phase 1) and Slagfall / Final Pour (phase 2+)",
+                     "subtitle": "3/4 front, toon preview of the final textures; the crown spins in phase 2+ (engine)",
+                     "width": 1560, "sections": [{"label": "", "height": 740, "images": [
+                         {"path": hero[1], "label": "phase 1: door shut, two arms"},
+                         {"path": hero[2], "label": "phase 2+: door burst, molten arms out"}]}]},
+                    os.path.join(out_dir, KEY + "_34.png"), work)
+    ppm22, ppm28 = SPEC.SCREEN_H / 22.0, SPEC.SCREEN_H / 28.0
+    lay2 = {
+        "title": "The Slag King - in-game camera at true pixel size",
+        "subtitle": "orthographic, 55 deg pitch, yaw 0; 1560 x 860 crops of the 1080p frame; four 2.2 m hero mannequins",
+        "width": 1600,
+        "sections": [
+            {"label": "Phase 1, 1 player (view height 22 m = %.1f px/m), 1x" % ppm22, "height": None,
+             "images": [{"path": ing["p1_22"]["color"], "label": "phase 1, 22 m"}]},
+            {"label": "Phase 2+, turned 28 deg toward a hero, 22 m, 1x", "height": None,
+             "images": [{"path": ing["p2_22"]["color"], "label": "phase 2, 22 m"}]},
+            {"label": "4 players (view height 28 m = %.1f px/m), 1x; and the game-size silhouettes (half size)" % ppm28,
+             "height": None, "images": [{"path": ing["p1_28"]["color"], "label": "phase 1, 28 m"}]},
+            {"label": "Silhouettes at game size (shown at half size)", "height": 430,
+             "images": [{"path": ing["p1_22"]["sil"], "label": "phase 1"}, {"path": ing["p2_22"]["sil"], "label": "phase 2"}]},
+        ],
+        "notes": ["The engine draws the red-white telegraph decals; the model carries none."],
+    }
+    R.contact_sheet(lay2, os.path.join(out_dir, KEY + "_ingame.png"), work)
+
+
+def review(mesh, arm, rep, paint_rep, clips, quick=False, lite=False):
+    """All review renders and the four report sheets. lite: only the hero shots and the in-game frames,
+    with their two sheets written to work/review (paint iterations; reports/ is left alone)."""
     import gfa_rig as RIG
     scene = bpy.context.scene
     pack = C.pack_dir(KIND, KEY)
@@ -1224,12 +1494,14 @@ def review(mesh, arm, rep, paint_rep, clips, quick=False):
     tex = [os.path.join(pack, "textures", KEY + "_basecolor.png"), os.path.join(pack, "textures", KEY + "_emissive.png")]
     _p1_pose(arm)
     # 1) turnarounds: phase 1 (idle frame 0), phase 2 (idle_p2 frame 0)
-    turn1 = R.turnaround([mesh], work, KEY + "_p1", R.CREATURE_VIEWS, size=400, samples=10)
-    _p2_pose(arm)
-    v2 = {k: R.CREATURE_VIEWS[k] for k in ("front", "34_front", "side", "top")}
-    v2["game"] = tuple(B.game_dir())
-    turn2 = R.turnaround([mesh], work, KEY + "_p2", v2, size=400, samples=10)
-    _p1_pose(arm)
+    turn1 = turn2 = {}
+    if not lite:
+        turn1 = R.turnaround([mesh], work, KEY + "_p1", R.CREATURE_VIEWS, size=400, samples=10)
+        _p2_pose(arm)
+        v2 = {k: R.CREATURE_VIEWS[k] for k in ("front", "34_front", "side", "top")}
+        v2["game"] = tuple(B.game_dir())
+        turn2 = R.turnaround([mesh], work, KEY + "_p2", v2, size=400, samples=10)
+        _p1_pose(arm)
     # hero shots (the user's first look): phase 1 and phase 2, 3/4 front
     hero = {}
     for ph, fn in ((1, _p1_pose), (2, _p2_pose)):
@@ -1238,11 +1510,13 @@ def review(mesh, arm, rep, paint_rep, clips, quick=False):
                                 samples=14)["34"]
     _p1_pose(arm)
     # 2) size comparison: front view beside a 2.2 m hero and a 1 m measuring pole
-    man = R.mannequin(aim_dir=(0.0, -1.0, 0.0), name="GFA_HERO_SIZE")
-    man.location = (9.2, -1.0, 0.0)
-    bpy.context.view_layer.update()
-    size_png = B.size_compare([mesh], os.path.join(work, KEY + "_size.png"), man, w=1100, h=760, pole_height=13)
-    C.remove_objects([man])
+    size_png = None
+    if not lite:
+        man = R.mannequin(aim_dir=(0.0, -1.0, 0.0), name="GFA_HERO_SIZE")
+        man.location = (9.2, -1.0, 0.0)
+        bpy.context.view_layer.update()
+        size_png = B.size_compare([mesh], os.path.join(work, KEY + "_size.png"), man, w=1100, h=760, pole_height=13)
+        C.remove_objects([man])
     # 3) the in-game camera at true 1080p pixel size (a 1560 x 860 crop of the frame)
     party = _party([(-6.5, -8.5), (5.5, -9.0), (9.5, -3.0), (-9.5, -2.5)])
     ing = {}
@@ -1262,6 +1536,9 @@ def review(mesh, arm, rep, paint_rep, clips, quick=False):
     fl = bpy.data.objects.get("GFA_FLOOR")
     if fl:
         C.remove_objects([fl])
+    if lite:
+        first_look_sheets(hero, ing, work, work)
+        return {"ingame": ing, "hero": hero}
     # 4) key frames of every clip (3/4 front, one shared scale)
     order = ["idle@loop", "move@loop", "windup", "attack", "hit", "strike_circle", "slam_trail", "radial", "door_open",
              "door_close", "roar", "phase2", "idle_p2@loop", "move_p2@loop", "windup_p2", "attack_p2", "hit_p2",
@@ -1305,30 +1582,7 @@ def review(mesh, arm, rep, paint_rep, clips, quick=False):
         "notes": notes,
     }
     R.contact_sheet(layout, os.path.join(reports, KEY + "_review.png"), work)
-    R.contact_sheet({"title": "The Slag King - Molten Court (phase 1) and Slagfall / Final Pour (phase 2+)",
-                     "subtitle": "3/4 front, toon preview of the final textures; the crown spins in phase 2+ (engine)",
-                     "width": 1560, "sections": [{"label": "", "height": 740, "images": [
-                         {"path": hero[1], "label": "phase 1: door shut, two arms"},
-                         {"path": hero[2], "label": "phase 2+: door burst, molten arms out"}]}]},
-                    os.path.join(reports, KEY + "_34.png"), work)
-    ppm22, ppm28 = SPEC.SCREEN_H / 22.0, SPEC.SCREEN_H / 28.0
-    lay2 = {
-        "title": "The Slag King - in-game camera at true pixel size",
-        "subtitle": "orthographic, 55 deg pitch, yaw 0; 1560 x 860 crops of the 1080p frame; four 2.2 m hero mannequins",
-        "width": 1600,
-        "sections": [
-            {"label": "Phase 1, 1 player (view height 22 m = %.1f px/m), 1x" % ppm22, "height": None,
-             "images": [{"path": ing["p1_22"]["color"], "label": "phase 1, 22 m"}]},
-            {"label": "Phase 2+, turned 28 deg toward a hero, 22 m, 1x", "height": None,
-             "images": [{"path": ing["p2_22"]["color"], "label": "phase 2, 22 m"}]},
-            {"label": "4 players (view height 28 m = %.1f px/m), 1x; and the game-size silhouettes (half size)" % ppm28,
-             "height": None, "images": [{"path": ing["p1_28"]["color"], "label": "phase 1, 28 m"}]},
-            {"label": "Silhouettes at game size (shown at half size)", "height": 430,
-             "images": [{"path": ing["p1_22"]["sil"], "label": "phase 1"}, {"path": ing["p2_22"]["sil"], "label": "phase 2"}]},
-        ],
-        "notes": ["The engine draws the red-white telegraph decals; the model carries none."],
-    }
-    R.contact_sheet(lay2, os.path.join(reports, KEY + "_ingame.png"), work)
+    first_look_sheets(hero, ing, reports, work)
     groups = [("Phase 1 loops and the generic pair (windup, attack, hit)", order[:5]),
               ("Molten Court attacks and the furnace face", order[5:11]),
               ("Phase change 1 -> 2 and the phase-2 loops", order[11:14]),
@@ -1374,9 +1628,10 @@ def main():
         return
     # paint before skinning, at 1/8 scale so the painter's brush features are boss-sized
     tex_dir = os.path.join(pack, "textures")
-    paint_rep = B.paint_scaled(mesh, KEY, recipes(), tex_dir, scale=0.125, size=size, decals=decals(),
-                               ao_distance=0.7, ao_samples=16, seed=5, margin_px=4,
-                               uv_small_islands=(0.35, 0.55))
+    with extra_paint_passes(PAINT_SCALE, mesh):
+        paint_rep = B.paint_scaled(mesh, KEY, recipes(), tex_dir, scale=PAINT_SCALE, size=size, decals=decals(),
+                                   ao_distance=0.7, ao_samples=16, seed=5, margin_px=4,
+                                   uv_small_islands=(0.35, 0.55))
     C.log("paint", {k: paint_rep[k] for k in ("size", "texel_density_px_per_m", "coverage", "seconds")})
     # rig, skin, sockets, clips
     arm = B.build_rig(RIG_NAME, rig_table(), col=col, bone_len=0.6)
@@ -1419,7 +1674,7 @@ def main():
     C.write_json(os.path.join(pack, "reports", "build_report.json"),
                  {"export": {k: v for k, v in rep.items() if k != "nodes"}, "paint": paint_rep, "skin": skin})
     if not C.flag(argv, "--no-review"):
-        review(mesh, arm, rep, paint_rep, clips, quick=C.flag(argv, "--quick"))
+        review(mesh, arm, rep, paint_rep, clips, quick=C.flag(argv, "--quick"), lite=C.flag(argv, "--lite"))
     C.write_pack_status(KIND, KEY, [
         C.rel(C.model_path(KIND, KEY)), C.rel(os.path.splitext(C.model_path(KIND, KEY))[0] + ".meta.json"),
         C.rel(blend), C.rel(os.path.join(tex_dir, KEY + "_basecolor.png")), C.rel(os.path.join(tex_dir, KEY + "_emissive.png")),

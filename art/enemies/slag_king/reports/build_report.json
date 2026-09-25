@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "boss",
   "extensions_used": [],
-  "tris": 21543,
+  "tris": 25006,
   "budget": [
    20000,
    40000
@@ -19,7 +19,7 @@
      2048
     ],
     "format": "png",
-    "bytes": 687861
+    "bytes": 946990
    },
    {
     "name": "slag_king_basecolor",
@@ -29,18 +29,18 @@
      2048
     ],
     "format": "png",
-    "bytes": 3729086
+    "bytes": 3270279
    }
   ],
   "materials": [
    "M_slag_king"
   ],
   "sockets": {
-   "fx_mouth": {
+   "head_top": {
     "translation": [
      0.0,
-     7.1638,
-     4.8583
+     12.9435,
+     2.4825
     ],
     "forward": [
      -0.0,
@@ -70,23 +70,6 @@
      0.0
     ]
    },
-   "fx_core": {
-    "translation": [
-     0.0,
-     6.9819,
-     3.668
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
    "hit_center": {
     "translation": [
      0.0,
@@ -104,11 +87,28 @@
      0.0
     ]
    },
-   "head_top": {
+   "fx_core": {
     "translation": [
      0.0,
-     12.9435,
-     2.4825
+     6.9819,
+     3.668
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     7.1638,
+     4.8583
     ],
     "forward": [
      -0.0,
@@ -130,12 +130,12 @@
    ],
    "max": [
     7.5237,
-    12.801,
-    6.3512
+    12.8054,
+    6.4279
    ]
   },
-  "height_m": 12.827,
-  "height_vs_hero": 5.83,
+  "height_m": 12.831,
+  "height_vs_hero": 5.832,
   "joints": [
    "root",
    "pelvis",
@@ -204,52 +204,54 @@
  "paint": {
   "size": 2048,
   "texel_density_px_per_m": {
-   "median": 35.8,
-   "p10": 20.3,
-   "p90": 40.7
+   "median": 36.0,
+   "p10": 20.8,
+   "p90": 41.1
   },
-  "coverage": 0.464,
+  "coverage": 0.468,
   "zones": [
    "slag",
+   "limb",
    "crust",
    "iron",
    "steel",
    "blade",
+   "edge",
    "molten",
    "lava",
    "core",
    "obsidian",
    "ichor"
   ],
-  "decals": 13,
+  "decals": 15,
   "basecolor": "art/enemies/slag_king/textures/slag_king_basecolor.png",
   "emissive": "art/enemies/slag_king/textures/slag_king_emissive.png",
-  "emissive_texels": 485115,
-  "seconds": 39.1,
+  "emissive_texels": 867703,
+  "seconds": 106.4,
   "paint_scale": 0.125
  },
  "skin": {
-  "vertices": 12168,
+  "vertices": 14090,
   "multi_bone": 0,
   "per_bone": {
-   "thigh_L": 274,
-   "shin_L": 249,
+   "thigh_L": 324,
+   "shin_L": 357,
    "foot_L": 69,
-   "thigh_R": 273,
-   "shin_R": 253,
+   "thigh_R": 323,
+   "shin_R": 357,
    "foot_R": 69,
    "pelvis": 1150,
    "spine_01": 204,
-   "spine_02": 2340,
-   "upperarm_L": 236,
+   "spine_02": 2468,
+   "upperarm_L": 280,
    "head": 1248,
-   "door": 353,
-   "crown_spin": 2055,
-   "lowerarm_L": 682,
-   "upperarm_R": 281,
-   "lowerarm_R": 682,
-   "hand_R": 202,
-   "hand_L": 366,
+   "door": 250,
+   "crown_spin": 2864,
+   "lowerarm_L": 816,
+   "upperarm_R": 336,
+   "lowerarm_R": 822,
+   "hand_R": 322,
+   "hand_L": 649,
    "arm2_upper_L": 234,
    "arm2_lower_L": 228,
    "arm2_hand_L": 129,
