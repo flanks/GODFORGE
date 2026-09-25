@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "ashrunner",
  "tier": "swarm",
- "tris": 1262,
+ "tris": 1056,
  "tris_budget": [
   600,
   1500
@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 81923
+   "bytes": 62274
   },
   {
    "name": "ashrunner_basecolor",
@@ -26,15 +26,15 @@
     512
    ],
    "format": "png",
-   "bytes": 318035
+   "bytes": 297859
   }
  ],
  "sockets": {
-  "fx_core": {
+  "head_top": {
    "translation": [
     0.0,
-    0.405,
-    0.02
+    0.92,
+    0.3
    ],
    "forward": [
     -0.0,
@@ -81,11 +81,11 @@
     0.0
    ]
   },
-  "head_top": {
+  "fx_core": {
    "translation": [
     0.0,
-    0.92,
-    0.3
+    0.405,
+    0.02
    ],
    "forward": [
     -0.0,
@@ -112,20 +112,20 @@
  "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
  "bounds_m": {
   "min": [
-   -0.1546,
+   -0.2888,
    0.0,
    -0.7894
   ],
   "max": [
-   0.1417,
-   0.8193,
+   0.2728,
+   0.8264,
    0.655
   ]
  },
- "size_m": 0.819,
+ "size_m": 0.826,
  "glb": "assets/models/enemies/ashrunner.glb",
- "glb_bytes": 563928,
- "glb_sha256": "3f9d45b1be0891162277beffc551a962ca41360f65867b954f4353528f451f6d",
+ "glb_bytes": 498632,
+ "glb_sha256": "d844951132afb130e2331f99a4c003114d29b502b72f74c2206e489cd0b0550a",
  "source_blend": "art/enemies/ashrunner/source/ashrunner.blend",
  "build_script": "tools/blender/gf_assets/enemies/ashrunner.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -159,20 +159,20 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 191.7,
-   "p10": 121.7,
-   "p90": 268.1
+   "median": 189.6,
+   "p10": 114.5,
+   "p90": 273.4
   },
-  "coverage": 0.351
+  "coverage": 0.415
  },
  "skin": {
-  "vertices": 802,
+  "vertices": 705,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 387,
-   "head": 116,
+   "body": 280,
+   "head": 126,
    "legs_a": 78,
    "legs_b": 88,
    "tail": 133

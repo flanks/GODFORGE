@@ -19,9 +19,10 @@
     "art/enemies/ashrunner/reports/ashrunner_review.png",
     "art/enemies/ashrunner/reports/ashrunner_crowd_review.png",
     "art/enemies/ashrunner/reports/ashrunner_crowd.png",
-    "art/enemies/ashrunner/reports/ashrunner_lineup.png"
+    "art/enemies/ashrunner/reports/ashrunner_lineup.png",
+    "art/enemies/ashrunner/reports/ashrunner_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/ashrunner.py and reviewed by enemies/ashrunner_crowd.py (40 ashrunners in pairs mixed with 20 clinkers at true game size)."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/ashrunner.py and reviewed by enemies/ashrunner_crowd.py (40 ashrunners in pairs mixed with 20 clinkers at true game size). Art review fix (6/10): the forequarters widened to a wedge (head-on 13 -> 25 px at 1x) and the four ember-edged ribs merged into one hot chest window framed by one rib bar; before/after in reports/ashrunner_review_fix.png (enemies/ashrunner_fix_sheet.py)."
   },
   "2_user_approval": {
    "status": "pending_human",

@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "swarm",
   "extensions_used": [],
-  "tris": 1262,
+  "tris": 1056,
   "budget": [
    600,
    1500
@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 81923
+    "bytes": 62274
    },
    {
     "name": "ashrunner_basecolor",
@@ -29,18 +29,18 @@
      512
     ],
     "format": "png",
-    "bytes": 318035
+    "bytes": 297859
    }
   ],
   "materials": [
    "M_ashrunner"
   ],
   "sockets": {
-   "fx_core": {
+   "head_top": {
     "translation": [
      0.0,
-     0.405,
-     0.02
+     0.92,
+     0.3
     ],
     "forward": [
      -0.0,
@@ -87,11 +87,11 @@
      0.0
     ]
    },
-   "head_top": {
+   "fx_core": {
     "translation": [
      0.0,
-     0.92,
-     0.3
+     0.405,
+     0.02
     ],
     "forward": [
      -0.0,
@@ -107,18 +107,18 @@
   },
   "bounds": {
    "min": [
-    -0.1546,
+    -0.2888,
     0.0,
     -0.7894
    ],
    "max": [
-    0.1417,
-    0.8193,
+    0.2728,
+    0.8264,
     0.655
    ]
   },
-  "height_m": 0.819,
-  "height_vs_hero": 0.372,
+  "height_m": 0.826,
+  "height_vs_hero": 0.376,
   "joints": [
    "root",
    "body",
@@ -142,11 +142,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 191.7,
-   "p10": 121.7,
-   "p90": 268.1
+   "median": 189.6,
+   "p10": 114.5,
+   "p90": 273.4
   },
-  "coverage": 0.351,
+  "coverage": 0.415,
   "zones": [
    "hide",
    "char",
@@ -159,17 +159,17 @@
   "decals": 6,
   "basecolor": "art/enemies/ashrunner/textures/ashrunner_basecolor.png",
   "emissive": "art/enemies/ashrunner/textures/ashrunner_emissive.png",
-  "emissive_texels": 38373,
-  "seconds": 25.2
+  "emissive_texels": 32384,
+  "seconds": 29.2
  },
  "skin": {
-  "vertices": 802,
+  "vertices": 705,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 387,
-   "head": 116,
+   "body": 280,
+   "head": 126,
    "legs_a": 78,
    "legs_b": 88,
    "tail": 133
@@ -178,332 +178,332 @@
  "parts": [
   {
    "id": 0,
-   "name": "forechest_char",
+   "name": "torso_char",
    "zone": "char",
    "bone": "body",
-   "faces": 14
+   "faces": 24
   },
   {
    "id": 1,
-   "name": "forechest_hide",
+   "name": "torso_hide",
    "zone": "hide",
    "bone": "body",
-   "faces": 28
+   "faces": 44
   },
   {
    "id": 2,
    "name": "ember_core",
    "zone": "ember",
    "bone": "body",
-   "faces": 48
+   "faces": 42
   },
   {
    "id": 3,
-   "name": "keel",
-   "zone": "char",
+   "name": "rib",
+   "zone": "rib",
    "bone": "body",
-   "faces": 12
+   "faces": 26
   },
   {
    "id": 4,
-   "name": "rib0",
-   "zone": "rib",
-   "bone": "body",
-   "faces": 34
-  },
-  {
-   "id": 5,
-   "name": "rib1",
-   "zone": "rib",
-   "bone": "body",
-   "faces": 34
-  },
-  {
-   "id": 6,
-   "name": "rib2",
-   "zone": "rib",
-   "bone": "body",
-   "faces": 34
-  },
-  {
-   "id": 7,
-   "name": "rib3",
-   "zone": "rib",
-   "bone": "body",
-   "faces": 34
-  },
-  {
-   "id": 8,
-   "name": "spine_bar",
-   "zone": "rib",
-   "bone": "body",
-   "faces": 12
-  },
-  {
-   "id": 9,
-   "name": "hide_flap_R",
-   "zone": "hide",
-   "bone": "body",
-   "faces": 18
-  },
-  {
-   "id": 10,
    "name": "rump_char",
    "zone": "char",
    "bone": "tail",
    "faces": 16
   },
   {
-   "id": 11,
+   "id": 5,
    "name": "rump_hide",
    "zone": "hide",
    "bone": "tail",
    "faces": 26
   },
   {
-   "id": 12,
+   "id": 6,
    "name": "skull_char",
    "zone": "char",
    "bone": "head",
    "faces": 16
   },
   {
-   "id": 13,
+   "id": 7,
    "name": "skull_hide",
    "zone": "hide",
    "bone": "head",
    "faces": 19
   },
   {
-   "id": 14,
+   "id": 8,
    "name": "skull_maw",
    "zone": "maw",
    "bone": "head",
    "faces": 3
   },
   {
-   "id": 15,
+   "id": 9,
    "name": "jaw_char",
    "zone": "char",
    "bone": "body",
    "faces": 20
   },
   {
-   "id": 16,
+   "id": 10,
    "name": "jaw_maw",
    "zone": "maw",
    "bone": "body",
    "faces": 6
   },
   {
-   "id": 17,
+   "id": 11,
    "name": "fang_up",
    "zone": "bone",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 12,
+   "name": "fang_lo",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 13,
+   "name": "fang_up",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 14,
+   "name": "fang_lo",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 15,
+   "name": "eye",
+   "zone": "eye",
+   "bone": "head",
+   "faces": 18
+  },
+  {
+   "id": 16,
+   "name": "eye",
+   "zone": "eye",
+   "bone": "head",
+   "faces": 18
+  },
+  {
+   "id": 17,
+   "name": "cheek_ruff",
+   "zone": "hide",
    "bone": "head",
    "faces": 5
   },
   {
    "id": 18,
-   "name": "fang_lo",
-   "zone": "bone",
-   "bone": "body",
+   "name": "cheek_ruff",
+   "zone": "hide",
+   "bone": "head",
    "faces": 5
   },
   {
    "id": 19,
-   "name": "fang_up",
-   "zone": "bone",
-   "bone": "head",
-   "faces": 5
-  },
-  {
-   "id": 20,
-   "name": "fang_lo",
-   "zone": "bone",
-   "bone": "body",
-   "faces": 5
-  },
-  {
-   "id": 21,
-   "name": "eye",
-   "zone": "eye",
-   "bone": "head",
-   "faces": 18
-  },
-  {
-   "id": 22,
-   "name": "eye",
-   "zone": "eye",
-   "bone": "head",
-   "faces": 18
-  },
-  {
-   "id": 23,
    "name": "ear_L",
    "zone": "char",
    "bone": "head",
    "faces": 5
   },
   {
-   "id": 24,
+   "id": 20,
    "name": "ear_R",
    "zone": "char",
    "bone": "head",
    "faces": 5
   },
   {
-   "id": 25,
+   "id": 21,
    "name": "mane",
    "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 22,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 23,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 24,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 25,
+   "name": "ruff",
+   "zone": "hide",
    "bone": "body",
    "faces": 5
   },
   {
    "id": 26,
-   "name": "mane",
-   "zone": "char",
+   "name": "ruff",
+   "zone": "hide",
    "bone": "body",
    "faces": 5
   },
   {
    "id": 27,
-   "name": "mane",
-   "zone": "char",
+   "name": "ruff",
+   "zone": "hide",
    "bone": "body",
    "faces": 5
   },
   {
    "id": 28,
-   "name": "mane",
-   "zone": "char",
+   "name": "ruff",
+   "zone": "hide",
    "bone": "body",
    "faces": 5
   },
   {
    "id": 29,
-   "name": "mane",
-   "zone": "char",
+   "name": "ruff",
+   "zone": "hide",
    "bone": "body",
    "faces": 5
   },
   {
    "id": 30,
-   "name": "upperarm",
+   "name": "ruff",
    "zone": "hide",
-   "bone": "legs_a",
-   "faces": 8
+   "bone": "body",
+   "faces": 5
   },
   {
    "id": 31,
-   "name": "forearm",
-   "zone": "char",
-   "bone": "legs_a",
-   "faces": 12
-  },
-  {
-   "id": 32,
-   "name": "paw_f",
-   "zone": "char",
-   "bone": "legs_a",
-   "faces": 15
-  },
-  {
-   "id": 33,
-   "name": "thigh",
-   "zone": "hide",
-   "bone": "legs_b",
-   "faces": 8
-  },
-  {
-   "id": 34,
-   "name": "shin",
-   "zone": "char",
-   "bone": "legs_b",
-   "faces": 12
-  },
-  {
-   "id": 35,
-   "name": "hock_spur",
-   "zone": "char",
-   "bone": "legs_b",
-   "faces": 5
-  },
-  {
-   "id": 36,
-   "name": "paw_h",
-   "zone": "char",
-   "bone": "legs_b",
-   "faces": 15
-  },
-  {
-   "id": 37,
    "name": "upperarm",
    "zone": "hide",
    "bone": "legs_a",
    "faces": 8
   },
   {
-   "id": 38,
+   "id": 32,
    "name": "forearm",
    "zone": "char",
    "bone": "legs_a",
    "faces": 12
   },
   {
-   "id": 39,
+   "id": 33,
    "name": "paw_f",
    "zone": "char",
    "bone": "legs_a",
    "faces": 15
   },
   {
-   "id": 40,
+   "id": 34,
    "name": "thigh",
    "zone": "hide",
    "bone": "legs_b",
    "faces": 8
   },
   {
-   "id": 41,
+   "id": 35,
    "name": "shin",
    "zone": "char",
    "bone": "legs_b",
    "faces": 12
   },
   {
-   "id": 42,
+   "id": 36,
    "name": "hock_spur",
    "zone": "char",
    "bone": "legs_b",
    "faces": 5
   },
   {
-   "id": 43,
+   "id": 37,
    "name": "paw_h",
    "zone": "char",
    "bone": "legs_b",
    "faces": 15
   },
   {
+   "id": 38,
+   "name": "upperarm",
+   "zone": "hide",
+   "bone": "legs_a",
+   "faces": 8
+  },
+  {
+   "id": 39,
+   "name": "forearm",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 12
+  },
+  {
+   "id": 40,
+   "name": "paw_f",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 15
+  },
+  {
+   "id": 41,
+   "name": "thigh",
+   "zone": "hide",
+   "bone": "legs_b",
+   "faces": 8
+  },
+  {
+   "id": 42,
+   "name": "shin",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 12
+  },
+  {
+   "id": 43,
+   "name": "hock_spur",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 5
+  },
+  {
    "id": 44,
+   "name": "paw_h",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 15
+  },
+  {
+   "id": 45,
    "name": "tail_char",
    "zone": "char",
    "bone": "tail",
    "faces": 8
   },
   {
-   "id": 45,
+   "id": 46,
    "name": "tail_hide",
    "zone": "hide",
    "bone": "tail",
    "faces": 18
-  },
-  {
-   "id": 46,
-   "name": "tail_tatter",
-   "zone": "hide",
-   "bone": "tail",
-   "faces": 5
   },
   {
    "id": 47,
@@ -521,20 +521,27 @@
   },
   {
    "id": 49,
+   "name": "tail_tatter",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 50,
    "name": "tail_cinder",
    "zone": "ember",
    "bone": "tail",
    "faces": 5
   },
   {
-   "id": 50,
+   "id": 51,
    "name": "tail_cinder_b",
    "zone": "ember",
    "bone": "tail",
    "faces": 5
   }
  ],
- "tris_blender": 1262,
+ "tris_blender": 1056,
  "clips": [
   {
    "name": "ashrunner_idle@loop",

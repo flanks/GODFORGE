@@ -279,7 +279,7 @@ def main():
         {"label": "The ashrunner beside the clinker (both Cinder Wastes Unmade swarm) and the 2.2 m hero (rest pose, toon preview "
                   "of the shipped GLBs)", "height": 400,
          "images": [{"path": out["lineup"], "label": "hero | clinker (SKITTER: a dark dome, a pale club, teal) | "
-                                                    "ashrunner (SPRINT: a pale arrow with a burning ribcage)"}]},
+                                                    "ashrunner (SPRINT: a pale wedge with a burning chest)"}]},
         {"label": "The same three through the game camera (55 deg, %.1f px/m): TRUE size 1x, then 3x nearest" % PPM,
          "height": None, "images": [{"path": out["lineup_game"], "label": "1x"},
                                     {"path": out["lineup_game"], "label": "3x", "scale": 3}]},
@@ -310,10 +310,13 @@ def main():
     outputs = [C.rel(C.model_path("enemy", key)), C.rel(os.path.splitext(C.model_path("enemy", key))[0] + ".meta.json"),
                "art/enemies/ashrunner/source/ashrunner.blend", "art/enemies/ashrunner/textures/ashrunner_basecolor.png",
                "art/enemies/ashrunner/textures/ashrunner_emissive.png", "art/enemies/ashrunner/reports/ashrunner_review.png",
-               C.rel(out["sheet"]), C.rel(crowd2x), C.rel(lineup)]
+               C.rel(out["sheet"]), C.rel(crowd2x), C.rel(lineup), "art/enemies/ashrunner/reports/ashrunner_review_fix.png"]
     C.write_pack_status("enemy", key, outputs,
                         "Built from code by tools/blender/gf_assets/enemies/ashrunner.py and reviewed by "
-                        "enemies/ashrunner_crowd.py (40 ashrunners in pairs mixed with 20 clinkers at true game size).",
+                        "enemies/ashrunner_crowd.py (40 ashrunners in pairs mixed with 20 clinkers at true game size). "
+                        "Art review fix (6/10): the forequarters widened to a wedge (head-on 13 -> 25 px at 1x) and the "
+                        "four ember-edged ribs merged into one hot chest window framed by one rib bar; before/after in "
+                        "reports/ashrunner_review_fix.png (enemies/ashrunner_fix_sheet.py).",
                         tier="swarm", extra={"skeleton": SPEC.SWARM_SKELETON, "faction": "unmade", "verb": "SPRINT"})
     C.log("DONE ashrunner crowd", out["sheet"])
 

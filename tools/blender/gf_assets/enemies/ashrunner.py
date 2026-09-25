@@ -5,35 +5,40 @@ exported and reviewed from code.
       -P tools/blender/gf_assets/enemies/ashrunner.py -- [--size 512] [--no-review] [--preview]
 
   then: -P tools/blender/gf_assets/enemies/ashrunner_crowd.py   (the horde read, mixed with clinkers)
+        -P tools/blender/gf_assets/enemies/ashrunner_fix_sheet.py -- --before DIR   (the review-fix sheet)
 
 Content row (content/sheets/enemies.csv): ashrunner, Swarm, P0, hp 18, speed 5.2, radius 0.36, scale 1.0,
 Swarmer(jitter 0.6), colour #F2A541, shape Hound, packs of 2-4 - "Fast ash-hounds that hunt in pairs."
 Collider radius x scale = 0.36 m, so the body is about 0.8-1.1 m long (docs/art/ENEMIES.md section 2).
 
 Design (docs/art/ENEMIES.md; the user's enemy pack):
-  * verb SPRINT: a lean ash-grey hound of cinder and char, built like an arrow - a long, low skull held
-    level with the spine, a deep keel chest, a tucked waist, small hips, long legs and a whip tail streaming
-    straight back. Black char shards stream back off the neck like a wind-torn mane, and two long ear
-    spikes sweep back over the withers. Every long line points backward: it reads as speed standing still;
-  * the signature is the EMBER-LINED RIBCAGE: the hide has burnt away over the flanks, four black rib bars
-    arc down each side over a glowing ember core. From the 55 deg camera: pale ash shoulders, a pale spine
-    ridge and a pale rump frame a window of orange-lit dark ribs - "a grey streak with a burning chest";
-  * THE UNMADE's wrong asymmetry, bold enough for 35 px: the ribcage is burnt open on the whole left flank,
-    but a torn flap of ash hide still hangs over the rear ribs on the right; the right ear is snapped off
-    short; the mane leans to the right;
+  * verb SPRINT: an ash-grey hound of cinder and char, built like an arrow - a long, low skull held level
+    with the spine, a tucked waist, hard haunches, long legs and a whip tail streaming straight back. Black
+    char shards stream back off the neck like a wind-torn mane, and two big ears sweep back over the withers.
+    Every long line points backward: it reads as speed standing still;
+  * a WEDGE from the game camera (art review fix): hyena-heavy forequarters - a bull neck, 0.46 m shoulders and
+    a broad ash ruff flaring back off them (about 0.5 m across), a heavier skull with cheek ruffs and broad
+    ears - narrowing through the chest to a 0.17 m waist and a 0.19 m rump. Head-on (the hunting approach)
+    it is 25 px wide at 1x, not a 13 px sliver;
+  * the signature is the BURNT-OPEN CHEST: the hide has burnt through over the ribcage in ONE hot window, a
+    lens that is longest over the back and runs down the left flank, framed at its rear by ONE black rib bar.
+    From the 55 deg camera: pale shoulders, one hot orange shape, one dark bar, a pale rump - "a grey streak
+    with a burning chest". (The first build had four black ribs with ember edge strokes: a barcode at 1x.);
+  * THE UNMADE's wrong asymmetry, bold enough for 35 px: the window is burnt open down the whole left flank but
+    framed by hide on the right; the right ear is snapped off short; the mane and the ruff lean right;
   * faction glow: the Cinder Wastes Unmade burn molten (the Slag King's ramp) with the Unmade teal as the
-    marker - the ribs and the tail tip glow ember (rim #C8400C, hot #FF6B1A, a warm #FFB070 core instead of
+    marker - the window and the tail tip glow ember (rim #C8400C, hot #FF6B1A, a warm #FFB070 core instead of
     the white-hot #FFF3D6, so no white speckle), the eye slits and the maw glow teal #2FBFA8. The bite
     telegraph is the clinker's language: the skull tips back and bares a teal maw;
   * value plan at game size: ash-grey top masses (lighter than the #3A2C24 floor), charcoal legs, jaw,
-    keel and mane (darker than the floor, with light brush edges), the ember window and the tail tip as the
-    one warm accent. The clinker is a dark dome with a pale club and teal; the ashrunner is a pale arrow
+    underside and mane (darker than the floor, with light brush edges), the ember window and the tail tip as
+    the one warm accent. The clinker is a dark dome with a pale club and teal; the ashrunner is a pale wedge
     with an orange chest: distinct at a glance, same faction.
 
 Rig GF_Swarm_v1 (rigid). The gallop is a double-suspension bound with a FLEXING SPINE:
-  body   = fore-chest, neck, ribcage, ember core, keel, spine ridge, lower jaw, mane, right hide flap
-  head   = the skull + upper jaw, eyes and ears, hinged at the jaw joint: pitching it nose-up opens the
-           mouth, and the lower jaw's teal floor faces the camera (the bite telegraph)
+  body   = neck, shoulders and chest (one loft), ember core, the rib bar, lower jaw, mane and ruff
+  head   = the skull + upper jaw, eyes, cheek ruffs and ears, hinged at the jaw joint: pitching it nose-up
+           opens the mouth, and the lower jaw's teal floor faces the camera (the bite telegraph)
   legs_a = both front legs (pivot: the shoulder joints)     legs_b = both hind legs (pivot: the hip joints)
   tail   = the loin, rump and tail (pivot: the loin): it flexes the spine - rump tucked under in the
            gathered phase, stretched back in the extended phase. The hind legs follow the rump (their
@@ -77,12 +82,28 @@ HIP = Vector((0.0, 0.30, 0.43))           # hind-leg pivot
 LOIN = Vector((0.0, 0.16, 0.47))          # tail-bone pivot: the spine flexes here
 JAW = Vector((0.0, -0.415, 0.548))        # head-bone pivot: the jaw hinge
 CORE = Vector((0.0, -0.02, 0.405))        # ember core centre (fx_core)
-RIB_C = (0.405, 0.126, 0.142)             # ribcage ellipse: centre z, half-width, half-height
-RIB_Y = (-0.125, -0.055, 0.015, 0.082)    # the four ribs (y at the spine)
-RIB_W = 0.032                             # rib bar width (along the body)
-# fore-chest + neck rings (y, cx, cz, w, h): high withers (the apex), wide shoulders, a thick neck
-FORE_RINGS = [(-0.13, 0.0, 0.42, 0.21, 0.28), (-0.21, 0.0, 0.445, 0.25, 0.32), (-0.285, 0.0, 0.46, 0.2, 0.26),
-              (-0.345, 0.0, 0.515, 0.14, 0.17), (-0.405, 0.0, 0.56, 0.1, 0.11)]
+EMBER_C = Vector((0.015, -0.055, 0.56))   # centre of the ember glow ramp: on the window top the camera sees
+# Review fix (art review 6/10): head-on the old body was 0.30 m wide (15 px at 1x, a pale sliver) and its four
+# ember-edged ribs read as a barcode. The torso is now ONE loft, a hyena-heavy wedge from above: 0.46 m across
+# the shoulders (0.5 m with the ash ruff), 0.34 m over the chest window, a 0.17 m waist, a 0.19 m rump. The
+# hide is burnt through in ONE hot window over the ribcage (WIN_Y[0]..WIN_Y[1]), framed at its rear by ONE rib
+# bar: from the camera, pale hide -> one hot shape -> one dark bar -> pale hide (a rib crossing the middle of
+# the window read as an orange-black-orange wasp stripe in the horde)
+WIN_Y = (-0.11, 0.03, 0.075)              # chest window: front edge, rear edge = the rib bar; then a shape ring
+RIB_W = 0.042                             # rib bar width (along the body)
+# torso rings (y, cx, cz, w, h), neck to waist: a bull neck, the widest point at the shoulders, the window,
+# then a hard tuck into the waist (the rump loft on the tail bone starts inside the last ring)
+TORSO_RINGS = [(-0.40, 0.0, 0.567, 0.17, 0.16), (-0.345, 0.0, 0.537, 0.29, 0.245), (-0.285, 0.0, 0.492, 0.42, 0.31),
+               (-0.21, 0.0, 0.458, 0.47, 0.34), (WIN_Y[0], 0.0, 0.425, 0.40, 0.30), (WIN_Y[1], 0.0, 0.41, 0.345, 0.28),
+               (WIN_Y[2], 0.0, 0.42, 0.29, 0.25), (0.105, 0.0, 0.452, 0.17, 0.17)]
+# the window's open faces: (ring interval, profile segment). Segment k joins BODY_PROFILE vertices k and k+1:
+# 0 = top-left, 1 = upper left flank, 2 = mid left flank, 9 = top-right. The Unmade asymmetry: from above the
+# window is framed by pale hide on the right, but it is burnt open down the whole LEFT flank
+WIN_FACES = {(4, 0), (4, 1), (4, 2), (4, 9)}
+# the window's outline: y shifts of its edge vertices (ring, profile vertex) - a lens that is longest over the
+# back and narrows down the left flank, so it reads as a hole burnt in the hide rather than a band
+WIN_SHIFT = {(4, 0): -0.026, (4, 1): -0.02, (4, 9): -0.014, (4, 2): -0.004, (4, 3): 0.028,
+             (5, 0): 0.004, (5, 1): 0.0, (5, 9): 0.002, (5, 8): 0.0, (5, 2): -0.012, (5, 3): -0.026, (5, 4): -0.03}
 
 # unit cross-sections (x, z): a keel-chested hound body, a skull with a flat brow plane, a narrow jaw
 BODY_PROFILE = [(0.0, 1.0), (0.62, 0.84), (0.97, 0.34), (0.86, -0.3), (0.46, -0.8), (0.0, -1.0),
@@ -171,30 +192,6 @@ def arc_band(pts, radial, width, thick):
     return M.recalc(bm)
 
 
-def arc_plate(stations, phis, thick, ridge=0.0, lift=None):
-    """A thick plate draped over an ellipse: stations = [(y, cx, cz, a, b, offset)], phis = angles (deg,
-    0 = top, + toward the creature's left). ridge raises the phi = 0 line; lift(u) adds z along the stations."""
-    bm = bmesh.new()
-    rings = []
-    ns = len(stations)
-    for si, (y, cx, cz, a, b, o) in enumerate(stations):
-        dz = lift(si / max(1, ns - 1)) if lift else 0.0
-        outer, inner = [], []
-        for ph in phis:
-            r = math.radians(ph)
-            rr = 1.0 + (ridge if abs(ph) < 1e-3 else 0.0)
-            outer.append((cx + math.sin(r) * (a + o), y, cz + dz + math.cos(r) * (b + o) * rr))
-            inner.append((cx + math.sin(r) * (a + o - thick), y, cz + dz + math.cos(r) * (b + o - thick)))
-        rings.append([bm.verts.new(p) for p in outer + inner[::-1]])
-    n = len(rings[0])
-    for a_, b_ in zip(rings[:-1], rings[1:]):
-        for k in range(n):
-            bm.faces.new((a_[k], a_[(k + 1) % n], b_[(k + 1) % n], b_[k]))
-    bm.faces.new(rings[0])
-    bm.faces.new(rings[-1][::-1])
-    return M.recalc(bm)
-
-
 def shard(base, direction, length, r, flat=0.45, x_hint=(1, 0, 0), rot=45.0):
     """A flattened 4-sided spike from `base` along `direction` (its wide side follows x_hint)."""
     b = M.spike(r, length, sides=4, base_scale=(1.0, flat), rot_offset=rot)
@@ -202,21 +199,53 @@ def shard(base, direction, length, r, flat=0.45, x_hint=(1, 0, 0), rot=45.0):
     return b
 
 
+def torso_ring(y):
+    """The torso loft's ring (y, cx, cz, w, h) at y (linear between its rings, clamped)."""
+    rs = sorted(TORSO_RINGS)
+    if y <= rs[0][0]:
+        return rs[0]
+    for r0, r1 in zip(rs[:-1], rs[1:]):
+        if r0[0] <= y <= r1[0]:
+            t = (y - r0[0]) / (r1[0] - r0[0])
+            return tuple(a + (b - a) * t for a, b in zip(r0, r1))
+    return rs[-1]
+
+
 def fore_top(y):
-    """Top of the fore-chest / neck loft at y (linear between its rings)."""
-    rs = sorted(FORE_RINGS)
-    tops = [(r[0], r[2] + r[4] / 2) for r in rs]
-    if y <= tops[0][0]:
-        return tops[0][1]
-    for (y0, z0), (y1, z1) in zip(tops[:-1], tops[1:]):
-        if y0 <= y <= y1:
-            return z0 + (z1 - z0) * (y - y0) / (y1 - y0)
-    return tops[-1][1]
+    """Top of the torso loft at y."""
+    _, _, cz, _, h = torso_ring(y)
+    return cz + h / 2
 
 
-def ellipse_pt(phi_deg, y, cz, a, b, grow=0.0):
-    r = math.radians(phi_deg)
-    return Vector((math.sin(r) * (a + grow), y, cz + math.cos(r) * (b + grow)))
+def torso_pt(y, px, pz, grow=0.0):
+    """A point on the torso loft's surface at y for a profile coordinate (px, pz), pushed out by `grow` m."""
+    _, cx, cz, w, h = torso_ring(y)
+    return Vector((cx + px * (w / 2 + grow), y, cz + pz * (h / 2 + grow)))
+
+
+def torso_ring_verts(shift=None, inset=0.0, lo=0, hi=None):
+    """The torso rings' vertex positions (Vectors) with WIN_SHIFT-style y shifts, pulled `inset` m inside."""
+    shift = shift or {}
+    out = []
+    for i, (y, cx, cz, w, h) in enumerate(TORSO_RINGS[lo:hi], start=lo):
+        out.append([Vector((cx + px * (w / 2 - inset), y + shift.get((i, k), 0.0), cz + pz * (h / 2 - inset)))
+                    for k, (px, pz) in enumerate(BODY_PROFILE)])
+    return out
+
+
+def loft_open(ring_verts, skip=(), ring0=0):
+    """A lofted tube through ring_verts (lists of Vectors of equal length) without the faces (ring interval i,
+    profile segment k) in `skip` (interval numbers start at ring0), capped at both ends."""
+    bm = bmesh.new()
+    rv = [[bm.verts.new(p) for p in ring] for ring in ring_verts]
+    n = len(rv[0])
+    for i, (a, b) in enumerate(zip(rv[:-1], rv[1:]), start=ring0):
+        for k in range(n):
+            if (i, k) not in skip:
+                bm.faces.new((a[k], a[(k + 1) % n], b[(k + 1) % n], b[k]))
+    bm.faces.new(rv[0])
+    bm.faces.new(rv[-1])
+    return M.recalc(bm)
 
 
 # ---- the model ------------------------------------------------------------------------------------------------
@@ -227,69 +256,48 @@ class Build:
         self.info = {}
 
     def torso(self, a):
-        """Fore-chest + neck (one loft), the keel, the ribcage hoops over the ember core, a black spine bar, the
-        torn right hide flap, and the loin + rump (tail bone). Down-facing faces are char, the rest ash hide."""
+        """Neck, shoulders and chest as ONE loft (a wedge from above), burnt open in one chest window over an
+        ember core and crossed by one black rib bar; then the loin + rump (tail bone). Down-facing faces are char,
+        the rest ash hide."""
         def zone_down(f, lim=-0.42):
             return "char" if f.normal.z < lim else "hide"
-        fore = loft(FORE_RINGS, BODY_PROFILE)
-        M.noise_displace(fore, 0.005, freq=8.0, seed=SEED)
-        for z, piece in split_by_faces(fore, zone_down).items():
-            a.add(piece, z, bone="body", name="forechest_" + z, shading="auto", sharp_angle=28.0)
-        cz, ra, rb = RIB_C
-        # ember core: fills the ribcage, its top shows between the ribs from the game camera
-        core = M.sphere(1.0, 8, 6)
-        M.xform(core, loc=CORE, scale=(ra - 0.022, 0.16, rb - 0.022))
+        torso = loft_open(torso_ring_verts(WIN_SHIFT), WIN_FACES)
+        # a burnt, ragged rim: the window's edge vertices step a little in and out along the body
+        for v in torso.verts:
+            if any(e.is_boundary for e in v.link_edges):
+                v.co.y += self.rng.uniform(-0.006, 0.006)
+        M.noise_displace(torso, 0.005, freq=8.0, seed=SEED)
+        self.window_edges = [[e.verts[0].co.copy(), e.verts[1].co.copy()] for e in torso.edges if e.is_boundary]
+        for z, piece in split_by_faces(torso, zone_down).items():
+            a.add(piece, z, bone="body", name="torso_" + z, shading="auto", sharp_angle=28.0)
+        # ember core: the torso itself from the shoulders to the waist, 12 mm inside the hide, so it fills the
+        # window to the brim (no see-through slivers past back-face-culled inner walls in the engine)
+        core = loft_open(torso_ring_verts(WIN_SHIFT, inset=0.012, lo=3), ring0=3)
         a.add(core, "ember", bone="body", name="ember_core", shading="smooth")
-        # keel (sternum): a char bar under the ribcage
-        keel = loft([(-0.2, 0.0, 0.272, 0.05, 0.05), (-0.06, 0.0, 0.26, 0.05, 0.045), (0.1, 0.0, 0.3, 0.035, 0.035)],
-                    [(0, 1), (1, 0.2), (0.5, -1), (-0.5, -1), (-1, 0.2)])
-        a.add(keel, "char", bone="body", name="keel", shading="flat")
-        # ribs: four black hoops from keel to keel over the top, sweeping back as they arc down; seen from the
-        # 55 deg camera they cross the ember core like a grille ("ember-lined ribs")
-        phis = (-156, -112, -68, -28, 0, 28, 68, 112, 156)
-        self.rib_edges = []                             # the outer long edges of every rib (painted ember lines)
-        for i, y0 in enumerate(RIB_Y):
-            s = 1.0 - 0.08 * abs(i - 1.2)                # deepest at the second rib
-            pts, rad = [], []
-            for ph in phis:
-                u = abs(ph) / 156.0
-                p = ellipse_pt(ph, y0 + 0.045 * u * u, cz, ra * s, rb * s)
-                pts.append(p)
-                rad.append(Vector((p.x, 0.0, (p.z - cz) * (ra / rb) ** 2)).normalized())
-            w, t = RIB_W, 0.022
-            a.add(arc_band(pts, rad, w, t), "rib", bone="body", name="rib%d" % i, shading="flat")
-            for sgn in (1, -1):
-                line = []
-                for k in range(len(pts)):
-                    tg = (pts[min(len(pts) - 1, k + 1)] - pts[max(0, k - 1)]).normalized()
-                    sd = tg.cross(rad[k]).normalized()
-                    line.append(pts[k] + sd * sgn * w / 2 + rad[k] * t)
-                self.rib_edges.append(line)
-        # spine bar: the black backbone the ribs hang from
-        sp = [ellipse_pt(0, y, cz, ra, rb, 0.012) for y in (-0.19, -0.05, 0.1)]
-        a.add(M.tube(sp, [0.022, 0.02, 0.017], sides=5), "rib", bone="body", name="spine_bar", shading="flat")
-        # the torn right-flank hide flap over the rear ribs (the Unmade asymmetry)
-        st = [(-0.02, 0.0, cz, ra * 0.99, rb * 0.97, 0.03), (0.04, 0.0, cz, ra * 0.95, rb * 0.93, 0.032),
-              (0.11, 0.0, cz + 0.005, ra * 0.84, rb * 0.86, 0.03)]
-        flap = arc_plate(st, (-36, -64, -92, -120), 0.018)
-        for v in flap.verts:                            # a torn lower edge
-            if v.co.z < cz - 0.03:
-                v.co.z += self.rng.uniform(-0.025, 0.025)
-                v.co.y += self.rng.uniform(-0.012, 0.012)
-        a.add(flap, "hide", bone="body", name="hide_flap_R", shading="flat")
-        # loin + rump (tail bone): a narrow waist that swells into small hard haunches
-        rump = loft([(0.07, 0.0, 0.47, 0.085, 0.095), (0.15, 0.0, 0.47, 0.098, 0.105), (0.235, 0.0, 0.462, 0.155, 0.145),
-                     (0.33, 0.0, 0.462, 0.162, 0.15), (0.425, 0.0, 0.475, 0.088, 0.088)], BODY_PROFILE)
+        # the one rib: a black hoop from the left lower chest over the top to the right upper flank. It runs along
+        # the window's rear edge (half over the glow, half over the hide), stands 12 mm proud, and both ends dive
+        # under the hide
+        pts, rad = [], []
+        for k, grow in ((4, -0.035), (3, -0.01), (2, -0.01), (1, -0.01), (0, -0.01), (9, -0.01), (8, -0.035)):
+            px, pz = BODY_PROFILE[k]
+            p = torso_pt(WIN_Y[1] + WIN_SHIFT.get((5, k), 0.0), px, pz, grow)
+            pts.append(p)
+            _, _, cz, w, h = torso_ring(p.y)
+            rad.append(Vector((px / (w / 2), 0.0, pz / (h / 2))).normalized())
+        a.add(arc_band(pts, rad, RIB_W, 0.022), "rib", bone="body", name="rib", shading="flat")
+        # loin + rump (tail bone): a tucked waist that swells into hard haunches (the narrow end of the wedge)
+        rump = loft([(0.07, 0.0, 0.47, 0.12, 0.12), (0.15, 0.0, 0.47, 0.13, 0.12), (0.235, 0.0, 0.462, 0.185, 0.15),
+                     (0.33, 0.0, 0.462, 0.19, 0.155), (0.425, 0.0, 0.475, 0.1, 0.095)], BODY_PROFILE)
         M.noise_displace(rump, 0.004, freq=9.0, seed=SEED + 1)
         for z, piece in split_by_faces(rump, zone_down).items():
             a.add(piece, z, bone="tail", name="rump_" + z, shading="auto", sharp_angle=28.0)
-        self.info["spine_top"] = cz + rb + 0.03
 
     def head(self, a):
         """Skull + upper jaw (head bone, hinged at JAW), lower jaw (body). Palate and jaw floor are teal maw.
         A jackal's head: a broad brow plane, a tapered snout, big raked-back triangular ears."""
-        skull = loft([(-0.39, 0.0, 0.61, 0.12, 0.115), (-0.445, 0.0, 0.615, 0.15, 0.13), (-0.515, 0.0, 0.595, 0.105, 0.095),
-                      (-0.588, 0.0, 0.574, 0.074, 0.07), (-0.655, 0.0, 0.558, 0.05, 0.048)], SKULL_PROFILE)
+        # review fix: a heavier skull - 0.2 m across the cheeks (was 0.15), a broad brow, a blunter muzzle
+        skull = loft([(-0.385, 0.0, 0.612, 0.17, 0.13), (-0.44, 0.0, 0.62, 0.205, 0.145), (-0.51, 0.0, 0.601, 0.15, 0.108),
+                      (-0.585, 0.0, 0.578, 0.1, 0.078), (-0.655, 0.0, 0.56, 0.066, 0.054)], SKULL_PROFILE)
 
         def skull_zone(f):
             c = f.calc_center_median()
@@ -301,8 +309,8 @@ class Build:
             return "hide"
         for z, piece in split_by_faces(skull, skull_zone).items():
             a.add(piece, z, bone="head", name="skull_" + z, shading="auto", sharp_angle=28.0)
-        jaw = loft([(-0.395, 0.0, 0.524, 0.09, 0.054), (-0.49, 0.0, 0.525, 0.075, 0.048),
-                    (-0.565, 0.0, 0.524, 0.056, 0.037), (-0.632, 0.0, 0.526, 0.038, 0.027)], JAW_PROFILE)
+        jaw = loft([(-0.395, 0.0, 0.522, 0.13, 0.06), (-0.49, 0.0, 0.524, 0.1, 0.052),
+                    (-0.565, 0.0, 0.524, 0.072, 0.04), (-0.632, 0.0, 0.526, 0.048, 0.029)], JAW_PROFILE)
 
         def jaw_zone(f):
             return "maw" if f.normal.z > 0.9 and f.calc_center_median().y < -0.43 else "char"
@@ -310,61 +318,79 @@ class Build:
             a.add(piece, z, bone="body", name="jaw_" + z, shading="auto", sharp_angle=30.0)
         # fangs: upper canines over the jaw, lower canines up
         for sx in (1, -1):
-            a.add(shard((sx * 0.029, -0.57, 0.55), (sx * 0.1, -0.15, -1.0), 0.038, 0.009, flat=0.8), "bone",
+            a.add(shard((sx * 0.036, -0.57, 0.552), (sx * 0.1, -0.15, -1.0), 0.04, 0.01, flat=0.8), "bone",
                   bone="head", name="fang_up", shading="flat")
-            a.add(shard((sx * 0.022, -0.61, 0.522), (sx * 0.15, -0.2, 1.0), 0.026, 0.007, flat=0.8), "bone",
+            a.add(shard((sx * 0.027, -0.61, 0.522), (sx * 0.15, -0.2, 1.0), 0.028, 0.008, flat=0.8), "bone",
                   bone="body", name="fang_lo", shading="flat")
         # teal eye slits on the brow (they show the facing from above)
         for sx in (1, -1):
             e = M.sphere(1.0, 6, 3)
-            M.xform(e, scale=(0.009, 0.024, 0.007))
+            M.xform(e, scale=(0.011, 0.027, 0.008))
             M.xform(e, rot=(14, 0, sx * -26))
-            M.xform(e, loc=(sx * 0.047, -0.505, 0.633))
+            M.xform(e, loc=(sx * 0.058, -0.5, 0.645))
             a.add(e, "eye", bone="head", name="eye", shading="smooth")
-        # ears: big black jackal ears, raked back and splayed out so they break the outline from the game camera; the
-        # right one is torn off halfway
-        for sx, ln in ((1, 0.21), (-1, 0.115)):
-            base = Vector((sx * 0.05, -0.43, 0.662))
-            d = Vector((sx * 0.5, 0.62, 0.9)).normalized()
-            b = shard(base, d, ln, 0.05, flat=0.55, x_hint=(sx * 0.7, -0.7, 0.0), rot=0.0)
+        # ash cheek ruffs flaring back off the jaw corners: the skull reads broad from above
+        for sx in (1, -1):
+            d = Vector((sx * 0.85, 0.8, 0.05)).normalized()
+            a.add(shard((sx * 0.075, -0.45, 0.585), d, 0.085, 0.034, flat=0.4, x_hint=(d.y, -d.x, 0.0), rot=0.0),
+                  "hide", bone="head", name="cheek_ruff", shading="flat")
+        # ears: big black jackal ears (review fix: a broader base, set wider), raked back and splayed out so they
+        # break the outline from the game camera; the right one is torn off halfway
+        for sx, ln in ((1, 0.22), (-1, 0.125)):
+            base = Vector((sx * 0.072, -0.425, 0.672))
+            d = Vector((sx * 0.62, 0.6, 0.85)).normalized()
+            b = shard(base, d, ln, 0.066, flat=0.55, x_hint=(sx * 0.7, -0.7, 0.0), rot=0.0)
             if ln < 0.15:                               # the torn ear: a notched, blunt tip
                 tip = max(b.verts, key=lambda v: (v.co - base).length)
-                tip.co = base + d * ln + Vector((sx * 0.012, 0.0, 0.01))
+                tip.co = base + d * ln + Vector((sx * 0.014, 0.0, 0.012))
             a.add(b, "char", bone="head", name="ear_" + ("L" if sx > 0 else "R"), shading="flat")
         self.info["mouth"] = Vector((0.0, -0.55, 0.54))
         self.info["head_top"] = 0.75
 
     def mane(self, a):
-        """Char shards streaming back off the neck and withers (a wind-torn cinder mane), leaning right."""
-        stations = [(-0.37, 0.0, 0.13, 0.026), (-0.315, -0.022, 0.19, 0.032), (-0.255, 0.016, 0.23, 0.036),
-                    (-0.19, -0.028, 0.2, 0.034), (-0.13, 0.006, 0.13, 0.026)]
+        """A black char crest streaming back off the neck and withers (a wind-torn cinder mane, leaning right),
+        and (review fix) a broad ASH RUFF: flat blades flaring back and out off both shoulders, so the
+        forequarters read about 0.5 m wide from the game camera. The ruff is fuller on the right (the mane
+        leans right; the left flank is the burnt-open one)."""
+        stations = [(-0.37, 0.0, 0.14, 0.03), (-0.31, -0.024, 0.2, 0.036), (-0.245, 0.012, 0.22, 0.038),
+                    (-0.18, -0.026, 0.17, 0.034)]
         for y, x, ln, r in stations:
             z = fore_top(y)
             d = Vector((x * 4.0 - 0.18, 1.0, 0.62)).normalized()
             a.add(shard((x, y, z - 0.03), d, ln, r, flat=0.4, x_hint=(0, 0, 1), rot=self.rng.uniform(30, 60)), "char",
                   bone="body", name="mane", shading="flat")
+        # ruff blades: (y, profile x, profile z, direction (out, back, up), length, base radius)
+        blades = [(-0.335, 0.5, 0.86, (0.55, 1.0, 0.3), 0.16, 0.046), (-0.27, 0.8, 0.6, (0.72, 1.0, 0.12), 0.165, 0.05),
+                  (-0.2, 0.95, 0.25, (0.78, 1.0, -0.06), 0.13, 0.046)]
+        for sx, gain in ((1, 0.9), (-1, 1.1)):
+            for y, px, pz, (dx, dy, dz), ln, r in blades:
+                base = torso_pt(y, sx * px, pz, -0.02)
+                d = Vector((sx * dx, dy, dz)).normalized()
+                a.add(shard(base, d, ln * gain, r, flat=0.35, x_hint=(d.y, -d.x, 0.0), rot=0.0), "hide", bone="body",
+                      name="ruff", shading="flat")
 
     def legs(self, a):
         """Front legs (legs_a) nearly straight under the shoulders; hind legs (legs_b) in the hound's Z.
         Upper legs are ash hide, lower legs and paws char."""
         self.feet = {}
         for sx in (1, -1):
-            sh = Vector((sx * 0.09, -0.205, 0.46))
-            el = Vector((sx * 0.088, -0.155, 0.285))
-            wr = Vector((sx * 0.083, -0.19, 0.085))
-            pw = Vector((sx * 0.083, -0.228, 0.03))
-            a.add(M.tube([sh, el], [0.052, 0.034], sides=6), "hide", bone="legs_a", name="upperarm", shading="auto")
-            a.add(M.tube([el + Vector((0, 0.004, 0.02)), wr, pw], [0.034, 0.024, 0.019], sides=5), "char", bone="legs_a",
+            # review fix: the front legs hang from the wider shoulders, heavier in the upper arm
+            sh = Vector((sx * 0.15, -0.205, 0.47))
+            el = Vector((sx * 0.14, -0.155, 0.285))
+            wr = Vector((sx * 0.118, -0.19, 0.085))
+            pw = Vector((sx * 0.118, -0.228, 0.03))
+            a.add(M.tube([sh, el], [0.066, 0.04], sides=6), "hide", bone="legs_a", name="upperarm", shading="auto")
+            a.add(M.tube([el + Vector((0, 0.004, 0.02)), wr, pw], [0.038, 0.026, 0.02], sides=5), "char", bone="legs_a",
                   name="forearm", shading="auto", sharp_angle=40.0)
             paw = M.sphere(1.0, 5, 3)
             M.xform(paw, loc=(pw.x, pw.y - 0.018, 0.02), scale=(0.028, 0.045, 0.02))
             a.add(paw, "char", bone="legs_a", name="paw_f", shading="flat")
             self.feet["F" + ("L" if sx > 0 else "R")] = pw
-            hp = Vector((sx * 0.082, 0.3, 0.45))
-            st = Vector((sx * 0.09, 0.215, 0.27))
-            hk = Vector((sx * 0.085, 0.37, 0.13))
-            pw = Vector((sx * 0.085, 0.345, 0.03))
-            a.add(M.tube([hp, st], [0.066, 0.038], sides=6), "hide", bone="legs_b", name="thigh", shading="auto")
+            hp = Vector((sx * 0.092, 0.3, 0.45))
+            st = Vector((sx * 0.102, 0.215, 0.27))
+            hk = Vector((sx * 0.095, 0.37, 0.13))
+            pw = Vector((sx * 0.095, 0.345, 0.03))
+            a.add(M.tube([hp, st], [0.07, 0.04], sides=6), "hide", bone="legs_b", name="thigh", shading="auto")
             a.add(M.tube([st + Vector((0, 0.005, 0.015)), hk, pw], [0.038, 0.025, 0.02], sides=5), "char", bone="legs_b",
                   name="shin", shading="auto", sharp_angle=40.0)
             a.add(shard(hk + Vector((0, 0.01, 0.0)), (0, 1.0, 0.35), 0.05, 0.014, flat=0.6), "char", bone="legs_b",
@@ -432,10 +458,16 @@ class Build:
                            gradient={"axis": (0, 0, 1), "range": (0.46, 0.34), "color": "shadow", "amount": 0.3}),
             "char": P.zone(base=CHAR, shadow="#0B0808", light=CHAR_LIGHT, planes=0.14, parts=0.06, brush=0.06,
                            brush_freq=5.0, edge=0.95, edge_width=0.007, edge_breakup=0.35, cavity=0.6, ao=0.5),
+            # the one rib bar: black, its edges only warm-lit by the core (no glowing strokes: one dark bar)
             "rib": P.zone(base=RIB_BASE, shadow="#100909", light=RIB_LIGHT, planes=0.12, parts=0.08, brush=0.05,
-                          edge=1.0, edge_width=0.008, edge_breakup=0.25, cavity=0.5, ao=0.3),
+                          edge=0.6, edge_width=0.007, edge_breakup=0.3, cavity=0.5, ao=0.3),
+            # the window glow: one small cooled-hot spot on the back, hot orange over most of the window, deepening
+            # to the rim red down the burnt left flank; a darker painted base under it keeps the glow saturated
+            # (a pale base under a big glow washes it to a pale lantern at 1x)
             "ember": P.faction_zone("unmade", "molten", glow=True,
-                                    emit=dict(EMBER, mode="radial", center=tuple(CORE), radius=0.16, base_mix=0.25)),
+                                    emit=dict(EMBER, mode="radial", center=tuple(EMBER_C), radius=0.2, base_mix=0.0,
+                                              stops=[(0.0, EMBER["core"], "#E07A34"), (0.3, EMBER["hot"], "#C4501A"),
+                                                     (0.7, EMBER["hot"], "#B0400F"), (1.0, EMBER["color"], "#7A1E05")])),
             "maw": P.faction_zone("unmade", "ichor", glow=True,
                                   emit=dict(TEAL, mode="radial", center=tuple(self.info["mouth"]), radius=0.12,
                                             base_mix=0.2)),
@@ -474,8 +506,10 @@ class Build:
 #     brushy boundary; side planes part of the way. The lift skips texels that are already light (edge strokes);
 #   * BURNT FROM THE GROUND UP: below a ragged line at about BURN_Z the hide chars to black (the lower chest, the
 #     elbows and stifles), with a smouldering rust band on the line - the hound runs through cinders;
-#   * EMBER-LINED RIBS: both outer long edges of every rib carry a broken, glowing ember stroke (the brief's
-#     signature), measured to the rib's own edge lines, so no glow runs across a rib at its segment joints.
+#   * THE BURNT WINDOW RIM (review fix; it replaces the ember strokes on the edges of four ribs, which read as a
+#     barcode at 1x): the hide around the chest window chars in a thin brushy band (about 12 mm), with one
+#     broken ember line on the very edge. Pale hide -> black rim -> hot core: one framed hot shape, measured to
+#     the window's own boundary edges (Build.window_edges).
 BURN_Z = 0.35
 
 
@@ -488,7 +522,7 @@ def _polyline_samples(lines, spacing=0.002):
     return out
 
 
-def extra_passes(maps, zones_order, base, emis, rib_edges, seed=0):
+def extra_passes(maps, zones_order, base, emis, window_edges, seed=0):
     import numpy as np
     Z, pos, tn = maps["zone"], maps["pos"], maps["tnrm"]
     if "hide" in zones_order:
@@ -508,13 +542,17 @@ def extra_passes(maps, zones_order, base, emis, rib_edges, seed=0):
         c = P.mix(c, P.hex3(SMOULDER), line * 0.8)
         emis[m] = np.maximum(emis[m], P.hex3("#3A1206")[None, :] * line[:, None])
         base[m] = c
-    if "rib" in zones_order and rib_edges:
-        m = Z == zones_order.index("rib")
+    idx = [zones_order.index(z) for z in ("hide", "char") if z in zones_order]
+    if idx and window_edges:
+        m = np.isin(Z, idx)
         p = pos[m]
-        d = P._kd_dist(_polyline_samples(rib_edges), p, 0.03)
-        dabs = P.spread01(P.fbm(p, 12.0, 2, seed=seed + 503))
-        k = P.smoothstep(0.0062, 0.0026, d) * P.smoothstep(0.2, 0.36, dabs)
-        base[m] = P.mix(base[m], P.hex3(EMBER["hot"]), k * 0.5)
+        d = P._kd_dist(_polyline_samples(window_edges), p, 0.05)
+        br = P.spread01(P.fbm(p, 14.0, 2, seed=seed + 503))
+        rim = P.smoothstep(0.017, 0.009, d + (br - 0.5) * 0.01)
+        base[m] = P.mix(base[m], P.hex3(CHAR), rim * 0.7)
+        dabs = P.spread01(P.fbm(p, 9.0, 2, seed=seed + 504))
+        k = P.smoothstep(0.0075, 0.0035, d) * P.smoothstep(0.22, 0.34, dabs)
+        base[m] = P.mix(base[m], P.hex3(EMBER["hot"]), k * 0.6)
         glow = P.mix(np.repeat(P.hex3(EMBER["color"])[None], len(p), 0), P.hex3(EMBER["hot"]), P.smoothstep(0.5, 1.0, k))
         emis[m] = np.maximum(emis[m], glow * k[:, None])
     return base, emis
@@ -541,14 +579,14 @@ def apply_decals(maps, zones_order, base, emis, decals):
 
 
 @contextmanager
-def painter_passes(rib_edges):
+def painter_passes(window_edges):
     """Within the block, gfa_paint.paint also runs extra_passes() (between the zones and the decals)."""
     import numpy as np
     orig = P.paint
 
     def paint(maps, zones_order, recipes_, dist_convex, dist_concave, decals=(), seed=0):
         base, emis = orig(maps, zones_order, recipes_, dist_convex, dist_concave, (), seed)
-        base, emis = extra_passes(maps, zones_order, base, emis, rib_edges, seed)
+        base, emis = extra_passes(maps, zones_order, base, emis, window_edges, seed)
         base, emis = apply_decals(maps, zones_order, base, emis, decals)
         return np.clip(base, 0, 1), np.clip(emis, 0, 1)
 
@@ -611,7 +649,7 @@ def preview(mesh, work):
     fl = B._floor(scene)
     fm = fl.data.materials[0]
     fm.diffuse_color = C.hex_linear(R.FLOOR)
-    for yaw, tag in ((-35.0, "face"), (145.0, "away"), (90.0, "side")):
+    for yaw, tag in ((-35.0, "face"), (145.0, "away"), (90.0, "side"), (0.0, "head"), (180.0, "tail")):
         mesh.rotation_euler = (0, 0, math.radians(yaw))
         bpy.context.view_layer.update()
         ppm = SPEC.SCREEN_H / SPEC.GAME_VIEW_HEIGHTS[0]
@@ -724,14 +762,14 @@ def make_clips(arm):
     settle = F(counter({"body": {"rot": (3, 3, -3)}, "head": {"rot": (-6, 4, 0)}, "tail": {"rot": (2, -3, 0)}}))
     jolt = F({"root": {"loc": (0, 0.02, 0)}, "body": {"rot": (-16, 0, 6)}, "head": {"rot": (-32, 0, 0)},
               "legs_a": {"rot": (-10, 0, 0)}, "legs_b": {"rot": (8, 0, 0)}, "tail": {"rot": (6, 0, 0)}})
-    stumble = F({"root": {"loc": (0, -0.12, 0.12)}, "body": {"rot": (22, 0, 26)}, "head": {"rot": (-12, 10, 0)},
+    stumble = F({"root": {"loc": (0, -0.08, 0.12)}, "body": {"rot": (22, 0, 26)}, "head": {"rot": (-12, 10, 0)},
                  "legs_a": {"rot": (38, 0, -8)}, "legs_b": {"rot": (-12, 0, 6)}, "tail": {"rot": (-10, 0, 0)}})
-    side = F({"root": {"loc": (0, -0.265, 0.15)}, "body": {"rot": (6, 0, 84)}, "head": {"rot": (-14, 0, -18)},
+    side = F({"root": {"loc": (0, -0.145, 0.15)}, "body": {"rot": (6, 0, 84)}, "head": {"rot": (-14, 0, -18)},
               "legs_a": {"rot": (-28, 0, 16)}, "legs_b": {"rot": (22, 0, 12)}, "tail": {"rot": (4, 12, 0)}})
-    crumble = F({"root": {"loc": (0, -0.3, 0.15)}, "body": {"rot": (6, 0, 88), "scale": 0.6},
+    crumble = F({"root": {"loc": (0, -0.19, 0.15)}, "body": {"rot": (6, 0, 88), "scale": 0.6},
                  "head": {"rot": (-10, 0, -22), "scale": 0.6}, "legs_a": {"rot": (-30, 0, 18), "scale": 0.45},
                  "legs_b": {"rot": (24, 0, 14), "scale": 0.45}, "tail": {"rot": (4, 14, 0), "scale": 0.55}})
-    gone = F({"root": {"loc": (0, -0.34, 0.15)}, "body": {"rot": (6, 0, 88), "scale": 0.02},
+    gone = F({"root": {"loc": (0, -0.24, 0.15)}, "body": {"rot": (6, 0, 88), "scale": 0.02},
               "head": {"rot": (-10, 0, -22), "scale": 0.02}, "legs_a": {"rot": (-30, 0, 18), "scale": 0.02},
               "legs_b": {"rot": (24, 0, 14), "scale": 0.02}, "tail": {"rot": (4, 14, 0), "scale": 0.02}})
     RIG.cycle_clip(arm, KEY, "idle@loop", mo["idle_frames"], idle)
@@ -867,7 +905,7 @@ def beauty(arm, mesh, reports):
             out.append(R.render(scene, os.path.join(reports, "..", "work", "%s_34_%s.png" % (KEY, tag)), 760, 560))
     RIG.unmute_none(arm)
     scene.frame_set(0)
-    layout = {"title": "Ashrunner - ember-lined ribs, teal maw", "subtitle": "gallop (extended suspension) | wind-up "
+    layout = {"title": "Ashrunner - burnt-open chest, teal maw", "subtitle": "gallop (extended suspension) | wind-up "
               "(the skull tips back off the teal jaw: the bite telegraph)", "width": 1600,
               "sections": [{"label": "3/4 front, toon preview of the final textures", "height": 560,
                             "images": [{"path": out[0], "label": "move@loop f0"}, {"path": out[1], "label": "windup f15"}]}]}
@@ -886,7 +924,8 @@ def review(arm, mesh, rep, reports, work, tex, notes):
     strips = clip_strips(arm, mesh, work)
     ing = []
     for label, yaw, pose in (("facing the camera, rest", -35.0, None), ("running across, gallop f2", 90.0, 2),
-                             ("running away, gallop f7", 150.0, 7)):
+                             ("running away, gallop f7", 150.0, 7), ("head-on (the hunting approach), gallop f2", 0.0, 2),
+                             ("tail-on, gallop f7", 180.0, 7)):
         arm.rotation_euler = (0.0, 0.0, math.radians(yaw))
         if pose is not None:
             RIG.pose_at(arm, RIG.clip_name(KEY, "move@loop"), pose)
@@ -910,7 +949,7 @@ def review(arm, mesh, rep, reports, work, tex, notes):
     ppm = SPEC.SCREEN_H / SPEC.GAME_VIEW_HEIGHTS[0]
     layout = {
         "title": "Ashrunner - the ash hound  (ashrunner.glb)",
-        "subtitle": "Swarm Hound | The Unmade | Cinder Wastes | verb SPRINT | GF_Swarm_v1 | ember-lined ribs, teal maw",
+        "subtitle": "Swarm Hound | The Unmade | Cinder Wastes | verb SPRINT | GF_Swarm_v1 | burnt-open chest, teal maw",
         "width": 1600,
         "sections": [
             {"label": "Turnaround (rest pose) - toon preview of the final textures (engine-like ramp, rim, ink; emissive x1.6)",
@@ -955,7 +994,7 @@ def main():
     tex_dir = os.path.join(pack, "textures")
     reports = C.ensure_dir(os.path.join(pack, "reports"))
     P.unwrap = weighted_unwrap(P.unwrap)
-    with painter_passes(b.rib_edges):
+    with painter_passes(b.window_edges):
         paint_rep = P.paint_asset(mesh, KEY, b.recipes(), tex_dir, size=size, decals=b.decals(), ao_distance=0.04,
                                   ao_samples=16, edge_min_angle=24.0, margin_px=3, uv_angle=66.0, seed=SEED)
     arm = RIG.build_swarm_rig(b.pivots(), col=col)
