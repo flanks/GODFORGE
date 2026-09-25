@@ -352,6 +352,8 @@ bitflags_lite! {
         const CHARGING = 256;
         const PINGED = 512;
         const PRIMED = 1024;
+        /// Player-side effect (ally telegraphs, player hazards): drawn gold, never red.
+        const ALLY = 2048;
     }
 }
 

@@ -177,4 +177,862 @@
     ],
     codex: "Nyctia keeps accounts. You are overdrawn.",
   ),
+  (
+    key: "conductors_requiem",
+    name: "Conductor\'s Requiem",
+    phase: EA,
+    ingredients: [
+      Part("tempestcore"),
+      Part("mech_arc_relay"),
+      Part("relic_stormcatcher"),
+    ],
+    bonus: [
+      Chain(jumps: 1, range: 4.0, falloff: 0.7),
+      ApplyStatus(status: Shock, chance: 0.1, stacks: 1, duration: 2.0),
+    ],
+    codex: "The sky conducts, the horde performs, and nobody survives to applaud.",
+  ),
+  (
+    key: "the_crowded_grave",
+    name: "The Crowded Grave",
+    phase: EA,
+    ingredients: [
+      Part("voidcore"),
+      Part("mech_sundering_payload"),
+      Part("relic_pyre_lung"),
+    ],
+    bonus: [
+      Area(1.2),
+      Damage(1.1),
+    ],
+    codex: "Pull them close, bury them together. It saves on shovels.",
+  ),
+  (
+    key: "compound_interest",
+    name: "Compound Interest",
+    phase: EA,
+    ingredients: [
+      Chassis("coinshooter"),
+      Part("gildcore"),
+      Part("relic_greedstone"),
+    ],
+    bonus: [
+      Ricochet(bounces: 1, range: 6.0),
+      ShardsOnKill(chance: 0.02),
+    ],
+    codex: "Every coin comes back, and it brings friends.",
+  ),
+  (
+    key: "writ_of_execution",
+    name: "Writ of Execution",
+    phase: EA,
+    ingredients: [
+      Chassis("seraph_lance"),
+      Part("dawncore"),
+      Part("relic_scale_of_judgement"),
+    ],
+    bonus: [
+      DamageVsStatus(status: Mark, mult: 1.15),
+      ApplyStatus(status: Mark, chance: 0.1, stacks: 1, duration: 4.0),
+    ],
+    codex: "Signed in light, sealed in gold, served at the speed of law.",
+  ),
+  (
+    key: "gaiaas_gallows",
+    name: "Gaiaa\'s Gallows",
+    phase: EA,
+    ingredients: [
+      Part("cairncore"),
+      Part("mech_impaler"),
+      Part("relic_pinning_stake"),
+    ],
+    bonus: [
+      ApplyStatus(status: Root, chance: 0.1, stacks: 1, duration: 1.5),
+      Damage(1.08),
+    ],
+    codex: "The earth holds them still so that you can be thorough.",
+  ),
+  (
+    key: "one_shot_one_grave",
+    name: "One Shot, One Grave",
+    phase: EA,
+    ingredients: [
+      Chassis("longstrider_rail"),
+      Part("mech_deep_draw"),
+      Part("sigil_patient_death"),
+    ],
+    bonus: [
+      DamageVsFullHp(1.2),
+      Pierce(2),
+    ],
+    codex: "Ossian only ever needed one shot. The rest were for the audience.",
+  ),
+  (
+    key: "the_godsbane_oath",
+    name: "The Godsbane Oath",
+    phase: EA,
+    ingredients: [
+      Chassis("godsbane_rifle"),
+      Part("mech_railspike"),
+      Part("relic_titanbreaker_wedge"),
+    ],
+    bonus: [
+      Pierce(1),
+      DamageVsElites(1.15),
+    ],
+    codex: "It killed a god once. It would very much like to do it again.",
+  ),
+  (
+    key: "whip_of_the_heavens",
+    name: "Whip of the Heavens",
+    phase: EA,
+    ingredients: [
+      Chassis("stormlash"),
+      Part("stormcore"),
+      Part("mech_arc_relay"),
+    ],
+    bonus: [
+      Chain(jumps: 1, range: 4.0, falloff: 0.6),
+      FireRate(1.05),
+    ],
+    codex: "Selene cracked it once. The horde is still flinching.",
+  ),
+  (
+    key: "nyctias_wager",
+    name: "Nyctia\'s Wager",
+    phase: EA,
+    ingredients: [
+      Part("gloamcore"),
+      Part("relic_crooked_knucklebone"),
+      Part("sigil_loaded_dice"),
+    ],
+    bonus: [
+      CritDamage(0.3),
+      Pierce(1),
+    ],
+    codex: "Nyctia plays with crooked bones and loaded dice. So do you, and the house is losing.",
+  ),
+  (
+    key: "the_arsenal_wakes",
+    name: "The Arsenal Wakes",
+    phase: EA,
+    ingredients: [
+      Chassis("wraith_bow"),
+      Part("mech_quickdraw_string"),
+      Part("relic_sentry_seed"),
+    ],
+    bonus: [
+      CritChance(0.06),
+      ChargeTime(0.9),
+    ],
+    codex: "Every loosed arrow drafts another archer. Thessaly calls it recruitment.",
+  ),
+  (
+    key: "the_kiln_mouth",
+    name: "The Kiln Mouth",
+    phase: EA,
+    ingredients: [
+      Chassis("bellowfire_projector"),
+      Part("kilncore"),
+      Part("relic_ashen_covenant"),
+    ],
+    bonus: [
+      Area(1.15),
+      Damage(1.1),
+    ],
+    codex: "The forge exhales, and the floor becomes the forge.",
+  ),
+  (
+    key: "the_red_reaping",
+    name: "The Red Reaping",
+    phase: EA,
+    ingredients: [
+      Part("barbcore"),
+      Part("mech_razor_halo"),
+      Part("relic_salt_the_wound"),
+    ],
+    bonus: [
+      Lifesteal(0.02),
+      ApplyStatus(status: Bleed, chance: 0.1, stacks: 1, duration: 3.0),
+    ],
+    codex: "Gaiaa\'s blood-law: what you spill, you keep.",
+  ),
+  (
+    key: "pyras_fireworks",
+    name: "Pyra\'s Fireworks",
+    phase: EA,
+    ingredients: [
+      Element(Flame),
+      Part("mech_sundering_payload"),
+      Part("relic_gyrestone"),
+    ],
+    bonus: [
+      Area(1.1),
+      ApplyStatus(status: Burn, chance: 0.2, stacks: 1, duration: 3.0),
+    ],
+    codex: "Pyra loved a celebration, especially somebody else\'s funeral.",
+  ),
+  (
+    key: "the_thundering_heads",
+    name: "The Thundering Heads",
+    phase: EA,
+    ingredients: [
+      Element(Storm),
+      Part("mech_hydra_volley"),
+      Part("relic_stormglass_phial"),
+    ],
+    bonus: [
+      ApplyStatus(status: Shock, chance: 0.1, stacks: 1, duration: 2.0),
+      Damage(1.05),
+    ],
+    codex: "Three more heads, one storm, and a horde with nowhere left to run.",
+  ),
+  (
+    key: "the_final_hour",
+    name: "The Final Hour",
+    phase: EA,
+    ingredients: [
+      Chassis("pendulum_repeater"),
+      Part("mech_resounding_vault"),
+      Part("relic_epitaph_engine"),
+    ],
+    bonus: [
+      Doomstack(stacks: 12, burst: 1.5),
+      FireRate(1.05),
+    ],
+    codex: "Tick. Tick. Tick. Tick. Tick. Tick. Tick. Tick. Tick. Tick. Tick. Boom.",
+  ),
+  (
+    key: "the_long_mercy",
+    name: "The Long Mercy",
+    phase: EA,
+    ingredients: [
+      Part("ironcore"),
+      Part("mech_railspike"),
+      Part("relic_misericorde"),
+    ],
+    bonus: [
+      Pierce(1),
+      Damage(1.08),
+    ],
+    codex: "Mercy is a long blade and a short queue.",
+  ),
+  (
+    key: "the_anvil_waltz",
+    name: "The Anvil Waltz",
+    phase: EA,
+    ingredients: [
+      Chassis("anvil_gauntlets"),
+      Part("mech_whirling_anvils"),
+    ],
+    bonus: [
+      Knockback(1.3),
+      DamageTaken(0.92),
+    ],
+    codex: "Brax learned to dance. The floor did not survive the lesson.",
+  ),
+  (
+    key: "the_seraphic_schism",
+    name: "The Seraphic Schism",
+    phase: EA,
+    ingredients: [
+      Part("halocore"),
+      Part("mech_cleaving_fork"),
+    ],
+    bonus: [
+      Homing(turn_rate: 60.0),
+      Damage(1.1),
+    ],
+    codex: "The light finds you, then argues with itself over how many ways to end you.",
+  ),
+  (
+    key: "the_kindling_doctrine",
+    name: "The Kindling Doctrine",
+    phase: EA,
+    ingredients: [
+      Part("embercore"),
+      Part("relic_ashen_covenant"),
+    ],
+    bonus: [
+      ApplyStatus(status: Burn, chance: 0.15, stacks: 1, duration: 3.0),
+      Damage(1.05),
+    ],
+    codex: "Pyra\'s first law: what burns, burns more. Her second law is the first law, louder.",
+  ),
+  (
+    key: "litany_of_lightning",
+    name: "Litany of Lightning",
+    phase: EA,
+    ingredients: [
+      Part("stormcore"),
+      Part("mech_ricochet_rosary"),
+    ],
+    bonus: [
+      Chain(jumps: 1, range: 4.5, falloff: 0.65),
+      Damage(1.05),
+    ],
+    codex: "Every bounce a verse, every arc an amen. The congregation does not stay for the sermon.",
+  ),
+  (
+    key: "hound9s_litter",
+    name: "Hound-9\'s Litter",
+    phase: EA,
+    ingredients: [
+      Chassis("serpent_smg"),
+      Part("relic_hound9_spares"),
+    ],
+    bonus: [
+      CritChance(0.05),
+      FireRate(1.05),
+    ],
+    codex: "Hound-9 insists they are not puppies. They are absolutely puppies, and every one is armed.",
+  ),
+  (
+    key: "the_tolling_hour",
+    name: "The Tolling Hour",
+    phase: EA,
+    ingredients: [
+      Part("mech_gatling_hymn"),
+      Part("relic_funeral_bell"),
+    ],
+    bonus: [
+      Doomstack(stacks: 5, burst: 0.6),
+      FireRate(1.05),
+    ],
+    codex: "Five hits, one funeral. Do the arithmetic, then start digging.",
+  ),
+  (
+    key: "one_foot_in_the_pyre",
+    name: "One Foot in the Pyre",
+    phase: EA,
+    ingredients: [
+      Part("mech_heavy_hand"),
+      Part("relic_brink_coin"),
+    ],
+    bonus: [
+      Lifesteal(0.02),
+      DamageWhileLowHp(threshold: 0.3, mult: 1.15),
+    ],
+    codex: "Umbra-Rex\'s favourite stance: one foot in the grave, the other on the horde\'s neck.",
+  ),
+  (
+    key: "the_smiting_line",
+    name: "The Smiting Line",
+    phase: EA,
+    ingredients: [
+      Part("dawncore"),
+      Part("mech_needle_ray"),
+    ],
+    bonus: [
+      CritChance(0.06),
+      CritDamage(0.2),
+    ],
+    codex: "Seraphel never raised her voice. She raised a line of light, and the line was final.",
+  ),
+  (
+    key: "murmuration_of_murrain",
+    name: "Murmuration of Murrain",
+    phase: EA,
+    ingredients: [
+      Part("blightcore"),
+      Part("mech_seeker_swarm"),
+    ],
+    bonus: [
+      Chain(jumps: 1, range: 3.0, falloff: 0.55),
+      Damage(1.05),
+    ],
+    codex: "A flock of sickness. It knows where the horde lives.",
+  ),
+  (
+    key: "morwenns_undertow",
+    name: "Morwenn\'s Undertow",
+    phase: EA,
+    ingredients: [
+      Part("miasmacore"),
+      Part("relic_razorwake"),
+    ],
+    bonus: [
+      Trail(duration: 1.5, dps: 0.1, slow: 0.1),
+      Damage(1.05),
+    ],
+    codex: "Behind every shot runs a sick tide. Morwenn calls it the scenic route.",
+  ),
+  (
+    key: "quagmire_liturgy",
+    name: "Quagmire Liturgy",
+    phase: EA,
+    ingredients: [
+      Chassis("gravemaw_mortar"),
+      Part("relic_tarpit_heart"),
+    ],
+    bonus: [
+      Area(1.2),
+      Damage(1.05),
+    ],
+    codex: "Gravemaw spits, the ground swallows, and the horde learns to stand still forever.",
+  ),
+  (
+    key: "the_bleeding_halo",
+    name: "The Bleeding Halo",
+    phase: EA,
+    ingredients: [
+      Part("mech_razor_halo"),
+      Part("relic_bloodletter"),
+    ],
+    bonus: [
+      ApplyStatus(status: Bleed, chance: 0.1, stacks: 1, duration: 3.0),
+      MoveSpeed(1.05),
+    ],
+    codex: "Stand still and they circle. Run and they circle faster. Someone is bleeding, and it is not you.",
+  ),
+  (
+    key: "the_unending_refrain",
+    name: "The Unending Refrain",
+    phase: EA,
+    ingredients: [
+      Part("mech_resounding_vault"),
+      Part("sigil_cadence"),
+    ],
+    bonus: [
+      FireRate(1.1),
+      Damage(1.05),
+    ],
+    codex: "You fire once. The Forge keeps singing it back.",
+  ),
+  (
+    key: "clockwork_heresy",
+    name: "Clockwork Heresy",
+    phase: EA,
+    ingredients: [
+      Chassis("pendulum_repeater"),
+      Part("sigil_second_hand"),
+    ],
+    bonus: [
+      FireRate(1.1),
+      CooldownRate(1.1),
+    ],
+    codex: "Epoch wound a dead god\'s clock backwards to see what would happen. This happened.",
+  ),
+  (
+    key: "accounts_receivable",
+    name: "Accounts Receivable",
+    phase: EA,
+    ingredients: [
+      Part("hexcore"),
+      Part("relic_ledger_of_sins"),
+    ],
+    bonus: [
+      ApplyStatus(status: Curse, chance: 0.1, stacks: 1, duration: 4.0),
+      Damage(1.05),
+    ],
+    codex: "Every curse is a line item, and Thessaly always collects.",
+  ),
+  (
+    key: "rose_of_cinders",
+    name: "Rose of Cinders",
+    phase: EA,
+    ingredients: [
+      Part("mech_compass_rose"),
+      Part("relic_pyre_lung"),
+    ],
+    bonus: [
+      ExplodeOnKill(chance: 0.1, radius: 1.5, damage: 0.3),
+      Area(1.1),
+    ],
+    codex: "Round and round the firework goes. Where it stops, nobody is left to say.",
+  ),
+  (
+    key: "the_shrapnel_gospel",
+    name: "The Shrapnel Gospel",
+    phase: EA,
+    ingredients: [
+      Part("shrapnelcore"),
+      Part("mech_scatterburst"),
+    ],
+    bonus: [
+      Fork(count: 1, angle: 50.0, damage: 0.3),
+      Damage(1.05),
+    ],
+    codex: "Five pellets, twenty fragments, one very brief sermon.",
+  ),
+  (
+    key: "foundry_rain",
+    name: "Foundry Rain",
+    phase: EA,
+    ingredients: [
+      Chassis("gravemaw_mortar"),
+      Part("slagcore"),
+    ],
+    bonus: [
+      Area(1.15),
+      Knockback(1.2),
+    ],
+    codex: "The Slag King fell, and it has been raining him ever since.",
+  ),
+  (
+    key: "the_blightburn_accord",
+    name: "The Blightburn Accord",
+    phase: EA,
+    ingredients: [
+      Part("plaguecore"),
+      Part("relic_coal_tongue_brand"),
+    ],
+    bonus: [
+      Puddle(radius: 1.0, duration: 1.5, dps: 0.1, status: Burn),
+      Damage(1.05),
+    ],
+    codex: "Rot and fire signed a treaty. The horde was not consulted.",
+  ),
+  (
+    key: "the_branching_sky",
+    name: "The Branching Sky",
+    phase: EA,
+    ingredients: [
+      Part("squallcore"),
+      Part("mech_tuning_fork"),
+    ],
+    bonus: [
+      Fork(count: 1, angle: 45.0, damage: 0.5),
+      ProjectileSpeed(1.1),
+    ],
+    codex: "Lightning never strikes the same place twice. It prefers five places at once.",
+  ),
+  (
+    key: "the_drowning_dark",
+    name: "The Drowning Dark",
+    phase: EA,
+    ingredients: [
+      Chassis("tidecaller_harpoon"),
+      Part("voidcore"),
+    ],
+    bonus: [
+      Area(1.15),
+      Damage(1.1),
+    ],
+    codex: "The harpoon pulls them in, the well keeps them, and the sea keeps everything.",
+  ),
+  (
+    key: "the_turning_spheres",
+    name: "The Turning Spheres",
+    phase: EA,
+    ingredients: [
+      Chassis("orrery_discs"),
+      Part("mech_ricochet_rosary"),
+    ],
+    bonus: [
+      Ricochet(bounces: 1, range: 6.0),
+      Damage(1.05),
+    ],
+    codex: "The planets never stop. Neither do the discs. Neither, briefly, does the screaming.",
+  ),
+  (
+    key: "the_mountains_bloom",
+    name: "The Mountain\'s Bloom",
+    phase: EA,
+    ingredients: [
+      Chassis("colossus_cannon"),
+      Part("mech_compass_rose"),
+    ],
+    bonus: [
+      Area(1.1),
+      Knockback(1.2),
+    ],
+    codex: "Valdris stood in the middle of the horde and simply went off.",
+  ),
+  (
+    key: "the_unbroken_anvil",
+    name: "The Unbroken Anvil",
+    phase: EA,
+    ingredients: [
+      Part("relic_anvil_plate"),
+      Part("sigil_anvilheart"),
+    ],
+    bonus: [
+      MaxShield(20.0),
+      Knockback(1.2),
+    ],
+    codex: "Valdris has been hit by gods. He describes it as a firm handshake.",
+  ),
+  (
+    key: "the_cinder_stampede",
+    name: "The Cinder Stampede",
+    phase: EA,
+    ingredients: [
+      Part("relic_cindertread"),
+      Part("sigil_ghostlight"),
+    ],
+    bonus: [
+      DashRecharge(0.85),
+      MoveSpeed(1.05),
+    ],
+    codex: "Kael dashes to survive. You dash because the floor catches fire and it is funny.",
+  ),
+  (
+    key: "the_wandering_wicks",
+    name: "The Wandering Wicks",
+    phase: EA,
+    ingredients: [
+      Part("wickcore"),
+      Part("mech_carrion_drift"),
+    ],
+    bonus: [
+      Trail(duration: 1.0, dps: 0.1, slow: 0.0),
+      Range(1.1),
+    ],
+    codex: "They drift and they circle, setting the whole field alight in search of someone to hug.",
+  ),
+  (
+    key: "heavens_battery",
+    name: "Heaven\'s Battery",
+    phase: P1,
+    ingredients: [
+      Chassis("thundercoil_launcher"),
+      Part("tempestcore"),
+    ],
+    bonus: [
+      ApplyStatus(status: Shock, chance: 0.1, stacks: 1, duration: 2.0),
+      UltCharge(1.1),
+    ],
+    codex: "Selene stores lightning in the horde and withdraws it with interest.",
+  ),
+  (
+    key: "orbit_of_the_unmade",
+    name: "Orbit of the Unmade",
+    phase: EA,
+    ingredients: [
+      Element(Void),
+      Part("mech_razor_halo"),
+    ],
+    bonus: [
+      Orbit(count: 1, radius: 1.5, speed: 1.3, damage: 0.35),
+      CritChance(0.04),
+    ],
+    codex: "A ring of little voids around you. They are not hungry. They are starving.",
+  ),
+  (
+    key: "morwenns_breath",
+    name: "Morwenn\'s Breath",
+    phase: EA,
+    ingredients: [
+      Element(Plague),
+      Part("mech_titans_exhale"),
+    ],
+    bonus: [
+      Puddle(radius: 1.2, duration: 2.0, dps: 0.1, status: None),
+      Damage(1.05),
+    ],
+    codex: "The sea-goddess sighed once and a coastline died. Your breath is smaller. Slightly.",
+  ),
+  (
+    key: "the_gilded_bastion",
+    name: "The Gilded Bastion",
+    phase: P1,
+    ingredients: [
+      Element(Radiant),
+      Part("relic_gilded_aegis"),
+    ],
+    bonus: [
+      MaxShield(20.0),
+      Damage(1.05),
+    ],
+    codex: "Seraphel\'s law protects the faithful. The faithful are, in this case, heavily armed.",
+  ),
+  (
+    key: "the_law_of_large_numbers",
+    name: "The Law of Large Numbers",
+    phase: EA,
+    ingredients: [
+      Part("mech_scatterburst"),
+      Part("relic_dying_star"),
+    ],
+    bonus: [
+      ExplodeOnKill(chance: 0.05, radius: 3.0, damage: 0.3),
+      Damage(1.05),
+    ],
+    codex: "Statistically, one of them was going to explode. Statistically, it was all of them.",
+  ),
+  (
+    key: "twice_cursed",
+    name: "Twice-Cursed",
+    phase: EA,
+    ingredients: [
+      Part("relic_hexnail"),
+      Part("sigil_hexlace"),
+    ],
+    bonus: [
+      DamageVsStatus(status: Curse, mult: 1.15),
+    ],
+    codex: "Thessaly signed the curse twice, just to be sure. The horde was sure.",
+  ),
+  (
+    key: "the_first_word",
+    name: "The First Word",
+    phase: EA,
+    ingredients: [
+      Chassis("sunspike_shotgun"),
+      Part("relic_opening_verse"),
+    ],
+    bonus: [
+      DamageVsFullHp(1.1),
+      Knockback(1.2),
+    ],
+    codex: "Seraphel calls it an introduction. The horde never gets to reply.",
+  ),
+  (
+    key: "double_or_nothing",
+    name: "Double or Nothing",
+    phase: EA,
+    ingredients: [
+      Chassis("coinshooter"),
+      Part("mech_twin_barrel"),
+    ],
+    bonus: [
+      CritChance(0.05),
+      Damage(1.05),
+    ],
+    codex: "Mirren never gambles. Mirren shoots twice and calls it insurance.",
+  ),
+  (
+    key: "the_narrow_sun",
+    name: "The Narrow Sun",
+    phase: EA,
+    ingredients: [
+      Chassis("sunspike_shotgun"),
+      Part("mech_choke_bore"),
+    ],
+    bonus: [
+      Damage(1.1),
+      Knockback(1.3),
+    ],
+    codex: "Seven pellets, one hole, no survivors.",
+  ),
+  (
+    key: "the_crows_tithe",
+    name: "The Crows\' Tithe",
+    phase: EA,
+    ingredients: [
+      Part("mech_carrion_drift"),
+      Part("relic_reapers_tithe"),
+    ],
+    bonus: [
+      ShardsOnKill(chance: 0.02),
+      Homing(turn_rate: 30.0),
+    ],
+    codex: "The crows always take their share. Mirren is negotiating a commission.",
+  ),
+  (
+    key: "burning_the_candle",
+    name: "Burning the Candle",
+    phase: EA,
+    ingredients: [
+      Part("mech_overclock"),
+      Part("relic_ember_of_ruin"),
+    ],
+    bonus: [
+      FireRate(1.08),
+      Lifesteal(0.02),
+    ],
+    codex: "At both ends, then the middle, then the candlestick.",
+  ),
+  (
+    key: "the_titanfellers_draw",
+    name: "The Titanfeller\'s Draw",
+    phase: EA,
+    ingredients: [
+      Part("mech_deep_draw"),
+      Part("relic_headsmans_hood"),
+    ],
+    bonus: [
+      DamageVsElites(1.15),
+      CritChance(0.05),
+    ],
+    codex: "The Last Titan is very large. That is not a problem. That is a target.",
+  ),
+  (
+    key: "the_serpents_thirst",
+    name: "The Serpent\'s Thirst",
+    phase: EA,
+    ingredients: [
+      Chassis("serpent_smg"),
+      Part("relic_leech_crown"),
+    ],
+    bonus: [
+      Lifesteal(0.02),
+      DamageTaken(0.95),
+    ],
+    codex: "The serpent drinks one sip at a time. It never stops drinking.",
+  ),
+  (
+    key: "the_reddeath_reaction",
+    name: "The Reddeath Reaction",
+    phase: V1,
+    ingredients: [
+      Part("vitriolcore"),
+      Part("relic_reddeath_alembic"),
+    ],
+    bonus: [
+      Area(1.15),
+      ExplodeOnKill(chance: 0.1, radius: 2.0, damage: 0.3),
+    ],
+    codex: "Vex calls it chemistry. Everyone else calls it the reason the room is gone.",
+  ),
+  (
+    key: "the_pack_remembers",
+    name: "The Pack Remembers",
+    phase: V1,
+    ingredients: [
+      Chassis("huntmother_javelins"),
+      Part("mech_packhunt_volley"),
+      Part("relic_huntmothers_fang"),
+    ],
+    bonus: [
+      Homing(turn_rate: 40.0),
+      DamageVsElites(1.1),
+    ],
+    codex: "Fenra\'s pack does not hunt gods. It hunts what the gods were afraid of.",
+  ),
+  (
+    key: "the_last_chorus",
+    name: "The Last Chorus",
+    phase: V1,
+    ingredients: [
+      Chassis("chorus_harp"),
+      Part("mech_chorus_lattice"),
+      Part("relic_last_chorus_bell"),
+    ],
+    bonus: [
+      FireRate(1.1),
+      Damage(1.05),
+    ],
+    codex: "Lyra sings the final verse of a hymn no god lived to hear.",
+  ),
+  (
+    key: "chaos_theorem",
+    name: "Chaos Theorem",
+    phase: V1,
+    ingredients: [
+      Part("unmadecore"),
+      Part("mech_split_carom"),
+    ],
+    bonus: [
+      Fork(count: 1, angle: 90.0, damage: 0.4),
+      CritChance(0.05),
+    ],
+    codex: "It split, it bounced, it split again. The Unmaking took notes.",
+  ),
+  (
+    key: "the_heirs_verdict",
+    name: "The Heir\'s Verdict",
+    phase: V1,
+    ingredients: [
+      Chassis("dawnbreaker_carbine"),
+      Part("verdictcore"),
+      Part("relic_heirs_oath"),
+    ],
+    bonus: [
+      ApplyStatus(status: Mark, chance: 0.15, stacks: 1, duration: 4.0),
+      Damage(1.05),
+    ],
+    codex: "Seraph reads the charges. The carbine reads the sentence.",
+  ),
 ]

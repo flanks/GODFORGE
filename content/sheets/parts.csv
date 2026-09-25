@@ -48,3 +48,84 @@ sigil_loaded_dice,Sigil of Loaded Dice,Sigil,EA,aeon,1.0,sigil; crit,CritChance(
 sigil_borrowed_hour,Sigil of the Borrowed Hour,Sigil,EA,aeon,1.0,sigil; ability,CooldownRate(1.2),Time runs faster for you.
 sigil_slow_rot,Sigil of Slow Rot,Sigil,EA,aeon,1.0,sigil; trail,"Trail(duration: 2.0, dps: 0.2, slow: 0.3)",Your shots age the world they pass through.
 sigil_second_hand,Sigil of the Second Hand,Sigil,EA,aeon,1.0,sigil; echo,"EchoShot(every: 5, damage: 0.6)",Every 5th shot happens twice.
+shrapnelcore,Shrapnelcore,Core,EA,,1.0,kinetic; fork; shrapnel,"Element(Kinetic); Style(Pellet); Fork(count: 3, angle: 70.0, damage: 0.35); Damage(0.95)",On first hit every shot bursts into three shards of dead-god iron.
+barbcore,Barbcore,Core,EA,,1.0,kinetic; bleed,"Element(Kinetic); Style(Needle); ApplyStatus(status: Bleed, chance: 0.4, stacks: 1, duration: 4.0); Damage(0.9)",Barbed needles that catch and tear. Running only makes it worse.
+cairncore,Cairncore,Core,EA,,1.0,kinetic; root; heavy,"Element(Kinetic); Style(Boulder); ApplyStatus(status: Root, chance: 0.2, stacks: 1, duration: 1.5); Damage(1.2); FireRate(0.85)",Hurls grave-cairn stones that pin the living to the earth.
+slagcore,Slagcore,Core,EA,,1.0,flame; explode,"Element(Flame); Style(Boulder); Explode(radius: 1.6, damage: 0.55); ProjectileSpeed(0.8)",Molten slag that bursts where it lands. The Slag King's leftovers.
+kilncore,Kilncore,Core,EA,,1.0,flame; puddle; burn,"Element(Flame); Style(Globe); Puddle(radius: 1.6, duration: 3.0, dps: 0.3, status: Burn); ProjectileSpeed(0.85)",Globes of liquid forge-fire that pool and keep on burning.
+wickcore,Wickcore,Core,EA,,1.0,flame; trail,"Element(Flame); Style(Needle); Trail(duration: 3.0, dps: 0.3, slow: 0.0); Damage(0.9)",Every shot drags a burning fuse behind it. The floor remembers.
+tempestcore,Tempestcore,Core,P1,,1.0,storm; shock,"Element(Storm); Style(Bolt); ApplyStatus(status: Shock, chance: 0.4, stacks: 1, duration: 2.5); ProjectileSpeed(1.25)",Fast bolts that fill the damned with static until they burst.
+squallcore,Squallcore,Core,EA,,1.0,storm; fork,"Element(Storm); Style(Arc); Fork(count: 2, angle: 45.0, damage: 0.55); Knockback(1.3)",Lightning that splits the moment it finds flesh.
+hexcore,Hexcore,Core,EA,,1.0,void; curse,"Element(Void); Style(Needle); ApplyStatus(status: Curse, chance: 0.35, stacks: 1, duration: 4.0); Damage(0.9)",Hex-needles that make the damned more damnable.
+gloamcore,Gloamcore,Core,EA,,1.0,void; pierce; crit,Element(Void); Style(Blade); Pierce(2); CritChance(0.06); ProjectileSpeed(0.9),Dusk-blades that pass through the living as if they were already ghosts.
+blightcore,Blightcore,Core,EA,,1.0,plague; chain; contagion,"Element(Plague); Style(Globe); Chain(jumps: 3, range: 3.0, falloff: 0.5); ProjectileSpeed(0.9)",Sickness that leaps from body to body. Nobody is patient zero twice.
+miasmacore,Miasmacore,Core,EA,,1.0,plague; trail; slow,"Element(Plague); Style(Globe); Trail(duration: 3.0, dps: 0.2, slow: 0.3); Range(1.15)",Globes that weep a slowing fog behind them.
+gildcore,Gildcore,Core,EA,,1.0,radiant; ricochet; coin,"Element(Radiant); Style(Coin); Ricochet(bounces: 1, range: 6.0); CritChance(0.05)",Blessed gold. It always finds its way back into circulation.
+halocore,Halocore,Core,EA,,1.0,radiant; homing,Element(Radiant); Style(Orb); Homing(turn_rate: 120.0); Damage(0.95),Small haloes that go looking for the guilty.
+mech_twin_barrel,Twin Barrel,Mechanism,P1,,1.0,multishot,Projectiles(1); Spread(3.0); Damage(0.8),"A second barrel, welded on by a smith who hated waiting."
+mech_hydra_volley,Hydra Volley,Mechanism,EA,,1.0,multishot; spread,Projectiles(3); Spread(22.0); Damage(0.65); FireRate(0.9),Three more heads on every shot. Each one bites.
+mech_compass_rose,Compass Rose,Mechanism,EA,,0.9,multishot; spread; nova,Projectiles(4); Spread(180.0); Damage(0.6),"Every shot erupts in a full circle, pointing everywhere at once."
+mech_skipstone,Skipstone,Mechanism,EA,,1.0,ricochet; velocity,"Ricochet(bounces: 1, range: 5.0); ProjectileSpeed(1.25); FireRate(1.1)",Quick shots that skip once off the first thing they hit.
+mech_ricochet_rosary,Ricochet Rosary,Mechanism,EA,,0.8,ricochet,"Ricochet(bounces: 3, range: 6.0); Damage(0.7)","Three bounces per shot, a prayer bead for each."
+mech_seeker_swarm,Seeker Swarm,Mechanism,EA,,1.0,multishot; homing,Projectiles(2); Spread(40.0); Homing(turn_rate: 150.0); Damage(0.6),"Shots scatter wide, then turn and hunt."
+mech_carrion_drift,Carrion Drift,Mechanism,EA,,1.0,homing; range,Homing(turn_rate: 90.0); Range(1.5); ProjectileSpeed(0.7); Damage(1.1),Slow shots that circle like crows until they find meat.
+mech_railspike,Railspike,Mechanism,EA,,1.0,pierce; velocity,Pierce(2); ProjectileSpeed(1.8); Damage(1.15); FireRate(0.8),"Hypervelocity spikes. Slow to load, impossible to dodge."
+mech_impaler,Impaler,Mechanism,EA,,1.0,pierce,Pierce(4); Knockback(0.3); FireRate(0.85),"Skewers four in a row. Knockback all but vanishes, so the line holds still."
+mech_cleaving_fork,Cleaving Fork,Mechanism,EA,,1.0,fork,"Fork(count: 3, angle: 70.0, damage: 0.45); Damage(0.9)",On first hit the shot cleaves into three.
+mech_tuning_fork,Tuning Fork,Mechanism,EA,,1.0,fork; precise,"Fork(count: 2, angle: 15.0, damage: 0.75); ProjectileSpeed(1.15)",Two narrow tines ring on through the line at near-full strength.
+mech_arc_relay,Arc Relay,Mechanism,EA,,1.0,chain,"Chain(jumps: 2, range: 4.0, falloff: 0.6); Damage(0.9)",A conductor coil: every hit arcs on to two more.
+mech_needle_ray,Needle Ray,Mechanism,EA,,0.8,beam; range,Beam(width: 0.25); Damage(0.5); FireRate(1.6); Range(1.3),"Converts the weapon into a thin, far-reaching ray."
+mech_titans_exhale,Titan's Exhale,Mechanism,EA,,0.8,beam; close,Beam(width: 1.2); Damage(0.5); FireRate(1.5); Range(0.55),"Converts the weapon into a short, wide gout of force."
+mech_whirling_anvils,Whirling Anvils,Mechanism,EA,,0.9,orbit; heavy,"Orbit(count: 2, radius: 2.8, speed: 0.55, damage: 0.9); MoveSpeed(0.95)",Two anvils swing around you on chains of light. They are heavy. So are you.
+mech_razor_halo,Razor Halo,Mechanism,EA,,0.9,orbit,"Orbit(count: 5, radius: 1.5, speed: 1.3, damage: 0.35); FireRate(0.85)",Five razors spin tight around you. Hugging you is now a mistake.
+mech_gatling_hymn,Gatling Hymn,Mechanism,EA,,1.0,fire_rate; spread,FireRate(1.6); Damage(0.65); Spread(8.0),A hymn with one very fast verse.
+mech_heavy_hand,Heavy Hand,Mechanism,EA,,1.0,damage; knockback; area,FireRate(0.6); Damage(1.6); Knockback(1.6); Area(1.2),"Fewer shots. Each lands like a verdict, and every blast grows to match."
+mech_quickdraw_string,Quickdraw String,Mechanism,EA,,1.0,charge; fire_rate,ChargeTime(0.55); Damage(0.85); FireRate(1.1),Charge weapons draw in half the time. Everything else just shoots a little faster.
+mech_deep_draw,Deep Draw,Mechanism,EA,,1.0,charge; pierce,ChargeTime(1.3); Damage(1.45); FireRate(0.8); Pierce(1),Hold longer. Hit harder. Go through.
+mech_resounding_vault,Resounding Vault,Mechanism,EA,,1.0,echo,"EchoShot(every: 3, damage: 0.6); FireRate(0.95)",Every third shot rings out twice.
+mech_choke_bore,Choke Bore,Mechanism,EA,,1.0,precise; range,Spread(-12.0); Range(1.35); ProjectileSpeed(1.25); Damage(1.05),Tightens every spread and sends it further.
+mech_sundering_payload,Sundering Payload,Mechanism,EA,,1.0,explode,"Explode(radius: 1.8, damage: 0.6); ProjectileSpeed(0.8); FireRate(0.85)",Every shot carries a charge of godfire that bursts on impact.
+relic_coal_tongue_brand,Coal-Tongue Brand,Relic,EA,,1.0,burn,"ApplyStatus(status: Burn, chance: 0.2, stacks: 2, duration: 3.0)","Rarely catches. When it does, it catches twice."
+relic_stormglass_phial,Stormglass Phial,Relic,EA,,1.0,shock,"ApplyStatus(status: Shock, chance: 0.35, stacks: 1, duration: 2.5)",Bottled thunder. Hits build static that discharges in bursts.
+relic_hexnail,Hexnail,Relic,EA,,1.0,curse,"ApplyStatus(status: Curse, chance: 0.3, stacks: 1, duration: 4.0)",A coffin nail. Every hit drives the curse a little deeper.
+relic_rootbinders_knot,Rootbinder's Knot,Relic,EA,,1.0,root; knockback,"ApplyStatus(status: Root, chance: 0.15, stacks: 1, duration: 2.0); Knockback(0.6)",Hits can bind enemies to the ground. Knockback softens so they stay put.
+relic_quarry_brand,Quarry Brand,Relic,EA,,1.0,mark; crit,"ApplyStatus(status: Mark, chance: 0.35, stacks: 1, duration: 4.0); CritDamage(0.15)",Brands your quarry. Hits against the Marked find the weak point.
+relic_ashen_covenant,Ashen Covenant,Relic,EA,,1.0,burn; conditional,"DamageVsStatus(status: Burn, mult: 1.35)",+35% damage to burning enemies. Pyra keeps her promises.
+relic_stormcatcher,Stormcatcher,Relic,EA,,1.0,shock; conditional,"DamageVsStatus(status: Shock, mult: 1.35)",+35% damage to shocked enemies. The storm always knows where to go.
+relic_ledger_of_sins,Ledger of Sins,Relic,EA,,1.0,curse; conditional,"DamageVsStatus(status: Curse, mult: 1.3)",+30% damage to cursed enemies. Every sin is itemised.
+relic_pinning_stake,Pinning Stake,Relic,EA,,0.9,root; conditional,"DamageVsStatus(status: Root, mult: 1.5)","+50% damage to rooted enemies. Hold still, this will only hurt a lot."
+relic_salt_the_wound,Salt the Wound,Relic,EA,,1.0,bleed; conditional; lifesteal,"DamageVsStatus(status: Bleed, mult: 1.25); Lifesteal(0.02)","+25% damage to bleeding enemies, and a sip of whatever spills."
+relic_scale_of_judgement,Scale of Judgement,Relic,EA,,1.0,mark; conditional,"DamageVsStatus(status: Mark, mult: 1.35)",+35% damage to Marked enemies. The scale only ever tips one way.
+relic_leech_crown,Leech Crown,Relic,EA,,0.8,lifesteal,Lifesteal(0.06); DamageTaken(1.12),"Drink deep: 6% lifesteal, but you take 12% more damage."
+relic_ichor_chalice,Ichor Chalice,Relic,EA,,1.0,lifesteal; survival,Lifesteal(0.025); MaxHealth(30.0),A cup of god-blood. +30 max health and a steady trickle of healing.
+relic_hound9_spares,Hound-9's Spare Parts,Relic,EA,,1.0,turret; crit,"SpawnTurretOnCrit(chance: 0.5, duration: 2.5, power: 0.2); CritChance(0.04)","Crits often spawn tiny, short-lived turrets. Hound-9 would like them back."
+relic_sentry_seed,Sentry Seed,Relic,EA,,0.9,turret; crit,"SpawnTurretOnCrit(chance: 0.15, duration: 6.0, power: 0.45)",Crits rarely plant a sturdy forge-sentry that fights on for six seconds.
+relic_funeral_bell,Funeral Bell,Relic,EA,,1.0,doom,"Doomstack(stacks: 5, burst: 1.6)","Every fifth hit tolls the bell. Small bursts, but it never stops ringing."
+relic_epitaph_engine,Epitaph Engine,Relic,EA,,0.8,doom,"Doomstack(stacks: 12, burst: 6.5); Damage(0.9)",Twelve hits write the epitaph. The last one reads it aloud.
+relic_pyre_lung,Pyre Lung,Relic,P1,,1.0,volatile,"ExplodeOnKill(chance: 0.5, radius: 1.4, damage: 0.5)","Half of all kills cough out a small, hot burst."
+relic_dying_star,Dying Star,Relic,EA,,0.8,volatile,"ExplodeOnKill(chance: 0.15, radius: 3.2, damage: 1.4)",Now and then a kill collapses into a dying star and takes the whole crowd with it.
+relic_reapers_tithe,Reaper's Tithe,Relic,EA,,1.0,execute; greed,Execute(threshold: 0.08); ShardsOnKill(chance: 0.03),Finishes enemies below 8% health and takes a godshard for the trouble.
+relic_misericorde,Misericorde,Relic,EA,,0.8,execute,Execute(threshold: 0.15); DamageVsFullHp(0.85),The mercy blade ends anything below 15% health. It hates starting fights.
+relic_anvil_plate,Anvil Plate,Relic,EA,,1.0,survival,DamageTaken(0.85); MoveSpeed(0.94),"Take 15% less damage. Move like you are wearing an anvil, because you are."
+relic_gilded_aegis,Gilded Aegis,Relic,P1,,1.0,survival; shield,MaxShield(45.0),A regenerating shield of beaten god-gold.
+relic_beating_stone,Beating Stone,Relic,EA,,1.0,survival,MaxHealth(50.0); Regen(1.0),+50 max health and slow regeneration. It beats when you forget to.
+relic_ember_of_ruin,Ember of Ruin,Relic,EA,,1.0,low_hp; conditional,"DamageWhileLowHp(threshold: 0.4, mult: 1.45)",+45% damage while below 40% health. Umbra-Rex approves of your choices.
+relic_brink_coin,Coin of the Brink,Relic,EA,,0.8,low_hp; conditional,"DamageWhileLowHp(threshold: 0.3, mult: 1.6); MaxHealth(-30.0)","+60% damage below 30% health, and 30 less health to get you there sooner."
+relic_opening_verse,Opening Verse,Relic,EA,,1.0,opener; conditional,DamageVsFullHp(1.45),+45% damage to enemies at full health. Make an entrance.
+relic_titanbreaker_wedge,Titanbreaker Wedge,Relic,EA,,1.0,elite; conditional,DamageVsElites(1.6); Damage(0.9),"+60% damage to elites and bosses, at the expense of the small fry."
+relic_crooked_knucklebone,Crooked Knucklebone,Relic,EA,,1.0,crit,CritChance(0.18); CritDamage(-0.4),Crits come often and land softer. The bones are crooked in your favour.
+relic_headsmans_hood,Headsman's Hood,Relic,EA,,1.0,crit,CritDamage(0.9); FireRate(0.92),+90% crit damage. Take your time. Aim for the neck.
+relic_razorwake,Razorwake,Relic,EA,,1.0,trail,"Trail(duration: 2.0, dps: 0.35, slow: 0.0)",Projectiles leave a wake of razor-light that cuts whatever crosses it.
+relic_tarpit_heart,Tarpit Heart,Relic,EA,,0.9,puddle; root,"Puddle(radius: 1.4, duration: 2.5, dps: 0.15, status: Root)",Impacts leave pitch pools that hold the horde fast.
+relic_gyrestone,Gyrestone,Relic,EA,,1.0,area,Area(1.35); Damage(0.95),"Every blast, well, pool and burst you make grows by a third."
+relic_cindertread,Cindertread,Relic,EA,,1.0,dash_nova; burn,"DashNova(radius: 2.0, damage: 20.0, element: Flame, status: Burn)",Every dash kicks up a burst of burning cinders.
+vitriolcore,Vitriolcore,Core,V1,,1.0,plague; explode; puddle,"Element(Plague); Style(Globe); Explode(radius: 1.5, damage: 0.4); Puddle(radius: 1.3, duration: 2.5, dps: 0.2); ProjectileSpeed(0.8)","Alchemical globes that shatter, splash and linger. Vex's favourite solvent."
+verdictcore,Verdictcore,Core,V1,,1.0,radiant; mark; conditional,"Element(Radiant); Style(Slug); DamageVsStatus(status: Mark, mult: 1.3); Knockback(1.2)",Radiant slugs that strike the Marked like a final ruling.
+unmadecore,Unmadecore,Core,V1,,0.8,void; fork; curse; chaos,"Element(Void); Style(Shard); Fork(count: 2, angle: 90.0, damage: 0.5); ApplyStatus(status: Curse, chance: 0.2, stacks: 1, duration: 3.0)",A splinter pried from the Unmaking. It will not stay one thing for long.
+mech_split_carom,Split Carom,Mechanism,V1,,0.9,ricochet; fork,"Ricochet(bounces: 1, range: 5.0); Fork(count: 2, angle: 30.0, damage: 0.4); Damage(0.8)","Bounces once, then splits. Geometry weeps."
+mech_packhunt_volley,Packhunt Volley,Mechanism,V1,,1.0,multishot; homing; pierce,Projectiles(2); Spread(25.0); Homing(turn_rate: 110.0); Pierce(1); Damage(0.6),"Shots run as a pack: they spread, circle and go for the throat."
+mech_chorus_lattice,Chorus Lattice,Mechanism,V1,,0.9,echo,"EchoShot(every: 2, damage: 0.45); Damage(0.85)",Every other shot is sung back by a choir that died with its gods.
+relic_last_chorus_bell,Bell of the Last Chorus,Relic,V1,,1.0,echo; ability,"EchoShot(every: 4, damage: 0.7); UltCharge(1.1)",It rings for gods who are not coming back. Every fourth shot rings with it.
+relic_reddeath_alembic,Reddeath Alembic,Relic,V1,,0.9,volatile; area,"ExplodeOnKill(chance: 0.4, radius: 2.2, damage: 0.7); Area(1.1)",Distils the recently dead into something far more useful: bombs.
+relic_huntmothers_fang,Huntmother's Fang,Relic,V1,,1.0,bleed; elite,"ApplyStatus(status: Bleed, chance: 0.35, stacks: 2, duration: 3.0); DamageVsElites(1.15)",A fang from something that hunted gods. It still knows the big ones.
+relic_heirs_oath,Heir's Oath,Relic,V1,,1.0,shield; mark,"MaxShield(35.0); ApplyStatus(status: Mark, chance: 0.2, stacks: 1, duration: 4.0)","An oath of law: shield the faithful, mark the guilty."

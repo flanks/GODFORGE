@@ -164,6 +164,8 @@ pub enum ForgeOutcome {
 pub enum ForgeError {
     #[error("no such part in the bag")]
     NotInBag,
+    #[error("you must stand at a hot anvil")]
+    NotAtAnvil,
     #[error("the {0:?} slot is locked during a run")]
     SlotLocked(Slot),
     #[error("nothing equipped in the {0:?} slot")]

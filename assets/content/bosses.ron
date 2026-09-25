@@ -71,4 +71,247 @@
             ),
         ],
     ),
+    // ───────── Verdant Ruin mini-boss ─────────
+    (
+        key: "gullet_bloom",
+        keep_distance: 4.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "Feeding Time",
+                cadence: 2.5,
+                attacks: [
+                    Strike(shape: Cone(range: 7.0, angle_deg: 60.0), windup: 1.0, damage: 32.0, element: Plague),
+                    Radial(projectiles: 14, speed: 6.0, damage: 14.0, radius: 0.35),
+                    Summon(enemy: "rotmite", count: 8),
+                    Pools(count: 3, radius: 2.0, duration: 5.0, dps: 14.0, windup: 1.0),
+                ],
+            ),
+            (
+                below: 0.5,
+                name: "Overripe",
+                cadence: 1.9,
+                speed_mult: 1.2,
+                attacks: [
+                    Strike(shape: Ring(inner: 2.5, outer: 7.0), at_self: true, windup: 1.0, damage: 34.0, element: Plague),
+                    Radial(projectiles: 20, speed: 6.5, damage: 15.0, radius: 0.35),
+                    Summon(enemy: "bloatbulb", count: 3),
+                    Strike(shape: Cone(range: 8.0, angle_deg: 75.0), windup: 0.9, damage: 36.0, element: Plague),
+                    Pools(count: 4, radius: 2.2, duration: 5.5, dps: 16.0, windup: 0.9),
+                ],
+            ),
+        ],
+    ),
+    // ───────── Verdant Ruin boss ─────────
+    // A trio-hydra of plague singers: each head owns one telegraph family (cone, line, ring).
+    (
+        key: "choir_of_rot",
+        keep_distance: 7.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "Three Voices",
+                cadence: 2.4,
+                attacks: [
+                    Strike(shape: Cone(range: 10.0, angle_deg: 50.0), windup: 1.1, damage: 42.0, element: Plague),
+                    Radial(projectiles: 18, speed: 5.5, damage: 15.0, radius: 0.4),
+                    Strike(shape: Ring(inner: 3.0, outer: 6.5), at_self: true, windup: 1.2, damage: 45.0, element: Plague),
+                    Summon(enemy: "glimmermoth", count: 6),
+                ],
+            ),
+            (
+                below: 0.65,
+                name: "Dissonance",
+                cadence: 2.0,
+                speed_mult: 1.1,
+                attacks: [
+                    Strike(shape: Line(length: 18.0, width: 2.2), windup: 1.0, damage: 48.0, element: Plague),
+                    Pools(count: 4, radius: 2.3, duration: 6.0, dps: 18.0, windup: 1.0),
+                    SlamTrail(count: 6, spacing: 2.2, radius: 1.6, windup: 0.9, stagger: 0.16, damage: 40.0),
+                    Summon(enemy: "lampcap", count: 8),
+                    Radial(projectiles: 24, speed: 5.8, damage: 15.0, radius: 0.4),
+                ],
+            ),
+            (
+                below: 0.3,
+                name: "Last Refrain",
+                cadence: 1.6,
+                speed_mult: 1.25,
+                attacks: [
+                    Strike(shape: Circle(radius: 4.5), at_self: true, windup: 1.2, damage: 60.0, element: Plague),
+                    Strike(shape: Cone(range: 12.0, angle_deg: 90.0), windup: 1.0, damage: 50.0, element: Plague),
+                    Radial(projectiles: 30, speed: 6.0, damage: 16.0, radius: 0.4),
+                    Pools(count: 5, radius: 2.4, duration: 6.0, dps: 20.0, windup: 0.9),
+                    Summon(enemy: "bloatbulb", count: 4),
+                ],
+            ),
+        ],
+    ),
+    // ───────── Hollow Spire mini-boss ─────────
+    (
+        key: "the_gnomon",
+        keep_distance: 7.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "Zenith",
+                cadence: 2.5,
+                attacks: [
+                    Strike(shape: Line(length: 16.0, width: 2.0), windup: 1.0, damage: 34.0, element: Radiant),
+                    Strike(shape: Ring(inner: 3.0, outer: 6.0), at_self: true, windup: 1.1, damage: 32.0, element: Void),
+                    Summon(enemy: "ticker", count: 10),
+                    Radial(projectiles: 12, speed: 5.5, damage: 14.0, radius: 0.35),
+                ],
+            ),
+            (
+                below: 0.5,
+                name: "Long Shadows",
+                cadence: 1.9,
+                speed_mult: 1.2,
+                attacks: [
+                    Strike(shape: Line(length: 22.0, width: 2.4), windup: 0.9, damage: 38.0, element: Radiant),
+                    Strike(shape: Cone(range: 9.0, angle_deg: 80.0), windup: 0.9, damage: 34.0, element: Void),
+                    SlamTrail(count: 5, spacing: 2.4, radius: 1.5, windup: 0.9, stagger: 0.2, damage: 32.0),
+                    Summon(enemy: "starmote", count: 5),
+                    Radial(projectiles: 16, speed: 6.0, damage: 14.0, radius: 0.35),
+                ],
+            ),
+        ],
+    ),
+    // ───────── Hollow Spire boss ─────────
+    // Clock hands sweep as Line strikes; Pools are pockets of stopped time.
+    (
+        key: "aeons_remnant",
+        keep_distance: 5.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "The Hour Turns",
+                cadence: 2.4,
+                attacks: [
+                    SlamTrail(count: 6, spacing: 2.3, radius: 1.6, windup: 1.0, stagger: 0.2, damage: 42.0),
+                    Strike(shape: Line(length: 20.0, width: 2.4), windup: 1.1, damage: 50.0, element: Kinetic),
+                    Radial(projectiles: 16, speed: 5.0, damage: 16.0, radius: 0.4),
+                    Strike(shape: Ring(inner: 4.0, outer: 8.0), at_self: true, windup: 1.2, damage: 45.0, element: Radiant),
+                ],
+            ),
+            (
+                below: 0.6,
+                name: "Unwinding",
+                cadence: 2.0,
+                speed_mult: 1.15,
+                attacks: [
+                    Pools(count: 4, radius: 2.4, duration: 6.5, dps: 18.0, windup: 1.0),
+                    Summon(enemy: "cogling", count: 8),
+                    Strike(shape: Cone(range: 11.0, angle_deg: 60.0), windup: 1.0, damage: 52.0, element: Void),
+                    SlamTrail(count: 7, spacing: 2.2, radius: 1.7, windup: 0.9, stagger: 0.15, damage: 44.0),
+                    Radial(projectiles: 22, speed: 5.5, damage: 16.0, radius: 0.4),
+                ],
+            ),
+            (
+                below: 0.25,
+                name: "Twelfth Chime",
+                cadence: 1.5,
+                speed_mult: 1.3,
+                attacks: [
+                    Strike(shape: Circle(radius: 5.0), at_self: true, windup: 1.3, damage: 65.0, element: Void),
+                    Strike(shape: Line(length: 26.0, width: 2.8), windup: 1.0, damage: 60.0, element: Radiant),
+                    Radial(projectiles: 28, speed: 6.0, damage: 17.0, radius: 0.4),
+                    Summon(enemy: "ticker", count: 12),
+                    Pools(count: 5, radius: 2.5, duration: 6.0, dps: 20.0, windup: 0.9),
+                ],
+            ),
+        ],
+    ),
+    // ───────── The Unmaking mini-boss ─────────
+    (
+        key: "the_axiom",
+        keep_distance: 6.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "First Law",
+                cadence: 2.3,
+                attacks: [
+                    Strike(shape: Line(length: 20.0, width: 2.0), windup: 1.0, damage: 40.0, element: Void),
+                    Strike(shape: Ring(inner: 2.5, outer: 7.0), at_self: true, windup: 1.0, damage: 38.0, element: Void),
+                    Radial(projectiles: 16, speed: 6.0, damage: 16.0, radius: 0.35),
+                    Summon(enemy: "vector", count: 4),
+                ],
+            ),
+            (
+                below: 0.5,
+                name: "Contradiction",
+                cadence: 1.8,
+                speed_mult: 1.2,
+                attacks: [
+                    Strike(shape: Circle(radius: 3.5), windup: 0.9, damage: 44.0, element: Void),
+                    Strike(shape: Ring(inner: 3.0, outer: 8.0), at_self: true, windup: 1.0, damage: 40.0, element: Void),
+                    SlamTrail(count: 6, spacing: 2.2, radius: 1.6, windup: 0.9, stagger: 0.14, damage: 38.0),
+                    Radial(projectiles: 22, speed: 6.5, damage: 17.0, radius: 0.35),
+                    Summon(enemy: "paradox", count: 5),
+                ],
+            ),
+        ],
+    ),
+    // ───────── The Unmaking final boss ─────────
+    // Four phases built for four Godforged: Pools(count: 4) drops one hazard per player, Ring strikes
+    // leave a safe core (group up) and Circle-at-self strikes punish stacking (spread out).
+    (
+        key: "the_last_titan",
+        keep_distance: 5.0,
+        phases: [
+            (
+                below: 1.0,
+                name: "Waking Chaos",
+                cadence: 2.4,
+                attacks: [
+                    SlamTrail(count: 6, spacing: 2.4, radius: 1.8, windup: 1.0, stagger: 0.18, damage: 46.0),
+                    Strike(shape: Cone(range: 12.0, angle_deg: 70.0), windup: 1.1, damage: 55.0, element: Void),
+                    Radial(projectiles: 20, speed: 5.5, damage: 17.0, radius: 0.45),
+                    Summon(enemy: "fractling", count: 8),
+                ],
+            ),
+            (
+                below: 0.75,
+                name: "One for Each of You",
+                cadence: 2.1,
+                speed_mult: 1.1,
+                attacks: [
+                    Pools(count: 4, radius: 2.4, duration: 6.0, dps: 20.0, windup: 1.1),
+                    Strike(shape: Ring(inner: 3.5, outer: 9.0), at_self: true, windup: 1.3, damage: 58.0, element: Void),
+                    Strike(shape: Line(length: 24.0, width: 2.6), windup: 1.0, damage: 56.0, element: Radiant),
+                    Summon(enemy: "wronghound", count: 8),
+                    Radial(projectiles: 26, speed: 5.8, damage: 17.0, radius: 0.45),
+                ],
+            ),
+            (
+                below: 0.45,
+                name: "Broken Geometry",
+                cadence: 1.8,
+                speed_mult: 1.2,
+                attacks: [
+                    Strike(shape: Circle(radius: 5.0), at_self: true, windup: 1.3, damage: 66.0, element: Void),
+                    SlamTrail(count: 8, spacing: 2.2, radius: 1.8, windup: 0.9, stagger: 0.12, damage: 48.0),
+                    Strike(shape: Cone(range: 13.0, angle_deg: 100.0), windup: 1.0, damage: 58.0, element: Void),
+                    Summon(enemy: "collapsar", count: 4),
+                    Pools(count: 4, radius: 2.6, duration: 6.5, dps: 22.0, windup: 1.0),
+                ],
+            ),
+            (
+                below: 0.2,
+                name: "End of All Shapes",
+                cadence: 1.4,
+                speed_mult: 1.35,
+                attacks: [
+                    Strike(shape: Line(length: 30.0, width: 3.0), windup: 1.0, damage: 70.0, element: Void),
+                    Strike(shape: Ring(inner: 4.0, outer: 11.0), at_self: true, windup: 1.2, damage: 64.0, element: Radiant),
+                    Radial(projectiles: 32, speed: 6.2, damage: 18.0, radius: 0.45),
+                    SlamTrail(count: 9, spacing: 2.0, radius: 1.9, windup: 0.85, stagger: 0.1, damage: 50.0),
+                    Pools(count: 6, radius: 2.6, duration: 6.0, dps: 24.0, windup: 0.9),
+                    Summon(enemy: "paradox", count: 6),
+                ],
+            ),
+        ],
+    ),
 ]

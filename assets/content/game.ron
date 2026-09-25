@@ -45,9 +45,10 @@
         pickup_lifetime: 40.0,
     ),
     run: (
-        ember_per_kill: (1, 6, 40, 150),
-        ember_per_room: 15,
-        ember_victory_bonus: 250,
+        // Tuned by the 100-hour audit: ~390 Ember/run → Altar + trees ≥80% at ~55–75 h (§11.5).
+        ember_per_kill: (0.05, 1.0, 15.0, 60.0),
+        ember_per_room: 4.0,
+        ember_victory_bonus: 100.0,
         death_shard_keep: 0.4,
         start_shards: 6,
         door_delay: 1.2,

@@ -3,3 +3,119 @@ arsenal_spare_parts,Arsenal,1,Spare Parts,40,,BagCapacity(2),P1,Carry two more p
 flesh_hardened,Flesh,1,Hardened,30,,Mods([MaxHealth(25.0)]),P1,+25 max health for every Godforged.
 fate_rekindled,Fate,1,Rekindled,60,,Rekindles(1),P1,One more solo Rekindle per run.
 bond_echo_resonance,Bond,1,Echo Resonance,50,,EchoPower(0.05),P1,Echo drones fight 5% harder.
+arsenal_whetstone_rite,Arsenal,1,Whetstone Rite,35,,Mods([Damage(1.03)]),P1,+3% weapon damage. Sharpen before you descend; the Smithshade insists.
+arsenal_greased_breech,Arsenal,1,Greased Breech,45,,Mods([FireRate(1.03)]),P1,+3% fire rate on every chassis.
+arsenal_hairline_sights,Arsenal,1,Hairline Sights,55,,Mods([CritChance(0.02)]),P1,+2% crit chance.
+arsenal_vessas_tab,Arsenal,1,Vessa's Tab,30,,StartShards(5),P1,Start each run with 5 more Godshards. Vessa keeps a tab; she never collects.
+arsenal_godsbane_rifle,Arsenal,2,Godsbane Rifle,100,arsenal_hairline_sights,"Unlock(""godsbane_rifle"")",P1,Unlocks the Godsbane Rifle chassis (Forge Lv 3). The rifle that killed a god remembers how.
+arsenal_sunspike_shotgun,Arsenal,2,Sunspike Shotgun,100,arsenal_greased_breech,"Unlock(""sunspike_shotgun"")",P1,Unlocks the Sunspike Shotgun chassis (Forge Lv 3). A fistful of sunlight at arm's length.
+arsenal_riveted_satchel,Arsenal,2,Riveted Satchel,70,arsenal_spare_parts,BagCapacity(1),P1,Carry one more part.
+arsenal_tempered_steel,Arsenal,2,Tempered Steel,90,arsenal_whetstone_rite,Mods([Damage(1.03)]),P1,+3% weapon damage.
+arsenal_shard_pouch,Arsenal,2,Shard Pouch,65,arsenal_vessas_tab,StartShards(5),P1,Start each run with 5 more Godshards.
+arsenal_skipstone,Arsenal,2,Skipstone,110,arsenal_whetstone_rite,"Unlock(""mech_skipstone"")",EA,"Unlocks the Skipstone mechanism, which can now drop in runs. Quick shots that skip off the first thing they hit."
+arsenal_bellowfire_projector,Arsenal,3,Bellowfire Projector,180,arsenal_sunspike_shotgun,"Unlock(""bellowfire_projector"")",EA,"Unlocks the Bellowfire Projector chassis (Forge Lv 6). The furnace, breathed at the world."
+arsenal_gravemaw_mortar,Arsenal,3,Gravemaw Mortar,180,arsenal_godsbane_rifle; arsenal_tempered_steel,"Unlock(""gravemaw_mortar"")",EA,Unlocks the Gravemaw Mortar chassis (Forge Lv 6). Shells that swallow crowds whole.
+arsenal_smiths_apron,Arsenal,3,Smith's Apron,150,arsenal_riveted_satchel,BagCapacity(1),EA,Carry one more part.
+arsenal_salvagers_ledger,Arsenal,3,Salvager's Ledger,130,arsenal_shard_pouch,StartShards(5),EA,Start each run with 5 more Godshards. Nothing the Forge touches is ever scrap.
+arsenal_hammer_rhythm,Arsenal,3,Hammer Rhythm,160,arsenal_tempered_steel,Mods([FireRate(1.03)]),EA,+3% fire rate. Strike while the iron sings.
+arsenal_whirling_anvils,Arsenal,3,Whirling Anvils,210,arsenal_skipstone,"Unlock(""mech_whirling_anvils"")",EA,"Unlocks the Whirling Anvils mechanism, which can now drop in runs. Anvils swing around you on chains of light."
+arsenal_stormlash,Arsenal,4,Stormlash,320,arsenal_bellowfire_projector,"Unlock(""stormlash"")",EA,Unlocks the Stormlash chassis (Forge Lv 9). A whip of captured lightning that leaps between the damned.
+arsenal_seraph_lance,Arsenal,4,Seraph Lance,320,arsenal_gravemaw_mortar,"Unlock(""seraph_lance"")",EA,Unlocks the Seraph Lance chassis (Forge Lv 9). A spear of law that never has to be thrown.
+arsenal_second_bellows,Arsenal,4,Second Bellows,400,arsenal_smiths_apron; arsenal_salvagers_ledger,AnvilCharges(1),EA,"+1 forge charge at every anvil. More fusing, more rerolling, more madness."
+arsenal_godsmiths_temper,Arsenal,4,Godsmith's Temper,260,arsenal_hammer_rhythm,Mods([CritDamage(0.1)]),EA,+10% crit damage.
+arsenal_slagcore,Arsenal,4,Slagcore,280,arsenal_whirling_anvils,"Unlock(""slagcore"")",EA,"Unlocks the Slagcore core, which can now drop in runs. Molten slag that bursts where it lands: the Slag King's leftovers."
+arsenal_tidecaller_harpoon,Arsenal,5,Tidecaller Harpoon,600,arsenal_seraph_lance,"Unlock(""tidecaller_harpoon"")",EA,Unlocks the Tidecaller Harpoon chassis (Forge Lv 12). A drowned god's harpoon pulls what it pierces.
+arsenal_orrery_discs,Arsenal,5,Orrery Discs,600,arsenal_stormlash,"Unlock(""orrery_discs"")",EA,Unlocks the Orrery Discs chassis (Forge Lv 12). Planetary blades that orbit from foe to foe.
+arsenal_sentry_seed,Arsenal,5,Sentry Seed,420,arsenal_second_bellows,"Unlock(""relic_sentry_seed"")",EA,"Unlocks the Sentry Seed relic, which can now drop in runs. Crits can plant a sturdy forge-sentry that fights on without you."
+arsenal_epitaph_engine,Arsenal,5,Epitaph Engine,480,arsenal_slagcore,"Unlock(""relic_epitaph_engine"")",EA,"Unlocks the Epitaph Engine relic, which can now drop in runs. Enough hits write the epitaph; the last one reads it aloud."
+arsenal_dying_star,Arsenal,5,Dying Star,520,arsenal_slagcore,"Unlock(""relic_dying_star"")",EA,"Unlocks the Dying Star relic, which can now drop in runs. Now and then a kill collapses and takes the crowd with it."
+arsenal_godsmiths_bellows,Arsenal,6,Godsmith's Bellows,1100,arsenal_sentry_seed,AnvilCharges(1),EA,"+1 more forge charge at every anvil. The last godsmith's own bellows, still breathing."
+arsenal_compass_rose,Arsenal,6,Compass Rose,850,arsenal_epitaph_engine; arsenal_dying_star,"Unlock(""mech_compass_rose"")",EA,"Unlocks the Compass Rose mechanism, which can now drop in runs. Every shot erupts in a full circle, pointing everywhere at once."
+arsenal_last_arsenal,Arsenal,6,The Last Arsenal,1200,arsenal_tidecaller_harpoon; arsenal_orrery_discs,"Mods([Damage(1.04), FireRate(1.03)])",EA,+4% weapon damage and +3% fire rate. Every divine chassis reclaimed; the Forge sings.
+flesh_fleet_foot,Flesh,1,Fleet Foot,40,,Mods([MoveSpeed(1.03)]),P1,+3% move speed.
+flesh_ember_blood,Flesh,1,Ember Blood,45,,Mods([Regen(0.2)]),P1,Regenerate 0.2 health per second. The Forge's fire still runs in you.
+flesh_coiled_sinew,Flesh,1,Coiled Sinew,50,,Mods([DashRecharge(0.95)]),P1,Dashes recharge 5% faster.
+flesh_warding_ash,Flesh,1,Warding Ash,60,,Mods([MaxShield(10.0)]),P1,"+10 shield, reforming after 4 seconds unhurt."
+flesh_iron_marrow,Flesh,2,Iron Marrow,90,flesh_hardened,Mods([MaxHealth(15.0)]),P1,+15 max health.
+flesh_forge_scarred,Flesh,2,Forge-Scarred,75,flesh_hardened; flesh_warding_ash,Mods([DamageTaken(0.98)]),P1,Take 2% less damage. Every scar is a lesson the Forge kept.
+flesh_ash_mantle,Flesh,2,Ash Mantle,120,flesh_warding_ash,Mods([MaxShield(10.0)]),P1,+10 shield.
+flesh_windstep,Flesh,2,Windstep,100,flesh_fleet_foot,Mods([MoveSpeed(1.02)]),P1,+2% move speed.
+flesh_ready_hands,Flesh,2,Ready Hands,80,flesh_coiled_sinew,Mods([CooldownRate(1.03)]),P1,Actives recover 3% faster.
+flesh_kindled_will,Flesh,2,Kindled Will,110,flesh_ember_blood,Mods([UltCharge(1.04)]),P1,Ultimate charges 4% faster.
+flesh_slag_heart,Flesh,3,Slag Heart,170,flesh_iron_marrow,Mods([MaxHealth(15.0)]),EA,"+15 max health. Heavy, molten, and very hard to stop."
+flesh_reforged_skin,Flesh,3,Reforged Skin,200,flesh_forge_scarred,Mods([DamageTaken(0.98)]),EA,Take 2% less damage.
+flesh_restless_blood,Flesh,3,Restless Blood,130,flesh_ember_blood; flesh_iron_marrow,Mods([Regen(0.3)]),EA,Regenerate 0.3 health per second.
+flesh_cinder_stride,Flesh,3,Cinder Stride,180,flesh_windstep; flesh_coiled_sinew,Mods([DashRecharge(0.95)]),EA,Dashes recharge 5% faster.
+flesh_godforged_sinew,Flesh,3,Godforged Sinew,150,flesh_ready_hands,Mods([ActiveDamage(1.05)]),EA,+5% active ability damage.
+flesh_stormheart,Flesh,3,Stormheart,220,flesh_kindled_will,Mods([UltCharge(1.04)]),EA,Ultimate charges 4% faster.
+flesh_titan_bones,Flesh,4,Titan Bones,300,flesh_slag_heart,Mods([MaxHealth(20.0)]),EA,+20 max health.
+flesh_unyielding,Flesh,4,Unyielding,360,flesh_reforged_skin; flesh_ash_mantle,"Mods([DamageTaken(0.97), MaxShield(10.0)])",EA,Take 3% less damage and gain +10 shield.
+flesh_ichor_veins,Flesh,4,Ichor Veins,240,flesh_restless_blood,Mods([Regen(0.3)]),EA,Regenerate a further 0.3 health per second. Gold where the red used to be.
+flesh_quickened_pulse,Flesh,4,Quickened Pulse,280,flesh_cinder_stride,Mods([MoveSpeed(1.02)]),EA,+2% move speed.
+flesh_tireless,Flesh,4,Tireless,260,flesh_godforged_sinew,Mods([CooldownRate(1.04)]),EA,Actives recover 4% faster.
+flesh_molten_constitution,Flesh,5,Molten Constitution,500,flesh_titan_bones,Mods([MaxHealth(20.0)]),EA,+20 max health.
+flesh_ichor_aegis,Flesh,5,Ichor Aegis,550,flesh_unyielding,Mods([MaxShield(15.0)]),EA,+15 shield.
+flesh_unchained_stride,Flesh,5,Unchained Stride,650,flesh_quickened_pulse,Mods([DashCharges(1)]),EA,+1 dash charge.
+flesh_surging_spirit,Flesh,5,Surging Spirit,600,flesh_stormheart; flesh_tireless,"Mods([UltCharge(1.04), CooldownRate(1.03)])",EA,Ultimate charges 4% faster and actives recover 3% faster.
+flesh_blooded_resolve,Flesh,5,Blooded Resolve,450,flesh_ichor_veins,"Mods([DamageWhileLowHp(threshold: 0.3, mult: 1.1)])",EA,+10% damage while below 30% health. Umbra-Rex smiles on the nearly dead.
+flesh_godforged_body,Flesh,6,Godforged Body,1000,flesh_molten_constitution; flesh_ichor_aegis,"Mods([MaxHealth(25.0), DamageTaken(0.98)])",EA,"+25 max health and take 2% less damage. Burned, broken and remade: finally, a body worth the name."
+flesh_ceaseless,Flesh,6,Ceaseless,900,flesh_unchained_stride,"Mods([MoveSpeed(1.02), DashRecharge(0.95)])",EA,+2% move speed; dashes recharge 5% faster.
+flesh_divine_vigor,Flesh,6,Divine Vigor,1150,flesh_surging_spirit,"Mods([ActiveDamage(1.06), UltCharge(1.04)])",EA,+6% active ability damage; ultimate charges 4% faster.
+fate_lucky_spark,Fate,1,Lucky Spark,35,,Mods([Luck(0.03)]),P1,+0.03 Luck: rarer parts roll more often.
+fate_gleaners_reach,Fate,1,Gleaner's Reach,30,,Mods([PickupRadius(1.15)]),P1,+15% pickup radius.
+fate_omen_reader,Fate,1,Omen Reader,45,,Mods([CritChance(0.02)]),P1,+2% crit chance. The omens always point at the weak spot.
+fate_tithe_of_the_fallen,Fate,1,Tithe of the Fallen,50,,Mods([ShardsOnKill(chance: 0.01)]),P1,Kills have a 1% chance to drop an extra Godshard.
+fate_second_door,Fate,2,Second Door,90,fate_lucky_spark,BoonRerolls(1),P1,+1 Boon Door reroll per run. No god gets the last word.
+fate_gilded_odds,Fate,2,Gilded Odds,80,fate_lucky_spark,Mods([Luck(0.03)]),P1,+0.03 Luck.
+fate_shard_sense,Fate,2,Shard-Sense,100,fate_tithe_of_the_fallen,Mods([ShardsOnKill(chance: 0.01)]),P1,Kills have a further 1% chance to drop an extra Godshard.
+fate_lodestone_charm,Fate,2,Lodestone Charm,65,fate_gleaners_reach,Mods([PickupRadius(1.15)]),P1,+15% pickup radius.
+fate_crooked_die,Fate,2,Crooked Die,110,fate_omen_reader,Mods([CritChance(0.02)]),P1,+2% crit chance.
+fate_portent,Fate,2,Portent,120,fate_omen_reader,"Mods([ApplyStatus(status: Mark, chance: 0.04, stacks: 1, duration: 3.0)])",P1,Hits have a 4% chance to Mark. Fate points at the doomed.
+fate_fortunes_edge,Fate,3,Fortune's Edge,150,fate_crooked_die,Mods([CritDamage(0.1)]),EA,+10% crit damage.
+fate_windfall,Fate,3,Windfall,170,fate_shard_sense,StartShards(10),EA,Start each run with 10 more Godshards.
+fate_favored_of_the_forge,Fate,3,Favored of the Forge,190,fate_gilded_odds,Mods([Luck(0.03)]),EA,+0.03 Luck.
+fate_death_omen,Fate,3,Death Omen,210,fate_crooked_die; fate_portent,Mods([Execute(threshold: 0.04)]),EA,Hits kill non-boss enemies below 4% health. Fate had already decided.
+fate_doomsayer,Fate,3,Doomsayer,140,fate_portent,"Mods([DamageVsStatus(status: Mark, mult: 1.05)])",EA,+5% damage to Marked enemies.
+fate_magpies_fortune,Fate,3,Magpie's Fortune,125,fate_lodestone_charm,"Mods([Luck(0.02), PickupRadius(1.1)])",EA,+0.02 Luck and +10% pickup radius.
+fate_every_door_opens,Fate,4,Every Door Opens,320,fate_second_door; fate_favored_of_the_forge,BoonRerolls(1),EA,+1 Boon Door reroll per run.
+fate_gilded_fate,Fate,4,Gilded Fate,280,fate_favored_of_the_forge; fate_magpies_fortune,Mods([Luck(0.03)]),EA,+0.03 Luck.
+fate_jackpot,Fate,4,Jackpot,360,fate_windfall,Mods([ShardsOnKill(chance: 0.015)]),EA,Kills have a further 1.5% chance to drop an extra Godshard.
+fate_blessed_aim,Fate,4,Blessed Aim,240,fate_fortunes_edge,Mods([CritChance(0.02)]),EA,+2% crit chance.
+fate_written_in_ash,Fate,4,Written in Ash,400,fate_death_omen; fate_doomsayer,Mods([DamageVsElites(1.05)]),EA,+5% damage to elites and bosses. Their names were written long ago.
+fate_twice_rekindled,Fate,5,Twice Rekindled,650,fate_rekindled; fate_every_door_opens,Rekindles(1),EA,"One more solo Rekindle per run. The ember refuses, again."
+fate_lodestar,Fate,5,Lodestar,550,fate_gilded_fate,Mods([Luck(0.04)]),EA,+0.04 Luck.
+fate_final_tally,Fate,5,Final Tally,600,fate_written_in_ash,Mods([Execute(threshold: 0.06)]),EA,Hits kill non-boss enemies below 6% health.
+fate_kismet,Fate,5,Kismet,450,fate_blessed_aim,"Mods([ApplyStatus(status: Mark, chance: 0.04, stacks: 1, duration: 3.0)])",EA,"Hits gain another 4% chance to Mark. What is written, happens."
+fate_rain_of_shards,Fate,5,Rain of Shards,500,fate_jackpot,"Mods([ShardsOnKill(chance: 0.01), PickupRadius(1.1)])",EA,Kills have a further 1% chance to drop an extra Godshard; +10% pickup radius.
+fate_the_forge_chooses,Fate,6,The Forge Chooses,1000,fate_every_door_opens; fate_lodestar,BoonRerolls(1),EA,+1 Boon Door reroll per run. You no longer take what the gods offer; you choose.
+fate_fortunes_crown,Fate,6,Fortune's Crown,900,fate_lodestar; fate_rain_of_shards,Mods([Luck(0.05)]),EA,+0.05 Luck. Godforged parts stop being rumors.
+fate_the_last_word,Fate,6,The Last Word,1150,fate_final_tally; fate_kismet,Mods([DamageVsElites(1.06)]),EA,+6% damage to elites and bosses. Fate always has the last word.
+bond_tether_ward,Bond,1,Tether Ward,40,,Mods([MaxShield(10.0)]),P1,+10 shield. The Soul-Tether remembers every hand that held it.
+bond_shared_hearth,Bond,1,Shared Hearth,35,,Mods([Regen(0.2)]),P1,Regenerate 0.2 health per second. Nobody bleeds alone at the Forge.
+bond_kindred_flame,Bond,1,Kindred Flame,45,,"Mods([DamageVsStatus(status: Burn, mult: 1.04)])",P1,"+4% damage to Burning enemies, whoever lit them."
+bond_war_horn,Bond,1,War Horn,55,,Mods([UltCharge(1.03)]),P1,Ultimate charges 3% faster. Four ultimates at once is a catastrophe.
+bond_burnished_echo,Bond,2,Burnished Echo,80,bond_echo_resonance,EchoPower(0.03),P1,Echo drones fight 3% harder.
+bond_storm_kin,Bond,2,Storm-Kin,70,bond_kindred_flame,"Mods([DamageVsStatus(status: Shock, mult: 1.04)])",P1,+4% damage to Shocked enemies.
+bond_hexbound,Bond,2,Hexbound,90,bond_kindred_flame,"Mods([DamageVsStatus(status: Curse, mult: 1.04)])",P1,+4% damage to Cursed enemies.
+bond_revivers_oath,Bond,2,Reviver's Oath,100,bond_tether_ward,Mods([MaxShield(10.0)]),P1,+10 shield. Whoever pulls you back is owed a wall.
+bond_hearthsong,Bond,2,Hearthsong,110,bond_shared_hearth,Mods([Regen(0.2)]),P1,Regenerate a further 0.2 health per second.
+bond_shoulder_to_shoulder,Bond,2,Shoulder to Shoulder,120,bond_tether_ward; bond_shared_hearth,Mods([DamageTaken(0.98)]),P1,Take 2% less damage.
+bond_echo_choir,Bond,3,Echo Choir,170,bond_burnished_echo,EchoPower(0.03),EA,Echo drones fight 3% harder. Old builds hum in harmony.
+bond_held_fast,Bond,3,Held Fast,130,bond_hexbound,"Mods([DamageVsStatus(status: Root, mult: 1.05)])",EA,+5% damage to Rooted enemies.
+bond_open_wounds,Bond,3,Open Wounds,140,bond_storm_kin,"Mods([DamageVsStatus(status: Bleed, mult: 1.05)])",EA,+5% damage to Bleeding enemies.
+bond_shared_quarry,Bond,3,Shared Quarry,150,bond_storm_kin; bond_hexbound,"Mods([DamageVsStatus(status: Mark, mult: 1.04)])",EA,+4% damage to Marked enemies.
+bond_blood_oath,Bond,3,Blood Oath,200,bond_hearthsong,Mods([Lifesteal(0.01)]),EA,Return 1% of damage dealt as health.
+bond_war_chorus,Bond,3,War Chorus,220,bond_war_horn; bond_shoulder_to_shoulder,"Mods([UltCharge(1.04), CooldownRate(1.03)])",EA,Ultimate charges 4% faster; actives recover 3% faster.
+bond_echo_forged,Bond,4,Echo-Forged,300,bond_echo_choir,EchoPower(0.03),EA,Echo drones fight 3% harder.
+bond_synergists_lore,Bond,4,Synergist's Lore,260,bond_held_fast; bond_open_wounds,Mods([Area(1.05)]),EA,+5% weapon area. Combos land wider when the whole party feeds them.
+bond_lifeline,Bond,4,Lifeline,350,bond_revivers_oath; bond_blood_oath,Mods([Regen(0.2)]),EA,Regenerate a further 0.2 health per second. Someone always pulls you back.
+bond_rallying_stride,Bond,4,Rallying Stride,240,bond_war_chorus,"Mods([MoveSpeed(1.02), DashRecharge(0.96)])",EA,+2% move speed; dashes recharge 4% faster.
+bond_elemental_covenant,Bond,4,Elemental Covenant,380,bond_shared_quarry,"Mods([DamageVsStatus(status: Burn, mult: 1.03), DamageVsStatus(status: Shock, mult: 1.03), DamageVsStatus(status: Curse, mult: 1.03)])",EA,"+3% damage to Burning, Shocked and Cursed enemies."
+bond_echo_ascendant,Bond,5,Echo Ascendant,600,bond_echo_forged,EchoPower(0.03),EA,Echo drones fight 3% harder.
+bond_none_left_behind,Bond,5,None Left Behind,500,bond_lifeline,Mods([DamageTaken(0.97)]),EA,Take 3% less damage.
+bond_catastrophe_of_four,Bond,5,Catastrophe of Four,650,bond_rallying_stride,Mods([UltCharge(1.05)]),EA,"Ultimate charges 5% faster. Alone you are a spark; together, a catastrophe."
+bond_convergence,Bond,5,Convergence,450,bond_synergists_lore; bond_elemental_covenant,Mods([Damage(1.03)]),EA,+3% weapon damage. Every element answers every other.
+bond_kinship_of_the_forged,Bond,5,Kinship of the Forged,550,bond_lifeline,Mods([MaxHealth(20.0)]),EA,+20 max health.
+bond_echo_apotheosis,Bond,6,Echo Apotheosis,1200,bond_echo_ascendant,EchoPower(0.03),EA,Echo drones fight 3% harder. Your fallen weapons return as legends.
+bond_unbroken_circle,Bond,6,Unbroken Circle,1000,bond_none_left_behind; bond_kinship_of_the_forged,"Mods([MaxShield(10.0), DamageTaken(0.98)])",EA,+10 shield and take 2% less damage.
+bond_carnage_covenant,Bond,6,Carnage Covenant,900,bond_catastrophe_of_four; bond_convergence,"Mods([Area(1.04), CooldownRate(1.03)])",EA,+4% weapon area; actives recover 3% faster. Carnage is co-op.

@@ -118,10 +118,10 @@ impl Default for DropTuning {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct RunTuning {
-    /// Ember per kill by class [Swarm, Elite, MiniBoss, Boss].
-    pub ember_per_kill: [u32; 4],
-    pub ember_per_room: u32,
-    pub ember_victory_bonus: u32,
+    /// Ember per kill by class [Swarm, Elite, MiniBoss, Boss] (fractional: swarm kills trickle).
+    pub ember_per_kill: [f32; 4],
+    pub ember_per_room: f32,
+    pub ember_victory_bonus: f32,
     /// Fraction of godshards kept on death (§4: ~40%).
     pub death_shard_keep: f32,
     /// Starting godshards.
@@ -141,9 +141,9 @@ pub struct RunTuning {
 impl Default for RunTuning {
     fn default() -> Self {
         Self {
-            ember_per_kill: [1, 6, 40, 150],
-            ember_per_room: 15,
-            ember_victory_bonus: 250,
+            ember_per_kill: [0.05, 1.0, 15.0, 60.0],
+            ember_per_room: 4.0,
+            ember_victory_bonus: 100.0,
             death_shard_keep: 0.4,
             start_shards: 6,
             door_delay: 1.2,

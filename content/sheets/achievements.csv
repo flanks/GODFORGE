@@ -1,3 +1,121 @@
 key,name,category,stat,target,phase,desc
 first_spark,First Spark,Combat,kills,1,P0,Kill your first Unmade.
 first_forging,First Forging,Forge,forge_actions,1,P0,Perform your first anvil action.
+the_unmade_are_many,The Unmade Are Many,Combat,kills,1000,P0,"Kill 1,000 Unmade. There are always more."
+tidebreaker,Tidebreaker,Combat,kills,50000,EA,"Kill 50,000 Unmade. The tide doesn't notice. The Forge does."
+the_taller_they_stand,The Taller They Stand,Combat,elite_kills,100,P1,"Kill 100 elite Unmade. The taller they stand, the louder they land."
+out_of_breath,Out of Breath,Combat,miniboss_kills_the_bellows,1,P1,"Defeat The Bellows, the wheezing mini-boss of the Cinder Wastes."
+middle_management,Middle Management,Combat,miniboss_kills,25,EA,Defeat 25 mini-bosses. Someone has to deal with them.
+scythe_season,Scythe Season,Combat,best_kill_streak,100,P1,Reach a 100-kill streak.
+one_hit_one_obituary,"One Hit, One Obituary",Combat,damage_in_one_hit,5000,EA,"Deal 5,000 damage with a single hit."
+wed_in_the_flame,Wed in the Flame,Forge,fuses,1,P0,Fuse two parts into one of higher rarity. Till slag do them part.
+the_anvils_second_opinion,The Anvil's Second Opinion,Forge,rerolls,1,P0,Re-roll a slot at an anvil.
+kindled,Kindled,Forge,anvils_defended,1,P0,Hold an anvil through its kindling wave.
+touched_by_gold,Touched by Gold,Forge,godforged_parts_forged,1,P1,Forge a Godforged-rarity part.
+hammer_arm,Hammer Arm,Forge,forge_actions,500,EA,Perform 500 anvil actions. Your shoulder has filed a complaint.
+alloy_of_a_hundred_vows,Alloy of a Hundred Vows,Forge,fuses,100,EA,Fuse parts 100 times.
+six_strikes_of_the_hammer,Six Strikes of the Hammer,Forge,anvils_used_one_run,6,EA,Forge at six different anvils in a single run.
+every_inch_a_gods_weapon,Every Inch a God's Weapon,Forge,all_godforged_weapons,1,EA,"Wield a weapon whose Core, Mechanism and Relic are all Godforged."
+indecision_is_a_weapon,Indecision Is a Weapon,Forge,rerolls_one_anvil,5,EA,Re-roll five times at a single anvil. The anvil is starting to take it personally.
+a_name_for_madness,A Name for Madness,Codex,recipes_discovered,1,P1,Discover your first named recipe.
+recipe_for_disaster,Recipe for Disaster,Codex,recipes_discovered,10,EA,Discover 10 named recipes.
+loremaster_of_the_last_forge,Loremaster of the Last Forge,Codex,codex_completion_pct,80,EA,Complete 80% of the Codex.
+twelve_ways_to_end_a_crowd,Twelve Ways to End a Crowd,Codex,synergies_discovered,12,EA,Trigger all 12 Elemental Synergy combos at least once.
+blessed_by_the_whole_dead_family,Blessed by the Whole Dead Family,Codex,gods_blessed,8,EA,Accept a boon from each of the eight dead gods.
+two_dead_gods_one_opinion,"Two Dead Gods, One Opinion",Codex,duo_boons_discovered,1,EA,Discover a Duo Boon.
+last_will_of_a_god,Last Will of a God,Codex,legendary_boons_taken,1,EA,Accept a Legendary boon.
+not_today_wraith,"Not Today, Wraith",Co-op,revives,1,P1,Soul-Tether a downed ally back into the fight.
+stubborn_company,Stubborn Company,Co-op,revives,100,EA,Revive allies 100 times. Nobody gets to leave early.
+dead_weight,Dead Weight,Co-op,times_revived,50,EA,Be revived by allies 50 times. They keep coming back for you. Nobody knows why.
+golden_crescendo,Golden Crescendo,Co-op,overdrives_triggered,1,P1,Trigger Team Overdrive.
+elemental_chemistry,Elemental Chemistry,Co-op,synergies_triggered,1,P1,Trigger an Elemental Synergy combo with an ally.
+together_a_catastrophe,"Together, a Catastrophe",Co-op,runs_completed_4p,1,EA,Complete a run with a full party of four.
+mirror_mirror_mirror_mirror,"Mirror, Mirror, Mirror, Mirror",Co-op,runs_completed_same_character,1,EA,Complete a 4-player run in which everyone picked the same Godforged.
+priorities,Priorities,Co-op,loot_pings_while_downed,1,EA,Ping loot while downed. First things first.
+peak_carnage,Peak Carnage,Co-op,runs_completed_peak_carnage,1,EA,Complete a 4-player run with all four players fielding an Echo.
+forged_in_friendship,Forged in Friendship (and Fire),Co-op,bond_recipes_forged,1,EA,Forge a Bond recipe from two players' parts.
+the_mountain_walks_home,The Mountain Walks Home,Mastery,runs_completed_valdris,1,EA,Complete a run as Valdris.
+glass_cannon_unbroken,"Glass Cannon, Unbroken",Mastery,runs_completed_selene,1,EA,Complete a run as Selene.
+last_shot_standing,Last Shot Standing,Mastery,runs_completed_kael,1,EA,Complete a run as Kael.
+working_as_intended,Working as Intended,Mastery,runs_completed_thessaly,1,EA,Complete a run as Thessaly.
+punched_through_the_apocalypse,Punched Through the Apocalypse,Mastery,runs_completed_brax,1,EA,Complete a run as Brax.
+the_hunt_ends_here,The Hunt Ends Here,Mastery,runs_completed_ossian,1,EA,Complete a run as Ossian.
+the_perfect_heist,The Perfect Heist,Mastery,runs_completed_mirren,1,EA,Complete a run as Mirren.
+finished_before_i_started,Finished Before I Started,Mastery,runs_completed_epoch,1,EA,Complete a run as Epoch.
+harder_every_reforging,Harder Every Reforging,Mastery,mastery_level_valdris,25,EA,Reach Mastery 25 with Valdris.
+thunder_has_an_ego,Thunder Has an Ego,Mastery,mastery_level_selene,25,EA,Reach Mastery 25 with Selene.
+ghost_with_a_grudge,Ghost with a Grudge,Mastery,mastery_level_kael,25,EA,Reach Mastery 25 with Kael.
+coven_of_one,Coven of One,Mastery,mastery_level_thessaly,25,EA,Reach Mastery 25 with Thessaly.
+knuckle_scripture,Knuckle Scripture,Mastery,mastery_level_brax,25,EA,Reach Mastery 25 with Brax.
+patient_as_the_grave,Patient as the Grave,Mastery,mastery_level_ossian,25,EA,Reach Mastery 25 with Ossian.
+honest_work_never,Honest Work (Never),Mastery,mastery_level_mirren,25,EA,Reach Mastery 25 with Mirren.
+twenty_five_oclock,Twenty-Five O'Clock,Mastery,mastery_level_epoch,25,EA,Reach Mastery 25 with Epoch.
+the_whole_doomed_roster,The Whole Doomed Roster,Mastery,characters_cleared,8,EA,Complete a run with each of the eight Godforged.
+four_who_would_not_stay_dead,Four Who Would Not Stay Dead,Mastery,characters_mastery_50,4,EA,Reach Mastery 50 with four different Godforged.
+let_the_weapon_decide,Let the Weapon Decide,Mastery,runs_completed_auto,1,EA,Complete a run entirely in AUTO aim mode.
+steady_hand_short_life,"Steady Hand, Short Life",Mastery,runs_completed_manual,1,EA,Complete a run entirely in MANUAL aim mode.
+a_dead_gods_guiding_hand,A Dead God's Guiding Hand,Mastery,runs_completed_assisted,1,EA,Complete a run entirely in ASSISTED aim mode.
+unblinking,Unblinking,Mastery,deadeye_max_reached,1,EA,Reach the maximum Deadeye bonus in MANUAL aim mode.
+you_asked_for_this,You Asked for This,Chaos,chaos_tier_cleared,1,EA,Clear Chaos Tier 1 of the Trials of the Forge. Nobody made you.
+glutton_for_punishment,Glutton for Punishment,Chaos,chaos_tier_cleared,5,EA,Clear Chaos Tier 5.
+halfway_to_ruin,Halfway to Ruin,Chaos,chaos_tier_cleared,10,EA,Clear Chaos Tier 10.
+ichor_in_the_teeth,Ichor in the Teeth,Chaos,chaos_tier_cleared,15,EA,Clear Chaos Tier 15.
+broke_the_game_beautifully,"Broke the Game, Beautifully",Chaos,chaos_tier_cleared,20,EA,Clear Chaos Tier 20: The Last Arsenal.
+same_seed_different_grave,"Same Seed, Different Grave",Chaos,weekly_seeds_completed,1,EA,Complete a weekly seeded run.
+standing_appointment_with_death,Standing Appointment with Death,Chaos,weekly_seeds_completed,10,EA,Complete 10 weekly seeded runs.
+first_of_many,First of Many,Story,deaths,1,P0,Die for the first time. The Smithshade is already reforging you.
+the_godcore_comes_home,The Godcore Comes Home,Story,runs_completed,1,EA,Complete a run and carry a godcore back to the Forge.
+long_live_the_slag,Long Live the Slag,Story,boss_kills_slag_king,1,P1,Defeat The Slag King in the Cinder Wastes.
+tough_crowd,Tough Crowd,Story,boss_kills_choir_of_rot,1,EA,Silence the Choir of Rot in the Verdant Ruin.
+times_up,Time's Up,Story,boss_kills_aeons_remnant,1,EA,Defeat Aeon's Remnant atop the Hollow Spire.
+getting_to_know_the_doomed,Getting to Know the Doomed,Story,relationship_arcs_completed,1,EA,Complete a relationship arc in the Godforge.
+reforged_a_hundred_times,Reforged a Hundred Times,Story,deaths,100,EA,Die 100 times. The Smithshade stopped counting. Vessa didn't.
+found_not_forged,"Found, Not Forged",Challenge,runs_completed_no_forge,1,EA,Complete a run without performing a single anvil action.
+the_gods_are_dead_anyway,The Gods Are Dead Anyway,Challenge,runs_completed_no_boons,1,EA,Complete a run without accepting a single boon.
+speedrun_to_the_afterlife,Speedrun to the Afterlife,Challenge,deaths_within_60s,1,EA,"Die within 60 seconds of starting a run. Impressive, in its way."
+brief_candle,Brief Candle,Challenge,runs_completed_under_15m,1,EA,Complete a run in under 15 minutes.
+alone_a_spark,"Alone, a Spark",Challenge,runs_completed_solo,1,EA,Complete a run solo.
+it_lives_on_without_you,It Lives On Without You,Collection,echoes_saved,1,EA,Save a weapon as an Echo.
+promoted_posthumously,Promoted Posthumously,Collection,echo_max_stars,5,EA,Promote an Echo to five stars.
+armory_of_the_dead_gods,Armory of the Dead Gods,Collection,chassis_unlocked,16,EA,Unlock 16 weapon chassis.
+dressed_for_the_funeral,Dressed for the Funeral,Collection,alt_skins_unlocked,1,EA,Unlock an alternate skin for any Godforged.
+mountain_unmoved,Mountain Unmoved,Mastery,mastery_level_valdris,50,V1,Reach Mastery 50 with Valdris.
+heavens_favorite_weapon,Heaven's Favorite Weapon,Mastery,mastery_level_selene,50,V1,Reach Mastery 50 with Selene.
+encore_for_the_dead,Encore for the Dead,Mastery,mastery_level_kael,50,V1,Reach Mastery 50 with Kael.
+grand_hexmistress_of_the_forge,Grand Hexmistress of the Forge,Mastery,mastery_level_thessaly,50,V1,Reach Mastery 50 with Thessaly.
+the_furnace_never_goes_out,The Furnace Never Goes Out,Mastery,mastery_level_brax,50,V1,Reach Mastery 50 with Brax.
+every_quarry_remembered,"Every Quarry, Remembered",Mastery,mastery_level_ossian,50,V1,Reach Mastery 50 with Ossian.
+stole_the_whole_show,Stole the Whole Show,Mastery,mastery_level_mirren,50,V1,Reach Mastery 50 with Mirren.
+all_the_time_in_the_world,All the Time in the World,Mastery,mastery_level_epoch,50,V1,Reach Mastery 50 with Epoch.
+whos_a_good_chimera,Who's a Good Chimera?,Mastery,runs_completed_fenra,1,V1,Complete a run as Fenra.
+sang_them_to_sleep,Sang Them to Sleep,Mastery,runs_completed_lyra,1,V1,Complete a run as Lyra.
+unexploded_ingredients,Unexploded Ingredients,Mastery,runs_completed_vex,1,V1,Complete a run as Vex.
+verdict_delivered,Verdict Delivered,Mastery,runs_completed_seraph,1,V1,Complete a run as Seraph.
+twelve_graves_no_bodies,"Twelve Graves, No Bodies",Mastery,characters_cleared,12,V1,Complete a run with each of the twelve Godforged.
+the_edge_of_everything,The Edge of Everything,Story,unmaking_reached,1,V1,Set foot in the Unmaking.
+unmaker_unmade,"Unmaker, Unmade",Story,boss_kills_last_titan,1,V1,Defeat The Last Titan.
+what_the_smithshade_wouldnt_say,What the Smithshade Wouldn't Say,Story,true_ending_seen,1,V1,Witness the true ending of the Last Arsenal.
+everyone_has_opinions,Everyone Has Opinions,Story,relationship_arcs_completed,50,V1,Complete 50 relationship arcs. Everyone has opinions about everyone.
+beyond_the_last_arsenal,Beyond the Last Arsenal,Chaos,chaos_prestige,1,V1,Ascend to Chaos Prestige.
+eight_ways_to_break_the_game,Eight Ways to Break the Game,Chaos,chaos_20_characters_cleared,8,V1,Clear Chaos Tier 20 with eight different Godforged.
+a_year_of_endings,A Year of Endings,Chaos,weekly_seeds_completed,52,V1,Complete 52 weekly seeded runs.
+no_hands_but_mine,No Hands but Mine,Chaos,chaos_tier_cleared_manual,20,V1,Clear Chaos Tier 20 entirely in MANUAL aim mode.
+pocket_sized_apocalypse,Pocket-Sized Apocalypse,Co-op,crossplay_runs_completed,1,V1,Complete a cross-play run with Godforged on both PC and mobile.
+hands_off_the_apocalypse,Hands Off the Apocalypse,Co-op,runs_completed_all_auto_4p,1,V1,Complete a 4-player run with every player in AUTO aim mode.
+four_horsemen_no_horses,"Four Horsemen, No Horses",Co-op,chaos_tier_cleared_4p,20,V1,Clear Chaos Tier 20 with a full party of four.
+nobody_dies_today,Nobody Dies Today,Co-op,runs_completed_4p_no_downs,1,V1,Complete a 4-player run without anyone being downed. A first for everyone.
+a_million_little_endings,A Million Little Endings,Combat,kills,1000000,V1,"Kill 1,000,000 Unmade."
+excessive_force,Excessive Force,Combat,damage_in_one_hit,50000,V1,"Deal 50,000 damage with a single hit."
+sixfold_suffering,Sixfold Suffering,Combat,max_statuses_one_enemy,6,V1,"Afflict one enemy with Burn, Shock, Curse, Root, Bleed and Mark at the same time."
+gold_standard,Gold Standard,Forge,godforged_parts_forged,500,V1,Forge 500 Godforged-rarity parts.
+the_anvil_knows_your_name,The Anvil Knows Your Name,Forge,forge_actions,5000,V1,"Perform 5,000 anvil actions."
+every_weapon_the_gods_forgot,Every Weapon the Gods Forgot,Forge,chassis_runs_completed,24,V1,Complete a run with each of the 24 weapon chassis.
+nothing_left_unwritten,Nothing Left Unwritten,Codex,codex_completion_pct,100,V1,Complete the entire Codex.
+every_duet_of_the_dead,Every Duet of the Dead,Codex,duo_boons_discovered,30,V1,Discover 30 Duo Boons.
+arsenal_reassembled,Arsenal Reassembled,Collection,chassis_unlocked,24,V1,Unlock all 24 weapon chassis.
+wardrobe_of_the_damned,Wardrobe of the Damned,Collection,alt_skins_unlocked,24,V1,Unlock every alternate skin for all twelve Godforged.
+dress_your_ghost,Dress Your Ghost,Collection,echoes_customized,1,V1,Customize the look of an Echo drone.
+forge_eternal,Forge Eternal,Collection,forge_level,20,V1,Reach Forge Level 20.
+untouched_by_the_end,Untouched by the End,Challenge,last_titan_flawless,1,V1,Defeat The Last Titan without taking damage.
+beautiful_madness,Beautiful Madness,Challenge,max_enemies_alive,400,V1,Survive with 400 Unmade on screen at once.
+nothing_fancy,Nothing Fancy,Challenge,runs_completed_common_only,1,V1,Complete a run with only Common parts equipped.

@@ -5,3 +5,113 @@ nyctia_umbral_edge,Umbral Edge,Standard,nyctia,P1,1.0,,CritChance(0.1); CritDama
 pyra_pyre_eternal,Pyre Eternal,Legendary,pyra,EA,0.4,"FromGod(god: ""pyra"", count: 2)","ExplodeOnKill(chance: 0.5, radius: 2.6, damage: 1.2)",Every death feeds the pyre.
 thunderburn,Thunderburn,Duo,pyra; zephyros,EA,0.6,"FromGod(god: ""pyra"", count: 1); FromGod(god: ""zephyros"", count: 1)","DamageVsStatus(status: Shock, mult: 1.25); ApplyStatus(status: Burn, chance: 0.3, stacks: 1, duration: 3.0)",Shock triggers burn.
 bond_of_the_forge,Bond of the Forge,Team,,P1,0.5,,DashCharges(1),+1 dash charge for all.
+pyra_kindling_volley,Kindling Volley,Standard,pyra,P1,1.0,,"FireRate(1.12); ApplyStatus(status: Burn, chance: 0.2, stacks: 1, duration: 3.0)",+12% fire rate; hits have a 20% chance to Burn.
+pyra_cinder_bloom,Cinder Bloom,Standard,pyra,P1,1.0,,"ExplodeOnKill(chance: 0.25, radius: 2.0, damage: 0.7)",Kills have a 25% chance to burst into flame for 70% weapon damage.
+pyra_blastfire_rounds,Blastfire Rounds,Standard,pyra,P1,1.0,,"Explode(radius: 1.5, damage: 0.35)","Shots explode on impact, dealing 35% of the hit to everything nearby."
+pyra_flarestep,Flarestep,Standard,pyra,EA,1.0,,"DashNova(radius: 2.5, damage: 30.0, element: Flame, status: Burn)",Dashing releases a fire nova that deals 30 damage and sets enemies Burning.
+pyra_scorched_heavens,Scorched Heavens,Standard,pyra,EA,1.0,,"UltCharge(1.12); UltGround(radius: 3.0, duration: 4.0, dps: 25.0, element: Flame)",+12% ultimate charge; ultimates leave burning ground (25 damage per second for 4 s).
+pyra_cauterize,Cauterize,Standard,pyra,EA,1.0,,Regen(2.0),Your wounds sear shut: regenerate 2 HP per second.
+pyra_conflagration,Conflagration,Standard,pyra,EA,1.0,,"ApplyStatus(status: Burn, chance: 0.3, stacks: 2, duration: 3.0)","Hits have a 30% chance to Burn, and your weapon's Burns land 2 stacks at once."
+pyra_roaring_pyre,Roaring Pyre,Standard,pyra,EA,1.0,,Area(1.25),"Every explosion, pool and well your weapon creates is 25% wider."
+pyra_furnace_rite,Furnace Rite,Standard,pyra,EA,1.0,,ActiveDamage(1.3),Your actives burn hotter: +30% active damage.
+pyra_searing_brand,Searing Brand,Standard,pyra,EA,1.0,,"Damage(1.05); DamageVsStatus(status: Burn, mult: 1.2)","+5% damage, and +20% more against Burning enemies."
+zephyros_stormbrand,Stormbrand,Standard,zephyros,P1,1.0,,"Damage(1.15); ApplyStatus(status: Shock, chance: 0.25, stacks: 1, duration: 2.0)",+15% damage; hits have a 25% chance to Shock.
+zephyros_leaping_arc,Leaping Arc,Standard,zephyros,P1,1.0,,"Chain(jumps: 2, range: 4.5, falloff: 0.5)",Hits arc to 2 more enemies; each jump deals half the damage of the last.
+zephyros_skystride,Skystride,Standard,zephyros,P1,1.0,,"DashNova(radius: 2.5, damage: 25.0, element: Storm, status: Shock)",Dashing cracks a thunderclap that deals 25 damage and Shocks enemies.
+zephyros_quickening_gale,Quickening Gale,Standard,zephyros,EA,1.0,,FireRate(1.15); ProjectileSpeed(1.15),+15% fire rate; +15% projectile speed.
+zephyros_updraft,Updraft,Standard,zephyros,EA,1.0,,DashRecharge(0.8); MoveSpeed(1.05),Dashes recharge 20% faster; +5% move speed.
+zephyros_thunderhead,Thunderhead,Standard,zephyros,EA,1.0,,"UltGround(radius: 4.0, duration: 3.0, dps: 35.0, element: Storm)",Ultimates leave a crackling storm cell (35 damage per second for 3 s).
+zephyros_rebounding_gale,Rebounding Gale,Standard,zephyros,EA,1.0,,"Ricochet(bounces: 1, range: 6.0); ProjectileSpeed(1.1)",Shots rebound to 1 more target; +10% projectile speed.
+zephyros_ionized_air,Ionized Air,Standard,zephyros,EA,1.0,,"DamageVsStatus(status: Shock, mult: 1.25)",+25% damage to Shocked enemies.
+zephyros_galvanize,Galvanize,Standard,zephyros,EA,1.0,,CooldownRate(1.2); ActiveDamage(1.1),Actives recover 20% faster and deal +10% damage.
+zephyros_stormcalm,Stormcalm,Standard,zephyros,EA,1.0,,DamageTaken(0.92); MoveSpeed(1.05),Calm at the center of the storm: take 8% less damage; +5% move speed.
+zephyros_thousandfold_thunder,Thousandfold Thunder,Legendary,zephyros,EA,0.4,"FromGod(god: ""zephyros"", count: 2)","Chain(jumps: 4, range: 6.0, falloff: 0.85); ApplyStatus(status: Shock, chance: 0.4, stacks: 1, duration: 2.0)","Hits arc to 4 more enemies, losing only 15% per jump; hits have a 40% chance to Shock."
+nyctia_quietus,Quietus,Standard,nyctia,P1,1.0,,Execute(threshold: 0.1),Hits kill non-boss enemies below 10% HP.
+nyctia_serrated_shadow,Serrated Shadow,Standard,nyctia,P1,1.0,,"ApplyStatus(status: Bleed, chance: 0.25, stacks: 1, duration: 4.0); CritDamage(0.15)",Hits have a 25% chance to Bleed; +15% crit damage.
+nyctia_veil_of_knives,Veil of Knives,Standard,nyctia,P1,1.0,,"DashNova(radius: 3.0, damage: 25.0, element: Void, status: Bleed)",Dashing bursts into knife-filled smoke that deals 25 damage and makes enemies Bleed.
+nyctia_ambuscade,Ambuscade,Standard,nyctia,EA,1.0,,DamageVsFullHp(1.3); CritChance(0.05),+30% damage to enemies at full HP; +5% crit chance.
+nyctia_shade_twin,Shade Twin,Standard,nyctia,EA,1.0,,"SpawnTurretOnCrit(chance: 0.2, duration: 4.0, power: 0.3)",Crits have a 20% chance to call a shadow double that fires your weapon at 30% power for 4 s.
+nyctia_keen_darkness,Keen Darkness,Standard,nyctia,EA,1.0,,CritChance(0.08); FireRate(1.08),+8% crit chance; +8% fire rate.
+nyctia_assassins_vow,Assassin's Vow,Standard,nyctia,EA,1.0,,DamageVsElites(1.2); CritDamage(0.25),+20% damage against elites and bosses; +25% crit damage.
+nyctia_nightshroud,Nightshroud,Standard,nyctia,EA,1.0,,DashCharges(1); DamageTaken(0.95),Wrapped in smoke: +1 dash charge; take 5% less damage.
+nyctia_hunting_shadows,Hunting Shadows,Standard,nyctia,EA,1.0,,Homing(turn_rate: 120.0); CritChance(0.05),Shots curve toward their prey; +5% crit chance.
+nyctia_dark_of_the_moon,Dark of the Moon,Standard,nyctia,EA,1.0,,UltCharge(1.15); ActiveDamage(1.15),+15% ultimate charge; actives deal +15% damage.
+nyctia_kiss_of_silence,Kiss of Silence,Legendary,nyctia,EA,0.4,"FromGod(god: ""nyctia"", count: 2)",Execute(threshold: 0.2); CritDamage(0.5),Hits kill non-boss enemies below 20% HP; +50% crit damage.
+aeon_stilled_sands,Stilled Sands,Standard,aeon,EA,1.0,,"Trail(duration: 2.5, dps: 0.1, slow: 0.4)",Shots leave trails of stilled time that slow enemies by 40%.
+aeon_ageless_flame,Ageless Flame,Standard,aeon,EA,1.0,,"ApplyStatus(status: Burn, chance: 0.1, stacks: 1, duration: 6.0)","Hits have a 10% chance to Burn, and your weapon's Burns last 6 s."
+aeon_unclosing_wounds,Unclosing Wounds,Standard,aeon,EA,1.0,,"ApplyStatus(status: Bleed, chance: 0.1, stacks: 1, duration: 8.0)","Hits have a 10% chance to Bleed, and your weapon's Bleeds last 8 s."
+aeon_quickened_hours,Quickened Hours,Standard,aeon,EA,1.0,,CooldownRate(1.2); UltCharge(1.08),Actives recover 20% faster; +8% ultimate charge.
+aeon_rewinding_ward,Rewinding Ward,Standard,aeon,EA,1.0,,MaxShield(25.0); CooldownRate(1.05),+25 shield that winds itself back after 4 s unharmed; actives recover 5% faster.
+aeon_echoing_instant,Echoing Instant,Standard,aeon,EA,1.0,,"EchoShot(every: 4, damage: 0.5)",Every 4th shot repeats itself at 50% damage.
+aeon_stutterstep,Stutterstep,Standard,aeon,EA,1.0,,"DashNova(radius: 3.0, damage: 20.0, element: Void, status: Root); DashRecharge(0.9)",Dashing stops time around you (20 damage and a brief Root); dashes recharge 10% faster.
+aeon_shattered_moment,Shattered Moment,Standard,aeon,EA,1.0,,"UltGround(radius: 4.0, duration: 6.0, dps: 18.0, element: Void)",Ultimates shatter time into a wide rift (18 damage per second for 6 s).
+aeon_heavy_hours,Heavy Hours,Standard,aeon,EA,1.0,,Damage(1.25); ProjectileSpeed(0.85),"Shots carry the weight of ages: +25% damage, but 15% slower projectiles."
+aeon_turning_hands,Turning Hands,Standard,aeon,EA,1.0,,"Orbit(count: 2, radius: 2.4, speed: 0.5, damage: 0.35)","Two clock-hands orbit you, cutting enemies for 35% weapon damage."
+aeon_wound_spring,Wound Spring,Standard,aeon,EA,1.0,,ChargeTime(0.8); FireRate(1.08),Charge weapons charge 20% faster; +8% fire rate.
+aeon_eternal_recurrence,Eternal Recurrence,Legendary,aeon,EA,0.5,"FromGod(god: ""aeon"", count: 3)","EchoShot(every: 3, damage: 1.0)",Every 3rd shot happens again at full damage.
+gaiaa_grasping_stone,Grasping Stone,Standard,gaiaa,EA,1.0,,"Damage(1.1); ApplyStatus(status: Root, chance: 0.15, stacks: 1, duration: 1.5)",+10% damage; hits have a 15% chance to Root enemies for 1.5 s.
+gaiaa_granite_skin,Granite Skin,Standard,gaiaa,EA,1.0,,DamageTaken(0.88),Take 12% less damage.
+gaiaa_bedrock,Bedrock,Standard,gaiaa,EA,1.0,,MaxHealth(60.0); MoveSpeed(0.96),"+60 max HP, at the cost of 4% move speed."
+gaiaa_bloodroot,Bloodroot,Standard,gaiaa,EA,1.0,,Lifesteal(0.03),Heal for 3% of the damage you deal.
+gaiaa_tremor_step,Tremor Step,Standard,gaiaa,EA,1.0,,"DashNova(radius: 2.5, damage: 30.0, element: Kinetic, status: Root)",Dashing sends out a tremor that deals 30 damage and Roots enemies.
+gaiaa_crush_the_bound,Crush the Bound,Standard,gaiaa,EA,1.0,,"DamageVsStatus(status: Root, mult: 1.3)",+30% damage to Rooted enemies.
+gaiaa_sanguine_thorns,Sanguine Thorns,Standard,gaiaa,EA,1.0,,"ApplyStatus(status: Bleed, chance: 0.2, stacks: 1, duration: 4.0); Lifesteal(0.015)",Hits have a 20% chance to Bleed; heal for 1.5% of damage dealt.
+gaiaa_tectonic_wrath,Tectonic Wrath,Standard,gaiaa,EA,1.0,,"UltGround(radius: 4.0, duration: 4.0, dps: 25.0, element: Kinetic)",Ultimates split the ground into grinding stone (25 damage per second for 4 s).
+gaiaa_earthen_might,Earthen Might,Standard,gaiaa,EA,1.0,,ActiveDamage(1.2); DamageTaken(0.95),Actives deal +20% damage; take 5% less damage.
+gaiaa_deep_marrow,Deep Marrow,Standard,gaiaa,EA,1.0,,MaxHealth(20.0); Regen(1.5),+20 max HP; regenerate 1.5 HP per second.
+gaiaa_landslide,Landslide,Standard,gaiaa,EA,1.0,,Damage(1.12); Knockback(1.35),+12% damage; +35% knockback.
+gaiaa_unbroken_mountain,The Unbroken Mountain,Legendary,gaiaa,EA,0.4,"FromGod(god: ""gaiaa"", count: 2)",DamageTaken(0.8); MaxHealth(80.0); Lifesteal(0.03),"Take 20% less damage, gain 80 max HP and heal for 3% of damage dealt."
+morwenn_brackish_pools,Brackish Pools,Standard,morwenn,EA,1.0,,"Puddle(radius: 1.6, duration: 3.0, dps: 0.3)",Impacts leave toxic pools that deal 30% weapon damage per second.
+morwenn_witchs_brine,Witch's Brine,Standard,morwenn,EA,1.0,,"Damage(1.1); ApplyStatus(status: Curse, chance: 0.2, stacks: 1, duration: 4.0)",+10% damage; hits have a 20% chance to Curse.
+morwenn_plague_wake,Plague Wake,Standard,morwenn,EA,1.0,,"Trail(duration: 2.5, dps: 0.3, slow: 0.2)",Shots leave a festering wake that deals 30% weapon damage per second and slows 20%.
+morwenn_spreading_blight,Spreading Blight,Standard,morwenn,EA,1.0,,"Fork(count: 2, angle: 50.0, damage: 0.4)","On first hit, shots burst into 2 blighted droplets at 40% damage."
+morwenn_brinestep,Brinestep,Standard,morwenn,EA,1.0,,"DashNova(radius: 3.0, damage: 20.0, element: Plague, status: Curse)",Dashing throws off a wave of brine that deals 20 damage and Curses enemies.
+morwenn_dragged_under,Dragged Under,Standard,morwenn,EA,1.0,,"DamageVsStatus(status: Curse, mult: 1.2)",+20% damage to Cursed enemies.
+morwenn_deluge,Deluge,Standard,morwenn,EA,1.0,,"UltGround(radius: 4.5, duration: 5.0, dps: 20.0, element: Plague)",Ultimates flood the area with a plague tide (20 damage per second for 5 s).
+morwenn_drowning_gyre,Drowning Gyre,Standard,morwenn,EA,1.0,,"GravityWell(radius: 2.0, pull: 3.5, duration: 1.2, dps: 0.15)",Impacts open small whirlpools that drag enemies together.
+morwenn_contagion,Contagion,Standard,morwenn,EA,1.0,,"Chain(jumps: 1, range: 4.0, falloff: 0.5); ApplyStatus(status: Curse, chance: 0.15, stacks: 1, duration: 4.0)",Hits leap to 1 nearby enemy at 50% damage; hits have a 15% chance to Curse.
+morwenn_wreckers_haul,Wrecker's Haul,Standard,morwenn,EA,1.0,,PickupRadius(1.4); Luck(0.1),The sea gives up its wrecks: +40% pickup radius and better part rarity.
+morwenn_barnacle_hide,Barnacle Hide,Standard,morwenn,EA,1.0,,DamageTaken(0.93); Regen(1.0),Take 7% less damage; regenerate 1 HP per second.
+morwenn_black_tide,The Black Tide,Legendary,morwenn,EA,0.4,"FromGod(god: ""morwenn"", count: 2)","Puddle(radius: 2.6, duration: 5.0, dps: 0.5, status: Curse); Area(1.2)",Every impact floods the ground with cursing brine (50% weapon damage per second); +20% area.
+seraphel_condemning_writ,Condemning Writ,Standard,seraphel,EA,1.0,,"Damage(1.1); ApplyStatus(status: Mark, chance: 0.25, stacks: 1, duration: 5.0)",+10% damage; hits have a 25% chance to Mark.
+seraphel_sentence_passed,Sentence Passed,Standard,seraphel,EA,1.0,,"DamageVsStatus(status: Mark, mult: 1.25)",+25% damage to Marked enemies.
+seraphel_aegis_of_law,Aegis of Law,Standard,seraphel,EA,1.0,,MaxShield(40.0),Gain a 40-point shield that recharges after 4 s unharmed.
+seraphel_lance_of_dawn,Lance of Dawn,Standard,seraphel,EA,1.0,,Pierce(1); ProjectileSpeed(1.2),Shots pierce 1 enemy and fly 20% faster.
+seraphel_smite_the_mighty,Smite the Mighty,Standard,seraphel,EA,1.0,,DamageVsElites(1.25),+25% damage against elites and bosses.
+seraphel_sanctified_step,Sanctified Step,Standard,seraphel,EA,1.0,,"DashNova(radius: 2.5, damage: 25.0, element: Radiant, status: Mark)",Dashing flares with holy light that deals 25 damage and Marks enemies.
+seraphel_consecrated_ground,Consecrated Ground,Standard,seraphel,EA,1.0,,"UltGround(radius: 3.5, duration: 4.0, dps: 30.0, element: Radiant)",Ultimates consecrate the ground (30 damage per second for 4 s).
+seraphel_litany_of_light,Litany of Light,Standard,seraphel,EA,1.0,,ActiveDamage(1.2); UltCharge(1.1),Actives deal +20% damage; +10% ultimate charge.
+seraphel_radiant_mantle,Radiant Mantle,Standard,seraphel,EA,1.0,,MaxShield(20.0); Regen(1.0),+20 shield; regenerate 1 HP per second.
+seraphel_rebuke,Rebuke,Standard,seraphel,EA,1.0,,Knockback(1.4); DamageTaken(0.94),Shots drive the unworthy back (+40% knockback); take 6% less damage.
+seraphel_guiding_light,Guiding Light,Standard,seraphel,EA,1.0,,Range(1.15); PickupRadius(1.3),+15% weapon range; +30% pickup radius.
+seraphel_judgment_absolute,Judgment Absolute,Legendary,seraphel,EA,0.4,"FromGod(god: ""seraphel"", count: 2)","ApplyStatus(status: Mark, chance: 1.0, stacks: 1, duration: 4.0); DamageVsStatus(status: Mark, mult: 1.25)",Every hit Marks its target; +25% damage to Marked enemies.
+umbra_rex_brink_of_ruin,Brink of Ruin,Standard,umbra_rex,EA,1.0,,"DamageWhileLowHp(threshold: 0.4, mult: 1.35)",+35% damage while below 40% HP.
+umbra_rex_tolling_doom,Tolling Doom,Standard,umbra_rex,EA,1.0,,"Doomstack(stacks: 10, burst: 3.0)",Every hit adds Doom; at 10 stacks the target bursts for 300% weapon damage.
+umbra_rex_pound_of_flesh,Pound of Flesh,Standard,umbra_rex,EA,1.0,,MaxHealth(-40.0); Damage(1.3),Sacrifice 40 max HP for +30% damage.
+umbra_rex_tyrants_haste,Tyrant's Haste,Standard,umbra_rex,EA,1.0,,FireRate(1.25); DamageTaken(1.1),"+25% fire rate, but take 10% more damage."
+umbra_rex_ruinstep,Ruinstep,Standard,umbra_rex,EA,1.0,,"DashNova(radius: 3.0, damage: 35.0, element: Void)",Dashing collapses the ground behind you for 35 damage.
+umbra_rex_ashen_scar,Ashen Scar,Standard,umbra_rex,EA,1.0,,"UltGround(radius: 4.0, duration: 5.0, dps: 30.0, element: Void)",Ultimates leave a smoldering scar of ruin (30 damage per second for 5 s).
+umbra_rex_kings_tithe,King's Tithe,Standard,umbra_rex,EA,1.0,,ShardsOnKill(chance: 0.05); Luck(0.1),Kills have a 5% chance to drop an extra Godshard; better part rarity.
+umbra_rex_spite_of_the_dying,Spite of the Dying,Standard,umbra_rex,EA,1.0,,"DamageWhileLowHp(threshold: 0.3, mult: 1.2); Lifesteal(0.02)",Heal for 2% of damage dealt; +20% damage while below 30% HP.
+umbra_rex_weight_of_the_end,Weight of the End,Standard,umbra_rex,EA,1.0,,"Doomstack(stacks: 6, burst: 1.5)",Every hit adds Doom; at 6 stacks the target bursts for 150% weapon damage.
+umbra_rex_cinder_oath,Cinder Oath,Standard,umbra_rex,EA,1.0,,MaxHealth(-40.0); MaxShield(50.0),Trade 40 max HP for a 50-point shield.
+umbra_rex_harbinger,Harbinger,Standard,umbra_rex,EA,1.0,,ActiveDamage(1.35); MaxHealth(-20.0),Sacrifice 20 max HP: actives deal +35% damage.
+umbra_rex_last_crown,The Last Crown,Legendary,umbra_rex,EA,0.5,"FromGod(god: ""umbra_rex"", count: 3)","DamageWhileLowHp(threshold: 0.5, mult: 1.5); Doomstack(stacks: 6, burst: 3.0)","+50% damage while below 50% HP; every hit adds Doom, bursting at 6 stacks for 300% weapon damage."
+choir_of_anvils,Choir of Anvils,Team,,EA,0.4,,UltCharge(1.15); CooldownRate(1.1),Every player's ultimate charges 15% faster and actives recover 10% faster.
+wall_of_halos,Wall of Halos,Team,seraphel,EA,0.5,,MaxShield(30.0),+30 shield for every player.
+spoils_of_the_shatterlands,Spoils of the Shatterlands,Team,,EA,0.6,,PickupRadius(1.3); Luck(0.1),+30% pickup radius and better part rarity for every player.
+pitchfire,Pitchfire,Duo,pyra; morwenn,EA,0.6,"FromGod(god: ""pyra"", count: 1); FromGod(god: ""morwenn"", count: 1)","Puddle(radius: 2.0, duration: 4.0, dps: 0.4, status: Burn); Area(1.15)",Impacts spill burning pitch: pools deal 40% weapon damage per second and ignite; +15% area.
+funeral_pyre,Funeral Pyre,Duo,pyra; nyctia,EA,0.5,"FromGod(god: ""pyra"", count: 1); FromGod(god: ""nyctia"", count: 1)","Execute(threshold: 0.15); ExplodeOnKill(chance: 0.4, radius: 2.4, damage: 1.0)",Hits execute non-boss enemies below 15% HP; kills have a 40% chance to erupt for 100% weapon damage.
+blaze_of_ruin,Blaze of Ruin,Duo,pyra; umbra_rex,EA,0.6,"FromGod(god: ""pyra"", count: 1); FromGod(god: ""umbra_rex"", count: 1)","DamageWhileLowHp(threshold: 0.4, mult: 1.3); ExplodeOnKill(chance: 0.3, radius: 3.0, damage: 1.2)",+30% damage while below 40% HP; kills have a 30% chance to explode for 120% weapon damage.
+stormwhirl,Stormwhirl,Duo,zephyros; morwenn,EA,0.6,"FromGod(god: ""zephyros"", count: 1); FromGod(god: ""morwenn"", count: 1)","GravityWell(radius: 2.2, pull: 4.0, duration: 1.5, dps: 0.2); ApplyStatus(status: Shock, chance: 0.3, stacks: 1, duration: 2.0)",Impacts spin up crackling whirlpools that drag enemies together; hits have a 30% chance to Shock.
+sky_tribunal,Sky Tribunal,Duo,zephyros; seraphel,EA,0.6,"FromGod(god: ""zephyros"", count: 1); FromGod(god: ""seraphel"", count: 1)","Chain(jumps: 2, range: 5.0, falloff: 0.7); ApplyStatus(status: Mark, chance: 0.3, stacks: 1, duration: 4.0)",Hits arc to 2 more enemies at 70% damage per jump; hits have a 30% chance to Mark.
+silent_thunder,Silent Thunder,Duo,zephyros; nyctia,EA,0.7,"FromGod(god: ""zephyros"", count: 1); FromGod(god: ""nyctia"", count: 1)","CritChance(0.12); DamageVsStatus(status: Shock, mult: 1.3)",+12% crit chance; +30% damage to Shocked enemies.
+dusk_verdict,Dusk Verdict,Duo,nyctia; seraphel,EA,0.6,"FromGod(god: ""nyctia"", count: 1); FromGod(god: ""seraphel"", count: 1)","DamageVsStatus(status: Mark, mult: 1.3); CritDamage(0.4)",+30% damage to Marked enemies; +40% crit damage.
+thousand_cuts,A Thousand Cuts,Duo,nyctia; aeon,EA,0.6,"FromGod(god: ""nyctia"", count: 1); FromGod(god: ""aeon"", count: 1)","ApplyStatus(status: Bleed, chance: 0.3, stacks: 2, duration: 6.0); DamageVsStatus(status: Bleed, mult: 1.25)",Hits have a 30% chance to Bleed; your weapon's Bleeds land 2 stacks and last 6 s; +25% damage to Bleeding enemies.
+amber_tomb,Amber Tomb,Duo,aeon; gaiaa,EA,0.6,"FromGod(god: ""aeon"", count: 1); FromGod(god: ""gaiaa"", count: 1)","ApplyStatus(status: Root, chance: 0.25, stacks: 1, duration: 3.0); DamageVsStatus(status: Root, mult: 1.25)",Hits have a 25% chance to seal enemies in amber (Root for 3 s); +25% damage to Rooted enemies.
+doomsday_clock,Doomsday Clock,Duo,aeon; umbra_rex,EA,0.5,"FromGod(god: ""aeon"", count: 1); FromGod(god: ""umbra_rex"", count: 1)","Doomstack(stacks: 5, burst: 2.5); FireRate(1.1)",Every hit adds Doom; at 5 stacks the target bursts for 250% weapon damage; +10% fire rate.
+tide_of_ages,Tide of Ages,Duo,aeon; morwenn,EA,0.6,"FromGod(god: ""aeon"", count: 1); FromGod(god: ""morwenn"", count: 1)","ApplyStatus(status: Curse, chance: 0.3, stacks: 2, duration: 6.0); Trail(duration: 3.0, dps: 0.15, slow: 0.45)",Hits have a 30% chance to apply 2 Curse stacks lasting 6 s; shots leave an undertow that slows 45%.
+sunken_roots,Sunken Roots,Duo,gaiaa; morwenn,EA,0.7,"FromGod(god: ""gaiaa"", count: 1); FromGod(god: ""morwenn"", count: 1)","Puddle(radius: 2.0, duration: 4.0, dps: 0.3, status: Root); Lifesteal(0.02)",Impacts leave sucking mire that Roots enemies inside; heal for 2% of damage dealt.
+hallowed_bulwark,Hallowed Bulwark,Duo,gaiaa; seraphel,EA,0.7,"FromGod(god: ""gaiaa"", count: 1); FromGod(god: ""seraphel"", count: 1)",MaxShield(50.0); DamageTaken(0.88),+50 shield; take 12% less damage.
+covenant_of_blood,Covenant of Blood,Duo,gaiaa; umbra_rex,EA,0.6,"FromGod(god: ""gaiaa"", count: 1); FromGod(god: ""umbra_rex"", count: 1)","Lifesteal(0.04); DamageWhileLowHp(threshold: 0.5, mult: 1.25)",Heal for 4% of damage dealt; +25% damage while below 50% HP.
+day_of_reckoning,Day of Reckoning,Duo,seraphel; umbra_rex,EA,0.5,"FromGod(god: ""seraphel"", count: 1); FromGod(god: ""umbra_rex"", count: 1)","Doomstack(stacks: 7, burst: 3.0); ApplyStatus(status: Mark, chance: 0.3, stacks: 1, duration: 5.0)",Every hit adds Doom (7 stacks burst for 300% weapon damage); hits have a 30% chance to Mark.

@@ -2,13 +2,13 @@
 
 #[macro_export]
 macro_rules! bitflags_lite {
-    ($(#[$m:meta])* pub struct $name:ident: $t:ty { $(const $f:ident = $v:expr;)* }) => {
+    ($(#[$m:meta])* pub struct $name:ident: $t:ty { $($(#[$fm:meta])* const $f:ident = $v:expr;)* }) => {
         $(#[$m])*
         #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
         pub struct $name(pub $t);
         #[allow(dead_code)]
         impl $name {
-            $(pub const $f: $name = $name($v);)*
+            $($(#[$fm])* pub const $f: $name = $name($v);)*
             pub const fn empty() -> Self { $name(0) }
             pub const fn contains(self, other: $name) -> bool { self.0 & other.0 == other.0 }
             pub fn set(&mut self, other: $name, on: bool) {

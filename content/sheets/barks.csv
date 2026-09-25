@@ -1,3 +1,215 @@
 key,speaker,trigger,weight,line
 valdris_run_start_1,valdris,run_start,1.0,Another descent. The anvil remembers every one.
 smithshade_return_1,smithshade,hub_return,1.0,"Back again, and in fewer pieces than I feared."
+valdris_run_start_2,valdris,run_start,0.5,Stand behind me. It is the safest place left in the world. The bar is low.
+valdris_low_hp_1,valdris,low_hp,1.0,"Cracks in the armor. The anvil has seen worse. On me, mostly."
+valdris_downed_1,valdris,downed,1.0,Down. Not done. Lift with your legs. I am heavy.
+valdris_revived_ally_1,valdris,revived_ally,1.0,Up. The wall needs every stone.
+valdris_death_1,valdris,death,1.0,Tell the Smithshade... hit harder this time.
+valdris_victory_1,valdris,victory,1.0,The mountain stands. Someone find me a chair that will hold.
+valdris_anvil_hot_1,valdris,anvil_hot,1.0,Anvil's hot! Forge. I'll hold the door.
+valdris_ult_ready_1,valdris,ult_ready,1.0,Colossus Cannon ready! Mountainfall on your word.
+valdris_ping_danger_1,valdris,ping_danger,1.0,Danger. Get behind me.
+valdris_ping_loot_1,valdris,ping_loot,1.0,Parts here. Take them. I'll carry the rest of you.
+valdris_ally_same_character_1,valdris,ally_same_character,1.0,Another of me. The Unmade should have stayed home.
+valdris_ally_same_character_2,valdris,ally_same_character,0.5,More of me. Good. A wall is better with more wall.
+valdris_kill_streak_1,valdris,kill_streak,1.0,They keep walking into the wall. I keep being the wall.
+valdris_boss_intro_1,valdris,boss_intro,1.0,Big. Good. Big things fall loud.
+valdris_boss_kill_1,valdris,boss_kill,1.0,"It fell. Mountains always do, in the end. I would know."
+valdris_forge_fuse_1,valdris,forge_fuse,1.0,"Two into one. Stronger for it. Like me, after every death."
+valdris_forge_godforged_1,valdris,forge_godforged,1.0,Gold. The Smithshade will pretend he isn't proud.
+valdris_overdrive_1,valdris,overdrive,1.0,"Overdrive! Forward, all of you. The wall is advancing."
+valdris_hub_return_1,valdris,hub_return,1.0,Home. The anvil is warmer than the welcome. Both are enough.
+selene_run_start_1,selene,run_start,1.0,Try to keep up. And try not to stand where I'm aiming.
+selene_room_clear_1,selene,room_clear,1.0,"Silence. My second favorite sound, after thunder."
+selene_low_hp_1,selene,low_hp,1.0,I'm fine. This is a strategic amount of bleeding.
+selene_downed_1,selene,downed,1.0,This is humiliating. Revive me before anyone important notices.
+selene_revived_ally_1,selene,revived_ally,1.0,Up you get. You owe me a storm.
+selene_forge_reroll_1,selene,forge_reroll,1.0,No. Again. The anvil knows exactly what I deserve.
+selene_synergy_1,selene,synergy,1.0,"Your element, my lightning. You're welcome."
+selene_overdrive_1,selene,overdrive,1.0,Overdrive! Let the heavens take notes.
+selene_kill_streak_1,selene,kill_streak,1.0,Another screen deleted. Do try to look impressed.
+selene_boss_intro_1,selene,boss_intro,1.0,You're the finale? I've struck taller steeples.
+selene_boss_kill_1,selene,boss_kill,1.0,And that is the end of your phase. And your everything.
+selene_death_1,selene,death,1.0,Tell them the sky took me. Not... whatever that was.
+selene_victory_1,selene,victory,1.0,Obviously. Write it down: Selene did most of it.
+selene_anvil_hot_1,selene,anvil_hot,1.0,Anvil's hot! Guard me while I make this weapon worthy of me.
+selene_ult_ready_1,selene,ult_ready,1.0,Heaven's Verdict is ready. Stand in my storm and you'll hit harder.
+selene_ping_danger_1,selene,ping_danger,1.0,Danger there! Keep it off me. I break.
+selene_ping_loot_1,selene,ping_loot,1.0,Loot! Bring it here. I'll make it famous.
+selene_ally_same_character_1,selene,ally_same_character,1.0,"Another Selene? Finally, someone who can keep up."
+selene_ally_same_character_2,selene,ally_same_character,0.5,Two storms in one sky. One of us is the lesser storm. It isn't me.
+kael_run_start_1,kael,run_start,1.0,Full mag. One life. Somebody else's.
+kael_room_clear_1,kael,room_clear,1.0,Quiet. Keep moving.
+kael_low_hp_1,kael,low_hp,1.0,Bleeding. Been worse. Been dead.
+kael_downed_1,kael,downed,1.0,Down. Save a bullet for whatever did it.
+kael_revived_ally_1,kael,revived_ally,1.0,On your feet. Dying's my trick.
+kael_forge_reroll_1,kael,forge_reroll,1.0,Again. Luck owes me.
+kael_forge_godforged_1,kael,forge_godforged,1.0,Gold. Suits me.
+kael_synergy_1,kael,synergy,1.0,Nice. Do that again.
+kael_kill_streak_1,kael,kill_streak,1.0,Didn't miss. Not starting now.
+kael_boss_kill_1,kael,boss_kill,1.0,Big ones drop the same. Louder.
+kael_death_1,kael,death,1.0,Figures. Reload me.
+kael_victory_1,kael,victory,1.0,Walked out. Nobody walks out. Huh.
+kael_hub_return_1,kael,hub_return,1.0,Back. Nobody missed me. Good.
+kael_anvil_hot_1,kael,anvil_hot,1.0,Anvil's hot. Make it quick.
+kael_ult_ready_1,kael,ult_ready,1.0,Bullet Ballet's loaded. Say when.
+kael_ping_danger_1,kael,ping_danger,1.0,Danger. There.
+kael_ping_loot_1,kael,ping_loot,1.0,Parts. Grab 'em.
+kael_ally_same_character_1,kael,ally_same_character,1.0,Another me. One of us is the ghost. Don't ask which.
+kael_ally_same_character_2,kael,ally_same_character,0.5,More ghosts. Crowded afterlife.
+thessaly_run_start_1,thessaly,run_start,1.0,"Turrets primed, hexes wound, will unwritten. Shall we?"
+thessaly_room_clear_1,thessaly,room_clear,1.0,Room's clear. Recalibrating the curse. And my nerves.
+thessaly_low_hp_1,thessaly,low_hp,1.0,"Structural integrity: questionable. Mine, specifically."
+thessaly_downed_1,thessaly,downed,1.0,Minor design flaw. I'm the flaw. Tether me.
+thessaly_revived_ally_1,thessaly,revived_ally,1.0,Patched. Don't make me void your warranty.
+thessaly_forge_fuse_1,thessaly,forge_fuse,1.0,"Two parts, one purpose. If it hums, that's normal. If it sings, run."
+thessaly_forge_godforged_1,thessaly,forge_godforged,1.0,Godforged. I'd kill for the schematics. I'd settle for surviving it.
+thessaly_recipe_discovered_1,thessaly,recipe_discovered,1.0,A new recipe! Someone write it down before it writes us down.
+thessaly_synergy_1,thessaly,synergy,1.0,Curse plus element. Beautiful arithmetic. Terrible for them.
+thessaly_kill_streak_1,thessaly,kill_streak,1.0,The curse is compounding. I do love a good interest rate.
+thessaly_boss_intro_1,thessaly,boss_intro,1.0,"Big, loud and badly engineered. Let's file a complaint."
+thessaly_death_1,thessaly,death,1.0,Well. That's one way to test the failsafe.
+thessaly_victory_1,thessaly,victory,1.0,Everything I built worked. Mark the date. It won't happen twice.
+thessaly_anvil_hot_1,thessaly,anvil_hot,1.0,Anvil's hot! Hands off my wiring and cover me.
+thessaly_ult_ready_1,thessaly,ult_ready,1.0,"Sabbath of Sparks is ready. Turrets, Echoes: everyone gets a turn."
+thessaly_ping_danger_1,thessaly,ping_danger,1.0,Danger! Reads as angry. Very angry.
+thessaly_ping_loot_1,thessaly,ping_loot,1.0,Salvage here. I can make that someone else's problem.
+thessaly_ally_same_character_1,thessaly,ally_same_character,1.0,"Another me. At last, a colleague who reads the manual."
+thessaly_ally_same_character_2,thessaly,ally_same_character,0.5,"More of me, one budget. We'll be arguing about wiring by the second room."
+brax_run_start_1,brax,run_start,1.0,"Oh, I love this part! The part where we punch everything!"
+brax_room_clear_1,brax,room_clear,1.0,"Aw, all gone already? I was just warming up!"
+brax_low_hp_1,brax,low_hp,1.0,Ha! Getting a bit crispy! Still punching!
+brax_downed_1,brax,downed,1.0,I'm fine! I'm lying down on purpose! ...Little help?
+brax_revived_ally_1,brax,revived_ally,1.0,"Up you go, friend! Now let's hit something together!"
+brax_forge_fuse_1,brax,forge_fuse,1.0,Squish 'em together! Bigger is better!
+brax_overdrive_1,brax,overdrive,1.0,OVERDRIVE! Everybody punch! Even the gun people!
+brax_kill_streak_1,brax,kill_streak,1.0,Is anyone counting? I lost count! Keep 'em coming!
+brax_boss_intro_1,brax,boss_intro,1.0,You're HUGE! I'm gonna punch you so much!
+brax_boss_kill_1,brax,boss_kill,1.0,Down goes the big one! High fives all around!
+brax_death_1,brax,death,1.0,Worth it! Tell the Smithshade I want the same fists back!
+brax_victory_1,brax,victory,1.0,We won! Can we go again? I want to go again!
+brax_hub_return_1,brax,hub_return,1.0,"Home! Did anyone see that last punch? I was dead, so I missed it!"
+brax_anvil_hot_1,brax,anvil_hot,1.0,Anvil's hot! Forge something that punches!
+brax_ult_ready_1,brax,ult_ready,1.0,Meltdown's ready! Point me at the biggest one!
+brax_ping_danger_1,brax,ping_danger,1.0,Big scary one over there! I'll go say hello!
+brax_ping_loot_1,brax,ping_loot,1.0,"Ooh, shiny! Loot over here!"
+brax_ally_same_character_1,brax,ally_same_character,1.0,Another me?! Best! Day! Ever!
+brax_ally_same_character_2,brax,ally_same_character,0.5,More Braxes! We should start a band. The band is punching.
+ossian_run_start_1,ossian,run_start,1.0,The hunt begins. May our quarry be worthy of the ending.
+ossian_room_clear_1,ossian,room_clear,1.0,The field is still. Do not trust it.
+ossian_low_hp_1,ossian,low_hp,1.0,The hunter bleeds. The hunt does not stop.
+ossian_downed_1,ossian,downed,1.0,I am the quarry now. Come quickly.
+ossian_revived_ally_1,ossian,revived_ally,1.0,Rise. The hunt is not finished with you.
+ossian_forge_reroll_1,ossian,forge_reroll,1.0,No. Show me another. Patience is also a weapon.
+ossian_recipe_discovered_1,ossian,recipe_discovered,1.0,A new pattern. The hunt-god kept such things in his memory. Now I keep them.
+ossian_synergy_1,ossian,synergy,1.0,"Struck together, as a pack should. Again."
+ossian_kill_streak_1,ossian,kill_streak,1.0,One breath. One shot. Again. Again.
+ossian_boss_intro_1,ossian,boss_intro,1.0,At last. Quarry worthy of the hunt-god's name.
+ossian_boss_kill_1,ossian,boss_kill,1.0,"Rest, great one. You were hunted well."
+ossian_death_1,ossian,death,1.0,A good death is a patient one. This was not patient.
+ossian_victory_1,ossian,victory,1.0,The hunt is ended. I will name each of them in my prayers. It will take some time.
+ossian_anvil_hot_1,ossian,anvil_hot,1.0,Anvil's hot. I will watch the far ridges.
+ossian_ult_ready_1,ossian,ult_ready,1.0,"Rain of the Hunt is ready. Mark them, and they are mine."
+ossian_ping_danger_1,ossian,ping_danger,1.0,Danger. There. It has seen us.
+ossian_ping_loot_1,ossian,ping_loot,1.0,Something worth taking. There.
+ossian_ally_same_character_1,ossian,ally_same_character,1.0,Another archer of a dead god. He would have laughed. He never laughed.
+ossian_ally_same_character_2,ossian,ally_same_character,0.5,More hunters than quarry. Soon that will be true of the whole world.
+mirren_run_start_1,mirren,run_start,1.0,"Right, team. In, out, nobody dies. Well, everybody dies. But stylishly."
+mirren_low_hp_1,mirren,low_hp,1.0,"Bit of a snag, darlings. The snag is me. Bleeding."
+mirren_downed_1,mirren,downed,1.0,Caught! How embarrassing. Spring me and I'll split the take.
+mirren_revived_ally_1,mirren,revived_ally,1.0,"Back on your feet, love. You owe me. I'm writing it down."
+mirren_forge_fuse_1,mirren,forge_fuse,1.0,Two little trinkets become one big crime. Lovely.
+mirren_forge_reroll_1,mirren,forge_reroll,1.0,Again! The dice love me. Eventually.
+mirren_forge_godforged_1,mirren,forge_godforged,1.0,"Solid gold, darling. I'd steal it, if it weren't already mine."
+mirren_recipe_discovered_1,mirren,recipe_discovered,1.0,A new recipe! Let's call it a trade secret and charge admission.
+mirren_overdrive_1,mirren,overdrive,1.0,Overdrive! Spend it like it's stolen!
+mirren_kill_streak_1,mirren,kill_streak,1.0,"They keep coming, and I keep collecting."
+mirren_death_1,mirren,death,1.0,Every heist has a catch. I suppose I was it.
+mirren_victory_1,mirren,victory,1.0,"And that, darlings, is how you rob the end of the world."
+mirren_hub_return_1,mirren,hub_return,1.0,"Home again, pockets full. Don't tell Vessa."
+mirren_anvil_hot_1,mirren,anvil_hot,1.0,Anvil's hot! Form a line. Mirren's discount applies.
+mirren_ult_ready_1,mirren,ult_ready,1.0,"Grand Heist is ready. Everybody, pockets open."
+mirren_ping_danger_1,mirren,ping_danger,1.0,"Trouble, there. Big, ugly, and not my type."
+mirren_ping_loot_1,mirren,ping_loot,1.0,"Loot! Mine. I mean, ours. Mostly mine."
+mirren_ally_same_character_1,mirren,ally_same_character,1.0,Another me? Then who's watching the silverware?
+mirren_ally_same_character_2,mirren,ally_same_character,0.5,More of me? Wonderful. Everybody keep one hand on your purse.
+epoch_run_start_1,epoch,run_start,1.0,We have started. We have also finished. The middle is the interesting part.
+epoch_low_hp_1,epoch,low_hp,1.0,My wounds are early. I'd scheduled them for later.
+epoch_downed_1,epoch,downed,1.0,I remember this part. I didn't enjoy it next time either.
+epoch_revived_ally_1,epoch,revived_ally,1.0,There. I've un-happened that for you.
+epoch_forge_fuse_1,epoch,forge_fuse,1.0,"Two parts, one future. The other futures are... disappointed."
+epoch_forge_reroll_1,epoch,forge_reroll,1.0,Again. I prefer the version I haven't seen yet.
+epoch_recipe_discovered_1,epoch,recipe_discovered,1.0,A new recipe. I've always known it. Now you do too.
+epoch_synergy_1,epoch,synergy,1.0,"Perfect timing. Mine, obviously."
+epoch_overdrive_1,epoch,overdrive,1.0,Overdrive. Hurry. Patiently.
+epoch_kill_streak_1,epoch,kill_streak,1.0,Tick. Tick. Tick. They fall on the beat.
+epoch_death_1,epoch,death,1.0,Ah. This is where I stop. I always forget.
+epoch_victory_1,epoch,victory,1.0,We won. I knew that yesterday. Tomorrow. Whenever.
+epoch_hub_return_1,epoch,hub_return,1.0,Home. I was here a moment ago. And a year from now.
+epoch_anvil_hot_1,epoch,anvil_hot,1.0,Anvil's hot. For thirty seconds. I've already counted them.
+epoch_ult_ready_1,epoch,ult_ready,1.0,"Stolen Second is ready. I'd give it back, but to whom?"
+epoch_ping_danger_1,epoch,ping_danger,1.0,"Danger, there. In a moment. Now."
+epoch_ping_loot_1,epoch,ping_loot,1.0,Loot. You pick it up in four seconds. Go on.
+epoch_ally_same_character_1,epoch,ally_same_character,1.0,Another me. Early. You're always early.
+epoch_ally_same_character_2,epoch,ally_same_character,0.5,More of me. Which one is the original? Neither. Both. Later.
+smithshade_hub_return_1,smithshade,hub_return,1.0,Sit by the forge and warm what's left of you. I've already started on the rest.
+smithshade_hub_return_2,smithshade,hub_return,1.0,"Every time you come back, the anvil sings a little truer. Don't let it go to your head."
+smithshade_hub_return_3,smithshade,hub_return,0.5,I forged weapons for gods. Now I forge excuses for mortals. The work is steadier.
+smithshade_hub_return_4,smithshade,hub_return,1.0,Valdris fell in the Cinder Wastes again. I reforged him harder. He asked me to. That one worries me.
+smithshade_hub_return_5,smithshade,hub_return,1.0,Selene asked me to forge her a crown. I gave her a lightning rod. She hasn't noticed the difference.
+smithshade_hub_return_6,smithshade,hub_return,1.0,Kael never says thank you. He leaves spent casings on my anvil instead. I keep every one.
+smithshade_hub_return_7,smithshade,hub_return,1.0,Thessaly took my bellows apart to see how they breathe. They breathe better now. I resent that.
+smithshade_hub_return_8,smithshade,hub_return,1.0,Brax punched the anvil to say good morning. The anvil survived. So did Brax. Barely.
+smithshade_hub_return_9,smithshade,hub_return,1.0,"Ossian prays over everything he kills. At this rate, the dead gods owe him a very long reply."
+smithshade_hub_return_10,smithshade,hub_return,1.0,Mirren swears she's never stolen from this forge. My second-best hammer swears otherwise.
+smithshade_hub_return_11,smithshade,hub_return,1.0,Epoch thanked me for a blade I haven't made yet. I suppose I'd better make it.
+smithshade_death_1,smithshade,death,1.0,"Down you went, and up you'll come. The Forge doesn't accept resignations."
+smithshade_death_2,smithshade,death,1.0,I reforged you harder. Try to break a little less easily. Or at least more heroically.
+smithshade_death_3,smithshade,death,1.0,Death is only the Forge asking for another draft.
+smithshade_death_4,smithshade,death,0.5,Ash on my floor again. At least you're consistent.
+smithshade_victory_1,smithshade,victory,1.0,"A godcore, brought home. Hear that hum? That's the Forge remembering what it was for."
+smithshade_victory_2,smithshade,victory,1.0,"Not bad, for mortals. Not bad for gods, either. Don't tell them. They're dead, but they'd sulk."
+smithshade_victory_3,smithshade,victory,0.5,"I'd embrace you, but I'm smoke and you're still on fire. Take the sentiment."
+smithshade_recipe_discovered_1,smithshade,recipe_discovered,1.0,A new recipe. Not even the gods tried that one. They weren't brave enough. Or foolish enough.
+smithshade_recipe_discovered_2,smithshade,recipe_discovered,1.0,"Write it in the Codex, quick, before it writes itself on the walls."
+smithshade_run_start_1,smithshade,run_start,1.0,"Go on, then. Hammer the world back into shape."
+smithshade_run_start_2,smithshade,run_start,1.0,"Come back whole, or come back in pieces. Just come back."
+smithshade_forge_godforged_1,smithshade,forge_godforged,1.0,Gold. True gold. I felt that strike from here.
+smithshade_boss_kill_1,smithshade,boss_kill,1.0,Another tyrant cold on the stone. I remember when they were only ore.
+vessa_hub_return_1,vessa,hub_return,1.0,"Welcome back. Sign here, here, and here, where it says 'still technically alive'."
+vessa_hub_return_2,vessa,hub_return,1.0,"Ember logged. Shards counted. Your dignity arrived separately, as usual."
+vessa_hub_return_3,vessa,hub_return,0.5,You left with a full kit and returned with most of a body. I've noted the discrepancy.
+vessa_hub_return_4,vessa,hub_return,1.0,Valdris returns his kit polished. After dying. I don't trust anyone that tidy.
+vessa_hub_return_5,vessa,hub_return,1.0,"Selene requisitioned a mirror. 'For the field.' I've filed it under weapons, since she insists."
+vessa_hub_return_6,vessa,hub_return,1.0,Kael signs his requisitions with a single bullet hole. I've learned to read them.
+vessa_hub_return_7,vessa,hub_return,1.0,Thessaly's requisitions come with diagrams. The diagrams have footnotes. I look forward to them. Don't tell her.
+vessa_hub_return_8,vessa,hub_return,1.0,"Brax broke four gauntlets, two doors and one of my ledgers. He apologized to the ledger."
+vessa_hub_return_9,vessa,hub_return,1.0,Ossian returns every arrow he didn't use. There are never any. He returns the quiver anyway. Solemnly.
+vessa_hub_return_10,vessa,hub_return,1.0,Someone's been in the stores. Everything is dusted and alphabetized. Mirren is taunting me.
+vessa_hub_return_11,vessa,hub_return,1.0,Epoch requisitioned something for next Tuesday. I approved it. Apparently I already had.
+vessa_death_1,vessa,death,1.0,Forty percent of your shards made it back. More than can be said for you.
+vessa_death_2,vessa,death,1.0,Death logged. Cause: optimism.
+vessa_death_3,vessa,death,1.0,"I salvaged what I could. Shards, mostly. Your Echo kept the weapon. It asked after you."
+vessa_death_4,vessa,death,0.5,Another funeral I don't have to cater. The Forge is efficient that way.
+vessa_victory_1,vessa,victory,1.0,"Full extraction. Godcore intact. You, intact. I'll need a second form for that."
+vessa_victory_2,vessa,victory,1.0,Victory. I'll mark it in red ink. The only red I'm ever glad to see.
+vessa_victory_3,vessa,victory,0.5,"Congratulations. Your reward is doing it again, but harder. I don't make the rules. I just count them."
+vessa_recipe_discovered_1,vessa,recipe_discovered,1.0,New recipe logged. I've given it a shelf. The shelf looks nervous.
+vessa_recipe_discovered_2,vessa,recipe_discovered,1.0,Another recipe. The Codex is getting heavy. Good. Heavy things are harder to steal.
+vessa_run_start_1,vessa,run_start,1.0,Supplies issued. Please return them in fewer flames than last time.
+vessa_run_start_2,vessa,run_start,1.0,Off you go. Try to die somewhere with decent salvage.
+hound9_hub_return_1,hound9,hub_return,1.0,Hound-9 detects: returning Godforged. Wag protocol engaged.
+hound9_hub_return_2,hound9,hub_return,1.0,Welcome home. Hound-9 kept your spot warm. Hound-9 was sitting in it.
+hound9_hub_return_3,hound9,hub_return,1.0,Brax threw the ball into the lava again. Hound-9 retrieved it. Hound-9 would like to discuss boundaries. And do it again.
+hound9_hub_return_4,hound9,hub_return,1.0,Valdris lets Hound-9 sleep against his armor. Thermal efficiency: excellent. Friendship efficiency: also excellent.
+hound9_hub_return_5,hound9,hub_return,1.0,Kael does not pat Hound-9. Kael nods at Hound-9. Hound-9 has decided this counts.
+hound9_hub_return_6,hound9,hub_return,0.5,Thessaly upgraded Hound-9's hearing. Hound-9 can now hear Vessa sigh from three rooms away.
+hound9_hub_return_7,hound9,hub_return,0.5,Epoch said 'good dog' before Hound-9 did anything. Hound-9 is attempting to deserve it retroactively.
+hound9_death_1,hound9,death,1.0,Godforged status: deceased. Hound-9 status: sad. Reforging: underway. Hound-9 status: less sad.
+hound9_death_2,hound9,death,1.0,Hound-9 fetched what was left of you. Hound-9 is sorry. Hound-9 is also a very good fetcher.
+hound9_victory_1,hound9,victory,1.0,Victory! Hound-9 is running in circles. This serves no purpose. Hound-9 does not care.
+hound9_victory_2,hound9,victory,1.0,Godcore retrieved. Hound-9 requested to sniff it. Request denied by Vessa. Hound-9 sniffed it anyway.
+hound9_recipe_discovered_1,hound9,recipe_discovered,1.0,New recipe archived. Hound-9 has buried a backup copy in the ash-yard. For safety.
+hound9_recipe_discovered_2,hound9,recipe_discovered,1.0,Recipe detected. Hound-9's tail servo moved without authorization. Diagnosis: excitement.
+hound9_anvil_hot_1,hound9,anvil_hot,1.0,Anvil temperature optimal! Hound-9 recommends: forging. Hound-9 also recommends: defending Hound-9.

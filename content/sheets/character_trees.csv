@@ -1,2 +1,241 @@
 key,character,index,branch,name,cost,requires,mods,unlock,phase,desc
 valdris_01,valdris,1,Bulwark,Thick Plate,20,,MaxHealth(20.0),,P1,+20 max health.
+valdris_02,valdris,2,Bulwark,Riveted Hide,30,valdris_01,DamageTaken(0.98),,P1,Take 2% less damage. The Smithshade rivets what the Unmade tears.
+valdris_03,valdris,3,Bulwark,Slag-Blood,45,valdris_02,Regen(0.4),,P1,Regenerate 0.4 health per second. Molten blood seals every crack.
+valdris_04,valdris,4,Bulwark,Quenched Flesh,65,valdris_03,MaxHealth(20.0),,P1,"+20 max health. Plunged hissing into the trough, and harder for it."
+valdris_05,valdris,5,Bulwark,Barricade Oath,90,valdris_04,MaxShield(20.0),,P1,"+20 shield, reforming after 4 seconds unhurt."
+valdris_06,valdris,6,Bulwark,Anvil Stance,90,valdris_04,DamageTaken(0.97),,P1,"Take 3% less damage. Planted feet, lowered head."
+valdris_07,valdris,7,Bulwark,Temple Pillar,125,valdris_05; valdris_06,MaxHealth(25.0),,P1,+25 max health. What falls on him breaks.
+valdris_08,valdris,8,Bulwark,Warden of the Breach,170,valdris_07,MaxShield(20.0),,P1,+20 shield. Allies learn to fight in his shadow.
+valdris_09,valdris,9,Bulwark,Mountain's Patience,230,valdris_08,DamageTaken(0.97); Regen(0.3),,P1,Take 3% less damage and regenerate 0.3 health per second.
+valdris_10,valdris,10,Bulwark,Anvilheart,320,valdris_09,,sigil_anvilheart,P1,Unlocks the Sigil of the Anvilheart: Gaiaa's stone beats in your chest.
+valdris_11,valdris,11,Siege,Breach Powder,25,,Damage(1.03),,P1,+3% weapon damage. Siege work starts with a heavier charge.
+valdris_12,valdris,12,Siege,Ramming Shot,40,valdris_11,Knockback(1.15),,P1,+15% knockback. Send them back to the Unmaking.
+valdris_13,valdris,13,Siege,Wide Bore,55,valdris_12,Area(1.05),,P1,+5% weapon area: every blast and splash lands wider.
+valdris_14,valdris,14,Siege,Braced Tripod,80,valdris_13,FireRate(1.04),,P1,+4% fire rate. Siege Stance was only the beginning.
+valdris_15,valdris,15,Siege,Slam Doctrine,110,valdris_14,ActiveDamage(1.05),,P1,+5% active ability damage. Bulwark Slam lands like a dropped bell.
+valdris_16,valdris,16,Siege,Rampart Drill,110,valdris_14,CooldownRate(1.04),,P1,Actives recover 4% faster. Raise the barricade; raise it again.
+valdris_17,valdris,17,Siege,Wallbreaker,150,valdris_15; valdris_16,DamageVsElites(1.05),,P1,+5% damage to elites and bosses. Walls fall; so do champions.
+valdris_18,valdris,18,Siege,Crushing Weight,200,valdris_17,Damage(1.03); Knockback(1.1),,P1,+3% weapon damage and +10% knockback.
+valdris_19,valdris,19,Siege,Tremor Drills,260,valdris_18,DashRecharge(0.95),,P1,Dashes recharge 5% faster. The ground learns his footfalls.
+valdris_20,valdris,20,Siege,Quaking Step,360,valdris_19,,sigil_quaking_step,P1,Unlocks the Sigil of the Quaking Step: every dash lands like an earthquake.
+valdris_21,valdris,21,Avatar,Mountain's Ember,30,,UltCharge(1.04),,P1,Ultimate charges 4% faster. The mountain stirs sooner.
+valdris_22,valdris,22,Avatar,Colossal Frame,45,valdris_21,MaxHealth(15.0),,P1,+15 max health. Room for a god-sized heart.
+valdris_23,valdris,23,Avatar,Boulder Arm,65,valdris_22,Area(1.04),,P1,+4% weapon area. Every shell lands like a boulder.
+valdris_24,valdris,24,Avatar,Titan's Breath,95,valdris_23,UltCharge(1.05),,P1,Ultimate charges 5% faster.
+valdris_25,valdris,25,Avatar,Landslide,130,valdris_24,ActiveDamage(1.05),,P1,+5% active ability damage.
+valdris_26,valdris,26,Avatar,Bedrock Stride,130,valdris_24,MoveSpeed(1.03),,P1,"+3% move speed. Slow, but never stopped."
+valdris_27,valdris,27,Avatar,Avalanche Heart,175,valdris_25; valdris_26,UltCharge(1.05); DamageTaken(0.98),,P1,Ultimate charges 5% faster; take 2% less damage.
+valdris_28,valdris,28,Avatar,Chained Tremors,230,valdris_27,"ExplodeOnKill(chance: 0.06, radius: 1.8, damage: 0.5)",,P1,Kills have a 6% chance to erupt in a small quake (50% weapon damage).
+valdris_29,valdris,29,Avatar,Summit Resolve,300,valdris_28,MaxHealth(20.0); UltCharge(1.04),,P1,+20 max health; ultimate charges 4% faster.
+valdris_30,valdris,30,Avatar,Colossal Echo,400,valdris_29,,sigil_colossal_echo,P1,Unlocks the Sigil of the Colossal Echo: ultimates leave burning ground.
+selene_01,selene,1,Tempest,Quickened Coil,20,,FireRate(1.03),,P1,+3% fire rate. The coil sings a half-step faster.
+selene_02,selene,2,Tempest,Charged Casing,30,selene_01,ProjectileSpeed(1.08),,P1,+8% projectile speed.
+selene_03,selene,3,Tempest,Thunderhead,45,selene_02,Damage(1.03),,P1,+3% weapon damage.
+selene_04,selene,4,Tempest,Arc Sights,65,selene_03,CritChance(0.02),,P1,+2% crit chance.
+selene_05,selene,5,Tempest,Glass Edge,90,selene_04,CritDamage(0.1),,P1,"+10% crit damage. She was never built to last, only to land."
+selene_06,selene,6,Tempest,Long Sky,90,selene_04,Range(1.05),,P1,+5% weapon range.
+selene_07,selene,7,Tempest,Lightning Tempo,125,selene_05; selene_06,FireRate(1.04),,P1,+4% fire rate.
+selene_08,selene,8,Tempest,Overcharged Barrel,170,selene_07,Damage(1.03); ProjectileSpeed(1.05),,P1,+3% weapon damage and +5% projectile speed.
+selene_09,selene,9,Tempest,Stormwright's Hands,230,selene_08,FireRate(1.03); Damage(1.02),,P1,+3% fire rate and +2% weapon damage.
+selene_10,selene,10,Tempest,Cadence,320,selene_09,,sigil_cadence,P1,Unlocks the Sigil of Cadence: every few shots echo.
+selene_11,selene,11,Static,Static Skin,25,,ActiveDamage(1.04),,P1,+4% active ability damage. Every step banks a little more charge.
+selene_12,selene,12,Static,Arc Theory,40,selene_11,CooldownRate(1.03),,P1,Actives recover 3% faster.
+selene_13,selene,13,Static,Live Wire,55,selene_12,"ApplyStatus(status: Shock, chance: 0.05, stacks: 1, duration: 2.0)",,P1,Hits have a 5% chance to Shock.
+selene_14,selene,14,Static,Nova Lattice,80,selene_13,ActiveDamage(1.05),,P1,+5% active ability damage. Arc Nova finds more to love.
+selene_15,selene,15,Static,Conductor,110,selene_14,"Chain(jumps: 1, range: 3.5, falloff: 0.5)",,P1,Shots chain to 1 more nearby enemy at 50% damage.
+selene_16,selene,16,Static,Grounded Soul,110,selene_14,MaxShield(15.0),,P1,+15 shield. Some of the lightning stays home.
+selene_17,selene,17,Static,Capacitor Heart,150,selene_15; selene_16,CooldownRate(1.04); ActiveDamage(1.03),,P1,Actives recover 4% faster and deal 3% more damage.
+selene_18,selene,18,Static,Stormblood,200,selene_17,"DamageVsStatus(status: Shock, mult: 1.08)",,P1,+8% damage to Shocked enemies.
+selene_19,selene,19,Static,Skyfire Surge,260,selene_18,ActiveDamage(1.06),,P1,+6% active ability damage.
+selene_20,selene,20,Static,Static Bloom,360,selene_19,,sigil_static_bloom,P1,Unlocks the Sigil of Static Bloom: hits build Shock that discharges in bursts.
+selene_21,selene,21,Stormfront,Swift Front,30,,MoveSpeed(1.02),,P1,+2% move speed. Lightning never walks.
+selene_22,selene,22,Stormfront,Blinkstep,45,selene_21,DashRecharge(0.95),,P1,Dashes recharge 5% faster.
+selene_23,selene,23,Stormfront,Gathering Storm,65,selene_22,UltCharge(1.04),,P1,Ultimate charges 4% faster.
+selene_24,selene,24,Stormfront,Storm Trail,95,selene_23,"DashNova(radius: 1.8, damage: 12.0, element: Storm)",,P1,Dashing releases a small Storm nova (12 damage).
+selene_25,selene,25,Stormfront,Verdict Drums,130,selene_24,UltCharge(1.05),,P1,Ultimate charges 5% faster. Heaven's Verdict gathers early.
+selene_26,selene,26,Stormfront,Windborne,130,selene_24,MoveSpeed(1.02),,P1,+2% move speed.
+selene_27,selene,27,Stormfront,Thunder Mantle,175,selene_25; selene_26,UltCharge(1.04); CooldownRate(1.03),,P1,Ultimate charges 4% faster; actives recover 3% faster.
+selene_28,selene,28,Stormfront,Wide Heavens,230,selene_27,Area(1.05),,P1,+5% weapon area. Storms were never small.
+selene_29,selene,29,Stormfront,Tempest Wings,300,selene_28,MoveSpeed(1.02); DashRecharge(0.95),,P1,+2% move speed; dashes recharge 5% faster.
+selene_30,selene,30,Stormfront,Skyrender,400,selene_29,,sigil_skyrender,P1,Unlocks the Sigil of the Skyrender: the storm never waits.
+kael_01,kael,1,Deadeye,Steady Wrist,20,,CritChance(0.02),,P1,+2% crit chance.
+kael_02,kael,2,Deadeye,Spectral Sights,30,kael_01,CritDamage(0.08),,P1,+8% crit damage.
+kael_03,kael,3,Deadeye,Quick Draw,45,kael_02,FireRate(1.03),,P1,+3% fire rate. The Serpent never stops talking.
+kael_04,kael,4,Deadeye,Hollow Point,65,kael_03,CritChance(0.02),,P1,+2% crit chance.
+kael_05,kael,5,Deadeye,Duelist's Focus,90,kael_04,DamageVsElites(1.05),,P1,+5% damage to elites and bosses. Pick the strongest; end the argument.
+kael_06,kael,6,Deadeye,Ghost Lead,90,kael_04,ProjectileSpeed(1.08),,P1,+8% projectile speed. The bullet arrives before the sound.
+kael_07,kael,7,Deadeye,Killing Rhythm,125,kael_05; kael_06,CritDamage(0.1),,P1,+10% crit damage.
+kael_08,kael,8,Deadeye,Twin Barrels,170,kael_07,CritChance(0.02),,P1,+2% crit chance. Never misses twice.
+kael_09,kael,9,Deadeye,Deadeye's Oath,230,kael_08,CritChance(0.02); CritDamage(0.1),,P1,+2% crit chance and +10% crit damage.
+kael_10,kael,10,Deadeye,Nightfall,320,kael_09,,sigil_nightfall,P1,Unlocks the Sigil of Nightfall: Nyctia guides the killing blow.
+kael_11,kael,11,Revenant,Grave Mark,25,,"ApplyStatus(status: Mark, chance: 0.05, stacks: 1, duration: 3.0)",,P1,Hits have a 5% chance to Mark.
+kael_12,kael,12,Revenant,Wraith's Patience,40,kael_11,"DamageVsStatus(status: Mark, mult: 1.05)",,P1,+5% damage to Marked enemies.
+kael_13,kael,13,Revenant,Fan Discipline,55,kael_12,ActiveDamage(1.05),,P1,+5% active ability damage. Fan of Blades cuts deeper.
+kael_14,kael,14,Revenant,Last Rites,80,kael_13,Execute(threshold: 0.04),,P1,Hits kill non-boss enemies below 4% health.
+kael_15,kael,15,Revenant,Shadow Reload,110,kael_14,CooldownRate(1.04),,P1,Actives recover 4% faster.
+kael_16,kael,16,Revenant,Coffin Nails,110,kael_14,"ApplyStatus(status: Bleed, chance: 0.06, stacks: 1, duration: 3.0)",,P1,Hits have a 6% chance to Bleed. Running only makes it worse.
+kael_17,kael,17,Revenant,Death's Ledger,150,kael_15; kael_16,Execute(threshold: 0.06),,P1,Hits kill non-boss enemies below 6% health.
+kael_18,kael,18,Revenant,Wraith's Verdict,200,kael_17,"DamageVsStatus(status: Mark, mult: 1.06); CritChance(0.02)",,P1,+6% damage to Marked enemies and +2% crit chance.
+kael_19,kael,19,Revenant,Mercy Denied,260,kael_18,DamageVsElites(1.05),,P1,+5% damage to elites and bosses.
+kael_20,kael,20,Revenant,Silent Edge,360,kael_19,,sigil_silent_edge,P1,Unlocks the Sigil of the Silent Edge: the wounded simply stop.
+kael_21,kael,21,Ghoststep,Light Feet,30,,MoveSpeed(1.02),,P1,+2% move speed.
+kael_22,kael,22,Ghoststep,Wraith Recoil,45,kael_21,DashRecharge(0.95),,P1,Dashes recharge 5% faster.
+kael_23,kael,23,Ghoststep,Between Worlds,65,kael_22,DamageTaken(0.98),,P1,Take 2% less damage. Half of him is already somewhere else.
+kael_24,kael,24,Ghoststep,Phantom Waltz,95,kael_23,UltCharge(1.05),,P1,Ultimate charges 5% faster. The ballet is always one song away.
+kael_25,kael,25,Ghoststep,Ghost Current,130,kael_24,"DashNova(radius: 1.6, damage: 10.0, element: Void)",,P1,Dashing releases a small Void nova (10 damage).
+kael_26,kael,26,Ghoststep,Slipstream,130,kael_24,MoveSpeed(1.02),,P1,+2% move speed.
+kael_27,kael,27,Ghoststep,Restless Dead,175,kael_25; kael_26,DashRecharge(0.94),,P1,Dashes recharge 6% faster.
+kael_28,kael,28,Ghoststep,Encore,230,kael_27,UltCharge(1.05); CritChance(0.02),,P1,Ultimate charges 5% faster and +2% crit chance.
+kael_29,kael,29,Ghoststep,Wraithwalk,300,kael_28,DashCharges(1),,P1,+1 dash charge. He never stops moving.
+kael_30,kael,30,Ghoststep,Ghostlight,400,kael_29,,sigil_ghostlight,P1,Unlocks the Sigil of Ghostlight: one more step between worlds.
+thessaly_01,thessaly,1,Hexcraft,Hedge Curse,20,,"ApplyStatus(status: Curse, chance: 0.04, stacks: 1, duration: 3.0)",,EA,Hits have a 4% chance to Curse.
+thessaly_02,thessaly,2,Hexcraft,Witch's Due,30,thessaly_01,"DamageVsStatus(status: Curse, mult: 1.04)",,EA,+4% damage to Cursed enemies.
+thessaly_03,thessaly,3,Hexcraft,Bowstring Sigils,45,thessaly_02,ChargeTime(0.96),,EA,Charge weapons draw 4% faster.
+thessaly_04,thessaly,4,Hexcraft,Spite Thread,65,thessaly_03,Damage(1.03),,EA,+3% weapon damage.
+thessaly_05,thessaly,5,Hexcraft,Lingering Malice,90,thessaly_04,"ApplyStatus(status: Curse, chance: 0.04, stacks: 1, duration: 4.0)",,EA,Hits gain another 4% chance to Curse; curses last up to 4 seconds.
+thessaly_06,thessaly,6,Hexcraft,Snare Knot,90,thessaly_04,"ApplyStatus(status: Root, chance: 0.03, stacks: 1, duration: 1.0)",,EA,Hits have a 3% chance to Root for 1 second.
+thessaly_07,thessaly,7,Hexcraft,Malediction,125,thessaly_05; thessaly_06,"DamageVsStatus(status: Curse, mult: 1.05)",,EA,+5% damage to Cursed enemies.
+thessaly_08,thessaly,8,Hexcraft,Seeking Hex,170,thessaly_07,Homing(turn_rate: 40.0),,EA,Shots gently home in on their targets.
+thessaly_09,thessaly,9,Hexcraft,Cursewright,230,thessaly_08,Damage(1.04),,EA,+4% weapon damage.
+thessaly_10,thessaly,10,Hexcraft,Hexlace,320,thessaly_09,,sigil_hexlace,EA,Unlocks the Sigil of Hexlace: every hit laces a curse.
+thessaly_11,thessaly,11,Tinkerwork,Oiled Cogs,25,,CooldownRate(1.03),,EA,Actives recover 3% faster.
+thessaly_12,thessaly,12,Tinkerwork,Brass Familiar,40,thessaly_11,ActiveDamage(1.04),,EA,+4% active ability damage. The turrets shoot with a grudge.
+thessaly_13,thessaly,13,Tinkerwork,Magnet Charm,55,thessaly_12,PickupRadius(1.15),,EA,+15% pickup radius. Binding Hex spoils come to you.
+thessaly_14,thessaly,14,Tinkerwork,Tinker's Patience,80,thessaly_13,CooldownRate(1.04),,EA,Actives recover 4% faster.
+thessaly_15,thessaly,15,Tinkerwork,Spark Engine,110,thessaly_14,"SpawnTurretOnCrit(chance: 0.05, duration: 3.0, power: 0.2)",,EA,"Crits have a 5% chance to spawn a small turret (20% power, 3 seconds)."
+thessaly_16,thessaly,16,Tinkerwork,Gearbound Luck,110,thessaly_14,Luck(0.03),,EA,+0.03 Luck: hexed spoils roll rarer.
+thessaly_17,thessaly,17,Tinkerwork,Master Tinker,150,thessaly_15; thessaly_16,ActiveDamage(1.05),,EA,+5% active ability damage.
+thessaly_18,thessaly,18,Tinkerwork,Clockwork Ward,200,thessaly_17,MaxShield(20.0),,EA,+20 shield. Something ticking stands guard.
+thessaly_19,thessaly,19,Tinkerwork,Perpetual Motion,260,thessaly_18,CooldownRate(1.04); UltCharge(1.03),,EA,Actives recover 4% faster; ultimate charges 3% faster.
+thessaly_20,thessaly,20,Tinkerwork,Tinker's Grace,360,thessaly_19,,sigil_tinkers_grace,EA,Unlocks the Sigil of Tinker's Grace: your contraptions are always ready.
+thessaly_21,thessaly,21,Sabbath,Candle Vigil,30,,UltCharge(1.04),,EA,Ultimate charges 4% faster.
+thessaly_22,thessaly,22,Sabbath,Blood Price,45,thessaly_21,Lifesteal(0.01),,EA,Return 1% of damage dealt as health.
+thessaly_23,thessaly,23,Sabbath,Coven Hearth,65,thessaly_22,MaxHealth(15.0),,EA,+15 max health.
+thessaly_24,thessaly,24,Sabbath,Sabbath Drums,95,thessaly_23,UltCharge(1.05),,EA,Ultimate charges 5% faster. The sparks are already gathering.
+thessaly_25,thessaly,25,Sabbath,Hexed Ground,130,thessaly_24,"DamageVsStatus(status: Root, mult: 1.06)",,EA,+6% damage to Rooted enemies. Binding Hex holds them for the kill.
+thessaly_26,thessaly,26,Sabbath,Soul Tithe,130,thessaly_24,Regen(0.3),,EA,Regenerate 0.3 health per second.
+thessaly_27,thessaly,27,Sabbath,Witchfire Choir,175,thessaly_25; thessaly_26,UltCharge(1.05); ActiveDamage(1.03),,EA,Ultimate charges 5% faster; +3% active ability damage.
+thessaly_28,thessaly,28,Sabbath,Bound in Ash,230,thessaly_27,Lifesteal(0.01),,EA,Return a further 1% of damage dealt as health.
+thessaly_29,thessaly,29,Sabbath,High Sabbath,300,thessaly_28,Area(1.05); UltCharge(1.03),,EA,+5% weapon area; ultimate charges 3% faster.
+thessaly_30,thessaly,30,Sabbath,Bound Souls,400,thessaly_29,,sigil_bound_souls,EA,"Unlocks the Sigil of Bound Souls: where your shots land, the ground itself curses."
+brax_01,brax,1,Furnace,Banked Coals,20,,MaxHealth(15.0),,EA,+15 max health. The furnace runs on something.
+brax_02,brax,2,Furnace,Bellows Lungs,30,brax_01,Regen(0.3),,EA,Regenerate 0.3 health per second.
+brax_03,brax,3,Furnace,Kindling Fists,45,brax_02,"ApplyStatus(status: Burn, chance: 0.05, stacks: 1, duration: 3.0)",,EA,Hits have a 5% chance to Burn.
+brax_04,brax,4,Furnace,Heat Soak,65,brax_03,DamageTaken(0.98),,EA,Take 2% less damage. Heat is just another thing to eat.
+brax_05,brax,5,Furnace,Forge Draft,90,brax_04,FireRate(1.03),,EA,+3% attack rate. Heat builds faster.
+brax_06,brax,6,Furnace,Ember Skin,90,brax_04,MaxShield(15.0),,EA,+15 shield.
+brax_07,brax,7,Furnace,Roaring Furnace,125,brax_05; brax_06,"ApplyStatus(status: Burn, chance: 0.05, stacks: 1, duration: 4.0)",,EA,Hits gain another 5% chance to Burn; burns last up to 4 seconds.
+brax_08,brax,8,Furnace,Cinderblood,170,brax_07,MaxHealth(20.0),,EA,+20 max health.
+brax_09,brax,9,Furnace,Heart of the Furnace,230,brax_08,DamageTaken(0.97); Regen(0.3),,EA,Take 3% less damage and regenerate 0.3 health per second.
+brax_10,brax,10,Furnace,Furnace Heart,320,brax_09,,sigil_furnace_heart,EA,Unlocks the Sigil of the Furnace Heart: everything you touch catches.
+brax_11,brax,11,Pugilist,Brass Knuckles,25,,Damage(1.03),,EA,+3% weapon damage.
+brax_12,brax,12,Pugilist,Haymaker,40,brax_11,Knockback(1.15),,EA,+15% knockback.
+brax_13,brax,13,Pugilist,Footwork,55,brax_12,MoveSpeed(1.02),,EA,+2% move speed. Brawlers dance too.
+brax_14,brax,14,Pugilist,Uppercut Drills,80,brax_13,ActiveDamage(1.05),,EA,+5% active ability damage. Cinder Uppercut sends them higher.
+brax_15,brax,15,Pugilist,Rush Conditioning,110,brax_14,CooldownRate(1.04),,EA,Actives recover 4% faster. Furnace Rush comes back around.
+brax_16,brax,16,Pugilist,Bruiser's Eye,110,brax_14,DamageVsElites(1.05),,EA,+5% damage to elites and bosses.
+brax_17,brax,17,Pugilist,Iron Rhythm,150,brax_15; brax_16,FireRate(1.04),,EA,+4% attack rate.
+brax_18,brax,18,Pugilist,Stagger Step,200,brax_17,Knockback(1.1); Damage(1.02),,EA,+10% knockback and +2% weapon damage.
+brax_19,brax,19,Pugilist,Champion's Grit,260,brax_18,MaxHealth(20.0); DamageTaken(0.98),,EA,+20 max health; take 2% less damage.
+brax_20,brax,20,Pugilist,Iron Knuckle,360,brax_19,,sigil_iron_knuckle,EA,Unlocks the Sigil of the Iron Knuckle: hit them so hard they remember it next run.
+brax_21,brax,21,Meltdown,Stoked Core,30,,UltCharge(1.04),,EA,Ultimate charges 4% faster.
+brax_22,brax,22,Meltdown,Scorch Marks,45,brax_21,"DamageVsStatus(status: Burn, mult: 1.04)",,EA,+4% damage to Burning enemies.
+brax_23,brax,23,Meltdown,Slag Geysers,65,brax_22,Area(1.04),,EA,+4% weapon area.
+brax_24,brax,24,Meltdown,Blast Furnace,95,brax_23,UltCharge(1.05),,EA,Ultimate charges 5% faster.
+brax_25,brax,25,Meltdown,Last Ember,130,brax_24,"DamageWhileLowHp(threshold: 0.35, mult: 1.08)",,EA,+8% damage while below 35% health. The furnace burns hottest at the end.
+brax_26,brax,26,Meltdown,Cinder Burst,130,brax_24,"ExplodeOnKill(chance: 0.06, radius: 1.8, damage: 0.5)",,EA,Kills have a 6% chance to burst in cinders (50% weapon damage).
+brax_27,brax,27,Meltdown,Molten Fists,175,brax_25; brax_26,"DamageVsStatus(status: Burn, mult: 1.05); UltCharge(1.03)",,EA,+5% damage to Burning enemies; ultimate charges 3% faster.
+brax_28,brax,28,Meltdown,Shockwave Knuckles,230,brax_27,ActiveDamage(1.05),,EA,+5% active ability damage.
+brax_29,brax,29,Meltdown,Critical Mass,300,brax_28,UltCharge(1.05); Area(1.03),,EA,Ultimate charges 5% faster; +3% weapon area.
+brax_30,brax,30,Meltdown,Meltpoint,400,brax_29,,sigil_meltpoint,EA,Unlocks the Sigil of Meltpoint: burning enemies take more damage.
+ossian_01,ossian,1,Quarry,Tracker's Eye,20,,"ApplyStatus(status: Mark, chance: 0.05, stacks: 1, duration: 4.0)",,EA,Hits have a 5% chance to Mark.
+ossian_02,ossian,2,Quarry,Blood Trail,30,ossian_01,"DamageVsStatus(status: Mark, mult: 1.04)",,EA,+4% damage to Marked enemies.
+ossian_03,ossian,3,Quarry,Hunt-God's Hand,45,ossian_02,CritChance(0.02),,EA,+2% crit chance.
+ossian_04,ossian,4,Quarry,Stalker's Oath,65,ossian_03,DamageVsElites(1.05),,EA,+5% damage to elites and bosses. Big game is the only game.
+ossian_05,ossian,5,Quarry,Rain Signal,90,ossian_04,UltCharge(1.05),,EA,Ultimate charges 5% faster. The hunt answers sooner.
+ossian_06,ossian,6,Quarry,Hamstring,90,ossian_04,"ApplyStatus(status: Bleed, chance: 0.05, stacks: 1, duration: 3.0)",,EA,Hits have a 5% chance to Bleed. Wounded prey runs; running prey bleeds.
+ossian_07,ossian,7,Quarry,Named Prey,125,ossian_05; ossian_06,"DamageVsStatus(status: Mark, mult: 1.06)",,EA,+6% damage to Marked enemies.
+ossian_08,ossian,8,Quarry,Killing Word,170,ossian_07,CritDamage(0.1),,EA,+10% crit damage.
+ossian_09,ossian,9,Quarry,Last Hunt's Song,230,ossian_08,UltCharge(1.04); CritChance(0.02),,EA,Ultimate charges 4% faster; +2% crit chance.
+ossian_10,ossian,10,Quarry,Huntmark,320,ossian_09,,sigil_huntmark,EA,Unlocks the Sigil of the Huntmark: the hunt-god chooses your quarry.
+ossian_11,ossian,11,Longshot,Steady Breath,25,,ChargeTime(0.96),,EA,Charge weapons draw 4% faster.
+ossian_12,ossian,12,Longshot,Far Horizon,40,ossian_11,Range(1.05),,EA,+5% weapon range.
+ossian_13,ossian,13,Longshot,Rail Oil,55,ossian_12,ProjectileSpeed(1.08),,EA,+8% projectile speed.
+ossian_14,ossian,14,Longshot,Comet Lore,80,ossian_13,ActiveDamage(1.05),,EA,+5% active ability damage. Piercing Comet goes through one more wall of the dead.
+ossian_15,ossian,15,Longshot,Skyhook Rig,110,ossian_14,CooldownRate(1.04),,EA,Actives recover 4% faster.
+ossian_16,ossian,16,Longshot,Through and Through,110,ossian_14,Pierce(1),,EA,Shots pierce 1 more enemy.
+ossian_17,ossian,17,Longshot,Longstrider's Stance,150,ossian_15; ossian_16,ChargeTime(0.95),,EA,Charge weapons draw 5% faster.
+ossian_18,ossian,18,Longshot,Horizon Eye,200,ossian_17,Range(1.05); Damage(1.02),,EA,+5% weapon range and +2% weapon damage.
+ossian_19,ossian,19,Longshot,Far-Struck,260,ossian_18,Damage(1.04),,EA,+4% weapon damage.
+ossian_20,ossian,20,Longshot,Far Sight,360,ossian_19,,sigil_far_sight,EA,"Unlocks the Sigil of Far Sight: see further, strike sooner."
+ossian_21,ossian,21,Patience,Held Breath,30,,DamageVsFullHp(1.04),,EA,+4% damage to full-health enemies.
+ossian_22,ossian,22,Patience,Hide of Ash,45,ossian_21,DamageTaken(0.98),,EA,"Take 2% less damage. Helpless when surrounded, but not defenseless."
+ossian_23,ossian,23,Patience,Distance Kept,65,ossian_22,DashRecharge(0.95),,EA,Dashes recharge 5% faster. Keep the distance.
+ossian_24,ossian,24,Patience,First Arrow,95,ossian_23,DamageVsFullHp(1.04),,EA,+4% damage to full-health enemies.
+ossian_25,ossian,25,Patience,Ghillie Cloak,130,ossian_24,MaxShield(15.0),,EA,+15 shield.
+ossian_26,ossian,26,Patience,Stalker's Stride,130,ossian_24,MoveSpeed(1.02),,EA,+2% move speed.
+ossian_27,ossian,27,Patience,Opening Verse,175,ossian_25; ossian_26,DamageVsFullHp(1.04); CritChance(0.02),,EA,+4% damage to full-health enemies and +2% crit chance.
+ossian_28,ossian,28,Patience,Quiet Mind,230,ossian_27,CooldownRate(1.03); UltCharge(1.03),,EA,Actives recover 3% faster; ultimate charges 3% faster.
+ossian_29,ossian,29,Patience,Perfect Stillness,300,ossian_28,DamageVsFullHp(1.04); MaxHealth(15.0),,EA,+4% damage to full-health enemies and +15 max health.
+ossian_30,ossian,30,Patience,Patient Death,400,ossian_29,,sigil_patient_death,EA,Unlocks the Sigil of Patient Death: the first hit is the one that matters.
+mirren_01,mirren,1,Fortune,Lucky Coin,20,,Luck(0.03),,EA,+0.03 Luck: rarer parts roll more often.
+mirren_02,mirren,2,Fortune,Glint Eye,30,mirren_01,PickupRadius(1.1),,EA,+10% pickup radius.
+mirren_03,mirren,3,Fortune,Fox's Charm,45,mirren_02,DamageTaken(0.98),,EA,Take 2% less damage. Hard to hit what you can't pin down.
+mirren_04,mirren,4,Fortune,Gilded Pouch,65,mirren_03,Luck(0.03),,EA,+0.03 Luck.
+mirren_05,mirren,5,Fortune,Favored Hand,90,mirren_04,CritChance(0.02),,EA,+2% crit chance.
+mirren_06,mirren,6,Fortune,Shiny Things,90,mirren_04,PickupRadius(1.1),,EA,+10% pickup radius.
+mirren_07,mirren,7,Fortune,Fortune's Darling,125,mirren_05; mirren_06,Luck(0.04),,EA,+0.04 Luck.
+mirren_08,mirren,8,Fortune,Glittering Decoy,170,mirren_07,ActiveDamage(1.05),,EA,+5% active ability damage. The decoy's coins cut.
+mirren_09,mirren,9,Fortune,Golden Hour,230,mirren_08,Luck(0.04); UltCharge(1.03),,EA,+0.04 Luck; ultimate charges 3% faster.
+mirren_10,mirren,10,Fortune,Gilded Tongue,320,mirren_09,,sigil_gilded_tongue,EA,Unlocks the Sigil of the Gilded Tongue: fortune listens when you talk.
+mirren_11,mirren,11,Larceny,Light Fingers,25,,ShardsOnKill(chance: 0.01),,EA,Kills have a 1% chance to drop an extra Godshard.
+mirren_12,mirren,12,Larceny,Quick Exit,40,mirren_11,DashRecharge(0.95),,EA,Dashes recharge 5% faster.
+mirren_13,mirren,13,Larceny,Snatch Practice,55,mirren_12,CooldownRate(1.04),,EA,Actives recover 4% faster. Snatch comes back around.
+mirren_14,mirren,14,Larceny,Lined Coat,80,mirren_13,ShardsOnKill(chance: 0.01),,EA,Kills have a further 1% chance to drop an extra Godshard.
+mirren_15,mirren,15,Larceny,Heist Planner,110,mirren_14,UltCharge(1.05),,EA,Ultimate charges 5% faster. The Grand Heist is always being planned.
+mirren_16,mirren,16,Larceny,Fence's Cut,110,mirren_14,PickupRadius(1.1),,EA,+10% pickup radius.
+mirren_17,mirren,17,Larceny,Cutpurse,150,mirren_15; mirren_16,ShardsOnKill(chance: 0.01),,EA,Kills have a further 1% chance to drop an extra Godshard.
+mirren_18,mirren,18,Larceny,Getaway,200,mirren_17,MoveSpeed(1.03),,EA,+3% move speed.
+mirren_19,mirren,19,Larceny,Master Thief,260,mirren_18,ShardsOnKill(chance: 0.01); UltCharge(1.03),,EA,Kills have a further 1% chance to drop an extra Godshard; ultimate charges 3% faster.
+mirren_20,mirren,20,Larceny,Pickpocket,360,mirren_19,,sigil_pickpocket,EA,Unlocks the Sigil of the Pickpocket: the dead don't need godshards.
+mirren_21,mirren,21,Gambit,Loaded Chamber,30,,CritChance(0.02),,EA,+2% crit chance.
+mirren_22,mirren,22,Gambit,Double or Nothing,45,mirren_21,CritDamage(0.08),,EA,+8% crit damage.
+mirren_23,mirren,23,Gambit,Sleight of Hand,65,mirren_22,FireRate(1.03),,EA,+3% fire rate.
+mirren_24,mirren,24,Gambit,House Edge,95,mirren_23,CritChance(0.02),,EA,+2% crit chance.
+mirren_25,mirren,25,Gambit,Coin Burst,130,mirren_24,"ExplodeOnKill(chance: 0.05, radius: 1.6, damage: 0.4)",,EA,Kills have a 5% chance to burst in gilded shrapnel (40% weapon damage).
+mirren_26,mirren,26,Gambit,Marked Cards,130,mirren_24,"ApplyStatus(status: Mark, chance: 0.04, stacks: 1, duration: 3.0)",,EA,Hits have a 4% chance to Mark.
+mirren_27,mirren,27,Gambit,Bank Shot,175,mirren_25; mirren_26,"Ricochet(bounces: 1, range: 5.0)",,EA,Shots ricochet to 1 more target.
+mirren_28,mirren,28,Gambit,High Roller,230,mirren_27,CritDamage(0.1),,EA,+10% crit damage.
+mirren_29,mirren,29,Gambit,All In,300,mirren_28,CritChance(0.02); Damage(1.03),,EA,+2% crit chance and +3% weapon damage.
+mirren_30,mirren,30,Gambit,Loaded Dice,400,mirren_29,,sigil_loaded_dice,EA,Unlocks the Sigil of Loaded Dice: fate owes you one.
+epoch_01,epoch,1,Hourglass,Borrowed Minute,20,,CooldownRate(1.03),,EA,Actives recover 3% faster.
+epoch_02,epoch,2,Hourglass,Rewound Flesh,30,epoch_01,Regen(0.3),,EA,Regenerate 0.3 health per second. Wounds forget they happened.
+epoch_03,epoch,3,Hourglass,Spare Seconds,45,epoch_02,DashRecharge(0.95),,EA,Dashes recharge 5% faster.
+epoch_04,epoch,4,Hourglass,Unhurried,65,epoch_03,CooldownRate(1.03),,EA,Actives recover 3% faster.
+epoch_05,epoch,5,Hourglass,Chronal Ward,90,epoch_04,MaxShield(15.0),,EA,+15 shield. A blow that never arrives cannot hurt you.
+epoch_06,epoch,6,Hourglass,Leap Year,90,epoch_04,UltCharge(1.04),,EA,Ultimate charges 4% faster.
+epoch_07,epoch,7,Hourglass,Clockwright,125,epoch_05; epoch_06,CooldownRate(1.04),,EA,Actives recover 4% faster.
+epoch_08,epoch,8,Hourglass,Unwritten Wounds,170,epoch_07,MaxHealth(15.0),,EA,+15 max health.
+epoch_09,epoch,9,Hourglass,Eternal Moment,230,epoch_08,CooldownRate(1.03); UltCharge(1.03),,EA,Actives recover 3% faster; ultimate charges 3% faster.
+epoch_10,epoch,10,Hourglass,Borrowed Hour,320,epoch_09,,sigil_borrowed_hour,EA,Unlocks the Sigil of the Borrowed Hour: time runs faster for you.
+epoch_11,epoch,11,Entropy,Aging Touch,25,,"ApplyStatus(status: Curse, chance: 0.04, stacks: 1, duration: 3.0)",,EA,Hits have a 4% chance to Curse.
+epoch_12,epoch,12,Entropy,Wound of Years,40,epoch_11,"ApplyStatus(status: Bleed, chance: 0.05, stacks: 1, duration: 3.0)",,EA,Hits have a 5% chance to Bleed.
+epoch_13,epoch,13,Entropy,Hour of Decay,55,epoch_12,"DamageVsStatus(status: Curse, mult: 1.05)",,EA,+5% damage to Cursed enemies.
+epoch_14,epoch,14,Entropy,Entropic Lens,80,epoch_13,Range(1.05),,EA,+5% weapon range.
+epoch_15,epoch,15,Entropy,Doom Clock,110,epoch_14,"Doomstack(stacks: 12, burst: 1.5)",,EA,Every hit winds a doom clock; at 12 it bursts for 150% weapon damage.
+epoch_16,epoch,16,Entropy,Widening Hours,110,epoch_14,Area(1.05),,EA,+5% weapon area.
+epoch_17,epoch,17,Entropy,Age of Rust,150,epoch_15; epoch_16,"DamageVsStatus(status: Bleed, mult: 1.05)",,EA,+5% damage to Bleeding enemies.
+epoch_18,epoch,18,Entropy,Time Wounds,200,epoch_17,"ApplyStatus(status: Curse, chance: 0.04, stacks: 1, duration: 4.0)",,EA,Hits gain another 4% chance to Curse; curses last up to 4 seconds.
+epoch_19,epoch,19,Entropy,Heat Death,260,epoch_18,"Damage(1.03); DamageVsStatus(status: Curse, mult: 1.04)",,EA,+3% weapon damage and +4% damage to Cursed enemies.
+epoch_20,epoch,20,Entropy,Slow Rot,360,epoch_19,,sigil_slow_rot,EA,Unlocks the Sigil of Slow Rot: your shots age the world they pass through.
+epoch_21,epoch,21,Pendulum,Swing Weight,30,,FireRate(1.03),,EA,+3% fire rate.
+epoch_22,epoch,22,Pendulum,Escapement,45,epoch_21,ProjectileSpeed(1.06),,EA,+6% projectile speed.
+epoch_23,epoch,23,Pendulum,Metronome,65,epoch_22,Damage(1.03),,EA,+3% weapon damage.
+epoch_24,epoch,24,Pendulum,Tick and Tock,95,epoch_23,FireRate(1.03),,EA,+3% fire rate.
+epoch_25,epoch,25,Pendulum,Stolen Moment,130,epoch_24,UltCharge(1.05),,EA,Ultimate charges 5% faster. The Stolen Second is never far.
+epoch_26,epoch,26,Pendulum,Balance Wheel,130,epoch_24,MoveSpeed(1.02),,EA,+2% move speed. Borrowed Time favors those in motion.
+epoch_27,epoch,27,Pendulum,Double Beat,175,epoch_25; epoch_26,"EchoShot(every: 10, damage: 0.35)",,EA,Every 10th shot echoes at 35% damage.
+epoch_28,epoch,28,Pendulum,Mainspring,230,epoch_27,FireRate(1.04),,EA,+4% fire rate.
+epoch_29,epoch,29,Pendulum,Perfect Time,300,epoch_28,CritChance(0.02); UltCharge(1.03),,EA,+2% crit chance; ultimate charges 3% faster.
+epoch_30,epoch,30,Pendulum,Second Hand,400,epoch_29,,sigil_second_hand,EA,Unlocks the Sigil of the Second Hand: some shots happen twice.
