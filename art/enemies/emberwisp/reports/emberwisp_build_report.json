@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 167025
+    "bytes": 68574
    },
    {
     "name": "emberwisp_basecolor",
@@ -29,7 +29,7 @@
      512
     ],
     "format": "png",
-    "bytes": 181739
+    "bytes": 176477
    }
   ],
   "materials": [
@@ -70,11 +70,11 @@
      0.0
     ]
    },
-   "fx_mouth": {
+   "head_top": {
     "translation": [
      0.0,
-     0.6129,
-     0.0734
+     1.22,
+     0.0
     ],
     "forward": [
      -0.0,
@@ -87,11 +87,11 @@
      0.0
     ]
    },
-   "head_top": {
+   "fx_mouth": {
     "translation": [
      0.0,
-     1.23,
-     0.0
+     0.6244,
+     0.0852
     ],
     "forward": [
      -0.0,
@@ -107,18 +107,18 @@
   },
   "bounds": {
    "min": [
-    -0.2365,
-    0.3772,
+    -0.2633,
+    0.3765,
     -0.7328
    ],
    "max": [
-    0.2888,
-    1.07,
-    0.1444
+    0.3019,
+    1.06,
+    0.1464
    ]
   },
-  "height_m": 0.693,
-  "height_vs_hero": 0.315,
+  "height_m": 0.684,
+  "height_vs_hero": 0.311,
   "joints": [
    "root",
    "body",
@@ -142,11 +142,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 214.1,
-   "p10": 198.2,
-   "p90": 430.5
+   "median": 206.5,
+   "p10": 187.2,
+   "p90": 405.4
   },
-  "coverage": 0.502,
+  "coverage": 0.518,
   "zones": [
    "mask",
    "crust",
@@ -159,16 +159,16 @@
   "decals": 2,
   "basecolor": "art/enemies/emberwisp/textures/emberwisp_basecolor.png",
   "emissive": "art/enemies/emberwisp/textures/emberwisp_emissive.png",
-  "emissive_texels": 181023,
-  "seconds": 63.0
+  "emissive_texels": 58359,
+  "seconds": 42.3
  },
  "skin": {
-  "vertices": 492,
+  "vertices": 491,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 127,
+   "body": 126,
    "head": 52,
    "legs_a": 132,
    "legs_b": 99,
@@ -188,7 +188,7 @@
    "name": "head_ember",
    "zone": "ember",
    "bone": "body",
-   "faces": 3
+   "faces": 4
   },
   {
    "id": 2,
@@ -213,21 +213,21 @@
   },
   {
    "id": 5,
-   "name": "tongue_40",
+   "name": "tongue_64",
    "zone": "tongue",
    "bone": "legs_a",
    "faces": 33
   },
   {
    "id": 6,
-   "name": "tongue_96",
+   "name": "tongue_100",
    "zone": "tongue",
    "bone": "legs_b",
    "faces": 33
   },
   {
    "id": 7,
-   "name": "tongue_140",
+   "name": "tongue_142",
    "zone": "tongue",
    "bone": "legs_a",
    "faces": 33
@@ -241,21 +241,21 @@
   },
   {
    "id": 9,
-   "name": "tongue_222",
+   "name": "tongue_220",
    "zone": "tongue",
    "bone": "legs_a",
    "faces": 33
   },
   {
    "id": 10,
-   "name": "tongue_266",
+   "name": "tongue_262",
    "zone": "tongue",
    "bone": "legs_b",
    "faces": 33
   },
   {
    "id": 11,
-   "name": "tongue_318",
+   "name": "tongue_298",
    "zone": "tongue",
    "bone": "legs_a",
    "faces": 33

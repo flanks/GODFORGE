@@ -9,6 +9,9 @@ animated, exported and reviewed from code.
   --no-review   build, paint, rig, export and validate only
   --no-crowd    skip the horde review (40 emberwisps mixed with clinkers, imported from the shipped GLBs)
   --crowd-only  only the horde review (needs assets/models/enemies/emberwisp.glb and clinker*.glb)
+  --metrics-only [--glb PATH] [--out DIR] [--tag T]   only the art-review metric renders of a shipped GLB (toon,
+                emission-only and zone passes at true 1x); enemies/emberwisp_fix_sheet.py measures them and draws
+                the before / after sheet. The full build runs them on the new GLB unless --no-metrics
 
 Content row (content/sheets/enemies.csv): emberwisp, Swarm, P0, hp 20, speed 4.2, radius 0.34, scale 1.0,
 Swarmer(jitter 1.4), colour #FFD27A, shape Wisp, packs of 2-3, death_burst (radius 1.6, damage 16) -
@@ -19,25 +22,30 @@ summons four of them in its Blaze phase. Collider radius x scale = 0.34 m, so th
 Design (docs/art/ENEMIES.md; the user's enemy pack):
   * FACTION: the Fallen Godworks. Their glow is literally this creature: cold gold #D4B45A fading to dead
     ember #8A3A1E. It is the last spark of a dead god-forge, still wearing a scrap of its war-machine: a small
-    soot-blackened god-bronze mask. The row colour #FFD27A only sets the palest band of the flame (#FFF4D0 /
-    #F4E6B0 are the faction's own cold-gold light and core). No player gold #FFC940: the gold stays faded,
-    and the flame cools to rust and dead ember, never to a saturated warm gold. No red-white.
+    soot-blackened god-bronze mask. ART REVIEW FIX (5/10): the first pass was a white-gold / pale-gold fire and
+    19-27 % of its pixels sat within dE 20 of the player gold #FFC940 (it read as a gold pickup or fire VFX).
+    The flame is now dead ember (#C8663A tongues cooling to #8A3A1E tips, painted, lit by the toon ramp, not
+    emissive), cold gold #D4B45A glows only in a thin band against the core, and there is no pale band: no
+    pixel within dE 20 of #FFC940 and at most 40 % of the pixels glow in any pose. The row colour #FFD27A is
+    the greybox tint only. No red-white.
   * VERB FLICKER: a dark mask-head in a cup of flame, a ring of flame tongues rising and curling around it
     (open over the face and the crown, so the 55 deg camera always sees the dark core in the middle of the
     fire), a forked tail streaming behind. Two tongue groups flare and gutter out of phase, the tail whips,
     and the whole spirit jinks in small erratic darts.
-  * VALUE PLAN at game size: the dark core (it reads on bright floors) framed by the hottest, palest band
-    of the flame (so it pops on the dark Cinder floor too); the tongues cool through cold gold to rust,
-    and their tips and the tail tip go to dead ember - a dark painted edge around the bright mass. The
-    face carries one slanted cold-gold eye slit; the other eye is a big burning break in the mask's
-    upper-left corner (the asymmetry that survives 35 px, and one big glowing gap the camera sees).
+  * VALUE PLAN at game size: the dark mask is the creature (review fix: the 8 px dark core read as a
+    fireball; the mask-head is now about 16 px at 1x, over half the flame's width, and all of it reads dark),
+    framed by a thin cold-gold band against the core, then the mid-value ember flame, whose tips and tail
+    tip go to dead ember. The face carries one big slanted cold-gold eye slit, the only light on the mask and
+    the focal point; the mask's upper-left corner is broken off into a charred notch (unlit), so the
+    asymmetry is in the mask's outline against the fire, and the lopsided tongues carry the rest.
   * PAINT: the flame is painted, not graded: flat heat bands (flame_paint(), installed around gfa_paint.paint
     for this build only). Heat runs along each lick's own centreline, its blade edges run cooler than its
     centre (a hot stripe up every tongue), smooth waves across the flame bend the band borders into flame
-    fingers, and each band has its own emission. The emissive PNG is sRGB, so the flame stores its emission
-    close to the band colour (the first pass scaled it in sRGB and the fire read as brown leather). The
-    mask-head is the gf_assets NPR painter: dark bronze value planes, verdigris cavities, dull old-gold edge
-    strokes, a low war-helm crest over the crown, two bold glowing cracks from the broken corner.
+    fingers, and each band has its own emission gain and base-colour factor (only the cold-gold and warm
+    ember-core bands next to the core glow). The emissive PNG is sRGB, so the flame stores its emission
+    close to the band colour. The mask-head is the gf_assets NPR painter: dark bronze value planes,
+    verdigris cavities, sparse dull old-gold edge strokes, a low war-helm crest over the crown, two painted
+    (unlit) dead-ember cracks from the broken corner.
   * The review renders drop the preview's ink hull on glowing faces (the engine's toon shader adds emission
     after its ink edge) and draw the client's blob shadow under the hovering wisp.
 
@@ -48,6 +56,7 @@ tail = the forked tail and its sparks, root = the hover bob and tilts.
 Toolkit: tools/blender/gf_assets (gfa_model / gfa_paint / gfa_rig / gfa_export / gfa_render / gfa_boss).
 Structure follows enemies/clinker.py (the shipped swarm crawler).
 """
+import json
 import math
 import os
 import random
@@ -58,7 +67,7 @@ sys.path.insert(0, os.path.join(HERE, ".."))
 import bmesh  # noqa: E402
 import bpy  # noqa: E402
 import numpy as np  # noqa: E402
-from mathutils import Matrix, Vector  # noqa: E402
+from mathutils import Matrix, Quaternion, Vector  # noqa: E402
 
 import gfa_common as C  # noqa: E402
 import gfa_export as E  # noqa: E402
@@ -79,43 +88,55 @@ ZONES = ["mask", "crust", "ember", "flame", "tongue", "tail", "spark"]
 FLAME_ZONES = ("flame", "tongue", "tail", "spark")
 
 CZ = 0.60                  # hover height of the core centre (m)
-HEAD_R = 0.15              # mask-head radius
-FACE_TILT = 10.0           # the face looks this much up (deg), toward the 55 deg camera
+HEAD_R = 0.18              # mask-head radius (review fix: 0.15 -> 0.18, the mask is the creature, not a pip)
+FACE_TILT = 16.0           # the face looks this much up (deg), toward the 55 deg camera
 CORE = Vector((0.0, 0.0, CZ))
 
-# the flame tongues: flat blades with a diamond section, rising in an S from a ring around the core.
-# (angle deg around the core, 0 = front / -Y, 90 = the creature's LEFT / +X; height; outward reach; back
-# sweep; base half-width; inward curl of the tip; S wiggle; bone). The left side carries one big hooked
-# tongue that curls over the crown, the right side two lower licks - lopsided on purpose; the back is a tall
-# crest of three; nothing rises in front of the face (two short licks flank the chin).
+# the flame tongues: flat blades with a diamond section, rising in an S from a ring BEHIND the mask-head's
+# outline (review fix: the roots no longer cover the mask's sides, and the hooked tongue no longer curls over
+# the crown). (angle deg around the core, 0 = front / -Y, 90 = the creature's LEFT / +X; height; outward reach;
+# back sweep; base half-width; inward curl of the tip; S wiggle; bone). The left side carries one big hooked
+# tongue, the right side two lower licks - lopsided on purpose; the back is a tall crest of three; nothing
+# rises in front of the face (two short licks flank the jaw).
 TONGUES = [
-    (40.0, 0.16, 0.08, 0.02, 0.075, 0.03, 0.015, "legs_a"),
-    (96.0, 0.44, 0.15, 0.10, 0.140, 0.18, 0.030, "legs_b"),
-    (140.0, 0.42, 0.06, 0.20, 0.150, 0.05, -0.030, "legs_a"),
-    (180.0, 0.54, 0.03, 0.26, 0.160, 0.03, 0.035, "legs_b"),
-    (222.0, 0.38, 0.06, 0.18, 0.145, 0.04, -0.030, "legs_a"),
-    (266.0, 0.26, 0.10, 0.08, 0.120, 0.05, 0.025, "legs_b"),
-    (318.0, 0.15, 0.08, 0.02, 0.072, 0.03, -0.015, "legs_a"),
+    (64.0, 0.17, 0.08, 0.05, 0.070, 0.02, 0.015, "legs_a"),
+    (100.0, 0.44, 0.16, 0.12, 0.130, 0.10, 0.030, "legs_b"),
+    (142.0, 0.42, 0.06, 0.20, 0.140, 0.04, -0.030, "legs_a"),
+    (180.0, 0.52, 0.02, 0.24, 0.150, 0.02, 0.035, "legs_b"),
+    (220.0, 0.38, 0.06, 0.18, 0.135, 0.03, -0.030, "legs_a"),
+    (262.0, 0.26, 0.12, 0.09, 0.110, 0.04, 0.025, "legs_b"),
+    (298.0, 0.15, 0.08, 0.05, 0.066, 0.02, -0.015, "legs_a"),
 ]
+TONGUE_ROOT = 0.62         # tongue roots sit this x HEAD_R out from the core, and a little behind it
 DIAMOND = [(1.0, 0.0), (0.0, 1.0), (-1.0, 0.0), (0.0, -1.0)]
 
 # ---- palette (gfa_spec.FACTIONS["godworks"]) -------------------------------------------------------------
-GOLD_CORE, GOLD_LIGHT, GOLD, GOLD_RIM = "#FFF4D0", "#F4E6B0", "#D4B45A", "#8A6A28"
+GOLD_LIGHT, GOLD, GOLD_RIM = "#F4E6B0", "#D4B45A", "#8A6A28"
 EMBER_LIGHT, EMBER, EMBER_RIM = "#C8663A", "#8A3A1E", "#4A1A0C"
 BRONZE_DARK, OLD_GOLD, VERDIGRIS_SH = "#5E5034", "#86703F", "#10201C"
 SOOT = "#241E17"           # the soot-blackened bronze of the mask-head (the dark core)
-# heat bands of the painted flame: (heat where the band starts, colour, emission gain)
 EMBER_CORE = "#E08A50"     # dead_ember core: the warm step between the gold and the rust
-BANDS = [(0.00, GOLD_CORE, 1.00), (0.10, GOLD_LIGHT, 0.92), (0.22, GOLD, 0.84), (0.60, EMBER_CORE, 0.80),
-         (0.78, EMBER, 0.72), (0.92, EMBER_RIM, 0.60)]
-# The emissive PNG is sRGB (the engine linearises it), so a gain of 0.74 is about half the light. The flame is
-# self-lit: emission carries the colour, the base colour only adds a little toon-lit form under it.
-FLAME_BASE_K = 0.42        # base colour = band colour x this (sRGB)
+# the eye slit's glow (rim, core): held-back cold gold. Over the gold base line, lit by the toon ramp and x1.6,
+# the slit lands at a pale cold gold (#F9CF8C-#FFE894 on screen, dE76 27+ from #FFC940); a pale-gold core
+# (#F4E6B0) clipped to cream-white and read as a white pip, not the gold eye the review asked for
+EYE_GOLD, EYE_CORE = "#9C8452", "#B39469"
+# Heat bands of the painted flame: (heat where the band starts, colour, emission gain, base-colour factor).
+# REVIEW FIX (player-colour clash): the flame is dead ember, not gold. Cold gold glows only in a thin band
+# against the core, then the warm ember step (a dim glow), and the tongues themselves are painted dead ember
+# #C8663A -> #8A3A1E with NO emission: the engine's toon ramp lights them, so they carry form and an ink edge
+# like the rest of the creature, and the glow stays a focal accent (the review's target: 40 % or less of the
+# pixels glow). The old ramp (white-gold core, pale gold, gold, then ember tips, all emissive x1.6 in the
+# review) put 19-27 % of the pixels within dE 20 of the P1 gold #FFC940. No pale band anywhere.
+BANDS = [(0.00, GOLD, 0.68, 0.40), (0.15, EMBER_CORE, 0.60, 0.55), (0.30, EMBER_LIGHT, 0.0, 1.0),
+         (0.62, EMBER, 0.0, 1.0)]
+# The emissive PNG is sRGB (the engine linearises it); the review preview multiplies it by 1.6. A gold gain of
+# 0.68 lands the lit, glowing band at about #D4B45A on screen (dE76 about 24 from #FFC940); a gain near 1.0
+# lands at about #FFDE70 (dE76 17): the clash.
 FLAME_EMIT_K = 1.0         # emission = band colour x gain x this (sRGB)
 PALETTE = [("soot bronze (core)", SOOT), ("dark bronze", BRONZE_DARK), ("old-gold edge", OLD_GOLD),
-           ("verdigris shadow", VERDIGRIS_SH), ("gold core", GOLD_CORE), ("cold gold light", GOLD_LIGHT),
-           ("cold gold", GOLD), ("ember core", EMBER_CORE), ("dead ember", EMBER), ("ember rim", EMBER_RIM),
-           ("row colour", ROW["color"])]
+           ("verdigris shadow", VERDIGRIS_SH), ("eye glow", EYE_CORE), ("cold gold (by the core)", GOLD),
+           ("ember core (dim glow)", EMBER_CORE), ("ember light (tongues)", EMBER_LIGHT), ("dead ember (tips)", EMBER),
+           ("ember rim (break)", EMBER_RIM)]
 UV_SCALE = {"mask": 1.7, "crust": 1.5, "ember": 1.2, "flame": 0.8, "tongue": 0.75, "tail": 0.75, "spark": 0.5}
 
 
@@ -191,8 +212,10 @@ class Build:
                 z *= 1.06
             v.co = Vector((x * r * 1.02, y * r * 0.94, z * r * 1.04))
         M.recalc(bm)
-        planes = [cut(bm, Vector((0.58, -0.50, 0.64)).normalized() * 0.89 * r, (0.58, -0.50, 0.64)),
-                  cut(bm, Vector((0.90, -0.10, 0.42)).normalized() * 0.93 * r, (0.90, -0.10, 0.42))]
+        # the break: a V notch off the upper-left corner, shallower than before (review fix: it is a dim ember
+        # socket now, so the gold eye slit is the one focal point, and the dark mask stays whole)
+        planes = [cut(bm, Vector((0.58, -0.50, 0.64)).normalized() * 0.915 * r, (0.58, -0.50, 0.64)),
+                  cut(bm, Vector((0.90, -0.10, 0.42)).normalized() * 0.945 * r, (0.90, -0.10, 0.42))]
         M.noise_displace(bm, 0.004, freq=12.0, seed=SEED + 1)
         tilt = Matrix.Translation(CORE) @ Matrix.Rotation(math.radians(-FACE_TILT), 4, "X")
         M.xform(bm, matrix=tilt)
@@ -224,10 +247,11 @@ class Build:
 
     def hood(self, a):
         """The flame hood: a closed teardrop of flame cupping the core from below and behind (head bone).
-        Its top sits inside the head, so only the rim of fire around the core shows."""
-        zb = CZ - 0.22
-        prof = [(0.0, zb), (0.07, zb + 0.015), (0.13, CZ - 0.15), (0.165, CZ - 0.085), (0.172, CZ - 0.03),
-                (0.14, CZ + 0.02), (0.0, CZ + 0.04)]
+        Its top sits inside the head, so only a collar of fire around the jaw shows. It is painted by distance
+        from the core: cold gold against the mask, dead ember at the bottom tip (review fix)."""
+        zb = CZ - 0.215
+        prof = [(0.0, zb), (0.065, zb + 0.015), (0.125, CZ - 0.15), (0.158, CZ - 0.085), (0.165, CZ - 0.03),
+                (0.135, CZ + 0.02), (0.0, CZ + 0.04)]
         bm = M.lathe(prof, sides=10)
         for v in bm.verts:
             dz = CZ - v.co.z
@@ -239,7 +263,8 @@ class Build:
             v.co.y += 0.04 * max(0.0, v.co.y) / 0.18 + 0.02               # fuller at the back, the head sits forward
         M.noise_displace(bm, 0.010, freq=9.0, seed=SEED + 2)
         pid = a.add(bm, "flame", bone="head", name="hood", shading="smooth")
-        self.heat[pid] = ("hood", CZ + 0.04, zb, 0.02, 0.8, 7.0)
+        # heat by distance from the core, in mask radii: 1.0 = the mask's surface, 1.22 = the bottom tip
+        self.heat[pid] = ("shell", Vector(CORE), HEAD_R * 1.0, HEAD_R * 1.24, 0.0, 0.78, 7.0)
 
     def tongues(self, a):
         """A ring of flame licks rising around the core's sides and back: out, up, sweeping back, and the tips
@@ -250,7 +275,7 @@ class Build:
             t = math.radians(th)
             rad = Vector((math.sin(t), -math.cos(t), 0.0))
             side = up.cross(rad)
-            base = CORE + rad * 0.10 + Vector((0, 0.02, -0.07))
+            base = CORE + rad * (TONGUE_ROOT * HEAD_R) + Vector((0, 0.04, -0.06))
             pts = [base,
                    base + rad * out * 0.60 + up * h * 0.24 + back * sweep * 0.10 + side * wig * 0.5,
                    base + rad * out * 1.00 + up * h * 0.50 + back * sweep * 0.36 + side * wig,
@@ -271,9 +296,9 @@ class Build:
     def tail(self, a):
         """The forked tail: a flat ribbon of flame streaming back from the hood, curling up at the end, with a
         second lick forking off to the left, and two sparks in its wake (tail bone)."""
-        root = Vector((0.0, 0.06, CZ - 0.11))
-        path = [root, Vector((0.02, 0.26, CZ - 0.16)), Vector((-0.03, 0.45, CZ - 0.14)),
-                Vector((0.0, 0.61, CZ - 0.07)), Vector((0.05, 0.73, CZ + 0.03))]
+        root = Vector((0.0, 0.08, CZ - 0.12))
+        path = [root, Vector((0.02, 0.28, CZ - 0.17)), Vector((-0.03, 0.46, CZ - 0.15)),
+                Vector((0.0, 0.61, CZ - 0.08)), Vector((0.05, 0.72, CZ + 0.02))]
         pts = M.catmull(path, 2)
         n = len(pts)
         radii = [0.0 if i == n - 1 else 0.125 * (1 - i / (n - 1)) ** 0.85 for i in range(n)]
@@ -293,7 +318,7 @@ class Build:
         self.tail_tip = Vector(pts[-1])
         for loc, s, rot in (((0.14, 0.46, CZ + 0.03), 0.040, (20, 10, 30)), ((-0.10, 0.70, CZ + 0.07), 0.034, (-15, 25, 0))):
             pid = a.add(diamond(s, loc, rot), "spark", bone="tail", name="spark", shading="flat")
-            self.heat[pid] = ("const", 0.3)
+            self.heat[pid] = ("const", 0.2)       # sparks: the dim ember-core glow
 
     def build(self, col):
         a = M.Assembly(KEY + "_mesh", ZONES, bones=RIG.BONE_NAMES)
@@ -319,26 +344,31 @@ class Build:
 
     # -- paint --
     def recipes(self):
-        glow = {"color": GOLD_RIM, "hot": GOLD, "core": GOLD_CORE}
         flat_flame = dict(edge=0.0, cavity=0.0, ao=0.0, planes=0.0, parts=0.0, brush=0.0)
         return {
             # the face: soot-blackened god-bronze, broad value planes, dull old-gold edge strokes (the chipped
-            # soot), verdigris in the cavities; the chin sinks into shadow
-            "mask": P.zone(base=mix_hex(SOOT, BRONZE_DARK, 0.62), shadow=VERDIGRIS_SH, light=OLD_GOLD, planes=0.22,
-                           parts=0.0, brush=0.06, brush_freq=5.0, edge=0.85, edge_width=0.008, edge_breakup=0.38,
+            # soot), verdigris in the cavities; the chin sinks into shadow. Review fix: one step darker and fewer
+            # edge strokes, so the whole mask reads as ONE dark shape at 35 px with the eye slit as its light
+            "mask": P.zone(base=mix_hex(SOOT, BRONZE_DARK, 0.5), shadow=VERDIGRIS_SH, light=OLD_GOLD, planes=0.2,
+                           parts=0.0, brush=0.06, brush_freq=5.0, edge=0.5, edge_width=0.008, edge_breakup=0.45,
                            cavity=0.8, cavity_width=0.007, ao=0.45,
-                           gradient={"axis": (0, 0, 1), "range": (CZ + 0.01, CZ - 0.13), "color": "shadow", "amount": 0.4}),
+                           gradient={"axis": (0, 0, 1), "range": (CZ + 0.01, CZ - 0.16), "color": "shadow", "amount": 0.4}),
             # the crown and the back of the head: darker soot, dark bronze edges
             "crust": P.zone(base=SOOT, shadow=VERDIGRIS_SH, light=mix_hex(BRONZE_DARK, OLD_GOLD, 0.35), planes=0.18,
-                            parts=0.0, brush=0.06, brush_freq=5.0, edge=0.9, edge_width=0.009, edge_breakup=0.35,
+                            parts=0.0, brush=0.06, brush_freq=5.0, edge=0.6, edge_width=0.009, edge_breakup=0.4,
                             cavity=0.8, cavity_width=0.007, ao=0.45),
-            # the broken corner: the burning inside of the head, white-gold at the centre of the break
-            "ember": P.faction_zone("godworks", "cold_gold_glow", glow=True,
-                                    emit={"color": GOLD_RIM, "hot": GOLD, "core": GOLD_LIGHT, "mode": "radial",
-                                          "center": tuple(self.break_c), "radius": 0.055, "base_mix": 0.05}),
+            # the broken corner: the charred inside of the head, burnt soot with a rust cast and NO glow (review
+            # fix: it was a white-gold light that competed with the eye; a dim ember glow still covered a third
+            # of the head the 55 deg camera sees and cut the dark mask to a crescent). The notch reads in the
+            # mask's outline against the fire; the eye slit is the one light on the mask
+            "ember": P.zone(base=mix_hex(SOOT, EMBER_RIM, 0.45), shadow="#140A07", light=mix_hex(EMBER_RIM, EMBER, 0.4),
+                            planes=0.12, parts=0.0, brush=0.05, brush_freq=6.0, edge=0.0, cavity=0.5,
+                            cavity_width=0.006, ao=0.4,
+                            gradient={"center": tuple(self.break_c), "range": (0.07, 0.0), "color": "light",
+                                      "amount": 0.35}),
             # flame zones: repainted by flame_paint() (heat bands); these recipes only keep the painter happy
-            "flame": P.zone(base=GOLD, **flat_flame), "tongue": P.zone(base=GOLD, **flat_flame),
-            "tail": P.zone(base=EMBER_LIGHT, **flat_flame), "spark": P.zone(base=GOLD_LIGHT, **flat_flame),
+            "flame": P.zone(base=GOLD, **flat_flame), "tongue": P.zone(base=EMBER_LIGHT, **flat_flame),
+            "tail": P.zone(base=EMBER_LIGHT, **flat_flame), "spark": P.zone(base=EMBER_CORE, **flat_flame),
         }
 
     def face_frame(self):
@@ -349,24 +379,28 @@ class Build:
         return Matrix(((x.x, y.x, z.x, o.x), (x.y, y.y, z.y, o.y), (x.z, y.z, z.z, o.z), (0, 0, 0, 1)))
 
     def decals(self):
-        """Few, bold glowing lines (a web of small cracks turns to speckle at 35 px): the one slanted eye slit
-        on the right half of the face and two cracks over the crown from the broken corner."""
+        """Few, bold lines (a web of small cracks turns to speckle at 35 px): the one slanted, glowing eye slit
+        on the right half of the face (THE focal point, the only light on the mask) and two painted, unlit
+        dead-ember cracks over the crown from the broken corner (close-up detail; they fade out at game size)."""
         rng = random.Random(SEED + 100)
         burnt = "#0E0A07"
         fr = self.face_frame()
         out = []
-        # the eye: an angry slant (the outer end high), cold gold with a white-gold core, a burnt rim
-        eye = [[(-0.084, 0.034), (-0.060, 0.024), (-0.028, 0.006)]]
-        out.append(P.decal_lines(eye, fr, 0.030, zones=["mask"], color=GOLD, rim=burnt, rim_width=0.022,
-                                 emit={"color": GOLD, "core": GOLD_LIGHT}, facing=0.2, depth=(-0.06, 0.08)))
-        # two cracks over the crown from the break toward the back (seen from the 55 deg camera)
-        top = Matrix.Translation((0.0, 0.0, CZ + 0.22))
-        crown = M.crack_lines(rng, start=(0.05, -0.02), direction=128, length=0.15, step=0.02, jag=0.4,
+        # the eye: an angry slant (the outer end high) under the brow, about 5 x 2 px at 1x (review fix: it was
+        # 3 x 1.5 px), a pale cold gold on screen (EYE_GOLD / EYE_CORE), never the saturated player gold. A burnt
+        # rim cuts it out of the dark mask
+        eye = [[(-0.122, 0.050), (-0.090, 0.036), (-0.056, 0.022), (-0.026, 0.010)]]
+        out.append(P.decal_lines(eye, fr, 0.042, zones=["mask"], color=GOLD, rim=burnt, rim_width=0.030,
+                                 emit={"color": EYE_GOLD, "core": EYE_CORE}, facing=0.2, depth=(-0.07, 0.09)))
+        # two cracks over the crown from the break toward the back (seen from the 55 deg camera): painted dead
+        # ember, no emission (review fix: glowing cracks broke the dark crown into speckle)
+        top = Matrix.Translation((0.0, 0.0, CZ + 0.26))
+        crown = M.crack_lines(rng, start=(0.06, -0.024), direction=128, length=0.17, step=0.024, jag=0.4,
                               branches=1, branch_len=0.35, depth=1)
-        crown += M.crack_lines(rng, start=(0.07, 0.02), direction=72, length=0.11, step=0.02, jag=0.4, branches=0,
+        crown += M.crack_lines(rng, start=(0.085, 0.024), direction=72, length=0.12, step=0.024, jag=0.4, branches=0,
                                depth=0)
-        out.append(P.decal_lines(crown, top, 0.014, zones=["crust", "mask"], color=GOLD, rim=burnt, rim_width=0.032,
-                                 emit={"color": GOLD_RIM, "core": GOLD}, facing=0.3, depth=(-0.3, 0.0)))
+        out.append(P.decal_lines(crown, top, 0.018, zones=["crust", "mask"], color=EMBER, rim=burnt, rim_width=0.034,
+                                 emit=None, facing=0.3, depth=(-0.3, 0.0)))
         return out
 
 
@@ -450,14 +484,25 @@ def flame_paint(orig, heat_rules):
                 ang = np.arctan2(q[:, 0], -q[:, 1])
                 wave = 0.55 * np.sin(ang * licks + ph1) + 0.3 * np.sin(ang * (licks * 2 + 1) + ph2)
                 h[s] = t0 + (t1 - t0) * u ** 1.1 + 0.10 * wave * (0.35 + u)
+            elif rule[0] == "shell":
+                # by distance from a centre (r_in -> r_out): the cold gold hugs the mask, the ember falls away
+                c0, r_in, r_out, t0, t1, licks = rule[1:]
+                dvec = q - np.asarray(tuple(c0), dtype=np.float32)[None]
+                u = np.clip((np.linalg.norm(dvec, axis=1) - r_in) / (r_out - r_in), 0.0, 1.0)
+                ang = np.arctan2(dvec[:, 0], -dvec[:, 1])
+                wave = 0.55 * np.sin(ang * licks + ph1) + 0.3 * np.sin(ang * (licks * 2 + 1) + ph2)
+                h[s] = t0 + (t1 - t0) * u + 0.08 * wave * (0.3 + u)
             else:
                 h[s] = rule[1]
         wob = P.spread01(P.fbm(p, 24.0, 1, seed=seed + 62))
         h = h + 0.025 * (wob - 0.5)
-        cols = _band_mix(h, [(s0, P.hex3(hx)) for s0, hx, _ in BANDS], 0.010)
+        cols = _band_mix(h, [(s0, P.hex3(hx)) for s0, hx, _, _ in BANDS], 0.010)
         cols = cols * (1.0 + 0.08 * (P.fbm(p, 8.0, 2, seed=seed + 63) - 0.5))[:, None]   # a faint brush drift
-        gain = _band_mix(h, [(s0, np.array([g], np.float32)) for s0, _, g in BANDS], 0.010)[:, 0]
-        base[idx] = np.clip(cols * FLAME_BASE_K, 0, 1)
+        gain = _band_mix(h, [(s0, np.array([g], np.float32)) for s0, _, g, _ in BANDS], 0.010)[:, 0]
+        kb = _band_mix(h, [(s0, np.array([k], np.float32)) for s0, _, _, k in BANDS], 0.010)[:, 0]
+        # glowing bands keep a dim base (the emission carries their colour); the painted ember bands carry the
+        # full colour in the base, lit by the engine's toon ramp like the mask
+        base[idx] = np.clip(cols * kb[:, None], 0, 1)
         emis[idx] = np.clip(cols * (gain * FLAME_EMIT_K)[:, None], 0, 1)
         return base, emis
     return paint
@@ -881,9 +926,9 @@ CLINKER_LOOKS = ("clinker", "clinker_v1", "clinker_v2", "clinker_v3")
 CROWD_CLIPS = SPEC.ENEMY_CLIPS_REQUIRED
 
 
-def import_glb(key):
+def import_glb(key, path=None):
     before = set(bpy.data.objects)
-    bpy.ops.import_scene.gltf(filepath=C.model_path("enemy", key))
+    bpy.ops.import_scene.gltf(filepath=path or C.model_path("enemy", key))
     new = [o for o in bpy.data.objects if o not in before]
     arm = next(o for o in new if o.type == "ARMATURE")
     mesh = next(o for o in new if o.type == "MESH")
@@ -918,7 +963,12 @@ def spawn(v, loc, yaw, clip=None, frame=0.0):
         if mod.type == "ARMATURE":
             mod.object = a2
     a2.location = loc
-    a2.rotation_euler = (0.0, 0.0, yaw)
+    # the glTF importer leaves its objects in QUATERNION mode (rotation_euler would be ignored, and every copy
+    # faced the same way): turn the imported rest rotation about world Z (as enemies/ashrunner_crowd.py)
+    q0 = v["arm"].rotation_quaternion.copy() if v["arm"].rotation_mode == "QUATERNION" else \
+        v["arm"].rotation_euler.to_quaternion()
+    a2.rotation_mode = "QUATERNION"
+    a2.rotation_quaternion = Quaternion((0.0, 0.0, 1.0), yaw) @ q0
     for pb in a2.pose.bones:
         pb.rotation_mode = "QUATERNION"
         pb.rotation_quaternion = (1, 0, 0, 0)
@@ -1043,10 +1093,117 @@ def crowd_review(reports, work):
     return out
 
 
+# ---- review-fix metrics: the art review's numbers, measured on a shipped GLB --------------------------------
+# Three passes per pose through the game camera at TRUE 1x pixel size (the same framing as game_poses):
+#   toon  - the review's toon preview on the Cinder floor (+ blob shadow): the colours the player sees;
+#   emis  - the emissive texture x1.6 alone on black: which pixels glow;
+#   zone  - Workbench flat, AA off: the mask-head (body bone) black, the flame (head / legs) white, the tail and its
+#           sparks grey, background blue: the mask's width against the flame's.
+# enemies/emberwisp_fix_sheet.py analyses them (dE to the player gold, glow share, mask width) and draws the
+# before / after sheet. Run on any emberwisp GLB, so the pre-fix file is measured with the same code.
+
+METRIC_POSES = [("rest front", None, 0, 0.0), ("rest 3/4", None, 0, -35.0), ("drift", "move@loop", 4, -35.0),
+                ("flicker", "idle@loop", 10, -35.0), ("windup", "windup", 15, -35.0), ("attack", "attack", 5, -35.0),
+                ("hit", "hit", 2, -35.0), ("death burst", "death", 11, -35.0), ("moving away", "move@loop", 4, 145.0)]
+METRIC_PX = 76
+METRIC_TARGET = (0.0, 0.12, 0.36)
+ZONE_RGB = {"body": (0.0, 0.0, 0.0), "tail": (0.5, 0.5, 0.5), "flame": (1.0, 1.0, 1.0)}
+
+
+def _emis_only_mat(img, gain=1.6):
+    m = bpy.data.materials.new("GFA_EMIS_ONLY")
+    nt = m.node_tree
+    nt.nodes.clear()
+    o = nt.nodes.new("ShaderNodeOutputMaterial")
+    e = nt.nodes.new("ShaderNodeEmission")
+    t = nt.nodes.new("ShaderNodeTexImage")
+    t.image = img
+    e.inputs["Strength"].default_value = gain
+    nt.links.new(t.outputs["Color"], e.inputs["Color"])
+    nt.links.new(e.outputs[0], o.inputs[0])
+    return m
+
+
+def _zone_mats(mesh):
+    """Give a (copied) GLB mesh three flat materials by bone: body (the mask-head), tail (+ sparks), flame."""
+    mats = {}
+    for k, rgb in ZONE_RGB.items():
+        m = bpy.data.materials.get("GFA_ZONE_" + k) or bpy.data.materials.new("GFA_ZONE_" + k)
+        m.diffuse_color = (*rgb, 1.0)
+        mats[k] = m
+    me = mesh.data
+    names = {vg.index: vg.name for vg in mesh.vertex_groups}
+    order = ["body", "tail", "flame"]
+    me.materials.clear()
+    for k in order:
+        me.materials.append(mats[k])
+    idx = np.zeros(len(me.polygons), dtype=np.int32)
+    for p in me.polygons:
+        v = me.vertices[p.vertices[0]]
+        g = max(v.groups, key=lambda gg: gg.weight, default=None)
+        bone = names.get(g.group, "") if g else ""
+        idx[p.index] = order.index(bone) if bone in ("body", "tail") else 2
+    me.polygons.foreach_set("material_index", idx)
+    me.update()
+
+
+def metric_renders(glb, out_dir, tag):
+    """Render the three metric passes for every METRIC_POSES pose of `glb` into out_dir; returns the index."""
+    C.reset_scene(fps=FPS)
+    v = import_glb(KEY, glb)
+    scene = bpy.context.scene
+    C.ensure_dir(out_dir)
+    index = {"glb": glb, "tag": tag, "px": METRIC_PX, "view_height_m": SPEC.GAME_VIEW_HEIGHTS[0],
+             "floor": R.FLOOR, "emissive_gain": 1.6, "poses": []}
+    ortho = SPEC.GAME_VIEW_HEIGHTS[0] * METRIC_PX / SPEC.SCREEN_H
+    for label, clip, f, yaw in METRIC_POSES:
+        arm, mesh = spawn(v, (0.0, 0.0, 0.0), math.radians(yaw), clip, f)
+        blob = blob_shadow("GFA_BLOB_metric", (0.0, 0.0))
+        bpy.context.view_layer.update()
+        slug = "".join(ch if ch.isalnum() else "_" for ch in label)
+        paths = {k: os.path.join(out_dir, "%s_%s_%s.png" % (KEY, slug, k)) for k in ("toon", "emis", "zone")}
+        # 1) toon preview on the Cinder floor with the blob shadow
+        game_render([mesh], {}, paths["toon"], METRIC_PX, METRIC_PX, METRIC_TARGET, samples=16)
+        # 2) emission x1.6 only, on black
+        fl = bpy.data.objects.get("GFA_FLOOR")
+        fl.hide_render = True
+        blob.hide_render = True
+        R.setup_cycles(scene, 16, bg="#000000")
+        saved = mesh.material_slots[0].material
+        em = _emis_only_mat(R._tex_of(saved, "Emission Color"))
+        mesh.material_slots[0].material = em
+        R.aim(scene, METRIC_TARGET, game_dir(), ortho)
+        R.render(scene, paths["emis"], METRIC_PX, METRIC_PX)
+        mesh.material_slots[0].material = saved
+        bpy.data.materials.remove(em)
+        # 3) zones by bone, Workbench flat, no anti-aliasing
+        _zone_mats(mesh)
+        scene.render.engine = "BLENDER_WORKBENCH"
+        sh = scene.display.shading
+        sh.light, sh.color_type = "FLAT", "MATERIAL"
+        sh.show_cavity = sh.show_shadows = sh.show_object_outline = False
+        sh.background_type = "VIEWPORT"
+        sh.background_color = (0.0, 0.0, 1.0)
+        scene.display.render_aa = "OFF"
+        scene.view_settings.view_transform = "Standard"
+        R.aim(scene, METRIC_TARGET, game_dir(), ortho)
+        R.render(scene, paths["zone"], METRIC_PX, METRIC_PX)
+        scene.display.render_aa = "8"
+        fl.hide_render = False
+        index["poses"].append({"label": label, "clip": clip, "frame": f, "yaw": yaw,
+                               **{k: os.path.abspath(p) for k, p in paths.items()}})
+        C.remove_objects([mesh, blob])
+        bpy.data.objects.remove(arm)
+    with open(os.path.join(out_dir, "renders.json"), "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(index, fh, indent=1)      # (C.write_json logs a repo-relative path; out_dir may be elsewhere)
+    C.log("metric renders", tag, out_dir)
+    return index
+
+
 # ---- preview (flat zone colours, Workbench) -------------------------------------------------------------------
 
-PREVIEW_COLORS = {"mask": "#3A3024", "crust": "#2A231A", "ember": "#FFF4D0", "flame": "#F4E6B0", "tongue": "#D4B45A",
-                  "tail": "#C8663A", "spark": "#FFF4D0"}
+PREVIEW_COLORS = {"mask": "#3A3024", "crust": "#2A231A", "ember": "#3A1C12", "flame": "#D4B45A", "tongue": "#C8663A",
+                  "tail": "#A4492A", "spark": "#E08A50"}
 
 
 def preview(mesh, work):
@@ -1079,6 +1236,12 @@ def main():
     if C.flag(argv, "--crowd-only"):
         crowd_review(reports, work)
         C.log("DONE crowd")
+        return
+    if C.flag(argv, "--metrics-only"):
+        tag = C.opt(argv, "--tag", "after")
+        metric_renders(os.path.abspath(C.opt(argv, "--glb", C.model_path(KIND, KEY))),
+                       os.path.abspath(C.opt(argv, "--out", os.path.join(work, "metrics", tag))), tag)
+        C.log("DONE metrics")
         return
     C.reset_scene(fps=FPS)
     col = C.get_collection(KEY)
@@ -1113,8 +1276,9 @@ def main():
     extra = {
         "content_key": KEY,
         "faction": "fallen_godworks",
-        "look": "a soot-blackened god-bronze mask-head (the dark core) in a cup and ring of cold-gold flame that cools "
-                "to dead ember, with a forked tail; the mask's upper-left corner is broken open onto the fire",
+        "look": "a soot-blackened god-bronze mask-head (the dark core, about half the flame's width) with one "
+                "cold-gold eye slit, in a cup and ring of dead-ember flame (cold gold only against the core); the "
+                "mask's upper-left corner is broken off (a charred notch) and a forked tail streams behind",
         "hover_m": {"core_centre": CZ, "flame_bottom": None, "flame_top": None},
         "bones": {"root": "hover bob and tilts", "body": "the mask-head core (persists; it falls in the death)",
                   "head": "the flame hood cupping the core", "legs_a": "tongue group A (flickers against B)",
@@ -1158,6 +1322,11 @@ def main():
         review(b, arm, mesh, rep, reports, work, tex, notes, frames)
         if not C.flag(argv, "--no-crowd"):
             crowd_review(reports, work)
+        if not C.flag(argv, "--no-metrics"):
+            # the art review's numbers on the shipped GLB (player-gold clash, glow share, mask width)
+            mdir = os.path.join(work, "metrics", "after")
+            metric_renders(C.model_path(KIND, KEY), mdir, "after")
+            C.run_comfy_python("enemies/emberwisp_fix_sheet.py", "--analyse", mdir)
         C.write_pack_status(KIND, KEY, status_outputs(reports),
                             "Built from code by tools/blender/gf_assets/enemies/emberwisp.py (model, heat-band flame "
                             "paint, GF_Swarm_v1 rig, six clips, export, review sheets and the 40-copy horde render "

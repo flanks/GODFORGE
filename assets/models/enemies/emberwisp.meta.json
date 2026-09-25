@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 167025
+   "bytes": 68574
   },
   {
    "name": "emberwisp_basecolor",
@@ -26,7 +26,7 @@
     512
    ],
    "format": "png",
-   "bytes": 181739
+   "bytes": 176477
   }
  ],
  "sockets": {
@@ -64,11 +64,11 @@
     0.0
    ]
   },
-  "fx_mouth": {
+  "head_top": {
    "translation": [
     0.0,
-    0.6129,
-    0.0734
+    1.22,
+    0.0
    ],
    "forward": [
     -0.0,
@@ -81,11 +81,11 @@
     0.0
    ]
   },
-  "head_top": {
+  "fx_mouth": {
    "translation": [
     0.0,
-    1.23,
-    0.0
+    0.6244,
+    0.0852
    ],
    "forward": [
     -0.0,
@@ -112,25 +112,25 @@
  "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
  "bounds_m": {
   "min": [
-   -0.2365,
-   0.3772,
+   -0.2633,
+   0.3765,
    -0.7328
   ],
   "max": [
-   0.2888,
-   1.07,
-   0.1444
+   0.3019,
+   1.06,
+   0.1464
   ]
  },
- "size_m": 0.693,
+ "size_m": 0.684,
  "glb": "assets/models/enemies/emberwisp.glb",
- "glb_bytes": 464092,
- "glb_sha256": "e37f71221ba2864b45e739977129bc5846b5bea37e08cf939d0a9dd229200b10",
+ "glb_bytes": 360376,
+ "glb_sha256": "4c5d6811c304c01c5919e55c27cfdc2b8e71f1ef6b38b2f57af2b67ab5417199",
  "source_blend": "art/enemies/emberwisp/source/emberwisp.blend",
  "build_script": "tools/blender/gf_assets/enemies/emberwisp.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
  "generator": "Blender 5.2.0 LTS",
- "built": "2026-09-25",
+ "built": "2026-09-26",
  "validation": {
   "ok": true,
   "errors": [],
@@ -138,11 +138,11 @@
  },
  "content_key": "emberwisp",
  "faction": "fallen_godworks",
- "look": "a soot-blackened god-bronze mask-head (the dark core) in a cup and ring of cold-gold flame that cools to dead ember, with a forked tail; the mask's upper-left corner is broken open onto the fire",
+ "look": "a soot-blackened god-bronze mask-head (the dark core, about half the flame's width) with one cold-gold eye slit, in a cup and ring of dead-ember flame (cold gold only against the core); the mask's upper-left corner is broken off (a charred notch) and a forked tail streams behind",
  "hover_m": {
   "core_centre": 0.6,
-  "flame_bottom": 0.3772,
-  "flame_top": 1.07
+  "flame_bottom": 0.3765,
+  "flame_top": 1.06
  },
  "bones": {
   "root": "hover bob and tilts",
@@ -173,19 +173,19 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 214.1,
-   "p10": 198.2,
-   "p90": 430.5
+   "median": 206.5,
+   "p10": 187.2,
+   "p90": 405.4
   },
-  "coverage": 0.502
+  "coverage": 0.518
  },
  "skin": {
-  "vertices": 492,
+  "vertices": 491,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 127,
+   "body": 126,
    "head": 52,
    "legs_a": 132,
    "legs_b": 99,
