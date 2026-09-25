@@ -2,8 +2,13 @@
 //! player colours, danger red-white telegraphs. Greybox primitives stand in for authored glTF
 //! until the Blender pipeline delivers models; every mesh and material goes through this cache so
 //! swapping in real assets touches one module.
+//!
+//! Lit looks are painterly toon materials ([`ToonMaterial`]); glows, decals, additive light and
+//! ink hulls stay `StandardMaterial`. Materials are cached per (colour, look), so 400 enemies of
+//! a handful of kinds share a handful of handles and batch.
 
 use crate::ClientConfig;
+use crate::materials::{ToonMaterial, ToonStyle, toon, toon_from_standard};
 use gf_core::damage::DamageType;
 use gf_core::rarity::Rarity;
 use gf_engine::client::{Face, rgba_image};
@@ -14,22 +19,60 @@ use std::f32::consts::FRAC_PI_2;
 /// Material families.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Look {
-    /// Painted matte surface.
+    /// Painted matte prop (toon, soft gold rim, world-space brushwork).
     Matte,
-    /// Worked metal (anvils, weapons, gold trim).
+    /// Worked metal: anvils, weapons, gold trim (toon).
     Metal,
     /// Emissive: blooms in HDR (projectiles, ichor, embers).
     Glow,
-    /// Matte with a faint inner glow (status-afflicted enemies, hot metal).
+    /// Enemy body with a faint inner glow: status tints (toon, foe rim).
     Smolder,
     /// Flat unlit translucent decal on the ground (telegraphs, hazards, rings).
     Decal,
     /// Additive light (particles, flashes).
     Additive,
-    /// Translucent lit (echoes, downed wraiths).
+    /// Translucent lit: echoes, downed wraiths (toon).
     Ghost,
     /// Inverted-hull ink outline: unlit, front faces culled (painterly silhouettes, §12).
     Ink,
+    /// Player character in slot n: toon with a rim in the player's colour.
+    Hero(u8),
+    /// Enemy body: toon with a warm red rim.
+    Foe,
+    /// Glowing-hot body: hit flash, wind-up blink, heated metal (toon, blooms).
+    Hot,
+}
+
+impl Look {
+    /// Painterly toon material (as opposed to a plain `StandardMaterial`).
+    pub fn is_toon(self) -> bool {
+        !matches!(self, Look::Glow | Look::Decal | Look::Additive | Look::Ink)
+    }
+}
+
+/// A cached material of either kind.
+#[derive(Clone, Debug, PartialEq)]
+pub enum Mat {
+    Std(Handle<StandardMaterial>),
+    Toon(Handle<ToonMaterial>),
+}
+
+impl Mat {
+    /// Insert the matching `MeshMaterial3d` on an entity.
+    pub fn insert(self, entity: &mut EntityCommands) {
+        match self {
+            Mat::Std(h) => entity.insert(MeshMaterial3d(h)),
+            Mat::Toon(h) => entity.insert(MeshMaterial3d(h)),
+        };
+    }
+
+    /// The toon handle (tint swaps, downed swap).
+    pub fn toon(&self) -> Option<Handle<ToonMaterial>> {
+        match self {
+            Mat::Toon(h) => Some(h.clone()),
+            Mat::Std(_) => None,
+        }
+    }
 }
 
 #[derive(Resource)]
@@ -47,17 +90,26 @@ pub struct Palette {
     pub ring: Handle<Mesh>,
     /// Flat 1×1 quad, centred.
     pub quad: Handle<Mesh>,
-    pub ground_texture: Handle<Image>,
+    /// Tileable painted cliff strata (greyscale-warm; the toon material tints it per biome).
+    pub rock_texture: Handle<Image>,
+    /// Soft radial blob (alpha) for contact shadows.
+    pub blob_texture: Handle<Image>,
+    /// Hand-painted block face (ink border, bevel light, brushwork) for architecture primitives.
+    pub block_texture: Handle<Image>,
     pub players: [Color; 4],
     pub danger: Color,
     sectors: HashMap<u8, Handle<Mesh>>,
     annuli: HashMap<u16, Handle<Mesh>>,
     cache: HashMap<(u32, Look), Handle<StandardMaterial>>,
+    toon_cache: HashMap<(u32, Look), Handle<ToonMaterial>>,
+    blob_cache: HashMap<u8, Handle<StandardMaterial>>,
 }
 
 impl Palette {
-    /// Cached material for a colour and look.
+    /// Cached `StandardMaterial` for a colour and one of the plain looks (glow, decal, additive,
+    /// ink). Lit looks go through [`Palette::toon`] / [`Palette::look`].
     pub fn mat(&mut self, mats: &mut Assets<StandardMaterial>, color: Color, look: Look) -> Handle<StandardMaterial> {
+        debug_assert!(!look.is_toon(), "{look:?} is a toon look: use Palette::look");
         let key = (color_key(color), look);
         if let Some(h) = self.cache.get(&key) {
             return h.clone();
@@ -65,6 +117,47 @@ impl Palette {
         let h = mats.add(make_material(color, look));
         self.cache.insert(key, h.clone());
         h
+    }
+
+    /// Cached toon material for a colour and a lit look.
+    pub fn toon(&mut self, toons: &mut Assets<ToonMaterial>, color: Color, look: Look) -> Handle<ToonMaterial> {
+        let key = (color_key(color), look);
+        if let Some(h) = self.toon_cache.get(&key) {
+            return h.clone();
+        }
+        let h = toons.add(make_toon(color, look, &self.players, &self.block_texture));
+        self.toon_cache.insert(key, h.clone());
+        h
+    }
+
+    /// Cached material of the right kind for any look.
+    pub fn look(
+        &mut self,
+        mats: &mut Assets<StandardMaterial>,
+        toons: &mut Assets<ToonMaterial>,
+        color: Color,
+        look: Look,
+    ) -> Mat {
+        if look.is_toon() { Mat::Toon(self.toon(toons, color, look)) } else { Mat::Std(self.mat(mats, color, look)) }
+    }
+
+    /// Shared soft contact-shadow material (`strength` 0..1 quantized, so a few handles total).
+    pub fn blob_shadow(&mut self, mats: &mut Assets<StandardMaterial>, strength: f32) -> Handle<StandardMaterial> {
+        let q = (strength.clamp(0.0, 1.0) * 10.0).round() as u8;
+        let texture = self.blob_texture.clone();
+        self.blob_cache
+            .entry(q)
+            .or_insert_with(|| {
+                mats.add(StandardMaterial {
+                    base_color: Color::srgba(0.02, 0.015, 0.04, q as f32 / 10.0),
+                    base_color_texture: Some(texture),
+                    unlit: true,
+                    alpha_mode: AlphaMode::Blend,
+                    fog_enabled: false,
+                    ..default()
+                })
+            })
+            .clone()
     }
 
     /// Flat circular sector of radius 1 and total angle `angle_deg`, symmetric about the mesh's +Y.
@@ -99,16 +192,46 @@ fn color_key(c: Color) -> u32 {
     q(l.red) | (q(l.green) << 8) | (q(l.blue) << 16) | (a << 24)
 }
 
+fn make_toon(color: Color, look: Look, players: &[Color; 4], block: &Handle<Image>) -> ToonMaterial {
+    let lin = color.to_linear();
+    let emissive = |gain: f32| LinearRgba::rgb(lin.red * gain, lin.green * gain, lin.blue * gain);
+    match look {
+        Look::Metal => toon_from_standard(
+            StandardMaterial {
+                base_color: color,
+                base_color_texture: Some(block.clone()),
+                perceptual_roughness: 0.38,
+                metallic: 0.55,
+                ..default()
+            },
+            &ToonStyle::metal(),
+        ),
+        Look::Matte => toon(color, Some(block.clone()), LinearRgba::BLACK, &ToonStyle::prop()),
+        Look::Hero(slot) => toon(color, None, LinearRgba::BLACK, &ToonStyle::hero(players[slot as usize % 4])),
+        Look::Foe => toon(color, None, LinearRgba::BLACK, &ToonStyle::foe()),
+        Look::Smolder => toon(color, None, emissive(0.6), &ToonStyle::foe()),
+        Look::Hot => toon(color, None, emissive(2.4), &ToonStyle::foe()),
+        Look::Ghost => {
+            let mut m = toon(color, None, emissive(0.5), &ToonStyle::hero(color.with_alpha(1.0)));
+            m.base.alpha_mode = AlphaMode::Blend;
+            m
+        }
+        _ => toon(color, None, LinearRgba::BLACK, &ToonStyle::prop()),
+    }
+}
+
+/// Plain `StandardMaterial` looks. Lit looks only land here as a fallback: they normally go
+/// through [`make_toon`].
 fn make_material(color: Color, look: Look) -> StandardMaterial {
     let lin = color.to_linear();
     let emissive = |gain: f32| LinearRgba::rgb(lin.red * gain, lin.green * gain, lin.blue * gain);
     match look {
-        Look::Matte => {
+        Look::Matte | Look::Hero(_) | Look::Foe => {
             StandardMaterial { base_color: color, perceptual_roughness: 0.88, reflectance: 0.25, ..default() }
         }
         Look::Metal => StandardMaterial { base_color: color, perceptual_roughness: 0.36, metallic: 0.85, ..default() },
         Look::Glow => StandardMaterial { base_color: color, emissive: emissive(4.0), ..default() },
-        Look::Smolder => {
+        Look::Smolder | Look::Hot => {
             StandardMaterial { base_color: color, emissive: emissive(0.8), perceptual_roughness: 0.7, ..default() }
         }
         Look::Decal => StandardMaterial {
@@ -233,7 +356,9 @@ fn setup(
         disc: meshes.add(Circle::new(1.0).mesh().resolution(40)),
         ring: meshes.add(Annulus::new(0.86, 1.0).mesh().resolution(48)),
         quad: meshes.add(Rectangle::new(1.0, 1.0)),
-        ground_texture: images.add(rgba_image(GROUND_SIZE, GROUND_SIZE, ground_pixels(GROUND_SIZE), true)),
+        rock_texture: images.add(rgba_image(ROCK_SIZE, ROCK_SIZE, rock_pixels(ROCK_SIZE), true)),
+        blob_texture: images.add(rgba_image(BLOB_SIZE, BLOB_SIZE, blob_pixels(BLOB_SIZE), false)),
+        block_texture: images.add(rgba_image(BLOCK_SIZE, BLOCK_SIZE, block_pixels(BLOCK_SIZE), false)),
         players: [
             hex(&game.player_colors[0]),
             hex(&game.player_colors[1]),
@@ -244,11 +369,15 @@ fn setup(
         sectors: HashMap::new(),
         annuli: HashMap::new(),
         cache: HashMap::new(),
+        toon_cache: HashMap::new(),
+        blob_cache: HashMap::new(),
     };
     commands.insert_resource(palette);
 }
 
-const GROUND_SIZE: u32 = 256;
+const ROCK_SIZE: u32 = 256;
+const BLOB_SIZE: u32 = 64;
+const BLOCK_SIZE: u32 = 128;
 
 fn hash(x: i32, y: i32, k: u32) -> f32 {
     let mut h =
@@ -270,42 +399,92 @@ fn vnoise(x: f32, y: f32, period: i32) -> f32 {
     a + (b - a) * s(fy)
 }
 
-/// Painted flagstones: jittered slabs with dark mortar and brush-like value noise. Greyscale-warm
-/// so the per-biome material tint carries the palette. Tiles seamlessly.
-fn ground_pixels(size: u32) -> Vec<u8> {
-    const CELLS: i32 = 6;
+/// Painted cliff strata: ledged rock courses of uneven height, split by vertical joints. Each
+/// block catches light on its top lip and falls into shadow under it, so a flat cliff face reads
+/// as stacked, broken rock. Greyscale-warm (the toon material tints it) and tiles seamlessly.
+fn rock_pixels(size: u32) -> Vec<u8> {
+    const COURSES: i32 = 5;
     let mut out = Vec::with_capacity((size * size * 4) as usize);
     for py in 0..size {
         for px in 0..size {
-            let u = px as f32 / size as f32 * CELLS as f32;
-            let v = py as f32 / size as f32 * CELLS as f32;
-            let (ci, cj) = (u.floor() as i32, v.floor() as i32);
-            let (mut d1, mut d2, mut id) = (f32::MAX, f32::MAX, 0.0);
-            for dj in -1..=1 {
-                for di in -1..=1 {
-                    let (x, y) = (ci + di, cj + dj);
-                    let (wx, wy) = (x.rem_euclid(CELLS), y.rem_euclid(CELLS));
-                    let c = Vec2::new(x as f32 + 0.15 + 0.7 * hash(wx, wy, 1), y as f32 + 0.15 + 0.7 * hash(wx, wy, 2));
-                    let d = c.distance(Vec2::new(u, v));
-                    if d < d1 {
-                        d2 = d1;
-                        d1 = d;
-                        id = hash(wx, wy, 3);
-                    } else if d < d2 {
-                        d2 = d;
-                    }
-                }
-            }
-            let fu = px as f32 / size as f32;
-            let fv = py as f32 / size as f32;
-            let n = 0.55 * vnoise(fu * 8.0, fv * 8.0, 8)
-                + 0.3 * vnoise(fu * 16.0, fv * 16.0, 16)
-                + 0.15 * vnoise(fu * 32.0, fv * 32.0, 32);
-            let edge = ((d2 - d1) * 7.0).clamp(0.0, 1.0).powf(0.5);
-            let slab = 0.64 + 0.12 * id + 0.2 * (n - 0.5);
-            let lum = (0.36 + (slab - 0.36) * edge).clamp(0.0, 1.0);
+            let u = px as f32 / size as f32;
+            let v = py as f32 / size as f32;
+            // Wavy course boundaries (periodic in u).
+            let wob = (vnoise(u * 6.0, 3.0, 6) - 0.5) * 0.5 + (vnoise(u * 13.0, 7.0, 13) - 0.5) * 0.2;
+            let cv = v * COURSES as f32 + wob;
+            let course = cv.floor() as i32;
+            let fv = cv - cv.floor();
+            let ci = course.rem_euclid(COURSES);
+            // Vertical joints: 2-4 blocks per course, staggered.
+            let blocks = 2 + (hash(ci, 0, 11) * 3.0) as i32;
+            let jw = (vnoise(v * 9.0, ci as f32 * 3.1, 9) - 0.5) * 0.12;
+            let cu = u * blocks as f32 + hash(ci, 1, 12) + jw * blocks as f32;
+            let block = cu.floor() as i32;
+            let fu = cu - cu.floor();
+            let id = hash(ci, block.rem_euclid(blocks), 13);
+            let n = 0.5 * vnoise(u * 16.0, v * 16.0, 16)
+                + 0.3 * vnoise(u * 32.0, v * 32.0, 32)
+                + 0.2 * vnoise(u * 64.0, v * 64.0, 64);
+            // Lit top lip, shadowed underside, dark joints.
+            let lip = (1.0 - (fv / 0.12).clamp(0.0, 1.0)).powf(1.5);
+            let under = ((fv - 0.78) / 0.22).clamp(0.0, 1.0).powf(1.4);
+            let joint = 1.0 - (fu.min(1.0 - fu) * blocks as f32 * 10.0).clamp(0.0, 1.0);
+            let seam = 1.0 - (fv.min(1.0 - fv) * 26.0).clamp(0.0, 1.0);
+            let mut lum = 0.5 + 0.2 * (id - 0.5) + 0.26 * (n - 0.5);
+            lum += 0.2 * lip - 0.24 * under;
+            lum *= 1.0 - 0.75 * joint.max(seam);
             let to8 = |f: f32| (f.clamp(0.0, 1.0) * 255.0) as u8;
-            out.extend_from_slice(&[to8(lum), to8(lum * 0.94), to8(lum * 0.86), 255]);
+            out.extend_from_slice(&[to8(lum), to8(lum * 0.95), to8(lum * 0.9), 255]);
+        }
+    }
+    out
+}
+
+/// A hand-painted block face: a dark ink border, a light bevel on the upper/left lips and a
+/// shadowed lower/right lip, brushwork and a few chips inside. Every face of a cube (and the band
+/// of a cylinder) maps the whole image, so each face gets its own painted edges.
+fn block_pixels(size: u32) -> Vec<u8> {
+    let mut out = Vec::with_capacity((size * size * 4) as usize);
+    for py in 0..size {
+        for px in 0..size {
+            let u = (px as f32 + 0.5) / size as f32;
+            let v = (py as f32 + 0.5) / size as f32;
+            let edge = u.min(1.0 - u).min(v.min(1.0 - v));
+            let n = 0.55 * vnoise(u * 6.0, v * 6.0, 6)
+                + 0.3 * vnoise(u * 14.0 + 3.0, v * 5.0, 14)
+                + 0.15 * vnoise(u * 32.0, v * 32.0, 32);
+            // Brush strokes: blotchy value with a faint drag, like a loaded brush across the face.
+            let stroke = vnoise(u * 4.0, v * 12.0, 12);
+            let mut lum = 0.78 + 0.28 * (n - 0.5) + 0.05 * (stroke - 0.5);
+            // Bevel: light catches the top/left lips, the bottom/right lips turn away.
+            let lip = (1.0 - ((edge - 0.035) / 0.07).clamp(0.0, 1.0)).powf(1.3);
+            let lit_side = if u.min(v) < (1.0 - u).min(1.0 - v) { 1.0 } else { -0.8 };
+            lum += 0.2 * lip * lit_side;
+            // Chips knocked out of the edges.
+            let chip = vnoise(u * 11.0 + 7.0, v * 11.0 + 2.0, 11);
+            if edge < 0.09 && chip > 0.7 {
+                lum *= 0.6;
+            }
+            // Ink border.
+            let ink = 1.0 - ((edge - 0.012) / 0.016).clamp(0.0, 1.0);
+            lum *= 1.0 - 0.85 * ink;
+            let to8 = |f: f32| (f.clamp(0.0, 1.0) * 255.0) as u8;
+            out.extend_from_slice(&[to8(lum), to8(lum * 0.97), to8(lum * 0.93), 255]);
+        }
+    }
+    out
+}
+
+/// Soft radial falloff in alpha (contact shadows).
+fn blob_pixels(size: u32) -> Vec<u8> {
+    let mut out = Vec::with_capacity((size * size * 4) as usize);
+    for py in 0..size {
+        for px in 0..size {
+            let x = (px as f32 + 0.5) / size as f32 * 2.0 - 1.0;
+            let y = (py as f32 + 0.5) / size as f32 * 2.0 - 1.0;
+            let r2 = (x * x + y * y).min(1.0);
+            let a = (1.0 - r2).powf(1.6);
+            out.extend_from_slice(&[255, 255, 255, (a * 255.0) as u8]);
         }
     }
     out
@@ -323,10 +502,10 @@ mod tests {
     }
 
     #[test]
-    fn ground_tiles_seamlessly() {
+    fn rock_tiles_seamlessly() {
         // The noise lattice wraps, so opposite edges sample the same field.
         assert!((vnoise(0.0, 3.3, 8) - vnoise(8.0, 3.3, 8)).abs() < 1e-5);
-        assert_eq!(ground_pixels(16).len(), 16 * 16 * 4);
+        assert_eq!(rock_pixels(16).len(), 16 * 16 * 4);
     }
 
     #[test]

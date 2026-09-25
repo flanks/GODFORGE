@@ -13,6 +13,7 @@ pub mod net;
 pub mod offscreen;
 pub mod palette;
 pub mod scene;
+pub mod terrain;
 pub mod ui;
 pub mod vfx;
 

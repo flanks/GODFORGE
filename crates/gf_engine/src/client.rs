@@ -78,7 +78,20 @@ pub fn iso_camera(view_height: f32, clear: Color) -> impl Bundle {
         Hdr,
         Tonemapping::TonyMcMapface,
         Bloom { intensity: 0.22, ..Bloom::NATURAL },
+        painterly_grade(),
     )
+}
+
+/// Painterly colour grade: richer saturation in the shadows and midtones (Hades-style colour
+/// shadows instead of grey ones), a touch of midtone contrast, highlights left clean.
+fn painterly_grade() -> bevy::render::view::ColorGrading {
+    use bevy::render::view::{ColorGrading, ColorGradingGlobal, ColorGradingSection};
+    ColorGrading {
+        global: ColorGradingGlobal { post_saturation: 1.06, ..default() },
+        shadows: ColorGradingSection { saturation: 1.2, contrast: 1.04, ..default() },
+        midtones: ColorGradingSection { saturation: 1.12, contrast: 1.06, ..default() },
+        highlights: ColorGradingSection { saturation: 1.02, ..default() },
+    }
 }
 
 /// Directional key light. With `shadows`, one cascade sized for the fixed iso camera (the whole

@@ -7,10 +7,12 @@
 //!   everything else eases toward its latest authoritative position.
 //! * The local player renders at its predicted position (see `net::Prediction`).
 
-use crate::camera::w3;
+use crate::camera::{KeyLight, w3};
 use crate::input::InputState;
+use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial};
 use crate::net::{CurrentRoom, Link, Prediction};
-use crate::palette::{Look, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
+use crate::palette::{Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
+use crate::terrain::{self, TerrainStores};
 use crate::{ClientConfig, ClientSet};
 use gf_content::{ContentDb, Decor, EnemyShape, RoomDef};
 use gf_core::aim::AimMode;
@@ -18,8 +20,7 @@ use gf_core::ids::NetId;
 use gf_core::movement::Obstacle;
 use gf_core::rarity::Rarity;
 use gf_core::revive::LifeState;
-use gf_engine::bevy::math::Affine2;
-use gf_engine::client::NotShadowCaster;
+use gf_engine::client::{NotShadowCaster, SystemParam};
 use gf_engine::prelude::*;
 use gf_net::quant::{u8_to_dir, u8_to_frac, u16_to_dir};
 use gf_net::*;
@@ -28,9 +29,11 @@ use std::f32::consts::{FRAC_PI_2, FRAC_PI_4};
 
 const PROJECTILE_HEIGHT: f32 = 0.9;
 const GOLD: &str = "#FFC940";
-const BRONZE: &str = "#9A7443";
+const BRONZE: &str = "#7E5E36";
 const IRON: &str = "#3B3633";
 const INK: &str = "#140C08";
+/// Ink outline thickness on room architecture (world units).
+const ENV_INK: f32 = 0.06;
 
 #[derive(Component)]
 pub struct RoomGeometry;
@@ -70,7 +73,7 @@ pub struct Visual {
     /// Animated children: telegraph fill / anvil progress, anvil ring, anvil hot glow.
     parts: [Option<Entity>; 3],
     tint: Tint,
-    base_mat: Option<Handle<StandardMaterial>>,
+    base_mat: Option<Handle<ToonMaterial>>,
 }
 
 impl Visual {
@@ -123,8 +126,8 @@ pub struct PlayerRig {
     shield: Entity,
     aura: Entity,
     tether: Entity,
-    body_mat: Handle<StandardMaterial>,
-    ghost_mat: Handle<StandardMaterial>,
+    body_mat: Handle<ToonMaterial>,
+    ghost_mat: Handle<ToonMaterial>,
     downed: bool,
 }
 
@@ -182,51 +185,77 @@ pub fn build(app: &mut App) {
     );
 }
 
+/// The mesh and material stores every spawner needs.
+#[derive(SystemParam)]
+pub struct Stores<'w> {
+    pub meshes: ResMut<'w, Assets<Mesh>>,
+    pub mats: ResMut<'w, Assets<StandardMaterial>>,
+    pub toons: ResMut<'w, Assets<ToonMaterial>>,
+}
+
 /// Spawning helper bundling the asset stores.
 struct Kit<'a, 'w, 's> {
     commands: &'a mut Commands<'w, 's>,
     pal: &'a mut Palette,
     mats: &'a mut Assets<StandardMaterial>,
+    toons: &'a mut Assets<ToonMaterial>,
     meshes: &'a mut Assets<Mesh>,
 }
 
-impl Kit<'_, '_, '_> {
-    fn mat(&mut self, c: Color, look: Look) -> Handle<StandardMaterial> {
-        self.pal.mat(self.mats, c, look)
+impl<'a, 'w, 's> Kit<'a, 'w, 's> {
+    fn new(commands: &'a mut Commands<'w, 's>, pal: &'a mut Palette, stores: &'a mut Stores) -> Self {
+        Kit { commands, pal, mats: stores.mats.as_mut(), toons: stores.toons.as_mut(), meshes: stores.meshes.as_mut() }
     }
 
-    fn child(&mut self, parent: Entity, mesh: &Handle<Mesh>, mat: Handle<StandardMaterial>, tf: Transform) -> Entity {
-        self.commands.spawn((Mesh3d(mesh.clone()), MeshMaterial3d(mat), tf, ChildOf(parent))).id()
+    fn mat(&mut self, c: Color, look: Look) -> Mat {
+        self.pal.look(self.mats, self.toons, c, look)
     }
 
-    fn hidden_child(
-        &mut self,
-        parent: Entity,
-        mesh: &Handle<Mesh>,
-        mat: Handle<StandardMaterial>,
-        tf: Transform,
-    ) -> Entity {
-        self.commands.spawn((Mesh3d(mesh.clone()), MeshMaterial3d(mat), tf, Visibility::Hidden, ChildOf(parent))).id()
+    fn child(&mut self, parent: Entity, mesh: &Handle<Mesh>, mat: Mat, tf: Transform) -> Entity {
+        let mut e = self.commands.spawn((Mesh3d(mesh.clone()), tf, ChildOf(parent)));
+        mat.insert(&mut e);
+        e.id()
     }
 
-    fn geometry(&mut self, mesh: &Handle<Mesh>, mat: Handle<StandardMaterial>, tf: Transform) {
-        self.commands.spawn((RoomGeometry, Mesh3d(mesh.clone()), MeshMaterial3d(mat), tf));
+    fn hidden_child(&mut self, parent: Entity, mesh: &Handle<Mesh>, mat: Mat, tf: Transform) -> Entity {
+        let mut e = self.commands.spawn((Mesh3d(mesh.clone()), tf, Visibility::Hidden, ChildOf(parent)));
+        mat.insert(&mut e);
+        e.id()
+    }
+
+    fn geometry(&mut self, mesh: &Handle<Mesh>, mat: Mat, tf: Transform) {
+        let mut e = self.commands.spawn((RoomGeometry, Mesh3d(mesh.clone()), tf));
+        mat.insert(&mut e);
+    }
+
+    /// Room geometry with an inverted-hull ink outline (`grow` is added to the local scale).
+    fn inked(&mut self, mesh: &Handle<Mesh>, mat: Mat, tf: Transform, grow: Vec3) {
+        self.geometry(mesh, mat, tf);
+        let ink = self.mat(hex(INK), Look::Ink);
+        let mut e = self.commands.spawn((
+            RoomGeometry,
+            Mesh3d(mesh.clone()),
+            Transform { scale: tf.scale + grow, ..tf },
+            NotShadowCaster,
+        ));
+        ink.insert(&mut e);
     }
 
     /// Soft contact shadow (no shadow maps: cheap and readable at 400 enemies).
     fn shadow(&mut self, parent: Entity, radius: f32, lift: f32) {
-        let m = self.mat(Color::srgba(0.0, 0.0, 0.0, 0.38), Look::Decal);
+        let m = Mat::Std(self.pal.blob_shadow(self.mats, 0.6));
         let disc = self.pal.disc.clone();
-        self.child(
+        let e = self.child(
             parent,
             &disc,
             m,
             Transform {
                 translation: Vec3::new(0.0, 0.012 - lift, 0.0),
                 rotation: flat(FRAC_PI_2),
-                scale: Vec3::splat(radius),
+                scale: Vec3::splat(radius * 1.25),
             },
         );
+        self.commands.entity(e).insert(NotShadowCaster);
     }
 }
 
@@ -239,10 +268,12 @@ fn rebuild_room(
     link: Res<Link>,
     current: Res<CurrentRoom>,
     mut pal: ResMut<Palette>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut stores: Stores,
+    mut floors: ResMut<Assets<FloorMaterial>>,
+    mut abysses: ResMut<Assets<AbyssMaterial>>,
     mut index: ResMut<SceneIndex>,
     mut ambient: ResMut<GlobalAmbientLight>,
+    mut keys: Query<&mut DirectionalLight, With<KeyLight>>,
     old: Query<Entity, With<RoomGeometry>>,
 ) {
     let Some(world) = &link.latest else { return };
@@ -254,15 +285,34 @@ fn rebuild_room(
         commands.entity(e).despawn();
     }
     let room = current.def.as_ref();
-    let colors = cfg
-        .content
-        .biomes
-        .try_get(world.run.biome)
-        .map(|b| [hex(&b.palette[0]), hex(&b.palette[1]), hex(&b.palette[2])])
-        .unwrap_or([hex("#2B1B15"), hex("#FF8A2A"), hex("#140D0A")]);
-    ambient.color = mix(Color::srgb(1.0, 0.88, 0.74), colors[1], 0.22);
-    let mut kit = Kit { commands: &mut commands, pal: &mut pal, mats: &mut mats, meshes: &mut meshes };
-    build_room(&mut kit, room, colors);
+    let biome = cfg.content.biomes.try_get(world.run.biome);
+    let colors = biome.map(|b| [hex(&b.palette[0]), hex(&b.palette[1]), hex(&b.palette[2])]).unwrap_or([
+        hex("#2B1B15"),
+        hex("#FF8A2A"),
+        hex("#140D0A"),
+    ]);
+    let look = BiomeLook::new(biome.map_or("", |b| b.key.as_str()), colors);
+    // Lighting: warm key against a cool ambient (saturated cool shadows, warm light pools).
+    ambient.color = look.ambient;
+    ambient.brightness = look.ambient_brightness;
+    for mut key in &mut keys {
+        key.color = look.key;
+        key.illuminance = look.key_lux;
+    }
+    // Visual variety from the replicated room seed (authored rooms: their key).
+    let seed = match world.run.room_seed {
+        0 => room.key.bytes().fold(0x811C_9DC5u32, |h, b| (h ^ b as u32).wrapping_mul(0x0100_0193)),
+        s => s,
+    };
+    let terrain_stores = TerrainStores {
+        meshes: stores.meshes.as_mut(),
+        toons: stores.toons.as_mut(),
+        floors: floors.as_mut(),
+        abysses: abysses.as_mut(),
+    };
+    terrain::build(&mut commands, terrain_stores, &pal, room, &look, seed);
+    let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
+    build_room(&mut kit, room, &look);
 }
 
 fn hash01(i: i32, k: u32) -> f32 {
@@ -273,52 +323,25 @@ fn hash01(i: i32, k: u32) -> f32 {
     (h & 0xffff) as f32 / 65535.0
 }
 
-fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
+fn build_room(kit: &mut Kit, room: &RoomDef, look: &BiomeLook) {
     let half = room.half_extents;
-    // Painted floor: tileable flagstones tinted by the biome palette.
-    let floor = lighten(mix(mix(base, Color::srgb(0.36, 0.34, 0.33), 0.45), accent, 0.06), 1.45);
-    let ground_mat = kit.mats.add(StandardMaterial {
-        base_color: floor,
-        base_color_texture: Some(kit.pal.ground_texture.clone()),
-        uv_transform: Affine2::from_scale(half * 2.0 / 10.0),
-        perceptual_roughness: 0.95,
-        reflectance: 0.15,
-        ..default()
-    });
-    let ground = kit.meshes.add(Plane3d::new(Vec3::Y, half));
-    kit.geometry(&ground, ground_mat, Transform::default());
-    // The abyss beyond the arena.
-    let void_mesh = kit.meshes.add(Plane3d::new(Vec3::Y, half + Vec2::splat(60.0)));
-    let void_mat = kit.mat(lighten(deep, 0.9), Look::Matte);
-    kit.geometry(&void_mesh, void_mat, Transform::from_xyz(0.0, -0.8, 0.0));
-    // Rim glow where floor meets abyss.
-    let rim = kit.mat(hdr(accent, 1.6).with_alpha(0.35), Look::Decal);
-    let quad = kit.pal.quad.clone();
-    for (center, size) in [
-        (Vec2::new(0.0, -half.y - 0.25), Vec2::new(half.x * 2.0, 0.5)),
-        (Vec2::new(-half.x - 0.25, 0.0), Vec2::new(0.5, half.y * 2.0)),
-        (Vec2::new(half.x + 0.25, 0.0), Vec2::new(0.5, half.y * 2.0)),
-    ] {
-        kit.geometry(
-            &quad,
-            rim.clone(),
-            Transform { translation: w3(center, -0.02), rotation: flat(FRAC_PI_2), scale: size.extend(1.0) },
-        );
-    }
+    let accent = look.accent;
 
     // Walls: tall ruined backdrop to the north, medium flanks, a low ledge to the south so the
     // camera never loses a character behind geometry (§5 readability).
-    let wall = kit.mat(lighten(mix(base, Color::srgb(0.2, 0.19, 0.22), 0.4), 1.25), Look::Matte);
-    let cap = kit.mat(hex(BRONZE), Look::Metal);
+    let wall = kit.mat(look.masonry(), Look::Matte);
+    // Capstones: the same stone, a lighter course (they catch the key light and cap the ink).
+    let cap = kit.mat(lighten(look.masonry(), 1.35), Look::Matte);
     let cube = kit.pal.cube.clone();
     let segment = |kit: &mut Kit, center: Vec2, size: Vec2, h: f32, i: i32| {
-        kit.geometry(
+        kit.inked(
             &cube,
             wall.clone(),
             Transform::from_translation(w3(center, h * 0.5)).with_scale(Vec3::new(size.x, h, size.y)),
+            Vec3::splat(ENV_INK * 2.0),
         );
         if hash01(i, 9) > 0.55 {
-            kit.geometry(
+            kit.inked(
                 &cube,
                 cap.clone(),
                 Transform::from_translation(w3(center, h + 0.08)).with_scale(Vec3::new(
@@ -326,6 +349,7 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                     0.16,
                     size.y + 0.15,
                 )),
+                Vec3::splat(ENV_INK * 2.0),
             );
         }
     };
@@ -347,18 +371,20 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
     }
 
     // Obstacles (skipping those a Decor::Pillar already dresses).
-    let stone = kit.mat(lighten(mix(base, Color::srgb(0.5, 0.46, 0.42), 0.5), 1.5), Look::Matte);
+    let stone = kit.mat(lighten(look.masonry(), 1.15), Look::Matte);
     let cylinder = kit.pal.cylinder.clone();
+    let cyl_ink = Vec3::new(ENV_INK, ENV_INK * 2.0, ENV_INK);
     let dressed = |c: Vec2| room.decor.iter().any(|d| matches!(d, Decor::Pillar { at, .. } if at.distance(c) < 0.5));
     for o in &room.obstacles {
         match *o {
             Obstacle::Circle { center, radius } if !dressed(center) => {
-                kit.geometry(
+                kit.inked(
                     &cylinder,
                     stone.clone(),
                     Transform::from_translation(w3(center, 1.1)).with_scale(Vec3::new(radius, 2.2, radius)),
+                    cyl_ink,
                 );
-                kit.geometry(
+                kit.inked(
                     &cylinder,
                     cap.clone(),
                     Transform::from_translation(w3(center, 2.3)).with_scale(Vec3::new(
@@ -366,15 +392,17 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                         0.25,
                         radius * 1.15,
                     )),
+                    cyl_ink,
                 );
             }
             Obstacle::Box { center, half } if !dressed(center) => {
-                kit.geometry(
+                kit.inked(
                     &cube,
                     stone.clone(),
                     Transform::from_translation(w3(center, 0.7)).with_scale(Vec3::new(half.x * 2.0, 1.4, half.y * 2.0)),
+                    Vec3::splat(ENV_INK * 2.0),
                 );
-                kit.geometry(
+                kit.inked(
                     &cube,
                     cap.clone(),
                     Transform::from_translation(w3(center, 1.48)).with_scale(Vec3::new(
@@ -382,6 +410,7 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                         0.16,
                         half.y * 2.0 + 0.2,
                     )),
+                    Vec3::splat(ENV_INK * 2.0),
                 );
             }
             _ => {}
@@ -391,30 +420,12 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
     // Decor.
     let iron = kit.mat(hex(IRON), Look::Metal);
     let bronze = kit.mat(hex(BRONZE), Look::Metal);
-    let lava = kit.mat(hdr(accent, 3.2).with_alpha(0.95), Look::Decal);
-    let lava_halo = kit.mat(hdr(accent, 1.2).with_alpha(0.2), Look::Decal);
     let flame = kit.mat(hdr(mix(accent, Color::WHITE, 0.3), 1.0), Look::Glow);
     let sphere = kit.pal.sphere.clone();
     for d in &room.decor {
         match *d {
-            Decor::LavaCrack { from, to, width } => {
-                let v = to - from;
-                let (mid, len, ang) = ((from + to) * 0.5, v.length(), v.y.atan2(v.x));
-                kit.geometry(
-                    &quad,
-                    lava_halo.clone(),
-                    Transform {
-                        translation: w3(mid, 0.008),
-                        rotation: flat(ang),
-                        scale: Vec3::new(width * 4.0, len + width * 2.0, 1.0),
-                    },
-                );
-                kit.geometry(
-                    &quad,
-                    lava.clone(),
-                    Transform { translation: w3(mid, 0.012), rotation: flat(ang), scale: Vec3::new(width, len, 1.0) },
-                );
-            }
+            // Painted into the floor as glowing rifts (see `terrain` / floor.wesl).
+            Decor::LavaCrack { .. } => {}
             Decor::BrokenAnvil { at, scale } => {
                 kit.geometry(
                     &cube,
@@ -448,17 +459,23 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                 );
                 kit.commands.spawn((
                     RoomGeometry,
-                    PointLight { color: mix(accent, Color::WHITE, 0.2), intensity: 160_000.0, range: 9.0, ..default() },
+                    PointLight {
+                        color: mix(accent, Color::WHITE, 0.25),
+                        intensity: look.brazier,
+                        range: 12.0,
+                        ..default()
+                    },
                     Transform::from_translation(w3(at, 1.6)),
                 ));
             }
             Decor::Pillar { at, radius, height } => {
-                kit.geometry(
+                kit.inked(
                     &cylinder,
                     stone.clone(),
                     Transform::from_translation(w3(at, height * 0.5)).with_scale(Vec3::new(radius, height, radius)),
+                    cyl_ink,
                 );
-                kit.geometry(
+                kit.inked(
                     &cube,
                     cap.clone(),
                     Transform::from_translation(w3(at, height + 0.15)).with_scale(Vec3::new(
@@ -466,11 +483,13 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                         0.3,
                         radius * 2.3,
                     )),
+                    Vec3::splat(ENV_INK * 2.0),
                 );
-                kit.geometry(
+                kit.inked(
                     &cube,
                     stone.clone(),
                     Transform::from_translation(w3(at, 0.15)).with_scale(Vec3::new(radius * 2.3, 0.3, radius * 2.3)),
+                    Vec3::splat(ENV_INK * 2.0),
                 );
             }
         }
@@ -485,8 +504,7 @@ fn sync_entities(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     mut pal: ResMut<Palette>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut stores: Stores,
     mut index: ResMut<SceneIndex>,
     mut visuals: Query<&mut Visual>,
 ) {
@@ -500,7 +518,7 @@ fn sync_entities(
     let me = link.slot;
     let ally_alpha = cfg.content.game.vfx.ally_effect_alpha;
     let mut effects = 0;
-    let mut kit = Kit { commands: &mut commands, pal: &mut pal, mats: &mut mats, meshes: &mut meshes };
+    let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
     for e in &world.entities {
         if matches!(
             e.kind,
@@ -791,7 +809,7 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
         Some(d) => (hex(&d.color), d.radius * d.scale.max(0.3), d.shape, e.flags.contains(EntityFlags::BOSS)),
         None => (Color::srgb(0.6, 0.6, 0.6), 0.5, EnemyShape::Blob, false),
     };
-    let base = kit.mat(color, Look::Matte);
+    let base = kit.mat(color, Look::Foe);
     let (sphere, capsule, cube, cone, torus) = (
         kit.pal.sphere.clone(),
         kit.pal.capsule.clone(),
@@ -864,7 +882,7 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
     }
     // Silhouette accents: ember crowns on blobs, ears on hounds, mandibles on crawlers.
     let accent = kit.mat(lighten(mix(color, hex("#FFD27A"), 0.55), 1.1), Look::Glow);
-    let dark = kit.mat(lighten(color, 0.55), Look::Matte);
+    let dark = kit.mat(lighten(color, 0.55), Look::Foe);
     match shape {
         EnemyShape::Blob => {
             let f = kit.child(
@@ -946,7 +964,7 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
     kit.shadow(parent, r * 1.2, lift);
     let mut v = Visual::new(e, color, r, lift);
     v.body = Some(body);
-    v.base_mat = Some(base);
+    v.base_mat = base.toon();
     v
 }
 
@@ -1218,9 +1236,9 @@ fn status_color(bit: u8) -> Color {
 fn tint_entities(
     time: Res<Time>,
     mut pal: ResMut<Palette>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut toons: ResMut<Assets<ToonMaterial>>,
     mut q: Query<&mut Visual>,
-    mut bodies: Query<&mut MeshMaterial3d<StandardMaterial>>,
+    mut bodies: Query<&mut MeshMaterial3d<ToonMaterial>>,
 ) {
     let blink = (time.elapsed_secs() * 14.0).sin() > 0.0;
     for mut v in &mut q {
@@ -1249,11 +1267,11 @@ fn tint_entities(
         let danger = pal.danger;
         m.0 = match tint {
             Tint::Base => base,
-            Tint::Flash => pal.mat(&mut mats, Color::srgb(1.0, 0.96, 0.9), Look::Glow),
-            Tint::Warn => pal.mat(&mut mats, mix(v.color, danger, 0.7), Look::Glow),
-            Tint::Frozen => pal.mat(&mut mats, mix(v.color, hex("#BFE8FF"), 0.6), Look::Smolder),
-            Tint::Stunned => pal.mat(&mut mats, mix(v.color, hex("#FFE27A"), 0.45), Look::Smolder),
-            Tint::Status(bit) => pal.mat(&mut mats, mix(v.color, status_color(bit), 0.5), Look::Smolder),
+            Tint::Flash => pal.toon(&mut toons, Color::srgb(1.0, 0.96, 0.9), Look::Hot),
+            Tint::Warn => pal.toon(&mut toons, mix(v.color, danger, 0.7), Look::Hot),
+            Tint::Frozen => pal.toon(&mut toons, mix(v.color, hex("#BFE8FF"), 0.6), Look::Smolder),
+            Tint::Stunned => pal.toon(&mut toons, mix(v.color, hex("#FFE27A"), 0.45), Look::Smolder),
+            Tint::Status(bit) => pal.toon(&mut toons, mix(v.color, status_color(bit), 0.5), Look::Smolder),
         };
     }
 }
@@ -1307,9 +1325,9 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView) -> Entity {
     let pc = kit.pal.player(p.slot);
     let r = p.radius.max(0.3);
     let root = kit.commands.spawn((Transform::from_translation(w3(p.mover.pos, 0.0)), Visibility::default())).id();
-    let body_mat = kit.mat(color, Look::Matte);
+    let body_mat = kit.mat(color, Look::Hero(p.slot));
     let ghost_mat = kit.mat(color.with_alpha(0.35), Look::Ghost);
-    let head = kit.mat(lighten(color, 1.3), Look::Matte);
+    let head = kit.mat(lighten(color, 1.3), Look::Hero(p.slot));
     let gold = kit.mat(hex(GOLD), Look::Metal);
     let brass = kit.mat(hex("#B8A27A"), Look::Metal);
     let muzzle = kit.mat(element_color(gf_core::damage::DamageType::Kinetic), Look::Glow);
@@ -1341,6 +1359,9 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView) -> Entity {
         body_mat.clone(),
         Transform::from_xyz(0.0, 0.85, 0.0).with_scale(Vec3::new(r * 2.0, 0.85, r * 2.0)),
     );
+    let (Some(body_mat), Some(ghost_mat)) = (body_mat.toon(), ghost_mat.toon()) else {
+        unreachable!("hero and ghost looks are toon materials")
+    };
     kit.child(root, &sphere, head, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62)));
     let ink = kit.mat(hex(INK), Look::Ink);
     let o1 = kit.child(
@@ -1401,12 +1422,11 @@ fn sync_players(
     pred: Res<Prediction>,
     input: Res<InputState>,
     mut pal: ResMut<Palette>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut stores: Stores,
     mut index: ResMut<SceneIndex>,
     mut rigs: Query<(&mut PlayerRig, &mut Transform, &mut Visibility)>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<PlayerRig>>,
-    mut bodies: Query<&mut MeshMaterial3d<StandardMaterial>>,
+    mut bodies: Query<&mut MeshMaterial3d<ToonMaterial>>,
 ) {
     let Some(world) = &link.latest else { return };
     let dt = time.delta_secs();
@@ -1417,7 +1437,7 @@ fn sync_players(
         let present = world.players.iter().find(|p| p.slot == slot);
         match (present, index.players[slot as usize]) {
             (Some(p), None) => {
-                let mut kit = Kit { commands: &mut commands, pal: &mut pal, mats: &mut mats, meshes: &mut meshes };
+                let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
                 index.players[slot as usize] = Some(spawn_rig(&mut kit, &cfg.content, p));
             }
             (None, Some(e)) => {

@@ -11,6 +11,14 @@ use gf_net::GameEvent;
 #[derive(Component)]
 pub struct MainCamera;
 
+/// The shadow-casting key light (its colour follows the biome).
+#[derive(Component)]
+pub struct KeyLight;
+
+/// Where the key light shines from (upper left of the screen), aimed at the origin. The floor
+/// paints its stone bevels toward it.
+pub const KEY_LIGHT_FROM: Vec3 = Vec3::new(-10.0, 22.0, 9.0);
+
 /// Screen-shake trauma (0..1); shake = trauma².
 #[derive(Resource, Default)]
 pub struct Shake {
@@ -42,8 +50,9 @@ fn setup(mut commands: Commands, cfg: Res<ClientConfig>) {
     commands.spawn((MainCamera, iso_camera(cam.view_height[0], Color::srgb(0.03, 0.02, 0.018)), Transform::default()));
     // Warm key light from the upper left, cool fill from the right: gold light against deep shadow.
     commands.spawn((
+        KeyLight,
         key_light(Color::srgb(1.0, 0.84, 0.62), 11_000.0, cfg.shadows),
-        Transform::from_xyz(-10.0, 22.0, 9.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_translation(KEY_LIGHT_FROM).looking_at(Vec3::ZERO, Vec3::Y),
     ));
     commands.spawn(vignette(0.62));
     commands.spawn((
@@ -111,9 +120,10 @@ fn follow(
             view_h = view_h.max(spread * 1.5 + 10.0).min(cam.view_height[3] + 4.0);
         }
     }
-    // Keep the view over the arena (a little abyss past the rim is part of the look).
+    // Keep the view over the arena, but let the rim, the cliffs and the abyss below come into
+    // view at the edges (the depth is part of the look).
     let half_view = Vec2::new(view_h * 0.5 * 16.0 / 9.0, view_h * 0.5);
-    let limit = (room.def.half_extents + Vec2::splat(2.0) - half_view * Vec2::new(0.85, 0.7)).max(Vec2::ZERO);
+    let limit = (room.def.half_extents + Vec2::splat(2.0) - half_view * Vec2::new(0.62, 0.36)).max(Vec2::ZERO);
     focus = focus.clamp(-limit, limit);
     if !shake.seeded {
         shake.focus = focus;
