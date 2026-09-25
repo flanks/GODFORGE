@@ -13,11 +13,15 @@ Collider radius x scale = 0.21 m, so the body footprint is ~0.45-0.6 m (docs/art
 Design (docs/art/ENEMIES.md section 7, E1; the user's enemy pack):
   * verb SKITTER: a hunched, eyeless infant figure fused into a cracked obsidian carapace. The big bowed
     skull hangs low in front; the back is three overlapping obsidian scutes with teal ichor glowing
-    through the gaps; the limbs are WRONG: three thin shard legs on one side, one huge clawed arm on the
-    other. The skull is split vertically: one half is a jaw that swings open sideways on a hinge (the
-    `head` bone), showing a glowing teal maw - that wedge of light is the wind-up read at 35 px;
-  * value plan at game size: dark obsidian mass (reads against the #3A2C24 Cinder floor through the
-    engine ink + rim), teal slits on the back and the face, pale bone belly / knees / claws;
+    through the gaps; the limbs are WRONG: three thin dark shard legs on one side, one huge PALE BONE
+    clawed arm on the other. The skull is split vertically: one half is a jaw that swings open sideways on
+    a hinge (the `head` bone), showing a glowing teal maw - that wedge of light is the wind-up read at 35 px;
+  * value plan at game size: dark obsidian mass framed by a light crest stroke on every scute lip (so it
+    separates from the #3A2C24 Cinder floor), the one pale bone arm (the asymmetry read), teal slits on
+    the back and the face, pale bone belly / knees / claws;
+  * art review fixes (7.5/10, 2026-09-25): the arm was a thin obsidian tube that read as a fourth leg - it
+    is now a massive pale bone club (Build.legs, zone "arm"); the scute edges were sub-pixel and at floor
+    value - they are brighter (SCUTE_EDGE) and each rear lip carries a bold stroke (Build._lip_strokes);
   * palette: THE UNMADE only (gfa_spec.FACTIONS): obsidian, wet obsidian, ichor teal #2FBFA8 with a
     #B8FFE8 hot core, bone. The row colour #9A5B3C is only a faint warm tint in the shell's light plane.
 
@@ -62,7 +66,7 @@ KIND, TIER = "enemy", "swarm"
 FPS = 30
 ROW = {"key": "clinker", "class": "Swarm", "biome": "cinder_wastes", "hp": 9, "speed": 3.8, "radius": 0.26,
        "scale": 0.8, "behavior": "Swarmer(jitter: 1.0)", "color": "#9A5B3C", "shape": "Crawler", "pack": "(6, 10)"}
-ZONES = ["hull", "plate", "limb", "skull", "bone", "core", "maw", "ichor"]
+ZONES = ["hull", "plate", "limb", "skull", "bone", "core", "maw", "ichor", "arm"]
 
 # ---- the variant table -------------------------------------------------------------------------------------
 # plates (scutes): (y0, y1, front offset, rear offset, rear lift, roll deg) - the offset is how far the scute
@@ -139,14 +143,14 @@ HULL_PROFILE = [(0.0, 1.0), (0.6, 0.84), (0.95, 0.38), (1.0, -0.12), (0.74, -0.7
 ARC = [(1.0, 0.1), (0.95, 0.42), (0.6, 0.84), (0.0, 1.0), (-0.6, 0.84), (-0.95, 0.42), (-1.0, 0.1)]
 # UV importance (linear texel scale per zone before packing): what the 55 deg camera sees gets the pixels
 UV_WEIGHT = {"plate": 1.35, "skull": 1.3, "hull": 1.05, "limb": 0.95, "bone": 0.85, "core": 0.75, "maw": 0.85,
-             "ichor": 0.6}
+             "ichor": 0.6, "arm": 1.1}
 Y_C = 0.02                 # body centre (y)
 JAW_GAP = 0.010            # gap between the skull halves at the hinge
 PLATE_STANDOFF = 0.012     # added to every scute offset (the hull noise is +-8 mm)
 JAW_V = 4.5                # degrees each half's inner face opens toward the front (the resting glow wedge)
 
-PALETTE = [("obsidian", "#1A1720"), ("obsidian light", "#5B4A52"), ("wet sheen", "#7FA7A0"), ("bone", "#BDB09A"),
-           ("ichor", "#1F8F7E"), ("glow", "#2FBFA8"), ("hot core", "#B8FFE8"), ("row tint", "#9A5B3C")]
+PALETTE = [("obsidian", "#1A1720"), ("obsidian light", "#5B4A52"), ("wet sheen", "#7FA7A0"),
+           ("bone", "#BDB09A"), ("ichor", "#1F8F7E"), ("glow", "#2FBFA8"), ("hot core", "#B8FFE8"), ("row tint", "#9A5B3C")]
 
 
 def mix_hex(a, b, t):
@@ -155,6 +159,13 @@ def mix_hex(a, b, t):
 
 
 LIGHT_WARM = mix_hex("#4B4658", ROW["color"], 0.28)     # obsidian light plane, faintly warmed by the row colour
+# review fix: the scutes' edge strokes were sub-pixel and sat at about the floor's value, so the dark body
+# melted into the #3A2C24 ground. Their light is now obsidian light #4B4658 pushed brighter (the glassy
+# sheen of a knapped obsidian edge; still violet-grey, faintly warmed by the row colour), and each scute's
+# rear lip carries a bold stroke about a game pixel wide (Build._lip_strokes), so every scute is framed.
+SCUTE_EDGE = mix_hex(mix_hex("#4B4658", "#FFFFFF", 0.26), ROW["color"], 0.16)
+PALETTE.insert(2, ("scute edge", SCUTE_EDGE))
+ARM_BONE = mix_hex("#BDB09A", "#6E6152", 0.18)          # the big arm: faction bone, a step down in value
 SPILL = "#123C38"                                         # teal glow spill painted into the obsidian
 
 
@@ -203,13 +214,14 @@ def arc_point(s, arc=None):
     return tuple(arc[i][k] * (1 - t) + arc[i + 1][k] * t for k in range(2))
 
 
-def scute(hull_at, y0, y1, o0, o1, t, lift, ridge, arc, xshift=0.0, rng=None, jag=0.0):
+def scute(hull_at, y0, y1, o0, o1, t, lift, ridge, arc, xshift=0.0, rng=None, jag=0.0, lip=None):
     """A thick scute hugging the hull: the unit arc `arc` at three rings (y0, mid, y1), standing off the hull
     by o0 at the front (tucked) to o1 at the rear (flared), `t` thick, the rear edge lifted by `lift`; `ridge`
     raises the top point (keel / rift lip); `jag` breaks the flared rear edge (random y / z nicks, metres).
-    hull_at(y) -> (cx, cz, w, h)."""
+    hull_at(y) -> (cx, cz, w, h). lip: a list that receives the outer rear-lip points (the painted crest)."""
     bm = bmesh.new()
     rings = []
+    last_outer = None
     for u in (0.0, 0.5, 1.0):
         y = y0 + (y1 - y0) * u
         cx, cz, w, h = hull_at(y)
@@ -224,6 +236,9 @@ def scute(hull_at, y0, y1, o0, o1, t, lift, ridge, arc, xshift=0.0, rng=None, ja
             outer.append((cx + xshift + px * (w / 2 + o), y + jy, cz + dz + jz + pz * (h / 2 + o) * rr))
             inner.append((cx + xshift + px * (w / 2 + o - t), y + jy, cz + dz + jz + pz * (h / 2 + o - t)))
         rings.append([bm.verts.new(p) for p in outer + inner[::-1]])
+        last_outer = outer
+    if lip is not None:
+        lip.extend(Vector(p) for p in last_outer)
     n = len(rings[0])
     for a, b in zip(rings[:-1], rings[1:]):
         for k in range(n):
@@ -315,9 +330,13 @@ class Build:
             piv = Vector((cx, (y0 + y1) / 2, cz))
             rot = Matrix.Translation(piv) @ Matrix.Rotation(math.radians(roll), 4, "Y") @ Matrix.Translation(-piv)
             geo["matrix"] = rot
+            geo["lips"] = []
             for k, (xs, arc) in enumerate(halves):
-                b = scute(self.hull_at, y0, y1, o0, o1, V["plate_t"], lift, V["ridge"], arc, xshift=xs, rng=rng, jag=0.016)
+                lip = []
+                b = scute(self.hull_at, y0, y1, o0, o1, V["plate_t"], lift, V["ridge"], arc, xshift=xs, rng=rng, jag=0.016,
+                          lip=lip)
                 M.xform(b, matrix=rot)
+                geo["lips"].append([rot @ p for p in lip])
                 a.add(b, "plate", bone="tail", name="scute%d%s" % (i, "" if sp <= 0 else "LR"[k]), shading="flat")
         top = 0.0
         for pi, u, s, length, back, r in V["shards"]:
@@ -448,26 +467,49 @@ class Build:
             a.add(shard(out[1] + d * 0.014, d, 0.07 * th + 0.01, 0.018 * th, rng, flat=0.7), "limb", bone=groups[name],
                   name="spur_" + name, shading="flat")
             self.feet[name] = out[-1]
-        # the one huge arm on the other side (legs_b: it limps with the middle leg)
+        # the one huge arm on the other side (legs_b: it limps with the middle leg). Review fix: the first
+        # arm was a thin obsidian tube that read as a fourth leg at 35 px (a symmetric tick). It is now a
+        # massive PALE BONE club - a fat upper arm, a forearm that swells and flattens into a paddle toward
+        # the knuckles (widest in the ground plane, where the 55 deg camera sees it), a big knuckle-walking
+        # fist and four heavy talons - so the lopsided shape reads by value and mass: one pale lump on one
+        # side, three thin dark legs on the other. The upper arm darkens toward the shoulder (paint: "arm").
         s = V["arm"]
-        sh = Vector((-0.13 * W, -0.12, 0.24))
-        rel = [(0, 0, 0), (-0.16, 0.06, -0.01), (-0.155, -0.15, -0.165), (-0.135, -0.21, -0.19)]
+        sh = Vector((-0.14 * W, -0.11, 0.25))
+        rel = [(0, 0, 0), (-0.175, 0.045, 0.025), (-0.19, -0.14, -0.10), (-0.175, -0.215, -0.15)]
         pts = [sh + Vector(r) * s for r in rel]
-        pts[-1].z = max(0.045, pts[-1].z)
-        radii = [0.07 * s, 0.062 * s, 0.05 * s, 0.045 * s]
-        a.add(M.tube(pts, radii, sides=6), "limb", bone="legs_b", name="arm_R", shading="flat")
-        a.add(knob(0.05 * s, pts[1]), "bone", bone="legs_b", name="elbow_R", shading="flat")
-        d = Vector((-0.5, 0.6, 0.6)).normalized()
-        a.add(shard(pts[1] + d * 0.03, d, 0.1 * s, 0.024 * s, rng), "limb", bone="legs_b", name="elbow_spike", shading="flat")
-        hand_c = pts[-1] + Vector((0.004, -0.03, 0.0)) * s
-        hand = M.sphere(1.0, 6, 4)
-        M.xform(hand, loc=hand_c, scale=(0.078 * s, 0.072 * s, 0.05 * s))
-        a.add(hand, "limb", bone="legs_b", name="hand_R", shading="flat")
-        for k, dx in enumerate((-0.045, 0.0, 0.045)):
-            c0 = hand_c + Vector((dx * s, -0.05 * s, 0.01))
-            c1 = c0 + Vector((dx * 0.4 * s, -0.05 * s, 0.0))
-            c2 = c1 + Vector((dx * 0.2 * s, -0.035 * s, -c1.z + 0.003))
-            a.add(M.tube([c0, c1, c2], [0.02 * s, 0.013 * s, 0.0], sides=4), "bone", bone="legs_b", name="claw%d" % k,
+        pts[-1].z = max(0.085, pts[-1].z)
+        pts[-2].z = max(0.12, pts[-2].z)
+        radii = [0.062 * s, 0.066 * s, 0.084 * s, 0.078 * s]
+        flat_xy = [(1.0, 1.0), (1.0, 1.0), (0.78, 1.28), (0.72, 1.32)]
+        a.add(M.tube(pts, radii, sides=7, scale_xy=flat_xy), "arm", bone="legs_b", name="arm_R", shading="flat")
+        a.add(knob(0.068 * s, pts[1]), "arm", bone="legs_b", name="elbow_R", shading="flat")
+        d = Vector((-0.45, 0.55, 0.7)).normalized()
+        a.add(shard(pts[1] + d * 0.045, d, 0.13 * s, 0.03 * s, rng), "limb", bone="legs_b", name="elbow_spike", shading="flat")
+        # two small obsidian crystals breaking through the top of the forearm (the carapace spreading into
+        # the pale limb; small dark notches that keep the bone mass from reading as a plain sausage)
+        crng = random.Random(V["seed"] + 400)
+        for t_, ln_, r_ in ((0.3, 0.075, 0.02), (0.68, 0.055, 0.017)):
+            p = pts[1].lerp(pts[2], t_)
+            r_here = radii[1] + (radii[2] - radii[1]) * t_
+            n_out = Vector((-0.55, 0.0, 0.85)).normalized()
+            d = Vector((-0.45, 0.45, 0.77)).normalized()
+            a.add(shard(p + n_out * r_here * 0.8, d, ln_ * s, r_ * s, crng), "limb", bone="legs_b", name="arm_shard",
+                  shading="flat")
+        hand_c = pts[-1] + Vector((0.0, -0.045, -0.01)) * s
+        hand_c.z = max(0.07, hand_c.z)
+        hand = M.sphere(1.0, 7, 4)
+        M.xform(hand, loc=hand_c, scale=(0.105 * s, 0.09 * s, 0.066 * s), rot=(0, 0, 8))
+        a.add(hand, "arm", bone="legs_b", name="hand_R", shading="flat")
+        self.shoulder = tuple(sh)
+        # four heavy talons: three fanning forward, a thumb hooking inward (toward the face)
+        talons = [(-0.075, -0.055, 1.0), (-0.02, -0.075, 1.12), (0.035, -0.07, 1.0), (0.085, -0.02, 0.8)]
+        for k, (dx, dy, ln) in enumerate(talons):
+            c0 = hand_c + Vector((dx * s, dy * s, 0.012))
+            out = Vector((dx * 1.1, dy, 0.0)).normalized()
+            c1 = c0 + out * 0.055 * s * ln + Vector((0, 0, 0.01))
+            c2 = c1 + out * 0.045 * s * ln
+            c2.z = 0.004
+            a.add(M.tube([c0, c1, c2], [0.03 * s, 0.021 * s, 0.0], sides=5), "arm", bone="legs_b", name="claw%d" % k,
                   shading="flat")
         self.feet["R1"] = hand_c
 
@@ -519,12 +561,23 @@ class Build:
                                    brush_freq=4.0, edge=0.9, edge_width=0.007, edge_breakup=0.42, cavity=0.85,
                                    cavity_width=0.008, ao=0.65,
                                    gradient={"axis": (0, 0, 1), "range": (0.30, 0.10), "color": "shadow", "amount": 0.5}),
-            "plate": P.faction_zone("unmade", "obsidian", light=LIGHT_WARM, planes=0.22, parts=0.10, brush=0.09,
-                                    brush_freq=4.0, edge=1.0, edge_width=0.010, edge_breakup=0.46, cavity=0.85,
+            # scutes: brighter facet-edge strokes (the glassy knapped edges of obsidian)
+            # (the bold crest stroke on each scute's rear lip is a decal: _lip_strokes)
+            "plate": P.faction_zone("unmade", "obsidian", light=SCUTE_EDGE, planes=0.22, parts=0.10, brush=0.09,
+                                    brush_freq=4.0, edge=1.0, edge_width=0.011, edge_breakup=0.34, cavity=0.85,
                                     cavity_width=0.008, ao=0.7),
-            "limb": P.faction_zone("unmade", "obsidian", light=LIGHT_WARM, planes=0.14, parts=0.06, edge=0.9,
-                                   edge_width=0.006, edge_breakup=0.38, cavity=0.7, ao=0.5,
+            "limb": P.faction_zone("unmade", "obsidian", light=mix_hex(LIGHT_WARM, SCUTE_EDGE, 0.5), planes=0.14,
+                                   parts=0.06, edge=0.95, edge_width=0.008, edge_breakup=0.3, cavity=0.7, ao=0.5,
                                    gradient={"axis": (0, 0, 1), "range": (0.22, 0.0), "color": "shadow", "amount": 0.3}),
+            # the lone huge arm: pale bone (the asymmetry read at 35 px), a touch below the faction bone so a
+            # horde of pale fists does not outshine the heroes; the upper arm darkens to bone shadow toward the
+            # shoulder so the pale mass stays joined to the shell (a black root made the fist look detached)
+            "arm": P.faction_zone("unmade", "bone", base=ARM_BONE, planes=0.10, parts=0.05, brush=0.07,
+                                  brush_freq=6.0, edge=0.8, edge_width=0.009, edge_breakup=0.35, cavity=0.9,
+                                  cavity_width=0.009, ao=0.7,
+                                  stroke=(0.0, -0.6, -0.8), stroke_amount=0.22, stroke_freq=(45.0, 5.0),
+                                  gradient={"center": self.shoulder, "range": (0.17, 0.04), "color": "shadow",
+                                            "amount": 0.85}),
             "skull": P.faction_zone("unmade", "obsidian", light=mix_hex(LIGHT_WARM, "#7FA7A0", 0.35), planes=0.14,
                                     parts=0.03, edge=0.85, edge_width=0.007, edge_breakup=0.4, cavity=0.8, ao=0.6,
                                     stroke=(0, 0, 1), stroke_amount=0.3, stroke_freq=(55.0, 5.0)),
@@ -545,6 +598,35 @@ class Build:
                               emit={"color": "#0B2F2B", "core": "#0B2F2B"}, depth=depth, facing=facing - 0.4),
                 P.decal_lines(lines, frame, width, zones=zones, color="#2FBFA8", rim="#07060A", rim_width=width * 2.4,
                               emit={"color": "#2FBFA8", "core": "#B8FFE8"}, depth=depth, facing=facing)]
+
+    def _lip_strokes(self, rng):
+        """Review fix (value): a bold light stroke along the flared rear lip of every scute - the crest the
+        55 deg camera sees - so each scute is framed by a light arc and the dark body separates from the
+        #3A2C24 floor at 35 px. Hand-painted, not an outline: it follows the jagged lip, wobbles a few mm,
+        stops short of the low flanks and breaks once per scute; a mid-tone halo softens it into the obsidian."""
+        strokes = []
+        for g in self.plate_geo:
+            for lip in g["lips"]:
+                pts = []
+                for a_, b_ in zip(lip[:-1], lip[1:]):
+                    for k in range(3):
+                        pts.append(a_.lerp(b_, k / 3.0))
+                pts.append(lip[-1])
+                n = len(pts)
+                # only the upper arc: the crest the camera sees (trim the low flank ends)
+                trim = max(1, int(round(n * (0.1 if len(g["lips"]) == 1 else 0.06))))
+                if len(g["lips"]) == 1:
+                    keep = pts[trim:n - trim]
+                else:                                  # split-back halves: trim only the flank end
+                    keep = pts[trim:] if abs(lip[0].x) > abs(lip[-1].x) else pts[:n - trim]
+                line = [(p.x + rng.uniform(-0.002, 0.002), p.y - 0.008 + rng.uniform(-0.0025, 0.0025)) for p in keep]
+                gap = rng.randint(2, max(3, len(line) - 4))          # one break per stroke, off-centre
+                for seg in (line[:gap], line[gap + 1:]):
+                    if len(seg) >= 2:
+                        strokes.append(seg)
+        top = Matrix.Translation((0, 0, 0.28))
+        return [P.decal_lines(strokes, top, 0.024, zones=["plate"], color=SCUTE_EDGE, rim=LIGHT_WARM, rim_width=0.02,
+                              depth=(-0.12, 0.45), facing=-0.35)]
 
     def decals(self):
         """Few, bold fissures (a crack web turns to speckle at 35 px): 2-5 per variant on the scutes, one over
@@ -583,8 +665,10 @@ class Build:
             slits.append([(-0.24, y), (0.24, y)])
         if V["split"] > 0:
             slits.append([(0.0, g[0]["y0"]), (0.0, g[-1]["y1"])])
-        out.append(P.decal_lines(slits, top, 0.001, zones=["plate"], color=None, rim=SPILL, rim_width=0.03,
+        # (narrow: a wide spill used to paint over the scutes' light lips, the one thing framing each scute)
+        out.append(P.decal_lines(slits, top, 0.001, zones=["plate"], color=None, rim=SPILL, rim_width=0.017,
                                  emit={"color": "#0B2F2B", "core": "#0B2F2B"}, depth=(0.0, 0.4), facing=-0.6))
+        out += self._lip_strokes(random.Random(V["seed"] + 300))     # own rng: the other cracks stay put
         # a crack over the skull (from the split back over the crown)
         hy = self.head_c[1]
         sk = M.crack_lines(rng, start=(0.02, hy - 0.08 * V["head"]), direction=75, length=0.13, step=0.018, jag=0.45,
@@ -983,7 +1067,8 @@ def main():
         "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named "
                         "{file_stem}_{clip}. Pick one of variant_set per spawn (clinker.glb alone is complete).",
         "mirrored": mir,
-        "limbs": "three shard legs on the %s, one huge clawed arm on the %s" % (("right", "left") if mir else ("left", "right")),
+        "limbs": "three thin dark shard legs on the %s, one huge pale bone clawed arm on the %s" % (
+            ("right", "left") if mir else ("left", "right")),
         "gait": "legs_a = front + rear leg of the three-leg side; legs_b = middle leg + the big arm (limps)",
         "move_cycle_m": V["motion"]["move_cycle_m"],
         "move_note": "rigid-group skitter: play move@loop at speed / move_cycle_m cycles per second (row speed 3.8 m/s "

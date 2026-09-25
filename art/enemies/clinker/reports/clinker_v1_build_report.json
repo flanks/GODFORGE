@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "swarm",
   "extensions_used": [],
-  "tris": 952,
+  "tris": 1008,
   "budget": [
    600,
    1500
@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 76968
+    "bytes": 73115
    },
    {
     "name": "clinker_v1_basecolor",
@@ -29,47 +29,13 @@
      512
     ],
     "format": "png",
-    "bytes": 271018
+    "bytes": 304594
    }
   ],
   "materials": [
    "M_clinker_v1"
   ],
   "sockets": {
-   "fx_core": {
-    "translation": [
-     0.0,
-     0.4347,
-     -0.07
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "hit_center": {
-    "translation": [
-     0.0,
-     0.2892,
-     -0.02
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
    "head_top": {
     "translation": [
      0.0,
@@ -103,6 +69,40 @@
      1.0,
      0.0
     ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.2892,
+     -0.02
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.4347,
+     -0.07
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
    }
   },
   "bounds": {
@@ -112,9 +112,9 @@
     -0.4065
    ],
    "max": [
-    0.3325,
+    0.4425,
     0.7371,
-    0.4763
+    0.5303
    ]
   },
   "height_m": 0.737,
@@ -142,11 +142,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 194.1,
-   "p10": 168.7,
-   "p90": 278.0
+   "median": 204.2,
+   "p10": 157.9,
+   "p90": 257.0
   },
-  "coverage": 0.429,
+  "coverage": 0.407,
   "zones": [
    "hull",
    "plate",
@@ -155,16 +155,17 @@
    "bone",
    "core",
    "maw",
-   "ichor"
+   "ichor",
+   "arm"
   ],
-  "decals": 11,
+  "decals": 12,
   "basecolor": "art/enemies/clinker/textures/clinker_v1_basecolor.png",
   "emissive": "art/enemies/clinker/textures/clinker_v1_emissive.png",
-  "emissive_texels": 56431,
-  "seconds": 40.3
+  "emissive_texels": 44304,
+  "seconds": 17.2
  },
  "skin": {
-  "vertices": 648,
+  "vertices": 682,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
@@ -172,7 +173,7 @@
    "body": 238,
    "head": 75,
    "legs_a": 62,
-   "legs_b": 117,
+   "legs_b": 151,
    "tail": 156
   }
  },
@@ -432,14 +433,14 @@
   {
    "id": 36,
    "name": "arm_R",
-   "zone": "limb",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 20
+   "faces": 23
   },
   {
    "id": 37,
    "name": "elbow_R",
-   "zone": "bone",
+   "zone": "arm",
    "bone": "legs_b",
    "faces": 12
   },
@@ -452,55 +453,76 @@
   },
   {
    "id": 39,
-   "name": "hand_R",
+   "name": "arm_shard",
    "zone": "limb",
    "bone": "legs_b",
-   "faces": 24
+   "faces": 5
   },
   {
    "id": 40,
-   "name": "claw0",
-   "zone": "bone",
+   "name": "arm_shard",
+   "zone": "limb",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 5
   },
   {
    "id": 41,
-   "name": "claw1",
-   "zone": "bone",
+   "name": "hand_R",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 28
   },
   {
    "id": 42,
-   "name": "claw2",
-   "zone": "bone",
+   "name": "claw0",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 11
   },
   {
    "id": 43,
-   "name": "drip",
-   "zone": "ichor",
-   "bone": "body",
-   "faces": 5
+   "name": "claw1",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
   },
   {
    "id": 44,
+   "name": "claw2",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
+  },
+  {
+   "id": 45,
+   "name": "claw3",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
+  },
+  {
+   "id": 46,
    "name": "drip",
    "zone": "ichor",
    "bone": "body",
    "faces": 5
   },
   {
-   "id": 45,
+   "id": 47,
+   "name": "drip",
+   "zone": "ichor",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 48,
    "name": "drip",
    "zone": "ichor",
    "bone": "body",
    "faces": 5
   }
  ],
- "tris_blender": 952,
+ "tris_blender": 1008,
  "clips": [
   {
    "name": "clinker_v1_idle@loop",

@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "swarm",
   "extensions_used": [],
-  "tris": 980,
+  "tris": 1036,
   "budget": [
    600,
    1500
@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 70006
+    "bytes": 61071
    },
    {
     "name": "clinker_v3_basecolor",
@@ -29,18 +29,18 @@
      512
     ],
     "format": "png",
-    "bytes": 275369
+    "bytes": 306222
    }
   ],
   "materials": [
    "M_clinker_v3"
   ],
   "sockets": {
-   "fx_mouth": {
+   "hit_center": {
     "translation": [
      0.0,
-     0.1591,
-     0.4194
+     0.2817,
+     -0.02
     ],
     "forward": [
      -0.0,
@@ -70,23 +70,6 @@
      0.0
     ]
    },
-   "hit_center": {
-    "translation": [
-     0.0,
-     0.2817,
-     -0.02
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
    "fx_core": {
     "translation": [
      0.0,
@@ -103,18 +86,35 @@
      1.0,
      0.0
     ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.1591,
+     0.4194
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
    }
   },
   "bounds": {
    "min": [
     -0.4222,
-    -0.0,
+    0.0,
     -0.4065
    ],
    "max": [
-    0.3482,
+    0.4648,
     0.5699,
-    0.495
+    0.5525
    ]
   },
   "height_m": 0.57,
@@ -142,11 +142,11 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 185.5,
-   "p10": 157.5,
-   "p90": 261.5
+   "median": 199.9,
+   "p10": 153.8,
+   "p90": 253.8
   },
-  "coverage": 0.401,
+  "coverage": 0.407,
   "zones": [
    "hull",
    "plate",
@@ -155,16 +155,17 @@
    "bone",
    "core",
    "maw",
-   "ichor"
+   "ichor",
+   "arm"
   ],
-  "decals": 11,
+  "decals": 12,
   "basecolor": "art/enemies/clinker/textures/clinker_v3_basecolor.png",
   "emissive": "art/enemies/clinker/textures/clinker_v3_emissive.png",
-  "emissive_texels": 46670,
-  "seconds": 46.9
+  "emissive_texels": 36375,
+  "seconds": 15.1
  },
  "skin": {
-  "vertices": 669,
+  "vertices": 703,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
@@ -172,7 +173,7 @@
    "body": 242,
    "head": 74,
    "legs_a": 62,
-   "legs_b": 117,
+   "legs_b": 151,
    "tail": 174
   }
  },
@@ -453,14 +454,14 @@
   {
    "id": 39,
    "name": "arm_R",
-   "zone": "limb",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 20
+   "faces": 23
   },
   {
    "id": 40,
    "name": "elbow_R",
-   "zone": "bone",
+   "zone": "arm",
    "bone": "legs_b",
    "faces": 12
   },
@@ -473,55 +474,76 @@
   },
   {
    "id": 42,
-   "name": "hand_R",
+   "name": "arm_shard",
    "zone": "limb",
    "bone": "legs_b",
-   "faces": 24
+   "faces": 5
   },
   {
    "id": 43,
-   "name": "claw0",
-   "zone": "bone",
+   "name": "arm_shard",
+   "zone": "limb",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 5
   },
   {
    "id": 44,
-   "name": "claw1",
-   "zone": "bone",
+   "name": "hand_R",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 28
   },
   {
    "id": 45,
-   "name": "claw2",
-   "zone": "bone",
+   "name": "claw0",
+   "zone": "arm",
    "bone": "legs_b",
-   "faces": 9
+   "faces": 11
   },
   {
    "id": 46,
-   "name": "drip",
-   "zone": "ichor",
-   "bone": "body",
-   "faces": 5
+   "name": "claw1",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
   },
   {
    "id": 47,
+   "name": "claw2",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
+  },
+  {
+   "id": 48,
+   "name": "claw3",
+   "zone": "arm",
+   "bone": "legs_b",
+   "faces": 11
+  },
+  {
+   "id": 49,
    "name": "drip",
    "zone": "ichor",
    "bone": "body",
    "faces": 5
   },
   {
-   "id": 48,
+   "id": 50,
+   "name": "drip",
+   "zone": "ichor",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 51,
    "name": "drip",
    "zone": "ichor",
    "bone": "body",
    "faces": 5
   }
  ],
- "tris_blender": 980,
+ "tris_blender": 1036,
  "clips": [
   {
    "name": "clinker_v3_idle@loop",

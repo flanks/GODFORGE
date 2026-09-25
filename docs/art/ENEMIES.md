@@ -213,6 +213,10 @@ Every `Swarm` row does, whatever its greybox shape:
   vertically split skull, and a yaw opens it into the glowing wind-up wedge. Build script:
   `tools/blender/gf_assets/enemies/clinker.py`. Brief, metrics and the 40-copy horde review:
   [art/enemies/clinker/README.md](../../art/enemies/clinker/README.md).
+* **Art review fixes (7.5/10).** The lone arm is now a massive pale bone club, so the three-and-one
+  asymmetry reads by value and mass at 35 px instead of as a symmetric tick. Every scute's rear lip
+  carries a bright obsidian-light crest stroke (`#7F7278`), so the dark body separates from the Cinder
+  floor instead of relying on the teal seams alone.
 
 ### The variant rule (cheap roster width)
 

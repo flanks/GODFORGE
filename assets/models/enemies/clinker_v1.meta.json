@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "clinker_v1",
  "tier": "swarm",
- "tris": 952,
+ "tris": 1008,
  "tris_budget": [
   600,
   1500
@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 76968
+   "bytes": 73115
   },
   {
    "name": "clinker_v1_basecolor",
@@ -26,44 +26,10 @@
     512
    ],
    "format": "png",
-   "bytes": 271018
+   "bytes": 304594
   }
  ],
  "sockets": {
-  "fx_core": {
-   "translation": [
-    0.0,
-    0.4347,
-    -0.07
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
-  "hit_center": {
-   "translation": [
-    0.0,
-    0.2892,
-    -0.02
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
   "head_top": {
    "translation": [
     0.0,
@@ -97,6 +63,40 @@
     1.0,
     0.0
    ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.2892,
+    -0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.4347,
+    -0.07
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
   }
  },
  "clips": [
@@ -117,15 +117,15 @@
    -0.4065
   ],
   "max": [
-   0.3325,
+   0.4425,
    0.7371,
-   0.4763
+   0.5303
   ]
  },
  "size_m": 0.737,
  "glb": "assets/models/enemies/clinker_v1.glb",
- "glb_bytes": 498288,
- "glb_sha256": "c26686a5019db75e8a8c9969cf6ce353a9de9e24ec18f978ac4c3c52c836093b",
+ "glb_bytes": 534800,
+ "glb_sha256": "5d081ca8894e3df2dcf68cc9cefd86be8b18c5dad8e1bfa8690fe9fda3f6d52d",
  "source_blend": "art/enemies/clinker/source/clinker_v1.blend",
  "build_script": "tools/blender/gf_assets/enemies/clinker.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -147,7 +147,7 @@
  ],
  "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named {file_stem}_{clip}. Pick one of variant_set per spawn (clinker.glb alone is complete).",
  "mirrored": true,
- "limbs": "three shard legs on the right, one huge clawed arm on the left",
+ "limbs": "three thin dark shard legs on the right, one huge pale bone clawed arm on the left",
  "gait": "legs_a = front + rear leg of the three-leg side; legs_b = middle leg + the big arm (limps)",
  "move_cycle_m": 0.65,
  "move_note": "rigid-group skitter: play move@loop at speed / move_cycle_m cycles per second (row speed 3.8 m/s -> about 6 cycles/s, the frantic flicker that reads as SKITTER at 35 px)",
@@ -167,14 +167,14 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 194.1,
-   "p10": 168.7,
-   "p90": 278.0
+   "median": 204.2,
+   "p10": 157.9,
+   "p90": 257.0
   },
-  "coverage": 0.429
+  "coverage": 0.407
  },
  "skin": {
-  "vertices": 648,
+  "vertices": 682,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
@@ -182,7 +182,7 @@
    "body": 238,
    "head": 75,
    "legs_a": 62,
-   "legs_b": 117,
+   "legs_b": 151,
    "tail": 156
   }
  }

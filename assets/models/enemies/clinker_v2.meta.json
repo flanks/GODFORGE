@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "clinker_v2",
  "tier": "swarm",
- "tris": 1024,
+ "tris": 1080,
  "tris_budget": [
   600,
   1500
@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 71281
+   "bytes": 64700
   },
   {
    "name": "clinker_v2_basecolor",
@@ -26,14 +26,14 @@
     512
    ],
    "format": "png",
-   "bytes": 276882
+   "bytes": 316380
   }
  ],
  "sockets": {
-  "hit_center": {
+  "head_top": {
    "translation": [
     0.0,
-    0.2543,
+    0.56,
     -0.02
    ],
    "forward": [
@@ -47,10 +47,10 @@
     0.0
    ]
   },
-  "head_top": {
+  "hit_center": {
    "translation": [
     0.0,
-    0.56,
+    0.2543,
     -0.02
    ],
    "forward": [
@@ -112,20 +112,20 @@
  "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
  "bounds_m": {
   "min": [
-   -0.4084,
-   -0.0125,
+   -0.5456,
+   -0.0024,
    -0.3635
   ],
   "max": [
    0.4338,
    0.4564,
-   0.5512
+   0.6188
   ]
  },
- "size_m": 0.469,
+ "size_m": 0.459,
  "glb": "assets/models/enemies/clinker_v2.glb",
- "glb_bytes": 502660,
- "glb_sha256": "43f9cbb67f82705a5248946a37984fed642dea84334582eb2de70722b15c367d",
+ "glb_bytes": 542516,
+ "glb_sha256": "137752bd3ea974deb2a5ad03ca46de6029b15995357c96b21f6ef7715cdb5223",
  "source_blend": "art/enemies/clinker/source/clinker_v2.blend",
  "build_script": "tools/blender/gf_assets/enemies/clinker.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -147,7 +147,7 @@
  ],
  "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named {file_stem}_{clip}. Pick one of variant_set per spawn (clinker.glb alone is complete).",
  "mirrored": false,
- "limbs": "three shard legs on the left, one huge clawed arm on the right",
+ "limbs": "three thin dark shard legs on the left, one huge pale bone clawed arm on the right",
  "gait": "legs_a = front + rear leg of the three-leg side; legs_b = middle leg + the big arm (limps)",
  "move_cycle_m": 0.55,
  "move_note": "rigid-group skitter: play move@loop at speed / move_cycle_m cycles per second (row speed 3.8 m/s -> about 6 cycles/s, the frantic flicker that reads as SKITTER at 35 px)",
@@ -167,14 +167,14 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 189.9,
-   "p10": 155.6,
-   "p90": 274.7
+   "median": 196.3,
+   "p10": 150.0,
+   "p90": 248.4
   },
-  "coverage": 0.419
+  "coverage": 0.405
  },
  "skin": {
-  "vertices": 692,
+  "vertices": 726,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
@@ -182,7 +182,7 @@
    "body": 252,
    "head": 78,
    "legs_a": 62,
-   "legs_b": 117,
+   "legs_b": 151,
    "tail": 183
   }
  }

@@ -36,33 +36,53 @@ keys (the crawler-family rule in ENEMIES.md), and none of them are built here.
 
 * **Silhouette.** The creature is a hunched, eyeless infant figure fused into an obsidian carapace. The
   big skull is bowed low in front, the back is a row of overlapping scutes, and the limbs are wrong: three
-  bent shard legs on one side and one huge clawed arm on the other. From the 55° camera it reads as a
-  lopsided dark bug with legs fanning out on one side and a claw on the other. The 40-copy crowd render
-  proves that each one stays countable at horde density rather than merging into one mass.
+  thin dark shard legs on one side and one huge **pale bone** clawed arm on the other. The arm is a fat
+  upper arm, a forearm that swells and flattens into a paddle toward the knuckles (widest in the ground
+  plane, where the 55° camera sees it), a knuckle-walking fist and four heavy talons, with two small
+  obsidian crystals breaking through the forearm. From the game camera it reads as a dark framed shell
+  with one pale club on one side: lopsided by value and by mass, not only by outline. The 40-copy crowd
+  render proves that each one stays countable at horde density rather than merging into one mass.
 * **The jaw is the wind-up read.** The skull is split down its flat, pale, eyeless face. The `head` bone
   is the hinged front half of the skull (the left half, or the right half on mirrored looks), and a yaw
   swings it open like a door on a vertical hinge. At rest a thin teal seam shows. In `windup` the
   creature rears up and the face splits into a wide glowing wedge, the one bright shape that shows
   "about to bite" at game size before the engine's red-white decal. In `attack` the jaw snaps shut on the
   lunge.
-* **Value plan.** Violet-black obsidian against the `#3A2C24` Cinder floor relies on the engine's ink
-  line and rim light. The internal read comes from the teal slits between the scutes, a few bold
-  fissures, the pale face, the belly, the knee knuckles and the claws. The glow is an accent, not the
-  mass. An early pass with big teal panels read as "a teal thing", and a dense crack web turned to
-  speckle at 35 px. The final version has 2-5 bold fissures per look, each with a painted teal glow spill.
+* **Value plan.** Three values do the work at 35 px: the violet-black obsidian mass (darker than the
+  `#3A2C24` Cinder floor), a light violet-grey lip stroke that frames every scute (so the dark body
+  separates from the floor instead of melting into it) and the one pale bone arm. The teal slits between
+  the scutes, a few bold fissures and the split face are the glow accent, not the mass. An early pass with
+  big teal panels read as "a teal thing", and a dense crack web turned to speckle at 35 px. The final
+  version has 2-5 bold fissures per look, each with a painted teal glow spill.
 * **Palette** (The Unmade only). Obsidian `#07060A / #1A1720`. The light plane is `#4B4658` warmed
-  28 % toward the row colour `#9A5B3C`: the only use of the row colour, as ENEMIES.md asks. The skull
-  gets a wet-sheen light (`#7FA7A0` mixed in). Bone is `#6E6152 / #BDB09A / #EDE4CF`. The glow is ichor
-  `#1F8F7E` rim, `#2FBFA8` hot and `#B8FFE8` core, with the core only right at `fx_core`. There are no
-  player colours, no `#7CFF6B` and no red-white.
+  28 % toward the row colour `#9A5B3C` (`#614C50`): the only use of the row colour, as ENEMIES.md asks.
+  The scute edges and lip strokes use obsidian light pushed brighter, `#7F7278` (`#4B4658` 26 % toward
+  white, 16 % toward the row colour). The skull gets a wet-sheen light (`#7FA7A0` mixed in). Bone is
+  `#6E6152 / #BDB09A / #EDE4CF`, and the big arm is the faction bone a step darker, `#AFA28D`, so a horde
+  of pale fists does not outshine the heroes. Its upper arm darkens to bone shadow toward the shoulder, so
+  the pale mass stays joined to the shell. The glow is ichor `#1F8F7E` rim, `#2FBFA8` hot and `#B8FFE8`
+  core, with the core only right at `fx_core`. There are no player colours, no `#7CFF6B` and no red-white.
 * **Paint.** This is the gf_assets NPR painter: flat value planes per facet and per part, cavity darks,
-  broken brushy edge strokes and low-frequency brush value shifts, with no baked light direction. The
-  emissive texture is separate. UV islands are importance-weighted (scutes 1.35×, skull 1.3×, belly and
-  drips smaller), with a 3 px margin at 512 px: coverage is about 43 % instead of 24 %.
+  broken brushy edge strokes and low-frequency brush value shifts, with no baked light direction. Each
+  scute's flared rear lip also carries a painted crest stroke (a line decal, `Build._lip_strokes`): it
+  follows the jagged lip, wobbles a few mm, stops short of the low flanks and breaks once per scute, with a
+  `#614C50` halo, so it reads as a brush stroke rather than an outline. The emissive texture is separate.
+  UV islands are importance-weighted (scutes 1.35×, skull 1.3×, arm 1.1×, belly and drips smaller), with
+  a 3 px margin at 512 px: coverage is about 40 % instead of 24 %.
 * **Size.** The body (hull and skull) is about 0.45 m wide by 0.75 m long, in line with the
-  collider's 2.2-3 × 0.21 m target. The legs and claws reach 0.77 × 0.88 m and overlap neighbours at horde
-  density, which is allowed for swarms. The heights are 0.47-0.74 m, or 0.21-0.34 × the 2.2 m hero:
-  always below the knee-to-waist band.
+  collider's 2.2-3 × 0.21 m target. The legs and the big arm reach 0.86-0.98 m across and 0.94-0.98 m
+  long, and they overlap neighbours at horde density, which is allowed for swarms. The heights are
+  0.46-0.74 m, or 0.21-0.34 × the 2.2 m hero: always below the knee-to-waist band.
+
+## Art review fixes (2026-09-25, review score 7.5/10)
+
+| Must-fix | What changed |
+|---|---|
+| The asymmetry did not read at game size: the legs were about 1 px and the creature read as a generic symmetric tick | The lone arm was a thin obsidian tube that read as a fourth leg. It is now a massive pale bone club (radius 0.062-0.084 m against the legs' 0.024-0.044 m, the forearm flattened 1.3× in the ground plane, a 0.21 m fist, four 0.03 m talons) in its own `arm` paint zone. At 35 px one side is a pale club and the other three thin dark legs |
+| The obsidian body was nearly the floor value; only the teal seam carried the read | The scutes' edge light went from `#614C50` to `#7F7278`, and every scute's rear lip got a bold crest stroke about one game pixel wide. The teal slit spill was narrowed from 30 to 17 mm so it no longer paints over the lips. In the 1x in-game render (teal glow pixels excluded), the share of shell pixels brighter than the floor went from 30 % to 55 %, and the share of clearly light ones (luminance above 70) went from 8 % to 34 %. They form light arcs that frame each scute |
+
+The fixes live in the shared build code, so all four looks were rebuilt, re-exported, re-validated and
+re-reviewed. The skeleton, clips, sockets and file names did not change.
 
 ## Rig and clips (GF_Swarm_v1, rigid skin)
 
@@ -98,10 +118,10 @@ keys (the crawler-family rule in ENEMIES.md), and none of them are built here.
 
 | File | Tris | Height | Length × width | Textures | Texel density (median) | GLB |
 |---|---|---|---|---|---|---|
-| clinker | 948 | 0.55 m | 0.88 × 0.77 m | 512 + 512 | 197 px/m | 0.49 MB |
-| clinker_v1 | 952 | 0.74 m | 0.88 × 0.75 m | 512 + 512 | 194 px/m | 0.50 MB |
-| clinker_v2 | 1,024 | 0.47 m | 0.91 × 0.84 m | 512 + 512 | 190 px/m | 0.50 MB |
-| clinker_v3 | 980 | 0.57 m | 0.90 × 0.77 m | 512 + 512 | 186 px/m | 0.50 MB |
+| clinker | 1,004 | 0.55 m | 0.94 × 0.89 m | 512 + 512 | 205 px/m | 0.52 MB |
+| clinker_v1 | 1,008 | 0.74 m | 0.94 × 0.86 m | 512 + 512 | 204 px/m | 0.54 MB |
+| clinker_v2 | 1,080 | 0.46 m | 0.98 × 0.98 m | 512 + 512 | 197 px/m | 0.54 MB |
+| clinker_v3 | 1,036 | 0.57 m | 0.96 × 0.89 m | 512 + 512 | 200 px/m | 0.52 MB |
 
 The swarm budget is 600-1,500 tris (the brief asks for 600-1,200 per look). There is one material with
 base colour and emissive, no Draco or meshopt, and every file passes `gfa_validate.py`. The game camera
@@ -120,6 +140,8 @@ art/enemies/clinker/
   reports/clinker_family_review.png   lineup, in-game lineup, 40-copy horde at true 1080p size (+ silhouette,
                               + the 4-player 28 m view), skitter cycle at game size
   reports/clinker_crowd.png, clinker_lineup.png
+  reports/clinker_review_fix_before_after.png   the art-review fix at true game size (a one-off, kept
+                              as a record; the build scripts do not regenerate it)
   work/                       local renders (git-ignored)
 assets/models/enemies/<key>.glb + <key>.meta.json
 tools/blender/gf_assets/enemies/clinker.py, clinker_crowd.py
