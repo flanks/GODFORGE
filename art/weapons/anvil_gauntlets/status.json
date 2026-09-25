@@ -43,33 +43,42 @@
     "art/weapons/anvil_gauntlets/production/anvil_gauntlets_stage2.blend (Git LFS)",
     "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_basecolor.png (1024x1024, Git LFS)",
     "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_emissive.png (1024x1024, Git LFS)",
+    "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_normal.png (1024x1024 Non-Color tangent-space, Git LFS)",
     "art/weapons/anvil_gauntlets/stage2_weapon.json",
     "art/weapons/anvil_gauntlets/stage2_texture.json",
     "art/weapons/anvil_gauntlets/reports/stage2_weapon.md",
     "art/weapons/anvil_gauntlets/reports/stage2/stage2_weapon{,_wireframe,_textures}.png",
-    "art/weapons/anvil_gauntlets/reports/stage2/{parts,texture}.json"
+    "art/weapons/anvil_gauntlets/reports/stage2/{parts,texture,gltf_check}.json"
    ],
    "metrics": {
     "triangles": {
-     "GAUNTLET_L": 2864,
-     "GAUNTLET_R": 2864,
-     "GAUNTLET_FIST_L": 2864,
-     "GAUNTLET_FIST_R": 2864
+     "GAUNTLET_L": 3858,
+     "GAUNTLET_R": 3858,
+     "GAUNTLET_FIST_L": 3858,
+     "GAUNTLET_FIST_R": 3858
     },
-    "triangles_pair_open": 5728,
-    "texel_density_px_per_m_median": 300.3,
-    "atlas_coverage": 0.3929,
+    "triangles_pair_open": 7716,
+    "texel_density_px_per_m_median": 289.5,
+    "atlas_coverage": 0.3424,
     "core_clearance_over_wearer_m": [
-     0.015,
-     0.0203,
-     0.0355,
-     0.0694,
-     0.0545,
-     0.0423,
-     0.023
-    ]
+     0.0223,
+     0.0295,
+     0.0431,
+     0.0141,
+     0.0219,
+     0.0158,
+     0.0562,
+     0.0481
+    ],
+    "blockout_plate_seeds": 18,
+    "normal_bake": {
+     "texels_with_detail": 76197,
+     "valid_fraction_of_target_zones": 0.3136,
+     "blur_px": 1.2
+    },
+    "gltf_check_ok": true
    },
-   "notes": "Rigid left/right pair, open (concept) and closed-fist variants with identical topology (shared UVs/texture). Authored in the weapon socket frame (origin palm centre, +Y along the fingers, +Z out of the back of the hand). All pieces closed and manifold.",
+   "notes": "Rigid left/right pair, open (concept) and closed-fist variants with identical topology (shared UVs/texture). v2 (polish pass 2026-09-25): built on the s202 blockout's own gauntlet field (plate centres from its lumps, plate tops on its surface, radial scale 1.04-1.10), chunky faceted basalt plates with 1.5 cm glowing seams, hexagonal bronze cuff / band / strap frame with studs, a broad hand core over the wearer's fingers, massive knuckle chunks, faceted rock fingers; tangent normals baked from the scaled blockout gauntlet. Authored in the weapon socket frame (origin palm centre, +Y along the fingers, +Z out of the back of the hand). All pieces closed and manifold.",
    "items": {
     "production_mesh": {
      "status": "done",

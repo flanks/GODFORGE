@@ -325,6 +325,28 @@ for ps in cfg["fit"].get("post_smooth", []):
     set_co(me, co)
     report.setdefault("post_smooth_verts", []).append(int((m > 0.05).sum()))
 
+# ---- grin: part the lips, lift and widen the mouth corners (toward the turnaround sheet's face) ------------------
+gr = cfg["fit"].get("grin")
+lg = body.vertex_groups.get("lips")
+if gr and lg:
+    co = get_co(me)
+    li = np.array([v.index for v in me.vertices if any(g.group == lg.index and g.weight > 0.5 for g in v.groups)])
+    lp = co[li]
+    inner = lp[lp[:, 1] > np.percentile(lp[:, 1], 70)]
+    z_slit = float(np.median(inner[:, 2]))
+    w = float(np.abs(lp[:, 0]).max())
+    ax = np.abs(lp[:, 0]) / w
+    low = lp[:, 2] < z_slit
+    lp[low, 2] -= gr["open"] * np.sqrt(np.clip(1 - ax[low] ** 2, 0, 1))
+    lp[low, 1] += gr["open"] * 0.3
+    corner = np.clip((ax - 0.55) / 0.45, 0, 1)
+    lp[:, 2] += gr["smile"] * corner
+    lp[:, 0] *= 1 + gr["widen"] * corner
+    co[li] = lp
+    co = symmetrize(co, mm)
+    set_co(me, co)
+    report["grin"] = {"lip_verts": int(len(li)), "slit_z": round(z_slit, 4), "mouth_half_width": round(w, 4)}
+
 # eyes ride along with the surrounding head surface (mean displacement of the 24 nearest vertices)
 disp = get_co(me) - co_tps
 for k in range(len(eyes)):
@@ -336,10 +358,15 @@ loops_added = []
 for lp in cfg["fit"].get("extra_loops", []):
     bm = bmesh.new()
     bm.from_mesh(me)
-    ring = [e for e in bm.edges
-            if (e.verts[0].co.z - lp["z"]) * (e.verts[1].co.z - lp["z"]) < 0
-            and min(abs(e.verts[0].co.x), abs(e.verts[1].co.x)) > lp["abs_x_min"]
-            and max(e.verts[0].co.z, e.verts[1].co.z) < lp["z"] + 0.15]
+    if lp.get("axis") == "x":        # elbow / wrist: the ring crossing |x| = abs_x on both arms
+        ring = [e for e in bm.edges
+                if (abs(e.verts[0].co.x) - lp["abs_x"]) * (abs(e.verts[1].co.x) - lp["abs_x"]) < 0
+                and e.verts[0].co.x * e.verts[1].co.x > 0 and min(e.verts[0].co.z, e.verts[1].co.z) > lp["z_min"]]
+    else:                            # knee: the ring crossing the plane z on both legs
+        ring = [e for e in bm.edges
+                if (e.verts[0].co.z - lp["z"]) * (e.verts[1].co.z - lp["z"]) < 0
+                and min(abs(e.verts[0].co.x), abs(e.verts[1].co.x)) > lp["abs_x_min"]
+                and max(e.verts[0].co.z, e.verts[1].co.z) < lp["z"] + 0.15]
     res = bmesh.ops.subdivide_edges(bm, edges=ring, cuts=1, use_grid_fill=True)
     # where the ring crosses a triangle the split leaves an n-gon: triangulate those, then pair triangles back into quads
     ngons = [f for f in bm.faces if len(f.verts) > 4]
@@ -350,7 +377,7 @@ for lp in cfg["fit"].get("extra_loops", []):
     bm.to_mesh(me)
     bm.free()
     me.update()
-    loops_added.append({"z": lp["z"], "edges_split": len(ring)})
+    loops_added.append({k: lp[k] for k in ("axis", "abs_x", "z") if k in lp} | {"edges_split": len(ring)})
 report["extra_loops"] = loops_added
 log("extra loops", loops_added)
 mm = mirror_map(get_co(me), tol=1e-4)          # the loops added vertices

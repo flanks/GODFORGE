@@ -10,7 +10,9 @@ Parts (each a closed mesh, faces tagged with paint zones - s2_geom.ZONES):
   SKIRT_PLATES             three tiers of overlapping bronze leaf plates (rigid pieces)
   WRAPS                    teal ankle wraps (sleeves with thickness) + instep straps + short wrist wraps
   HAIR / BEARD             shells over the scalp / jaw: the body's own quad layout there, pushed out to the
-                           sculpt's hair and beard surface, closed with a rim; plus spiky hair clumps
+                           sculpt's hair and beard surface (offsets smoothed), closed with a rim; plus chunky
+                           stylised clumps (tapered lofted locks: hair swept up and back, beard down off the
+                           jaw); BEARD also carries the teeth strip behind the parted lips (the grin)
 
   blender -b -P tools/blender/gf_hero/s2_parts.py -- <body.blend> <retopo_start.blend> <parts.json> <out.blend>
           [--report <json>]
@@ -58,7 +60,7 @@ zone_hex = {"skin": pal["skin"]["base"], "hair": pal["hair_beard"]["base"], "bea
             "eye": pal["eye_glow"]["hot"], "rock": pal["gauntlet_rock"]["base"], "lava": pal["lava_glow"]["hot"],
             "bronze": pal["bronze"]["base"], "plates": pal["scale_plates"]["base"], "leather": pal["belt_leather"]["base"],
             "cloth": pal["torn_cloth"]["base"], "sash": pal["teal_sash"]["base"], "wraps": pal["ankle_wraps"]["base"],
-            "linen": pal["wrap_linen"]["base"]}
+            "linen": pal["wrap_linen"]["base"], "teeth": "#E6D8BE"}
 mats = []
 for zname in G.ZONES:
     m = bpy.data.materials.get("Z_" + zname) or bpy.data.materials.new("Z_" + zname)
@@ -557,9 +559,12 @@ def clean_face_region(vmask):
     return [int(i) for i in np.nonzero(inside)[0]]
 
 
-def shell(name, vmask, zone, min_off, max_off, spikes=None):
+def shell(name, vmask, zone, min_off, max_off, clumps=None, extra=None):
+    """Hair / beard shell over the body's own head quads, offsets smoothed over the region (no facets),
+    closed with a rim; then chunky stylised clumps (tapered lofted locks) on top."""
     fidx = clean_face_region(vmask)
     bm = bmesh.new()
+    G.ensure_mask(bm)
     edge_count = {}
     for fi in fidx:
         vs = list(bme.polygons[fi].vertices)
@@ -568,55 +573,119 @@ def shell(name, vmask, zone, min_off, max_off, spikes=None):
             edge_count[key] = edge_count.get(key, 0) + 1
     bnd = {k for e, c in edge_count.items() if c == 1 for k in e}
     used = sorted({k for fi in fidx for k in bme.polygons[fi].vertices})
+    off = {}
+    for k in used:
+        p, nrm = bco[k], bno[k]
+        off[k] = float(np.clip((hit_pt[k] - p) @ nrm + 0.002, min_off, max_off)) if not np.isnan(hit_pt[k, 0]) else min_off
+    # smooth the offsets over the region (the sculpt's lumps made the v1 shell faceted); rim stays thin
+    nb = {k: set() for k in used}
+    for (a, b) in edge_count:
+        nb[a].add(b)
+        nb[b].add(a)
+    for _ in range(hc_["offset_smooth"]):
+        new = {}
+        for k in used:
+            if k in bnd:
+                new[k] = min_off * 0.35
+            else:
+                new[k] = 0.5 * off[k] + 0.5 * np.mean([off[j] for j in nb[k]])
+        off = new
     vo, vi = {}, {}
     for k in used:
         p, nrm = bco[k], bno[k]
-        off = float(np.clip((hit_pt[k] - p) @ nrm + 0.002, min_off, max_off)) if not np.isnan(hit_pt[k, 0]) else min_off
-        if k in bnd:
-            off = min_off * 0.35
-        vo[k] = bm.verts.new(tuple(p + nrm * off))
+        vo[k] = bm.verts.new(tuple(p + nrm * off[k]))
         vi[k] = bm.verts.new(tuple(p - nrm * 0.004))
-    fo = []
     for fi in fidx:
         vs = list(bme.polygons[fi].vertices)
-        fo.append(bm.faces.new([vo[k] for k in vs]))
+        bm.faces.new([vo[k] for k in vs])
         bm.faces.new([vi[k] for k in reversed(vs)])
     for (a, b), c in edge_count.items():
         if c == 1:
             bm.faces.new((vo[a], vo[b], vi[b], vi[a]))
     for f in bm.faces:
         f.material_index = G.Z[zone]
+    G.set_mask(bm, [vo[k] for k in used], 0.35)
+    G.set_mask(bm, [vi[k] for k in used], 0.1)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    nsp = 0
-    if spikes:
-        cand = [f for f in fo if f.is_valid and f.calc_center_median().z > spikes["z_min"] and len(f.verts) == 4]
-        rng.shuffle(cand)
+    n_cl = 0
+    if clumps:
+        pts = np.array([bco[k] + bno[k] * off[k] for k in used])
+        nrms = np.array([bno[k] for k in used])
+        sel = np.nonzero(clumps["select"](pts, nrms))[0]
+        sel = list(sel)
+        rng.shuffle(sel)
         chosen = []
-        for f in cand:
-            c = f.calc_center_median()
-            if all((c - g.calc_center_median()).length > spikes["spacing"] for g in chosen):
-                chosen.append(f)
-            if len(chosen) >= spikes["count"]:
+        for i in sel:
+            if all(np.linalg.norm(pts[i] - pts[j]) > clumps["spacing"] for j in chosen):
+                chosen.append(i)
+            if len(chosen) >= clumps["count"]:
                 break
-        for f in chosen:
-            nrm = f.normal.copy()
-            c = f.calc_center_median()
-            back = Vector((0.0, 1.0, 0.7)).normalized()
-            side = Vector((1.0 if c.x > 0 else -1.0, 0.0, 0.0)) * (0.25 if abs(c.x) > 0.03 else 0.0)
-            d = (nrm * 0.65 + back * spikes["sweep"] + side).normalized()
-            res = bmesh.ops.extrude_discrete_faces(bm, faces=[f])
-            nf = res["faces"][0]
-            L = spikes["length"] * rng.uniform(0.6, 1.25)
-            for v in nf.verts:
-                v.co = c + (v.co - c) * spikes["tip_scale"] + d * L
-            nsp += 1
-        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
-    report.setdefault("shells", {})[name] = {"faces_from_body": len(fidx), "spikes": nsp}
+        for i in chosen:
+            d0, bend = clumps["dirs"](pts[i], nrms[i])
+            G.lock(bm, pts[i], nrms[i], d0, bend, clumps["length"] * rng.uniform(0.7, 1.2), clumps["width"] * rng.uniform(0.85, 1.15),
+                   clumps["thick"], rng, zone)
+            n_cl += 1
+    if extra:
+        extra(bm)
+    report.setdefault("shells", {})[name] = {"faces_from_body": len(fidx), "clumps": n_cl}
     return finish(bm, name)
 
 
-shell("HAIR", is_hair, "hair", hc_["min_off"], hc_["max_off"], spikes=hc_["spikes"])
-shell("BEARD", is_beard, "beard", hc_["beard_min_off"], hc_["beard_max_off"], spikes=hc_.get("beard_spikes"))
+def hair_dirs(p, n):
+    """Hair clumps: out of the scalp, swept up and back, flaring to the sides."""
+    side = np.array([np.sign(p[0]), 0.0, 0.0]) * min(1.0, abs(p[0]) / 0.06)
+    d0 = n * 0.45 + np.array([0.0, 0.45, 0.45]) + side * 0.15
+    bend = np.array([0.0, 0.9, -0.3]) + side * 0.3
+    return d0 / np.linalg.norm(d0), bend / np.linalg.norm(bend)
+
+
+def beard_dirs(p, n):
+    """Beard clumps: down off the jaw and chin, a little forward."""
+    d0 = n * 0.3 + np.array([0.0, -0.15, -0.9])
+    bend = np.array([0.0, -0.3, -0.9])
+    return d0 / np.linalg.norm(d0), bend / np.linalg.norm(bend)
+
+
+tc = cfg.get("teeth")
+
+
+def teeth(bm):
+    """A curved teeth strip behind the parted lips (the grin)."""
+    lg = body.vertex_groups.get("lips")
+    if not (tc and lg):
+        return
+    li = np.array([v.index for v in bme.vertices if any(g.group == lg.index and g.weight > 0.5 for g in v.groups)])
+    lp = bco[li]
+    inner = lp[lp[:, 1] > np.percentile(lp[:, 1], 70)]
+    zs = float(np.median(inner[:, 2]))
+    y0 = float(np.median(inner[np.abs(inner[:, 0]) < 0.01][:, 1])) + tc["behind"]
+    w = float(np.abs(lp[:, 0]).max()) * tc["width_frac"]
+    rings = []
+    for x in np.linspace(-w, w, tc["segments"] + 1):
+        y = y0 + tc["arch"] * (x / w) ** 2
+        rings.append([(x, y, zs + tc["up"]), (x, y, zs - tc["down"]), (x, y + tc["thick"], zs - tc["down"]), (x, y + tc["thick"], zs + tc["up"])])
+    vr = [[bm.verts.new(p) for p in r] for r in rings]
+    fs = []
+    for a, b in zip(vr[:-1], vr[1:]):
+        for i in range(4):
+            j = (i + 1) % 4
+            fs.append(bm.faces.new((a[i], a[j], b[j], b[i])))
+    fs.append(bm.faces.new(list(reversed(vr[0]))))
+    fs.append(bm.faces.new(vr[-1]))
+    G.tag(fs, "teeth")
+    G.set_mask(bm, [v for r in vr for v in r], 0.5)
+    bmesh.ops.recalc_face_normals(bm, faces=fs)
+    report["teeth"] = {"slit_z": round(zs, 4), "front_y": round(y0, 4), "half_width": round(w, 4)}
+
+
+hcl = hc_["clumps"]
+bcl = hc_["beard_clumps"]
+shell("HAIR", is_hair, "hair", hc_["min_off"], hc_["max_off"],
+      clumps=dict(hcl, dirs=hair_dirs, select=lambda P, N: (P[:, 2] > hcl["z_min"]) & (N[:, 2] > 0.25)))
+shell("BEARD", is_beard, "beard", hc_["beard_min_off"], hc_["beard_max_off"],
+      clumps=dict(bcl, dirs=beard_dirs, select=lambda P, N: (P[:, 2] < bcl["z_max"]) & (N[:, 2] < 0.3) & (P[:, 1] < bcl["y_max"])
+                  & (np.abs(P[:, 0]) < bcl["x_max"])),
+      extra=teeth)
 report["hair_verts"] = int(is_hair.sum())
 report["beard_verts"] = int(is_beard.sum())
 

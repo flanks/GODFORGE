@@ -8,8 +8,16 @@
   3. bakes with Cycles (1 sample, EMIT) into float images: world position, world normal, paint zone,
      object index, coverage; plus the sculpt's concavity transferred onto the body (selected-to-active
      from the stage-1 reference) so anatomy lines follow the approved sculpt;
-  4. paints base colour + emissive in numpy (s2_paint.py), dilates the gutters, writes sRGB PNGs;
-  5. one material M_brax (base colour + emissive textures) on every part; the paint zone stays on
+  3b. high-to-low from the sculpt source (hi_lo in the texture config; the stage-1 blockout for the hero,
+     its radially scaled gauntlet copies for the weapon; never shipped): selected-to-active with a cage,
+     a tangent-space NORMAL bake, the source's concavity + Cycles AO (vertex colours) and its hit position.
+     Bake artifacts are cleaned: texels whose hit lies too far from the low-poly surface fade to flat,
+     only the listed zones and regions take detail, the normals are blurred by a normalised convolution
+     inside the valid area and clamped; plus a self-AO bake of the assembled low-poly parts;
+  4. paints base colour + emissive in numpy (s2_paint.py; AO and cavity folded into the painted colour),
+     dilates the gutters, writes sRGB PNGs and the Non-Color tangent-space normal map (OpenGL / +Y, the
+     glTF and Bevy StandardMaterial convention);
+  5. one material M_<key> (base colour + emissive + normal map) on every part; the paint zone stays on
      the faces as the integer attribute `gf_zone` so the textures can be repainted later.
 """
 import math
@@ -52,11 +60,12 @@ copies = {bpy.data.objects[t]: bpy.data.objects[s_] for t, s_ in cfg.get("uv_cop
 body = bpy.data.objects[cfg["body_object"]] if cfg.get("body_object") else None
 
 # ---- 1. shading ---------------------------------------------------------------------------------------
+sh = cfg.get("shading", {})
 for o in objs + list(copies):
     me = o.data
     me.shade_smooth()
-    if o is not body:
-        me.set_sharp_from_angle(angle=math.radians(cfg["sharp_angle_deg"]))
+    if o is not body and o.name not in sh.get("smooth", []):
+        me.set_sharp_from_angle(angle=math.radians(sh.get("per_object_deg", {}).get(o.name, cfg["sharp_angle_deg"])))
 
 # ---- 2. UVs -------------------------------------------------------------------------------------------
 if body is not None:
@@ -176,73 +185,200 @@ for kind in ("zone", "pos", "nrm", "obj", "mask"):
     maps_img[kind] = bake(kind, objs)
     log("baked %s (%.0fs)" % (kind, time.time() - t))
 
-# sculpt concavity -> body (anatomy lines)
-maps_img["cav"] = np.zeros((SIZE, SIZE, 4), dtype=np.float32)
-if body is not None and cfg.get("cav") and os.path.isfile(REF):
-    with bpy.data.libraries.load(REF, link=False) as (src, dst):
-        dst.objects = ["REF_blockout"]
-    ref = dst.objects[0]
-    scene.collection.objects.link(ref)
-    ref.hide_select = False
-    ref.hide_viewport = False
-    ref.hide_render = False
-    ref.hide_set(False)
-    rme = ref.data
-    rco = get_co(rme)
-    redges = get_edges(rme)
+# ---- 3b. high-to-low: tangent normals, cavity and AO from the sculpt reference; self-AO of the parts --------
+def enable_gpu():
+    try:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+        for kind in ("OPTIX", "CUDA", "HIP", "ONEAPI"):
+            try:
+                prefs.compute_device_type = kind
+            except TypeError:
+                continue
+            prefs.get_devices()
+            devs = [d for d in prefs.devices if d.type == kind]
+            if devs:
+                for d in prefs.devices:
+                    d.use = d.type == kind
+                scene.cycles.device = "GPU"
+                return kind
+    except Exception as ex:  # noqa: BLE001 - CPU fallback is fine
+        log("GPU not available (%s), baking on CPU" % ex)
+    scene.cycles.device = "CPU"
+    return "CPU"
+
+
+report["bake_device"] = enable_gpu()
+log("bake device", report["bake_device"])
+if scene.world is None:
+    scene.world = bpy.data.worlds.new("bake_world")
+
+
+def emit_mat(name, kind, attr=None):
+    """Emission material for a high-poly source: its colour attribute `attr`, or its normalised world position."""
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    em = nt.nodes.new("ShaderNodeEmission")
+    nt.links.new(em.outputs["Emission"], out.inputs["Surface"])
+    if kind == "attr":
+        at = nt.nodes.new("ShaderNodeAttribute")
+        at.attribute_name = attr
+        nt.links.new(at.outputs["Color"], em.inputs["Color"])
+    else:
+        g = nt.nodes.new("ShaderNodeNewGeometry")
+        sub = nt.nodes.new("ShaderNodeVectorMath")
+        sub.operation = "SUBTRACT"
+        sub.inputs[1].default_value = tuple(LO)
+        div = nt.nodes.new("ShaderNodeVectorMath")
+        div.operation = "DIVIDE"
+        div.inputs[1].default_value = tuple(HI - LO)
+        nt.links.new(g.outputs["Position"], sub.inputs[0])
+        nt.links.new(sub.outputs[0], div.inputs[0])
+        nt.links.new(div.outputs[0], em.inputs["Color"])
+    return m
+
+
+def fill_img(rgba):
+    img.pixels.foreach_set(np.tile(np.asarray(rgba, dtype=np.float32), SIZE * SIZE))
+
+
+def read_img():
+    px = np.empty(SIZE * SIZE * 4, dtype=np.float32)
+    img.pixels.foreach_get(px)
+    return px.reshape(SIZE, SIZE, 4)
+
+
+def select_pair(target, source):
+    for o in scene.objects:
+        o.select_set(False)
+    source.select_set(True)
+    target.select_set(True)
+    bpy.context.view_layer.objects.active = target
+
+
+def vertex_ao(src, distance, samples):
+    """Cycles AO of the source mesh alone, baked into a point colour attribute (the low-poly parts are hidden)."""
+    hidden = [o for o in scene.objects if o is not src and not o.hide_render]
+    for o in hidden:
+        o.hide_render = True
+    me = src.data
+    ca = me.color_attributes.get("gf_ao") or me.color_attributes.new("gf_ao", "FLOAT_COLOR", "POINT")
+    me.color_attributes.active_color = ca
+    scene.world.light_settings.distance = distance
+    scene.cycles.samples = samples
+    for o in scene.objects:
+        o.select_set(False)
+    src.select_set(True)
+    bpy.context.view_layer.objects.active = src
+    bpy.ops.object.bake(type="AO", target="VERTEX_COLORS")
+    for o in hidden:
+        o.hide_render = False
+    scene.cycles.samples = 1
+    v = np.empty(len(me.vertices) * 4, dtype=np.float32)
+    ca.data.foreach_get("color", v)
+    return v.reshape(-1, 4)[:, 0]
+
+
+def concavity(src, iters):
+    me = src.data
+    rco = get_co(me)
+    redges = get_edges(me)
     nv = len(rco)
     deg = np.bincount(redges.ravel(), minlength=nv).astype(np.float64)
     acc = np.zeros_like(rco)
     np.add.at(acc, redges[:, 0], rco[redges[:, 1]])
     np.add.at(acc, redges[:, 1], rco[redges[:, 0]])
     lap = acc / np.maximum(deg, 1)[:, None] - rco
-    rme.update()
+    me.update()
     rn = np.empty(nv * 3)
-    rme.vertices.foreach_get("normal", rn)
+    me.vertices.foreach_get("normal", rn)
     rn = rn.reshape(-1, 3)
     elen = np.linalg.norm(rco[redges[:, 0]] - rco[redges[:, 1]], axis=1).mean()
     cav = (lap * rn).sum(1) / elen
-    for _ in range(cfg["cav"]["smooth_iters"]):
+    for _ in range(iters):
         a2 = np.zeros(nv)
         np.add.at(a2, redges[:, 0], cav[redges[:, 1]])
         np.add.at(a2, redges[:, 1], cav[redges[:, 0]])
         cav = 0.5 * cav + 0.5 * a2 / np.maximum(deg, 1)
     lo_, hi_ = np.percentile(cav, [2, 98])
-    cavn = np.clip((cav - lo_) / (hi_ - lo_), 0, 1).astype(np.float32)
-    ca = rme.color_attributes.new("cav", "FLOAT_COLOR", "POINT")
-    ca.data.foreach_set("color", np.repeat(cavn, 4).reshape(-1, 4).ravel())
-    rmat = bpy.data.materials.new("REF_cav")
-    rmat.use_nodes = True
-    nt = rmat.node_tree
-    nt.nodes.clear()
-    o_ = nt.nodes.new("ShaderNodeOutputMaterial")
-    e_ = nt.nodes.new("ShaderNodeEmission")
-    at_ = nt.nodes.new("ShaderNodeAttribute")
-    at_.attribute_name = "cav"
-    nt.links.new(at_.outputs["Color"], e_.inputs["Color"])
-    nt.links.new(e_.outputs["Emission"], o_.inputs["Surface"])
-    rme.materials.clear()
-    rme.materials.append(rmat)
-    set_pass("zone")
+    return np.clip((cav - lo_) / (hi_ - lo_), 0, 1).astype(np.float32)
+
+
+pairs = []
+for hl in cfg.get("hi_lo", []):
+    if hl["source"] == "REF":
+        if not os.path.isfile(REF):
+            continue
+        with bpy.data.libraries.load(REF, link=False) as (src_, dst_):
+            dst_.objects = ["REF_blockout"]
+        src = dst_.objects[0]
+        scene.collection.objects.link(src)
+    else:
+        src = bpy.data.objects[hl["source"]]
+    src.hide_select = False
+    src.hide_viewport = False
+    src.hide_render = False
+    src.hide_set(False)
+    pairs.append((hl, src, [bpy.data.objects[t] for t in hl["targets"]]))
+hi_maps = {}
+if pairs:
     t = time.time()
-    # selected-to-active: REF emits its concavity into the body's atlas
-    for m in zone_mats:
-        nt = m.node_tree
-        for n_ in nt.nodes:
-            if n_.type == "TEX_IMAGE":
-                nt.nodes.active = n_
+    for hl, src, tg in pairs:
+        me = src.data
+        nv = len(me.vertices)
+        cav = concavity(src, hl.get("cavity_smooth", 6)) if hl.get("cavity") else np.zeros(nv, np.float32)
+        ao = vertex_ao(src, hl["ao_distance"], hl["ao_samples"]) if hl.get("ao") else np.ones(nv, np.float32)
+        hi = np.stack([cav, ao, np.zeros(nv, np.float32), np.ones(nv, np.float32)], 1)
+        ca = me.color_attributes.get("gf_hi") or me.color_attributes.new("gf_hi", "FLOAT_COLOR", "POINT")
+        ca.data.foreach_set("color", hi.ravel())
+        src["_mat_hi"] = emit_mat("HI_" + src.name, "attr", "gf_hi").name
+        src["_mat_pos"] = emit_mat("POS_" + src.name, "pos").name
+    log("high-poly cavity / AO prepared (%.0fs)" % (time.time() - t))
+    set_pass("zone")          # every target material has the bake image as its active node
+    for kind in ("hi", "hitpos", "normal"):
+        t = time.time()
+        fill_img((0.5, 0.5, 1.0, 0.0) if kind == "normal" else (0.0, 0.0, 0.0, 0.0))
+        for hl, src, tg in pairs:
+            src.data.materials.clear()
+            if kind != "normal":
+                src.data.materials.append(bpy.data.materials[src["_mat_hi" if kind == "hi" else "_mat_pos"]])
+            for target in tg:
+                select_pair(target, src)
+                if kind == "normal":
+                    bpy.ops.object.bake(type="NORMAL", normal_space="TANGENT", use_selected_to_active=True,
+                                        cage_extrusion=hl["cage"], max_ray_distance=hl["max_ray"], margin=0, use_clear=False)
+                else:
+                    bpy.ops.object.bake(type="EMIT", use_selected_to_active=True, cage_extrusion=hl["cage"],
+                                        max_ray_distance=hl["max_ray"], margin=0, use_clear=False)
+        hi_maps[kind] = read_img()
+        log("baked %s high-to-low (%.0fs)" % (kind, time.time() - t))
+    for hl, src, tg in pairs:
+        if hl["source"] == "REF":
+            bpy.data.objects.remove(src)
+# self-AO of the assembled low-poly parts (belt over the waist, plates over the skirt, hair over the scalp...)
+sa = cfg.get("self_ao")
+if sa:
+    t = time.time()
+    for o in scene.objects:
+        if o.type == "MESH" and o not in objs:
+            o.hide_render = True
+    scene.world.light_settings.distance = sa["distance"]
+    scene.cycles.samples = sa["samples"]
+    set_pass("zone")
     for o in scene.objects:
         o.select_set(False)
-    ref.select_set(True)
-    body.select_set(True)
-    bpy.context.view_layer.objects.active = body
-    bpy.ops.object.bake(type="EMIT", use_selected_to_active=True, cage_extrusion=cfg["cav"]["cage"],
-                        max_ray_distance=cfg["cav"]["max_ray"], margin=0, use_clear=True)
-    px = np.empty(SIZE * SIZE * 4, dtype=np.float32)
-    img.pixels.foreach_get(px)
-    maps_img["cav"] = px.reshape(SIZE, SIZE, 4)
-    log("baked sculpt concavity onto the body (%.0fs)" % (time.time() - t))
-    bpy.data.objects.remove(ref)
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.bake(type="AO", margin=0, use_clear=True)
+    maps_img["ao_self"] = read_img()
+    scene.cycles.samples = 1
+    log("baked self-AO (%.0fs)" % (time.time() - t))
+for o in list(scene.objects):
+    if o.name.startswith("BAKESRC"):
+        bpy.data.objects.remove(o)
 
 # ---- 4. paint -------------------------------------------------------------------------------------------
 zone_f = maps_img["zone"][..., 0] * 32.0 - 1.0
@@ -252,9 +388,66 @@ pos = maps_img["pos"][..., :3][valid] * (HI - LO) + LO
 nrm = maps_img["nrm"][..., :3][valid] * 2 - 1
 nrm /= np.linalg.norm(nrm, axis=1, keepdims=True) + 1e-9
 obj = np.rint(maps_img["obj"][..., 0][valid] * 32.0).astype(np.int64)
-cavv = maps_img["cav"][..., 0][valid]
 maps = {"pos": pos.astype(np.float32), "nrm": nrm.astype(np.float32), "zone": zi, "obj": obj,
-        "cav": np.where(obj == (objs.index(body) + 1 if body is not None else -1), cavv, 0.0).astype(np.float32), "mask": maps_img["mask"][..., 0][valid].astype(np.float32)}
+        "mask": maps_img["mask"][..., 0][valid].astype(np.float32), "prand": maps_img["mask"][..., 1][valid].astype(np.float32)}
+if "ao_self" in maps_img:
+    maps["ao_self"] = maps_img["ao_self"][..., 0][valid].astype(np.float32)
+
+
+def blur(a, sig):
+    """Separable Gaussian blur of an image array (axes 0, 1)."""
+    r = max(1, int(3 * sig))
+    w = np.exp(-0.5 * (np.arange(-r, r + 1) / sig) ** 2)
+    w /= w.sum()
+    for ax in (0, 1):
+        a = sum(wk * np.roll(a, k, axis=ax) for wk, k in zip(w, range(-r, r + 1)))
+    return a
+
+
+NM = np.zeros((SIZE, SIZE, 3), dtype=np.float32)
+NM[..., 2] = 1.0
+if hi_maps:
+    Pf = maps_img["pos"][..., :3] * (HI - LO) + LO
+    Hp = hi_maps["hitpos"][..., :3] * (HI - LO) + LO
+    dist = np.linalg.norm(Hp - Pf, axis=2)
+    Of = np.rint(maps_img["obj"][..., 0] * 32.0).astype(np.int64)
+    Wv = np.zeros((SIZE, SIZE), dtype=np.float32)
+    Ws = np.zeros((SIZE, SIZE), dtype=np.float32)
+    Tz = np.zeros((SIZE, SIZE), dtype=bool)
+    for hl, src, tg in pairs:
+        m = valid & np.isin(Of, [objs.index(o) + 1 for o in tg]) & np.isin(np.rint(zone_f).astype(np.int64), [G.Z[z] for z in hl["zones"]])
+        for ex in hl.get("exclude", []):
+            e = np.ones_like(m)
+            if "abs_x_min" in ex:
+                e &= np.abs(Pf[..., 0]) > ex["abs_x_min"]
+            if "abs_x_max" in ex:
+                e &= np.abs(Pf[..., 0]) < ex["abs_x_max"]
+            if "z_min" in ex:
+                e &= Pf[..., 2] > ex["z_min"]
+            if "z_max" in ex:
+                e &= Pf[..., 2] < ex["z_max"]
+            if "y_max" in ex:
+                e &= Pf[..., 1] < ex["y_max"]
+            m &= ~e
+        Tz |= m
+        vd = np.clip((hl["valid_dist"][1] - dist) / (hl["valid_dist"][1] - hl["valid_dist"][0]), 0, 1)
+        vd = vd * vd * (3 - 2 * vd)
+        Wv = np.where(m, vd, Wv)
+        Ws = np.where(m, vd * hl["normal_strength"], Ws)
+        blur_px = hl.get("blur_px", 1.5)
+    n_raw = hi_maps["normal"][..., :3] * 2 - 1
+    wb = blur(Ws, blur_px)
+    nb = blur(n_raw * Ws[..., None], blur_px) / np.maximum(wb, 1e-4)[..., None]
+    k = np.clip(Ws, 0, 1)[..., None]
+    NM = NM * (1 - k) + nb * k
+    NM /= np.linalg.norm(NM, axis=2, keepdims=True) + 1e-9
+    NM[..., 2] = np.maximum(NM[..., 2], 0.3)
+    NM /= np.linalg.norm(NM, axis=2, keepdims=True) + 1e-9
+    maps["hi_w"] = Wv[valid]
+    maps["cav"] = (hi_maps["hi"][..., 0] * Wv)[valid].astype(np.float32)
+    maps["ao_hi"] = hi_maps["hi"][..., 1][valid].astype(np.float32)
+    report["normal_bake"] = {"texels_with_detail": int((Ws > 0.05).sum()), "valid_fraction_of_target_zones":
+                             round(float((Wv > 0.5).sum()) / max(1, int(Tz.sum())), 4), "blur_px": blur_px}
 report["atlas_coverage"] = round(float(valid.mean()), 4)
 pc = dict(cfg["paint"])
 if fitrep and "eyes" in fitrep:
@@ -265,8 +458,11 @@ if fitrep and "eyes" in fitrep:
 lips = body.vertex_groups.get("lips") if body is not None else None
 if lips:
     bco = get_co(body.data)
-    lz = [bco[v.index][2] for v in body.data.vertices if any(g.group == lips.index and g.weight > 0.5 for g in v.groups)]
-    pc["mouth_z"] = float(np.mean(lz))
+    lp = bco[[v.index for v in body.data.vertices if any(g.group == lips.index and g.weight > 0.5 for g in v.groups)]]
+    inner = lp[lp[:, 1] > np.percentile(lp[:, 1], 70)]
+    pc["mouth_z"] = float(np.mean(lp[:, 2]))
+    pc["mouth"] = {"slit_z": float(np.median(inner[:, 2])), "half_w": float(np.abs(lp[:, 0]).max()),
+                   "y_inner": float(np.median(inner[:, 1]))}
 t = time.time()
 base, emis = PT.paint(maps, G.Z, pal, pc, log=log)
 log("painted %d texels (%.0fs)" % (len(pos), time.time() - t))
@@ -295,6 +491,11 @@ def save_png(arr, name):
 
 img_base = save_png(B, cfg["texture_names"]["base_color"])
 img_emis = save_png(E, cfg["texture_names"]["emissive"])
+img_nrm = None
+if "normal" in cfg["texture_names"]:
+    NMc = PT.dilate((NM * 0.5 + 0.5).astype(np.float32), valid, cfg["uv"]["margin_px"] + 8)
+    img_nrm = save_png(NMc, cfg["texture_names"]["normal"])
+    img_nrm.colorspace_settings.name = "Non-Color"
 report["textures"] = {k: rel(os.path.join(TEXDIR, v + ".png")) for k, v in cfg["texture_names"].items()}
 log("textures written", report["textures"])
 
@@ -310,6 +511,14 @@ te.image = img_emis
 nt.links.new(tb.outputs["Color"], bsdf.inputs["Base Color"])
 nt.links.new(te.outputs["Color"], bsdf.inputs["Emission Color"])
 bsdf.inputs["Emission Strength"].default_value = cfg["emission_strength"]
+if img_nrm is not None:
+    tn = nt.nodes.new("ShaderNodeTexImage")
+    tn.image = img_nrm
+    nm_node = nt.nodes.new("ShaderNodeNormalMap")
+    nm_node.space = "TANGENT"
+    nm_node.uv_map = "UVMap"
+    nt.links.new(tn.outputs["Color"], nm_node.inputs["Color"])
+    nt.links.new(nm_node.outputs["Normal"], bsdf.inputs["Normal"])
 bsdf.inputs["Roughness"].default_value = 0.85
 bsdf.inputs["Metallic"].default_value = 0.0
 for o in objs + list(copies):

@@ -1,100 +1,107 @@
 {
  "size": 2048,
  "uv_body_regions": {
-  "head": 1025,
+  "head": 1023,
   "sole_R": 79,
-  "torso": 504,
-  "handtop_R": 250,
+  "torso": 508,
+  "foot_R": 242,
   "ear_R": 78,
+  "handpalm_R": 223,
   "leg_R": 212,
-  "arm_L": 125,
+  "handpalm_L": 223,
+  "handtop_L": 251,
+  "arm_L": 172,
   "sole_L": 79,
   "leg_L": 212,
-  "foot_R": 242,
   "foot_L": 242,
-  "handpalm_R": 221,
-  "handpalm_L": 221,
   "ear_L": 78,
-  "arm_R": 125,
-  "handtop_L": 250,
+  "arm_R": 172,
+  "handtop_R": 251,
   "eye_L": 60,
   "eye_R": 60
  },
  "uv_body_cuts": {
   "head": 12,
   "torso": 17,
-  "arm_L": 15,
+  "arm_L": 18,
   "leg_L": 22,
   "foot_L": 2,
-  "arm_R": 15,
+  "arm_R": 18,
   "leg_R": 22,
   "foot_R": 2
  },
  "uv_copied": {},
- "uv_hidden_faces_packed_small": 1779,
+ "uv_hidden_faces_packed_small": 1948,
  "texel_density_px_per_m": {
   "BODY": {
-   "median": 508.7,
-   "p10": 158.8,
-   "p90": 632.3
+   "median": 500.4,
+   "p10": 157.6,
+   "p90": 625.1
   },
   "HAIR": {
-   "median": 478.5,
-   "p10": 125.2,
-   "p90": 604.1
+   "median": 498.0,
+   "p10": 160.1,
+   "p90": 572.7
   },
   "BEARD": {
-   "median": 181.4,
-   "p10": 46.3,
-   "p90": 552.3
+   "median": 477.8,
+   "p10": 156.3,
+   "p90": 575.3
   },
   "BELT": {
-   "median": 499.7,
-   "p10": 163.4,
-   "p90": 573.7
+   "median": 492.0,
+   "p10": 160.9,
+   "p90": 565.0
   },
   "SASH": {
-   "median": 543.8,
-   "p10": 163.9,
-   "p90": 571.6
+   "median": 535.5,
+   "p10": 161.4,
+   "p90": 562.9
   },
   "SKIRT_CLOTH": {
-   "median": 171.6,
-   "p10": 156.0,
-   "p90": 552.1
+   "median": 169.2,
+   "p10": 153.6,
+   "p90": 543.8
   },
   "SKIRT_PLATES": {
-   "median": 548.8,
-   "p10": 165.3,
-   "p90": 570.3
+   "median": 540.6,
+   "p10": 162.8,
+   "p90": 563.2
   },
   "WRAPS": {
-   "median": 551.1,
-   "p10": 165.3,
-   "p90": 586.2
+   "median": 542.7,
+   "p10": 170.9,
+   "p90": 577.5
   },
   "_all": {
-   "median": 519.4,
-   "p10": 157.5,
-   "p90": 596.4
+   "median": 511.8,
+   "p10": 159.8,
+   "p90": 586.6
   }
  },
  "uv_zero_area_faces": {},
- "atlas_coverage": 0.5201,
+ "bake_device": "OPTIX",
+ "normal_bake": {
+  "texels_with_detail": 468759,
+  "valid_fraction_of_target_zones": 0.6589,
+  "blur_px": 1.5
+ },
+ "atlas_coverage": 0.5154,
  "textures": {
   "base_color": "art/characters/brax/textures/brax_basecolor.png",
-  "emissive": "art/characters/brax/textures/brax_emissive.png"
+  "emissive": "art/characters/brax/textures/brax_emissive.png",
+  "normal": "art/characters/brax/textures/brax_normal.png"
  },
  "stats": {
   "BODY": {
    "name": "BODY",
-   "vertices": 3827,
-   "faces": 4063,
-   "triangles": 7642,
-   "quads": 3579,
-   "tri_faces": 484,
+   "vertices": 3927,
+   "faces": 4165,
+   "triangles": 7842,
+   "quads": 3677,
+   "tri_faces": 488,
    "ngons": 0,
-   "quad_ratio": 0.881,
+   "quad_ratio": 0.883,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
@@ -110,19 +117,19 @@
   },
   "HAIR": {
    "name": "HAIR",
-   "vertices": 250,
-   "faces": 248,
-   "triangles": 496,
-   "quads": 248,
-   "tri_faces": 0,
+   "vertices": 612,
+   "faces": 676,
+   "triangles": 1132,
+   "quads": 456,
+   "tri_faces": 220,
    "ngons": 0,
-   "quad_ratio": 1.0,
+   "quad_ratio": 0.675,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 1,
+   "parts": 23,
    "uv_layers": [
     "UVMap"
    ],
@@ -132,19 +139,19 @@
   },
   "BEARD": {
    "name": "BEARD",
-   "vertices": 362,
-   "faces": 384,
-   "triangles": 720,
-   "quads": 336,
-   "tri_faces": 48,
+   "vertices": 495,
+   "faces": 536,
+   "triangles": 954,
+   "quads": 418,
+   "tri_faces": 118,
    "ngons": 0,
-   "quad_ratio": 0.875,
+   "quad_ratio": 0.78,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 2,
+   "parts": 10,
    "uv_layers": [
     "UVMap"
    ],
@@ -263,6 +270,6 @@
    ]
   }
  },
- "triangles_total": 13978,
+ "triangles_total": 15048,
  "triangles_variants": {}
 }

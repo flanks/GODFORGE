@@ -29,7 +29,8 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "SASH": {
@@ -61,7 +62,8 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "SKIRT_CLOTH": {
@@ -93,7 +95,8 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "SKIRT_PLATES": {
@@ -125,7 +128,8 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "WRAPS": {
@@ -157,24 +161,25 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "HAIR": {
    "name": "HAIR",
-   "vertices": 250,
-   "faces": 248,
-   "triangles": 496,
-   "quads": 248,
-   "tri_faces": 0,
+   "vertices": 612,
+   "faces": 676,
+   "triangles": 1132,
+   "quads": 456,
+   "tri_faces": 220,
    "ngons": 0,
-   "quad_ratio": 1.0,
+   "quad_ratio": 0.675,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 1,
+   "parts": 23,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -189,24 +194,25 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   },
   "BEARD": {
    "name": "BEARD",
-   "vertices": 362,
-   "faces": 384,
-   "triangles": 720,
-   "quads": 336,
-   "tri_faces": 48,
+   "vertices": 495,
+   "faces": 536,
+   "triangles": 954,
+   "quads": 418,
+   "tri_faces": 118,
    "ngons": 0,
-   "quad_ratio": 0.875,
+   "quad_ratio": 0.78,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 2,
+   "parts": 10,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -221,22 +227,28 @@
     "Z_cloth",
     "Z_sash",
     "Z_wraps",
-    "Z_linen"
+    "Z_linen",
+    "Z_teeth"
    ]
   }
  },
- "skirt_cloth_pushed_out_samples": 20,
+ "skirt_cloth_pushed_out_samples": 19,
  "skirt_plates": 60,
  "shells": {
   "HAIR": {
    "faces_from_body": 77,
-   "spikes": 14
+   "clumps": 22
   },
   "BEARD": {
-   "faces_from_body": 143,
-   "spikes": 0
+   "faces_from_body": 130,
+   "clumps": 7
   }
  },
- "hair_verts": 111,
- "beard_verts": 212
+ "teeth": {
+  "slit_z": 1.9644,
+  "front_y": -0.074,
+  "half_width": 0.0241
+ },
+ "hair_verts": 110,
+ "beard_verts": 209
 }

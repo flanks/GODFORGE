@@ -3,23 +3,23 @@
  "reference": "brax_retopo_start.blend",
  "tps": {
   "landmarks": 37,
-  "residual_max_m": 5.835635641382453e-07,
-  "global_scale": 0.9796
+  "residual_max_m": 5.846570030332288e-07,
+  "global_scale": 0.9773
  },
  "head_dark_threshold": 0.2764,
  "mirror_pairs_missing": 0,
  "fit": {
   "iterations": 34,
-  "free_form_fitted_verts": 561,
-  "mean_abs_dist_m": 0.00345,
-  "p95_abs_dist_m": 0.02398,
-  "max_abs_dist_m": 0.04322,
+  "free_form_fitted_verts": 571,
+  "mean_abs_dist_m": 0.00337,
+  "p95_abs_dist_m": 0.02399,
+  "max_abs_dist_m": 0.04043,
   "rigid_regions": {
    "foot_L": {
     "scale": [
-     1.001,
+     1.0012,
      0.9998,
-     1.0013
+     1.0015
     ],
     "translate_m": [
      -0.0001,
@@ -31,7 +31,7 @@
     "scale": [
      0.9955,
      1.0003,
-     0.9993
+     0.9996
     ],
     "translate_m": [
      0.0,
@@ -42,8 +42,13 @@
   }
  },
  "post_smooth_verts": [
-  375
+  379
  ],
+ "grin": {
+  "lip_verts": 103,
+  "slit_z": 1.9649,
+  "mouth_half_width": 0.0316
+ },
  "extra_loops": [
   {
    "z": 0.6,
@@ -56,24 +61,49 @@
   {
    "z": 0.648,
    "edges_split": 22
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.6,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.565,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.635,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.925,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.895,
+   "edges_split": 20
   }
  ],
  "limb_radial": {
-  "verts": 1072,
+  "verts": 1172,
   "slab_scale_min_max": [
    1.0,
-   3.025
+   3.443
   ],
   "radius_before_m": [
-   0.0436,
-   0.0556,
-   0.0455,
-   0.0356,
-   0.0356,
-   0.034,
-   0.0313,
-   0.0267,
-   0.0273
+   0.0515,
+   0.0582,
+   0.0425,
+   0.0363,
+   0.0351,
+   0.0331,
+   0.0311,
+   0.0248,
+   0.0233
   ],
   "radius_target_m": [
    0.118,
@@ -90,9 +120,9 @@
  "hand_frames": {
   "L": {
    "origin": [
-    1.02219,
-    0.03232,
-    1.73268
+    1.01645,
+    0.03267,
+    1.7339
    ],
    "x_axis": [
     0.0,
@@ -111,13 +141,13 @@
    ],
    "wrist_abs_x": 0.925,
    "knuckle_abs_x": 1.0606,
-   "hand_verts": 143
+   "hand_verts": 153
   },
   "R": {
    "origin": [
-    -1.02219,
-    0.03232,
-    1.73268
+    -1.01645,
+    0.03267,
+    1.7339
    ],
    "x_axis": [
     0.0,
@@ -136,7 +166,7 @@
    ],
    "wrist_abs_x": 0.925,
    "knuckle_abs_x": 1.0606,
-   "hand_verts": 143
+   "hand_verts": 153
   }
  },
  "eyes": {
@@ -152,17 +182,17 @@
     2.038
    ]
   ],
-  "radius_m": 0.0124
+  "radius_m": 0.0123
  },
  "stats": {
   "name": "BODY",
-  "vertices": 3827,
-  "faces": 4063,
-  "triangles": 7642,
-  "quads": 3579,
-  "tri_faces": 484,
+  "vertices": 3927,
+  "faces": 4165,
+  "triangles": 7842,
+  "quads": 3677,
+  "tri_faces": 488,
   "ngons": 0,
-  "quad_ratio": 0.881,
+  "quad_ratio": 0.883,
   "boundary_edges": 0,
   "nonmanifold_edges": 0,
   "wire_edges": 0,

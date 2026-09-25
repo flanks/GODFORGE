@@ -1,212 +1,335 @@
 {
  "weapon": "anvil_gauntlets",
- "_doc": "Parameters of the anvil_gauntlets chassis weapon (tools/blender/gf_hero/s2_weapon.py + s2_gauntlet.py). Authored around Brax in his T-pose (metres, Blender axes: Z up, hero faces -Y, +X = his left; the left gauntlet is given, the right one is its mirror), then re-expressed in each hand's weapon socket frame (origin = palm centre, +Y along the fingers, +Z out of the back of the hand) from the hero's body_fit report.",
+ "_doc": "Parameters of the anvil_gauntlets chassis weapon (tools/blender/gf_hero/s2_weapon.py + s2_gauntlet.py), v2 (2026-09-25 polish pass): built on the s202 blockout's own gauntlet field around the axis (axis_y, axis_z). Metres, Blender axes, Brax's T-pose (Z up, faces -Y, +X = his left; the left gauntlet is given, the right one is built on the right arm's own field). Each object is then re-expressed in its hand's weapon socket frame (origin palm centre, +Y along the fingers, +Z out of the back of the hand).",
  "designed_on": "brax",
  "seed": 7,
  "palette": "art/characters/brax/palette.json",
  "gauntlet": {
-  "_doc": "Arm axis at y=axis_y, z=axis_z (T-pose). Sculpt: elbow ring |x| 0.52-0.68 (dy 0.377, dz 0.357 max), forearm rock 0.68-0.95 (dy 0.34-0.35, dz 0.28-0.31), wrist ~0.97, hand 1.0-1.14, fingertips 1.34.",
   "axis_y": 0.042,
   "axis_z": 1.755,
-  "elbow_ring": {
+  "blockout_field": {
+   "_doc": "blockout radius E(theta, x) sampled around the axis; median window (theta, x cells) removes the bolts; base_sigma = the smooth base B; lump_sigma smooths E - B before the plate-centre search; bake_x_min = where the bake source starts",
    "x": [
-    0.535,
-    0.668
+    0.48,
+    1.0
    ],
-   "r_out": 0.19,
-   "r_in_min": 0.13,
-   "ey": 1.05,
-   "ez": 0.98,
-   "segments": 6,
-   "phase_deg": 0
+   "dx": 0.004,
+   "dtheta_deg": 2.0,
+   "median": [
+    4,
+    3
+   ],
+   "base_sigma": [
+    8.0,
+    6.0
+   ],
+   "lump_sigma": [
+    1.5,
+    1.5
+   ],
+   "bake_x_min": 0.47
+  },
+  "radial_scale": {
+   "_doc": "the blockout gauntlet's radius is scaled by S(|x|) about the axis (the concept's fists read bigger than the blockout's)",
+   "x": [
+    0.5,
+    0.9,
+    0.97,
+    1.4
+   ],
+   "s": [
+    1.04,
+    1.07,
+    1.1,
+    1.1
+   ]
+  },
+  "forearm": {
+   "x": [
+    0.66,
+    0.935
+   ],
+   "plate_thickness": 0.036,
+   "clearance": 0.014,
+   "center_follow": 1.0
+  },
+  "cuff": {
+   "x": [
+    0.585,
+    0.675
+   ],
+   "gap": 0.012,
+   "r_out_flat": 0.152,
+   "min_wall": 0.028,
+   "stud_rims": [
+    0.013
+   ],
+   "stud_r": 0.012,
+   "stud_h": 0.01
   },
   "cog": {
    "angle_deg": 235,
-   "r_out": 0.046,
-   "r_in": 0.037,
+   "r_out": 0.05,
+   "r_in": 0.04,
    "teeth": 9,
-   "thick": 0.026,
+   "thick": 0.024,
    "hub": 0.02
   },
-  "core": {
+  "core_segments": 16,
+  "forearm_plates": {
+   "_doc": "plate centres = maxima of the blockout's lumps (seed_spacing apart); tops follow the scaled blockout surface; gap = the glowing seam",
    "x": [
-    0.62,
-    0.7,
-    0.8,
-    0.9,
-    0.99
+    0.678,
+    0.925
    ],
-   "ry": [
-    0.15,
-    0.15,
-    0.145,
-    0.128,
-    0.118
+   "r_ref": 0.16,
+   "seed_spacing": 0.046,
+   "gap": 0.015,
+   "min_area": 0.0004,
+   "lift": 0.004,
+   "h_min": 0.022,
+   "h_max": 0.062,
+   "chunk": {
+    "shoulder_inset": 0.011,
+    "shoulder_h": [
+     0.5,
+     0.75
+    ],
+    "top_inset": [
+     0.28,
+     0.42
+    ],
+    "top_h": [
+     0.85,
+     1.02
+    ],
+    "peak_h": [
+     1.0,
+     1.14
+    ],
+    "peak_offset": 0.35
+   },
+   "seed_x": [
+    0.66,
+    0.845
    ],
-   "rz": [
-    0.138,
-    0.13,
-    0.12,
-    0.108,
-    0.1
+   "extra_rings": [
+    {
+     "x": 0.893,
+     "count": 11
+    }
    ],
-   "rings": 7,
-   "segments": 16
-  },
-  "plates": {
-   "x": [
-    0.655,
-    0.97
-   ],
-   "r_ref": 0.14,
-   "around": 8,
-   "along": 4,
-   "jitter": 0.22,
-   "gap": 0.009,
-   "height": 0.028,
-   "chamfer": 0.009,
-   "dome": 0.004,
-   "tilt": 0.09,
-   "min_area": 0.0006
-  },
-  "wrist_band": {
-   "x": [
-    0.955,
-    1.008
-   ],
-   "r_in": 0.1,
-   "r_out": 0.137,
-   "ey": 1.05,
-   "ez": 0.94,
-   "segments": 6,
-   "phase_deg": 0
+   "_doc_seeds": "blockout plate centres are taken in seed_x only: past 0.845 the blockout has a rivet row, replaced by one synthetic plate ring"
   },
   "hand": {
+   "_doc": "hand core: superellipse sections [x, half-width y, half-height z, centre z offset]; it runs to 1.19 m so the wearer's fingers (tips at 1.18 m) end inside it and the rock fingers carry on from its front edge",
    "sections": [
     [
-     0.995,
-     0.112,
-     0.066
+     0.94,
+     0.118,
+     0.08,
+     -0.014
+    ],
+    [
+     1.005,
+     0.15,
+     0.096,
+     -0.02
     ],
     [
      1.07,
-     0.134,
-     0.074
+     0.168,
+     0.094,
+     -0.022
     ],
     [
-     1.15,
-     0.138,
-     0.066
+     1.14,
+     0.166,
+     0.084,
+     -0.024
+    ],
+    [
+     1.192,
+     0.156,
+     0.064,
+     -0.026
     ]
    ],
-   "chamfer": 0.024,
-   "top_plates": {
-    "x": [
+   "exponent": 3.2
+  },
+  "hand_plates": {
+   "x": [
+    0.96,
+    1.18
+   ],
+   "r_ref": 0.12,
+   "around": 7,
+   "along": 4,
+   "jitter": 0.2,
+   "gap": 0.014,
+   "min_area": 0.0003,
+   "height": 0.03,
+   "h_min": 0.02,
+   "h_max": 0.045,
+   "chunk": {
+    "shoulder_inset": 0.009,
+    "shoulder_h": [
+     0.5,
+     0.75
+    ],
+    "top_inset": [
+     0.28,
+     0.42
+    ],
+    "top_h": [
+     0.85,
+     1.02
+    ],
+    "peak_h": [
      1.0,
-     1.15
+     1.14
     ],
-    "y": [
-     -0.125,
-     0.125
-    ],
-    "cols": 3,
-    "rows": 2,
-    "gap": 0.01,
-    "height": 0.018,
-    "chamfer": 0.007,
-    "jitter": 0.2
+    "peak_offset": 0.35
    }
   },
+  "strap_frame": {
+   "_doc": "angular (hexagonal) bronze strap frame along the back of the forearm ending in a ring on the back of the wrist (approved turnaround sheet)",
+   "x": [
+    0.7,
+    0.9
+   ],
+   "corner_dx": 0.055,
+   "half_width": 0.08,
+   "bar_width": 0.022,
+   "bar_height": 0.016,
+   "lift": 0.004,
+   "wrist_ring": {
+    "x": 0.915,
+    "r_out": 0.032,
+    "r_in": 0.017,
+    "thick": 0.013,
+    "segments": 8
+   }
+  },
+  "wrist_band": {
+   "x": [
+    0.928,
+    0.97
+   ],
+   "gap": 0.01,
+   "r_out_flat": 0.13,
+   "min_wall": 0.024,
+   "stud_r": 0.01,
+   "stud_h": 0.009
+  },
+  "knuckle": {
+   "_doc": "massive knuckle chunks on the top front edge of the hand, one per finger",
+   "back": 0.03,
+   "lift": 0.0,
+   "size": [
+    0.075,
+    0.0,
+    0.05
+   ],
+   "width_scale": 0.95
+  },
   "fingers": {
-   "x0": 1.138,
-   "z_offset": -0.002,
+   "root_back": 0.012,
+   "z_offset": -0.012,
    "y": [
-    -0.098,
-    -0.033,
-    0.032,
-    0.096
+    -0.108,
+    -0.036,
+    0.036,
+    0.106
+   ],
+   "fan_deg": [
+    -9,
+    -3,
+    3,
+    9
    ],
    "lengths": [
     [
-     0.092,
-     0.072,
-     0.063
-    ],
-    [
-     0.099,
      0.076,
-     0.065
+     0.059,
+     0.05
     ],
     [
-     0.094,
-     0.073,
-     0.063
+     0.08,
+     0.062,
+     0.052
     ],
     [
-     0.081,
-     0.063,
-     0.054
+     0.077,
+     0.06,
+     0.05
+    ],
+    [
+     0.067,
+     0.053,
+     0.044
     ]
    ],
    "width": [
-    0.06,
-    0.062,
-    0.06,
-    0.056
+    0.07,
+    0.072,
+    0.07,
+    0.066
    ],
-   "height": 0.074,
+   "height": 0.08,
    "taper": 0.93,
+   "pitch_deg": 6,
    "curl_deg": [
-    3,
-    7,
-    9
+    4,
+    8,
+    10
    ],
-   "gap": 0.003,
-   "bevel": 0.02
-  },
-  "knuckle": {
-   "x": 1.128,
-   "z": 0.07,
-   "half": [
-    0.024,
-    0.0,
-    0.012
-   ],
-   "width_scale": 0.95,
-   "bevel": 0.007
+   "gap": 0.006,
+   "jitter": 0.1
   },
   "thumb": {
    "base": [
-    1.035,
-    -0.135,
-    -0.02
+    1.0,
+    -0.15,
+    -0.035
    ],
-   "dir": [
-    0.62,
-    -0.76,
-    -0.12
+   "dirs": [
+    [
+     0.55,
+     -0.75,
+     -0.35
+    ],
+    [
+     0.75,
+     -0.55,
+     -0.35
+    ],
+    [
+     0.9,
+     -0.3,
+     -0.3
+    ]
    ],
    "lengths": [
-    0.081,
+    0.08,
     0.064,
     0.055
    ],
-   "width": 0.068,
-   "height": 0.064,
-   "bend": 0.35
+   "width": 0.074,
+   "height": 0.07
   },
   "fist": {
    "_doc": "closed-fist variant: the same segments curled under the palm, thumb across the front of the fingers",
    "curl_deg": [
     88,
-    92,
-    62
+    95,
+    70
    ],
    "thumb_dirs": [
     [
-     0.45,
-     -0.3,
-     -0.84
+     0.4,
+     -0.35,
+     -0.85
     ],
     [
      0.35,
@@ -220,24 +343,10 @@
     ]
    ]
   },
-  "strap_frame": {
-   "_doc": "angular (hexagonal) bronze strap frame along the back of the forearm ending in a ring on the back of the wrist (approved turnaround sheet)",
-   "x": [
-    0.675,
-    0.945
-   ],
-   "corner_dx": 0.06,
-   "half_width": 0.085,
-   "bar_width": 0.02,
-   "bar_height": 0.014,
-   "lift": 0.004,
-   "wrist_ring": {
-    "x": 0.975,
-    "r_out": 0.03,
-    "r_in": 0.016,
-    "thick": 0.012,
-    "segments": 10
-   }
-  }
+  "build_offset": [
+   -0.028,
+   0.0
+  ],
+  "_doc_build_offset": "the blockout's gauntlet axis (axis_y, axis_z) sits 3 cm behind Brax's fitted forearm; the build moves the whole blockout field by build_offset onto the forearm"
  }
 }

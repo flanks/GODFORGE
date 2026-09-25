@@ -10,7 +10,7 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 # paint zones = material slots, in this order, on every stage-2 object
-ZONES = ["skin", "hair", "beard", "eye", "rock", "lava", "bronze", "plates", "leather", "cloth", "sash", "wraps", "linen"]
+ZONES = ["skin", "hair", "beard", "eye", "rock", "lava", "bronze", "plates", "leather", "cloth", "sash", "wraps", "linen", "teeth"]
 Z = {n: i for i, n in enumerate(ZONES)}
 
 
@@ -204,12 +204,14 @@ def ensure_mask(bm):
     return bm.verts.layers.float_color.get(MASK_LAYER) or bm.verts.layers.float_color.new(MASK_LAYER)
 
 
-def set_mask(bm, verts, value):
-    """Per-vertex paint mask (float colour attribute gf_mask): 0 = plate outline / edge, 1 = plate centre /
-    ridge; the painter darkens outlines and lifts ridges with it."""
+def set_mask(bm, verts, value, rand=None):
+    """Per-vertex paint mask (float colour attribute gf_mask): R = 0 plate outline / edge .. 1 plate centre /
+    ridge (the painter darkens outlines and lifts ridges with it), G = a per-piece random value (per-plate
+    tone variation; = R when not given), A = 1 once set."""
     lay = bm.verts.layers.float_color.get(MASK_LAYER) or bm.verts.layers.float_color.new(MASK_LAYER)
+    g = value if rand is None else rand
     for v in verts:
-        v[lay] = (value, value, value, 1.0)
+        v[lay] = (value, g, value, 1.0)
 
 
 def prism_plate(bm, base_pts, top_pts, top_inner_pts, zone_top, zone_side):
@@ -239,3 +241,188 @@ def prism_plate(bm, base_pts, top_pts, top_inner_pts, zone_top, zone_side):
     set_mask(bm, I, 1.0)
     bmesh.ops.recalc_face_normals(bm, faces=faces)
     return faces
+
+
+def rock_chunk(bm, pts, nrm, hs, rng, cfg, zone="rock", plate_rand=None, base_sink=0.004):
+    """A stylised hand-sculpted rock plate on a surface: base polygon pts (counter-clockwise seen from
+    outside) with outward normals nrm and per-vertex heights hs. Side walls rise to an irregular shoulder
+    ring, a bevel runs in to a top ring and the top closes in a fan to an off-centre peak, so every plate
+    is a few big facets (flat-shaded by the sharp-edge angle). Closed; gf_mask R: 0 base .. 1 peak."""
+    ensure_mask(bm)
+    P = [np.asarray(p, dtype=np.float64) for p in pts]
+    N = [np.asarray(n, dtype=np.float64) for n in nrm]
+    n = len(P)
+    c = np.mean(P, axis=0)
+    nc = np.mean(N, axis=0)
+    nc /= np.linalg.norm(nc) + 1e-12
+    hm = float(np.mean(hs))
+    edge = float(np.mean([np.linalg.norm(P[i] - P[(i + 1) % n]) for i in range(n)]))
+    B, Sh, T = [], [], []
+    for i in range(n):
+        toc = c - P[i]
+        dist = np.linalg.norm(toc) + 1e-12
+        B.append(P[i] - N[i] * base_sink)
+        sh_in = min(cfg["shoulder_inset"], 0.3 * dist) / dist
+        Sh.append(P[i] + toc * sh_in + N[i] * hs[i] * rng.uniform(*cfg["shoulder_h"]))
+        T.append(P[i] + toc * rng.uniform(*cfg["top_inset"]) + N[i] * hs[i] * rng.uniform(*cfg["top_h"]))
+    tang = rng.uniform(-1, 1) * (P[0] - c) + rng.uniform(-1, 1) * (P[n // 2] - c)
+    tang = tang - nc * (tang @ nc)
+    peak = c + nc * hm * rng.uniform(*cfg["peak_h"]) + tang / (np.linalg.norm(tang) + 1e-9) * cfg["peak_offset"] * edge * 0.5
+    vB = [bm.verts.new(tuple(p)) for p in B]
+    vS = [bm.verts.new(tuple(p)) for p in Sh]
+    vT = [bm.verts.new(tuple(p)) for p in T]
+    vP = bm.verts.new(tuple(peak))
+    fs = []
+    for i in range(n):
+        j = (i + 1) % n
+        fs.append(bm.faces.new((vB[i], vB[j], vS[j], vS[i])))
+        fs.append(bm.faces.new((vS[i], vS[j], vT[j], vT[i])))
+        fs.append(bm.faces.new((vT[i], vT[j], vP)))
+    fs.append(bm.faces.new(list(reversed(vB))))
+    tag(fs, zone)
+    set_mask(bm, vB, 0.0, plate_rand)
+    set_mask(bm, vS, 0.3, plate_rand)
+    set_mask(bm, vT, 0.75, plate_rand)
+    set_mask(bm, [vP], 1.0, plate_rand)
+    bmesh.ops.recalc_face_normals(bm, faces=fs)
+    return fs
+
+
+def rock_block(bm, center, xdir, zdir, lx, ly, lz, rng, zone="rock", facets=None):
+    """A chunky faceted rock block (knuckle): an irregular octagon base on the plane (center, zdir) with
+    extents lx (along xdir) x ly, closed by rock_chunk with height lz."""
+    x = np.asarray(xdir, dtype=np.float64)
+    x /= np.linalg.norm(x)
+    z = np.asarray(zdir, dtype=np.float64)
+    z /= np.linalg.norm(z)
+    y = np.cross(z, x)
+    pts = []
+    for k in range(8):
+        a = (k + 0.5) * math.pi / 4
+        r = rng.uniform(0.88, 1.0)
+        pts.append(np.asarray(center, dtype=np.float64) + x * math.cos(a) * lx / 2 * r + y * math.sin(a) * ly / 2 * r)
+    cfg = facets or {"shoulder_inset": 0.008, "shoulder_h": [0.5, 0.7], "top_inset": [0.3, 0.42], "top_h": [0.88, 1.0],
+                     "peak_h": [1.02, 1.12], "peak_offset": 0.3}
+    return rock_chunk(bm, pts, [z] * 8, np.full(8, lz), rng, cfg, zone=zone, plate_rand=rng.random(), base_sink=0.01)
+
+
+def rock_segment(bm, pos, d, up, L, wid, hgt, rng, zone="rock", joint_start=False, joint_end=False, taper=0.92,
+                 jitter=0.1, sides=6):
+    """A faceted rock finger segment: a hexagonal prism (flattened underside, a ridge on top) from pos along
+    d, length L, irregular per-vertex radii, inset ends. Joint end faces are lava (they glow between the
+    segments); a free end closes in a blunt rock tip."""
+    ensure_mask(bm)
+    d = Vector(d).normalized()
+    xa, ya, za = frame_from(d, up_hint=tuple(up))
+    p0 = Vector(tuple(pos))
+    angs = [math.pi / 2 + k * 2 * math.pi / sides for k in range(sides)]
+    jit = [1.0 + rng.uniform(-jitter, jitter) for _ in range(sides)]
+
+    def ring(sv, scale, ridge=0.0):
+        c = p0 + d * sv
+        out = []
+        for k, a in enumerate(angs):
+            ca, sa = math.cos(a), math.sin(a)
+            r = scale * jit[k] * (1.0 + (ridge if k == 0 else 0.0))
+            zz = sa * hgt / 2 * r
+            if sa < -0.3:
+                zz *= 0.8                         # flatter underside
+            out.append(c + ya * (ca * wid / 2 * r) + za * zz)
+        return out
+    rings = (ring(0.0, 0.8), ring(L * 0.14, 1.0, 0.1), ring(L * 0.78, taper, 0.06), ring(L, 0.78 if joint_end else 0.62))
+    vr = [[bm.verts.new(tuple(p)) for p in r] for r in rings]
+    fs = []
+    for a, b in zip(vr[:-1], vr[1:]):
+        for i in range(sides):
+            j = (i + 1) % sides
+            fs.append(bm.faces.new((a[i], a[j], b[j], b[i])))
+    tag(fs, zone)
+    cap0 = bm.faces.new(list(reversed(vr[0])))
+    cap0.material_index = Z["lava" if joint_start else zone]
+    if joint_end:
+        cap1 = bm.faces.new(vr[3])
+        cap1.material_index = Z["lava"]
+        caps = [cap1]
+    else:
+        vt = bm.verts.new(tuple(p0 + d * (L + hgt * 0.12)))
+        caps = [bm.faces.new((vr[3][i], vr[3][(i + 1) % sides], vt)) for i in range(sides)]
+        tag(caps, zone)
+        set_mask(bm, [vt], 0.9)
+    set_mask(bm, vr[0] + vr[3], 0.25)
+    set_mask(bm, vr[1] + vr[2], 0.8)
+    all_f = fs + [cap0] + caps
+    bmesh.ops.recalc_face_normals(bm, faces=all_f)
+    return all_f
+
+
+def stud(bm, c, d, r, h, zone="bronze", sides=6):
+    """A low bronze dome (rivet) on direction d."""
+    ensure_mask(bm)
+    d = np.asarray(d, dtype=np.float64)
+    d /= np.linalg.norm(d)
+    u = np.cross(d, [0.0, 0.0, 1.0] if abs(d[2]) < 0.9 else [1.0, 0.0, 0.0])
+    u /= np.linalg.norm(u)
+    v = np.cross(d, u)
+    c = np.asarray(c, dtype=np.float64)
+    angs = np.arange(sides) * 2 * math.pi / sides
+    vb = [bm.verts.new(tuple(c - d * 0.003 + (math.cos(a) * u + math.sin(a) * v) * r)) for a in angs]
+    vm = [bm.verts.new(tuple(c + d * h * 0.55 + (math.cos(a) * u + math.sin(a) * v) * r * 0.78)) for a in angs]
+    vt = bm.verts.new(tuple(c + d * h))
+    fs = []
+    for i in range(sides):
+        j = (i + 1) % sides
+        fs.append(bm.faces.new((vb[i], vb[j], vm[j], vm[i])))
+        fs.append(bm.faces.new((vm[i], vm[j], vt)))
+    fs.append(bm.faces.new(list(reversed(vb))))
+    tag(fs, zone)
+    set_mask(bm, vb, 0.2)
+    set_mask(bm, vm + [vt], 0.9)
+    bmesh.ops.recalc_face_normals(bm, faces=fs)
+    return fs
+
+
+def lock(bm, root, nrm, d0, bend, L, w, t, rng, zone, sides=6):
+    """A chunky stylised hair / beard clump: a tapered lens-section loft from root (sunk into the shell)
+    along d0, bending toward bend, closing in a point. gf_mask R rises from root (0.3) to tip (1)."""
+    ensure_mask(bm)
+    nrm = np.asarray(nrm, dtype=np.float64)
+    d0 = np.asarray(d0, dtype=np.float64)
+    bend = np.asarray(bend, dtype=np.float64)
+    dirs = []
+    for k in range(3):
+        d = d0 * (1 - 0.35 * k) + bend * (0.35 * k)
+        dirs.append(d / np.linalg.norm(d))
+    c = [np.asarray(root, dtype=np.float64) - nrm * 0.008]
+    for k, f in enumerate((0.3, 0.3)):
+        c.append(c[-1] + dirs[k] * L * f)
+    tip = c[-1] + dirs[2] * L * 0.4
+    scales = (1.0, 0.8, 0.5)
+    rings = []
+    for k in range(3):
+        T = dirs[min(k, 2)]
+        a = np.cross(T, nrm)
+        if np.linalg.norm(a) < 1e-6:
+            a = np.cross(T, [1.0, 0.0, 0.0])
+        a /= np.linalg.norm(a)
+        b = np.cross(a, T)
+        r = []
+        for i in range(sides):
+            th = i * 2 * math.pi / sides
+            r.append(c[k] + a * math.cos(th) * w / 2 * scales[k] + b * math.sin(th) * t / 2 * scales[k] * rng.uniform(0.9, 1.1))
+        rings.append(r)
+    vr = [[bm.verts.new(tuple(p)) for p in r] for r in rings]
+    vt = bm.verts.new(tuple(tip))
+    fs = []
+    for A, B in zip(vr[:-1], vr[1:]):
+        for i in range(sides):
+            j = (i + 1) % sides
+            fs.append(bm.faces.new((A[i], A[j], B[j], B[i])))
+    for i in range(sides):
+        fs.append(bm.faces.new((vr[-1][i], vr[-1][(i + 1) % sides], vt)))
+    fs.append(bm.faces.new(list(reversed(vr[0]))))
+    tag(fs, zone)
+    for k, m in enumerate((0.3, 0.55, 0.8)):
+        set_mask(bm, vr[k], m)
+    set_mask(bm, [vt], 1.0)
+    bmesh.ops.recalc_face_normals(bm, faces=fs)
+    return fs

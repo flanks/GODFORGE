@@ -221,14 +221,6 @@
   "max_off": 0.045,
   "beard_min_off": 0.012,
   "beard_max_off": 0.032,
-  "spikes": {
-   "z_min": 2.085,
-   "count": 14,
-   "spacing": 0.036,
-   "length": 0.026,
-   "tip_scale": 0.3,
-   "sweep": 0.65
-  },
   "_doc": "Hair and beard regions are cut from the body's head faces by lines around the head: phi = angle from the front (deg, symmetric), z = height (m). Thickness comes from the sculpt's surface along each normal, clamped to [min_off, max_off].",
   "head_cy": 0.0,
   "dark_lum": 0.3,
@@ -292,7 +284,28 @@
     2.0
    ]
   },
-  "beard_max_phi": 100
+  "beard_max_phi": 100,
+  "offset_smooth": 6,
+  "clumps": {
+   "_doc": "chunky stylised locks on the hair shell: count, minimum spacing (m), length, width, thickness (m), only above z_min",
+   "count": 22,
+   "spacing": 0.03,
+   "length": 0.055,
+   "width": 0.05,
+   "thick": 0.026,
+   "z_min": 2.075
+  },
+  "beard_clumps": {
+   "_doc": "a short pointed chin tuft: clumps along the beard's lower edge (below z_max, in front of y_max, |x| < x_max) hanging down",
+   "count": 7,
+   "spacing": 0.024,
+   "length": 0.04,
+   "width": 0.045,
+   "thick": 0.02,
+   "z_max": 1.915,
+   "y_max": -0.04,
+   "x_max": 0.075
+  }
  },
  "wrist_wraps": {
   "_doc": "short teal cloth wraps at the wrists matching the ankle wraps (2026-09-25 user decision: the rock gauntlets are the anvil_gauntlets weapon model, not part of the body)",
@@ -307,5 +320,15 @@
   "thick": 0.01,
   "inset": 0.004,
   "lip": 0.003
+ },
+ "teeth": {
+  "_doc": "the grin: a curved teeth strip behind the parted lips (in BEARD, zone teeth)",
+  "behind": 0.002,
+  "width_frac": 0.72,
+  "arch": 0.022,
+  "up": 0.006,
+  "down": 0.006,
+  "thick": 0.005,
+  "segments": 8
  }
 }

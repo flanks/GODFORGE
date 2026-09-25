@@ -7,43 +7,50 @@
  "uv_hidden_faces_packed_small": 0,
  "texel_density_px_per_m": {
   "GAUNTLET_L": {
-   "median": 300.3,
-   "p10": 273.8,
-   "p90": 319.4
+   "median": 289.5,
+   "p10": 270.9,
+   "p90": 304.6
   },
   "GAUNTLET_R": {
-   "median": 300.3,
-   "p10": 274.4,
-   "p90": 319.3
+   "median": 289.5,
+   "p10": 272.8,
+   "p90": 305.8
   },
   "_all": {
-   "median": 300.3,
-   "p10": 274.0,
-   "p90": 319.3
+   "median": 289.5,
+   "p10": 272.0,
+   "p90": 305.4
   }
  },
  "uv_zero_area_faces": {},
- "atlas_coverage": 0.3929,
+ "bake_device": "OPTIX",
+ "normal_bake": {
+  "texels_with_detail": 76197,
+  "valid_fraction_of_target_zones": 0.3136,
+  "blur_px": 1.2
+ },
+ "atlas_coverage": 0.3424,
  "textures": {
   "base_color": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_basecolor.png",
-  "emissive": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_emissive.png"
+  "emissive": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_emissive.png",
+  "normal": "art/weapons/anvil_gauntlets/textures/anvil_gauntlets_normal.png"
  },
  "stats": {
   "GAUNTLET_L": {
    "name": "GAUNTLET_L",
-   "vertices": 1566,
-   "faces": 1714,
-   "triangles": 2864,
-   "quads": 1150,
-   "tri_faces": 564,
+   "vertices": 2123,
+   "faces": 2401,
+   "triangles": 3858,
+   "quads": 1457,
+   "tri_faces": 944,
    "ngons": 0,
-   "quad_ratio": 0.671,
+   "quad_ratio": 0.607,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 70,
+   "parts": 100,
    "uv_layers": [
     "UVMap"
    ],
@@ -53,19 +60,19 @@
   },
   "GAUNTLET_R": {
    "name": "GAUNTLET_R",
-   "vertices": 1566,
-   "faces": 1714,
-   "triangles": 2864,
-   "quads": 1150,
-   "tri_faces": 564,
+   "vertices": 2123,
+   "faces": 2399,
+   "triangles": 3858,
+   "quads": 1459,
+   "tri_faces": 940,
    "ngons": 0,
-   "quad_ratio": 0.671,
+   "quad_ratio": 0.608,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 70,
+   "parts": 100,
    "uv_layers": [
     "UVMap"
    ],
@@ -75,19 +82,19 @@
   },
   "GAUNTLET_FIST_L": {
    "name": "GAUNTLET_FIST_L",
-   "vertices": 1566,
-   "faces": 1714,
-   "triangles": 2864,
-   "quads": 1150,
-   "tri_faces": 564,
+   "vertices": 2123,
+   "faces": 2401,
+   "triangles": 3858,
+   "quads": 1457,
+   "tri_faces": 944,
    "ngons": 0,
-   "quad_ratio": 0.671,
+   "quad_ratio": 0.607,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 70,
+   "parts": 100,
    "uv_layers": [
     "UVMap"
    ],
@@ -97,19 +104,19 @@
   },
   "GAUNTLET_FIST_R": {
    "name": "GAUNTLET_FIST_R",
-   "vertices": 1566,
-   "faces": 1714,
-   "triangles": 2864,
-   "quads": 1150,
-   "tri_faces": 564,
+   "vertices": 2123,
+   "faces": 2399,
+   "triangles": 3858,
+   "quads": 1459,
+   "tri_faces": 940,
    "ngons": 0,
-   "quad_ratio": 0.671,
+   "quad_ratio": 0.608,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 70,
+   "parts": 100,
    "uv_layers": [
     "UVMap"
    ],
@@ -118,9 +125,9 @@
    ]
   }
  },
- "triangles_total": 5728,
+ "triangles_total": 7716,
  "triangles_variants": {
-  "GAUNTLET_FIST_L": 2864,
-  "GAUNTLET_FIST_R": 2864
+  "GAUNTLET_FIST_L": 3858,
+  "GAUNTLET_FIST_R": 3858
  }
 }

@@ -77,8 +77,9 @@ def make_toon(M):
     nt = T.node_tree
     tex_b = [n for n in nt.nodes if n.type == "TEX_IMAGE" and "basecolor" in n.image.name][0]
     tex_e = [n for n in nt.nodes if n.type == "TEX_IMAGE" and "emissive" in n.image.name][0]
+    tex_n = ([n for n in nt.nodes if n.type == "TEX_IMAGE" and "normal" in n.image.name] or [None])[0]
     for n in list(nt.nodes):
-        if n not in (tex_b, tex_e):
+        if n not in (tex_b, tex_e, tex_n):
             nt.nodes.remove(n)
     out = nt.nodes.new("ShaderNodeOutputMaterial")
     dif = nt.nodes.new("ShaderNodeBsdfDiffuse")
@@ -119,6 +120,13 @@ def make_toon(M):
     emm.inputs["B"].default_value = (2.2, 2.2, 2.2, 1)
     em = nt.nodes.new("ShaderNodeEmission")
     L = nt.links.new
+    if tex_n is not None:        # the tangent-space normal map drives the toon bands, as in the game
+        nmn = nt.nodes.new("ShaderNodeNormalMap")
+        nmn.space = "TANGENT"
+        nmn.uv_map = "UVMap"
+        L(tex_n.outputs["Color"], nmn.inputs["Color"])
+        L(nmn.outputs["Normal"], dif.inputs["Normal"])
+        L(nmn.outputs["Normal"], lw.inputs["Normal"])
     L(dif.outputs[0], s2r.inputs[0])
     L(s2r.outputs["Color"], bw.inputs[0])
     L(bw.outputs[0], ramp.inputs["Fac"])

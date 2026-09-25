@@ -209,18 +209,23 @@ python tools/blender/gf_hero/run_stage2.py <key>          # [--from <step>] [--o
 |---|---|---|
 | prepare | `s2_prepare_blockout.py` | the selected stage-1 GLB, welded, crumbs dropped, scaled to the hero height, feet on z = 0, facing −Y, the TRELLIS colour sampled into `src_col`, the approved concept behind it as a reference image → `work/<key>_retopo_start.blend` (the sculpt reference; a human could retopologise from it) |
 | base | `s2_body_base.py` | the **MakeHuman hm08 base mesh (CC0)** loaded through MPFB (used as a tool only): macro sliders + CC0 face targets from `stage2_fit.json`, T-posed with MPFB's game_engine weights, reduced 4× by two un-subdivide passes (every second loop in both directions, so the joint loops survive), made symmetric from the clean half, triangle pairs joined back into quads |
-| fit | `s2_body_fit.py` | a thin-plate-spline landmark warp (joints, eyes, nose, ears, skull, chin, heels) to the hero's measured landmarks, then a surface fit to the sculpt by body band (rays along the normals, so the sculpt's double-walled shell is handled; smoothed, symmetric, tangentially relaxed); head and feet near-rigid; extra knee loops; forearm radius profile; the weapon attach frame per hand |
-| parts | `s2_parts.py` | belt + buckle, sash (wrap, knot, tails), torn underskirt, three tiers of rigid skirt plates, ankle and wrist wraps, hair and beard shells (the body's own head quads pushed out to the sculpt's hair/beard, closed with rims, spiky clumps), all closed meshes on the sculpt's measured envelope |
-| weapon | `s2_weapon.py` + `s2_gauntlet.py` | the hero's signature chassis weapon (below) |
-| texture | `s2_texture.py` + `s2_uv.py` + `s2_paint.py` | UVs (region seams + shortest-path cuts on the body, outer/inner split on shells, smart projection on hard surface, hidden faces packed small, one texel density, one atlas), Cycles bakes of position / normal / zone / object / mask and the sculpt's concavity, then numpy **hand-painted NPR** base colour + emissive from `palette.json`; one material `M_<key>`, zone kept as the face attribute `gf_zone` |
+| fit | `s2_body_fit.py` | a thin-plate-spline landmark warp (joints, eyes, nose, ears, skull, chin, heels) to the hero's measured landmarks, then a surface fit to the sculpt by body band (rays along the normals, so the sculpt's double-walled shell is handled; smoothed, symmetric, tangentially relaxed); head and feet near-rigid; extra knee, elbow and wrist loops; forearm radius profile; the grin (lips parted, corners up); the weapon attach frame per hand |
+| parts | `s2_parts.py` | belt + buckle, sash (wrap, knot, tails), torn underskirt, three tiers of rigid skirt plates, ankle and wrist wraps, hair and beard shells (the body's own head quads pushed out to the sculpt's hair/beard, offsets smoothed, closed with rims) with chunky lofted clumps, teeth behind the parted lips, all closed meshes on the sculpt's measured envelope |
+| weapon | `s2_weapon.py` + `s2_gauntlet.py` | the hero's signature chassis weapon, built on the blockout's own weapon geometry (below) |
+| texture | `s2_texture.py` + `s2_uv.py` + `s2_paint.py` | UVs (region seams + shortest-path cuts on the body, smart projection elsewhere, hidden faces packed small, one texel density, one atlas); Cycles bakes of position / normal / zone / object / mask; **high-to-low from the sculpt source** with a cage: a tangent-space normal map, the source's cavity and AO, cleaned by a hit-distance mask, zone and region masks and a normalised blur; a self-AO bake of the assembled parts; then numpy **hand-painted NPR** base colour (cavity and AO folded in) + emissive from `palette.json`; one material `M_<key>` with base colour, emissive and normal map; zone kept as the face attribute `gf_zone` |
+| gltf_check | `s2_gltf_check.py` | a scratch GLB export read back: every material has base colour, emissive and normal textures, every primitive NORMAL + TANGENT + TEXCOORD_0, nothing in `extensionsRequired` (bevy_gltf 0.20 maps them onto `StandardMaterial`, which the client's `ToonMaterial` extends) |
 | review / sheets | `s2_review.py`, `tools/comfy/stage2_sheets.py` | toon-review / clay / albedo turnarounds, close-ups, wireframes of the joints, the in-game camera (55°, 22 m / 28 m at true 1080p pixels), bare and armed, the concept silhouette IoU, texture + UV sheets |
 
 Budgets: the hero body set is **15 to 25k tris** (the weapon is separate), the chassis weapon **about 4 to 8k
 for the pair**. Textures: one 2048² sRGB base colour + one 2048² sRGB emissive per hero; 1024² for a
-weapon. The painting rules: flat painted value planes from the measured palette, no light direction and no
-ambient occlusion (the toon shader lights it), art-directed form cues only (lifted top faces on dark rock for
-the 55° camera, a painted highlight band on bronze, dark ink lines in the sculpt's deepest creases), and the
-glows (lava, sigil, eyes) in a separate emissive map that Heat / Meltdown scale at runtime. Brax's results,
+weapon, each with a Non-Color tangent-space normal map (OpenGL / +Y, the glTF and Bevy convention). The
+painting rules: flat painted value planes from the measured palette, no light direction (the toon shader
+lights it); form comes from the normal map through the toon bands (muscle volume, rock facets), with the
+sculpt's cavity and AO folded in as darker painted planes; art-directed cues only (lifted top faces on dark
+rock for the 55° camera, a painted highlight band on bronze, value planes on hair); and the glows (lava, sigil,
+crack network, eyes) in a separate emissive map that Heat / Meltdown scale at runtime. Polish pass
+(2026-09-25): gauntlets rebuilt on the blockout's own gauntlet, normal / AO bakes, bolder sigil and crack
+network, grin, chunkier hair and beard. Brax's results,
 numbers and the acceptance checklist: `art/characters/brax/reports/stage2_production_mesh.md`.
 
 ### Weapons (chassis models, user decision 2026-09-25)
@@ -237,6 +242,10 @@ hero can wield any chassis (6+ chassis; a hero's signature chassis is only the d
   hero's `reports/stage2/body_fit.json` (`hand_frames`) and the weapon's `reports/stage2/parts.json`.
 * Worn weapons enclose the hand and forearm; a weapon that hides the fingers ships an open and a
   closed-fist variant with identical topology (one UV layout, one texture).
+* A weapon that the stage-1 blockout already shows is built on the blockout's own geometry: for the
+  anvil_gauntlets, the blockout's radius around the gauntlet axis is sampled, its plate lumps give the plate
+  centres, the plate tops follow its surface (radially scaled), and a scaled copy of it is the high-poly
+  source of the weapon's normal bake (never shipped).
 * The hero body keeps bare forearms and hands with fist-capable loops.
 
 ### Stage 3: GF_Hero_v1, the one master skeleton

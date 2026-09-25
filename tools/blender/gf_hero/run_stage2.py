@@ -9,6 +9,8 @@ Steps (each one a headless Blender run, or ComfyUI's python for the PIL sheets):
   parts    s2_parts.py             gauntlets, belt, sash, skirt cloth + plates, wraps, hair, beard
   texture  s2_texture.py           UVs, bakes, hand-painted NPR base colour + emissive, M_<key>
   review   s2_review.py            review renders (toon / clay / albedo / wire / in-game / silhouette)
+  gltf_check  s2_gltf_check.py      scratch GLB export: base colour, emissive and normal textures, tangents,
+                                   no unloadable extensions (what bevy_gltf 0.20 needs)
   sheets   tools/comfy/stage2_sheets.py  review sheets into reports/stage2/ + concept IoU
   weapon, weapon_texture, weapon_review, weapon_sheets: the same for the hero's signature chassis weapon
            (stage2_fit.json "signature_weapon", art/weapons/<chassis>/): s2_weapon.py builds it around this
@@ -28,7 +30,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 BLENDER = os.environ.get("BLENDER", r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe")
 COMFY_PY = os.environ.get("COMFY_PY", r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe")
-STEPS = ["prepare", "base", "fit", "parts", "weapon", "texture", "weapon_texture", "review", "weapon_review", "sheets", "weapon_sheets"]
+STEPS = ["prepare", "base", "fit", "parts", "weapon", "texture", "weapon_texture", "gltf_check", "weapon_gltf_check",
+         "review", "weapon_review", "sheets", "weapon_sheets"]
 
 
 def run(cmd, log_path):
@@ -75,15 +78,20 @@ def main(argv):
                    os.path.join(A, "textures", "%s_emissive.png" % key), "--blockout", os.path.join(W, "renders", stem), stem,
                    "--tag", "%s stage 2" % key.capitalize()],
     }
+    cmds["gltf_check"] = [BLENDER, "-b", os.path.join(A, "production", "%s_stage2.blend" % key), "--python-exit-code", "1", "-P",
+                          os.path.join(G, "s2_gltf_check.py"), "--", os.path.join(W, "gltf_check", "%s.glb" % key), os.path.join(S2, "gltf_check.json")]
     wkey = json.load(open(os.path.join(ROOT, A, "stage2_fit.json"))).get("signature_weapon")
     if wkey:
         WA = os.path.join("art", "weapons", wkey)
         WS2 = os.path.join(WA, "reports", "stage2")
         wprod = os.path.join(WA, "production", "%s_stage2.blend" % wkey)
         cmds["weapon"] = B + [os.path.join(G, "s2_weapon.py"), "--", os.path.join(W, "%s_s2_body.blend" % key), os.path.join(WA, "stage2_weapon.json"),
-                              os.path.join(S2, "body_fit.json"), os.path.join(WA, "work", "%s_parts.blend" % wkey), "--report", os.path.join(WS2, "parts.json")]
+                              os.path.join(S2, "body_fit.json"), start, os.path.join(WA, "work", "%s_parts.blend" % wkey),
+                              "--report", os.path.join(WS2, "parts.json")]
         cmds["weapon_texture"] = B + [os.path.join(G, "s2_texture.py"), "--", os.path.join(WA, "work", "%s_parts.blend" % wkey), "-",
                                       os.path.join(WA, "stage2_texture.json"), "-", wprod, os.path.join(WA, "textures"), "--report", os.path.join(WS2, "texture.json")]
+        cmds["weapon_gltf_check"] = [BLENDER, "-b", wprod, "--python-exit-code", "1", "-P", os.path.join(G, "s2_gltf_check.py"), "--",
+                                     os.path.join(WA, "work", "gltf_check", "%s.glb" % wkey), os.path.join(WS2, "gltf_check.json")]
         cmds["review"] = cmds["review"] + ["--attach", wprod]
         cmds["weapon_review"] = B + [os.path.join(G, "s2_review.py"), "--", wprod, os.path.join(WA, "work", "renders", "stage2"), "--weapon"]
         cmds["weapon_sheets"] = [COMFY_PY, os.path.join("tools", "comfy", "stage2_sheets.py"), "--weapon", os.path.join(WA, "work", "renders", "stage2"), WS2,

@@ -8,7 +8,8 @@
  "emission_strength": 3.0,
  "texture_names": {
   "base_color": "anvil_gauntlets_basecolor",
-  "emissive": "anvil_gauntlets_emissive"
+  "emissive": "anvil_gauntlets_emissive",
+  "normal": "anvil_gauntlets_normal"
  },
  "objects": [
   "GAUNTLET_L",
@@ -26,5 +27,68 @@
   "hidden_density": 0.3,
   "margin_px": 4
  },
- "paint": {}
+ "paint": {
+  "ao": {
+   "self": {
+    "range": [
+     0.3,
+     0.95
+    ],
+    "strength": 0.5,
+    "skip": [
+     "lava"
+    ]
+   }
+  },
+  "rock_feet": 0.08
+ },
+ "shading": {
+  "smooth": [],
+  "per_object_deg": {}
+ },
+ "hi_lo": [
+  {
+   "_doc": "tangent normals from the blockout's own gauntlet (radially scaled like the build, BAKESRC_*, never shipped) onto the rock plates",
+   "source": "BAKESRC_L",
+   "targets": [
+    "GAUNTLET_L"
+   ],
+   "zones": [
+    "rock"
+   ],
+   "cage": 0.03,
+   "max_ray": 0.06,
+   "valid_dist": [
+    0.008,
+    0.02
+   ],
+   "normal_strength": 0.8,
+   "blur_px": 1.2,
+   "cavity": false,
+   "ao": false
+  },
+  {
+   "source": "BAKESRC_R",
+   "targets": [
+    "GAUNTLET_R"
+   ],
+   "zones": [
+    "rock"
+   ],
+   "cage": 0.03,
+   "max_ray": 0.06,
+   "valid_dist": [
+    0.008,
+    0.02
+   ],
+   "normal_strength": 0.8,
+   "blur_px": 1.2,
+   "cavity": false,
+   "ao": false
+  }
+ ],
+ "self_ao": {
+  "distance": 0.06,
+  "samples": 16
+ }
 }
