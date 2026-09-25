@@ -39,6 +39,13 @@
 //!
 //! Authored templates still matter: a template supplies the room kind, biome, encounter tuning,
 //! door count and motifs; boss and mini-boss arenas stay hand-built (seed 0).
+//!
+//! ## Map mode
+//!
+//! Biome maps ([`RoomKind::Expedition`], built by [`crate::worldgen`]) reuse this grammar at map
+//! scale: the [`Builder`] runs over the whole map with a [`TileMask`], so compositions stand only on
+//! open ground (never on roads, plazas, bridges, liquid or void) and props only on land, and its
+//! obstacle queries go through a bucket index. Rooms have no mask and generate exactly as before.
 
 use crate::db::ContentDb;
 use crate::schema::*;
@@ -48,14 +55,18 @@ use glam::Vec2;
 
 /// Rooms of these kinds are generated; the rest use their authored template verbatim.
 pub fn is_generated_kind(kind: RoomKind) -> bool {
-    matches!(kind, RoomKind::Combat | RoomKind::Elite | RoomKind::Anvil | RoomKind::Treasure)
+    matches!(kind, RoomKind::Combat | RoomKind::Elite | RoomKind::Anvil | RoomKind::Treasure | RoomKind::Expedition)
 }
 
 /// The layout the host and every client use for `template` + `seed` (seed 0 = authored as-is).
+/// Biome maps are always generated: seed 0 on an Expedition template means seed 1.
 pub fn resolve_room(db: &ContentDb, template: u16, seed: u32) -> RoomDef {
     let Some(t) = db.rooms.try_get(template).or_else(|| db.rooms.try_get(0)) else {
         return RoomDef::placeholder();
     };
+    if t.kind == RoomKind::Expedition {
+        return crate::worldgen::generate(db, t, seed.max(1));
+    }
     if seed == 0 || !is_generated_kind(t.kind) { t.clone() } else { generate(t, seed) }
 }
 
@@ -326,19 +337,6 @@ pub(crate) enum Biome {
     Unmaking,
 }
 
-/// Plaza-framing monuments.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum Mark {
-    Statue,
-    GreatBrazier,
-    SealedGate,
-    Tree,
-    SpiralStair,
-    InvertedColumn,
-    Rift,
-    Crystal,
-}
-
 impl Biome {
     pub(crate) fn of(key: &str) -> Biome {
         match key {
@@ -409,22 +407,22 @@ impl Biome {
     }
 
     /// Monument on the axis between the plaza and the gates.
-    pub(crate) fn axis_marks(self) -> &'static [(Mark, f32)] {
+    pub(crate) fn axis_marks(self) -> &'static [(MapMark, f32)] {
         match self {
-            Biome::Cinder => &[(Mark::Statue, 0.45), (Mark::GreatBrazier, 0.35), (Mark::SealedGate, 0.2)],
-            Biome::Verdant => &[(Mark::Statue, 0.35), (Mark::Tree, 0.4), (Mark::SealedGate, 0.25)],
-            Biome::Spire => &[(Mark::Statue, 0.4), (Mark::SpiralStair, 0.25), (Mark::SealedGate, 0.35)],
-            Biome::Unmaking => &[(Mark::InvertedColumn, 0.35), (Mark::Rift, 0.35), (Mark::Statue, 0.3)],
+            Biome::Cinder => &[(MapMark::Statue, 0.45), (MapMark::GreatBrazier, 0.35), (MapMark::SealedGate, 0.2)],
+            Biome::Verdant => &[(MapMark::Statue, 0.35), (MapMark::Tree, 0.4), (MapMark::SealedGate, 0.25)],
+            Biome::Spire => &[(MapMark::Statue, 0.4), (MapMark::SpiralStair, 0.25), (MapMark::SealedGate, 0.35)],
+            Biome::Unmaking => &[(MapMark::InvertedColumn, 0.35), (MapMark::Rift, 0.35), (MapMark::Statue, 0.3)],
         }
     }
 
     /// Mirrored pair flanking the central lane.
-    pub(crate) fn pair_marks(self) -> &'static [(Mark, f32)] {
+    pub(crate) fn pair_marks(self) -> &'static [(MapMark, f32)] {
         match self {
-            Biome::Cinder => &[(Mark::Statue, 0.6), (Mark::GreatBrazier, 0.4)],
-            Biome::Verdant => &[(Mark::Statue, 0.5), (Mark::Tree, 0.5)],
-            Biome::Spire => &[(Mark::Statue, 0.6), (Mark::Crystal, 0.4)],
-            Biome::Unmaking => &[(Mark::InvertedColumn, 0.5), (Mark::Rift, 0.3), (Mark::Statue, 0.2)],
+            Biome::Cinder => &[(MapMark::Statue, 0.6), (MapMark::GreatBrazier, 0.4)],
+            Biome::Verdant => &[(MapMark::Statue, 0.5), (MapMark::Tree, 0.5)],
+            Biome::Spire => &[(MapMark::Statue, 0.6), (MapMark::Crystal, 0.4)],
+            Biome::Unmaking => &[(MapMark::InvertedColumn, 0.5), (MapMark::Rift, 0.3), (MapMark::Statue, 0.2)],
         }
     }
 
@@ -523,6 +521,50 @@ impl Buckets {
     }
 }
 
+/// Map mode: a pad around a piece's extent that must also be `Ground`.
+pub(crate) const MASK_PAD: f32 = 0.5;
+
+/// Map mode's view of the biome map's tile raster (4 u tiles). Compositions stand only on
+/// `Ground` tiles (never on roads, plazas, bridges, liquid or void); visual props only on land.
+/// Rooms have no mask, and every check below is skipped for them.
+#[derive(Clone, Debug)]
+pub(crate) struct TileMask {
+    pub(crate) origin: Vec2,
+    pub(crate) size: f32,
+    pub(crate) w: usize,
+    pub(crate) h: usize,
+    pub(crate) kind: Vec<TileKind>,
+}
+
+impl TileMask {
+    pub(crate) fn of(grid: &TileGrid) -> Self {
+        Self { origin: grid.origin, size: grid.size, w: grid.w as usize, h: grid.h as usize, kind: grid.kind.clone() }
+    }
+
+    /// Tile column / row of a world coordinate (may be off the grid).
+    fn tile(&self, v: f32, origin: f32) -> i64 {
+        ((v - origin) / self.size).floor() as i64
+    }
+
+    /// Is every tile the box `c ± e` overlaps `Ground`? (Off the grid is not.)
+    pub(crate) fn ground(&self, c: Vec2, e: Vec2) -> bool {
+        let (x0, x1) = (self.tile(c.x - e.x, self.origin.x), self.tile(c.x + e.x, self.origin.x));
+        let (y0, y1) = (self.tile(c.y - e.y, self.origin.y), self.tile(c.y + e.y, self.origin.y));
+        if x0 < 0 || y0 < 0 || x1 >= self.w as i64 || y1 >= self.h as i64 {
+            return false;
+        }
+        (y0..=y1).all(|y| (x0..=x1).all(|x| self.kind[y as usize * self.w + x as usize] == TileKind::Ground))
+    }
+
+    /// Is the tile under `p` land?
+    pub(crate) fn land(&self, p: Vec2) -> bool {
+        let (x, y) = (self.tile(p.x, self.origin.x), self.tile(p.y, self.origin.y));
+        (0..self.w as i64).contains(&x)
+            && (0..self.h as i64).contains(&y)
+            && self.kind[y as usize * self.w + x as usize].is_land()
+    }
+}
+
 pub(crate) struct Builder {
     pub(crate) half: Vec2,
     pub(crate) biome: Biome,
@@ -546,6 +588,8 @@ pub(crate) struct Builder {
     pub(crate) comps: Vec<Rect>,
     pub(crate) spawn: Vec2,
     pub(crate) exits: Vec<Vec2>,
+    /// Map mode: the tiles pieces and props may stand on (`None` in rooms).
+    pub(crate) mask: Option<TileMask>,
 }
 
 impl Builder {
@@ -572,6 +616,7 @@ impl Builder {
             comps: Vec::new(),
             spawn: Vec2::ZERO,
             exits: Vec::new(),
+            mask: None,
         }
     }
 
@@ -598,10 +643,16 @@ impl Builder {
     }
 
     /// Inside the rim margin, out of the keep-outs and lanes, a lane away from other groups, and
-    /// either touching or a squeeze apart from its own group (no slivers that trap an elite).
+    /// either touching or a squeeze apart from its own group (no slivers that trap an elite). In
+    /// map mode, also only on `Ground` tiles.
     pub(crate) fn fits(&self, o: &Obstacle, g: u16) -> bool {
         let (c, e) = extent(o);
         if c.x.abs() + e.x > self.half.x - RIM || c.y.abs() + e.y > self.half.y - RIM {
+            return false;
+        }
+        if let Some(mask) = &self.mask
+            && !mask.ground(c, e + Vec2::splat(MASK_PAD))
+        {
             return false;
         }
         let (bc, br) = bounds(o);
@@ -698,12 +749,13 @@ impl Builder {
         self.lanes.iter().all(|l| point_seg(p, l.from, l.to) >= l.width * 0.5 + margin)
     }
 
-    /// Visual prop standing on free floor: inside the arena, `clear` from obstacles and off the
-    /// lanes, the spawn point and the gate mouths.
+    /// Visual prop standing on free floor: inside the arena (on land, in map mode), `clear` from
+    /// obstacles and off the lanes, the spawn point and the gate mouths.
     pub(crate) fn prop(&mut self, d: Decor, clear: f32) -> bool {
         let p = d.anchor();
         let ok = p.x.abs() <= self.half.x - 0.3
             && p.y.abs() <= self.half.y - 0.2
+            && self.mask.as_ref().is_none_or(|m| m.land(p))
             && self.clearance(p, clear) >= clear
             && self.off_lanes(p, clear.min(0.5))
             && p.distance(self.spawn) >= 3.0
@@ -1916,55 +1968,74 @@ pub(crate) fn stamp(b: &mut Builder, kind: DistrictKind, f: Frame) -> Option<Rec
 // ───────────────────────────── landmarks ─────────────────────────────
 
 /// Obstacle and decor of a monument at `at` facing `rot`; `grand` monuments stand on the axis.
-pub(crate) fn monument(b: &mut Builder, m: Mark, at: Vec2, rot: Rot16, grand: bool) -> (Obstacle, Decor) {
+pub(crate) fn monument(b: &mut Builder, m: MapMark, at: Vec2, rot: Rot16, grand: bool) -> (Obstacle, Decor) {
     let at = qv(at);
     let k = if grand { 1.0 } else { 0.8 };
     let circle = |r: f32| Obstacle::Circle { center: at, radius: q(r) };
     match m {
-        Mark::Statue => {
+        MapMark::Statue => {
             let r = q(b.rl(2.1, 2.5) * k);
             let (height, god, variant) = (q(b.rd(7.0, 9.0) * k), b.god(), b.vd(4));
             let variant = if b.biome == Biome::Unmaking { 2 } else { variant };
             (circle(r), Decor::Statue { at, radius: r, height, rot, god, variant })
         }
-        Mark::GreatBrazier => {
+        MapMark::GreatBrazier => {
             let r = q(b.rl(1.6, 2.0) * k.max(0.9));
             (circle(r), Decor::GreatBrazier { at, radius: r })
         }
-        Mark::SealedGate => {
+        MapMark::SealedGate => {
             let half = qv(Vec2::new(b.rl(3.0, 3.8), b.rl(0.9, 1.1)));
             let height = q(b.rd(7.0, 9.0));
             (Obstacle::Box { center: at, half }, Decor::SealedGate { at, half, height })
         }
-        Mark::Tree => {
+        MapMark::Tree => {
             let r = q(b.rl(1.4, 1.8) * k.max(0.85));
             let height = q(b.rd(10.0, 13.0) * k);
             (circle(r), Decor::Tree { at, radius: r, height, variant: 0 })
         }
-        Mark::SpiralStair => {
+        MapMark::SpiralStair => {
             let r = q(b.rl(2.4, 2.9));
             let height = q(b.rd(8.0, 11.0));
             (circle(r), Decor::SpiralStair { at, radius: r, height, rot })
         }
-        Mark::InvertedColumn => {
+        MapMark::InvertedColumn => {
             let r = q(b.rl(1.5, 1.9) * k.max(0.8));
             let height = q(b.rd(9.0, 12.0) * k);
             (circle(r), Decor::InvertedColumn { at, radius: r, height })
         }
-        Mark::Rift => {
+        MapMark::Rift => {
             let r = q(b.rl(1.1, 1.4));
             let height = q(b.rd(6.0, 8.0) * k);
             (circle(r), Decor::Rift { at, radius: r, height, rot: rot.wrapping_add(4) })
         }
-        Mark::Crystal => {
+        MapMark::Crystal => {
             let r = q(b.rl(1.6, 2.0) * k);
             let (height, variant) = (q(b.rd(5.0, 7.0)), b.vd(4));
             (circle(r), Decor::Crystal { at, radius: r, height, rot, variant })
         }
+        // Map-scale landmarks (region sites on biome maps); rooms never pick these.
+        MapMark::ColossusHead => {
+            let r = q(b.rl(2.6, 3.3) * k);
+            let variant = b.vd(4);
+            (circle(r), Decor::ColossusHead { at, radius: r, rot, variant })
+        }
+        MapMark::GreatAnvil => {
+            let r = q(b.rl(2.2, 2.8) * k);
+            (circle(r), Decor::GreatAnvil { at, radius: r, rot })
+        }
+        MapMark::Crucible => {
+            let r = q(b.rl(2.4, 3.0) * k.max(0.85));
+            (circle(r), Decor::Crucible { at, radius: r })
+        }
+        MapMark::FallenWeapon => {
+            let r = q(b.rl(2.2, 3.0) * k);
+            let (height, variant) = (q(b.rd(14.0, 20.0) * k), b.vd(5));
+            (circle(r), Decor::FallenWeapon { at, radius: r, height, rot, variant })
+        }
     }
 }
 
-pub(crate) fn pick_mark(b: &mut Builder, opts: &[(Mark, f32)]) -> Mark {
+pub(crate) fn pick_mark(b: &mut Builder, opts: &[(MapMark, f32)]) -> MapMark {
     let w: Vec<f32> = opts.iter().map(|o| o.1).collect();
     opts[b.lay.weighted_index(&w).unwrap_or(0)].0
 }
@@ -2093,6 +2164,10 @@ pub(crate) fn monument_at(o: Obstacle, d: Decor, at: Vec2, rot: Rot16) -> (Obsta
         Decor::Crystal { radius, height, variant, .. } => Decor::Crystal { at, radius, height, rot, variant },
         Decor::SpiralStair { radius, height, .. } => Decor::SpiralStair { at, radius, height, rot },
         Decor::SealedGate { half, height, .. } => Decor::SealedGate { at, half, height },
+        Decor::ColossusHead { radius, variant, .. } => Decor::ColossusHead { at, radius, rot, variant },
+        Decor::GreatAnvil { radius, .. } => Decor::GreatAnvil { at, radius, rot },
+        Decor::Crucible { radius, .. } => Decor::Crucible { at, radius },
+        Decor::FallenWeapon { radius, height, variant, .. } => Decor::FallenWeapon { at, radius, height, rot, variant },
         other => other,
     };
     (o, d)
