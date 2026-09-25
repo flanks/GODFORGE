@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "miniboss",
   "extensions_used": [],
-  "tris": 15576,
+  "tris": 17676,
   "budget": [
    10000,
    20000
@@ -19,7 +19,7 @@
      2048
     ],
     "format": "png",
-    "bytes": 609876
+    "bytes": 666466
    },
    {
     "name": "the_bellows_basecolor",
@@ -29,52 +29,35 @@
      2048
     ],
     "format": "png",
-    "bytes": 2412014
+    "bytes": 2456729
    }
   ],
   "materials": [
    "M_the_bellows"
   ],
   "sockets": {
+   "attack_origin": {
+    "translation": [
+     -1.0062,
+     0.9976,
+     4.8062
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
    "hit_center": {
     "translation": [
      0.0,
      2.75,
      -0.3
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "fx_mouth": {
-    "translation": [
-     0.0,
-     2.4193,
-     4.3746
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "fx_core": {
-    "translation": [
-     0.0,
-     2.5028,
-     3.182
     ],
     "forward": [
      -0.0,
@@ -104,11 +87,28 @@
      0.0
     ]
    },
-   "attack_origin": {
+   "fx_core": {
     "translation": [
      0.0,
-     2.4193,
-     4.3746
+     2.5028,
+     3.182
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     -1.0062,
+     0.9976,
+     4.8062
     ],
     "forward": [
      -0.0,
@@ -126,12 +126,12 @@
    "min": [
     -2.728,
     -0.0052,
-    -4.63
+    -4.032
    ],
    "max": [
     2.728,
     5.227,
-    4.3568
+    5.1878
    ]
   },
   "height_m": 5.232,
@@ -168,22 +168,22 @@
   "clips": [
    "the_bellows_idle@loop",
    "the_bellows_move@loop",
-   "the_bellows_idle_p2@loop",
-   "the_bellows_move_p2@loop",
    "the_bellows_windup",
    "the_bellows_attack",
    "the_bellows_hit",
    "the_bellows_radial",
    "the_bellows_summon",
+   "the_bellows_strike_ring",
+   "the_bellows_phase2",
+   "the_bellows_idle_p2@loop",
+   "the_bellows_move_p2@loop",
    "the_bellows_windup_p2",
    "the_bellows_attack_p2",
    "the_bellows_hit_p2",
    "the_bellows_radial_p2",
    "the_bellows_summon_p2",
-   "the_bellows_strike_ring",
    "the_bellows_strike_ring_p2",
    "the_bellows_strike_circle",
-   "the_bellows_phase2",
    "the_bellows_death",
    "the_bellows_inhale",
    "the_bellows_breathe",
@@ -201,11 +201,11 @@
   "size": 2048,
   "paint_scale": 0.25,
   "texel_density_px_per_m": {
-   "median": 47.1,
-   "p10": 45.9,
-   "p90": 85.6
+   "median": 47.3,
+   "p10": 45.2,
+   "p90": 85.9
   },
-  "coverage": 0.433,
+  "coverage": 0.434,
   "zones": [
    "bronze",
    "bronze_dark",
@@ -225,27 +225,27 @@
   "decals": 5,
   "basecolor": "art/enemies/the_bellows/textures/the_bellows_basecolor.png",
   "emissive": "art/enemies/the_bellows/textures/the_bellows_emissive.png",
-  "emissive_texels": 609995,
-  "seconds": 41.4
+  "emissive_texels": 625555,
+  "seconds": 44.6
  },
  "skin": {
-  "vertices": 8627,
+  "vertices": 9812,
   "multi_bone": 0,
   "per_bone": {
-   "pelvis": 562,
+   "pelvis": 322,
    "pleat_1": 102,
    "pleat_2": 102,
    "pleat_3": 102,
    "pleat_4": 102,
    "pleat_5": 102,
-   "lid": 1173,
+   "lid": 1045,
    "hatch_L": 88,
    "hatch_R": 88,
    "chimney_1": 282,
    "chimney_2": 282,
    "chimney_3": 224,
-   "head": 1931,
-   "mask_shard": 203,
+   "head": 3521,
+   "mask_shard": 166,
    "front_thigh_L": 258,
    "front_shin_L": 123,
    "front_paw_L": 440,
@@ -258,6 +258,388 @@
    "hind_thigh_R": 258,
    "hind_shin_R": 123,
    "hind_paw_R": 440
+  }
+ },
+ "ground": {
+  "idle@loop": {
+   "frames": [
+    0,
+    96
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.875,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.664,
+   "shard_min_z": 1.888,
+   "body_min_z": 1.514,
+   "leg_min_z": 0.407
+  },
+  "move@loop": {
+   "frames": [
+    0,
+    48
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.909,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.424,
+   "shard_min_z": 1.667,
+   "body_min_z": 1.311,
+   "leg_min_z": 0.378
+  },
+  "windup": {
+   "frames": [
+    0,
+    30
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.856,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.323,
+   "shard_min_z": 1.594,
+   "body_min_z": 1.35,
+   "leg_min_z": 0.395
+  },
+  "attack": {
+   "frames": [
+    0,
+    34
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 11.9,
+   "head_clamped_frames": 21,
+   "max_leg_reach": 0.856,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.295,
+   "body_min_z": 1.041,
+   "leg_min_z": 0.379
+  },
+  "hit": {
+   "frames": [
+    0,
+    15
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.996,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.665,
+   "shard_min_z": 1.894,
+   "body_min_z": 1.408,
+   "leg_min_z": 0.398
+  },
+  "radial": {
+   "frames": [
+    0,
+    48
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.874,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.519,
+   "shard_min_z": 1.697,
+   "body_min_z": 1.144,
+   "leg_min_z": 0.379
+  },
+  "summon": {
+   "frames": [
+    0,
+    62
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 23.2,
+   "head_clamped_frames": 43,
+   "max_leg_reach": 0.833,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.3,
+   "body_min_z": 1.083,
+   "leg_min_z": 0.377
+  },
+  "strike_ring": {
+   "frames": [
+    0,
+    62
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 19.0,
+   "head_clamped_frames": 21,
+   "max_leg_reach": 0.833,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.239,
+   "body_min_z": 0.906,
+   "leg_min_z": 0.366
+  },
+  "phase2": {
+   "frames": [
+    0,
+    78
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 8.4,
+   "head_clamped_frames": 13,
+   "max_leg_reach": 0.971,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": -0.0,
+   "body_min_z": 1.097,
+   "leg_min_z": 0.378
+  },
+  "idle_p2@loop": {
+   "frames": [
+    0,
+    96
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.882,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.653,
+   "shard_min_z": 2.267,
+   "body_min_z": 1.503,
+   "leg_min_z": 0.405
+  },
+  "move_p2@loop": {
+   "frames": [
+    0,
+    40
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.92,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.391,
+   "shard_min_z": 2.026,
+   "body_min_z": 1.28,
+   "leg_min_z": 0.378
+  },
+  "windup_p2": {
+   "frames": [
+    0,
+    30
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.856,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.323,
+   "shard_min_z": 1.987,
+   "body_min_z": 1.35,
+   "leg_min_z": 0.395
+  },
+  "attack_p2": {
+   "frames": [
+    0,
+    34
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 11.9,
+   "head_clamped_frames": 21,
+   "max_leg_reach": 0.856,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.687,
+   "body_min_z": 1.041,
+   "leg_min_z": 0.379
+  },
+  "hit_p2": {
+   "frames": [
+    0,
+    15
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.996,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.655,
+   "shard_min_z": 2.273,
+   "body_min_z": 1.408,
+   "leg_min_z": 0.398
+  },
+  "radial_p2": {
+   "frames": [
+    0,
+    48
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.874,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.517,
+   "shard_min_z": 2.081,
+   "body_min_z": 1.144,
+   "leg_min_z": 0.379
+  },
+  "summon_p2": {
+   "frames": [
+    0,
+    62
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 23.2,
+   "head_clamped_frames": 43,
+   "max_leg_reach": 0.827,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.692,
+   "body_min_z": 1.083,
+   "leg_min_z": 0.377
+  },
+  "strike_ring_p2": {
+   "frames": [
+    0,
+    59
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 19.0,
+   "head_clamped_frames": 22,
+   "max_leg_reach": 0.827,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.63,
+   "body_min_z": 0.906,
+   "leg_min_z": 0.366
+  },
+  "strike_circle": {
+   "frames": [
+    0,
+    54
+   ],
+   "max_body_lift_m": 0.0,
+   "max_head_up_deg": 0.0,
+   "head_clamped_frames": 0,
+   "max_leg_reach": 0.856,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.323,
+   "shard_min_z": 1.987,
+   "body_min_z": 1.35,
+   "leg_min_z": 0.394
+  },
+  "death": {
+   "frames": [
+    0,
+    90
+   ],
+   "max_body_lift_m": 0.03,
+   "max_head_up_deg": 61.8,
+   "head_clamped_frames": 65,
+   "max_leg_reach": 0.999,
+   "max_reach_miss_m": 0.0,
+   "planted_paw_z": [
+    -0.0,
+    0.0003
+   ],
+   "paw_min_z": -0.0,
+   "head_min_z": 0.04,
+   "shard_min_z": 1.466,
+   "body_min_z": 0.123,
+   "leg_min_z": 0.01
   }
  }
 }

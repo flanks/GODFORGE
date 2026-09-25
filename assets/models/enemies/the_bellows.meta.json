@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "the_bellows",
  "tier": "miniboss",
- "tris": 15576,
+ "tris": 17676,
  "tris_budget": [
   10000,
   20000
@@ -16,7 +16,7 @@
     2048
    ],
    "format": "png",
-   "bytes": 609876
+   "bytes": 666466
   },
   {
    "name": "the_bellows_basecolor",
@@ -26,49 +26,32 @@
     2048
    ],
    "format": "png",
-   "bytes": 2412014
+   "bytes": 2456729
   }
  ],
  "sockets": {
+  "attack_origin": {
+   "translation": [
+    -1.0062,
+    0.9976,
+    4.8062
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
   "hit_center": {
    "translation": [
     0.0,
     2.75,
     -0.3
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
-  "fx_mouth": {
-   "translation": [
-    0.0,
-    2.4193,
-    4.3746
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
-  "fx_core": {
-   "translation": [
-    0.0,
-    2.5028,
-    3.182
    ],
    "forward": [
     -0.0,
@@ -98,11 +81,28 @@
     0.0
    ]
   },
-  "attack_origin": {
+  "fx_core": {
    "translation": [
     0.0,
-    2.4193,
-    4.3746
+    2.5028,
+    3.182
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    -1.0062,
+    0.9976,
+    4.8062
    ],
    "forward": [
     -0.0,
@@ -119,22 +119,22 @@
  "clips": [
   "the_bellows_idle@loop",
   "the_bellows_move@loop",
-  "the_bellows_idle_p2@loop",
-  "the_bellows_move_p2@loop",
   "the_bellows_windup",
   "the_bellows_attack",
   "the_bellows_hit",
   "the_bellows_radial",
   "the_bellows_summon",
+  "the_bellows_strike_ring",
+  "the_bellows_phase2",
+  "the_bellows_idle_p2@loop",
+  "the_bellows_move_p2@loop",
   "the_bellows_windup_p2",
   "the_bellows_attack_p2",
   "the_bellows_hit_p2",
   "the_bellows_radial_p2",
   "the_bellows_summon_p2",
-  "the_bellows_strike_ring",
   "the_bellows_strike_ring_p2",
   "the_bellows_strike_circle",
-  "the_bellows_phase2",
   "the_bellows_death",
   "the_bellows_inhale",
   "the_bellows_breathe",
@@ -151,23 +151,23 @@
   "min": [
    -2.728,
    -0.0052,
-   -4.63
+   -4.032
   ],
   "max": [
    2.728,
    5.227,
-   4.3568
+   5.1878
   ]
  },
  "size_m": 5.232,
  "glb": "assets/models/enemies/the_bellows.glb",
- "glb_bytes": 4856348,
- "glb_sha256": "321b5cbe98597b58aac4445363be2d9cf64ca42db8feccd671798b70061d4744",
+ "glb_bytes": 5171236,
+ "glb_sha256": "42bd131dc52e8448980f2bf7a71e056d476fe880cb1c42c433f3458a004ab063",
  "source_blend": "art/enemies/the_bellows/source/the_bellows.blend",
  "build_script": "tools/blender/gf_assets/enemies/the_bellows.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
  "generator": "Blender 5.2.0 LTS",
- "built": "2026-09-25",
+ "built": "2026-09-26",
  "validation": {
   "ok": true,
   "errors": [],
@@ -236,27 +236,27 @@
   "fx_mouth": {
    "bone": "head",
    "blender_pos": [
-    0.0,
-    -4.375,
-    2.419
+    -1.006,
+    -4.806,
+    0.998
    ],
    "gltf_pos": [
-    0.0,
-    2.419,
-    4.375
+    -1.006,
+    0.998,
+    4.806
    ]
   },
   "attack_origin": {
    "bone": "head",
    "blender_pos": [
-    0.0,
-    -4.375,
-    2.419
+    -1.006,
+    -4.806,
+    0.998
    ],
    "gltf_pos": [
-    0.0,
-    2.419,
-    4.375
+    -1.006,
+    0.998,
+    4.806
    ]
   },
   "head_top": {
@@ -402,7 +402,7 @@
    "seconds": 1.6,
    "phase": 1,
    "loop": true,
-   "move_cycle_m": 1.959
+   "move_cycle_m": 1.692
   },
   "idle_p2@loop": {
    "frames": 96,
@@ -415,7 +415,7 @@
    "seconds": 1.333,
    "phase": 2,
    "loop": true,
-   "move_cycle_m": 2.23
+   "move_cycle_m": 1.935
   },
   "windup": {
    "frames": 30,
@@ -732,17 +732,17 @@
  },
  "phase_switch": "Clips carry the phase: every clip keys every joint. Stoke clips hold hatch_L/R shut and mask_shard at scale 1; phase2 blows the hatches open and drops the shard (scale 0.001 at its end); Blaze clips hold that state. In Blaze play '<clip>_p2' when it exists, else '<clip>' (strike_circle and death are authored with the Blaze body). Generic windup / attack are the verb: windup = the inhale (ends loaded, time-stretch to the sim windup), attack = the breath (fire VFX from fx_mouth at events_s.release).",
  "move_cycle_m": {
-  "move@loop": 1.959,
-  "move_p2@loop": 2.23
+  "move@loop": 1.692,
+  "move_p2@loop": 1.935
  },
  "paint": {
   "size": 2048,
   "texel_density_px_per_m": {
-   "median": 47.1,
-   "p10": 45.9,
-   "p90": 85.6
+   "median": 47.3,
+   "p10": 45.2,
+   "p90": 85.9
   },
-  "coverage": 0.433,
+  "coverage": 0.434,
   "paint_scale": 0.25,
   "broad_zones": [
    "bronze",
@@ -760,5 +760,181 @@
   "shape": "Colossus",
   "open_world": "Cinder Wastes Warlord POI (docs/OPEN_WORLD.md)"
  },
- "faction": "fallen_godworks"
+ "faction": "fallen_godworks",
+ "ground_contact": {
+  "rule": "floor z = 0: planted paws sit on it (their lowest vertex at 0, IK), nothing else goes below it; the head's lowest point stays >= 0.04 m, the body's >= 0.05 m",
+  "clips": {
+   "idle@loop": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.664,
+    "body_min_z": 1.514
+   },
+   "move@loop": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.424,
+    "body_min_z": 1.311
+   },
+   "windup": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.323,
+    "body_min_z": 1.35
+   },
+   "attack": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 1.041
+   },
+   "hit": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.665,
+    "body_min_z": 1.408
+   },
+   "radial": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.519,
+    "body_min_z": 1.144
+   },
+   "summon": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 1.083
+   },
+   "strike_ring": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 0.906
+   },
+   "phase2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 1.097
+   },
+   "idle_p2@loop": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.653,
+    "body_min_z": 1.503
+   },
+   "move_p2@loop": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.391,
+    "body_min_z": 1.28
+   },
+   "windup_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.323,
+    "body_min_z": 1.35
+   },
+   "attack_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 1.041
+   },
+   "hit_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.655,
+    "body_min_z": 1.408
+   },
+   "radial_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.517,
+    "body_min_z": 1.144
+   },
+   "summon_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 1.083
+   },
+   "strike_ring_p2": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 0.906
+   },
+   "strike_circle": {
+    "planted_paw_z": [
+     -0.0,
+     0.0
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.323,
+    "body_min_z": 1.35
+   },
+   "death": {
+    "planted_paw_z": [
+     -0.0,
+     0.0003
+    ],
+    "paw_min_z": -0.0,
+    "head_min_z": 0.04,
+    "body_min_z": 0.123
+   }
+  }
+ }
 }

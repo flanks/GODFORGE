@@ -1,0 +1,242 @@
+{
+ "review_items": [
+  "mask read as a cartoon mascot",
+  "silhouette read as a locket (ring handle)",
+  "clips through the floor"
+ ],
+ "ground_min_z_m": {
+  "before": {
+   "idle@loop": {
+    "paw": -0.033,
+    "head": 0.558,
+    "body": 0.361
+   },
+   "move@loop": {
+    "paw": -0.223,
+    "head": 0.389,
+    "body": 0.206
+   },
+   "windup": {
+    "paw": -0.212,
+    "head": 0.291,
+    "body": 0.222
+   },
+   "attack": {
+    "paw": -0.13,
+    "head": -0.245,
+    "body": 0.224
+   },
+   "hit": {
+    "paw": -0.145,
+    "head": 0.558,
+    "body": 0.24
+   },
+   "radial": {
+    "paw": -0.081,
+    "head": 0.341,
+    "body": 0.261
+   },
+   "summon": {
+    "paw": -0.224,
+    "head": -0.882,
+    "body": 0.113
+   },
+   "strike_ring": {
+    "paw": -0.159,
+    "head": -0.439,
+    "body": 0.189
+   },
+   "phase2": {
+    "paw": -0.174,
+    "head": -1.256,
+    "body": 0.202
+   },
+   "idle_p2@loop": {
+    "paw": -0.034,
+    "head": 0.548,
+    "body": 0.355
+   },
+   "move_p2@loop": {
+    "paw": -0.254,
+    "head": 0.37,
+    "body": 0.182
+   },
+   "windup_p2": {
+    "paw": -0.229,
+    "head": 0.299,
+    "body": 0.206
+   },
+   "attack_p2": {
+    "paw": -0.13,
+    "head": -0.245,
+    "body": 0.224
+   },
+   "hit_p2": {
+    "paw": -0.157,
+    "head": 0.548,
+    "body": 0.232
+   },
+   "radial_p2": {
+    "paw": -0.08,
+    "head": 0.34,
+    "body": 0.261
+   },
+   "summon_p2": {
+    "paw": -0.224,
+    "head": -0.882,
+    "body": 0.113
+   },
+   "strike_ring_p2": {
+    "paw": -0.159,
+    "head": -0.439,
+    "body": 0.189
+   },
+   "strike_circle": {
+    "paw": -0.053,
+    "head": 0.291,
+    "body": 0.315
+   },
+   "death": {
+    "paw": -0.937,
+    "head": -1.252,
+    "body": -0.568
+   }
+  },
+  "after": {
+   "idle@loop": {
+    "paw": -0.0,
+    "head": 0.664,
+    "body": 0.407
+   },
+   "move@loop": {
+    "paw": -0.0,
+    "head": 0.424,
+    "body": 0.378
+   },
+   "windup": {
+    "paw": -0.0,
+    "head": 0.323,
+    "body": 0.395
+   },
+   "attack": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.379
+   },
+   "hit": {
+    "paw": -0.0,
+    "head": 0.665,
+    "body": 0.398
+   },
+   "radial": {
+    "paw": -0.0,
+    "head": 0.519,
+    "body": 0.379
+   },
+   "summon": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.377
+   },
+   "strike_ring": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.366
+   },
+   "phase2": {
+    "paw": -0.0,
+    "head": -0.0,
+    "body": 0.378
+   },
+   "idle_p2@loop": {
+    "paw": -0.0,
+    "head": 0.653,
+    "body": 0.405
+   },
+   "move_p2@loop": {
+    "paw": -0.0,
+    "head": 0.391,
+    "body": 0.378
+   },
+   "windup_p2": {
+    "paw": -0.0,
+    "head": 0.323,
+    "body": 0.395
+   },
+   "attack_p2": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.379
+   },
+   "hit_p2": {
+    "paw": -0.0,
+    "head": 0.655,
+    "body": 0.398
+   },
+   "radial_p2": {
+    "paw": -0.0,
+    "head": 0.517,
+    "body": 0.379
+   },
+   "summon_p2": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.377
+   },
+   "strike_ring_p2": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.366
+   },
+   "strike_circle": {
+    "paw": -0.0,
+    "head": 0.323,
+    "body": 0.394
+   },
+   "death": {
+    "paw": -0.0,
+    "head": 0.04,
+    "body": 0.01
+   }
+  }
+ },
+ "floor_tolerance_m": 0.005,
+ "clips_below_floor": {
+  "before": [
+   "attack",
+   "attack_p2",
+   "death",
+   "hit",
+   "hit_p2",
+   "idle@loop",
+   "idle_p2@loop",
+   "move@loop",
+   "move_p2@loop",
+   "phase2",
+   "radial",
+   "radial_p2",
+   "strike_circle",
+   "strike_ring",
+   "strike_ring_p2",
+   "summon",
+   "summon_p2",
+   "windup",
+   "windup_p2"
+  ],
+  "after": []
+ },
+ "cited": [
+  "move@loop paws: review 0.22 m under, measured -0.22 -> +0.00 m",
+  "strike_ring mask: review 0.44 m under, measured -0.44 -> +0.04 m",
+  "summon mask: review 0.88 m under, measured -0.88 -> +0.04 m",
+  "death mask: review 1.25 m under, measured -1.25 -> +0.04 m"
+ ],
+ "sheet": {
+  "path": "art/enemies/the_bellows/reports/the_bellows_review_fix.png",
+  "size": [
+   1600,
+   2238
+  ],
+  "bytes": 1576498
+ }
+}

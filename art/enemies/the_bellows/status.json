@@ -3,7 +3,7 @@
  "kind": "enemy",
  "tier": "miniboss",
  "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
@@ -20,9 +20,10 @@
     "art/enemies/the_bellows/reports/the_bellows_ingame.png",
     "art/enemies/the_bellows/reports/the_bellows_clips.png",
     "art/enemies/the_bellows/reports/the_bellows_34.png",
-    "art/enemies/the_bellows/reports/the_bellows_verb.png"
+    "art/enemies/the_bellows/reports/the_bellows_verb.png",
+    "art/enemies/the_bellows/reports/the_bellows_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/the_bellows.py (dedicated rig GF_Bellows_v1)."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/the_bellows.py (dedicated rig GF_Bellows_v1). Art review fix (5.5/10): the mask remade as a stern wind god with a curled war-horn, twin forked grips instead of the ring handle, every clip floor-solved (IK-planted paws at z = 0, nothing below the floor); before / after in reports/the_bellows_review_fix.png (the_bellows_fix_views.py + the_bellows_fix_sheet.py)."
   },
   "2_user_approval": {
    "status": "pending_human",
