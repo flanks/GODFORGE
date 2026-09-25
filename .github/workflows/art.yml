@@ -1,0 +1,44 @@
+# GODFORGE art track (docs/ART_PIPELINE.md). Cheap, headless, stdlib-only: no Blender, no GPU.
+#
+#   art-gates  status.json rules (human gates, stand-ins never final), nothing > 20 MB in git,
+#              manifest local-only files not tracked, shipped GLBs loadable by bevy_gltf 0.20
+#              (no Draco / meshopt / quantisation), every art tool script compiles
+#
+# Stage 5 adds the headless Blender export + import smoke test here (it needs a Blender install
+# on the runner, so it lands with the exporter, not before).
+
+name: Art
+
+on:
+  push:
+    paths:
+      - "art/**"
+      - "assets/models/**"
+      - "tools/comfy/**"
+      - "tools/blender/**"
+      - "docs/ART_PIPELINE.md"
+      - ".github/workflows/art.yml"
+  pull_request:
+    paths:
+      - "art/**"
+      - "assets/models/**"
+      - "tools/comfy/**"
+      - "tools/blender/**"
+      - "docs/ART_PIPELINE.md"
+      - ".github/workflows/art.yml"
+  workflow_dispatch:
+
+jobs:
+  art-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Status rules, 20 MB limit, glTF extensions
+        run: python tools/comfy/check_art.py
+      - name: Art tool scripts compile
+        run: |
+          shopt -s nullglob
+          python -m py_compile tools/comfy/*.py tools/blender/gf_hero/*.py

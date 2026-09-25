@@ -1,0 +1,93 @@
+{
+ "about": "Input for tools/comfy/palette_extract.py: where each material is sampled on the approved front concept. Boxes are [x0, y0, x1, y1] in concept pixels (1536x1024, origin top-left, x1/y1 exclusive); hue in degrees, sat/val in 0-1 (HSV), applied inside the boxes after the flat background is removed. tones = lightness (CIELAB L*) percentiles reported as shadow/base/highlight. Edit a box, re-run the tool, look at reports/stage0_palette_samples.png.",
+ "character": "brax",
+ "concept": "art/characters/brax/references/BRAX_front_approved.png",
+ "content_color": "#FF7A3D",
+ "outputs": {
+  "palette": "art/characters/brax/palette.json",
+  "color_script": "art/characters/brax/color_script.png",
+  "overlay": "art/characters/brax/reports/stage0_palette_samples.png"
+ },
+ "swatches": [
+  {
+   "key": "skin", "label": "Skin",
+   "note": "warm sun-dark skin; soot flecks and lava cracks are painted on top",
+   "boxes": [[663, 205, 713, 240], [735, 215, 760, 245], [545, 170, 600, 250], [610, 710, 675, 780], [850, 710, 915, 780], [735, 100, 760, 120]],
+   "hue": [5, 35], "sat": [0.30, 0.78], "val": [0.35, 0.95], "drop_hot": true
+  },
+  {
+   "key": "hair_beard", "label": "Hair & beard",
+   "note": "near-black warm brown; the short beard frames the jaw",
+   "boxes": [[752, 128, 790, 158], [735, 40, 800, 70]],
+   "val": [0.0, 0.30]
+  },
+  {
+   "key": "eye_glow", "label": "Eye glow", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [25, 60, 95],
+   "note": "tiny at game scale; the brow shadow + glow pair is what reads",
+   "boxes": [[742, 90, 790, 103]],
+   "hue": [15, 60], "sat": [0.50, 1.0], "val": [0.85, 1.0]
+  },
+  {
+   "key": "gauntlet_rock", "label": "Gauntlet rock",
+   "note": "near-black basalt; reads by value on lit floors, sinks on dark ones",
+   "boxes": [[190, 160, 480, 300], [1056, 160, 1346, 300]],
+   "sat": [0.0, 0.55], "val": [0.0, 0.40]
+  },
+  {
+   "key": "lava_glow", "label": "Lava glow", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [10, 50, 97],
+   "note": "cracks + chest sigil; unlit in the shader, bloom does the rest",
+   "boxes": [[720, 185, 812, 300], [190, 150, 560, 300], [976, 150, 1346, 300]],
+   "hue": [0, 58], "sat": [0.55, 1.0], "val": [0.82, 1.0]
+  },
+  {
+   "key": "bronze", "label": "Bronze bands & buckle",
+   "note": "elbow rings, wrist band, belt buckle: the metal accent",
+   "boxes": [[480, 145, 535, 292], [999, 145, 1054, 292], [735, 362, 787, 412]],
+   "hue": [22, 50], "sat": [0.40, 0.92], "val": [0.35, 0.97], "drop_hot": true
+  },
+  {
+   "key": "scale_plates", "label": "Scale-plate skirt",
+   "note": "overlapping bronze leaves; same family as the bands",
+   "boxes": [[655, 455, 705, 555], [770, 455, 815, 555], [830, 455, 900, 560]],
+   "hue": [18, 45], "sat": [0.35, 0.88], "val": [0.35, 0.97]
+  },
+  {
+   "key": "belt_leather", "label": "Belt leather",
+   "note": "dark riveted leather under the buckle",
+   "boxes": [[670, 378, 730, 393], [790, 378, 850, 393]],
+   "hue": [0, 45], "val": [0.0, 0.38]
+  },
+  {
+   "key": "torn_cloth", "label": "Torn cloth",
+   "note": "ragged under-skirt between and below the plates",
+   "boxes": [[770, 560, 800, 680], [800, 620, 890, 680]],
+   "hue": [0, 35], "sat": [0.30, 1.0], "val": [0.10, 0.45]
+  },
+  {
+   "key": "teal_sash", "label": "Teal sash",
+   "note": "the one cool mass on the body: Brax's second read after the fists",
+   "boxes": [[712, 450, 758, 600], [740, 730, 780, 880]],
+   "hue": [165, 205], "sat": [0.35, 1.0], "val": [0.15, 1.0]
+  },
+  {
+   "key": "gold_pattern", "label": "Sash gold pattern",
+   "note": "thin meander on the sash tails; texture detail, not a shape",
+   "boxes": [[712, 600, 762, 670], [742, 730, 790, 880]],
+   "hue": [25, 58], "sat": [0.35, 1.0], "val": [0.40, 1.0]
+  },
+  {
+   "key": "ankle_wraps", "label": "Ankle wraps",
+   "note": "dark teal bands echoing the sash",
+   "boxes": [[597, 790, 670, 945], [855, 790, 930, 945]],
+   "hue": [150, 215], "sat": [0.15, 1.0], "val": [0.10, 1.0]
+  },
+  {
+   "key": "wrap_linen", "label": "Wrap underlayer",
+   "note": "pale linen showing between the teal bands",
+   "boxes": [[597, 820, 670, 900], [855, 820, 930, 900]],
+   "hue": [15, 55], "sat": [0.05, 0.45], "val": [0.30, 1.0]
+  }
+ ]
+}

@@ -1,0 +1,412 @@
+{
+ "character": "brax",
+ "generated_by": "tools/comfy/palette_extract.py",
+ "spec": "art/characters/brax/palette_spec.json",
+ "source": {
+  "path": "art/characters/brax/references/BRAX_front_approved.png",
+  "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "generated": "2026-09-25",
+ "kind": "measured from approved art (stage 0 derived data, not a new design)",
+ "method": "per swatch: pixels in the sample boxes passing the HSV filter, flat background removed; tones = median colour of the pixels within +-5 percentile of the named CIELAB L* percentile",
+ "sheet_background": "#171E25",
+ "content_color": "#FF7A3D",
+ "swatches": [
+  {
+   "n": 1,
+   "key": "skin",
+   "label": "Skin",
+   "emissive": false,
+   "tones": {
+    "shadow": "#854936",
+    "base": "#B46746",
+    "highlight": "#C67851"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    51.7,
+    27.8,
+    31.8
+   ],
+   "pixels_sampled": 14378,
+   "note": "warm sun-dark skin; soot flecks and lava cracks are painted on top",
+   "silhouette_share": 0.1955
+  },
+  {
+   "n": 2,
+   "key": "hair_beard",
+   "label": "Hair & beard",
+   "emissive": false,
+   "tones": {
+    "shadow": "#050303",
+    "base": "#1C1210",
+    "highlight": "#3A2622"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    6.5,
+    4.4,
+    2.8
+   ],
+   "pixels_sampled": 2512,
+   "note": "near-black warm brown; the short beard frames the jaw",
+   "silhouette_share": 0.0318
+  },
+  {
+   "n": 3,
+   "key": "eye_glow",
+   "label": "Eye glow",
+   "emissive": true,
+   "tones": {
+    "rim": "#DE875A",
+    "hot": "#F5A611",
+    "core": "#FAEA3C"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 25,
+    "hot": 60,
+    "core": 95
+   },
+   "base_lab": [
+    74.0,
+    19.4,
+    75.7
+   ],
+   "pixels_sampled": 39,
+   "note": "tiny at game scale; the brow shadow + glow pair is what reads",
+   "silhouette_share": 0.0144
+  },
+  {
+   "n": 4,
+   "key": "gauntlet_rock",
+   "label": "Gauntlet rock",
+   "emissive": false,
+   "tones": {
+    "shadow": "#150F0F",
+    "base": "#291F1E",
+    "highlight": "#4A3A36"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    12.9,
+    4.6,
+    2.5
+   ],
+   "pixels_sampled": 29189,
+   "note": "near-black basalt; reads by value on lit floors, sinks on dark ones",
+   "silhouette_share": 0.0825
+  },
+  {
+   "n": 5,
+   "key": "lava_glow",
+   "label": "Lava glow",
+   "emissive": true,
+   "tones": {
+    "rim": "#E7480D",
+    "hot": "#F2753B",
+    "core": "#FEE265"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 10,
+    "hot": 50,
+    "core": 97
+   },
+   "base_lab": [
+    63.3,
+    44.4,
+    52.9
+   ],
+   "pixels_sampled": 9680,
+   "note": "cracks + chest sigil; unlit in the shader, bloom does the rest",
+   "silhouette_share": 0.045
+  },
+  {
+   "n": 6,
+   "key": "bronze",
+   "label": "Bronze bands & buckle",
+   "emissive": false,
+   "tones": {
+    "shadow": "#6B3D1E",
+    "base": "#955B32",
+    "highlight": "#D99452"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    44.4,
+    19.9,
+    33.2
+   ],
+   "pixels_sampled": 4281,
+   "note": "elbow rings, wrist band, belt buckle: the metal accent",
+   "silhouette_share": 0.0472
+  },
+  {
+   "n": 7,
+   "key": "scale_plates",
+   "label": "Scale-plate skirt",
+   "emissive": false,
+   "tones": {
+    "shadow": "#6C3F25",
+    "base": "#925832",
+    "highlight": "#C27D46"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    43.2,
+    20.3,
+    31.7
+   ],
+   "pixels_sampled": 8860,
+   "note": "overlapping bronze leaves; same family as the bands",
+   "silhouette_share": 0.0786
+  },
+  {
+   "n": 8,
+   "key": "belt_leather",
+   "label": "Belt leather",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1A1210",
+    "base": "#291E1B",
+    "highlight": "#4C312B"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    12.5,
+    4.8,
+    4.1
+   ],
+   "pixels_sampled": 1567,
+   "note": "dark riveted leather under the buckle",
+   "silhouette_share": 0.0308
+  },
+  {
+   "n": 9,
+   "key": "torn_cloth",
+   "label": "Torn cloth",
+   "emissive": false,
+   "tones": {
+    "shadow": "#371F1C",
+    "base": "#4A2B26",
+    "highlight": "#57352D"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    21.3,
+    13.7,
+    9.3
+   ],
+   "pixels_sampled": 5225,
+   "note": "ragged under-skirt between and below the plates",
+   "silhouette_share": 0.1329
+  },
+  {
+   "n": 10,
+   "key": "teal_sash",
+   "label": "Teal sash",
+   "emissive": false,
+   "tones": {
+    "shadow": "#18404A",
+    "base": "#1F5A64",
+    "highlight": "#1A676D"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    35.0,
+    -15.4,
+    -11.4
+   ],
+   "pixels_sampled": 9369,
+   "note": "the one cool mass on the body: Brax's second read after the fists",
+   "silhouette_share": 0.073
+  },
+  {
+   "n": 11,
+   "key": "gold_pattern",
+   "label": "Sash gold pattern",
+   "emissive": false,
+   "tones": {
+    "shadow": "#725B30",
+    "base": "#7A6435",
+    "highlight": "#866A33"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    43.5,
+    2.5,
+    29.7
+   ],
+   "pixels_sampled": 1331,
+   "note": "thin meander on the sash tails; texture detail, not a shape",
+   "silhouette_share": 0.0081
+  },
+  {
+   "n": 12,
+   "key": "ankle_wraps",
+   "label": "Ankle wraps",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1F3134",
+    "base": "#284244",
+    "highlight": "#3A5959"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    26.1,
+    -9.3,
+    -4.4
+   ],
+   "pixels_sampled": 7559,
+   "note": "dark teal bands echoing the sash",
+   "silhouette_share": 0.0668
+  },
+  {
+   "n": 13,
+   "key": "wrap_linen",
+   "label": "Wrap underlayer",
+   "emissive": false,
+   "tones": {
+    "shadow": "#584539",
+    "base": "#715846",
+    "highlight": "#AC8468"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    39.5,
+    7.5,
+    14.4
+   ],
+   "pixels_sampled": 2165,
+   "note": "pale linen showing between the teal bands",
+   "silhouette_share": 0.0357
+  }
+ ],
+ "ink_and_deep_shadow_share": 0.1578,
+ "checks": {
+  "notes": "dE = CIELAB dE76 between base tones; dL = difference in L* (value), the part a toon ramp and a small screen keep.",
+  "dE_bronze_vs_scale_plates": 2.0,
+  "dE_content_color_vs_lava_hot": 4.6,
+  "dL_vs_sheet_background": {
+   "skin": 40.8,
+   "hair_beard": -4.4,
+   "eye_glow": 63.1,
+   "gauntlet_rock": 2.0,
+   "lava_glow": 52.4,
+   "bronze": 33.5,
+   "scale_plates": 32.3,
+   "belt_leather": 1.6,
+   "torn_cloth": 10.4,
+   "teal_sash": 24.1,
+   "gold_pattern": 32.6,
+   "ankle_wraps": 15.2,
+   "wrap_linen": 28.6
+  },
+  "biomes": [
+   {
+    "biome": "cinder_wastes",
+    "name": "Cinder Wastes",
+    "ground": "#2B1B15",
+    "accent": "#FF8A2A",
+    "dL_vs_ground": {
+     "gauntlet_rock": 1.3,
+     "skin": 40.1,
+     "bronze": 32.8,
+     "teal_sash": 23.4,
+     "lava_glow": 51.7
+    },
+    "dE_lava_hot_vs_biome_accent": 15.7
+   },
+   {
+    "biome": "verdant_ruin",
+    "name": "Verdant Ruin",
+    "ground": "#1C2A21",
+    "accent": "#5CF2B0",
+    "dL_vs_ground": {
+     "gauntlet_rock": -2.7,
+     "skin": 36.1,
+     "bronze": 28.8,
+     "teal_sash": 19.4,
+     "lava_glow": 47.7
+    },
+    "dE_lava_hot_vs_biome_accent": 107.0
+   },
+   {
+    "biome": "hollow_spire",
+    "name": "The Hollow Spire",
+    "ground": "#1B1D36",
+    "accent": "#A9C8FF",
+    "dL_vs_ground": {
+     "gauntlet_rock": 1.1,
+     "skin": 39.9,
+     "bronze": 32.6,
+     "teal_sash": 23.2,
+     "lava_glow": 51.5
+    },
+    "dE_lava_hot_vs_biome_accent": 94.8
+   },
+   {
+    "biome": "the_unmaking",
+    "name": "The Unmaking",
+    "ground": "#140B1F",
+    "accent": "#E24BFF",
+    "dL_vs_ground": {
+     "gauntlet_rock": 8.5,
+     "skin": 47.3,
+     "bronze": 40.0,
+     "teal_sash": 30.6,
+     "lava_glow": 58.9
+    },
+    "dE_lava_hot_vs_biome_accent": 119.5
+   }
+  ],
+  "biomes_note": "ground = the biome's albedo tint from biomes.ron (unlit); the lit floor in game is lighter. Treat these as worst-case value contrast, not a render."
+ }
+}

@@ -1,0 +1,96 @@
+{
+ "asset": "brax",
+ "references": [
+  {
+   "path": "art/characters/brax/references/BRAX_front_approved.png",
+   "bytes": 1546089,
+   "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+   "role": "approved front concept (stage 0, approved by the user)",
+   "in_git": true,
+   "approved_by": "user"
+  },
+  {
+   "path": "art/characters/brax/references/brax_concept_front.png",
+   "bytes": 1546089,
+   "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+   "role": "byte-identical copy used as the stage-1 TRELLIS.2 input (git stores one blob for both)",
+   "in_git": true
+  },
+  {
+   "path": "docs/media/playable_characters/BRAX.png",
+   "bytes": 1546089,
+   "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+   "role": "the user's original of the approved front, outside the art tree",
+   "in_git": false,
+   "note": "untracked in git at the time of writing; the art track does not commit files outside its working area"
+  }
+ ],
+ "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The 'files' list below is written by tools/comfy/art_manifest.py (raw output that stays local).",
+ "updated": "2026-09-25T14:55:51",
+ "policy": "files listed with in_git=false stay local (art/.gitignore); verify a copy by sha256",
+ "files": [
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s101.glb",
+   "bytes": 63003240,
+   "sha256": "d3163cad4464d31e72ddf41c8983ff5c6cb8dc59d64d2cce7e9d5eaf8ec1385f",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s101_cond.png",
+   "bytes": 607084,
+   "sha256": "4c3f27ead7330ce30695c1b0b13f5b31868affb52fba0473bc619103b8699a9f",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s101_mask.png",
+   "bytes": 130258,
+   "sha256": "4f8ebe12f3ffa30506a02571fa2777924c431009cdadad2178cf529c885a012c",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s202.glb",
+   "bytes": 62871556,
+   "sha256": "071de67e92deef2512b593f610c04c445c23d694a65bac9a1fa8f188f7c0b144",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s202_cond.png",
+   "bytes": 607084,
+   "sha256": "4c3f27ead7330ce30695c1b0b13f5b31868affb52fba0473bc619103b8699a9f",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s202_mask.png",
+   "bytes": 130258,
+   "sha256": "4f8ebe12f3ffa30506a02571fa2777924c431009cdadad2178cf529c885a012c",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s303.glb",
+   "bytes": 66195536,
+   "sha256": "0ba6741ec2951a24cdeb14210397aa937800a6c5185af784e226b9c502e00514",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s303_cond.png",
+   "bytes": 607084,
+   "sha256": "4c3f27ead7330ce30695c1b0b13f5b31868affb52fba0473bc619103b8699a9f",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/brax/source/brax_trellis2_s303_mask.png",
+   "bytes": 130258,
+   "sha256": "4f8ebe12f3ffa30506a02571fa2777924c431009cdadad2178cf529c885a012c",
+   "in_git": false,
+   "provenance": "art/characters/brax/source/brax_trellis2_s303.json"
+  }
+ ]
+}

@@ -1,0 +1,129 @@
+{
+ "asset": "brax",
+ "name": "Brax, The Furnace-Born",
+ "pipeline": "docs/ART_PIPELINE.md",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "0_concept_reference": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [
+    "art/characters/brax/references/BRAX_front_approved.png",
+    "art/characters/brax/brief.md",
+    "art/characters/brax/turnaround_prompts.md",
+    "art/characters/brax/palette.json",
+    "art/characters/brax/color_script.png",
+    "art/characters/brax/reports/stage0_readability.png",
+    "art/characters/brax/reports/stage0_palette_samples.png"
+   ],
+   "notes": "The front is approved by the user. The side, 3/4, back, expression, gauntlet and colour-script sheets have ready-to-paste prompts and wait for a human to generate and approve them. The palette and colour callouts are measurements of the approved front, not new design.",
+   "items": {
+    "front": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/BRAX.png",
+     "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+     "outputs": ["art/characters/brax/references/BRAX_front_approved.png"],
+     "notes": "The user supplied it as the approved front concept (1536x1024, T-pose, flat navy background). references/brax_concept_front.png is a byte-identical copy that the stage-1 track uses as TRELLIS input."
+    },
+    "side": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#1-side-view-left-profile",
+     "notes": "Prompt ready. Generate it in ChatGPT with the front attached, check it against the acceptance list, and save it as references/BRAX_side_approved.png."
+    },
+    "three_quarter": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#2-front-three-quarter-view",
+     "notes": "Prompt ready."
+    },
+    "back": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#3-back-view",
+     "notes": "Prompt ready. It includes a proposed back design (cracks over the shoulder blades, no second sigil) that the approver confirms or changes first."
+    },
+    "expression": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#4-expression-sheet",
+     "notes": "Prompt ready: 6 heads. Used for portraits, the codex and close-ups; the face is 1-2 px in gameplay."
+    },
+    "weapon_gauntlet": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#5-gauntlet-weapon-sheet",
+     "notes": "Prompt ready: 8 orthographic views including the closed fist, which stage 3 needs for rigging the finger plates."
+    },
+    "color_script": {
+     "status": "pending_human", "human_signoff_required": true, "outputs": [],
+     "prompt": "art/characters/brax/turnaround_prompts.md#6-colour-script",
+     "notes": "Prompt ready: flat, approved, game light, Heat 0, Heat max and Meltdown states. The measured palette item below stands in for this sheet's colour values until it is approved."
+    },
+    "palette": {
+     "status": "stand_in", "stand_in": true, "human_signoff_required": false,
+     "outputs": [
+      "art/characters/brax/palette.json",
+      "art/characters/brax/color_script.png",
+      "art/characters/brax/reports/stage0_palette_samples.png"
+     ],
+     "tool": "tools/comfy/palette_extract.py art/characters/brax/palette_spec.json",
+     "notes": "Automated measurement of the approved front (13 swatches, shadow/base/highlight). The values are exact for the front plate, so engineering can use them for shader and UI colours now. This is a STAND-IN for the painted colour-script sheet, which it does not replace: it has no lighting states and no Heat or Meltdown looks."
+    },
+    "brief": {
+     "status": "done", "human_signoff_required": false,
+     "outputs": ["art/characters/brax/brief.md"],
+     "notes": "Built from the content rows, the approved front and measurements. The design proposals in section 7 are decided by the approver through the pending sheets."
+    },
+    "turnaround_prompts": {
+     "status": "done", "human_signoff_required": false,
+     "outputs": ["art/characters/brax/turnaround_prompts.md"]
+    },
+    "readability_check": {
+     "status": "done", "human_signoff_required": false,
+     "outputs": ["art/characters/brax/reports/stage0_readability.png"],
+     "tool": "tools/comfy/readability_sheet.py brax art/characters/brax/references/BRAX_front_approved.png",
+     "notes": "2D approximation: the front plate at 65/86 px, on the biome grounds and pasted into a client frame. Findings are in brief.md section 5. The real check through the 55-degree camera belongs to stage 1."
+    }
+   }
+  },
+  "1_blockout": {
+   "status": "in_progress",
+   "human_signoff_required": false,
+   "outputs": [],
+   "notes": "Owned by the parallel stage-1 track (tools/comfy/run_trellis.py). TRELLIS.2 seeds s101, s202 and s303 were in source/ (local, gitignored, listed in manifest.json) by 14:55 on 2026-09-25, with review sheets in reports/blockout/. That track sets this entry when it picks a seed. SCULPT REFERENCE ONLY: never shipped, never copied to assets/models/."
+  },
+  "2_production_mesh": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Human artist in Blender 5.2: manual retopo (~15-25k tris), clean shoulder/elbow/knee loops, UVs, hand-painted NPR textures (palette.json values, brief.md sections 4 and 6). Any automated retopo or decimation made so engineering can proceed is a stand_in."
+  },
+  "3_rig": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The GF_Hero_v1 master skeleton does not exist yet (docs/ART_PIPELINE.md describes the plan). Auto-rig plus hand weight-paint fixes; a human signs off the weight painting (shoulders, hands, face)."
+  },
+  "4_animation": {
+   "status": "not_started",
+   "human_signoff_required": false,
+   "outputs": [],
+   "notes": "The shared clip set on GF_Hero_v1 plus Brax's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only."
+  },
+  "5_export_validate": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Headless Blender CI writes assets/models/characters/brax.glb, uncompressed because bevy_gltf 0.20 supports no Draco, meshopt or quantisation. A human applies the final Hades-II bar."
+  }
+ },
+ "human_gates": [
+  {"gate": "stage 0: approve the side, 3/4, back, expression, gauntlet and colour-script sheets", "state": "pending_human"},
+  {"gate": "stage 0: confirm or change the back / fist / Heat / Meltdown proposals before generating", "state": "pending_human"},
+  {"gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)", "state": "pending_human"},
+  {"gate": "stage 2: human retopo and hand-painted NPR textures", "state": "not_started"},
+  {"gate": "stage 3: weight-paint sign-off", "state": "not_started"},
+  {"gate": "stage 5: final Hades-II bar", "state": "not_started"}
+ ]
+}
