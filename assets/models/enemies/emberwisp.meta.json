@@ -1,0 +1,195 @@
+{
+ "kind": "enemy",
+ "key": "emberwisp",
+ "tier": "swarm",
+ "tris": 868,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "emberwisp_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 167025
+  },
+  {
+   "name": "emberwisp_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 181739
+  }
+ ],
+ "sockets": {
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.6,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.6,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    0.6129,
+    0.0734
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    1.23,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "emberwisp_idle@loop",
+  "emberwisp_move@loop",
+  "emberwisp_windup",
+  "emberwisp_attack",
+  "emberwisp_hit",
+  "emberwisp_death"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.2365,
+   0.3772,
+   -0.7328
+  ],
+  "max": [
+   0.2888,
+   1.07,
+   0.1444
+  ]
+ },
+ "size_m": 0.693,
+ "glb": "assets/models/enemies/emberwisp.glb",
+ "glb_bytes": 464092,
+ "glb_sha256": "e37f71221ba2864b45e739977129bc5846b5bea37e08cf939d0a9dd229200b10",
+ "source_blend": "art/enemies/emberwisp/source/emberwisp.blend",
+ "build_script": "tools/blender/gf_assets/enemies/emberwisp.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "emberwisp",
+ "faction": "fallen_godworks",
+ "look": "a soot-blackened god-bronze mask-head (the dark core) in a cup and ring of cold-gold flame that cools to dead ember, with a forked tail; the mask's upper-left corner is broken open onto the fire",
+ "hover_m": {
+  "core_centre": 0.6,
+  "flame_bottom": 0.3772,
+  "flame_top": 1.07
+ },
+ "bones": {
+  "root": "hover bob and tilts",
+  "body": "the mask-head core (persists; it falls in the death)",
+  "head": "the flame hood cupping the core",
+  "legs_a": "tongue group A (flickers against B)",
+  "legs_b": "tongue group B",
+  "tail": "the forked tail and its two sparks"
+ },
+ "move_cycle_m": 2.52,
+ "move_note": "move@loop is the erratic drift (0.6 s): play it at speed / move_cycle_m cycles per second (1x at the row speed 4.2 m/s). Clips play in place; the Swarmer jitter moves the entity",
+ "death_note": "death: the flame gutters, the core swells, the fire bursts outward and is gone by frame 14 (0.47 s); spawn the death_burst VFX (row death_burst radius 1.6) at fx_core around frame 11 (0.37 s). The blackened mask then tumbles to the ground and crumbles (held at 2 %)",
+ "windup_note": "windup: the flame gutters inward, then flares wide as the wisp rears back; attack: a 0.3 m dart forward and back (in place overall). The Swarmer has no windup state yet",
+ "content_row": {
+  "key": "emberwisp",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 20,
+  "speed": 4.2,
+  "radius": 0.34,
+  "scale": 1.0,
+  "behavior": "Swarmer(jitter: 1.4)",
+  "color": "#FFD27A",
+  "shape": "Wisp",
+  "pack": "(2, 3)",
+  "death_burst": "(1.6, 16.0)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 214.1,
+   "p10": 198.2,
+   "p90": 430.5
+  },
+  "coverage": 0.502
+ },
+ "skin": {
+  "vertices": 492,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 127,
+   "head": 52,
+   "legs_a": 132,
+   "legs_b": 99,
+   "tail": 82
+  }
+ }
+}

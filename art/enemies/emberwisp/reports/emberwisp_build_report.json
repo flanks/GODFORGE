@@ -1,0 +1,349 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\emberwisp.glb",
+  "key": "emberwisp",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 868,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "emberwisp_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 167025
+   },
+   {
+    "name": "emberwisp_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 181739
+   }
+  ],
+  "materials": [
+   "M_emberwisp"
+  ],
+  "sockets": {
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.6,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.6129,
+     0.0734
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     1.23,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.2365,
+    0.3772,
+    -0.7328
+   ],
+   "max": [
+    0.2888,
+    1.07,
+    0.1444
+   ]
+  },
+  "height_m": 0.693,
+  "height_vs_hero": 0.315,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "emberwisp_idle@loop",
+   "emberwisp_move@loop",
+   "emberwisp_windup",
+   "emberwisp_attack",
+   "emberwisp_hit",
+   "emberwisp_death"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 214.1,
+   "p10": 198.2,
+   "p90": 430.5
+  },
+  "coverage": 0.502,
+  "zones": [
+   "mask",
+   "crust",
+   "ember",
+   "flame",
+   "tongue",
+   "tail",
+   "spark"
+  ],
+  "decals": 2,
+  "basecolor": "art/enemies/emberwisp/textures/emberwisp_basecolor.png",
+  "emissive": "art/enemies/emberwisp/textures/emberwisp_emissive.png",
+  "emissive_texels": 181023,
+  "seconds": 63.0
+ },
+ "skin": {
+  "vertices": 492,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 127,
+   "head": 52,
+   "legs_a": 132,
+   "legs_b": 99,
+   "tail": 82
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "head_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 64
+  },
+  {
+   "id": 1,
+   "name": "head_ember",
+   "zone": "ember",
+   "bone": "body",
+   "faces": 3
+  },
+  {
+   "id": 2,
+   "name": "head_mask",
+   "zone": "mask",
+   "bone": "body",
+   "faces": 13
+  },
+  {
+   "id": 3,
+   "name": "crest",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 17
+  },
+  {
+   "id": 4,
+   "name": "hood",
+   "zone": "flame",
+   "bone": "head",
+   "faces": 60
+  },
+  {
+   "id": 5,
+   "name": "tongue_40",
+   "zone": "tongue",
+   "bone": "legs_a",
+   "faces": 33
+  },
+  {
+   "id": 6,
+   "name": "tongue_96",
+   "zone": "tongue",
+   "bone": "legs_b",
+   "faces": 33
+  },
+  {
+   "id": 7,
+   "name": "tongue_140",
+   "zone": "tongue",
+   "bone": "legs_a",
+   "faces": 33
+  },
+  {
+   "id": 8,
+   "name": "tongue_180",
+   "zone": "tongue",
+   "bone": "legs_b",
+   "faces": 33
+  },
+  {
+   "id": 9,
+   "name": "tongue_222",
+   "zone": "tongue",
+   "bone": "legs_a",
+   "faces": 33
+  },
+  {
+   "id": 10,
+   "name": "tongue_266",
+   "zone": "tongue",
+   "bone": "legs_b",
+   "faces": 33
+  },
+  {
+   "id": 11,
+   "name": "tongue_318",
+   "zone": "tongue",
+   "bone": "legs_a",
+   "faces": 33
+  },
+  {
+   "id": 12,
+   "name": "tail",
+   "zone": "tail",
+   "bone": "tail",
+   "faces": 49
+  },
+  {
+   "id": 13,
+   "name": "tail_fork",
+   "zone": "tail",
+   "bone": "tail",
+   "faces": 21
+  },
+  {
+   "id": 14,
+   "name": "spark",
+   "zone": "spark",
+   "bone": "tail",
+   "faces": 8
+  },
+  {
+   "id": 15,
+   "name": "spark",
+   "zone": "spark",
+   "bone": "tail",
+   "faces": 8
+  }
+ ],
+ "tris_blender": 868,
+ "clips": [
+  {
+   "name": "emberwisp_idle@loop",
+   "frames": [
+    0,
+    48
+   ],
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "emberwisp_move@loop",
+   "frames": [
+    0,
+    18
+   ],
+   "seconds": 0.6,
+   "loop": true
+  },
+  {
+   "name": "emberwisp_windup",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "emberwisp_attack",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "emberwisp_hit",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": false
+  },
+  {
+   "name": "emberwisp_death",
+   "frames": [
+    0,
+    25
+   ],
+   "seconds": 0.833,
+   "loop": false
+  }
+ ]
+}

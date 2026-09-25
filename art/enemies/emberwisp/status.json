@@ -1,0 +1,35 @@
+{
+ "asset": "emberwisp",
+ "kind": "enemy",
+ "tier": "swarm",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/emberwisp.glb",
+    "assets/models/enemies/emberwisp.meta.json",
+    "art/enemies/emberwisp/source/emberwisp.blend",
+    "art/enemies/emberwisp/textures/emberwisp_basecolor.png",
+    "art/enemies/emberwisp/textures/emberwisp_emissive.png",
+    "art/enemies/emberwisp/reports/emberwisp_review.png",
+    "art/enemies/emberwisp/reports/emberwisp_crowd_review.png",
+    "art/enemies/emberwisp/reports/emberwisp_crowd.png",
+    "art/enemies/emberwisp/reports/emberwisp_build_report.json"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/emberwisp.py (model, heat-band flame paint, GF_Swarm_v1 rig, six clips, export, review sheets and the 40-copy horde render mixed with clinkers)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ },
+ "skeleton": "GF_Swarm_v1",
+ "faction": "fallen_godworks"
+}
