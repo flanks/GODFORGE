@@ -88,10 +88,30 @@
    }
   },
   "1_blockout": {
-   "status": "in_progress",
+   "status": "done",
+   "stand_in": false,
+   "sculpt_reference_only": true,
+   "shipped": false,
    "human_signoff_required": false,
-   "outputs": [],
-   "notes": "Owned by the parallel stage-1 track (tools/comfy/run_trellis.py). TRELLIS.2 seeds s101, s202 and s303 were in source/ (local, gitignored, listed in manifest.json) by 14:55 on 2026-09-25, with review sheets in reports/blockout/. That track sets this entry when it picks a seed. SCULPT REFERENCE ONLY: never shipped, never copied to assets/models/."
+   "selected": "art/characters/brax/source/brax_trellis2_s202.glb",
+   "selected_sha256": "071de67e92deef2512b593f610c04c445c23d694a65bac9a1fa8f188f7c0b144",
+   "outputs": [
+    "art/characters/brax/reports/blockout_report.md",
+    "art/characters/brax/reports/blockout/blockout_selected.png",
+    "art/characters/brax/reports/blockout/blockout_compare.png",
+    "art/characters/brax/reports/blockout/input_maskcheck.png",
+    "art/characters/brax/reports/blockout/brax_trellis2_s{101,202,303}_{turnaround,closeups,ingame,silhouette}.png",
+    "art/characters/brax/source/brax_trellis2_s{101,202,303}.json",
+    "art/characters/brax/source/brax_trellis2_s{101,202,303}.glb (local only, gitignored; sha256 in manifest.json)"
+   ],
+   "tools": [
+    "tools/comfy/run_trellis.py",
+    "tools/comfy/trellis2_character_api.json",
+    "tools/blender/gf_hero/render_blockout.py",
+    "tools/comfy/blockout_sheets.py",
+    "tools/comfy/art_manifest.py"
+   ],
+   "notes": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. TRELLIS.2 (Pixal3D pruned) on the approved front, birefnet cut-out verified (full arm span and fingertips kept), 3 seeds (101/202/303) at the user's character settings (700k faces, 4096 px). s202 picked for its faceted gauntlet plates, head/beard and colour blocking; known defects (thin fingers, no lava-crack geometry or emissives, soft face, detached lower-leg shells under the skirt, fused cloth, baked lighting) are listed in reports/blockout_report.md section 6. The seed pick is an engineering judgement; the stage-2 artist may switch to s101 (single watertight surface) and should treat the concept and the approved sheets as the authority wherever the mesh disagrees."
   },
   "2_production_mesh": {
    "status": "not_started",

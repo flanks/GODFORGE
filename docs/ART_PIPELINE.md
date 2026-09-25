@@ -150,7 +150,7 @@ which has PIL and numpy. The other art tools use only the standard library.
    mask and the exact conditioning crop. Check that the mask covers the full silhouette (T-pose arm
    span, fingertips, dark props on a dark ground). If birefnet eats a part, feed a cut-out with a
    verified alpha instead and pass `--own-mask`.
-2. **Generate** (≈ 10-25 min per seed on the RTX 4070 Laptop, one job at a time — the GPU is shared):
+2. **Generate** (283-401 s per seed measured for Brax on the RTX 4070 Laptop, one job at a time — the GPU is shared):
    `python -u tools/comfy/run_trellis.py <key> <concept.png> --seed 101 --seed 202 --seed 303`
    - graph: `tools/comfy/trellis2_character_api.json`, a verbatim copy of the user's TRELLIS.2 graph;
      patches are applied in memory and written to the provenance JSON;
@@ -163,13 +163,21 @@ which has PIL and numpy. The other art tools use only the standard library.
    Output: `art/characters/<key>/source/<key>_trellis2_s<seed>.glb` + `.json` (+ `_cond.png`, `_mask.png`).
 3. **Review renders** (headless Blender, per seed):
    `blender -b -P tools/blender/gf_hero/render_blockout.py -- <glb> art/characters/<key>/work/renders/<stem> <stem>`
-   normalises the mesh to 2.2 m, renders textured + clay turnarounds, close-ups, and the in-game
-   camera (orthographic, 55° pitch, yaw 0, 22 m / 28 m view heights at 1080p pixel scale), and writes
-   topology metrics (components, holes, non-manifold edges).
-4. **Sheets + concept IoU**: `standalone-env/python.exe tools/comfy/blockout_sheets.py ...` builds the
-   committed review sheets and the front-silhouette IoU against the concept mask.
-5. **Pick a seed** by eye against the concept; write `reports/blockout_report.md`; set stage 1 to
-   `done` with the note SCULPT REFERENCE ONLY. The blockout never goes to `assets/models/`.
+   normalises the mesh to 2.2 m (feet on z = 0, facing Blender −Y), renders lit, clay and unlit-albedo
+   turnarounds, close-ups (the head's side view is clipped so the T-pose arm does not hide it), the
+   in-game camera (orthographic, 55° pitch, yaw 0, 22 m / 28 m view heights at 1080p pixel scale), and
+   diagnostics (connected components in colour, mid-plane sections). It writes topology metrics per
+   body region: components, open boundary loops, non-manifold edges. About 25 s per seed.
+4. **Sheets + concept IoU**: `<comfy-python> tools/comfy/blockout_sheets.py <renders> <reports/blockout> <concept> <mask> <stems...> [--selected <stem>]`
+   builds the committed review sheets (every PNG < 2 MB) and the front-silhouette IoU against the
+   concept mask. The IoU barely separates seeds, because TRELLIS.2 is conditioned on that exact
+   silhouette. The pick comes from the close-ups and the views the concept does not show.
+5. **Pick a seed** by eye against the concept, write `reports/blockout_report.md`, record the local
+   GLBs with `python tools/comfy/art_manifest.py <key> --selected <glb>`, and set stage 1 to `done`
+   with the note SCULPT REFERENCE ONLY. The blockout never goes to `assets/models/`.
+
+Result for Brax (2026-09-25): three seeds; **s202** picked (faceted gauntlet plates, head/beard,
+colour blocking). Known defects are listed in `art/characters/brax/reports/blockout_report.md` §6.
 
 ## 5. Stages 2-4 (planned; nothing built yet)
 

@@ -13,7 +13,7 @@ Nothing here is final. The Hades-II bar is a human gate at stage 5.
 | Stage | Status | Waiting on |
 |---|---|---|
 | 0 Concept & reference | **pending_human** | The front is approved (user). Side, 3/4, back, expression, gauntlet and colour-script sheets have prompts ready in [`turnaround_prompts.md`](turnaround_prompts.md) and wait for a human to generate and approve them (record approvals with `tools/comfy/approve_sheet.py`). The measured palette is a `stand_in` for the colour-script sheet. |
-| 1 Blockout (TRELLIS.2) | in_progress | Owned by the stage-1 track. It produces a sculpt reference only. |
+| 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated; **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)). The GLBs stay local (gitignored, sha256 in `manifest.json`), are never shipped and never go to `assets/models/`. |
 | 2 Production mesh | not_started | Human retopo + hand-painted NPR textures (human gate). |
 | 3 Rig | not_started | The GF_Hero_v1 master skeleton, then a human weight-paint sign-off. |
 | 4 Animation | not_started | Shared clip set + Brax's unique set (proposal in [`brief.md`](brief.md) §8). |

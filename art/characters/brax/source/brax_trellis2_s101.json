@@ -1,0 +1,77 @@
+{
+ "asset": "brax",
+ "stage": "1-blockout",
+ "use": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/",
+ "tool": "tools/comfy/run_trellis.py",
+ "model": "TRELLIS.2 (trellis_2_int8_convrot, trellis_2 shape/texture VAEs bf16), DINOv3-L conditioning, birefnet background removal; Pixal3D branch pruned (licence not cleared)",
+ "licence": "TRELLIS.2 code + weights MIT, run locally. The graph's DINOv3-L conditioning encoder is under Meta's DINOv3 licence (not MIT, not yet read for GODFORGE: pending_human gate in status.json); BiRefNet MIT per its repository. Pixal3D pruned.",
+ "comfyui": {
+  "url": "http://127.0.0.1:8188",
+  "version": "0.37.0",
+  "prompt_id": "00983fd7-7bf0-4bc3-9c69-f6480144e376",
+  "output": "3d/GF_brax_s101_00001.glb",
+  "attempts": 1
+ },
+ "input_image": {
+  "path": "art/characters/brax/references/brax_concept_front.png",
+  "sha256": "407114e70401b4daf85bea3b63e31398088653d62f456b8b7ac0508c1bd08b64",
+  "uploaded_as": "brax_concept_front.png"
+ },
+ "graph": {
+  "template": "tools/comfy/trellis2_character_api.json",
+  "template_sha256": "8471ef6d3b29a4c702aa95a6ad3781a562d6219d8b4e9075ec31f42504bb133c",
+  "submitted_sha256": "704312f0e3423712c3792bfa66140857b4c5e056df4631461ea71b199529bb40",
+  "patched_inputs": {
+   "122.image": "brax_concept_front.png",
+   "316.value": true,
+   "pruned_pixal3d_nodes": [
+    "319",
+    "298",
+    "242",
+    "56",
+    "55"
+   ],
+   "248.switch": true,
+   "312.background": "#808080",
+   "322.filename_prefix": "3d/GF_brax_s101",
+   "3.seed": 104,
+   "18.seed": 119,
+   "23.seed": 124,
+   "12.seed": 113,
+   "186.target_face_count": 700000,
+   "288.value": 4096,
+   "224.resolution": 2048
+  },
+  "template_sha256_note": "sha256 of the template with LF line endings; the run read a CRLF copy (sha256 9d5c4c317c94045a2b11a4db69c23136be9be3fbd5a2921ac9e5504e9aa606ec) with identical JSON content"
+ },
+ "seed": 101,
+ "node_seeds": {
+  "3": 104,
+  "18": 119,
+  "23": 124,
+  "12": 113
+ },
+ "settings": {
+  "target_faces": 700000,
+  "texture_px": 4096,
+  "background": "#808080",
+  "mask_source": "birefnet"
+ },
+ "timings": {
+  "execution_start_ms": 1790339615290,
+  "execution_end_ms": 1790339898236,
+  "execution_seconds": 282.9,
+  "wall_seconds": 285.4,
+  "generated": "2026-09-25T14:38:20"
+ },
+ "high_poly_info": "Vertices:   5,670,458 (5.67M); Faces:      11,328,012 (11.33M); Attributes: none",
+ "output": {
+  "path": "art/characters/brax/source/brax_trellis2_s101.glb",
+  "bytes": 63003240,
+  "sha256": "d3163cad4464d31e72ddf41c8983ff5c6cb8dc59d64d2cce7e9d5eaf8ec1385f"
+ },
+ "previews": {
+  "cond": "art/characters/brax/source/brax_trellis2_s101_cond.png",
+  "mask": "art/characters/brax/source/brax_trellis2_s101_mask.png"
+ }
+}
