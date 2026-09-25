@@ -6,6 +6,7 @@
 //! transport, so single-player and co-op share every code path (§20.3).
 
 pub mod camera;
+pub mod envkit;
 pub mod hud;
 pub mod input;
 pub mod materials;
@@ -16,6 +17,7 @@ pub mod scene;
 pub mod terrain;
 pub mod ui;
 pub mod vfx;
+pub mod world;
 
 use gf_content::ContentDb;
 use gf_core::aim::AimMode;
@@ -101,6 +103,7 @@ impl Plugin for ClientPlugin {
         palette::build(app);
         camera::build(app);
         scene::build(app);
+        world::build_plugin(app);
         vfx::build(app);
         hud::build(app);
         offscreen::build(app);

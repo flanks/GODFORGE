@@ -96,6 +96,9 @@ pub struct Palette {
     pub blob_texture: Handle<Image>,
     /// Hand-painted block face (ink border, bevel light, brushwork) for architecture primitives.
     pub block_texture: Handle<Image>,
+    /// The env kit's stone atlas: a painted block face on the left half (u < 0.5), borderless
+    /// brushed stone on the right half (lathes, bevels, cloth).
+    pub env_texture: Handle<Image>,
     pub players: [Color; 4],
     pub danger: Color,
     sectors: HashMap<u8, Handle<Mesh>>,
@@ -359,6 +362,7 @@ fn setup(
         rock_texture: images.add(rgba_image(ROCK_SIZE, ROCK_SIZE, rock_pixels(ROCK_SIZE), true)),
         blob_texture: images.add(rgba_image(BLOB_SIZE, BLOB_SIZE, blob_pixels(BLOB_SIZE), false)),
         block_texture: images.add(rgba_image(BLOCK_SIZE, BLOCK_SIZE, block_pixels(BLOCK_SIZE), false)),
+        env_texture: images.add(rgba_image(ENV_SIZE * 2, ENV_SIZE, env_pixels(ENV_SIZE), false)),
         players: [
             hex(&game.player_colors[0]),
             hex(&game.player_colors[1]),
@@ -378,6 +382,8 @@ fn setup(
 const ROCK_SIZE: u32 = 256;
 const BLOB_SIZE: u32 = 64;
 const BLOCK_SIZE: u32 = 128;
+/// Height of the env atlas (its block half holds four faces of half this size).
+const ENV_SIZE: u32 = 512;
 
 fn hash(x: i32, y: i32, k: u32) -> f32 {
     let mut h =
@@ -473,6 +479,128 @@ fn block_pixels(size: u32) -> Vec<u8> {
         }
     }
     out
+}
+
+/// The env kit's stone atlas, `2 × size` wide: the painted block face on the left, and on the
+/// right borderless stone with vertical brush drags and a few chisel marks (lathes and bevels map
+/// it, so turned and bevelled stone reads painted without a border on every facet).
+fn env_pixels(size: u32) -> Vec<u8> {
+    // Left half: four painted block faces (2 × 2 cells of `size / 2`); right half: turned stone.
+    let cell = size / 2;
+    let faces: Vec<Vec<f32>> = (0..4).map(|k| stone_face(cell, k)).collect();
+    let mut out = Vec::with_capacity((size * size * 8) as usize);
+    let to8 = |f: f32| (f.clamp(0.0, 1.0) * 255.0) as u8;
+    for py in 0..size {
+        for px in 0..size {
+            let (cx, cy) = (px / cell, py / cell);
+            let lum = faces[(cy * 2 + cx) as usize][((py % cell) * cell + px % cell) as usize];
+            out.extend_from_slice(&[to8(lum), to8(lum * 0.985), to8(lum * 0.965), 255]);
+        }
+        for px in 0..size {
+            let u = (px as f32 + 0.5) / size as f32;
+            let v = (py as f32 + 0.5) / size as f32;
+            let n = 0.5 * vnoise(u * 5.0, v * 5.0, 5)
+                + 0.3 * vnoise(u * 13.0 + 2.0, v * 13.0, 13)
+                + 0.2 * vnoise(u * 29.0, v * 29.0, 29);
+            // Vertical drags of a loaded brush, a few horizontal tool marks.
+            let drag = vnoise(u * 16.0, v * 2.0 + 5.0, 16);
+            let mut lum = 0.8 + 0.26 * (n - 0.5) + 0.12 * (drag - 0.5);
+            let band = (v * 7.0 + (vnoise(u * 8.0, 3.0, 8) - 0.5) * 0.3).fract();
+            if band < 0.035 {
+                lum *= 0.9;
+            }
+            // Sparse chisel nicks.
+            let nick = vnoise(u * 21.0 + 4.0, v * 21.0 + 9.0, 21);
+            if nick > 0.8 {
+                lum *= 0.8;
+            }
+            out.extend_from_slice(&[to8(lum), to8(lum * 0.985), to8(lum * 0.965), 255]);
+        }
+    }
+    out
+}
+
+/// One hand-painted stone block face (luminance, row-major `size²`), variant `k`: soft value
+/// clouds and brush drags, a lit upper-left bevel and a shadowed lower-right one, chipped edges,
+/// a crack or two with a light lip, soot toward the foot, a crisp ink border.
+fn stone_face(size: u32, k: u32) -> Vec<f32> {
+    let n = size as usize;
+    let mut lum = vec![0.0f32; n * n];
+    let seed = k * 97 + 13;
+    let off = k as f32 * 3.7;
+    for py in 0..n {
+        for px in 0..n {
+            let u = (px as f32 + 0.5) / size as f32;
+            let v = (py as f32 + 0.5) / size as f32;
+            let cloud = vnoise(u * 3.0 + off, v * 3.0, 3);
+            let fine = 0.6 * vnoise(u * 9.0 + off, v * 9.0, 9) + 0.4 * vnoise(u * 23.0, v * 23.0 + off, 23);
+            let drag = vnoise(u * 3.0 + v * 1.5 + off, v * 11.0, 11);
+            let mut l = 0.74 + 0.16 * (cloud - 0.5) + 0.12 * (fine - 0.5) + 0.07 * (drag - 0.5);
+            // Soot creeping up from the foot, a lighter crown.
+            l *= 0.9 + 0.14 * (1.0 - v);
+            let edge = u.min(1.0 - u).min(v.min(1.0 - v));
+            // Bevel: light on the upper-left lips, dark on the lower-right.
+            let lip = (1.0 - ((edge - 0.02) / 0.06).clamp(0.0, 1.0)).powf(1.4);
+            let lit = if u.min(v) <= (1.0 - u).min(1.0 - v) { 0.16 } else { -0.2 };
+            l += lip * lit;
+            // Chips bitten out of the edges.
+            let chip = vnoise(u * 13.0 + off * 2.0, v * 13.0 + 5.0, 13);
+            if edge < 0.08 && chip > 0.68 {
+                l *= 0.62;
+            } else if edge < 0.1 && chip > 0.64 {
+                l += 0.08;
+            }
+            // Grit.
+            l *= 0.94 + 0.12 * hash(px as i32, py as i32, seed);
+            lum[py * n + px] = l;
+        }
+    }
+    // Cracks: a jagged walk in from an edge, a dark line with a lit lip on one side.
+    let cracks = 1 + (hash(k as i32, 7, 3) * 2.0) as u32;
+    for c in 0..cracks {
+        let mut x = hash(k as i32, c as i32, 11) * 0.8 + 0.1;
+        let mut y = if c % 2 == 0 { 0.02 } else { 0.98 };
+        let mut dir = if c % 2 == 0 { 1.0f32 } else { -1.0 };
+        let steps = 10 + (hash(k as i32, c as i32, 12) * 14.0) as u32;
+        for s in 0..steps {
+            let dx = (hash(c as i32, s as i32, seed) - 0.5) * 0.09;
+            let dy = dir * (0.02 + 0.025 * hash(s as i32, c as i32, seed + 1));
+            if hash(s as i32, c as i32 + 9, seed) > 0.92 {
+                dir = -dir * 0.5 + 0.5 * dir.signum();
+            }
+            let (x1, y1) = ((x + dx).clamp(0.02, 0.98), (y + dy).clamp(0.02, 0.98));
+            let len = ((x1 - x).powi(2) + (y1 - y).powi(2)).sqrt().max(1e-4);
+            let pix = (len * size as f32).ceil() as u32 + 1;
+            for t in 0..=pix {
+                let f = t as f32 / pix as f32;
+                let (qx, qy) = (x + (x1 - x) * f, y + (y1 - y) * f);
+                let (ix, iy) = ((qx * size as f32) as i32, (qy * size as f32) as i32);
+                for (ox, oy, k2) in [(0, 0, 0.45), (1, 0, 0.7), (0, 1, 0.7), (-1, -1, 1.12)] {
+                    let (px, py) = (ix + ox, iy + oy);
+                    if px >= 0 && py >= 0 && (px as usize) < n && (py as usize) < n {
+                        let i = py as usize * n + px as usize;
+                        lum[i] = if k2 > 1.0 { lum[i].max(lum[i] * k2) } else { lum[i] * k2 };
+                    }
+                }
+            }
+            x = x1;
+            y = y1;
+            if !(0.03..=0.97).contains(&y) {
+                break;
+            }
+        }
+    }
+    // Crisp ink border.
+    for py in 0..n {
+        for px in 0..n {
+            let u = (px as f32 + 0.5) / size as f32;
+            let v = (py as f32 + 0.5) / size as f32;
+            let edge = u.min(1.0 - u).min(v.min(1.0 - v));
+            let ink = 1.0 - ((edge - 0.01) / 0.014).clamp(0.0, 1.0);
+            lum[py * n + px] *= 1.0 - 0.85 * ink;
+        }
+    }
+    lum
 }
 
 /// Soft radial falloff in alpha (contact shadows).
