@@ -1,0 +1,13 @@
+key,name,a,b,phase,effect,desc
+blightburn,Blightburn,Plague,Flame,P1,"Burst(radius: 3.2, damage_mult: 2.0, element: Flame, status: Burn)",Plague meets flame: the rot ignites.
+gravity_chain,Gravity Chain,Storm,Void,P1,"GravityChain(jumps: 4, range: 5.0, damage_mult: 1.2, pull: 6.0)",Lightning arcs through the well and drags the horde with it.
+firestorm,Firestorm,Flame,Storm,P1,"Field(radius: 3.0, duration: 3.0, dps_mult: 0.6, element: Storm, slow: 0.0)",A burning thunderhead squats on the target.
+collapsing_star,Collapsing Star,Flame,Void,P1,"Burst(radius: 3.6, damage_mult: 2.4, element: Void)",A fire so hungry it swallows itself.
+solar_flare,Solar Flare,Flame,Radiant,EA,"Burst(radius: 3.0, damage_mult: 1.8, element: Radiant, status: Mark)",Sunfire marks everything it scorches.
+toxic_conduit,Toxic Conduit,Storm,Plague,EA,"Burst(radius: 3.0, damage_mult: 1.5, element: Plague, status: Curse)",Shock carries the sickness from body to body.
+judgment_bolt,Judgment Bolt,Storm,Radiant,EA,"GravityChain(jumps: 3, range: 6.0, damage_mult: 1.6, pull: 0.0)",The sky delivers the verdict personally.
+entropy_bloom,Entropy Bloom,Void,Plague,EA,"Field(radius: 3.2, duration: 4.0, dps_mult: 0.5, element: Void, slow: 0.4)",Decay accelerates into a slowing bloom.
+eclipse,Eclipse,Void,Radiant,EA,"Burst(radius: 4.0, damage_mult: 2.2, element: Void, status: Curse)",Light and its absence annihilate.
+purge,Purge,Plague,Radiant,EA,"AllyHeal(radius: 6.0, amount: 20.0, damage_mult: 1.2)",Radiance burns out the plague and mends the faithful.
+shrapnel_blaze,Shrapnel Blaze,Kinetic,Flame,P1,"Burst(radius: 2.6, damage_mult: 1.6, element: Kinetic, status: Bleed)",Molten shrapnel tears through the pack.
+railshock,Railshock,Kinetic,Storm,P1,"GravityChain(jumps: 3, range: 5.0, damage_mult: 1.4, pull: 0.0)",Metal conducts. Violently.

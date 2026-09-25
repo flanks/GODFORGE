@@ -1,0 +1,50 @@
+key,name,slot,phase,god,weight,tags,mods,desc
+embercore,Embercore,Core,P0,,1.0,flame; bolt,"Element(Flame); Style(Bolt); ApplyStatus(status: Burn, chance: 0.35, stacks: 1, duration: 3.0)",Fire bolts that set the horde alight.
+stormcore,Stormcore,Core,P0,,1.0,storm; chain,"Element(Storm); Style(Arc); Chain(jumps: 2, range: 4.5, falloff: 0.65)",Chain arcs leap between the damned.
+voidcore,Voidcore,Core,P1,,1.0,void; gravity,"Element(Void); Style(Orb); GravityWell(radius: 2.2, pull: 5.0, duration: 1.5, dps: 0.25)",Impacts open gravity wells that drag enemies together.
+plaguecore,Plaguecore,Core,P1,,1.0,plague; puddle,"Element(Plague); Style(Globe); Puddle(radius: 1.8, duration: 3.5, dps: 0.35); ProjectileSpeed(0.8)",Slow globes that burst into festering pools.
+dawncore,Dawncore,Core,P1,,1.0,radiant; mark,"Element(Radiant); Style(Shard); ApplyStatus(status: Mark, chance: 0.25, stacks: 1, duration: 4.0); CritDamage(0.3)",Judgement shards that mark the guilty.
+ironcore,Ironcore,Core,P1,,1.0,kinetic; pierce,Element(Kinetic); Style(Slug); Pierce(1); Knockback(1.4); Damage(1.1),Honest metal. Goes through the first one.
+mech_ricochet,Ricochet,Mechanism,P0,,1.0,ricochet,"Ricochet(bounces: 2, range: 7.0); Damage(0.9)",Shots bounce to a new target after every hit.
+mech_multishot,Multishot,Mechanism,P0,,1.0,multishot,Projectiles(2); Spread(12.0); Damage(0.8),Two more projectiles per shot.
+mech_homing_shards,Homing Shards,Mechanism,P1,,1.0,homing,Homing(turn_rate: 200.0); ProjectileSpeed(0.9),Projectiles hunt their own targets.
+mech_beam_sweep,Beam Sweep,Mechanism,P1,,0.8,beam,Beam(width: 0.6); Damage(0.35); FireRate(2.5),Converts the weapon into a sweeping beam.
+mech_bounce_fork,Bounce-Fork,Mechanism,P1,,1.0,fork,"Fork(count: 2, angle: 40.0, damage: 0.6)",On first hit the shot splits into two forks.
+mech_sawblade_orbit,Sawblade Orbit,Mechanism,P1,,0.9,orbit,"Orbit(count: 3, radius: 2.2, speed: 0.8, damage: 0.5)",Three forge-sawblades orbit you and shred anything close.
+mech_lancet_drive,Lancet Drive,Mechanism,P1,,1.0,pierce,Pierce(3); ProjectileSpeed(1.3),Shots pierce three enemies and fly faster.
+mech_scatterburst,Scatterburst,Mechanism,P1,,1.0,multishot; spread,Projectiles(4); Spread(30.0); Damage(0.55); Range(0.75),A wide fan of five projectiles at close range.
+mech_overclock,Overclock,Mechanism,P1,,1.0,fire_rate,FireRate(1.4); Damage(0.85),Faster. Hotter. Slightly less precise.
+relic_vampire,Vampire,Relic,P0,,1.0,lifesteal,Lifesteal(0.04),Return 4% of damage dealt as health.
+relic_splitspawn,Splitspawn,Relic,P1,,1.0,turret; crit,"SpawnTurretOnCrit(chance: 0.35, duration: 5.0, power: 0.3); CritChance(0.05)",Critical hits can spawn a short-lived turret.
+relic_doomstack,Doomstack,Relic,P1,,1.0,doom,"Doomstack(stacks: 8, burst: 3.0)",Every hit stacks doom; eight stacks burst for heavy damage.
+relic_frostwake,Frostwake,Relic,P1,,1.0,trail; slow,"Trail(duration: 2.0, dps: 0.15, slow: 0.35)",Projectiles leave chilling trails that slow the horde.
+relic_volatile_heart,Volatile Heart,Relic,P1,,1.0,volatile,"ExplodeOnKill(chance: 0.3, radius: 2.0, damage: 0.8)",Kills sometimes detonate.
+relic_greedstone,Greedstone,Relic,P1,,0.8,greed,ShardsOnKill(chance: 0.04); Luck(0.15),Godshards fall like rain. Better parts too.
+relic_executioners_seal,Executioner's Seal,Relic,P1,,0.9,execute,Execute(threshold: 0.12),Hits kill non-boss enemies below 12% health.
+relic_nyctian_eye,Nyctian Eye,Relic,P1,,1.0,crit,CritChance(0.12); CritDamage(0.25),See the weak point. Hit it.
+relic_bloodletter,Bloodletter,Relic,P1,,1.0,bleed,"ApplyStatus(status: Bleed, chance: 0.3, stacks: 1, duration: 4.0)",Hits open wounds that bleed harder while enemies run.
+relic_giantsbane,Giantsbane,Relic,P1,,1.0,elite,DamageVsElites(1.35),+35% damage against elites and bosses.
+sigil_anvilheart,Sigil of the Anvilheart,Sigil,P0,gaiaa,1.0,sigil; survival,MaxHealth(60.0); DamageTaken(0.92),Gaiaa's stone beats in your chest.
+sigil_quaking_step,Sigil of the Quaking Step,Sigil,P1,gaiaa,1.0,sigil; dash,"DashNova(radius: 2.5, damage: 30.0, element: Kinetic)",Every dash lands like an earthquake.
+sigil_colossal_echo,Sigil of the Colossal Echo,Sigil,P1,pyra,1.0,sigil; ult,"UltGround(radius: 3.5, duration: 5.0, dps: 35.0, element: Flame)",Ults leave burning ground.
+sigil_cadence,Sigil of Cadence,Sigil,P1,zephyros,1.0,sigil; echo,"EchoShot(every: 4, damage: 0.8)",Every 4th shot echoes.
+sigil_static_bloom,Sigil of Static Bloom,Sigil,P1,zephyros,1.0,sigil; shock,"ApplyStatus(status: Shock, chance: 0.25, stacks: 1, duration: 2.0)",Hits build shock that discharges in bursts.
+sigil_skyrender,Sigil of the Skyrender,Sigil,P1,zephyros,1.0,sigil; speed,FireRate(1.12); MoveSpeed(1.05),The storm never waits.
+sigil_nightfall,Sigil of Nightfall,Sigil,P1,nyctia,1.0,sigil; crit,CritChance(0.08); CritDamage(0.4),Nyctia guides the killing blow.
+sigil_silent_edge,Sigil of the Silent Edge,Sigil,P1,nyctia,1.0,sigil; execute,Execute(threshold: 0.08),The wounded simply stop.
+sigil_ghostlight,Sigil of Ghostlight,Sigil,P1,nyctia,1.0,sigil; dash,DashCharges(1),One more step between worlds.
+sigil_hexlace,Sigil of Hexlace,Sigil,EA,morwenn,1.0,sigil; curse,"ApplyStatus(status: Curse, chance: 0.25, stacks: 1, duration: 4.0)",Every hit laces a curse.
+sigil_tinkers_grace,Sigil of Tinker's Grace,Sigil,EA,seraphel,1.0,sigil; ability,CooldownRate(1.15),Your contraptions are always ready.
+sigil_bound_souls,Sigil of Bound Souls,Sigil,EA,morwenn,1.0,sigil; puddle,"Puddle(radius: 1.5, duration: 3.0, dps: 0.25, status: Curse)",Where your shots land the ground itself curses.
+sigil_furnace_heart,Sigil of the Furnace Heart,Sigil,EA,pyra,1.0,sigil; burn,"ApplyStatus(status: Burn, chance: 0.3, stacks: 1, duration: 3.0)",Everything you touch catches.
+sigil_iron_knuckle,Sigil of the Iron Knuckle,Sigil,EA,gaiaa,1.0,sigil; knockback,Knockback(1.5); Damage(1.08),Hit them so hard they remember it next run.
+sigil_meltpoint,Sigil of Meltpoint,Sigil,EA,pyra,1.0,sigil; burn,"DamageVsStatus(status: Burn, mult: 1.25)",+25% damage to burning enemies.
+sigil_huntmark,Sigil of the Huntmark,Sigil,EA,seraphel,1.0,sigil; mark,"ApplyStatus(status: Mark, chance: 0.3, stacks: 1, duration: 5.0)",The hunt-god chooses your quarry.
+sigil_far_sight,Sigil of Far Sight,Sigil,EA,seraphel,1.0,sigil; range,Range(1.25); ProjectileSpeed(1.2),See further. Strike sooner.
+sigil_patient_death,Sigil of Patient Death,Sigil,EA,aeon,1.0,sigil; opener,DamageVsFullHp(1.35),The first hit is the one that matters.
+sigil_gilded_tongue,Sigil of the Gilded Tongue,Sigil,EA,umbra_rex,1.0,sigil; luck,Luck(0.3),Fortune listens when you talk.
+sigil_pickpocket,Sigil of the Pickpocket,Sigil,EA,nyctia,1.0,sigil; greed,ShardsOnKill(chance: 0.08),The dead don't need godshards.
+sigil_loaded_dice,Sigil of Loaded Dice,Sigil,EA,aeon,1.0,sigil; crit,CritChance(0.1),Fate owes you one.
+sigil_borrowed_hour,Sigil of the Borrowed Hour,Sigil,EA,aeon,1.0,sigil; ability,CooldownRate(1.2),Time runs faster for you.
+sigil_slow_rot,Sigil of Slow Rot,Sigil,EA,aeon,1.0,sigil; trail,"Trail(duration: 2.0, dps: 0.2, slow: 0.3)",Your shots age the world they pass through.
+sigil_second_hand,Sigil of the Second Hand,Sigil,EA,aeon,1.0,sigil; echo,"EchoShot(every: 5, damage: 0.6)",Every 5th shot happens twice.

@@ -1,0 +1,5 @@
+key,tree,tier,name,cost,requires,effect,phase,desc
+arsenal_spare_parts,Arsenal,1,Spare Parts,40,,BagCapacity(2),P1,Carry two more parts.
+flesh_hardened,Flesh,1,Hardened,30,,Mods([MaxHealth(25.0)]),P1,+25 max health for every Godforged.
+fate_rekindled,Fate,1,Rekindled,60,,Rekindles(1),P1,One more solo Rekindle per run.
+bond_echo_resonance,Bond,1,Echo Resonance,50,,EchoPower(0.05),P1,Echo drones fight 5% harder.

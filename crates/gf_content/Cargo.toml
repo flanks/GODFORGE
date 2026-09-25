@@ -1,10 +1,18 @@
 [package]
 name = "gf_content"
+description = "GODFORGE content schema, loader and validator (data-driven everything)."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[dependencies]
+gf_core = { workspace = true }
+glam = { workspace = true }
+serde = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
 
 [lints]
 workspace = true

@@ -1,0 +1,12 @@
+key,name,biome,class,phase,hp,speed,radius,contact_damage,mass,resist,plating,shield,behavior,color,shape,scale,pack,death_burst,desc
+cinderling,Cinderling,cinder_wastes,Swarm,P0,30,3.2,0.42,8,1.0,,,,Chaser,#E0662B,Blob,1.0,"(3, 6)",,A coal that learned to hate.
+ashrunner,Ashrunner,cinder_wastes,Swarm,P0,18,5.2,0.36,6,0.8,,,,Swarmer(jitter: 0.6),#F2A541,Hound,1.0,"(2, 4)",,Fast ash-hounds that hunt in pairs.
+clinker,Clinker,cinder_wastes,Swarm,P0,9,3.8,0.26,4,0.5,,,,Swarmer(jitter: 1.0),#9A5B3C,Crawler,0.8,"(6, 10)",,Skittering slag. There are always more.
+emberwisp,Emberwisp,cinder_wastes,Swarm,P0,20,4.2,0.34,5,0.6,,,,Swarmer(jitter: 1.4),#FFD27A,Wisp,1.0,"(2, 3)","(1.6, 16.0)",Erratic sparks that burst when snuffed.
+slagspitter,Slagspitter,cinder_wastes,Swarm,P0,40,2.6,0.48,6,1.2,,,,"Lobber(range: 11.0, windup: 1.1, radius: 1.4, damage: 18.0, cooldown: 3.2, keep_distance: 7.0)",#C24A1C,Spire,1.0,"(1, 2)",,Lobs molten slag where you are about to be.
+kindlejack,Kindlejack,cinder_wastes,Swarm,P0,26,4.6,0.4,0,0.9,,,,"Bomber(trigger_range: 1.6, fuse: 0.9, radius: 2.2, damage: 32.0)",#FF7A1A,Blob,1.0,"(1, 2)",,Runs at you. Then it is you who runs.
+anvil_brute,Anvil Brute,cinder_wastes,Elite,P0,520,2.4,0.9,18,4.0,,"(resist: {Kinetic: 0.5}, plate_hp: 260.0)",,"Charger(range: 9.0, windup: 0.9, speed: 13.0, duration: 0.55, cooldown: 3.5, damage: 34.0, width: 1.4)",#7A7F8C,Brute,1.3,"(1, 1)",,Plated in anvil-iron. Kinetic rounds glance off until the plates crack.
+forge_warden,Forge Warden,cinder_wastes,Elite,P0,380,2.2,0.75,12,3.0,,,80,"Support(range: 6.0, shield: 60.0, interval: 4.0, keep_distance: 6.0)",#D9B45A,Spire,1.2,"(1, 1)",,Wraps nearby Unmade in forge-shields. Kill it first.
+molten_hexer,Molten Hexer,cinder_wastes,Elite,P0,300,2.4,0.62,10,2.0,{Flame: 0.4},,,"Caster(range: 13.0, windup: 1.2, width: 1.2, length: 14.0, damage: 36.0, cooldown: 3.8, keep_distance: 9.0)",#FF4D6D,Spire,1.1,"(1, 1)",,Channels molten beams across the arena.
+the_bellows,The Bellows,cinder_wastes,MiniBoss,P1,2600,1.8,1.6,20,12.0,,,,"Boss(script: ""the_bellows"")",#B5532A,Colossus,1.6,"(1, 1)",,A furnace-lung the size of a house. It breathes fire and cinderlings.
+slag_king,The Slag King,cinder_wastes,Boss,P1,9500,1.6,2.2,26,30.0,{Flame: 0.5},,,"Boss(script: ""slag_king"")",#6B2A14,Colossus,2.4,"(1, 1)",,A living foundry colossus crowned in cooling slag.

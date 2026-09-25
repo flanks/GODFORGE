@@ -51,8 +51,29 @@ impl DamageType {
 pub const MAX_RESIST: f32 = 0.75;
 
 /// Per-type damage reduction fractions (negative = vulnerability).
+///
+/// Authored as a sparse map, e.g. `resist: {Kinetic: 0.5, Flame: -0.25}`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(from = "ResistMap", into = "ResistMap")]
 pub struct Resistances(pub [f32; 6]);
+
+type ResistMap = std::collections::BTreeMap<DamageType, f32>;
+
+impl From<ResistMap> for Resistances {
+    fn from(map: ResistMap) -> Self {
+        let mut r = [0.0; 6];
+        for (t, v) in map {
+            r[t.index()] = v;
+        }
+        Resistances(r)
+    }
+}
+
+impl From<Resistances> for ResistMap {
+    fn from(r: Resistances) -> Self {
+        DamageType::ALL.iter().filter(|t| r.0[t.index()] != 0.0).map(|t| (*t, r.0[t.index()])).collect()
+    }
+}
 
 impl Resistances {
     pub const NONE: Resistances = Resistances([0.0; 6]);
@@ -206,6 +227,17 @@ mod tests {
         assert!(plating.is_none());
         let (d, _) = apply_plating(40.0, DamageType::Kinetic, &mut plating);
         assert_eq!(d, 40.0);
+    }
+
+    #[test]
+    fn resistances_author_as_sparse_maps() {
+        let r: Resistances = ron::from_str("{Kinetic: 0.5, Flame: -0.25}").unwrap();
+        assert_eq!(r.get(DamageType::Kinetic), 0.5);
+        assert_eq!(r.get(DamageType::Flame), -0.25);
+        assert_eq!(r.get(DamageType::Void), 0.0);
+        assert_eq!(ron::to_string(&Resistances::NONE).unwrap(), "{}");
+        let back: Resistances = ron::from_str(&ron::to_string(&r).unwrap()).unwrap();
+        assert_eq!(back, r);
     }
 
     #[test]

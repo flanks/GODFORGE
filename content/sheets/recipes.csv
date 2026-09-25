@@ -1,0 +1,13 @@
+key,name,phase,ingredients,bonus,codex
+the_endless_argument,The Endless Argument,P1,"Part(""mech_ricochet""); Part(""stormcore""); Part(""relic_doomstack"")","Chain(jumps: 1, range: 4.0, falloff: 0.7); Damage(1.1)",Every answer bounces back with a louder question.
+pyre_of_the_faithful,Pyre of the Faithful,P1,"Part(""embercore""); Part(""mech_multishot""); Part(""relic_volatile_heart"")","Area(1.3); ExplodeOnKill(chance: 0.2, radius: 2.0, damage: 0.5)",Pyra's congregation arrives all at once.
+the_hungry_orbit,The Hungry Orbit,P1,"Part(""mech_sawblade_orbit""); Part(""relic_vampire"")","Lifesteal(0.02); Orbit(count: 1, radius: 2.2, speed: 0.8, damage: 0.5)","Four blades, one appetite."
+event_horizon,Event Horizon,P1,"Part(""voidcore""); Part(""mech_homing_shards"")",Area(1.25); Damage(1.1),Nothing escapes a shot that wants you.
+colossus_doctrine,Colossus Doctrine,P0,"Chassis(""colossus_cannon""); Part(""ironcore""); Part(""mech_lancet_drive"")",Knockback(1.5); Damage(1.15),Valdris's first commandment: through them.
+thunder_ledger,The Thunder Ledger,P1,"Chassis(""thundercoil_launcher""); Part(""stormcore""); Part(""relic_splitspawn"")",CritChance(0.08); FireRate(1.1),Every debt to Zephyros is paid in lightning.
+plague_gardener,The Plague Gardener,P1,"Part(""plaguecore""); Part(""mech_scatterburst""); Part(""relic_frostwake"")",Area(1.2); Damage(1.1),Plant widely. Water with rot.
+judgment_day,Judgment Day,P1,"Part(""dawncore""); Part(""mech_lancet_drive""); Part(""relic_executioners_seal"")",Execute(threshold: 0.05); CritChance(0.05),The verdict passes through the whole line.
+wildfire_contract,Wildfire Contract,P1,"Part(""embercore""); Part(""mech_ricochet""); Part(""relic_greedstone"")",ShardsOnKill(chance: 0.03); Damage(1.1),Mirren's favorite clause: the fire spreads and so does the profit.
+the_vein_tap,The Vein Tap,P1,"Part(""ironcore""); Part(""mech_bounce_fork""); Part(""relic_bloodletter"")",Lifesteal(0.02); Damage(1.1),Every wound opens two more.
+sunspike_sermon,Sunspike Sermon,P1,"Chassis(""sunspike_shotgun""); Element(Radiant); Part(""mech_bounce_fork"")",Damage(1.15); Pierce(1),A sermon best delivered at point-blank range.
+nightmare_ledger,The Nightmare Ledger,P1,"Element(Void); Part(""mech_overclock""); Part(""relic_nyctian_eye"")",CritDamage(0.4),Nyctia keeps accounts. You are overdrawn.

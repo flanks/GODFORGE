@@ -1,0 +1,21 @@
+tier,name,mods,desc
+1,Swift Unmade,EnemySpeed(1.08); EmberBonus(0.08),The Unmade move 8% faster.
+2,Hardened,EnemyHp(1.12); EmberBonus(0.08),Enemies have 12% more health.
+3,Volatile Deaths,"VolatileDeaths(chance: 0.15, radius: 1.6, damage: 14.0, fuse: 0.9); EmberBonus(0.08)",Some enemies burst after dying — telegraphed.
+4,Twin Elites,EliteChance(0.05); EmberBonus(0.08),Elites appear far more often.
+5,Heavy Hands,EnemyDamage(1.15); EmberBonus(0.08),Enemy attacks hit 15% harder.
+6,Relentless Tide,SpawnRate(1.15); EnemyCount(1.1); EmberBonus(0.08),More of them. Faster.
+7,Shielded Vanguard,ShieldedElites(0.3); EmberBonus(0.08),Elites arrive wrapped in forge-shields.
+8,Starved Flame,HealingReceived(0.7); EmberBonus(0.08),All healing is 30% weaker.
+9,Cold Anvils,AnvilHoldTime(1.25); EmberBonus(0.08),Anvils take longer to kindle.
+10,Titan's Resolve,BossHp(1.25); EmberBonus(0.08),Bosses have 25% more health.
+11,Quickened Doom,TelegraphSpeed(0.85); EmberBonus(0.08),Telegraphs resolve 15% faster.
+12,Swarm Surge,EnemyCount(1.15); EmberBonus(0.08),Even more of them.
+13,Iron Hide,EnemyHp(1.15); EmberBonus(0.08),Enemies have 15% more health.
+14,Chain of Ruin,"VolatileDeaths(chance: 0.15, radius: 1.8, damage: 18.0, fuse: 0.8); EmberBonus(0.08)",Volatile deaths are larger and more frequent.
+15,Bitter Ichor,EnemyDamage(1.15); EmberBonus(0.08),Enemy attacks hit even harder.
+16,Heavy Feet,PlayerDashCharges(-1); EmberBonus(0.08),Godforged start with one fewer dash.
+17,Endless Tide,SpawnRate(1.2); EmberBonus(0.08),The horde never breathes.
+18,Elite Legion,EliteChance(0.06); ShieldedElites(0.2); EmberBonus(0.08),Elites everywhere. Shielded.
+19,Crushing Weight,BossHp(1.25); EnemyHp(1.1); EmberBonus(0.08),Everything is heavier.
+20,The Last Arsenal,EnemySpeed(1.1); EnemyDamage(1.2); TelegraphSpeed(0.9); EmberBonus(0.2),Break the game — or be broken by it.

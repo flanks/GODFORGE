@@ -1,0 +1,7 @@
+key,name,kind,gods,phase,weight,requires,mods,desc
+pyra_wrathful_strike,Wrathful Strike,Standard,pyra,P1,1.0,,"Damage(1.2); ApplyStatus(status: Burn, chance: 0.15, stacks: 1, duration: 3.0)",Your weapon strikes with Pyra's fury.
+zephyros_tailwind,Tailwind,Standard,zephyros,P1,1.0,,MoveSpeed(1.12); FireRate(1.08),Zephyros pushes at your back.
+nyctia_umbral_edge,Umbral Edge,Standard,nyctia,P1,1.0,,CritChance(0.1); CritDamage(0.2),Strike from the dark.
+pyra_pyre_eternal,Pyre Eternal,Legendary,pyra,EA,0.4,"FromGod(god: ""pyra"", count: 2)","ExplodeOnKill(chance: 0.5, radius: 2.6, damage: 1.2)",Every death feeds the pyre.
+thunderburn,Thunderburn,Duo,pyra; zephyros,EA,0.6,"FromGod(god: ""pyra"", count: 1); FromGod(god: ""zephyros"", count: 1)","DamageVsStatus(status: Shock, mult: 1.25); ApplyStatus(status: Burn, chance: 0.3, stacks: 1, duration: 3.0)",Shock triggers burn.
+bond_of_the_forge,Bond of the Forge,Team,,P1,0.5,,DashCharges(1),+1 dash charge for all.

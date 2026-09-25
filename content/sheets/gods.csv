@@ -1,0 +1,9 @@
+key,name,domain,color,color_secondary,playstyle,phase
+pyra,Pyra,"Flame, Wrath",#E0312B,#FFC23D,"Burn, explosions, on-kill triggers",P1
+zephyros,Zephyros,"Storm, Sky",#3FD8FF,#F2FBFF,"Chain effects, speed, shock",P1
+nyctia,Nyctia,"Shadow, Silence",#7B3FE0,#141018,"Crit, execute, smoke/stealth",P1
+aeon,Aeon,"Time, Fate",#C9D2DC,#8A96A3,"Slow fields, rewinds, DoT stacking",EA
+gaiaa,Gaiaa,"Stone, Blood",#4E9A3A,#B07A3C,"Lifesteal, armor, roots",EA
+morwenn,Morwenn,"Sea, Plague",#1FA39A,#7FE36B,"Slows, puddles, spreading debuffs",EA
+seraphel,Seraphel,"Light, Law",#FFD86B,#FFFFFF,"Shields, smite beams, judgment marks",EA
+umbra_rex,Umbra-Rex,"Ruin, End",#8E1B1B,#FF6A2A,"Low-HP power, sacrifice, doom counters",EA

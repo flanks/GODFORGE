@@ -1,0 +1,231 @@
+// Character kits — the playable implementation of each Godforged (§8).
+// A character is playable iff it has a kit here. Kits are sequences of ability primitives
+// (see `AbilityStep` in crates/gf_content/src/schema.rs): adding a character is content work,
+// not engineering work (§20.10). Passives marked "approx" use the generic `Mods` passive until
+// their bespoke passive primitive ships (tracked in docs/VERTICAL_SLICE.md).
+[
+    // ───────────── VALDRIS — The Anvil-Born (Juggernaut / Anchor) — P0 ─────────────
+    (
+        character: "valdris",
+        passive: ArmorConversion(
+            conversion: 0.5,
+            max_armor: 90.0,
+            max_mitigation: 0.5,
+            break_radius: 5.0,
+            break_damage: 60.0,
+            break_knockback: 8.0,
+            break_taunt: 3.0,
+            break_cooldown: 6.0,
+        ),
+        active1: (
+            name: "Bulwark Slam",
+            desc: "Leap-slam: stun everything you land on and raise a forge barricade that blocks projectiles.",
+            cooldown: 9.0,
+            steps: [
+                Leap(range: 7.0, time: 0.45),
+                Nova(radius: 3.4, damage: 70.0, element: Kinetic, stun: 1.2, knockback: 7.0),
+                Barricade(length: 5.0, hp: 260.0, duration: 6.0, offset: 1.8),
+            ],
+        ),
+        active2: (
+            name: "Siege Stance",
+            desc: "Plant yourself: fire rate +120%, incoming damage −40%, enemies target you.",
+            cooldown: 14.0,
+            steps: [Buff(duration: 6.0, mods: [FireRate(2.2), DamageTaken(0.6)], root_self: true, taunt: true)],
+        ),
+        ultimate: (
+            name: "Mountainfall",
+            desc: "Become a colossal anvil-avatar for 8s: every shot is an exploding boulder, ground pounds chain.",
+            steps: [
+                Buff(
+                    duration: 8.0,
+                    mods: [Damage(1.6), Explode(radius: 2.4, damage: 0.8), Style(Boulder), DamageTaken(0.5), Knockback(1.5)],
+                    scale: 1.8,
+                    pulse: (interval: 1.1, radius: 4.5, damage: 90.0, element: Kinetic, knockback: 6.0),
+                ),
+            ],
+        ),
+    ),
+    // ───────────── SELENE — The Stormcaller (Glass Cannon) — P1 ─────────────
+    (
+        character: "selene",
+        passive: StaticCharge(per_meter: 0.015, max_bonus: 0.6),
+        active1: (
+            name: "Arc Nova",
+            desc: "Chain-lightning burst that scales with your weapon's fire rate.",
+            cooldown: 6.0,
+            steps: [ChainBurst(targets: 8, range: 6.0, damage: 45.0, element: Storm, scale_with_fire_rate: true)],
+        ),
+        active2: (
+            name: "Blink",
+            desc: "Teleport through enemies, leaving a storm trail.",
+            cooldown: 5.0,
+            steps: [Blink(range: 7.0, trail_damage: 40.0, element: Storm)],
+        ),
+        ultimate: (
+            name: "Heaven's Verdict",
+            desc: "Call a moving thunderstorm front that supercharges every ally's projectiles inside it.",
+            steps: [
+                Field(
+                    radius: 5.0,
+                    duration: 8.0,
+                    at: AimPoint(range: 10.0),
+                    dps: 30.0,
+                    element: Storm,
+                    status: (status: Shock, stacks: 1, duration: 2.0),
+                    ally_mods: [Damage(1.35), Chain(jumps: 2, range: 5.0, falloff: 0.7)],
+                    travel_speed: 1.5,
+                ),
+            ],
+        ),
+    ),
+    // ───────────── KAEL — The Wraithshot (Agile Duelist) — P1 ─────────────
+    (
+        character: "kael",
+        passive: GhostStep(crit_per_kill: 0.02, max_crit: 0.3, decay_per_s: 0.04, dash_refund_chance: 0.35),
+        active1: (
+            name: "Fan of Blades",
+            desc: "Spectral shotgun burst that Marks; crits on Marked enemies below 15% HP execute.",
+            cooldown: 5.0,
+            steps: [Cone(range: 6.5, angle_deg: 70.0, damage: 45.0, element: Kinetic, status: (status: Mark, stacks: 1, duration: 5.0))],
+        ),
+        active2: (
+            name: "Shadow Roll",
+            desc: "Roll with i-frames; your next 3 shots pierce.",
+            cooldown: 6.0,
+            steps: [Rush(distance: 5.0, time: 0.22, damage: 0.0), NextShots(count: 3, mods: [Pierce(3), Damage(1.25)])],
+        ),
+        ultimate: (
+            name: "Bullet Ballet",
+            desc: "6s of infinite dash and twin spectral pistols copying your Mechanism.",
+            steps: [Buff(duration: 6.0, mods: [FireRate(1.5), Projectiles(1), Spread(5.0), Damage(1.2), Execute(threshold: 0.15)], infinite_dash: true)],
+        ),
+    ),
+    // ───────────── THESSALY — The Hexweaver (Support / Summoner) — EA ─────────────
+    (
+        character: "thessaly",
+        // approx: Curse Weaver (debuffed enemies take +25% from ALL allies) → her own hits + curse application.
+        passive: Mods([DamageVsStatus(status: Curse, mult: 1.25), ApplyStatus(status: Curse, chance: 0.2, stacks: 1, duration: 4.0)]),
+        active1: (
+            name: "Forge Turret",
+            desc: "Deploy a turret copying your weapon's Core + Mechanism at 40% power.",
+            cooldown: 12.0,
+            steps: [Turret(power: 0.4, duration: 12.0, count: 1)],
+        ),
+        active2: (
+            name: "Binding Hex",
+            desc: "Root field; enemies killed inside drop extra parts.",
+            cooldown: 11.0,
+            steps: [Field(radius: 3.5, duration: 4.0, at: AimPoint(range: 9.0), root: true, status: (status: Curse, stacks: 1, duration: 4.0), bonus_drops: true)],
+        ),
+        ultimate: (
+            name: "Sabbath of Sparks",
+            desc: "Turrets and Echoes surge; allies gain lifesteal against cursed targets.",
+            steps: [
+                Turret(power: 0.6, duration: 8.0, count: 2),
+                Buff(duration: 8.0, mods: [FireRate(1.5), Lifesteal(0.06)]),
+            ],
+        ),
+    ),
+    // ───────────── BRAX — The Furnace-Born (Brawler) — EA ─────────────
+    (
+        character: "brax",
+        // approx: Heat Gauge → ignite on hit and reduced damage while brawling.
+        passive: Mods([ApplyStatus(status: Burn, chance: 0.25, stacks: 1, duration: 3.0), DamageTaken(0.9)]),
+        active1: (
+            name: "Cinder Uppercut",
+            desc: "Launch enemies skyward; the follow-up slam spawns flame geysers.",
+            cooldown: 7.0,
+            steps: [
+                Nova(radius: 2.6, damage: 60.0, element: Kinetic, stun: 0.8, knockback: 3.0),
+                Field(radius: 2.8, duration: 3.0, dps: 26.0, element: Flame, status: (status: Burn, stacks: 1, duration: 3.0)),
+            ],
+        ),
+        active2: (
+            name: "Furnace Rush",
+            desc: "Charge through a horde line, dragging enemies with you.",
+            cooldown: 8.0,
+            steps: [Rush(distance: 8.0, time: 0.4, damage: 50.0, element: Flame, drag: true)],
+        ),
+        ultimate: (
+            name: "Meltdown",
+            desc: "8s of molten fists: strikes emit shockwaves that copy your Mechanism.",
+            steps: [Buff(duration: 8.0, mods: [Damage(1.5), FireRate(1.3), Explode(radius: 2.0, damage: 0.6), Element(Flame)], scale: 1.25)],
+        ),
+    ),
+    // ───────────── OSSIAN — The Far-Struck (Artillery) — EA ─────────────
+    (
+        character: "ossian",
+        // approx: Marked Quarry (single-target stacking) → full-HP and elite bonuses.
+        passive: Mods([DamageVsFullHp(1.3), DamageVsElites(1.15)]),
+        active1: (
+            name: "Piercing Comet",
+            desc: "Charge shot that penetrates every enemy and wall in a line.",
+            cooldown: 7.0,
+            steps: [Line(length: 22.0, width: 1.2, damage: 140.0, element: Radiant, status: (status: Mark, stacks: 1, duration: 6.0))],
+        ),
+        active2: (
+            name: "Skyhook Mortar",
+            desc: "Arcing lob that splits into bomblets on landing.",
+            cooldown: 9.0,
+            steps: [
+                Nova(radius: 3.0, damage: 90.0, element: Kinetic, at: AimPoint(range: 14.0), delay: 0.7, knockback: 4.0),
+                Field(radius: 3.6, duration: 2.0, at: AimPoint(range: 14.0), dps: 40.0, element: Flame),
+            ],
+        ),
+        ultimate: (
+            name: "Rain of the Hunt",
+            desc: "5s of auto-crits on every Marked enemy, anywhere on screen.",
+            steps: [Buff(duration: 5.0, mods: [CritChance(0.6), DamageVsStatus(status: Mark, mult: 1.6), Homing(turn_rate: 240.0)])],
+        ),
+    ),
+    // ───────────── MIRREN — The Gilded Fox (Trickster) — EA ─────────────
+    (
+        character: "mirren",
+        // approx: Fortune's Favor → luck and bonus shards.
+        passive: Mods([Luck(0.35), ShardsOnKill(chance: 0.05)]),
+        active1: (
+            name: "Gilded Decoy",
+            desc: "Taunting clone that explodes into coins and shrapnel.",
+            cooldown: 10.0,
+            steps: [
+                Field(radius: 1.6, duration: 3.0, at: AimPoint(range: 7.0), taunt: true),
+                Nova(radius: 3.2, damage: 80.0, element: Kinetic, at: AimPoint(range: 7.0), delay: 3.0, knockback: 5.0),
+            ],
+        ),
+        active2: (
+            name: "Snatch",
+            desc: "Teleport-strike an elite and steal its momentum.",
+            cooldown: 8.0,
+            steps: [Blink(range: 6.0, trail_damage: 25.0, element: Kinetic), Nova(radius: 1.8, damage: 60.0, element: Kinetic, stun: 0.6), Buff(duration: 4.0, mods: [MoveSpeed(1.25), Damage(1.2)])],
+        ),
+        ultimate: (
+            name: "Grand Heist",
+            desc: "6s where every kill drops bonus loot.",
+            steps: [Buff(duration: 6.0, mods: [ShardsOnKill(chance: 0.5), Luck(1.0), FireRate(1.2)])],
+        ),
+    ),
+    // ───────────── EPOCH — The Unwound (Chrono / Tempo) — EA ─────────────
+    (
+        character: "epoch",
+        // approx: Borrowed Time (cooldowns tick 40% faster while moving) → flat cooldown rate.
+        passive: Mods([CooldownRate(1.3)]),
+        active1: (
+            name: "Still Field",
+            desc: "Bubble that slows enemies and projectiles inside.",
+            cooldown: 12.0,
+            steps: [Field(radius: 4.0, duration: 5.0, at: AimPoint(range: 8.0), slow: 0.6)],
+        ),
+        active2: (
+            name: "Rewind Wounds",
+            desc: "Revert the last 3s of damage taken by you or the most-hurt ally nearby.",
+            cooldown: 16.0,
+            steps: [RewindWounds(seconds: 3.0, range: 8.0)],
+        ),
+        ultimate: (
+            name: "Stolen Second",
+            desc: "Freeze enemies for 2s; when time resumes, every ally's cooldowns reset.",
+            steps: [TimeStop(duration: 2.0, reset_ally_cooldowns: true)],
+        ),
+    ),
+]

@@ -1,0 +1,25 @@
+key,name,phase,unlock_forge_level,stats.fire,stats.damage,stats.fire_rate,stats.projectiles,stats.spread_deg,stats.speed,stats.range,stats.radius,stats.pierce,stats.knockback,stats.crit_chance,stats.crit_mult,stats.charge_time,stats.charge_mult,stats.splash_radius,stats.splash_damage,stats.damage_type,stats.style,stats.precision_zone,stats.ramp,mods,tags,desc
+colossus_cannon,Colossus Cannon,P0,0,Auto,26,2.6,1,2,20,13,0.28,0,3.0,0.05,2.5,,,1.6,0.5,Kinetic,Shell,0.45,,,heavy; splash; valdris,"Siege artillery for one. Shells burst on impact, knocking the horde back."
+thundercoil_launcher,Thundercoil Launcher,P1,0,Auto,16,3.5,1,3,22,14,0.24,0,1.0,0.05,2.5,,,1.0,0.4,Storm,Orb,0.45,,,storm; splash; selene,Coiled lightning orbs that crackle on impact.
+serpent_smg,Serpent SMG,P1,0,Auto,7,11,1,6,26,11,0.14,0,0.3,0.06,2.5,,,,,Kinetic,Needle,0.4,,,rapid; kael,A hissing stream of needles. Never stops talking.
+godsbane_rifle,Godsbane Rifle,P1,3,Auto,22,3.2,1,1,34,17,0.18,1,1.0,0.1,2.5,,,,,Kinetic,Slug,0.5,,,precise; pierce,The rifle that killed a god. It remembers.
+wraith_bow,Wraith Bow,P1,0,Charge,40,2.0,1,0,30,18,0.2,2,1.5,0.08,2.5,0.8,2.5,,,Void,Arrow,0.5,,,charge; pierce; thessaly,Draw to charge; loose hex-bolts that pass through the living.
+sunspike_shotgun,Sunspike Shotgun,P1,3,Auto,9,1.6,7,22,24,8,0.15,0,2.5,0.05,2.5,,,,,Radiant,Pellet,0.4,,,spread; close,A fistful of sunlight at arm's length.
+anvil_gauntlets,Anvil Gauntlets,EA,0,Melee,30,3.0,1,50,0,2.8,0.4,0,4.0,0.06,2.5,,,,,Kinetic,Fist,0.5,,,melee; brax,Short-range shotgun-fists. Punching is the build.
+longstrider_rail,Longstrider Rail,EA,0,Charge,60,1.2,1,0,60,24,0.22,6,2.0,0.1,2.5,1.1,3.0,,,Kinetic,Slug,0.55,,,charge; pierce; ossian,High-zoom railgun. Deletes what it can see.
+coinshooter,Coinshooter,EA,0,Auto,12,5.0,2,8,24,12,0.16,0,0.6,0.07,2.5,,,,,Kinetic,Coin,0.45,,"Ricochet(bounces: 1, range: 6.0)",ricochet; mirren,Dual ricochet pistols. Every shot pays twice.
+pendulum_repeater,Pendulum Repeater,EA,0,Auto,10,4.0,1,3,26,13,0.16,0,0.6,0.05,2.5,,,,,Kinetic,Bolt,0.45,"(max_mult: 2.8, time_to_max: 3.0)",,ramp; epoch,Fire rate accelerates the longer the trigger is held.
+bellowfire_projector,Bellowfire Projector,EA,6,Beam,6,12,1,0,0,7,0.3,0,0.2,0.04,2.5,,,,,Flame,Arc,0.4,,Beam(width: 0.9),beam; close,A forge-bellows that breathes the furnace at the world.
+gravemaw_mortar,Gravemaw Mortar,EA,6,Auto,38,1.1,1,2,14,15,0.36,0,4.0,0.05,2.5,,,2.4,0.7,Kinetic,Globe,0.45,,,heavy; splash,Lobs shells that swallow crowds whole.
+stormlash,Stormlash,EA,9,Auto,11,3.0,1,3,28,10,0.16,0,0.5,0.05,2.5,,,,,Storm,Arc,0.45,,"Chain(jumps: 2, range: 4.0, falloff: 0.6)",chain,A whip of captured lightning that leaps between the damned.
+seraph_lance,Seraph Lance,EA,9,Beam,14,8,1,0,0,14,0.25,0,0.3,0.05,2.5,,,,,Radiant,Arc,0.45,,Beam(width: 0.45),beam; precise,A spear of law that never has to be thrown.
+tidecaller_harpoon,Tidecaller Harpoon,EA,12,Charge,55,1.5,1,0,26,14,0.26,3,-2.0,0.06,2.5,0.6,2.2,,,Plague,Blade,0.5,,,charge; pull,A drowned god's harpoon. It pulls what it pierces.
+orrery_discs,Orrery Discs,EA,12,Auto,14,2.4,1,4,16,12,0.3,0,1.0,0.05,2.5,,,,,Kinetic,Blade,0.45,,"Ricochet(bounces: 2, range: 6.0)",ricochet; blades,Spinning planetary blades that orbit from foe to foe.
+huntmother_javelins,Huntmother Javelins,V1,15,Auto,20,2.4,1,2,24,14,0.2,1,1.5,0.06,2.5,,,,,Kinetic,Blade,0.5,,,fenra,Barbed javelins from a mother who hunts gods.
+chorus_harp,Chorus Harp,V1,15,Auto,9,6.0,1,10,20,11,0.2,0,0.4,0.05,2.5,,,,,Radiant,Arc,0.4,,"Homing(turn_rate: 90.0)",lyra; homing,Notes that find their audience.
+plaguebloom_sprayer,Plaguebloom Sprayer,V1,15,Beam,5,12,1,0,0,7,0.3,0,0.1,0.04,2.5,,,,,Plague,Globe,0.4,,Beam(width: 1.0),vex; beam,A pressurised fog of the end of things.
+dawnbreaker_carbine,Dawnbreaker Carbine,V1,15,Auto,15,4.5,1,2,30,15,0.16,0,0.8,0.07,2.5,,,,,Radiant,Slug,0.5,,,seraph,Law delivered at 4.5 verdicts per second.
+titanfall_hammer,Titanfall Hammer,V1,18,Melee,70,1.2,1,70,0,3.4,0.5,0,6.0,0.05,2.5,,,1.8,0.6,Kinetic,Fist,0.5,,,melee; heavy,The last hammer of the last smith.
+voidheart_singularity,Voidheart Singularity,V1,18,Charge,45,1.0,1,0,12,14,0.4,0,-3.0,0.05,2.5,1.0,2.5,2.0,0.6,Void,Globe,0.45,,"GravityWell(radius: 3.0, pull: 6.0, duration: 2.0, dps: 0.3)",void; charge,A heart that collapses whatever it touches.
+echoing_greatbow,Echoing Greatbow,V1,18,Charge,50,1.6,3,12,32,20,0.2,1,1.2,0.08,2.5,0.9,2.4,,,Kinetic,Arrow,0.5,,,charge; spread,Three arrows. Each remembers the others.
+epochal_sundial,Epochal Sundial,V1,20,Auto,18,2.0,1,0,18,13,0.3,0,1.0,0.05,2.5,,,1.4,0.5,Radiant,Orb,0.45,,"ApplyStatus(status: Curse, chance: 0.3, stacks: 1, duration: 3.0)",time,Shadows that cut. The hour hand is a blade.

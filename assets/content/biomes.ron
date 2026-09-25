@@ -1,0 +1,28 @@
+// Biomes (§9). A run visits every biome available in the build's content phase, in this order.
+// `sequence` is the room path: `Door` rooms take their kind from the reward door the party picks.
+[
+    (
+        key: "cinder_wastes",
+        name: "Cinder Wastes",
+        phase: P0,
+        theme: "Molten forge-lands, shattered anvils, gold light.",
+        palette: ("#2B1B15", "#FF8A2A", "#140D0A"),
+        swarm: [
+            (key: "cinderling", weight: 1.0),
+            (key: "ashrunner", weight: 0.7),
+            (key: "clinker", weight: 0.6),
+            (key: "emberwisp", weight: 0.45),
+            (key: "slagspitter", weight: 0.35),
+            (key: "kindlejack", weight: 0.3),
+        ],
+        elites: [
+            (key: "anvil_brute", weight: 1.0),
+            (key: "forge_warden", weight: 0.7),
+            (key: "molten_hexer", weight: 0.8),
+        ],
+        minibosses: ["the_bellows"],
+        boss: "slag_king",
+        sequence: [Fixed(Combat), Door, Door, Door, Fixed(MiniBoss), Door, Door, Fixed(Boss)],
+        min_anvils: 2,
+    ),
+]
