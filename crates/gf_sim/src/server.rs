@@ -8,7 +8,7 @@ use crate::{SimTick, build_schedule, players, run, snapshot};
 use gf_content::ContentDb;
 use gf_content::schema::Phase;
 use gf_core::poi::PoiKind;
-use gf_core::scaling::{compile_enemy_tuning, party_scaling};
+use gf_core::scaling::{EnemyTuning, compile_enemy_tuning, party_scaling};
 use gf_engine::prelude::*;
 use gf_net::{NetServer, ServerConfig, ServerTransport, SessionEvent};
 use std::sync::Arc;
@@ -94,6 +94,16 @@ impl ServerStats {
     }
 }
 
+/// Enemy tuning for a party of `players` at chaos tier `tier`.
+fn enemy_tuning(db: &ContentDb, players: u8, tier: u8) -> EnemyTuning {
+    compile_enemy_tuning(&party_scaling(&db.party_scaling, players), &db.chaos_tiers, tier)
+}
+
+/// Horde clusters scale by their own size (1..=4 players), whatever the party size (§5.5).
+fn cluster_tuning(db: &ContentDb, tier: u8) -> ClusterTuning {
+    ClusterTuning([1, 2, 3, 4].map(|k| enemy_tuning(db, k, tier)))
+}
+
 pub struct SimServer {
     app: App,
     net: NetServer<Box<dyn ServerTransport>>,
@@ -116,12 +126,8 @@ impl SimServer {
             },
         );
         let mut app = App::new();
-        let tuning_for = |k: u8| {
-            compile_enemy_tuning(&party_scaling(&content.party_scaling, k), &content.chaos_tiers, cfg.chaos_tier)
-        };
-        let tuning = tuning_for(1);
-        // Horde clusters scale by their own size (1..=4 players), whatever the party size.
-        let clusters = ClusterTuning([tuning_for(1), tuning_for(2), tuning_for(3), tuning_for(4)]);
+        let tuning = enemy_tuning(&content, 1, cfg.chaos_tier);
+        let clusters = cluster_tuning(&content, cfg.chaos_tier);
         app.insert_resource(Content(content))
             .insert_resource(SimSettings {
                 seed: cfg.seed,
@@ -173,13 +179,14 @@ impl SimServer {
         &self.cfg
     }
 
+    /// Rescale enemies to the party size (joins and leaves), and the horde's per-cluster tuning.
     fn retune_party(&mut self) {
         let world = self.app.world_mut();
         let party = world.query::<&Player>().iter(world).count().max(1) as u8;
         let db = world.resource::<Content>().0.clone();
         let tier = world.resource::<SimSettings>().chaos_tier;
-        let enemy = compile_enemy_tuning(&party_scaling(&db.party_scaling, party), &db.chaos_tiers, tier);
-        world.insert_resource(Tuning { enemy, party });
+        world.insert_resource(Tuning { enemy: enemy_tuning(&db, party, tier), party });
+        world.insert_resource(cluster_tuning(&db, tier));
     }
 
     fn handle_session(&mut self, events: Vec<SessionEvent>) {
