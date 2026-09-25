@@ -1,5 +1,8 @@
 // Biomes (§9). A run visits every biome available in the build's content phase, in this order.
 // `sequence` is the room path: `Door` rooms take their kind from the reward door the party picks.
+// A biome map (OPEN_WORLD.md) is `sequence: [Fixed(Expedition), Fixed(Boss)]`: the biome's
+// `<key>_expedition` template in rooms.ron, whose Boss Gate leads into its Boss arena. `min_anvils`
+// counts only for door sequences (a map's anvils come from its POI quotas).
 [
     (
         key: "cinder_wastes",
