@@ -383,6 +383,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::Crucible { .. } => ("CRUCIBLE *", hex("#FF9A30")),
         Decor::GreatBrazier { .. } => ("GREAT BRAZIER *", hex("#FFCF50")),
         Decor::SealedGate { .. } => ("SEALED GATE *", hex("#3FA08A")),
+        Decor::Arch { .. } => ("ARCH", hex("#E0C89A")),
         Decor::Tree { .. } => ("TREE", hex("#7A5232")),
         Decor::FallenTree { .. } => ("FALLEN TREE", hex("#8A6038")),
         Decor::Crystal { .. } => ("CRYSTAL", hex("#A8F0FF")),
@@ -582,6 +583,17 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             circle(cv, v, at, radius * 0.6, col, 1.0);
             ring(cv, v, at, radius, 0.16, ink, 1.0);
         }
+        Decor::Arch { from, to, pier, variant, .. } => {
+            if variant == 0 {
+                segment(cv, v, from, to, pier * 0.55, col.scale(0.8), 0.9);
+            } else {
+                dashed(cv, v, from, to, pier * 0.3, 0.5, col.scale(0.8), 0.9);
+            }
+            for p in [from, to] {
+                boxf(cv, v, p, Vec2::splat(pier), col, 1.0);
+                box_outline(cv, v, p, Vec2::splat(pier), 0.14, ink, 1.0);
+            }
+        }
         Decor::SealedGate { at, half, .. } => {
             boxf(cv, v, at, half, col, 1.0);
             box_outline(cv, v, at, half, 0.16, ink, 1.0);
@@ -774,8 +786,14 @@ fn render_room(db: &ContentDb, room: &RoomDef, s: f32, labels: bool) -> Canvas {
             let q = v.px(Vec2::new(d.min.x, d.max.y));
             cv.label(q.x as i64 + 4, q.y as i64 + 4, &district_name(d.kind), ls, district_color(d.kind));
         }
+        let mut named: Vec<(&str, Vec2)> = Vec::new();
         for d in &room.decor {
             if let Some(name) = landmark_label(d) {
+                // Mirrored pairs share one label.
+                if named.iter().any(|(n, p)| *n == name && p.distance(d.anchor()) < 16.0) {
+                    continue;
+                }
+                named.push((name, d.anchor()));
                 let q = v.px(d.anchor());
                 let wpx = name.len() as i64 * 6 * ls;
                 cv.label(q.x as i64 - wpx / 2, q.y as i64 + (2.6 * s) as i64, name, ls, hex("#FFE8A0"));
@@ -1109,7 +1127,14 @@ pub fn preview_sheet(db: &ContentDb, o: &SheetOptions, out: &Path) -> Result<(),
             cv.blit(&map, x, y);
             let st = stats(room);
             cv.text((ci * cell_w + 6) as i64, (title_h + ri * cell_h + 4) as i64, &room.key, 1, TEXT);
-            cv.text((ci * cell_w + 6) as i64, (title_h + ri * cell_h + 14) as i64, &stats_line(&st), 1, DIM);
+            let short = format!(
+                "OBST {}  BLOCK {:.1}%  OPEN {:.0}%  SEAL {:.1}%",
+                st.obstacles,
+                st.blocked * 100.0,
+                st.open * 100.0,
+                st.sealed_elite * 100.0
+            );
+            cv.text((ci * cell_w + 6) as i64, (title_h + ri * cell_h + 14) as i64, &short, 1, DIM);
             println!("{:<40} {}", room.key, stats_line(&st));
             all.push(room);
         }
