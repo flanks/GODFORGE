@@ -843,13 +843,490 @@ impl Default for EncounterDef {
     }
 }
 
+/// Facing as an integer step of 1/16 turn (22.5°), counter-clockwise from +x on the ground plane:
+/// 0 = east, 4 = north (screen-up, toward the gates), 8 = west, 12 = south (toward the camera).
+/// Procgen stays trig-free by working in these steps; see [`rot16_dir`].
+pub type Rot16 = u8;
+
+/// Unit ground vector of a [`Rot16`] step (a literal table, so it is IEEE-exact everywhere).
+pub fn rot16_dir(rot: Rot16) -> Vec2 {
+    const S1: f32 = 0.382_683_43; // sin 22.5°
+    const S2: f32 = std::f32::consts::FRAC_1_SQRT_2; // sin 45°
+    const S3: f32 = 0.923_879_5; // sin 67.5°
+    const T: [(f32, f32); 16] = [
+        (1.0, 0.0),
+        (S3, S1),
+        (S2, S2),
+        (S1, S3),
+        (0.0, 1.0),
+        (-S1, S3),
+        (-S2, S2),
+        (-S3, S1),
+        (-1.0, 0.0),
+        (-S3, -S1),
+        (-S2, -S2),
+        (-S1, -S3),
+        (0.0, -1.0),
+        (S1, -S3),
+        (S2, -S2),
+        (S3, -S1),
+    ];
+    let (x, y) = T[(rot & 15) as usize];
+    Vec2::new(x, y)
+}
+
+/// Architectural finish of a [`Decor::Wall`] block (the env kit picks the mesh family).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum WallStyle {
+    /// Ruined masonry run with a jagged, broken top.
+    #[default]
+    Ruin,
+    /// Low parapet / balustrade segment (waist height, posts and a rail).
+    Parapet,
+    /// Square pedestal or toppled altar block, often carrying a small prop on top.
+    Plinth,
+    /// Root-bound wall or hedge of roots (Verdant).
+    Hedge,
+    /// Impossible geometry: a floating, slightly tilted monolith (Unmaking).
+    Monolith,
+    /// Iron-banded forge masonry with a quench trough or bellows (Cinder).
+    Forge,
+}
+
+/// Small-prop families for [`Decor::Clutter`] clusters.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ClutterKind {
+    /// Pots, urns and amphorae.
+    #[default]
+    Urns,
+    /// Crates, sacks and barrels.
+    Crates,
+    /// Weapon racks and discarded blades.
+    WeaponRack,
+    /// Ingot stacks, tongs and hammers (forge props).
+    Ingots,
+    /// Bones and skulls of fallen forgebearers.
+    Bones,
+    /// Votive candles and offering bowls.
+    Candles,
+    /// Stacked tomes, scrolls and a lectern.
+    Tomes,
+    /// Glowing mushroom clumps (Verdant).
+    Mushrooms,
+    /// Hanging or standing lanterns.
+    Lanterns,
+    /// Crystal shards and glass splinters.
+    Shards,
+    /// Coin heaps and chalices (treasure rooms).
+    Offerings,
+}
+
 /// Presentation-only set dressing (painted-world hooks).
+///
+/// Units are world units on the ground plane (x east, y north); heights are world units above the
+/// floor; `rot` is a [`Rot16`] facing; `variant` picks a mesh variant (the env kit takes it modulo
+/// its variant count); `god` indexes `ContentDb::gods` in table order (colour of banners and trim).
+///
+/// **Solid** variants (see [`Decor::is_solid`]) dress gameplay obstacles: in a generated room every
+/// obstacle is covered by exactly one solid decor ([`Decor::covers`] its centre), so the env kit can
+/// render the decor and skip the greybox. Every other variant is visual-only and never blocks.
+/// The biome reskins every variant (lava / glowing roots / starlight / raw chaos).
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Decor {
+    /// Visual: glowing fissure in the floor (lava, root vein, void crack, chaos rift) from → to.
     LavaCrack { from: Vec2, to: Vec2, width: f32 },
+    /// Visual: small toppled anvil / idol debris, ~1.5 u × `scale`.
     BrokenAnvil { at: Vec2, scale: f32 },
+    /// Visual: light source on a short stand (fire bowl, glow-bulb cluster, star lamp, chaos flame).
     Brazier { at: Vec2 },
+    /// Solid: standing column on `Obstacle::Circle { at, radius }`; `height` < 2.5 reads as a stump.
     Pillar { at: Vec2, radius: f32, height: f32 },
+
+    // ── solid: dresses obstacles ──
+    /// Solid: axis-aligned masonry block on `Obstacle::Box { center: at, half }`, `height` tall.
+    Wall {
+        at: Vec2,
+        half: Vec2,
+        height: f32,
+        #[serde(default)]
+        style: WallStyle,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid: rock / rubble mound / root knot / moon-rock / impossible polyhedron on
+    /// `Obstacle::Circle { at, radius }`.
+    Boulder {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid landmark: a god's statue, `height` tall, on the round plinth `Obstacle::Circle { at, radius }`,
+    /// facing `rot`. `variant` is the pose (0 raised blade, 1 kneeling, 2 headless, 3 arms outstretched).
+    Statue {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        god: u8,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid landmark: a fallen colossus head half-sunk in the floor, face turned to `rot`, on
+    /// `Obstacle::Circle { at, radius }` (crown/beard spikes may overhang to ~1.3 × radius).
+    ColossusHead {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid: toppled column lying from its base drum (`from`) to its broken end (`to`), `radius`
+    /// thick; covers the chain of `Obstacle::Circle`s laid along the segment.
+    FallenColumn { from: Vec2, to: Vec2, radius: f32 },
+    /// Solid landmark (Cinder): a colossal god-forge anvil, split in two, on
+    /// `Obstacle::Circle { at, radius }`, horn pointing `rot`.
+    GreatAnvil {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        rot: Rot16,
+    },
+    /// Solid landmark (Cinder): a crucible hung on chains over the molten pit
+    /// `Obstacle::Circle { at, radius }`; chains rise off-screen, the pit glows from below.
+    Crucible { at: Vec2, radius: f32 },
+    /// Solid landmark: a great fire bowl on a tripod (strong light) on `Obstacle::Circle { at, radius }`.
+    GreatBrazier { at: Vec2, radius: f32 },
+    /// Solid landmark: a monumental sealed temple gate (frame + shut doors) on
+    /// `Obstacle::Box { center: at, half }`; the doors face along the box's short axis, `height` tall.
+    SealedGate { at: Vec2, half: Vec2, height: f32 },
+    /// Solid (Verdant): an ancient tree trunk / giant mushroom stalk on `Obstacle::Circle { at, radius }`.
+    /// The canopy is presentation-only and should fade over characters.
+    Tree {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid (Verdant): a fallen giant tree with its root plate at `from` and broken crown at `to`,
+    /// trunk `radius` thick; covers the chain of `Obstacle::Circle`s along the segment.
+    FallenTree { from: Vec2, to: Vec2, radius: f32 },
+    /// Solid (Spire, Unmaking): crystal outcrop cluster `height` tall on `Obstacle::Circle { at, radius }`,
+    /// leaning toward `rot`.
+    Crystal {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Solid landmark (Spire): a broken spiral stair winding up a newel to `height`, on
+    /// `Obstacle::Circle { at, radius }`; the break faces `rot`.
+    SpiralStair {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+    },
+    /// Solid (Unmaking): a column standing on its capital, broken base toward the sky, `height`
+    /// tall, with fragments orbiting its top; on `Obstacle::Circle { at, radius }`.
+    InvertedColumn { at: Vec2, radius: f32, height: f32 },
+    /// Solid (Unmaking): a standing tear in reality (vertical glowing slash, `height` tall) whose
+    /// plane faces `rot`; its core is `Obstacle::Circle { at, radius }`.
+    Rift {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+    },
+    /// Solid: a sunken trench of the biome liquid (slag, water, void, chaos) along the axis-aligned
+    /// segment from → to, `width` wide. Covers the `Obstacle::Box`es laid along it; the gaps between
+    /// them are spanned by [`Decor::Bridge`]s.
+    Channel { from: Vec2, to: Vec2, width: f32 },
+
+    // ── visual only ──
+    /// Visual: a walkable stone span over a channel from bank (`from`) to bank (`to`), `width` wide.
+    Bridge { from: Vec2, to: Vec2, width: f32 },
+    /// Visual: a shallow walkable pool (reflecting water, star-mirror, cooled slag glass) with a low
+    /// stone lip, axis-aligned `at ± half`, rounded corners.
+    Pool { at: Vec2, half: Vec2 },
+    /// Visual: laid floor area, axis-aligned `at ± half`. `variant`: 0 flagstones, 1 herringbone,
+    /// 2 mosaic tesserae, 3 broken paving.
+    Paving {
+        at: Vec2,
+        half: Vec2,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Visual: circular floor decal of `radius`, rotated `rot`. `variant`: 0 plaza mosaic star (gold),
+    /// 1 rune ring, 2 clockface / orrery, 3 god sigil (uses `god`), 4 chaos glyph.
+    FloorInlay {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        variant: u8,
+        #[serde(default)]
+        god: u8,
+    },
+    /// Visual: ground cover patch of `radius` (grass, moss, ferns, ash drifts, lichen, stardust) with
+    /// tufts; `variant` picks the cover within the biome's set.
+    Overgrowth {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Visual: a thick root or vine crawling over the floor from → to (walkable, faint glow veins).
+    Roots { from: Vec2, to: Vec2, width: f32 },
+    /// Visual: low scattered debris cluster of `radius` (masonry chunks, slag lumps, shards).
+    Rubble {
+        at: Vec2,
+        radius: f32,
+        #[serde(default)]
+        variant: u8,
+    },
+    /// Visual: a cluster of `count` small props of one family within `radius`, turned `rot`.
+    Clutter {
+        at: Vec2,
+        radius: f32,
+        kind: ClutterKind,
+        #[serde(default)]
+        count: u8,
+        #[serde(default)]
+        rot: Rot16,
+    },
+    /// Visual: a banner in the colours of `god`, `height` tall, cloth facing `rot` (wall-hung when it
+    /// stands on the rim, on a pole otherwise).
+    Banner {
+        at: Vec2,
+        height: f32,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        god: u8,
+    },
+    /// Visual: chain (or vine garland / star-string) strung between two points `height` above the floor.
+    Chains { from: Vec2, to: Vec2, height: f32 },
+    /// Visual: a floating fragment of `radius` hovering `height` above the floor (bobbing, casts a
+    /// shadow).
+    Debris {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        variant: u8,
+    },
+}
+
+impl Decor {
+    /// Does this decor dress a gameplay obstacle (see the type docs)?
+    pub fn is_solid(&self) -> bool {
+        matches!(
+            self,
+            Decor::Pillar { .. }
+                | Decor::Wall { .. }
+                | Decor::Boulder { .. }
+                | Decor::Statue { .. }
+                | Decor::ColossusHead { .. }
+                | Decor::FallenColumn { .. }
+                | Decor::GreatAnvil { .. }
+                | Decor::Crucible { .. }
+                | Decor::GreatBrazier { .. }
+                | Decor::SealedGate { .. }
+                | Decor::Tree { .. }
+                | Decor::FallenTree { .. }
+                | Decor::Crystal { .. }
+                | Decor::SpiralStair { .. }
+                | Decor::InvertedColumn { .. }
+                | Decor::Rift { .. }
+                | Decor::Channel { .. }
+        )
+    }
+
+    /// Anchor point: `at`, or the midpoint of a from → to variant.
+    pub fn anchor(&self) -> Vec2 {
+        match *self {
+            Decor::LavaCrack { from, to, .. }
+            | Decor::FallenColumn { from, to, .. }
+            | Decor::FallenTree { from, to, .. }
+            | Decor::Channel { from, to, .. }
+            | Decor::Roots { from, to, .. }
+            | Decor::Bridge { from, to, .. }
+            | Decor::Chains { from, to, .. } => (from + to) * 0.5,
+            Decor::BrokenAnvil { at, .. }
+            | Decor::Brazier { at }
+            | Decor::Pillar { at, .. }
+            | Decor::Wall { at, .. }
+            | Decor::Boulder { at, .. }
+            | Decor::Statue { at, .. }
+            | Decor::ColossusHead { at, .. }
+            | Decor::GreatAnvil { at, .. }
+            | Decor::Crucible { at, .. }
+            | Decor::GreatBrazier { at, .. }
+            | Decor::SealedGate { at, .. }
+            | Decor::Tree { at, .. }
+            | Decor::Crystal { at, .. }
+            | Decor::SpiralStair { at, .. }
+            | Decor::InvertedColumn { at, .. }
+            | Decor::Rift { at, .. }
+            | Decor::Pool { at, .. }
+            | Decor::Paving { at, .. }
+            | Decor::FloorInlay { at, .. }
+            | Decor::Overgrowth { at, .. }
+            | Decor::Rubble { at, .. }
+            | Decor::Clutter { at, .. }
+            | Decor::Banner { at, .. }
+            | Decor::Debris { at, .. } => at,
+        }
+    }
+
+    /// Does this solid decor dress an obstacle centred at `p`? (Always false for visual decor.)
+    pub fn covers(&self, p: Vec2) -> bool {
+        let near_segment = |a: Vec2, b: Vec2, r: f32| {
+            let ab = b - a;
+            let t = ((p - a).dot(ab) / ab.length_squared().max(1e-6)).clamp(0.0, 1.0);
+            p.distance(a + ab * t) <= r
+        };
+        match *self {
+            Decor::Wall { at, half, .. } | Decor::SealedGate { at, half, .. } => {
+                (p - at).abs().cmple(half + Vec2::splat(0.01)).all()
+            }
+            Decor::FallenColumn { from, to, radius } | Decor::FallenTree { from, to, radius } => {
+                near_segment(from, to, radius * 0.5 + 0.01)
+            }
+            Decor::Channel { from, to, width } => near_segment(from, to, width * 0.5 + 0.01),
+            Decor::Pillar { at, .. }
+            | Decor::Boulder { at, .. }
+            | Decor::Statue { at, .. }
+            | Decor::ColossusHead { at, .. }
+            | Decor::GreatAnvil { at, .. }
+            | Decor::Crucible { at, .. }
+            | Decor::GreatBrazier { at, .. }
+            | Decor::Tree { at, .. }
+            | Decor::Crystal { at, .. }
+            | Decor::SpiralStair { at, .. }
+            | Decor::InvertedColumn { at, .. }
+            | Decor::Rift { at, .. } => p.distance(at) < 0.05,
+            _ => false,
+        }
+    }
+}
+
+/// How one side of the arena border is built (presentation; the playable rectangle never changes).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum RimEdge {
+    /// Tall solid masonry (north backdrop 5-8 u) with gate arches cut at the exits.
+    #[default]
+    Wall,
+    /// Ruined wall 1.5-4 u with breaches the horde pours through, rubble at its foot.
+    BrokenWall,
+    /// Row of columns under an architrave (6-9 u); the sky / abyss shows between them.
+    Colonnade,
+    /// Waist-high railing with posts and urns; the abyss drops away beyond it.
+    Balustrade,
+    /// Natural rock face: rising behind the north rim, dropping away on the flanks.
+    Cliff,
+    /// Dense roots, ferns and trunks (Verdant): dark foliage silhouettes.
+    Thicket,
+    /// Two or three terrace steps (~0.6 u each) rising outward, props on the landings.
+    Terrace,
+    /// The floor breaks into floating islands drifting into the void (Spire, Unmaking).
+    Shattered,
+    /// Carved edge with a glowing rune lip and a sheer drop into the abyss (the south default).
+    Open,
+}
+
+/// Arena border per side. `height` scales the north backdrop (world units); `variant` picks trim.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct RimStyle {
+    pub north: RimEdge,
+    pub east: RimEdge,
+    pub south: RimEdge,
+    pub west: RimEdge,
+    pub height: f32,
+    pub variant: u8,
+}
+
+impl Default for RimStyle {
+    fn default() -> Self {
+        Self {
+            north: RimEdge::Wall,
+            east: RimEdge::BrokenWall,
+            south: RimEdge::Open,
+            west: RimEdge::BrokenWall,
+            height: 4.0,
+            variant: 0,
+        }
+    }
+}
+
+/// Themed zones of a generated arena. Templates list preferred ones as `motifs`; generated rooms
+/// report where each one landed in `districts` (floor material and ambient props for the env kit).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum DistrictKind {
+    /// The central plaza: mosaic ring, or the anvil's forge circle.
+    Plaza,
+    /// Open killing field: sparse boulders, ground cover, fissures.
+    #[default]
+    Field,
+    /// A paved court framed by colonnades on two or three sides.
+    ColonnadeCourt,
+    /// Cinder: a collapsed forge hall around a great broken anvil.
+    ForgeHall,
+    /// Cinder: a slag channel crossed by stone bridges (chokepoints).
+    SlagChannel,
+    /// Cinder: a chain-hung crucible over a molten pit, ringed by anchor posts.
+    CrucibleYard,
+    /// Verdant: an overgrown cloister (colonnade square around a garden).
+    Cloister,
+    /// Verdant: a root-cracked terrace edged by low broken walls.
+    RootTerrace,
+    /// Verdant: a shallow reflecting pool flanked by columns.
+    ReflectingPool,
+    /// Verdant: a fallen giant tree across the district.
+    FallenGiant,
+    /// Spire: a broken spiral stair and its scattered steps.
+    BrokenStair,
+    /// Spire, Unmaking: crystal outcrops.
+    CrystalGarden,
+    /// Spire: a ring of floating debris around an orrery inlay.
+    DebrisRing,
+    /// Spire, Unmaking: a void chasm crossed by bridges.
+    VoidChasm,
+    /// Unmaking: the floor shattered into islands between void cracks.
+    ShatteredIslands,
+    /// Unmaking: standing reality rifts.
+    RiftField,
+    /// Unmaking: a colonnade of inverted columns at impossible spacings.
+    InvertedNave,
+}
+
+/// Where a district landed: axis-aligned `min..max` in world units.
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct District {
+    pub kind: DistrictKind,
+    pub min: Vec2,
+    pub max: Vec2,
+}
+
+/// A processional lane kept free of obstacles: the capsule from → to of total `width`.
+/// Presentation paves it (the path from the entrance through the plaza to each gate).
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Lane {
+    pub from: Vec2,
+    pub to: Vec2,
+    pub width: f32,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -872,6 +1349,18 @@ pub struct RoomDef {
     pub encounter: EncounterDef,
     #[serde(default)]
     pub decor: Vec<Decor>,
+    /// Templates: district motifs the generator favours for this room (its signature places).
+    #[serde(default)]
+    pub motifs: Vec<DistrictKind>,
+    /// Arena border dressing (presentation).
+    #[serde(default)]
+    pub rim: RimStyle,
+    /// Generated rooms: the themed zones and where they landed (presentation).
+    #[serde(default)]
+    pub districts: Vec<District>,
+    /// Generated rooms: processional lanes kept clear of obstacles (presentation paves them).
+    #[serde(default)]
+    pub lanes: Vec<Lane>,
 }
 
 impl RoomDef {
@@ -890,6 +1379,10 @@ impl RoomDef {
             spawn_zones: vec![SpawnZone::Edges { margin: 1.0 }],
             encounter: EncounterDef::default(),
             decor: Vec::new(),
+            motifs: Vec::new(),
+            rim: RimStyle::default(),
+            districts: Vec::new(),
+            lanes: Vec::new(),
         }
     }
 }

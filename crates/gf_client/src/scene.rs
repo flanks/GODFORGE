@@ -473,6 +473,9 @@ fn build_room(kit: &mut Kit, room: &RoomDef, [base, accent, deep]: [Color; 3]) {
                     Transform::from_translation(w3(at, 0.15)).with_scale(Vec3::new(radius * 2.3, 0.3, radius * 2.3)),
                 );
             }
+            // The env kit renders the rest of the procgen vocabulary; until then the obstacles
+            // they dress keep their greybox above.
+            _ => {}
         }
     }
 }
