@@ -1,0 +1,3885 @@
+{
+ "hero": "brax",
+ "rest_lowest_vertex_z_mm": 3.7,
+ "clips": {
+  "idle": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 312.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "45": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 311.6,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "68": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.5,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "90": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   }
+  },
+  "idle_combat": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.5,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "16": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 353.6,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "32": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "walk": {
+   "0": {
+    "lowest_vertex_z_mm": 6.5,
+    "lowest_cloth_z_mm": 286.3,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "4": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 330.7,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 2,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 225.8,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 126.2,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "16": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 185.7,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 450.0,
+    "gauntlet_L_cuts_body": 6,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 344.4,
+    "gauntlet_L_cuts_body": 6,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "28": {
+    "lowest_vertex_z_mm": 6.5,
+    "lowest_cloth_z_mm": 286.3,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "run": {
+   "0": {
+    "lowest_vertex_z_mm": -2.6,
+    "lowest_cloth_z_mm": 169.8,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      19
+     ],
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "thigh_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 18.1,
+    "lowest_cloth_z_mm": 190.6,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 27,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      12
+     ],
+     [
+      "thigh_twist_R",
+      3
+     ],
+     [
+      "spine_02",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 422.1,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 21,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      13
+     ],
+     [
+      "thigh_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 3.4,
+    "lowest_cloth_z_mm": 288.8,
+    "gauntlet_L_cuts_body": 17,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "thigh_L",
+      1
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 48.2,
+    "lowest_cloth_z_mm": 342.0,
+    "gauntlet_L_cuts_body": 22,
+    "gauntlet_R_cuts_body": 13,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "upperarm_R",
+      13
+     ],
+     [
+      "spine_01",
+      1
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 423.9,
+    "gauntlet_L_cuts_body": 28,
+    "gauntlet_R_cuts_body": 12,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "upperarm_R",
+      12
+     ],
+     [
+      "thigh_twist_L",
+      3
+     ],
+     [
+      "spine_01",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 178.0,
+    "gauntlet_L_cuts_body": 19,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      19
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": -2.6,
+    "lowest_cloth_z_mm": 169.8,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      19
+     ],
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "thigh_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "strafe_left": {
+   "0": {
+    "lowest_vertex_z_mm": 12.4,
+    "lowest_cloth_z_mm": 382.7,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 19.4,
+    "lowest_cloth_z_mm": 456.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 403.4,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 7.5,
+    "lowest_cloth_z_mm": 374.7,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 43.8,
+    "lowest_cloth_z_mm": 293.7,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 337.1,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 331.1,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 12.4,
+    "lowest_cloth_z_mm": 382.7,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "strafe_right": {
+   "0": {
+    "lowest_vertex_z_mm": 12.4,
+    "lowest_cloth_z_mm": 193.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 16.3,
+    "lowest_cloth_z_mm": 283.9,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 370.0,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "clavicle_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 7.5,
+    "lowest_cloth_z_mm": 456.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 44.2,
+    "lowest_cloth_z_mm": 496.5,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 451.8,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 227.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 12.4,
+    "lowest_cloth_z_mm": 193.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "backpedal": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 302.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 9.4,
+    "lowest_cloth_z_mm": 245.8,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 406.7,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 133.7,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 9.4,
+    "lowest_cloth_z_mm": 115.0,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 312.1,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 302.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "dash": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 98.4,
+    "lowest_cloth_z_mm": 202.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "thigh_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 113.8,
+    "lowest_cloth_z_mm": 174.4,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "thigh_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "dash_recover": {
+   "0": {
+    "lowest_vertex_z_mm": 113.8,
+    "lowest_cloth_z_mm": 174.4,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "thigh_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 276.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 21,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      21
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.6,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 353.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "14": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "fire_light": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.2,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 2,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.2,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 11,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      11
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "fire_heavy": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "5": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.6,
+    "gauntlet_L_cuts_body": 17,
+    "gauntlet_R_cuts_body": 26,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      22
+     ],
+     [
+      "upperarm_L",
+      17
+     ],
+     [
+      "clavicle_R",
+      2
+     ],
+     [
+      "upperarm_twist_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "7": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.0,
+    "gauntlet_L_cuts_body": 7,
+    "gauntlet_R_cuts_body": 11,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      11
+     ],
+     [
+      "upperarm_L",
+      7
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 1,
+    "gauntlet_R_cuts_body": 8,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      8
+     ],
+     [
+      "upperarm_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "16": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "fire_charge": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.3,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 36,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      25
+     ],
+     [
+      "upperarm_L",
+      13
+     ],
+     [
+      "upperarm_twist_R",
+      6
+     ],
+     [
+      "spine_03",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 31,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      25
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "upperarm_twist_R",
+      4
+     ],
+     [
+      "spine_03",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.3,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 36,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      25
+     ],
+     [
+      "upperarm_L",
+      13
+     ],
+     [
+      "upperarm_twist_R",
+      6
+     ],
+     [
+      "spine_03",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 31,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      25
+     ],
+     [
+      "upperarm_L",
+      14
+     ],
+     [
+      "upperarm_twist_R",
+      4
+     ],
+     [
+      "spine_03",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 352.3,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 36,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      25
+     ],
+     [
+      "upperarm_L",
+      13
+     ],
+     [
+      "upperarm_twist_R",
+      6
+     ],
+     [
+      "spine_03",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "hit_light": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 357.0,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      17
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "5": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.1,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "hit_heavy": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 414.3,
+    "gauntlet_L_cuts_body": 29,
+    "gauntlet_R_cuts_body": 25,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      27
+     ],
+     [
+      "upperarm_R",
+      24
+     ],
+     [
+      "upperarm_twist_L",
+      2
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 266.1,
+    "gauntlet_L_cuts_body": 20,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      21
+     ],
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "13": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 190.5,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      18
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "19": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 296.7,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "22": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 318.6,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "26": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "knockdown": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 398.8,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 19,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      19
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 168.9,
+    "lowest_cloth_z_mm": 187.2,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "14": {
+    "lowest_vertex_z_mm": 57.1,
+    "lowest_cloth_z_mm": -58.0,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 6.8,
+    "lowest_cloth_z_mm": -91.4,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 13,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 6.8,
+    "lowest_cloth_z_mm": -91.4,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 13,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "get_up": {
+   "0": {
+    "lowest_vertex_z_mm": 0.8,
+    "lowest_cloth_z_mm": -97.7,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 13,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "7": {
+    "lowest_vertex_z_mm": 3.3,
+    "lowest_cloth_z_mm": -65.7,
+    "gauntlet_L_cuts_body": 11,
+    "gauntlet_R_cuts_body": 10,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      11
+     ],
+     [
+      "upperarm_R",
+      10
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.0,
+    "lowest_cloth_z_mm": 72.6,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "spine_02",
+      1
+     ],
+     [
+      "upperarm_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "16": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 207.1,
+    "gauntlet_L_cuts_body": 58,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "thigh_L",
+      26
+     ],
+     [
+      "shin_L",
+      19
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "23": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 233.6,
+    "gauntlet_L_cuts_body": 20,
+    "gauntlet_R_cuts_body": 21,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "spine_03",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "27": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 287.4,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 341.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "36": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 369.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "death": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "4": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 367.3,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 19,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      19
+     ],
+     [
+      "upperarm_L",
+      18
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 56.2,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      12
+     ],
+     [
+      "upperarm_R",
+      12
+     ],
+     [
+      "thigh_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 0.1,
+    "lowest_cloth_z_mm": 25.7,
+    "gauntlet_L_cuts_body": 7,
+    "gauntlet_R_cuts_body": 7,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      7
+     ],
+     [
+      "upperarm_R",
+      7
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "25": {
+    "lowest_vertex_z_mm": 0.1,
+    "lowest_cloth_z_mm": 9.8,
+    "gauntlet_L_cuts_body": 7,
+    "gauntlet_R_cuts_body": 7,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      7
+     ],
+     [
+      "upperarm_R",
+      7
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "31": {
+    "lowest_vertex_z_mm": -3.8,
+    "lowest_cloth_z_mm": -233.3,
+    "gauntlet_L_cuts_body": 9,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      9
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "36": {
+    "lowest_vertex_z_mm": -2.3,
+    "lowest_cloth_z_mm": -129.4,
+    "gauntlet_L_cuts_body": 19,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      19
+     ],
+     [
+      "upperarm_R",
+      5
+     ],
+     [
+      "thigh_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "39": {
+    "lowest_vertex_z_mm": -2.3,
+    "lowest_cloth_z_mm": -147.1,
+    "gauntlet_L_cuts_body": 20,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "upperarm_R",
+      5
+     ],
+     [
+      "thigh_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "48": {
+    "lowest_vertex_z_mm": -2.3,
+    "lowest_cloth_z_mm": -129.4,
+    "gauntlet_L_cuts_body": 19,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      19
+     ],
+     [
+      "upperarm_R",
+      5
+     ],
+     [
+      "thigh_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "downed": {
+   "0": {
+    "lowest_vertex_z_mm": 156.5,
+    "lowest_cloth_z_mm": 238.0,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 3,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ],
+     [
+      "upperarm_R",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 206.5,
+    "lowest_cloth_z_mm": 256.8,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 4,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      4
+     ],
+     [
+      "upperarm_L",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 166.5,
+    "lowest_cloth_z_mm": 239.5,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 3,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ],
+     [
+      "upperarm_R",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "45": {
+    "lowest_vertex_z_mm": 201.5,
+    "lowest_cloth_z_mm": 237.0,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "60": {
+    "lowest_vertex_z_mm": 156.5,
+    "lowest_cloth_z_mm": 238.0,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 3,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ],
+     [
+      "upperarm_R",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "revive": {
+   "0": {
+    "lowest_vertex_z_mm": 156.5,
+    "lowest_cloth_z_mm": 238.0,
+    "gauntlet_L_cuts_body": 3,
+    "gauntlet_R_cuts_body": 3,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      3
+     ],
+     [
+      "upperarm_R",
+      3
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 118.4,
+    "lowest_cloth_z_mm": 413.6,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 191.8,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 25,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      23
+     ],
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "spine_03",
+      2
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "22": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 320.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 350.0,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "34": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 350.0,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "40": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 350.0,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "reforge_in": {
+   "0": {
+    "lowest_vertex_z_mm": 0.2,
+    "lowest_cloth_z_mm": -58.6,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      12
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": -3.4,
+    "lowest_cloth_z_mm": -79.1,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 7,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      12
+     ],
+     [
+      "upperarm_R",
+      7
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 134.9,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 27,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      23
+     ],
+     [
+      "upperarm_L",
+      19
+     ],
+     [
+      "spine_03",
+      5
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "22": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 298.1,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 29,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      23
+     ],
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_twist_R",
+      4
+     ],
+     [
+      "clavicle_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "26": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 350.8,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 19,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      19
+     ],
+     [
+      "upperarm_L",
+      18
+     ]
+    ],
+    "gauntlets_touch": 42
+   },
+   "28": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 350.8,
+    "gauntlet_L_cuts_body": 22,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      21
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 40
+   },
+   "36": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "45": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "victory": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 304.3,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 27,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      23
+     ],
+     [
+      "upperarm_L",
+      20
+     ],
+     [
+      "spine_03",
+      3
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "17": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.6,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 7,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      7
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 353.2,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "42": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 348.4,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "60": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 353.2,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      6
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "ping": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      18
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "5": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "14": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "17": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "interact": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 294.8,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      18
+     ],
+     [
+      "upperarm_R",
+      17
+     ]
+    ],
+    "gauntlets_touch": 43
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 276.3,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      18
+     ],
+     [
+      "upperarm_R",
+      18
+     ]
+    ],
+    "gauntlets_touch": 36
+   },
+   "14": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 276.3,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      18
+     ],
+     [
+      "upperarm_R",
+      18
+     ]
+    ],
+    "gauntlets_touch": 36
+   },
+   "26": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 276.3,
+    "gauntlet_L_cuts_body": 18,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      18
+     ],
+     [
+      "upperarm_R",
+      18
+     ]
+    ],
+    "gauntlets_touch": 36
+   },
+   "40": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   }
+  },
+  "forge_hammer": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 372.5,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 12,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      12
+     ],
+     [
+      "upperarm_L",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 374.4,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      12
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 361.4,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      18
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 26
+   },
+   "11": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 366.8,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "20": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 376.0,
+    "gauntlet_L_cuts_body": 10,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      22
+     ],
+     [
+      "upperarm_L",
+      10
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 372.5,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "36": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 372.5,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 12,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      12
+     ],
+     [
+      "upperarm_L",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "idle_signature": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.0,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 304.0,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "26": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 304.5,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "34": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 307.7,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "42": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 309.4,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "50": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 309.0,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "58": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "66": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 307.3,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "74": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   },
+   "82": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.1,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "86": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 19
+   },
+   "88": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "92": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 19
+   },
+   "94": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 305.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "106": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 307.3,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 2,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      2
+     ],
+     [
+      "upperarm_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "120": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 306.9,
+    "gauntlet_L_cuts_body": 0,
+    "gauntlet_R_cuts_body": 0,
+    "gauntlets_touch": 0
+   }
+  },
+  "jab_l": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "1": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 376.4,
+    "gauntlet_L_cuts_body": 5,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "4": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 376.4,
+    "gauntlet_L_cuts_body": 10,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      10
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "jab_r": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "1": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      21
+     ],
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 391.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 2,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "4": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 391.9,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 8,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      8
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "hook": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 354.3,
+    "gauntlet_L_cuts_body": 24,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      23
+     ],
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 395.6,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 21,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      21
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 399.7,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      20
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "16": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "uppercut": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "5": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 201.4,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      11
+     ],
+     [
+      "thigh_R",
+      6
+     ],
+     [
+      "thigh_twist_R",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 400.2,
+    "gauntlet_L_cuts_body": 19,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      19
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 3.4,
+    "lowest_cloth_z_mm": 438.0,
+    "gauntlet_L_cuts_body": 22,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      6
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 426.7,
+    "gauntlet_L_cuts_body": 23,
+    "gauntlet_R_cuts_body": 0,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      22
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "21": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 402.3,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 13,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      13
+     ],
+     [
+      "upperarm_R",
+      13
+     ]
+    ],
+    "gauntlets_touch": 4
+   },
+   "25": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": -25.9,
+    "gauntlet_L_cuts_body": 29,
+    "gauntlet_R_cuts_body": 8,
+    "cuts_by_bone": [
+     [
+      "thigh_L",
+      20
+     ],
+     [
+      "upperarm_R",
+      8
+     ],
+     [
+      "upperarm_L",
+      6
+     ],
+     [
+      "shin_L",
+      3
+     ]
+    ],
+    "gauntlets_touch": 11
+   },
+   "30": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 9.3,
+    "gauntlet_L_cuts_body": 23,
+    "gauntlet_R_cuts_body": 6,
+    "cuts_by_bone": [
+     [
+      "thigh_L",
+      17
+     ],
+     [
+      "upperarm_R",
+      6
+     ],
+     [
+      "shin_L",
+      3
+     ],
+     [
+      "upperarm_L",
+      3
+     ]
+    ],
+    "gauntlets_touch": 12
+   },
+   "38": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 304.3,
+    "gauntlet_L_cuts_body": 17,
+    "gauntlet_R_cuts_body": 20,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      20
+     ],
+     [
+      "upperarm_L",
+      17
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "48": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "furnace_rush": {
+   "0": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 100.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 10.6,
+    "lowest_cloth_z_mm": 131.0,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "4": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 362.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 18,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      18
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 241.5,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      16
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "8": {
+    "lowest_vertex_z_mm": 10.6,
+    "lowest_cloth_z_mm": 300.3,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "10": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 276.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 100.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "furnace_rush_end": {
+   "0": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 100.3,
+    "gauntlet_L_cuts_body": 14,
+    "gauntlet_R_cuts_body": 17,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "upperarm_L",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "2": {
+    "lowest_vertex_z_mm": 25.0,
+    "lowest_cloth_z_mm": 229.6,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "3": {
+    "lowest_vertex_z_mm": 4.4,
+    "lowest_cloth_z_mm": 221.6,
+    "gauntlet_L_cuts_body": 16,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ],
+     [
+      "upperarm_R",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "5": {
+    "lowest_vertex_z_mm": 2.6,
+    "lowest_cloth_z_mm": 280.2,
+    "gauntlet_L_cuts_body": 4,
+    "gauntlet_R_cuts_body": 8,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      8
+     ],
+     [
+      "upperarm_L",
+      4
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "9": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 308.7,
+    "gauntlet_L_cuts_body": 11,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ],
+     [
+      "upperarm_L",
+      11
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 326.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "15": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 353.9,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "meltdown_start": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 261.4,
+    "gauntlet_L_cuts_body": 23,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "thigh_L",
+      8
+     ]
+    ],
+    "gauntlets_touch": 1
+   },
+   "13": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 358.1,
+    "gauntlet_L_cuts_body": 5,
+    "gauntlet_R_cuts_body": 5,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      5
+     ],
+     [
+      "upperarm_R",
+      5
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "21": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 355.8,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 12,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      12
+     ],
+     [
+      "upperarm_R",
+      12
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "25": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 303.1,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 21,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      21
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "27": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 303.1,
+    "gauntlet_L_cuts_body": 22,
+    "gauntlet_R_cuts_body": 22,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_R",
+      21
+     ],
+     [
+      "upperarm_twist_L",
+      1
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 39
+   },
+   "33": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 231.3,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "40": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 254.7,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "meltdown": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 254.7,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 231.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      15
+     ],
+     [
+      "upperarm_R",
+      14
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "12": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 254.7,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "18": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 231.3,
+    "gauntlet_L_cuts_body": 12,
+    "gauntlet_R_cuts_body": 15,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      15
+     ],
+     [
+      "upperarm_L",
+      12
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "24": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 254.7,
+    "gauntlet_L_cuts_body": 13,
+    "gauntlet_R_cuts_body": 14,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      14
+     ],
+     [
+      "upperarm_L",
+      13
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  },
+  "heat_vent": {
+   "0": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "6": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 357.8,
+    "gauntlet_L_cuts_body": 2,
+    "gauntlet_R_cuts_body": 2,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      2
+     ],
+     [
+      "upperarm_R",
+      2
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "14": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 357.8,
+    "gauntlet_L_cuts_body": 1,
+    "gauntlet_R_cuts_body": 1,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      1
+     ],
+     [
+      "upperarm_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "22": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.2,
+    "gauntlet_L_cuts_body": 21,
+    "gauntlet_R_cuts_body": 25,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      24
+     ],
+     [
+      "upperarm_L",
+      21
+     ],
+     [
+      "upperarm_twist_R",
+      1
+     ]
+    ],
+    "gauntlets_touch": 0
+   },
+   "30": {
+    "lowest_vertex_z_mm": 5.1,
+    "lowest_cloth_z_mm": 356.3,
+    "gauntlet_L_cuts_body": 15,
+    "gauntlet_R_cuts_body": 16,
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ],
+     [
+      "upperarm_L",
+      15
+     ]
+    ],
+    "gauntlets_touch": 0
+   }
+  }
+ }
+}

@@ -412,10 +412,99 @@
    }
   },
   "4_animation": {
-   "status": "not_started",
-   "human_signoff_required": false,
-   "outputs": [],
-   "notes": "The shared clip set on GF_Hero_v1 plus Brax's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only. Rules from stage 3 (docs/art/GF_HERO_SKELETON.md section 7): FK on core bones, never key root / twist / sockets; with the anvil_gauntlets keep the wrist straight and play the fist clench with the fist variant; the validation poses (tools/blender/gf_hero/s3_pose_set.py) are the reference range; the sash tails and underskirt want secondary x_ bones."
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/run_stage4.py; no animator, no Mixamo / ActorCore seeds",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "human_signoff_required": true,
+   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md section 8: the clip library, naming and rules)",
+   "outputs": [
+    "art/characters/brax/production/brax_anim.blend (Git LFS)",
+    "art/characters/brax/reports/anim_report.md",
+    "art/characters/brax/reports/anim/clips.json",
+    "art/characters/brax/reports/anim/render_checks.json",
+    "art/characters/brax/reports/anim/gltf_check.json",
+    "art/characters/brax/reports/anim/<clip>.png (one contact sheet per clip, 34 sheets)",
+    "art/characters/brax/reports/anim/anim_board_{1,2,3}.png"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage4.py",
+    "tools/blender/gf_hero/s4lib.py",
+    "tools/blender/gf_hero/s4_clips.py",
+    "tools/blender/gf_hero/s4_brax.py",
+    "tools/blender/gf_hero/s4_contract.py",
+    "tools/blender/gf_hero/s4_anim.py",
+    "tools/blender/gf_hero/s4_render.py",
+    "tools/blender/gf_hero/s4_sheets.py",
+    "tools/blender/gf_hero/s4_gltf_check.py",
+    "tools/blender/gf_hero/check_clips.py"
+   ],
+   "metrics": {
+    "clips": 34,
+    "shared_clips": 24,
+    "unique_clips": 10,
+    "loops": 13,
+    "fps": 30,
+    "frames_total": 1079,
+    "loop_seams_closed": 13,
+    "foot_slide_max_mm_non_exempt": 0.9,
+    "slide_exempt": [
+     "furnace_rush"
+    ],
+    "wrist_swing_max_deg": 0.0,
+    "ik_miss_max_mm": 55.1,
+    "pelvis_drift_max_mm": 420.5,
+    "solver_vs_blender_max_error": 8.539288510021211e-07,
+    "gltf_animations": 34,
+    "gltf_check_ok": true,
+    "gltf_bytes": 10073528,
+    "key_frames_rendered": 225,
+    "gauntlet_cuts_body_max_verts": 58,
+    "gauntlets_touch_max_verts": 43,
+    "lowest_body_vertex_mm": -3.8,
+    "lowest_rigid_cloth_vertex_mm": -233.3,
+    "design_speed_run_mps": 6.2,
+    "design_speed_walk_mps": 1.799
+   },
+   "notes": "34 clips on GF_Hero_v1 (24 shared + 10 Brax), keyed in Python Cascadeur-style (effector-driven strong poses: anticipation, contact, follow-through, weight) and solved every frame with an analytic two-bone IK (s4lib.py); in place, 30 fps, loops closed by construction, locomotion speed-matched (playback rate = speed / design speed), planted feet at most 0.9 mm in every clip but the Furnace Rush skid-charge (slide_exempt by design), the anvil_gauntlets wrist rule kept (hand twist only). Naming <key>_<clip>[@loop] (docs/art/GF_HERO_SKELETON.md section 8); events in reports/anim/clips.json (stage 5 writes them to the GLB sidecar). Honest findings (reports/anim_report.md section 6): the gauntlet cuff presses into the biceps in every bent-arm pose (weapon geometry, ~15-25 verts a side), the rigid skirt plates and sash clip the ground and the thighs in lying / kneeling / high-knee poses (no x_ cloth bones yet), deep knee flexion shows the stage-3 knee flattening. The user's visual approval is the remaining gate.",
+   "items": {
+    "shared_clip_library": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_clips.py",
+      "tools/blender/gf_hero/s4lib.py",
+      "tools/blender/gf_hero/s4_contract.py"
+     ],
+     "notes": "24 shared clips, valid for every hero on GF_Hero_v1 (baked per hero from its landmark file and move speed)"
+    },
+    "brax_unique_clips": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_brax.py"
+     ],
+     "notes": "10 clips: idle_signature@loop, jab_l, jab_r, hook, uppercut (Cinder Uppercut), furnace_rush@loop, furnace_rush_end, meltdown_start, meltdown@loop, heat_vent"
+    },
+    "baked_clips_and_checks": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/production/brax_anim.blend",
+      "art/characters/brax/reports/anim/clips.json",
+      "art/characters/brax/reports/anim/gltf_check.json"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made clips (contact sheets in reports/anim/, findings in reports/anim_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "5_export_validate": {
    "status": "not_started",
@@ -456,6 +545,11 @@
    "gate": "stage 3: the user's visual approval of the AI-made rig and weights (no weight-paint artist, 2026-09-25)",
    "state": "pending_human",
    "via": "art/characters/brax/reports/stage3/ + reports/rig_report.md"
+  },
+  {
+   "gate": "stage 4: the user's visual approval of the AI-made clips (no animator, 2026-09-25)",
+   "state": "pending_human",
+   "via": "art/characters/brax/reports/anim/ + reports/anim_report.md"
   },
   {
    "gate": "stage 5: final Hades-II bar",

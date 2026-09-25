@@ -1,0 +1,383 @@
+{
+ "hero": "brax",
+ "file": "art/characters/brax/work/gltf_check/brax_anim.glb (local scratch)",
+ "bytes": 10073528,
+ "extensionsRequired": [],
+ "animations": 34,
+ "clips": {
+  "brax_backpedal@loop": {
+   "channels": 189,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_dash": {
+   "channels": 189,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_dash_recover": {
+   "channels": 189,
+   "duration_s": 0.46667,
+   "samples": 15,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_death": {
+   "channels": 189,
+   "duration_s": 1.6,
+   "samples": 49,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_downed@loop": {
+   "channels": 189,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_fire_charge@loop": {
+   "channels": 189,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_fire_heavy": {
+   "channels": 189,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_fire_light": {
+   "channels": 189,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_forge_hammer@loop": {
+   "channels": 189,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_furnace_rush@loop": {
+   "channels": 189,
+   "duration_s": 0.4,
+   "samples": 13,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_furnace_rush_end": {
+   "channels": 189,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_get_up": {
+   "channels": 189,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_heat_vent": {
+   "channels": 189,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_hit_heavy": {
+   "channels": 189,
+   "duration_s": 0.86667,
+   "samples": 27,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_hit_light": {
+   "channels": 189,
+   "duration_s": 0.4,
+   "samples": 13,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_hook": {
+   "channels": 189,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_idle@loop": {
+   "channels": 189,
+   "duration_s": 3.0,
+   "samples": 91,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_idle_combat@loop": {
+   "channels": 189,
+   "duration_s": 1.06667,
+   "samples": 33,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_idle_signature@loop": {
+   "channels": 189,
+   "duration_s": 4.0,
+   "samples": 121,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_interact": {
+   "channels": 189,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_jab_l": {
+   "channels": 189,
+   "duration_s": 0.33333,
+   "samples": 11,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_jab_r": {
+   "channels": 189,
+   "duration_s": 0.33333,
+   "samples": 11,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_knockdown": {
+   "channels": 189,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_meltdown@loop": {
+   "channels": 189,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_meltdown_start": {
+   "channels": 189,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_ping": {
+   "channels": 189,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "brax_reforge_in": {
+   "channels": 189,
+   "duration_s": 1.5,
+   "samples": 46,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_revive": {
+   "channels": 189,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_run@loop": {
+   "channels": 189,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_strafe_left@loop": {
+   "channels": 189,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_strafe_right@loop": {
+   "channels": 189,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "brax_uppercut": {
+   "channels": 189,
+   "duration_s": 1.6,
+   "samples": 49,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_victory": {
+   "channels": 189,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "brax_walk@loop": {
+   "channels": 189,
+   "duration_s": 0.93333,
+   "samples": 29,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  }
+ },
+ "missing": [],
+ "unexpected": [],
+ "twist_bones_animated_in": 34,
+ "failures": [],
+ "ok": true
+}

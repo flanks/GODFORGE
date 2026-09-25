@@ -172,7 +172,8 @@ aim, identity attach. Only the bone name differs, and the armory agent should up
    - Two-handed weapons: the weapon scene's `grip_L` node (world transform) is the left hand's IK target.
    - The weapon scene's `muzzle` node is the projectile / strike origin.
 3. **Animation.**
-   - Shared clips are authored on GF_Hero_v1 and baked per hero (§6); the target ids match across heroes.
+   - Shared clips are authored on GF_Hero_v1 and baked per hero (§8); the target ids match across heroes.
+   - Clip names, loops, layers, design speeds and events: §8.
    - Sockets are ordinary joints: they ride on their parents. No clip keys them.
    - Recoil, aim offsets and hit flinches stay procedural (ARCHITECTURE §9) and act on core bones or on the
      weapon entity.
@@ -271,3 +272,121 @@ Brax's results: `art/characters/brax/reports/rig_report.md`.
   fingers must be inside the fist mesh). The open variant needs the fingers extended.
 - **Retargeting from other rigs** (Mixamo / ActorCore stand-ins): map onto the core names and let the twist
   bones drive themselves.
+
+## 8. The clip library (stage 4)
+
+The clips are code, not hand-keyed files. One library, written once against GF_Hero_v1, is solved and baked per
+hero at that hero's proportions and move speed:
+
+- `tools/blender/gf_hero/s4_clips.py` is the **shared set** (24 clips, every hero);
+- `tools/blender/gf_hero/s4_<key>.py` is the hero's **unique set** (6 to 10 clips; Brax: `s4_brax.py`);
+- `tools/blender/gf_hero/s4_contract.py` is the plain-data contract: the shared names, loop flags, layers, the
+  quality gates;
+- `tools/blender/gf_hero/s4lib.py` is the solver.
+
+```sh
+python tools/blender/gf_hero/run_stage4.py <key>        # [--from <step>] [--only <step>], about 10 minutes
+```
+
+| Step | Script | Output |
+|---|---|---|
+| anim | `s4_anim.py` | `production/<key>_anim.blend` (Git LFS: the rig file plus one action and one muted NLA track per clip) + `reports/anim/clips.json` (metadata and metrics) |
+| render | `s4_render.py` | the key frames of every clip: Cycles CPU toon close-ups (front 3/4 and side, on a 0.5 m grid) and the 55° client camera at true 1080p pixels (yaw 0 and 90), plus mesh checks → `reports/anim/render_checks.json` |
+| sheets | `s4_sheets.py` (PIL) | `reports/anim/<clip>.png` per clip, `reports/anim/anim_board_<n>.png` (every clip at game size) |
+| gltf_check | `s4_gltf_check.py` | a scratch GLB with every clip, read back → `reports/anim/gltf_check.json` |
+| contract | `check_clips.py` (stdlib) | the same check CI runs (`.github/workflows/art.yml`, job `hero-clips`) |
+
+### Naming
+
+In the hero's GLB each clip is one glTF animation named **`<key>_<clip>`**, and loops add **`@loop`**:
+`brax_idle@loop`, `brax_dash`, `brax_jab_l`, `brax_meltdown@loop`. `<clip>` is lower_snake_case.
+
+- The client maps a sim state to `format!("{key}_{clip}")`. Shared clips have the same `<clip>` on every hero, so a
+  state never needs a per-hero branch.
+- Unique clips are named after the kit (`brax_uppercut` is Cinder Uppercut) and are looked up by the ability.
+- In Blender the action and its NLA track carry the same name. Stage 5 exports the tracks as they are.
+
+### The shared set
+
+| `<clip>` | Loop | Layer | Frames (30 fps) | Plays for |
+|---|---|---|---|---|
+| `idle` | loop | full | 90 | alive, not moving, out of combat |
+| `idle_combat` | loop | full | 32 | alive, not moving, in combat. **Frame 0 is the reference pose of every upper-layer clip** |
+| `walk` | loop | full | 28 | moving at under ~55 % of move speed; design speed 1.8 m/s × leg scale |
+| `run` | loop | full | 20 | moving within 45° of the aim; design speed = the hero's `move_speed` |
+| `strafe_left` / `strafe_right` | loop | full | 20 | moving 45-135° left / right of the aim, chest kept on the aim |
+| `backpedal` | loop | full | 18 | moving more than 135° away from the aim |
+| `dash` | one-shot | full | 8 | the 0.16 s dash; authored facing the dash direction |
+| `dash_recover` | one-shot | full | 14 | after a dash when the hero stops |
+| `fire_light` | one-shot | upper | 8 | each light shot (weapon hand thrust, the recoil stays procedural) |
+| `fire_heavy` | one-shot | upper | 16 | a heavy / charged release |
+| `fire_charge` | loop | upper | 24 | fire held on a Charge chassis |
+| `hit_light` | one-shot | upper | 12 | a light hit (flinch), over anything |
+| `hit_heavy` | one-shot | full | 26 | a heavy hit or stun |
+| `knockdown` | one-shot | full | 30 | floored; holds its last frame |
+| `get_up` | one-shot | full | 36 | the knockdown's stun ends |
+| `death` | one-shot | full | 48 | `LifeState::Downed` begins; holds its last frame |
+| `downed` | loop | full | 60 | the Soul-Tether wraith drift (the client adds the ghost material) |
+| `revive` | one-shot | full | 40 | revived by an ally |
+| `reforge_in` | one-shot | full | 45 | `LifeState::Reforging` ends: the hero reappears |
+| `victory` | one-shot | full | 60 | the run is won; holds its last frame |
+| `ping` | one-shot | upper | 20 | the ping input |
+| `interact` | one-shot | full | 40 | interact at an anvil / forge / shrine |
+| `forge_hammer` | loop | full | 36 | at the hub anvil / forge screen |
+
+Each hero's `reports/anim/clips.json` holds the exact frames, the events, the design speed and the metrics.
+`art/characters/brax/reports/anim_report.md` maps every clip to its sim state.
+
+### Rules the library keeps (and the engine can rely on)
+
+- **30 fps, in place.** Frame 0 is at t = 0, and a clip lasts frames / 30 s (frames + 1 samples). Only `pelvis`
+  translates. `root`, the twist bones and the sockets are never keyed; the exporter bakes the twist
+  constraints into every clip.
+- **Loops are closed.** The last frame *is* the first. The motion through the seam is no rougher than the motion
+  inside the clip, and `check_clips.py` enforces both.
+- **Locomotion is speed-matched.** While a foot is planted it moves under the body at exactly the design speed
+  (`clips.json` `design_speed_mps`), so the engine sets the playback rate to `speed / design_speed` and the feet
+  stay planted in the world.
+- **Planted feet stay planted** in every other clip: a planted ball joint drifts at most 10 mm, and the Brax clips
+  measure at most 0.9 mm. Clips marked `slide_exempt` break this rule on purpose (Brax's `furnace_rush` skid-charge), and the
+  report says why.
+- **Upper layer.** Clips with `layer: "upper"` keep the lower body on the combat stance. Mask `spine_01` and its
+  children to layer them over locomotion, or play them whole over `idle_combat`. Their first and last frames are
+  `idle_combat` frame 0, so an additive layer can use that frame as its reference pose.
+- **Events** (hit frames, launch, slam, footfalls of the big moves) are Blender pose markers on each action and are
+  listed in `clips.json` `events`. glTF has no events, so stage 5 writes them to the hero's
+  `assets/models/characters/<key>.meta.json`.
+- **Sleeve weapons.** The wrist never bends: the hand only twists, and `wrist_swing_max_deg` is 0 in every clip.
+  The fist / open gauntlet variant follows the finger curl. `clips.json` `weapon_variant` gives the start state
+  and the swap frames per hand, for example `ping` opens the right hand on frame 4 and closes it on frame 16.
+
+### How a pose is written (`s4lib.py`)
+
+A key pose is a dict of parameters, not of bone rotations:
+
+- FK angles per bone, in degrees, on the bone-local axes of §1;
+- the pelvis offset and a world rotation;
+- **arm effectors**: the fist (middle knuckle), a pole point for the elbow and the direction the back of the hand
+  faces, in chest space (riding the torso), hero space or absolute space;
+- **foot placements**: the ball on the ground, yaw, heel lift about the ball (or toe lift about the heel), lift
+  off the ground, and a knee hint;
+- head stabilisation (a world orientation, blendable with FK);
+- the fist curl.
+
+A clip interpolates these parameters between keys with a Kochanek-Bartels spline (tension per key, linear
+segments for snaps into contact, cyclic for loops). A channel that holds its value into or out of a key is at rest
+there, so a planted foot never drifts on the spline's overshoot. The clip is then solved **every frame** with an
+analytic two-bone IK:
+
+- the hinge is the lower bone's local X, so the elbow and knee never twist off their axis;
+- the reach is soft: a limb never snaps straight;
+- the toes never go through the ground.
+
+Every frame is baked as LINEAR keys. The solver matches Blender's own evaluation of the baked action to 1.3e-6.
+
+Locomotion clips are procedural (`s4_clips.locomotion`): a gait cycle from the design speed, duty factor, stance
+width, hip yaw (strafe), lift, heel roll and a ground-speed-matched swing.
+
+**A new hero** gets the whole shared set for free: its landmark file (§5) sets the proportions, `Kit` scales every
+offset by the hero's leg and arm length, and `characters.csv` gives the move speed. The hero only writes
+`s4_<key>.py` with its unique clips.

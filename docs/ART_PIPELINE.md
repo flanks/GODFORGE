@@ -32,7 +32,7 @@ glTF, because Bevy 0.20 can load neither Draco nor meshopt (§6).
 | 1 | none; judged by eye against the concept in review renders | automated + reviewer | `in_progress` → `done`, with the note SCULPT REFERENCE ONLY |
 | 2 | production mesh + NPR textures: **made by AI**, no human artist (user decision, 2026-09-25); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the review sheets |
 | 3 | rig + skin weights: **made by AI** (the same decision; stage 3 has no weight-paint artist either); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the stage-3 sheets |
-| 4 | none for the clips themselves | — | Mixamo/ActorCore-seeded clips are `stand_in` |
+| 4 | the clips: **made by AI** (no animator; the same decision), validated by metrics and review renders; the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human`. Mixamo/ActorCore-seeded clips would be `stand_in` |
 | 5 | the final Hades-II bar | **human** | `done` with `signed_off_by`. Only then may the hero's `final` be `true` |
 
 **Decision of 2026-09-25 (the user, relayed by the workflow coordinator): there is no human artist for
@@ -76,13 +76,14 @@ these violations:
 ### Clip naming
 
 * Every clip in a hero's GLB is named `{char}_{clip}`, and loops add `@loop`: `brax_idle@loop`,
-  `brax_run@loop`, `brax_dash`, `brax_hit_front`, `brax_death`, `brax_cinder_uppercut`,
-  `brax_meltdown_idle@loop`. `{clip}` is lower_snake_case.
-* The **shared set** (~40 clips) uses the same `{clip}` names for every hero, so the client maps
-  a state to `format!("{key}_{clip}")` and never special-cases a hero. The **unique set** (6 to 10
-  clips: ult, 2 actives, signature idle) is named after the kit's abilities.
-* Shared clips are authored once on GF_Hero_v1 (§5) and **baked per hero** at export, on that
-  hero's proportions (hip height, reach).
+  `brax_run@loop`, `brax_dash`, `brax_hit_light`, `brax_death`, `brax_uppercut`,
+  `brax_meltdown@loop`. `{clip}` is lower_snake_case.
+* The **shared set** (24 clips since stage 4; the table is `docs/art/GF_HERO_SKELETON.md` §8 and the
+  contract `tools/blender/gf_hero/s4_contract.py`) uses the same `{clip}` names for every hero, so the
+  client maps a state to `format!("{key}_{clip}")` and never special-cases a hero. The **unique set** (6 to
+  10 clips: ult, 2 actives, signature idle) is named after the kit's abilities.
+* Shared clips are authored once on GF_Hero_v1 (§5) and **baked per hero**, on that hero's proportions
+  (leg and arm length from its landmark file) and move speed.
 * Bevy builds each `AnimationTargetId` from the **bone-name path starting at the animation
   root**. Identical bone names, parenting *and armature object name* therefore let one hero's
   clip drive another hero's scene. A hero-specific armature name such as `brax_rig` would break
@@ -103,11 +104,14 @@ art/characters/<key>/
                   and one provenance JSON per GLB (committed)
   work/           full-size renders, mask checks, .blend files (LOCAL, gitignored)
   reports/        review sheets (PNG < 2 MB) and stage reports (committed); reports/stage2/ = stage-2 sheets + JSON;
-                  reports/stage3/ + rig_report.md = the rig's sheets, metrics and glTF check
+                  reports/stage3/ + rig_report.md = the rig's sheets, metrics and glTF check;
+                  reports/anim/ + anim_report.md = one contact sheet per clip, the game-size boards, clips.json
+                  (the clip manifest: frames, loops, layers, events, design speeds, metrics) and the glTF clip check
   stage2_fit.json / stage2_parts.json / stage2_texture.json   the hero's stage-2 inputs (landmarks, part
                   parameters, paint settings; committed, hand-edited)
   production/     <key>_stage2.blend: the production mesh + material (committed, Git LFS);
-                  <key>_rig.blend: GF_Hero_v1 + the skinned parts + the validation poses (stage 3, Git LFS)
+                  <key>_rig.blend: GF_Hero_v1 + the skinned parts + the validation poses (stage 3, Git LFS);
+                  <key>_anim.blend: the rig file + one action / NLA track per clip (stage 4, Git LFS)
   stage3_skin.json  the hero's stage-3 skinning numbers (committed, hand-edited)
   work/<key>_landmarks.json  the hero's GF_Hero_v1 landmark file (committed with git add -f; the rest of work/ is local)
   textures/       <key>_basecolor.png, <key>_emissive.png (committed, Git LFS)
@@ -119,7 +123,8 @@ tools/comfy/      ComfyUI drivers and the user's graphs (API format), plus the s
                   palette_extract.py, readability_sheet.py, approve_sheet.py, art_manifest.py, check_art.py
 tools/blender/gf_hero/   headless Blender scripts: stage-1 review renders, the stage-2 chain (run_stage2.py, s2_*.py),
                   the stage-3 rig chain (gf_hero_rig.py = the GF_Hero_v1 contract, run_stage3.py, s3_*.py, check_skeleton.py),
-                  later rig/export
+                  the stage-4 clip chain (run_stage4.py, s4lib.py = the solver, s4_clips.py = the shared library,
+                  s4_<key>.py = a hero's unique set, s4_contract.py, check_clips.py), later the stage-5 export
 assets/models/characters/<key>.glb   shipped hero mesh only (stage 5 output; the client falls back to greybox when missing)
 assets/models/weapons/<chassis>.glb  shipped weapon model (stage 5 output), attached to the weapon sockets
 ```
@@ -200,7 +205,7 @@ which has PIL and numpy. The other art tools use only the standard library.
 Result for Brax (2026-09-25): three seeds; **s202** picked (faceted gauntlet plates, head/beard,
 colour blocking). Known defects are listed in `art/characters/brax/reports/blockout_report.md` §6.
 
-## 5. Stages 2-4 (stages 2-3 implemented; 4 planned)
+## 5. Stages 2-4 (implemented)
 
 ### Stage 2: production mesh (implemented; made by AI, 2026-09-25)
 
@@ -291,12 +296,30 @@ Rotation, 15-bone hands, deform flags.
 * Rebuild: `python tools/blender/gf_hero/run_stage3.py <key>` (about a minute). Brax's results:
   `art/characters/brax/reports/rig_report.md`. A retarget test between two heroes comes when the second hero is rigged.
 
-### Stage 4: animation
+### Stage 4: animation (implemented; made by AI, 2026-09-25)
 
-The shared set (~40 clips) is authored once on GF_Hero_v1 and baked per hero at export (§2 clip
-naming). The unique set per hero is 6 to 10 clips: ult, 2 actives and a signature idle. Brax's
-proposal is in `art/characters/brax/brief.md` §8. Mixamo or ActorCore seeds are prototype
-`stand_in`s and are replaced before final. Weapon fire stays procedural.
+No human animator and no Mixamo / ActorCore seeds: the clips are keyed in Python on GF_Hero_v1, Cascadeur-style
+(strong key poses with anticipation, contact, follow-through and weight, effector-driven), and solved per frame.
+The contract, the naming, the shared table and the authoring model are in
+[`docs/art/GF_HERO_SKELETON.md`](art/GF_HERO_SKELETON.md) §8. One command bakes, renders and checks a hero, in
+about 10 minutes on the dev machine (almost all of it the review renders, Cycles on the CPU):
+
+```sh
+python tools/blender/gf_hero/run_stage4.py <key>          # [--from <step>] [--only <step>]
+```
+
+| Step | Script | What it does |
+|---|---|---|
+| anim | `s4_anim.py` (+ `s4lib.py`, `s4_clips.py`, `s4_<key>.py`) | the shared set (24 clips) + the hero's unique set, key poses interpolated in parameter space and solved every frame with an analytic two-bone IK; one action + one NLA track per clip in `production/<key>_anim.blend`; metrics per clip in `reports/anim/clips.json`: loop seam, foot slide in world space, in-place drift, wrist rule, elbow / knee range, IK misses, the gauntlet variant swaps |
+| render | `s4_render.py` | the key frames: toon close-ups (front 3/4 + side on a 0.5 m grid) and the 55° client camera at true 1080p pixels; mesh checks (ground, the sleeve weapon against the body and against the other gauntlet) |
+| sheets | `s4_sheets.py` | a contact sheet per clip (key frames, game size at 1x and 3x, the feet's world track, the numbers) + the game-size boards |
+| gltf_check | `s4_gltf_check.py` | a scratch GLB with every clip read back: names, durations, 30 fps, in place, loops closed, twist bones baked, no required extensions |
+| contract | `check_clips.py` | the stdlib contract (also a CI job) |
+
+Weapon fire stays procedural (recoil, aim, hit-stop); the fire and strike clips are short upper-layer clips that
+start and end on the `idle_combat` reference pose. Aim offsets are not authored: at the 55° top-down camera the hero
+turns to the aim, and the torso-versus-legs split is covered by the strafe and backpedal clips. Brax's results:
+`art/characters/brax/reports/anim_report.md`.
 
 ## 6. Export format note (stage 5, checked now so nobody plans around a dead end)
 
