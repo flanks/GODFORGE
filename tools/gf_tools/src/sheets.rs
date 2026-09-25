@@ -398,9 +398,10 @@ impl Node {
     }
 }
 
-/// Pretty RON used for every generated file.
+/// Pretty RON used for every generated file. Always LF: ron defaults to the platform newline, which
+/// made every generated file look stale to `import --check` on Windows.
 pub fn pretty() -> ron::ser::PrettyConfig {
-    ron::ser::PrettyConfig::new().depth_limit(3).indentor("  ".to_string()).struct_names(false)
+    ron::ser::PrettyConfig::new().depth_limit(3).indentor("  ".to_string()).struct_names(false).new_line("\n")
 }
 
 fn convert<T: DeserializeOwned + Serialize>(csv_text: &str, sheet: &Sheet) -> Result<String, Vec<String>> {
