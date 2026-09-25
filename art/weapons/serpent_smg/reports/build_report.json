@@ -5,7 +5,7 @@
   "kind": "weapon",
   "tier": "one_handed",
   "extensions_used": [],
-  "tris": 2370,
+  "tris": 2330,
   "budget": [
    1000,
    2500
@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 86606
+    "bytes": 114590
    },
    {
     "name": "serpent_smg_basecolor",
@@ -29,7 +29,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 987911
+    "bytes": 952307
    }
   ],
   "materials": [
@@ -43,23 +43,6 @@
    "serpent_smg"
   ],
   "sockets": {
-   "grip_R": {
-    "translation": [
-     0,
-     0,
-     0
-    ],
-    "forward": [
-     0,
-     0,
-     -1
-    ],
-    "up": [
-     0,
-     1,
-     0
-    ]
-   },
    "glow_core": {
     "translation": [
      0.0,
@@ -93,6 +76,23 @@
      1,
      0
     ]
+   },
+   "grip_R": {
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
    }
   },
   "bounds": {
@@ -115,11 +115,11 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 909.1,
-   "p10": 821.9,
-   "p90": 960.0
+   "median": 952.9,
+   "p10": 858.1,
+   "p90": 1008.0
   },
-  "coverage": 0.4,
+  "coverage": 0.418,
   "zones": [
    "scales",
    "head",
@@ -138,7 +138,7 @@
   "decals": 2,
   "basecolor": "art/weapons/serpent_smg/textures/serpent_smg_basecolor.png",
   "emissive": "art/weapons/serpent_smg/textures/serpent_smg_emissive.png",
-  "emissive_texels": 104040,
-  "seconds": 13.7
+  "emissive_texels": 144973,
+  "seconds": 21.2
  }
 }

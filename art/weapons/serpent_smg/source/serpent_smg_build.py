@@ -20,20 +20,22 @@ Design (docs/art/WEAPONS.md section 5, family RAPID -> verb THE STREAM; tier one
     family: a dark / bronze stripe rhythm), then runs forward as a lean neck along a thin dark-iron
     barrel with four backswept glowing needle quills on its spine (a row of small lights leading to
     the muzzle), and its head is the muzzle: a wedge viper skull with a bronze crown, backswept bone
-    horns, jaws wide open, two long bone fangs, slit-pupil glowing eyes, a glowing throat / palate /
-    tongue, and the needle barrel it spits (the small muzzle of the family);
-  * the drum magazine sits under the front coils (Thompson-style, in front of the grip): its faces are
-    painted as a coiled serpent tail in scales and its bronze band carries engraved overlapping scales
-    (the "coiled drum" / "scale-textured drum" of both briefs);
-  * value rhythm: dark violet scales over a bronze core (stripes), a bronze drum, a dark neck and head,
-    and the brightest values at the front: bone fangs, Kinetic glow in the eyes, the mouth and the
-    white-hot needle;
+    horns, jaws wide open, two long bone fangs, big slit-pupil glowing eyes, a glowing throat / palate /
+    tongue and a glowing jet that tapers into the needle barrel it spits (the small muzzle of the family);
+  * the drum magazine is a squat bronze canister tucked up under the front coils (Thompson-style, in
+    front of the grip; the coils swallow its top, so it is the belly of the coil mass): its domed faces
+    are painted as the serpent's coiled tail (one bronze spiral), a gold chamfer rim catches the light
+    and its band carries engraved overlapping scales (the "coiled drum" / "scale-textured drum");
+  * value rhythm (art review 2026-09-25: lifted for the 38 px game size): the coils in broad
+    alternating dark violet / light bronze bands, three per coil, so the coils read as a bold stripe
+    rhythm; a bright bronze drum; a banded neck; a bronze-crowned head; and the brightest values at the
+    front: bone fangs, big Kinetic eyes, the white-hot mouth, jet and needle;
   * palette: the warm metals of the player's arsenal (bronze, gold, bone, dark wood) plus the Kinetic
-    element glow #F4E3C1 (palette.rs). The scales are a violet-tinted dark iron and the grip wrap a
+    element glow #F4E3C1 (palette.rs). The dark bands are a violet-tinted dark and the grip wrap a
     dark violet leather: a quiet nod to Kael's #9A7CFF that stays out of the glow channel.
-  * scale texture: the snake skin (diamond-back pattern, overlapping scales, bone belly scutes) is
-    painted by a post-pass on top of gfa_paint.paint (see skin_postpass): texels are mapped into
-    body-local coordinates (arc length along the serpent's centre-line, angle around the tube).
+  * snake skin: painted by a post-pass on top of gfa_paint.paint (see skin_postpass): texels are mapped
+    into body-local coordinates (arc length along the serpent's centre-line, angle around the tube);
+    the bands are locked to the helix angle around the bore (see _band_coord).
 
 Grip frame (docs/art/WEAPONS.md section 2): origin = palm centre of the right hand on the pistol grip,
 +Y = barrel, +Z = up, +X = the weapon's right. Bore axis AX above the palm.
@@ -70,19 +72,24 @@ BODY_R = [(0.0, 0.009), (0.05, 0.015), (0.13, 0.0225), (0.66, 0.022), (0.84, 0.0
 COIL_SAMPLES = 5                 # control points per turn (x2 after smoothing)
 
 HEAD_HINGE = (0.352, AX)         # jaw hinge (y, z)
-JAW_UP, JAW_DOWN = 14.0, 24.0    # degrees the upper head lifts / the lower jaw drops
+JAW_UP, JAW_DOWN = 17.0, 28.0    # degrees the upper head lifts / the lower jaw drops (a wide glowing gape)
 NEEDLE = (0.37, 0.528)           # needle barrel from the throat to its tip (y)
+NEEDLE_R = 0.0095                # needle radius (thick enough to stay a white-hot line at game size)
 MUZZLE = (0.0, NEEDLE[1], AX)
 THROAT = (0.0, 0.378, AX)        # glow_core: the glowing throat behind the needle
-DRUM_C = (0.0, 0.186, AX - 0.097)
-DRUM_R, DRUM_W = 0.062, 0.068
+# the drum: a squat canister tucked up under the front coils (its top is swallowed by the coil mass, so it
+# reads as the belly of the coiled body, not a wheel hanging below the gun)
+DRUM_C = (0.0, 0.158, AX - 0.080)
+DRUM_R, DRUM_W = 0.055, 0.080
+DRUM_CHAMFER = 0.009             # the gold rim bevel between the faces and the band
+EYE_R = 0.019                    # glowing eyes (big enough to stay two bright pixels at game size)
 
 ZONES = ["scales", "head", "bronze", "gold", "bone", "iron", "wood", "wrap", "drum_face",
          "glow_eye", "glow_throat", "needle", "quill"]
 PALETTE = [  # (name, hex) for the review sheet
-    ("scales", "#2E2438"), ("diamond", "#4E4062"), ("outline", "#D6B97E"), ("belly", "#D2C09A"),
-    ("bronze", "#B87A35"), ("gold", "#E4B24A"), ("bone", "#E8DCC0"), ("iron", "#3B3340"), ("wood", "#4E2E22"),
-    ("wrap", "#3E2A4E"), ("glow rim", "#D9A85C"), ("kinetic", "#F4E3C1"), ("core", "#FFFBF0"),
+    ("dark band", "#3A2D4C"), ("bronze band", "#CC9046"), ("band ring", "#F6D896"), ("belly", "#D8C7A0"),
+    ("bronze", "#B87A35"), ("gold", "#E4B24A"), ("bone", "#E8DCC0"), ("head", "#44365A"), ("iron", "#3B3340"),
+    ("wood", "#4E2E22"), ("wrap", "#3E2A4E"), ("glow rim", "#E6A650"), ("kinetic", "#F4E3C1"), ("core", "#FFFBF0"),
 ]
 
 PATH = {}                        # centre-line samples for the skin painter (filled by build_mesh)
@@ -193,15 +200,17 @@ def build_mesh(col):
                          (H + 0.050, 0.084, 0.047, 0, AX + 0.021), (H + 0.092, 0.054, 0.034, 0, AX + 0.017),
                          (H + 0.124, 0.026, 0.021, 0, AX + 0.013)], bevel=0.008)
     upper.append((skull, "head", "skull", "auto"))
-    crown = M.loft_rect([(H + 0.004, 0.034, 0.012, 0, AX + 0.047), (H + 0.064, 0.026, 0.010, 0, AX + 0.042),
-                         (H + 0.104, 0.012, 0.008, 0, AX + 0.030)], bevel=0.003)
+    # a broad bronze crown plate: the head's top is what the 55 deg game camera sees, so it carries a
+    # light value (the dark skull only shows on the flanks)
+    crown = M.loft_rect([(H - 0.004, 0.050, 0.013, 0, AX + 0.047), (H + 0.050, 0.046, 0.012, 0, AX + 0.043),
+                         (H + 0.106, 0.020, 0.009, 0, AX + 0.030)], bevel=0.0035)
     upper.append((crown, "bronze", "crown", "auto"))
     for sx in (-1, 1):
         brow = M.box((0.016, 0.05, 0.012), bevel=0.004, taper=(0.7, 0.8))
-        M.xform(brow, loc=(sx * 0.031, H + 0.036, AX + 0.041), rot=(4, -sx * 18, sx * 10))
+        M.xform(brow, loc=(sx * 0.033, H + 0.034, AX + 0.043), rot=(4, -sx * 18, sx * 10))
         upper.append((brow, "bronze", "brow", "auto"))
-        eye = M.sphere(0.0145, 6, 4, scale=(0.8, 1.25, 0.9))
-        M.xform(eye, loc=(sx * 0.037, H + 0.038, AX + 0.032))
+        eye = M.sphere(EYE_R, 6, 4, scale=(0.85, 1.25, 0.9))
+        M.xform(eye, loc=(sx * 0.038, H + 0.040, AX + 0.031))
         upper.append((eye, "glow_eye", "eye", "smooth"))
         horn = M.horn([(sx * 0.030, H + 0.016, AX + 0.040), (sx * 0.040, H - 0.014, AX + 0.056),
                        (sx * 0.046, H - 0.048, AX + 0.063)], 0.0095, 0.0, sides=5)
@@ -210,11 +219,11 @@ def build_mesh(col):
                        (sx * 0.014, H + 0.129, AX - 0.046)], 0.0088, 0.0, sides=5)
         upper.append((fang, "bone", "fang", "smooth"))
     # glowing palate under the upper jaw (shows as a light wedge between the open jaws)
-    pal = M.loft_rect([(H - 0.006, 0.07, 0.006, 0, AX - 0.005), (H + 0.05, 0.062, 0.006, 0, AX - 0.004),
-                       (H + 0.1, 0.03, 0.006, 0, AX - 0.001)])
+    pal = M.loft_rect([(H - 0.006, 0.076, 0.006, 0, AX - 0.005), (H + 0.05, 0.068, 0.006, 0, AX - 0.004),
+                       (H + 0.104, 0.034, 0.006, 0, AX - 0.001)])
     upper.append((pal, "glow_throat", "palate", "flat"))
     R_up = hinge(JAW_UP)
-    EYES[:] = [R_up @ Vector((sx * 0.037, H + 0.038, AX + 0.032)) for sx in (-1, 1)]
+    EYES[:] = [R_up @ Vector((sx * 0.038, H + 0.040, AX + 0.031)) for sx in (-1, 1)]
     for bm, zone, name, shading in upper:
         M.xform(bm, matrix=R_up)
         a.add(bm, zone, name=name, shading=shading)
@@ -222,7 +231,7 @@ def build_mesh(col):
     jaw = M.loft_rect([(H - 0.016, 0.062, 0.020, 0, AX - 0.016), (H + 0.034, 0.058, 0.017, 0, AX - 0.018),
                        (H + 0.086, 0.034, 0.013, 0, AX - 0.017)], bevel=0.005)
     lower = [(jaw, "head", "jaw", "auto")]
-    tongue = M.loft_rect([(H - 0.01, 0.05, 0.005, 0, AX - 0.0055), (H + 0.07, 0.03, 0.005, 0, AX - 0.0065)])
+    tongue = M.loft_rect([(H - 0.01, 0.056, 0.005, 0, AX - 0.0055), (H + 0.078, 0.036, 0.005, 0, AX - 0.0065)])
     lower.append((tongue, "glow_throat", "tongue", "flat"))
     for sx in (-1, 1):
         lf = M.horn([(sx * 0.013, H + 0.076, AX - 0.012), (sx * 0.013, H + 0.083, AX + 0.002),
@@ -233,33 +242,37 @@ def build_mesh(col):
         M.xform(bm, matrix=R_dn)
         a.add(bm, zone, name=name, shading=shading)
 
-    # glowing throat between the jaws, and the needle barrel it spits
-    throat = M.cylinder(0.022, 0.03, sides=8, radius_top=0.013, axis="Y")
-    M.xform(throat, loc=(0, THROAT[1] - 0.008, AX))
+    # glowing throat between the jaws (a big white-hot cone: the brightest mass at the front end at game
+    # size), and the needle barrel it spits
+    throat = M.cylinder(0.029, 0.042, sides=8, radius_top=0.018, axis="Y")
+    M.xform(throat, loc=(0, THROAT[1] - 0.012, AX))
     a.add(throat, "glow_throat", name="throat", shading="smooth")
-    ndl = M.cylinder(0.0075, NEEDLE[1] - 0.03 - NEEDLE[0], sides=8, axis="Y")
-    M.xform(ndl, loc=(0, (NEEDLE[0] + NEEDLE[1] - 0.03) / 2, AX))
+    # the glowing jet: the throat's light carried forward between the fangs, tapering into the needle
+    # (a bright arrow-head at the front end of the gun at game size)
+    j0, j1 = THROAT[1] + 0.009, 0.472
+    jet = M.cylinder(0.018, j1 - j0, sides=8, radius_top=NEEDLE_R + 0.001, axis="Y")
+    M.xform(jet, loc=(0, (j0 + j1) / 2, AX))
+    a.add(jet, "glow_throat", name="jet", shading="smooth")
+    ndl = M.cylinder(NEEDLE_R, NEEDLE[1] - 0.032 - NEEDLE[0], sides=8, axis="Y")
+    M.xform(ndl, loc=(0, (NEEDLE[0] + NEEDLE[1] - 0.032) / 2, AX))
     a.add(ndl, "needle", name="needle", shading="smooth")
-    tipm = M.spike(0.0075, 0.03, sides=8, rot_offset=0)
-    M.xform(tipm, matrix=M.orient((0, NEEDLE[1] - 0.03, AX), (0, 1, 0), (1, 0, 0)))
+    tipm = M.spike(NEEDLE_R, 0.032, sides=8, rot_offset=0)
+    M.xform(tipm, matrix=M.orient((0, NEEDLE[1] - 0.032, AX), (0, 1, 0), (1, 0, 0)))
     a.add(tipm, "needle", name="needle_tip", shading="smooth")
-    rg = M.ring(0.0065, 0.012, 0.009, sides=8, axis="Y")
-    M.xform(rg, loc=(0, NEEDLE[1] - 0.062, AX))
+    rg = M.ring(NEEDLE_R - 0.001, NEEDLE_R + 0.005, 0.009, sides=8, axis="Y")
+    M.xform(rg, loc=(0, NEEDLE[1] - 0.064, AX))
     a.add(rg, "gold", name="needle_ring")
 
-    # -- the drum magazine: bronze rim, recessed painted faces, gold hub, a magwell up into the sleeve
-    rim = M.ring(DRUM_R - 0.012, DRUM_R, DRUM_W, sides=16, axis="X")
-    M.xform(rim, loc=DRUM_C)
-    a.add(rim, "bronze", name="drum_rim")
-    face = M.cylinder(DRUM_R - 0.011, DRUM_W - 0.012, sides=16, axis="X")
-    M.xform(face, loc=DRUM_C)
-    a.add(face, "drum_face", name="drum_face", shading="smooth")
-    hub = M.cylinder(0.011, DRUM_W + 0.006, sides=8, axis="X")
-    M.xform(hub, loc=DRUM_C)
-    a.add(hub, "gold", name="drum_hub")
-    well = M.box((0.034, 0.05, 0.03), bevel=0.005, taper=(0.9, 0.9))
-    M.xform(well, loc=(0, DRUM_C[1], AX - 0.036))
-    a.add(well, "iron", name="magwell")
+    # -- the drum magazine: a squat bronze canister tucked up under the front coils (the coils swallow its
+    # top, so at game size it is the belly of the coil mass). Domed faces painted as the serpent's coiled
+    # tail; a gold chamfer rim catches the light; no hub, no recessed face, no magwell (the old thin
+    # rim + hub + recessed face read as a cart wheel)
+    h, R_, c = DRUM_W / 2, DRUM_R, DRUM_CHAMFER
+    prof = [(0.0, -h - 0.004), (R_ * 0.55, -h - 0.0025), (R_ - c, -h), (R_, -h + c),
+            (R_, h - c), (R_ - c, h), (R_ * 0.55, h + 0.0025), (0.0, h + 0.004)]
+    drum = M.lathe(prof, sides=16, axis="X")
+    M.xform(drum, loc=DRUM_C)
+    a.add(drum, "drum_face", name="drum", shading="auto")
 
     # -- pistol grip (dark wood, violet leather wraps), gold pommel, iron trigger guard
     rake = math.radians(17)
@@ -295,7 +308,7 @@ KGLOW = {"core": "#FFFBF0", "hot": "#F4E3C1", "color": "#D9A85C"}     # Kinetic 
 RECIPES = {
     "scales": P.zone(base="#3A3046", shadow="#171220", light="#7A6C8E", planes=0.0, parts=0.0, brush=0.05,
                      edge=0.0, cavity=0.0, ao=0.65, ao_range=(0.2, 0.6)),
-    "head": P.zone(base="#3A3046", shadow="#171220", light="#8A7C9E", planes=0.08, edge=0.9, edge_width=0.004,
+    "head": P.zone(base="#44365A", shadow="#1A1324", light="#9484AC", planes=0.08, edge=0.9, edge_width=0.0045,
                    cavity=0.7, ao=0.6),
     "bronze": P.zone(base="#B87A35", shadow="#57301A", light="#F6CE7A", planes=0.08, parts=0.05, edge=0.85,
                      edge_width=0.0045, cavity=0.75, ao=0.65, stroke=(0, 1, 0), stroke_amount=0.16,
@@ -312,14 +325,18 @@ RECIPES = {
                    stroke_freq=(90.0, 5.0)),
     "wrap": P.zone(base="#3E2A4E", shadow="#170E1F", light="#7A5E92", planes=0.05, edge=0.55, edge_width=0.003,
                    cavity=0.6, ao=0.5, stroke=(1, 0, 0), stroke_amount=0.25, stroke_freq=(140.0, 8.0)),
-    "drum_face": P.zone(base="#3A3046", shadow="#171220", light="#7A6C8E", planes=0.0, parts=0.0, edge=0.0,
-                        cavity=0.0, ao=0.6),
+    # the drum canister: a light bronze band (engraved scales and the gold chamfer rim come from the skin
+    # post-pass, which also paints the domed faces)
+    "drum_face": P.zone(base="#C88A3E", shadow="#5E341B", light="#F8D286", planes=0.06, parts=0.0, edge=0.9,
+                        edge_width=0.005, cavity=0.6, ao=0.6, stroke=(1, 0, 0), stroke_amount=0.12,
+                        stroke_freq=(110.0, 6.0)),
     "glow_eye": P.zone(base="#F4E3C1", edge=0.0, cavity=0.0, ao=0.0,
-                       emit={"core": "#FFF8E6", "hot": "#F4E3C1", "color": "#E0B060", "mode": "flat"}),
-    # throat, palate and tongue: white-hot at the throat, Kinetic cream, warm gold toward the snout
+                       emit={"core": "#FFFBF0", "hot": "#F8EBCF", "color": "#E6B868", "mode": "flat"}),
+    # throat, palate and tongue: white-hot at the throat, Kinetic cream, warm gold toward the snout; at full
+    # strength and a wide radius so the whole open mouth is one bright shape at game size
     "glow_throat": P.zone(base="#F4E3C1", edge=0.0, cavity=0.0, ao=0.0,
-                          emit={"core": "#FFF6DE", "hot": "#F4E3C1", "color": "#E09A48", "mode": "radial",
-                                "center": THROAT, "radius": 0.07, "strength": 0.7, "base_mix": 0.1}),
+                          emit={"core": "#FFFBF0", "hot": "#F4E3C1", "color": "#E6A650", "mode": "radial",
+                                "center": THROAT, "radius": 0.11, "strength": 1.0, "base_mix": 0.2}),
     "quill": P.zone(base="#EFE2C4", shadow="#8C7458", light="#FFFBEE", edge=0.0, cavity=0.0, ao=0.2,
                     emit=dict(KGLOW, mode="flat", strength=0.75, base_mix=0.5)),
     # the needle glows along its whole length, white-hot at the tip (the brightest value of the gun)
@@ -332,7 +349,7 @@ RECIPES = {
 
 def decals():
     """The viper's post-ocular stripe on both head sides: a bone-gold line with a black halo from behind
-    the eye to the back of the skull (the body's diamond outline style carried onto the head)."""
+    the eye to the back of the skull (the band edges' gold line carried onto the head)."""
     out = []
     H = HEAD_HINGE[0]
     R_up = hinge(JAW_UP)
@@ -352,11 +369,18 @@ def decals():
 # ---- the snake-skin post-pass (runs inside gfa_paint.paint_asset) --------------------------------------
 
 SKIN = {
-    "base": "#2E2438", "scale_dark": "#1B1422", "scale_light": "#4A3D5A",
-    "diamond_fill": "#4E4062", "diamond_inner": "#80664A", "diamond_line": "#D6B97E", "diamond_rim": "#110C16",
-    "fleck": "#B89A68", "belly": "#D2C09A", "belly_line": "#6E5A45",
-    "scale_len": 0.0125, "scale_wid": 0.0105,          # one scale (m), along / across the body
-    "diamond_pitch": 0.052,                            # diamonds along the back (m)
+    # broad alternating bands, dark violet / light bronze: THREE per coil. An odd count per turn makes
+    # neighbouring coils swap colours, so the side of the receiver reads as a bold dark / bronze stripe
+    # rhythm at game size (the earlier diamond-outline pattern turned into speckle at 1x)
+    "dark": "#3A2D4C", "dark_ridge": "#5E4C74", "dark_shadow": "#1A1322",
+    "bronze": "#CC9046", "bronze_ridge": "#F2C874", "bronze_shadow": "#6A3C1E",
+    "ring_line": "#160F1B", "ring_light": "#F6D896",     # a thin dark ring + a broken gold line at each band edge
+    "belly": "#D8C7A0", "belly_line": "#7A6448", "tail_bone": "#8C7458",
+    "scale_len": 0.0125, "scale_wid": 0.0105,          # one scale (m), along / across the body (a faint hint)
+    "bands_per_turn": 3,
+    "band_phase_deg": 60.0,                            # band edges at 60 / 180 / 300 deg: one band sits centred
+                                                       # on top of each coil, where the game camera looks
+    "chevron": 0.0,                                    # band edges lean back on the flanks (0 = straight rings)
 }
 
 
@@ -382,6 +406,25 @@ def _dense_path(step=0.0015):
     return D, T, O, B, ss, Rr
 
 
+def _band_coord(D, ss):
+    """Band coordinate along the dense centre-line (an integer at every band edge). In the coils it
+    follows the helix angle around the bore (bands_per_turn per turn, phase-locked, so every coil has
+    the same band layout and the colours swap from coil to coil); on the tail and the neck it follows
+    the arc length at the coils' mean band length. Returns (coordinate, mean band length in m)."""
+    th = np.unwrap(np.arctan2(D[:, 0], D[:, 2] - AX))
+    th = th - th[0]
+    per = 2 * np.pi / SKIN["bands_per_turn"]
+    ph = math.radians(SKIN["band_phase_deg"])
+    tmax = th.max()
+    ia = int(np.argmax(th > 0.05))
+    ib = int(len(th) - 1 - np.argmax((th < tmax - 0.05)[::-1]))
+    band_len = (ss[ib] - ss[ia]) / max(1e-6, (th[ib] - th[ia]) / per)
+    bc = (th + ph) / per
+    bc = np.where(ss < ss[ia], (th[ia] + ph) / per - (ss[ia] - ss) / band_len, bc)
+    bc = np.where(ss > ss[ib], (th[ib] + ph) / per + (ss - ss[ib]) / band_len, bc)
+    return bc, band_len
+
+
 def _nearest(points, queries):
     kd = KDTree(len(points))
     for i, p in enumerate(points.tolist()):
@@ -393,71 +436,68 @@ def _nearest(points, queries):
     return out
 
 
-def skin_colour(u, w, hw, seed=0, belly=None, p=None):
-    """Painted snake skin in body coordinates: u = metres along the body (toward the head), w = metres
-    across it (0 on the spine), hw = half the visible width (the flank), belly = 0..1 mask. Returns
-    (N, 3) sRGB and a (N,) mask of the diamond fill (for the light accents)."""
+def skin_colour(bcoord, w, hw, band_len, seed=0, belly=None, p=None, chevron=None):
+    """Painted banded snake skin. bcoord = band coordinate along the body (an integer at each band edge),
+    w = metres across the body (0 on the spine), hw = half the visible width (the flank), band_len = one
+    band in metres, belly = 0..1 mask. Returns (N, 3) sRGB and the (N,) bronze-band mask.
+    Big flat value shapes first (the bands, a lighter painted ridge along the back of each coil, darker
+    flanks), then the small stuff that only shows up close: a thin dark ring and a broken gold line at
+    every band edge, a faint scale lattice, bone belly scutes."""
     S = SKIN
-    n = len(u)
-    col = np.repeat(P.hex3(S["base"])[None], n, 0)
-    # low-frequency paint variation (never grunge)
-    if p is not None:
-        col *= (1 + 0.06 * (P.fbm(p, 9.0, 2, seed=seed + 3) * 2 - 1))[:, None]
-    # overlapping scales: a diamond lattice; each scale lighter at its free (tail-ward) tip, dark seams
-    a = u / S["scale_len"]
-    b = w / S["scale_wid"]
-    x, y = a + b, a - b
-    fx, fy = x - np.floor(x), y - np.floor(y)
+    n = len(bcoord)
+    x = np.abs(w) / np.maximum(hw, 1e-6)              # 0 on the spine .. 1 at the visible flank edge
+    b = bcoord + (S["chevron"] if chevron is None else chevron) * np.minimum(x, 1.2)
+    if p is not None:                                  # hand-painted band edges: a gentle wobble, no jaggies
+        b = b + 0.03 * (P.spread01(P.fbm(p, 24.0, 2, seed=seed + 21)) - 0.5)
+    k = np.floor(b)
+    f = b - k
+    bronze = (np.mod(k, 2) == 1).astype(np.float32)
+
+    def pick(d_hex, b_hex):
+        return P.mix(np.repeat(P.hex3(d_hex)[None], n, 0), P.hex3(b_hex), bronze)
+
+    col = pick(S["dark"], S["bronze"])
+    if p is not None:                                  # low-frequency paint variation (never grunge)
+        col = col * (1 + 0.05 * (P.fbm(p, 9.0, 2, seed=seed + 3) * 2 - 1))[:, None]
+    # a lighter painted ridge along the back of the coil, the flanks falling toward the shadow hue
+    col = P.mix(col, pick(S["dark_ridge"], S["bronze_ridge"]),
+                P.smoothstep(0.62, 0.12, x) * (0.3 + 0.14 * bronze))
+    col = P.mix(col, pick(S["dark_shadow"], S["bronze_shadow"]), P.smoothstep(0.85, 1.25, x) * 0.25)
+    # a faint scale lattice (low contrast: it averages out at game size instead of speckling)
+    u = bcoord * band_len
+    a_ = u / S["scale_len"]
+    bb = w / S["scale_wid"]
+    fx, fy = (a_ + bb) - np.floor(a_ + bb), (a_ - bb) - np.floor(a_ - bb)
     seam = np.minimum(np.minimum(fx, 1 - fx), np.minimum(fy, 1 - fy))
-    tipv = 1.0 - (fx + fy) * 0.5                      # 1 at the tail-ward tip of the scale
-    amt = 1.0 if p is None else 0.55 + 0.45 * P.spread01(P.fbm(p, 14.0, 2, seed=seed + 9))
-    col = P.mix(col, P.hex3(S["scale_light"]), P.smoothstep(0.6, 0.95, tipv) * 0.35 * amt)
-    col = P.mix(col, P.hex3(S["scale_dark"]), P.smoothstep(0.12, 0.03, seam) * 0.45 * amt)
-    # diamond-back pattern along the spine: light diamonds with a black rim
-    pitch = S["diamond_pitch"]
-    k = np.round(u / pitch)
-    du = np.abs(u - k * pitch) / (pitch * 0.5)
-    dw = np.abs(w) / (hw * 0.62)
-    dd = du + dw                                       # < 1 inside the diamond
+    tipv = 1.0 - (fx + fy) * 0.5
+    col = P.mix(col, col * 1.14, P.smoothstep(0.6, 0.95, tipv) * 0.5)
+    col = P.mix(col, col * 0.78, P.smoothstep(0.1, 0.03, seam) * 0.45)
+    # band edges: a thin dark ring, and a thin broken gold line just inside every bronze band
+    e = np.minimum(f, 1 - f) * band_len               # metres to the nearest band edge
+    col = P.mix(col, P.hex3(S["ring_line"]), P.smoothstep(0.0034, 0.0018, e) * 0.9)
+    gl = P.smoothstep(0.0028, 0.0038, e) * P.smoothstep(0.0066, 0.005, e) * bronze
     if p is not None:
-        dd = dd + 0.05 * (P.fbm(p, 40.0, 2, seed=seed + 21) * 2 - 1)
-    # drawn as a bone-gold OUTLINE (with a black halo outside it) around a slightly lighter violet fill
-    # and a small muted-bronze inner diamond: the coils stay a DARK mass at game size, the chain of
-    # outlines is the rhythm up close
-    rim = P.smoothstep(1.24, 1.12, dd)
-    line = P.smoothstep(1.12, 1.04, dd) * P.smoothstep(0.84, 0.91, dd)
-    fill = P.smoothstep(0.91, 0.84, dd)
-    inner = P.smoothstep(0.40, 0.33, dd)
-    col = P.mix(col, P.hex3(S["diamond_rim"]), rim * 0.85)
-    dcol = P.mix(np.repeat(P.hex3(S["diamond_fill"])[None], n, 0), P.hex3(S["diamond_inner"]), inner)
-    # keep the scale seams faintly inside the diamonds (it is the same skin)
-    dcol = P.mix(dcol, dcol * 0.75, P.smoothstep(0.14, 0.03, seam) * 0.6)
-    col = P.mix(col, dcol, fill)
-    col = P.mix(col, P.hex3(S["diamond_line"]), line)
-    # lateral dabs between the diamonds (small light flecks low on the flank)
-    fl = np.abs(np.abs(w) / hw - 0.78)
-    kk = np.round((u - pitch * 0.5) / pitch)
-    fu = np.abs(u - pitch * 0.5 - kk * pitch) / (pitch * 0.18)
-    fleck = P.smoothstep(1.0, 0.6, fu + fl / 0.12)
-    col = P.mix(col, P.hex3(S["fleck"]), fleck * 0.7)
+        gl = gl * P.smoothstep(0.3, 0.5, P.spread01(P.fbm(p, 55.0, 2, seed=seed + 33)))
+    col = P.mix(col, P.hex3(S["ring_light"]), gl * 0.85)
     # belly scutes: transverse bone plates
     if belly is not None:
         bu = u / (S["scale_len"] * 0.95)
         fb = bu - np.floor(bu)
         bcol = P.mix(np.repeat(P.hex3(S["belly"])[None], n, 0), P.hex3(S["belly_line"]),
                      P.smoothstep(0.16, 0.04, np.minimum(fb, 1 - fb)))
-        bcol = P.mix(bcol, P.hex3(S["belly"]) * 1.08, P.smoothstep(0.5, 0.95, fb) * 0.4)
+        bcol = P.mix(bcol, P.hex3(S["belly"]) * 1.06, P.smoothstep(0.5, 0.95, fb) * 0.4)
         col = P.mix(col, bcol, belly)
-    return np.clip(col, 0, 1), fill
+    return np.clip(col, 0, 1), bronze
 
 
 def skin_postpass(maps, zones_order, base, emis, seed=0):
     P_, Z, ao = maps["pos"], maps["zone"], maps["ao"]
-    # 1) the serpent body
+    # 1) the serpent body: broad bands locked to the coils
     zi = zones_order.index("scales")
     idx = np.nonzero(Z == zi)[0]
     if len(idx):
         D, T, O, B, ss, Rr = _dense_path()
+        BC, band_len = _band_coord(D, ss)
         q = P_[idx]
         near = _nearest(D, q)
         v = q - D[near]
@@ -466,69 +506,93 @@ def skin_postpass(maps, zones_order, base, emis, seed=0):
         phi = np.arctan2((v * B[near]).sum(1), (v * O[near]).sum(1))
         rr = Rr[near]
         u = ss[near] + along
+        bc = np.interp(u, ss, BC)
         w = phi * rr
         hw = np.pi * rr * 0.58                        # visible half-width of the back + flanks
         belly = P.smoothstep(2.05, 2.35, np.abs(phi))
-        col, _ = skin_colour(u, w, hw, seed=seed, belly=belly, p=q)
-        # keep the painter's contact shadows (AO) from the base pass
+        col, bronze = skin_colour(bc, w, hw, band_len, seed=seed, belly=belly, p=q)
+        # keep the painter's contact shadows (AO) from the base pass, in each band's own shadow hue
         occ = 1 - ao[idx]
         k = P.smoothstep(0.2, 0.6, occ)
-        col = P.mix(col, P.hex3(RECIPES["scales"]["shadow"]), k * 0.6)
-        # tail end fades to the rattle's bone
-        col = P.mix(col, P.hex3("#8C7458"), P.smoothstep(0.03, 0.0, u) * 0.5)
+        sh = P.mix(np.repeat(P.hex3(SKIN["dark_shadow"])[None], len(idx), 0), P.hex3(SKIN["bronze_shadow"]), bronze)
+        col = P.mix(col, sh, k * 0.6)
+        # the tail end fades to the rattle's bone
+        col = P.mix(col, P.hex3(SKIN["tail_bone"]), P.smoothstep(0.03, 0.0, u) * 0.5)
         base[idx] = col
-    # 2) the drum faces: a coiled serpent tail in scales (a flat spiral band on each face)
+        C.log("skin: band length %.3f m, band coordinate %.1f .. %.1f" % (band_len, BC.min(), BC.max()))
+    # 2) the drum canister: domed faces = the serpent's coiled tail (one bronze spiral); a gold chamfer rim; a light
+    #    bronze band with engraved overlapping scales (the "coiled drum" / "scale-textured drum")
     zi = zones_order.index("drum_face")
     idx = np.nonzero(Z == zi)[0]
     if len(idx):
         q = P_[idx] - np.array(DRUM_C, dtype=np.float32)
+        nx = np.abs(maps["tnrm"][idx, 0])
         r = np.sqrt(q[:, 1] ** 2 + q[:, 2] ** 2)
-        side = np.sign(q[:, 0])
-        th = np.arctan2(q[:, 2], q[:, 1] * side)       # mirrored per face: both spirals wind the same way on screen
-        r0, r1, turns = 0.016, DRUM_R - 0.013, 2.0
-        band = (r1 - r0) / turns
-        psi = (r - r0) / band - th / (2 * np.pi)
-        f = psi - np.floor(psi)
-        u = (th + 2 * np.pi * np.floor(psi)) * (r0 + band * np.floor(psi) + band * 0.5)
-        w = (f - 0.5) * band
-        col, _ = skin_colour(u, w, band * 0.5, seed=seed + 50, p=P_[idx])
-        # the groove between the turns (black) with a light brushed edge on the outer side of each turn
-        groove = P.smoothstep(0.1, 0.02, np.minimum(f, 1 - f))
-        col = P.mix(col, P.hex3("#0E0A12"), groove * 0.95)
-        col = P.mix(col, P.hex3(SKIN["scale_light"]) * 1.25, P.smoothstep(0.8, 0.9, f) * P.smoothstep(0.98, 0.9, f) * 0.6)
-        # face edge (the drum's rim casts a painted contact shadow onto the face)
-        col = P.mix(col, P.hex3("#120D18"), P.smoothstep(r1 - 0.004, r1 + 0.002, r) * 0.8)
-        # flat caps only: the cylinder side under the rim stays dark
-        cap = np.abs(maps["tnrm"][idx, 0]) > 0.7
-        col[~cap] = P.hex3("#1A1420")
-        base[idx] = np.clip(col, 0, 1)
-    # 3) the drum's outer band: overlapping scales engraved into the bronze (the "scale-textured drum")
-    zi = zones_order.index("bronze")
-    idx = np.nonzero(Z == zi)[0]
-    if len(idx):
-        q = P_[idx] - np.array(DRUM_C, dtype=np.float32)
-        r = np.sqrt(q[:, 1] ** 2 + q[:, 2] ** 2)
-        nr = (maps["tnrm"][idx, 1] * q[:, 1] + maps["tnrm"][idx, 2] * q[:, 2]) / np.maximum(r, 1e-6)
-        sel = (np.abs(q[:, 0]) < DRUM_W / 2 - 0.0035) & (np.abs(r - DRUM_R) < 0.003) & (nr > 0.8)
-        sub = idx[sel]
-        if len(sub):
-            qs = q[sel]
-            u = np.arctan2(qs[:, 2], qs[:, 1]) * DRUM_R          # around the drum
-            v = qs[:, 0] + DRUM_W / 2                            # across the band
+        occ = P.smoothstep(0.2, 0.6, 1 - ao[idx])
+        # a) faces: the serpent's coiled tail as ONE light bronze spiral (a painted ridge along its crest, a
+        #    soft violet groove between the turns) that curls in to the centre. One colour along the spiral:
+        #    alternating bands line up from turn to turn into spokes, and a centre disc reads as a hub; both
+        #    made the old drum a cart wheel
+        cap = nx > 0.85
+        if cap.any():
+            qc, rc = q[cap], r[cap]
+            pc = P_[idx][cap]
+            side = np.sign(qc[:, 0])
+            th = np.arctan2(qc[:, 2], qc[:, 1] * side)  # mirrored per face: both spirals wind the same way on screen
+            r1, turns = DRUM_R - DRUM_CHAMFER - 0.002, 2.25
+            band = r1 / turns
+            psi = rc / band - th / (2 * np.pi)
+            fl = np.floor(psi)
+            f = psi - fl
+            x = np.abs(f - 0.5) * 2                   # 0 on the crest of the coil .. 1 in the groove
+            col = np.repeat(P.hex3(SKIN["bronze"])[None], len(rc), 0)
+            col = col * (1 + 0.05 * (P.fbm(pc, 9.0, 2, seed=seed + 51) * 2 - 1))[:, None]
+            col = P.mix(col, P.hex3(SKIN["bronze_ridge"]), P.smoothstep(0.62, 0.1, x) * 0.45)
+            col = P.mix(col, P.hex3(SKIN["bronze_shadow"]), P.smoothstep(0.55, 0.85, x) * 0.45)
+            # a faint scale lattice along the coil (low contrast, like the body)
+            u = (th + 2 * np.pi * fl) * np.maximum(rc, 0.004)
+            a_, bb = u / SKIN["scale_len"], (f - 0.5) * band / SKIN["scale_wid"]
+            fx, fy = (a_ + bb) - np.floor(a_ + bb), (a_ - bb) - np.floor(a_ - bb)
+            seam = np.minimum(np.minimum(fx, 1 - fx), np.minimum(fy, 1 - fy))
+            col = P.mix(col, col * 0.8, P.smoothstep(0.1, 0.03, seam) * 0.4 * P.smoothstep(0.004, 0.012, rc))
+            # the groove between the turns: a soft painted violet-black, broken like a brush line
+            gw = 0.86 + 0.05 * (P.spread01(P.fbm(pc, 40.0, 2, seed=seed + 52)) - 0.5)
+            col = P.mix(col, P.hex3("#241A2E"), P.smoothstep(gw, gw + 0.1, x) * 0.9)
+            # a painted contact shadow just inside the rim, and the AO where the coils swallow the drum
+            col = P.mix(col, P.hex3("#241A2E"), P.smoothstep(r1 - 0.001, r1 + 0.0025, rc) * 0.75)
+            col = P.mix(col, P.hex3(SKIN["bronze_shadow"]), occ[cap] * 0.6)
+            base[idx[cap]] = np.clip(col, 0, 1)
+        # b) the chamfer: a bright gold rim with a broken brushy highlight (the drum's read at game size)
+        ch = (nx > 0.35) & (nx <= 0.85)
+        if ch.any():
+            pc = P_[idx][ch]
+            col = np.repeat(P.hex3("#E8B84E")[None], int(ch.sum()), 0)
+            col = col * (1 + 0.06 * (P.fbm(pc, 12.0, 2, seed=seed + 61) * 2 - 1))[:, None]
+            hl = P.smoothstep(0.35, 0.55, P.spread01(P.fbm(pc, 38.0, 2, seed=seed + 62)))
+            col = P.mix(col, P.hex3("#FFEDB4"), hl * 0.6)
+            col = P.mix(col, P.hex3("#86511A"), occ[ch] * 0.6)
+            base[idx[ch]] = np.clip(col, 0, 1)
+        # c) the band: overlapping scales engraved into the light bronze
+        bd = nx <= 0.35
+        if bd.any():
+            sub = idx[bd]
+            qs = q[bd]
+            uu = np.arctan2(qs[:, 2], qs[:, 1]) * DRUM_R          # around the drum
+            vv = qs[:, 0] + DRUM_W / 2                            # across the band
             su, sv, rs = 0.017, 0.0105, 0.0112
             best_d = np.full(len(sub), 9.0, dtype=np.float32)
-            j0 = np.floor(v / sv)
+            j0 = np.floor(vv / sv)
             for dj in (-1, 0, 1, 2):                             # later rows lie on top of earlier ones
                 j = j0 + dj
                 off = (np.mod(j, 2)) * su * 0.5
-                cu = np.round((u - off) / su) * su + off
-                d = np.hypot(u - cu, v - j * sv) / rs
+                cu = np.round((uu - off) / su) * su + off
+                d = np.hypot(uu - cu, vv - j * sv) / rs
                 best_d = np.where(d < 1.0, d, best_d)
             col = base[sub]
-            col = P.mix(col, P.hex3("#F2C46E"), P.smoothstep(0.75, 0.25, best_d) * 0.28)
-            col = P.mix(col, P.hex3("#4A2814"), P.smoothstep(0.8, 0.97, best_d) * P.smoothstep(1.2, 1.0, best_d) * 0.7)
+            col = P.mix(col, P.hex3("#F6CE7A"), P.smoothstep(0.75, 0.25, best_d) * 0.3)
+            col = P.mix(col, P.hex3("#4A2814"), P.smoothstep(0.8, 0.97, best_d) * P.smoothstep(1.2, 1.0, best_d) * 0.6)
             base[sub] = col
-    # 4) slit pupils in the glowing eyes (dark, no emission)
+    # 3) slit pupils in the glowing eyes (dark, no emission): thin, so the eyes stay big bright shapes
     zi = zones_order.index("glow_eye")
     idx = np.nonzero(Z == zi)[0]
     if len(idx) and EYES:
@@ -536,8 +600,8 @@ def skin_postpass(maps, zones_order, base, emis, seed=0):
         slit = np.zeros(len(idx), dtype=np.float32)
         for e in EYES:
             v = q - np.array(e[:], dtype=np.float32)
-            out_side = v[:, 0] * np.sign(e.x) > 0.004
-            d = (v[:, 1] / 0.0034) ** 2 + (v[:, 2] / 0.0125) ** 2
+            out_side = v[:, 0] * np.sign(e.x) > 0.005
+            d = (v[:, 1] / 0.0032) ** 2 + (v[:, 2] / 0.0145) ** 2
             slit = np.maximum(slit, P.smoothstep(1.2, 0.8, d) * out_side)
         base[idx] = P.mix(base[idx], P.hex3("#1A1020"), slit)
         emis[idx] = emis[idx] * (1 - slit)[:, None]

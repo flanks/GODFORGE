@@ -2,7 +2,7 @@
  "kind": "weapon",
  "key": "serpent_smg",
  "tier": "one_handed",
- "tris": 2370,
+ "tris": 2330,
  "tris_budget": [
   1000,
   2500
@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 86606
+   "bytes": 114590
   },
   {
    "name": "serpent_smg_basecolor",
@@ -26,27 +26,10 @@
     1024
    ],
    "format": "png",
-   "bytes": 987911
+   "bytes": 952307
   }
  ],
  "sockets": {
-  "grip_R": {
-   "translation": [
-    0,
-    0,
-    0
-   ],
-   "forward": [
-    0,
-    0,
-    -1
-   ],
-   "up": [
-    0,
-    1,
-    0
-   ]
-  },
   "glow_core": {
    "translation": [
     0.0,
@@ -80,6 +63,23 @@
     1,
     0
    ]
+  },
+  "grip_R": {
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
   }
  },
  "clips": [],
@@ -100,8 +100,8 @@
  },
  "size_m": 0.768,
  "glb": "assets/models/weapons/serpent_smg.glb",
- "glb_bytes": 1192028,
- "glb_sha256": "08f167eddf447a33fa43674c2b9e5b61bc696c14c53eb1cb91e54ef973326b47",
+ "glb_bytes": 1180296,
+ "glb_sha256": "15da15d720de5410b412b719938ea3f350b7b405e10134471fb96010b820ad7a",
  "source_blend": "art/weapons/serpent_smg/source/serpent_smg.blend",
  "build_script": "art/weapons/serpent_smg/source/serpent_smg_build.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -124,10 +124,10 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 909.1,
-   "p10": 821.9,
-   "p90": 960.0
+   "median": 952.9,
+   "p10": 858.1,
+   "p90": 1008.0
   },
-  "coverage": 0.4
+  "coverage": 0.418
  }
 }
