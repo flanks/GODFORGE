@@ -196,7 +196,10 @@ impl Colors {
             AbyssKind::Sky => (hex("#8E94AE"), hex("#D6D2C6"), hex("#545A78")),
             AbyssKind::Chaos => (hex("#766886"), hex("#AA9EBE"), hex("#4A3E5A")),
         };
-        let stone = mix(stone, look.base, 0.12);
+        // A shade under the characters on the value ladder: lit tops of pale stone otherwise
+        // outshine the heroes under the warm key.
+        let stone = lighten(mix(stone, look.base, 0.12), 0.9);
+        let trim = lighten(trim, 0.92);
         let (leaf, leaf_dark, bark, crystal) = match look.abyss {
             AbyssKind::Magma => (hex("#4A3A2E"), hex("#2A1E18"), hex("#3A2A22"), hex("#FF9A4A")),
             AbyssKind::Water => (hex("#3F7A3A"), hex("#1F4A2A"), hex("#4A3A2C"), hex("#7FFFD0")),
@@ -2676,46 +2679,65 @@ fn rift(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, facing: Vec2) {
     let base = w3(at, 0.0);
     let rot = face(facing);
     let right = rot * Vec3::X;
-    // A vertical lens of light with a jagged rim, a hot core, glass shards around.
-    let n = 9;
-    let lens = |k: u32, w: f32, v: &mut Vr| {
+    // A tear in the world standing on its edge: a jagged rim of light around a lightless
+    // void, a white-hot seam down its middle, torn stone orbiting it.
+    let n = 11;
+    let fwd = rot * Vec3::Z;
+    let jag: Vec<f32> = (0..=n).map(|_| 0.75 + 0.5 * v.f()).collect();
+    let lens = |k: usize, w: f32| {
         let t = k as f32 / n as f32;
-        let y = 0.3 + (h - 0.3) * t;
-        let width = (t * PI).sin() * w * (0.8 + 0.4 * v.f());
-        (y, width)
+        (0.2 + (h - 0.2) * t, (t * PI).sin().powf(0.8) * w * jag[k])
     };
-    for (w, col) in [(r * 1.1, hdr(c.glow, 0.7)), (r * 0.45, c.flame_core)] {
-        let mut prev = lens(0, w, &mut v);
+    let void = lin(mix(hex("#05020A"), c.dark, 0.15));
+    for (w, col, off) in [
+        (r * 1.05, lin(hdr(c.glow, 1.1)), 0.0f32),
+        (r * 0.82, void, 0.025),
+        (r * 0.82, void, -0.025),
+        (r * 0.07, lin(c.flame_core), 0.05),
+        (r * 0.07, lin(c.flame_core), -0.05),
+    ] {
         for k in 1..=n {
-            let cur = lens(k, w, &mut v);
-            let (y0, w0) = prev;
-            let (y1, w1) = cur;
+            let ((y0, w0), (y1, w1)) = (lens(k - 1, w), lens(k, w));
+            let o = fwd * off;
             env.sheet(
                 [
-                    base + Vec3::Y * y0 - right * w0,
-                    base + Vec3::Y * y0 + right * w0,
-                    base + Vec3::Y * y1 + right * w1,
-                    base + Vec3::Y * y1 - right * w1,
+                    base + o + Vec3::Y * y0 - right * w0,
+                    base + o + Vec3::Y * y0 + right * w0,
+                    base + o + Vec3::Y * y1 + right * w1,
+                    base + o + Vec3::Y * y1 - right * w1,
                 ],
-                [lin(col); 4],
+                [col; 4],
                 Key::Glow,
             );
-            prev = cur;
         }
     }
-    env.disc(base + Vec3::Y * 0.03, r * 2.2, 14, lin(hdr(c.glow, 0.5)), [0.0; 4], Key::Glow);
-    for k in 0..6 {
-        let a = k as f32 / 6.0 * TAU + v.f();
-        let p = base + Vec3::new(a.cos(), 0.0, a.sin()) * (r * v.r(1.1, 1.8)) + Vec3::Y * v.r(0.5, h * 0.8);
-        env.crystal_spike(
-            p,
-            Quat::from_rotation_x(v.r(0.0, TAU)) * Quat::from_rotation_z(v.r(0.0, TAU)),
-            0.12,
-            0.3,
-            0.25,
-            4,
-            Paint::new(Key::Glow, c.crystal),
-        );
+    // Scorched ground with cracks of light under it.
+    env.disc(base + Vec3::Y * 0.02, r * 1.6, 12, lin(mix(c.dark, hex("#0A0608"), 0.5)), lin(c.dark), Key::Stone);
+    env.disc(base + Vec3::Y * 0.04, r * 0.9, 12, lin(hdr(c.glow, 0.3)), [0.0; 4], Key::Glow);
+    let glow = Paint::new(Key::Glow, hdr(c.glow, 0.7));
+    for k in 0..4 {
+        let a = k as f32 / 4.0 * TAU + v.r(-0.5, 0.5);
+        let p0 = base + wd(dir(a)) * (r * 0.3) + Vec3::Y * 0.04;
+        let p1 = p0 + wd(dir(a + v.r(-0.4, 0.4))) * (r * v.r(0.8, 1.4));
+        env.tube(&[p0, p1], &[0.06, 0.015], 4, glow);
+    }
+    for k in 0..7 {
+        let a = k as f32 / 7.0 * TAU + v.f();
+        let p = base + Vec3::new(a.cos(), 0.0, a.sin()) * (r * v.r(1.1, 1.8)) + Vec3::Y * v.r(0.5, h * 0.85);
+        let spin = Quat::from_rotation_x(v.r(0.0, TAU)) * Quat::from_rotation_z(v.r(0.0, TAU));
+        if k % 3 == 0 {
+            env.crystal_spike(p, spin, 0.12, 0.3, 0.25, 4, Paint::new(Key::Glow, c.crystal));
+        } else {
+            let s = v.r(0.18, 0.4);
+            env.rock(
+                p,
+                spin,
+                Vec3::new(s, s * 0.6, s * 0.8),
+                v.seed ^ k,
+                0.4,
+                Paint::new(Key::Rock, c.rock).ink(INK_S),
+            );
+        }
     }
     env.flames.push(Flame { at: base + Vec3::Y * (h * 0.5), color: c.glow, power: 1.2, range: 12.0 });
 }

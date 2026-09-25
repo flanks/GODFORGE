@@ -486,7 +486,7 @@ fn gallery() -> Vec<Decor> {
         Box::new(move |at| Decor::Wall { at, half, height, style, variant })
     };
     row(
-        24.0,
+        25.0,
         10.0,
         vec![
             wall(W::Ruin, v(3.5, 0.6), 3.0, 0),
@@ -509,7 +509,7 @@ fn gallery() -> Vec<Decor> {
         })
     };
     row(
-        14.0,
+        16.0,
         9.0,
         vec![
             Box::new(|at| Decor::Pillar { at, radius: 0.7, height: 4.5 }),
@@ -530,7 +530,7 @@ fn gallery() -> Vec<Decor> {
     for k in 0..4u8 {
         items.push(Box::new(move |at| Decor::ColossusHead { at, radius: 2.6, rot: 12 + k, variant: k }));
     }
-    row(4.0, 8.0, items);
+    row(7.0, 8.0, items);
     let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = vec![
         Box::new(|at| Decor::GreatAnvil { at, radius: 2.2, rot: 0 }),
         Box::new(|at| Decor::Crucible { at, radius: 2.7 }),
@@ -543,7 +543,7 @@ fn gallery() -> Vec<Decor> {
     for k in 0..3u8 {
         items.push(Box::new(move |at| Decor::Crystal { at, radius: 1.0, height: 3.0, rot: 5 * k, variant: k }));
     }
-    row(-6.0, 7.5, items);
+    row(-2.0, 7.5, items);
     let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = Vec::new();
     for k in 0..5u8 {
         items.push(Box::new(move |at| Decor::FallenWeapon { at, radius: 1.4, height: 8.0, rot: 5 + k, variant: k }));
@@ -553,7 +553,7 @@ fn gallery() -> Vec<Decor> {
     }
     items.push(Box::new(|at| Decor::FallenTree { from: at - v(2.5, 0.8), to: at + v(2.5, 0.8), radius: 0.6 }));
     items.push(Box::new(|at| Decor::FallenColumn { from: at - v(2.5, -0.8), to: at + v(2.5, -0.8), radius: 0.7 }));
-    row(-15.0, 7.5, items);
+    row(-10.5, 7.5, items);
     let kinds = [
         C::Urns,
         C::Crates,
@@ -576,7 +576,7 @@ fn gallery() -> Vec<Decor> {
     items.push(Box::new(|at| Decor::Brazier { at }));
     items.push(Box::new(|at| Decor::BrokenAnvil { at, scale: 1.2 }));
     items.push(Box::new(|at| Decor::Banner { at, height: 3.5, rot: 12, god: 1 }));
-    row(-22.0, 5.2, items);
+    row(-17.5, 5.2, items);
     let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = vec![
         Box::new(|at| Decor::Channel { from: at - v(0.0, 2.5), to: at + v(0.0, 2.5), width: 1.6 }),
         Box::new(|at| Decor::Pool { at, half: v(1.6, 1.2) }),
@@ -589,7 +589,7 @@ fn gallery() -> Vec<Decor> {
         items.push(Box::new(move |at| Decor::Overgrowth { at, radius: 1.4, variant: k }));
         items.push(Box::new(move |at| Decor::Debris { at, radius: 1.0, height: 1.2, variant: k }));
     }
-    row(-28.0, 5.4, items);
+    row(-23.5, 5.4, items);
     // The floor paint pieces sit along the east and west edges.
     for (k, y) in [-8.0f32, 0.0, 8.0, 16.0].into_iter().enumerate() {
         out.push(Decor::Paving { at: v(-37.0, y), half: v(2.5, 3.0), variant: k as u8 });
