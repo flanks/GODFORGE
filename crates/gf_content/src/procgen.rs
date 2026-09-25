@@ -18,14 +18,16 @@
 //!    ruins. A cross lane on each flank splits the field into quadrant slots, or the flank stays
 //!    one tall wing.
 //! 2. **Landmarks** frame the plaza: a monument on the axis between the plaza and the gates (two
-//!    gates) or a pair flanking the central lane (a central gate), and often a fallen colossus head
-//!    beside the plaza.
+//!    gates) or a pair flanking the central lane (a central gate), arches spanning the processional
+//!    lanes, and often a fallen colossus head beside the plaza.
 //! 3. **Districts.** Each slot receives a themed composition from the biome's pool, template
 //!    `motifs` first: a colonnade court, a collapsed forge hall around a great anvil, a slag channel
 //!    crossed by bridges, a cloister, a fallen giant tree, a broken spiral stair, a rift field...
-//!    Compositions put their backs to the rim and open toward the fight; one or two slots stay open
-//!    killing fields.
-//! 4. **Density.** Solitary ruins top the floor cover up to the pre-grammar density, so pacing holds.
+//!    Compositions put their backs to the rim and open toward the fight; in a four-slot room one
+//!    slot stays an open killing field.
+//! 4. **Density.** Compact ruin clusters along the north and flank bands and at the skirts of the
+//!    districts top the floor cover up to the pre-grammar density, so pacing holds while the middle
+//!    of the field stays open.
 //! 5. **Dressing** (visual only, its own RNG stream, so re-dressing never moves an obstacle):
 //!    banners, clutter and rubble along the rim, braziers at the gates and the plaza, floor inlays,
 //!    paving, ground cover and fissures.
@@ -766,12 +768,17 @@ fn ruin(b: &mut Builder, at: Vec2, satellites: u32) -> bool {
         Biome::Cinder if roll < 0.65 => stump_pair(b, g, at),
         Biome::Cinder if roll < 0.85 => plinth(b, g, at, WallStyle::Plinth),
         Biome::Cinder => short_column(b, g, at),
-        Biome::Verdant if roll < 0.35 => boulder(b, g, at, 1.2, 2.0),
-        Biome::Verdant if roll < 0.6 => {
+        Biome::Verdant if roll < 0.3 => boulder(b, g, at, 1.2, 2.0),
+        Biome::Verdant if roll < 0.55 => {
+            // A living ancient tree: the canopy frames the field from the edges.
+            let (r, height) = (b.rl(1.3, 1.7), q(b.rd(8.0, 11.0)));
+            b.circle(g, at, r, |at, radius| Decor::Tree { at, radius, height, variant: 0 })
+        }
+        Biome::Verdant if roll < 0.75 => {
             let (r, height) = (b.rl(1.1, 1.5), q(b.rd(1.2, 2.6)));
             b.circle(g, at, r, |at, radius| Decor::Tree { at, radius, height, variant: 1 })
         }
-        Biome::Verdant if roll < 0.8 => stump_pair(b, g, at),
+        Biome::Verdant if roll < 0.9 => stump_pair(b, g, at),
         Biome::Verdant => plinth(b, g, at, WallStyle::Hedge),
         Biome::Spire if roll < 0.3 => boulder(b, g, at, 1.2, 2.0),
         Biome::Spire if roll < 0.6 => crystal(b, g, at, 1.0, 1.8),
@@ -1268,7 +1275,7 @@ fn reflecting_pool(b: &mut Builder, f: Frame) -> Option<Rect> {
 fn fallen_giant(b: &mut Builder, f: Frame) -> Option<Rect> {
     let f = f.long();
     let s = b.scale;
-    let rt = b.rl(1.05, 1.35);
+    let rt = b.rl(1.15, 1.45);
     let len = (b.rl(15.0, 21.0) * s).min(f.hl * 2.0 - 4.0 * rt - 2.0);
     if len < 9.0 {
         return None;
@@ -1362,16 +1369,39 @@ fn root_terrace(b: &mut Builder, f: Frame) -> Option<Rect> {
     wall_line(b, g, &c, (-c.hl, c.hl), -c.hw + t, true, t, 2, WallStyle::Hedge, (0.9, 1.4));
     let side = if b.lay.chance(0.5) { -1.0 } else { 1.0 };
     wall_line(b, g, &c, (-c.hw + 2.0 * t + LANE, c.hw), side * (c.hl - t), false, t, 1, WallStyle::Hedge, (0.9, 1.4));
+    let short_end = c.hw * b.rl(-0.1, 0.3);
+    wall_line(b, g, &c, (short_end, c.hw), -side * (c.hl - t), false, t, 0, WallStyle::Hedge, (0.9, 1.4));
     let tr = b.rl(1.1, 1.45);
-    let tree_at = c.p(-side * (c.hl - tr - 1.0), c.hw - tr - 1.0);
+    let tree_at = c.p(-side * (c.hl - 2.0 * t - tr - 1.2), c.hw - tr - 1.0);
     let height = q(b.rd(8.0, 11.0));
     let tree = b.circle(g, tree_at, tr, |at, radius| Decor::Tree { at, radius, height, variant: 0 });
+    // A second, younger tree in the other back corner, and the altar the terrace was built for.
+    let tr2 = b.rl(0.9, 1.2);
+    let height2 = q(b.rd(6.5, 9.0));
+    b.circle(g, c.p(side * (c.hl - 2.0 * t - tr2 - 1.2), c.hw - tr2 - 1.0), tr2, |at, radius| Decor::Tree {
+        at,
+        radius,
+        height: height2,
+        variant: 0,
+    });
+    let altar = c.p(b.rl(-c.hl * 0.2, c.hl * 0.2), c.hw * 0.35);
+    let altar_half = c.h(b.rl(1.1, 1.5), b.rl(0.8, 1.0));
+    let (altar_h, altar_v) = (q(b.rd(0.9, 1.3)), b.vd(4));
+    if b.block(g, altar, altar_half, |at, half| Decor::Wall {
+        at,
+        half,
+        height: altar_h,
+        style: WallStyle::Plinth,
+        variant: altar_v,
+    }) {
+        b.clutter(altar + c.dir(0.0, -1.0) * (altar_half.min_element() + 1.2), 0.5, 0.8, Some(ClutterKind::Candles));
+    }
     if b.obstacles.len() == before {
         return None;
     }
     // Root knots heave the paving: lane-spaced from everything.
-    for _ in 0..b.lay.range_u32(1, 3) {
-        let at = c.p(b.rl(-c.hl * 0.5, c.hl * 0.5), b.rl(-c.hw * 0.2, c.hw * 0.4));
+    for _ in 0..b.lay.range_u32(2, 4) {
+        let at = c.p(b.rl(-c.hl * 0.6, c.hl * 0.6), b.rl(-c.hw * 0.5, c.hw * 0.2));
         let kg = b.group();
         let (r, variant) = (b.rl(1.2, 1.7), 1);
         b.circle(kg, at, r, |at, radius| Decor::Boulder { at, radius, variant });
@@ -1562,7 +1592,8 @@ fn shattered_islands(b: &mut Builder, f: Frame) -> Option<Rect> {
     let w = q(b.rl(1.4, 1.9));
     let va = b.rl(-0.3, 0.3) * c.hw;
     let ub = b.rl(-0.35, 0.35) * c.hl;
-    let cross = w * 0.5 + 1.9;
+    // The crossing stays an open isthmus: its diagonal gaps are full lanes, never a sealed pocket.
+    let cross = w * 0.5 + 2.6;
     let extra = b.rl(-0.7, 0.7) * c.hl;
     let mut placed = 0;
     // Crack along u (gaps at the crossing and one isthmus), then across it: one composition.
@@ -1888,6 +1919,59 @@ fn frame_plaza(b: &mut Builder, plaza: f32, center_gate: bool) {
             break;
         }
     }
+}
+
+/// Arches spanning the processional lanes: a triumphal arch between the entrance and the plaza,
+/// and matching arches on the side-gate lanes. Their piers stand just outside the lane.
+fn arches(b: &mut Builder, plaza: f32, kind: RoomKind) {
+    let p_axis = match kind {
+        RoomKind::Combat | RoomKind::Elite => 0.65,
+        RoomKind::Anvil => 0.4,
+        _ => 0.25,
+    };
+    if b.lay.chance(p_axis) {
+        let pier = q(b.rl(0.7, 0.9));
+        let x = AXIS_W * 0.5 + pier + 0.25;
+        let mid = (b.spawn.y + 7.0 - plaza) * 0.5;
+        for dy in [0.0f32, -1.0, 1.0, -2.0, 2.0, -3.0] {
+            if arch(b, Vec2::new(-x, mid + dy), Vec2::new(x, mid + dy), pier) {
+                break;
+            }
+        }
+    }
+    let side: Vec<Vec2> = b.exits.iter().filter(|e| e.x != 0.0).copied().collect();
+    if !side.is_empty() && b.lay.chance(0.5) {
+        let pier = q(b.rl(0.65, 0.85));
+        let x = LANE_W * 0.5 + pier + 0.25;
+        for e in side {
+            for dy in [7.5f32, 8.5, 9.5, 11.0] {
+                if arch(b, Vec2::new(e.x - x, e.y - dy), Vec2::new(e.x + x, e.y - dy), pier) {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+fn arch(b: &mut Builder, from: Vec2, to: Vec2, pier: f32) -> bool {
+    let (from, to, pier) = (qv(from), qv(to), q(pier));
+    let half = Vec2::splat(pier);
+    let pieces = [Obstacle::Box { center: from, half }, Obstacle::Box { center: to, half }];
+    let (height, variant) = (q(b.rd(5.0, 7.0)), u8::from(b.dress.chance(0.25)));
+    let g = b.group();
+    if !b.solid(g, &pieces, Decor::Arch { from, to, pier, height, variant }) {
+        return false;
+    }
+    let mid = qv((from + to) * 0.5);
+    if variant == 1 {
+        let radius = q(b.rd(0.9, 1.3));
+        b.decal(Decor::Rubble { at: mid, radius, variant: 0 });
+    } else {
+        // A banner hangs from the lintel over the lane.
+        let god = b.god();
+        b.decal(Decor::Banner { at: mid, height: q(height - 0.4), rot: 12, god });
+    }
+    true
 }
 
 /// Move a monument built at the origin to `at`, facing `rot`.
@@ -2250,10 +2334,11 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     //    free of top-up ruins.
     let center_gate = exits.iter().any(|e| e.x == 0.0);
     frame_plaza(&mut b, plaza, center_gate);
+    arches(&mut b, plaza, t.kind);
     let side_x = exits.iter().map(|e| e.x.abs()).fold(0.0f32, f32::max);
     let court_x = if side_x > 0.0 { side_x - LANE_W * 0.5 - PAD } else { AXIS_W * 0.5 + 7.0 };
     let reserve = [Rect::new(Vec2::new(-court_x, plaza * 0.6), Vec2::new(court_x, half.y))];
-    // 3. Districts: signature motif first, one or two open fields, the rest from the biome pool.
+    // 3. Districts: the signature motif, usually one open field, the rest from the biome pool.
     let mut pool: Vec<(DistrictKind, f32)> = b.biome.pool().to_vec();
     for m in &t.motifs {
         match pool.iter_mut().find(|(k, _)| k == m) {
@@ -2263,11 +2348,14 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
         }
     }
     let themed: Vec<usize> = (0..slots.len()).filter(|&i| !slots[i].strip).collect();
+    // A leftover strip is already an open field and counts against the quota.
+    let strips = slots.len() - themed.len();
     let n_fields = match themed.len() {
         0..=2 => 0,
-        3 => usize::from(b.lay.chance(0.35)),
-        _ => 1 + usize::from(b.lay.chance(0.3)),
-    };
+        3 => usize::from(b.lay.chance(0.25)),
+        _ => 1,
+    }
+    .saturating_sub(strips);
     let mut is_field: Vec<bool> = slots.iter().map(|s| s.strip).collect();
     for _ in 0..n_fields {
         let w: Vec<f32> = themed
@@ -2300,8 +2388,14 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
         .filter(|_| !motifs.is_empty());
     let mut used: Vec<DistrictKind> = Vec::new();
     let mut districts = vec![District { kind: DistrictKind::Plaza, min: Vec2::splat(-plaza), max: Vec2::splat(plaza) }];
-    let mut fields: Vec<Rect> = Vec::new();
-    for (i, slot) in slots.iter().enumerate() {
+    // The signature slot builds first, so the other slots see its motif as used.
+    let mut order: Vec<usize> = (0..slots.len()).collect();
+    if let Some(sig) = signature {
+        order.retain(|&i| i != sig);
+        order.insert(0, sig);
+    }
+    for i in order {
+        let slot = &slots[i];
         let flip = b.lay.chance(0.5);
         let f = slot.frame(flip);
         let mut kind = DistrictKind::Field;
@@ -2314,7 +2408,7 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
                 } else {
                     let w: Vec<f32> = pool
                         .iter()
-                        .map(|(k, w)| if used.contains(k) || *k == failed { w * 0.12 } else { *w })
+                        .map(|(k, w)| if used.contains(k) || *k == failed { w * 0.03 } else { *w })
                         .collect();
                     pool[b.lay.weighted_index(&w).unwrap_or(0)].0
                 };
@@ -2329,7 +2423,6 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
         }
         if kind == DistrictKind::Field {
             field(&mut b, f);
-            fields.push(slot.rect);
         }
         districts.push(District { kind, min: qv(slot.rect.min), max: qv(slot.rect.max) });
     }
@@ -2347,29 +2440,26 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     let target = cover_target(t.kind) * half.x * half.y * 4.0;
     let comps = b.comps.clone();
     let mut tries = 0;
-    while b.covered_area() < target && tries < 400 {
+    while b.covered_area() < target && tries < 900 {
         tries += 1;
         let roll = b.lay.f32();
         let at = if roll < 0.4 && !comps.is_empty() {
             let r = comps[b.lay.range_u32(0, comps.len() as u32) as usize];
-            let m = b.rl(1.5, 3.5);
+            let m = b.rl(1.5, 4.5);
             match b.lay.range_u32(0, 4) {
                 0 => Vec2::new(b.rl(r.min.x, r.max.x), r.max.y + m),
                 1 => Vec2::new(b.rl(r.min.x, r.max.x), r.min.y - m),
                 2 => Vec2::new(r.min.x - m, b.rl(r.min.y, r.max.y)),
                 _ => Vec2::new(r.max.x + m, b.rl(r.min.y, r.max.y)),
             }
-        } else if roll < 0.93 || fields.is_empty() {
+        } else {
             // The north and flank bands only: the south edge stands between the camera and the fight.
-            let d = b.rl(RIM + 2.0, RIM + 5.5);
+            let d = b.rl(RIM + 2.0, RIM + 7.0);
             match b.lay.range_u32(0, 3) {
                 0 => Vec2::new(b.rl(-half.x + d, half.x - d), half.y - d),
                 1 => Vec2::new(-half.x + d, b.rl(-half.y + d * 2.0, half.y - d)),
                 _ => Vec2::new(half.x - d, b.rl(-half.y + d * 2.0, half.y - d)),
             }
-        } else {
-            let r = fields[b.lay.range_u32(0, fields.len() as u32) as usize];
-            Vec2::new(b.rl(r.min.x, r.max.x), b.rl(r.min.y, r.max.y))
         };
         if b.comps.iter().chain(&reserve).any(|r| r.contains(at, 1.0)) {
             continue;

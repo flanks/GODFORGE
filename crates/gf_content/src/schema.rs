@@ -931,6 +931,10 @@ pub enum ClutterKind {
 /// obstacle is covered by exactly one solid decor ([`Decor::covers`] its centre), so the env kit can
 /// render the decor and skip the greybox. Every other variant is visual-only and never blocks.
 /// The biome reskins every variant (lava / glowing roots / starlight / raw chaos).
+///
+/// A visual prop (`Brazier`, `BrokenAnvil`, `Clutter`) whose anchor lies inside a solid `Wall`
+/// stands on top of that block (fire bowls on plinths, anvils on forge stations). A `Banner` on
+/// the north rim hangs from the backdrop wall, one at an `Arch`'s midpoint hangs from its lintel.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Decor {
     /// Visual: glowing fissure in the floor (lava, root vein, void crack, chaos rift) from → to.
@@ -1003,6 +1007,18 @@ pub enum Decor {
     /// Solid landmark: a monumental sealed temple gate (frame + shut doors) on
     /// `Obstacle::Box { center: at, half }`; the doors face along the box's short axis, `height` tall.
     SealedGate { at: Vec2, half: Vec2, height: f32 },
+    /// Solid: a freestanding arch spanning a lane. Its two square piers are the obstacles
+    /// `Obstacle::Box { center: from | to, half: (pier, pier) }`; the lintel joins them `height`
+    /// above the floor and the passage between them stays walkable. `variant`: 0 intact, 1 broken
+    /// (lintel fallen, one pier shorter).
+    Arch {
+        from: Vec2,
+        to: Vec2,
+        pier: f32,
+        height: f32,
+        #[serde(default)]
+        variant: u8,
+    },
     /// Solid (Verdant): an ancient tree trunk / giant mushroom stalk on `Obstacle::Circle { at, radius }`.
     /// The canopy is presentation-only and should fade over characters.
     Tree {
@@ -1143,6 +1159,7 @@ impl Decor {
                 | Decor::Crucible { .. }
                 | Decor::GreatBrazier { .. }
                 | Decor::SealedGate { .. }
+                | Decor::Arch { .. }
                 | Decor::Tree { .. }
                 | Decor::FallenTree { .. }
                 | Decor::Crystal { .. }
@@ -1162,6 +1179,7 @@ impl Decor {
             | Decor::Channel { from, to, .. }
             | Decor::Roots { from, to, .. }
             | Decor::Bridge { from, to, .. }
+            | Decor::Arch { from, to, .. }
             | Decor::Chains { from, to, .. } => (from + to) * 0.5,
             Decor::BrokenAnvil { at, .. }
             | Decor::Brazier { at }
@@ -1205,6 +1223,7 @@ impl Decor {
                 near_segment(from, to, radius * 0.5 + 0.01)
             }
             Decor::Channel { from, to, width } => near_segment(from, to, width * 0.5 + 0.01),
+            Decor::Arch { from, to, .. } => p.distance(from) < 0.05 || p.distance(to) < 0.05,
             Decor::Pillar { at, .. }
             | Decor::Boulder { at, .. }
             | Decor::Statue { at, .. }
