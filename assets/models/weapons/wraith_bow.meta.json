@@ -2,7 +2,7 @@
  "kind": "weapon",
  "key": "wraith_bow",
  "tier": "two_handed",
- "tris": 3226,
+ "tris": 3238,
  "tris_budget": [
   2000,
   4000
@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 182069
+   "bytes": 82360
   },
   {
    "name": "wraith_bow_basecolor",
@@ -26,44 +26,10 @@
     1024
    ],
    "format": "png",
-   "bytes": 769933
+   "bytes": 778123
   }
  ],
  "sockets": {
-  "grip_L": {
-   "translation": [
-    -0.0856,
-    -0.0278,
-    -0.332
-   ],
-   "forward": [
-    0,
-    0,
-    -1
-   ],
-   "up": [
-    0,
-    1,
-    0
-   ]
-  },
-  "muzzle": {
-   "translation": [
-    0.0,
-    0.0,
-    -0.38
-   ],
-   "forward": [
-    0,
-    0,
-    -1
-   ],
-   "up": [
-    0,
-    1,
-    0
-   ]
-  },
   "grip_R": {
    "translation": [
     0,
@@ -97,6 +63,40 @@
     1,
     0
    ]
+  },
+  "grip_L": {
+   "translation": [
+    -0.0856,
+    -0.0278,
+    -0.332
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.38
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
   }
  },
  "clips": [],
@@ -107,7 +107,7 @@
   "min": [
    -0.7337,
    -0.2199,
-   -0.75
+   -0.765
   ],
   "max": [
    0.7214,
@@ -117,8 +117,8 @@
  },
  "size_m": 1.455,
  "glb": "assets/models/weapons/wraith_bow.glb",
- "glb_bytes": 1100108,
- "glb_sha256": "cf7473e7e15cd63e83f3dacbfe4e5ff3d4398862cad6493b05b82003a9ac5c3c",
+ "glb_bytes": 1009948,
+ "glb_sha256": "7a9cd6980eef30699d954eeb669861178b8c39fae690f2401aaf3932af0e7227",
  "source_blend": "art/weapons/wraith_bow/source/wraith_bow.blend",
  "build_script": "art/weapons/wraith_bow/source/wraith_bow_build.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
@@ -143,10 +143,19 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 603.9,
-   "p10": 555.1,
-   "p90": 636.8
+   "median": 603.0,
+   "p10": 553.2,
+   "p90": 635.6
   },
-  "coverage": 0.366
+  "coverage": 0.364
+ },
+ "glow": {
+  "emissive_zones": [
+   "bolt_head",
+   "glow_eye",
+   "feather (outermost tips)",
+   "void (slit pupil decal)"
+  ],
+  "emissive_fraction_of_atlas": 0.0595
  }
 }

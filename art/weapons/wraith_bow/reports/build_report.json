@@ -5,7 +5,7 @@
   "kind": "weapon",
   "tier": "two_handed",
   "extensions_used": [],
-  "tris": 3226,
+  "tris": 3238,
   "budget": [
    2000,
    4000
@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 182069
+    "bytes": 82360
    },
    {
     "name": "wraith_bow_basecolor",
@@ -29,7 +29,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 769933
+    "bytes": 778123
    }
   ],
   "materials": [
@@ -44,40 +44,6 @@
    "wraith_bow"
   ],
   "sockets": {
-   "grip_L": {
-    "translation": [
-     -0.0856,
-     -0.0278,
-     -0.332
-    ],
-    "forward": [
-     0,
-     0,
-     -1
-    ],
-    "up": [
-     0,
-     1,
-     0
-    ]
-   },
-   "muzzle": {
-    "translation": [
-     0.0,
-     0.0,
-     -0.38
-    ],
-    "forward": [
-     0,
-     0,
-     -1
-    ],
-    "up": [
-     0,
-     1,
-     0
-    ]
-   },
    "grip_R": {
     "translation": [
      0,
@@ -111,13 +77,47 @@
      1,
      0
     ]
+   },
+   "grip_L": {
+    "translation": [
+     -0.0856,
+     -0.0278,
+     -0.332
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.0,
+     -0.38
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
    }
   },
   "bounds": {
    "min": [
     -0.7337,
     -0.2199,
-    -0.75
+    -0.765
    ],
    "max": [
     0.7214,
@@ -133,11 +133,11 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 603.9,
-   "p10": 555.1,
-   "p90": 636.8
+   "median": 603.0,
+   "p10": 553.2,
+   "p90": 635.6
   },
-  "coverage": 0.366,
+  "coverage": 0.364,
   "zones": [
    "wood",
    "feather",
@@ -146,13 +146,27 @@
    "brass",
    "void",
    "glow_eye",
-   "glow_string",
-   "glow_bolt"
+   "string",
+   "shaft",
+   "vane",
+   "bolt_head"
   ],
   "decals": 52,
   "basecolor": "art/weapons/wraith_bow/textures/wraith_bow_basecolor.png",
   "emissive": "art/weapons/wraith_bow/textures/wraith_bow_emissive.png",
-  "emissive_texels": 233592,
-  "seconds": 21.9
+  "emissive_texels": 62431,
+  "seconds": 13.9,
+  "glow": {
+   "painted_texels": 382035,
+   "emissive_texels": 19148,
+   "by_zone": {
+    "feather": 7713,
+    "void": 402,
+    "glow_eye": 2657,
+    "bolt_head": 8376
+   },
+   "emissive_fraction_of_painted": 0.0501,
+   "emissive_fraction_of_atlas_dilated": 0.0595
+  }
  }
 }

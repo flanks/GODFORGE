@@ -14,17 +14,24 @@ Design (docs/art/WEAPONS.md section 5, family CHARGE; secondary tags pierce, voi
     makes a shallow V back to the right hand, so the bow always shows stored tension. Each limb is a
     ghostly wing: a pale spar that curves back to the string nock, with a fan of carved wood feathers.
     The feathers turn from pointing forward near the riser to pointing outward and back at the tip,
-    like a spread wing's primaries, and their tips dissolve into violet glow. A spectral hex-bolt sits
-    on the string and runs through the riser, so the one sharp point (pierce) is at the front;
+    like a spread wing's primaries, and the two outermost ones end in a deep violet glow. A hex-bolt with
+    a flat broadhead sits on the string and runs through the riser, so the one sharp point (pierce) is at
+    the front;
   * CANTED about the aim axis (72 deg, top limb to the weapon's right): the game camera looks down at
     55 deg, so an upright bow turns edge-on whenever the hero aims up or down the screen. Canted this
     far, the whole wing shape shows from every aim (the limb plane faces the camera at 0.57-0.97);
   * value rhythm: dark iron riser in the middle (grip wrap, limb pockets, nock claws), pale limbs and
-    feathers, then the glows: violet string, white-hot bolt head in front (the brightest value);
+    feathers, a pale ghost-lilac string and a mid ghost-wood shaft (painted, not lit), then the glowing
+    broadhead in front: the brightest value, painted with a light / shadow split along its centre ridge;
+  * glow budget (art review 1): ONLY the bolt head, the void eye and the outermost feather tips emit (about
+    6 % of the atlas, was 22 %), so engine bloom cannot turn the bow into a violet aura that competes with
+    player 3's violet #B06CFF. The head's emission is derived from its painted colour (head_postpass, a
+    runtime hook on gfa_paint.paint like serpent_smg's), so the split survives the glow;
   * void accent: a hollow VOID EYE in an iron frame on the riser, with a violet rim and a glowing slit
     pupil. Hexweaver sigils are carved into the limbs;
   * palette: pale wraith-wood + dark iron + dark plum leather + bone-brass bolts (the arsenal's warm
-    metals) + the Void element hue #A45CFF (palette.rs element_color) for every glow.
+    metals) + the Void element hue #A45CFF (palette.rs element_color), authored darker and bluer for the
+    glows (#5A3CD8 feather tips, #6246C8 blade shadow) so they stay clear of player violet.
 
 Grip frame (docs/art/WEAPONS.md sections 2-3): origin = grip_R = the right palm centre at the string's
 nocking point (the drawing hand). +Y = the aim (the bolt), +Z = up, +X = the weapon's right. grip_L = the
@@ -81,12 +88,17 @@ FEATHERS = [
     (0.92, 9.0, 0.300, 0.074, 34.0),
 ]
 
-ZONES = ["wood", "feather", "iron", "wrap", "brass", "void", "glow_eye", "glow_string", "glow_bolt"]
+ZONES = ["wood", "feather", "iron", "wrap", "brass", "void", "glow_eye", "string", "shaft", "vane", "bolt_head"]
 PALETTE = [  # (name, hex) for the review sheet
     ("wraith-wood", "#9C91A3"), ("feather", "#B0A6BC"), ("iron", "#35303F"), ("wrap", "#4E2C48"),
-    ("bone-brass", "#C2A673"), ("void", "#140B20"), ("Void element", "#A45CFF"), ("glow rim", "#6E3CE0"),
-    ("glow hot", "#8A5CF5"), ("bolt core", "#F2ECFF"),
+    ("bone-brass", "#C2A673"), ("void", "#140B20"), ("spectral string", "#B9B0D8"), ("Void element", "#A45CFF"),
+    ("tip glow", "#5A3CD8"), ("blade shadow", "#6246C8"), ("blade light", "#E6DFFF"),
 ]
+
+# glow budget (art review 1): only the bolt head, the void eye and the outermost feather tips emit. The string,
+# the shaft, the vanes and the carved sigils are painted, not lit, so bloom cannot turn the bow into a violet
+# aura that competes with player 3's violet (#B06CFF).
+HEAD_REAR_Y, HEAD_TIP_Y = 0.556, 0.765
 
 
 def W(p):
@@ -275,26 +287,31 @@ def build_mesh(col, feathers=FEATHERS):
         a.add(bm, zone, name=name + "_up", shading=shading)
         a.add(low, zone, name=name + "_lo", shading=shading)
 
-    # ---- the spectral string: a V from each nock to the nocking point (the right hand), a knot at the nock
+    # ---- the spectral string: a V from each nock to the nocking point (the right hand), a knot at the nock.
+    # Painted pale ghost-lilac, not emissive (art review 1).
     for sz in (1, -1):
         s = M.tube([Vector((0, NOCK_Y + 0.004, sz * (T + 0.004))), Vector((0, 0, 0))], 0.0085, sides=6)
-        a.add(s, "glow_string", name="string", shading="smooth")
+        a.add(s, "string", name="string", shading="smooth")
     knot = M.ico(0.016, 1, scale=(1.0, 1.25, 1.0))
-    a.add(knot, "glow_string", name="string_knot", shading="smooth")
+    a.add(knot, "string", name="string_knot", shading="smooth")
 
-    # ---- the spectral hex-bolt: shaft, hexagonal bipyramid head, three vanes, nock
+    # ---- the hex-bolt: a painted ghost-wood shaft and vanes, and a glowing broadhead
     shaft = M.cylinder(0.0095, 0.60, sides=6, axis="Y")
     M.xform(shaft, loc=(0, 0.28, 0))
-    a.add(shaft, "glow_bolt", name="bolt_shaft", shading="smooth")
-    head = M.lathe([(0.0, 0.555), (0.038, 0.60), (0.03, 0.635), (0.0, BOLT_TIP_Y)], sides=6, cap=False, axis="Z")
-    M.xform(head, rot=(-90, 0, 0))
-    a.add(head, "glow_bolt", name="bolt_head", shading="flat")
+    a.add(shaft, "shaft", name="bolt_shaft", shading="smooth")
+    # the head is a flat six-sided broadhead lying in the bow plane (thin across it), so from the game camera it
+    # shows its broad side: a centre ridge splits each face into a light and a shadow facet (painted), the
+    # narrow edge strips are the cutting edges. Widest just behind the middle, a short kink, a long point.
+    head = M.lathe([(0.0, HEAD_REAR_Y), (0.013, 0.566), (0.047, 0.588), (0.039, 0.622), (0.0, HEAD_TIP_Y)],
+                   sides=6, cap=False, axis="Z")
+    M.xform(head, rot=(-90, 0, 0), scale=(0.42, 1.0, 1.0))
+    a.add(head, "bolt_head", name="bolt_head", shading="flat")
     for k in range(3):
         ang = math.radians(90 + 120 * k)
         vane = M.box((0.004, 0.10, 0.03), taper=(1.0, 0.45), shear=(0.0, -0.02))
         M.xform(vane, loc=(0, 0, 0.015))
         M.xform(vane, matrix=Matrix.Translation((0, 0.085, 0)) @ Matrix.Rotation(ang - math.pi / 2, 4, "Y"))
-        a.add(vane, "glow_bolt", name="bolt_vane", shading="flat")
+        a.add(vane, "vane", name="bolt_vane", shading="flat")
 
     obj = a.to_object(col)
     obj.data.transform(CANT)
@@ -313,12 +330,14 @@ RECIPES = {
                    edge_width=0.005, cavity=0.75, ao=0.6, brush=0.04, stroke=LIMB_AXIS, stroke_amount=0.42,
                    stroke_freq=(80.0, 5.0),
                    gradient={"center": BOW_CENTER, "range": (0.30, 0.62), "color": "#8C7CB4", "amount": 0.25}),
+    # the glow is only on the last few cm of the two outermost feathers per limb (their tips lie 0.80 and 0.84 m
+    # from the bow centre; emission starts at 0.76 m), in a deep indigo-violet that stays clear of player violet
     "feather": P.zone(base="#B0A6BC", shadow="#483E68", light="#E6E0EC", planes=0.1, parts=0.1, edge=0.8,
                       edge_width=0.0045, cavity=0.65, ao=0.75, ao_range=(0.12, 0.45), brush=0.03,
                       gradient={"center": BOW_CENTER, "range": (0.5, 0.85), "color": "#8C80D2", "amount": 0.5},
-                      emit={"color": "#6E3CE0", "hot": "#8A5CF5", "core": "#B89CFF", "mode": "radial",
-                            "center": BOW_CENTER, "radius": 0.86, "fade": (0.84, 0.98), "base_mix": 0.25,
-                            "strength": 0.85}),
+                      emit={"color": "#5A3CD8", "hot": "#7458EC", "core": "#B4A6FF", "mode": "radial",
+                            "center": BOW_CENTER, "radius": 0.84, "fade": (0.9, 0.995), "base_mix": 0.3,
+                            "strength": 0.8}),
     "iron": P.zone(base="#35303F", shadow="#120F17", light="#8E849C", planes=0.07, parts=0.05, edge=0.95,
                    edge_width=0.0042, cavity=0.6, ao=0.5, brush=0.05),
     "wrap": P.zone(base="#4E2C48", shadow="#1E0E1C", light="#8C5C80", planes=0.04, edge=0.5, edge_width=0.004,
@@ -328,21 +347,83 @@ RECIPES = {
     "void": P.zone(base="#140B20", shadow="#050308", light="#3A2A52", planes=0.02, edge=0.2, cavity=0.2, ao=0.2,
                    brush=0.02),
     "glow_eye": P.zone(base="#C8A0FF", edge=0.0, cavity=0.0, ao=0.0,
-                       emit={"color": "#8A4CFF", "hot": "#9C6BFF", "core": "#E2D6FF", "mode": "flat",
+                       emit={"color": "#7446F0", "hot": "#8A68FF", "core": "#E4DCFF", "mode": "flat",
                              "base_mix": 0.2}),
-    "glow_string": P.zone(base="#6E3CE0", edge=0.0, cavity=0.0, ao=0.0,
-                          emit={"core": "#B89CFF", "hot": "#8A5CF5", "color": "#6E3CE0", "mode": "radial",
-                                "center": (0, 0, 0), "radius": 0.62, "base_mix": 0.1}),
-    "glow_bolt": P.zone(base="#7040E6", edge=0.0, cavity=0.0, ao=0.0,
-                        emit={"core": "#F2ECFF", "hot": "#A585FF", "color": "#7040E6", "mode": "plane",
-                              "axis": (0, -1, 0), "range": (-BOLT_TIP_Y, -0.05), "base_mix": 0.2}),
+    # the spectral string: pale ghost-lilac, paler at the nocking point, cooler toward the nocks; not emissive
+    "string": P.zone(base="#C4BCE2", shadow="#4E4478", light="#F2EEFF", planes=0.0, parts=0.0, edge=0.0,
+                     cavity=0.0, ao=0.35, brush=0.03,
+                     gradient={"center": (0, 0, 0), "range": (0.08, 0.6), "color": "#8C80C4", "amount": 0.45}),
+    # the bolt's ghost-wood shaft: one step darker than the limbs so the blade in front is the brightest value
+    "shaft": P.zone(base="#7C7298", shadow="#2E2644", light="#C4BCD8", planes=0.06, parts=0.0, edge=0.55,
+                    edge_width=0.003, cavity=0.5, ao=0.45, brush=0.03, stroke=WD((0, 1, 0)), stroke_amount=0.3,
+                    stroke_freq=(260.0, 6.0)),
+    "vane": P.zone(base="#B0A6BC", shadow="#483E68", light="#E6E0EC", planes=0.12, parts=0.08, edge=0.7,
+                   edge_width=0.003, cavity=0.6, ao=0.5, brush=0.03,
+                   gradient={"axis": WD((0, -1, 0)), "range": (-0.13, -0.04), "color": "#6C5AB0", "amount": 0.55}),
+    # the broadhead: a painted light / shadow split along the centre ridge (the bow-frame -z half is the shadow
+    # facet), broken white edge strokes on the ridge and the cutting edges. Emission comes from the paint
+    # post-pass (head_postpass): it follows these painted values, so the split survives the glow.
+    "bolt_head": P.zone(base="#E6DFFF", shadow="#2E2068", light="#FFFFFF", planes=0.03, parts=0.0, edge=0.95,
+                        edge_width=0.0028, edge_breakup=0.12, cavity=0.6, ao=0.25, ao_range=(0.3, 0.7), brush=0.02,
+                        gradient={"axis": WD((0, 0, -1)), "range": (-0.0004, 0.0004), "color": "#6246C8",
+                                  "amount": 1.0}),
 }
+
+
+# ---- paint post-pass: the broadhead's glow follows its painted value planes --------------------------------
+
+def head_postpass(maps, zones_order, base, emis):
+    """Runs after gfa_paint.paint (runtime hook, gfa_paint itself is unchanged; same pattern as
+    art/weapons/serpent_smg). On the bolt head: darken toward the socket, a white-hot point, then the emission
+    = the painted colour x a ramp from the socket (dim) to the point (hot). The light facet glows pale, the
+    shadow facet glows a deep violet, so the blade keeps its light / shadow split under the glow and bloom."""
+    import numpy as np
+    zi = zones_order.index("bolt_head")
+    m = maps["zone"] == zi
+    if not m.any():
+        return base, emis
+    inv = np.array(CANT.inverted().to_3x3(), dtype=np.float32)
+    q = maps["pos"][m] @ inv.T                         # bow frame: y = along the bolt, z = across the blade
+    t = P.smoothstep(HEAD_REAR_Y + 0.01, HEAD_TIP_Y, q[:, 1])
+    c = base[m] * (0.72 + 0.28 * P.smoothstep(0.0, 0.35, t))[:, None]       # the socket end sits in shadow
+    light_side = P.smoothstep(-0.0004, 0.0004, q[:, 2])
+    point = P.smoothstep(0.86, 0.985, t)
+    tipc = P.mix(np.repeat(P.hex3("#B8A8FF")[None], len(c), 0), P.hex3("#FFFFFF"), light_side)
+    c = P.mix(c, tipc, point * 0.85)
+    base[m] = np.clip(c, 0, 1)
+    emis[m] = np.clip(c * (0.2 + 0.6 * t)[:, None], 0, 1)
+    return base, emis
+
+
+GLOW_STATS = {}
+
+
+def glow_stats(maps, zones_order, emis):
+    """Emissive texels per zone (over the painted texels, before the dilation margin)."""
+    import numpy as np
+    lit = emis.max(1) > 0.02
+    GLOW_STATS.clear()
+    GLOW_STATS["painted_texels"] = int(len(emis))
+    GLOW_STATS["emissive_texels"] = int(lit.sum())
+    GLOW_STATS["by_zone"] = {z: int((lit & (maps["zone"] == i)).sum()) for i, z in enumerate(zones_order)
+                             if (lit & (maps["zone"] == i)).any()}
+
+
+_paint_orig = P.paint
+
+
+def _paint_with_head(maps, zones_order, recipes, dist_convex, dist_concave, decals=(), seed=0):
+    base, emis = _paint_orig(maps, zones_order, recipes, dist_convex, dist_concave, decals, seed)
+    base, emis = head_postpass(maps, zones_order, base, emis)
+    glow_stats(maps, zones_order, emis)
+    return base, emis
 
 
 def decals():
     out = []
     rng = random.Random(11)
-    # carved Hexweaver sigils on the visible (-x) face of both limbs: violet lines in a dark groove, faintly lit.
+    # carved Hexweaver sigils on the visible (-x) face of both limbs: violet lines in a dark groove (painted only:
+    # the glow budget keeps them unlit).
     # Frame: X = limb axis (z), Y = aim (y), Z = -x (projection axis); u x v = z holds: z x y = -x.
     fr = CANT @ Matrix(((0, 0, -1, 0), (0, 1, 0, 0), (1, 0, 0, 0), (0, 0, 0, 1)))
     pts = limb_points(4)
@@ -355,8 +436,8 @@ def decals():
             ca, sa = math.cos(ang), math.sin(ang)
             for ln in g:
                 lines.append([(sz * (p.z + (q[1] * ca - q[0] * sa)), p.y + (q[1] * sa + q[0] * ca)) for q in ln])
-    out.append(P.decal_lines(lines, fr, 0.0042, zones=["wood"], color="#7B5CB0", rim="#2A1E3A", rim_width=0.0085,
-                             emit={"color": "#6E36C0", "core": "#9E6BFF"}, depth=(0.0, 0.08)))
+    out.append(P.decal_lines(lines, fr, 0.0042, zones=["wood"], color="#8A6CC4", rim="#2A1E3A", rim_width=0.0085,
+                             emit=None, depth=(0.0, 0.08)))
     # feathers, painted like carved plumes: a pale rachis and two dark splits in the vane, on both faces.
     # The feathers are stacked 5 mm apart across the bow plane, so each decal only takes its own feather's depth.
     fr_back = CANT @ Matrix(((0, 0, 1, 0), (0, -1, 0, 0), (1, 0, 0, 0), (0, 0, 0, 1)))   # X = z, Y = -y, Z = +x
@@ -386,10 +467,10 @@ def decals():
     fe = CANT @ Matrix(((0, 0, -1, EYE[0]), (0, 1, 0, EYE[1]), (1, 0, 0, EYE[2]), (0, 0, 0, 1)))
     slit = [[(-0.022, 0.0), (0.022, 0.0)]]
     out.append(P.decal_lines(slit, fe, 0.006, zones=["void"], color="#E6D6FF", rim="#5A2A9A", rim_width=0.012,
-                             emit={"color": "#A45CFF", "core": "#F4EAFF"}, depth=(-0.03, 0.03), facing=0.2))
+                             emit={"color": "#8A5CF5", "core": "#F4EEFF"}, depth=(-0.03, 0.03), facing=0.2))
     hexa = [[(0.084 * math.cos(math.radians(60 * i)), 0.044 * math.sin(math.radians(60 * i))) for i in range(7)]]
     out.append(P.decal_lines(hexa, fe, 0.0035, zones=["iron"], color="#8E6CC8", rim="#0C0910", rim_width=0.007,
-                             emit={"color": "#5A2A9A", "core": "#8E5CE0"}, depth=(-0.03, 0.03), facing=0.4))
+                             emit=None, depth=(-0.03, 0.03), facing=0.4))
     # the grip wrap: dark spiral seams (cylinder mapping around the grip axis)
     fg = CANT @ Matrix(((1, 0, 0, 0.0), (0, 1, 0, 0.33), (0, 0, 1, -0.09), (0, 0, 0, 1)))
     r = 0.04
@@ -426,8 +507,17 @@ def main():
 
     pack = C.pack_dir(KIND, KEY)
     tex_dir = os.path.join(pack, "textures")
-    paint_rep = P.paint_asset(mesh, KEY, RECIPES, tex_dir, size=size, decals=decals(), ao_distance=0.03,
-                              ao_samples=24, seed=5)
+    P.paint = _paint_with_head               # runtime hook: the bolt-head post-pass (gfa_paint itself is unchanged)
+    try:
+        paint_rep = P.paint_asset(mesh, KEY, RECIPES, tex_dir, size=size, decals=decals(), ao_distance=0.03,
+                                  ao_samples=24, seed=5)
+    finally:
+        P.paint = _paint_orig
+    paint_rep["glow"] = dict(GLOW_STATS)
+    paint_rep["glow"]["emissive_fraction_of_painted"] = round(
+        GLOW_STATS["emissive_texels"] / max(1, GLOW_STATS["painted_texels"]), 4)
+    paint_rep["glow"]["emissive_fraction_of_atlas_dilated"] = round(paint_rep["emissive_texels"] / float(size * size), 4)
+    C.log("glow:", paint_rep["glow"])
     blend = os.path.join(pack, "source", KEY + ".blend")
     C.save_blend(blend)
     bpy.ops.file.make_paths_relative()
@@ -436,7 +526,11 @@ def main():
                          extra={"chassis": {"damage_type": "Void", "style": "Arrow", "fire": "Charge",
                                             "tags": ["charge", "pierce", "thessaly"]},
                                 "cant_deg": CANT_DEG,
-                                "paint": {k: paint_rep[k] for k in ("size", "texel_density_px_per_m", "coverage")}})
+                                "paint": {k: paint_rep[k] for k in ("size", "texel_density_px_per_m", "coverage")},
+                                "glow": {"emissive_zones": ["bolt_head", "glow_eye", "feather (outermost tips)",
+                                                            "void (slit pupil decal)"],
+                                         "emissive_fraction_of_atlas": paint_rep["glow"][
+                                             "emissive_fraction_of_atlas_dilated"]}})
     reports = C.ensure_dir(os.path.join(pack, "reports"))   # gfa_sheet.py does not create the folder
     if not C.flag(argv, "--no-review"):
         review(root, mesh, rep, reports, tex_dir, pack)
@@ -475,6 +569,15 @@ def hold_sheet(root, mesh, reports, work):
     out = {}
     hero = R.turnaround([mesh], work, KEY + "_hero", {"34": (0.45, -0.35, 0.85)}, size=900)
     out["hero"] = hero["34"]
+    # close-ups of the broadhead (art review 1: a painted light / shadow split, not a flat white shape)
+    heads = []
+    R.setup_cycles(scene, 12)
+    with R.toon_preview([mesh], ink=0.0015):
+        for name, d in (("above", (0.0, 0.0001, 1.0)), ("34", (0.45, -0.35, 0.85)), ("below", (-0.4, 0.3, -0.85))):
+            R.aim(scene, Vector(W((0.0, 0.655, 0.0))), d, 0.3)
+            path = os.path.join(work, "%s_head_%s.png" % (KEY, name))
+            R.render(scene, path, 420)
+            heads.append({"path": path, "label": "bolt head, %s" % name})
     saved = root.matrix_world.copy()
     sockets = {c.name: c for c in root.children if c.type == "EMPTY"}
     shots = []
@@ -500,8 +603,8 @@ def hold_sheet(root, mesh, reports, work):
                     "game camera: orthographic, 55 deg pitch",
         "width": 1600,
         "sections": [
-            {"label": "Hero view (toon preview of the final textures)", "height": 520,
-             "images": [{"path": out["hero"], "label": "3/4 above"}]},
+            {"label": "Hero view, and the glowing broadhead close up (toon preview of the final textures, emissive x1.6)",
+             "height": 378, "images": [{"path": out["hero"], "label": "3/4 above"}] + heads},
             {"label": "In-game camera, zoomed 4.5x (smooth render, same angle), three aim directions", "height": 470,
              "images": [{"path": z, "label": "aim (%.1f, %.1f)" % (a[0], a[1])} for a, z, _, _ in shots]},
             {"label": "The same aims at true 1080p size (22 m view height, 49 px/m): 1x, then 3x nearest, then the 3x silhouette",

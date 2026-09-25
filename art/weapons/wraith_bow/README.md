@@ -20,7 +20,10 @@ One run takes about 35-45 s on the CPU and rebuilds everything below.
   in-game camera at 1x and 3x, silhouettes and textures.
 * [reports/wraith_bow_hold.png](reports/wraith_bow_hold.png) shows the bow held by the 2.2 m mannequin
   (right palm on the string, left palm on the riser) through the 55° game camera. It has three aim
-  directions, zoomed 4.5x, and the same aims at true 1080p size with game-size silhouettes.
+  directions, zoomed 4.5x, and the same aims at true 1080p size with game-size silhouettes. The top row
+  has three close-ups of the glowing broadhead.
+* [reports/wraith_bow_fix1_compare.png](reports/wraith_bow_fix1_compare.png) compares the build before and
+  after the fixes from art review 1 (see "Review history" below).
 
 ## Brief
 
@@ -37,14 +40,15 @@ the **Void element hue** (`#A45CFF`, `palette.rs`) and not her player green.
 
 * **Family: CHARGE → verb THE DRAW** (docs/art/WEAPONS.md section 5). The bow is modelled **at half
   draw**. The spectral string makes a shallow V (0.09 m) back to the right hand, so stored tension
-  shows even when the bow is idle. The secondary tags each add one accent. *Pierce*: a spectral
-  **hex-bolt** (hexagonal bipyramid head) sits on the string and runs through the riser, so the one sharp
-  point is at the front. *Void*: a hollow **void eye** in an iron frame on the riser, with a violet rim
+  shows even when the bow is idle. The secondary tags each add one accent. *Pierce*: a
+  **hex-bolt** with a glowing six-sided broadhead sits on the string and runs through the riser, so the one
+  sharp point is at the front. *Void*: a hollow **void eye** in an iron frame on the riser, with a violet rim
   and a glowing slit pupil.
 * **Wing limbs.** Each limb is a pale wood spar that curves back to an iron nock claw. Six carved
   feathers fan from it: pointing forward near the riser, then outward and back at the tip like a spread
-  wing's primaries, the last ones curling. The feathers overlap and are stacked 5 mm apart. Their tips
-  fade into violet glow (the "ghostly" part). From the game camera the bow reads as a pair of spread
+  wing's primaries, the last ones curling. The feathers overlap and are stacked 5 mm apart. The
+  feathers take on a violet tint toward the wing tips, and the two outermost end in a deep violet glow
+  (the "ghostly" part). From the game camera the bow reads as a pair of spread
   wings around a glowing bolt.
 * **Canted 72° about the aim axis** (top limb toward the weapon's right). The game camera looks down at
   55°, so an upright bow goes edge-on whenever the hero aims up or down the screen. Canted this far, the
@@ -53,18 +57,31 @@ the **Void element hue** (`#A45CFF`, `palette.rs`) and not her player green.
   socket, paint centre and decal goes through the same `W()` transform. If the user wants an upright or
   flat bow instead, change `CANT_DEG` and rebuild.
 * **Value rhythm:** a dark iron riser in the middle (plum leather grip wrap, iron limb pockets with
-  bone-brass bolts, iron bands, iron nock claws). Then the pale limbs and feathers. Then the glows: a
-  violet string, a violet bolt shaft, and a **white-hot bolt head at the front, the brightest value**.
+  bone-brass bolts, iron bands, iron nock claws). Then the pale limbs and feathers, a pale ghost-lilac
+  string (`#C4BCE2`, cooler toward the nocks) and a mid ghost-wood shaft (`#7C7298`) with pale vanes. Then
+  the **glowing broadhead at the front, the brightest value**.
   The wood and feathers sit one step below white (`#9C91A3` / `#B0A6BC`), so their painted value planes
   survive the lit side of the toon ramp.
 * **Painting:** flat value planes per face and per feather, wood grain along the limbs, cavity darks,
   and brushy edge highlights on the iron. Painted line decals add Hexweaver sigils carved into both limbs
   (faintly glowing), a pale rachis and two dark vane splits on every feather (both faces), a hexagon
   engraved round the eye, the eye's slit pupil, and spiral seams on the grip wrap.
-* **Glow colours:** the rim `#6E3CE0` → hot `#8A5CF5` → core `#B89CFF` (the string) / `#F2ECFF` (the bolt
-  head). This is the Void hue authored a little darker and bluer: saturated `#A45CFF` clips to
-  pink-magenta when the engine brightens emissive (blue saturates first). The engine scales the
-  strength (emissive authored at 1.0).
+* **Glow budget.** Only three things emit: the **bolt head**, the **void eye** (rim and slit pupil) and the
+  **last few centimetres of the two outermost feathers** on each limb. That is about 6 % of the atlas and
+  about 5 % of the painted texels. The string, the shaft, the vanes, the limb sigils and the hexagon round
+  the eye are painted only. With engine bloom the bow therefore does not wrap its holder in a violet aura
+  that could be mistaken for player 3's violet (`#B06CFF`).
+* **Glow colours:** the Void hue (`#A45CFF`) authored darker and bluer, away from the player violet:
+  feather tips `#5A3CD8` → `#7458EC`, eye `#7446F0` → `#8A68FF` with a pale `#E4DCFF` core. Saturated
+  `#A45CFF` would also clip to pink-magenta when the engine brightens emissive, because blue saturates
+  first. The engine scales the strength (emissive authored at 1.0).
+* **The broadhead** is a flat six-sided blade lying in the bow plane, so the game camera sees its broad
+  side. Its centre ridge splits each face into a painted **light facet** (`#E6DFFF` going to a white-hot
+  point) and a **shadow facet** (`#6246C8`), with broken white strokes on the ridge and the cutting edges.
+  It is darker toward the socket. Its emission is **derived from the painted colour** (`head_postpass`, a
+  runtime hook on `gfa_paint.paint` like `serpent_smg`'s, so the toolkit is unchanged), ramping from dim at
+  the socket to hot at the point. The light facet glows pale and the shadow facet glows a deep violet, so it
+  reads as a lit blade even under bloom, not as a flat white UI arrow.
 * **Tier:** `two_handed` (2,000-4,000 tris, 1024 px), as WEAPONS.md proposes.
 
 ## Grip frame and sockets
@@ -89,9 +106,10 @@ to the riser. The WEAPONS.md row now records it.
 
 | | |
 |---|---|
-| Triangles | 3,226 (two-handed budget 2,000-4,000) |
-| Parts | 40 parts in 9 paint zones (wood, feather, iron, wrap, brass, void, glow_eye, glow_string, glow_bolt) |
-| Textures | base colour 1024², emissive 1024² (PNG, embedded); texel density about 604 px/m median; atlas coverage 37 % |
+| Triangles | 3,238 (two-handed budget 2,000-4,000) |
+| Parts | 40 parts in 11 paint zones (wood, feather, iron, wrap, brass, void, glow_eye, string, shaft, vane, bolt_head) |
+| Textures | base colour 1024², emissive 1024² (PNG, embedded); texel density about 604 px/m median; atlas coverage 36 % |
+| Emissive | 5.9 % of the atlas lit (was 22.3 %), summed emissive luminance -85 %; by painted texels: bolt head 8.4 k, feather tips 7.7 k, eye rim 2.7 k, slit pupil 0.4 k (`reports/build_report.json`, `paint.glow`) |
 | Material | one material, `M_wraith_bow`: roughness 0.85, metallic 0, single-sided |
 | Size | 1.46 m tip to tip (with the feathers), bolt tip 0.75 m ahead of the string; bounds in glTF x -0.73..0.72, y -0.22..0.26, z -0.75..0.10 |
 | GLB | about 1.1 MB, no compression extensions (bevy_gltf 0.20 safe); `.blend` 0.16 MB |
@@ -106,6 +124,7 @@ to the riser. The WEAPONS.md row now records it.
 | `source/wraith_bow.blend` | yes (LFS); textures referenced relatively |
 | `textures/wraith_bow_basecolor.png`, `_emissive.png` | yes (LFS) |
 | `reports/wraith_bow_review.png`, `reports/wraith_bow_hold.png`, `reports/wraith_bow_34.png`, `reports/build_report.json` | yes |
+| `reports/wraith_bow_fix1_compare.png` (before / after art review 1; made once, not by the build) | yes |
 | `work/` (every review render, sheet layouts) | no (`.gitignore`) |
 
 ## Open points for the user's review
@@ -119,3 +138,16 @@ to the riser. The WEAPONS.md row now records it.
   either a two-bone string rig with a `wraith_bow_draw` clip, or client-side VFX at `glow_core`.
 * **The hold** in the review uses the toolkit's generic mannequin (the right hand in front of the chest).
   The real pose comes from GF_Hero_v1's `weapon_socket_R` and the left-hand IK to `grip_L`.
+
+## Review history
+
+* **Art review 1 (score 8/10), two must-fix items, both fixed:**
+  1. *Emissive covered about 20 % of the atlas (the string, the feather tips, the riser eye and the whole
+     bolt), in a violet close to player violet `#B06CFF`, so bloom would read as a violet aura on the
+     holder.* The glow is now only on the bolt head, the eye and the outermost feather tips (22.3 % → 5.9 %
+     of the atlas). The string is painted pale and does not emit, and neither do the shaft, the vanes or
+     the sigils. The remaining glows are authored bluer and darker than the player violet.
+  2. *The bolt head was a flat pure-white shape with no painted value.* It is now a flat broadhead with a
+     painted light/shadow split along its ridge, edge strokes, and a darker socket, and its glow follows
+     that paint. The close-ups are in `wraith_bow_hold.png`; before and after are in
+     `wraith_bow_fix1_compare.png`.
