@@ -120,7 +120,7 @@ impl ToonStyle {
             rim_strength: 0.35,
             rim_width: 0.3,
             shade: hex(SHADE),
-            shade_amount: 0.55,
+            shade_amount: 0.36,
             toon: 1.0,
             paint: 0.2,
             world_paint: true,
@@ -380,7 +380,7 @@ impl BiomeLook {
         };
         // (fissure heat, moss, veins, key colour, key lux, ambient colour, ambient brightness)
         let (cracks, moss, veins, key, key_lux, ambient, ambient_brightness) = match abyss {
-            AbyssKind::Magma => (1.0, 0.0, 0.0, hex("#FFD3A0"), 8_500.0, hex("#5B6BC0"), 230.0),
+            AbyssKind::Magma => (1.0, 0.0, 0.0, hex("#FFDDB8"), 8_000.0, hex("#6A5CB8"), 250.0),
             AbyssKind::Water => (0.4, 1.0, 0.0, hex("#E8F0D0"), 7_000.0, hex("#3C8090"), 260.0),
             AbyssKind::Sky => (0.4, 0.0, 1.0, hex("#FFE2C0"), 7_500.0, hex("#5060D0"), 250.0),
             AbyssKind::Chaos => (0.4, 0.0, 0.6, hex("#FFD0E8"), 7_000.0, hex("#7050C0"), 240.0),
@@ -405,7 +405,7 @@ impl BiomeLook {
     /// ground colour, so the glowing accents and the characters own the saturation.
     pub fn stone(&self) -> Color {
         let neutral = match self.abyss {
-            AbyssKind::Magma => hex("#66605C"),
+            AbyssKind::Magma => hex("#5E5A60"),
             AbyssKind::Water => hex("#56646A"),
             AbyssKind::Sky => hex("#5C5F78"),
             AbyssKind::Chaos => hex("#5A4C68"),
@@ -416,7 +416,7 @@ impl BiomeLook {
     /// Bare ground between the stones: dark, low-saturation earth (ash in the Cinder).
     pub fn dirt(&self) -> Color {
         let earth = match self.abyss {
-            AbyssKind::Magma => hex("#3A3230"),
+            AbyssKind::Magma => hex("#332D30"),
             AbyssKind::Water => hex("#2E3A2C"),
             AbyssKind::Sky => hex("#34364A"),
             AbyssKind::Chaos => hex("#322A3C"),

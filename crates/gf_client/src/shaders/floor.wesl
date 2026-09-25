@@ -651,7 +651,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let darkness = clamp(-stepped * 0.3, 0.0, 1.0);
     let l = luma(toon);
     toon = max(vec3(l) + (toon - vec3(l)) * (1.0 + 0.5 * darkness), vec3(0.0));
-    toon = mix(toon, toon * fp.cool.rgb * 2.0, 0.45 * darkness);
+    toon = mix(toon, toon * fp.cool.rgb * 2.0, 0.22 * darkness);
     let final_color = mix(lit.rgb, toon, 0.7) + glow;
 
     var out: FragmentOutput;

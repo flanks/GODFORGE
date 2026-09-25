@@ -17,7 +17,7 @@
 //! Presentation only: nothing here feeds the simulation.
 
 use crate::ClientSet;
-use crate::camera::{KEY_LIGHT_FROM, Shake, w3};
+use crate::camera::{KEY_LIGHT_FROM, KeyLight, Shake, w3};
 use crate::envkit::{self, CHUNK, Colors, Ctx, Env, Flame, Key, MeshBuf, h01, lin};
 use crate::materials::{
     ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_HOLES, FLOOR_INLAYS, FLOOR_PATHS, FLOOR_PAVING,
@@ -51,7 +51,32 @@ const ROCK_TILE: f32 = 4.5;
 pub fn build_plugin(app: &mut App) {
     app.init_resource::<EnvLights>()
         .add_systems(Startup, spawn_light_pool)
-        .add_systems(Update, pool_lights.in_set(ClientSet::Presentation));
+        .add_systems(Update, (tighten_key_shadows, pool_lights).in_set(ClientSet::Presentation));
+}
+
+/// The fixed iso camera sees ground 50–70 u deep and monuments a little nearer, so the key
+/// light's single cascade spans 20–80 u (60 u) instead of 130: sharper shadows for free.
+fn tighten_key_shadows(
+    mut q: Query<&mut gf_engine::bevy::light::CascadeShadowConfig, (With<KeyLight>, Added<DirectionalLight>)>,
+) {
+    for mut c in &mut q {
+        *c = gf_engine::bevy::light::CascadeShadowConfigBuilder {
+            num_cascades: 1,
+            minimum_distance: 20.0,
+            maximum_distance: 80.0,
+            first_cascade_far_bound: 80.0,
+            ..default()
+        }
+        .build();
+    }
+}
+
+/// A 32 u render chunk of the world (one entity per material family; `cx`, `cy` count from the
+/// map's north-west corner).
+#[derive(Component, Clone, Copy, Debug)]
+pub struct ChunkRoot {
+    pub cx: u32,
+    pub cy: u32,
 }
 
 /// The environment's light sources and the pooled point lights that follow the camera.
@@ -257,15 +282,17 @@ pub fn build(
     lights.timer = 0.0;
     let verts: usize;
     let mut draws = 0;
+    let (_, cols) = env.grid();
     {
         let bufs = env.into_buffers();
         verts = bufs.values().map(|b| b.pos.len()).sum::<usize>();
-        for ((_, key), buf) in bufs {
+        for ((chunk, key), buf) in bufs {
             if buf.is_empty() {
                 continue;
             }
             let mesh = stores.meshes.add(buf.into_mesh());
-            let mut e = commands.spawn((RoomGeometry, Mesh3d(mesh), Transform::default()));
+            let root = ChunkRoot { cx: chunk % cols, cy: chunk / cols };
+            let mut e = commands.spawn((RoomGeometry, root, Mesh3d(mesh), Transform::default()));
             match key {
                 Key::Stone => e.insert(MeshMaterial3d(stone.clone())),
                 Key::Metal => e.insert(MeshMaterial3d(metal.clone())),
@@ -284,10 +311,11 @@ pub fn build(
 
     // Map floors: one painted material per chunk.
     if let Some(map) = map {
-        for (buf, rect) in floors.into_values() {
+        for (chunk, (buf, rect)) in floors {
             if buf.is_empty() {
                 continue;
             }
+            let root = ChunkRoot { cx: chunk % cols, cy: chunk / cols };
             let params = map_floor_params(room, map, db, look, seed, rect);
             let mat = stores.floors.add(FloorMaterial {
                 base: StandardMaterial {
@@ -299,7 +327,14 @@ pub fn build(
                 extension: Floor { params },
             });
             let mesh = stores.meshes.add(buf.into_mesh());
-            commands.spawn((RoomGeometry, Mesh3d(mesh), MeshMaterial3d(mat), Transform::default(), NotShadowCaster));
+            commands.spawn((
+                RoomGeometry,
+                root,
+                Mesh3d(mesh),
+                MeshMaterial3d(mat),
+                Transform::default(),
+                NotShadowCaster,
+            ));
             draws += 1;
         }
         // The abyss under the whole map.

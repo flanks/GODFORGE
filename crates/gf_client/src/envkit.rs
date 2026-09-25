@@ -191,7 +191,7 @@ impl Colors {
         // Worked stone reads lighter and cooler than the floor, so architecture stands off the
         // ground under the warm key light; each biome leans it toward its own ground colour.
         let (stone, trim, rock) = match look.abyss {
-            AbyssKind::Magma => (hex("#7C746E"), hex("#AC9E8E"), hex("#4A4340")),
+            AbyssKind::Magma => (hex("#767078"), hex("#A89C94"), hex("#45404A")),
             AbyssKind::Water => (hex("#7F8C7C"), hex("#B8C0A6"), hex("#4C5A50")),
             AbyssKind::Sky => (hex("#8E94AE"), hex("#D6D2C6"), hex("#545A78")),
             AbyssKind::Chaos => (hex("#766886"), hex("#AA9EBE"), hex("#4A3E5A")),
@@ -209,7 +209,7 @@ impl Colors {
             trim: mix(trim, look.base, 0.1),
             dark: lighten(mix(stone, hex("#1A1420"), 0.45), 0.7),
             rock: mix(rock, look.base, 0.15),
-            iron: hex("#3E3834"),
+            iron: hex("#5C5652"),
             bronze: hex("#8A6232"),
             gold: hex("#D9A441"),
             wood: hex("#5E4230"),
@@ -298,6 +298,11 @@ impl Env {
         self.bufs
     }
 
+    /// Where the current chunk's stone and ink buffers end (for [`jag_top`]).
+    fn mark(&mut self) -> (usize, usize) {
+        (self.buf(Key::Stone).pos.len(), self.buf(Key::Ink).pos.len())
+    }
+
     /// Vertices emitted so far (all chunks and families).
     pub fn total_verts(&self) -> usize {
         self.bufs.values().map(|b| b.pos.len()).sum()
@@ -318,9 +323,12 @@ impl Env {
     fn block_raw(&mut self, pos: Vec3, rot: Quat, half: Vec3, bevel: f32, key: Key, c: [f32; 4], faces_uv: bool) {
         // Bevels only where they read (a bevelled box costs four times the vertices).
         let b = if half.min_element() < 0.22 { 0.0 } else { bevel.min(half.min_element() * 0.45).max(0.0) };
+        let seed = ((pos.x * 7.0).round() as i32 as u32).wrapping_mul(0x9E37_79B9)
+            ^ ((pos.z * 7.0).round() as i32 as u32).wrapping_mul(0x85EB_CA6B)
+            ^ ((pos.y * 7.0).round() as i32 as u32);
         let buf = self.buf(key);
         let inner = half - Vec3::splat(b);
-        // Six faces (inset by the bevel), each with its own painted block face.
+        // Six faces (inset by the bevel), each one of the atlas's four painted block faces.
         for axis in 0..3 {
             for sign in [-1.0f32, 1.0] {
                 let mut n = Vec3::ZERO;
@@ -330,12 +338,14 @@ impl Env {
                     1 => (0, 2),
                     _ => (0, 1),
                 };
+                let variant = (h01(seed, axis as u32 * 2 + (sign > 0.0) as u32) * 4.0) as u32 % 4;
+                let (cu, cv) = ((variant % 2) as f32 * 0.25, (variant / 2) as f32 * 0.5);
                 let mut corner = |su: f32, sv: f32| {
                     let mut l = Vec3::ZERO;
                     l[axis] = sign * half[axis];
                     l[u_ax] = su * inner[u_ax];
                     l[v_ax] = sv * inner[v_ax];
-                    let uv = if faces_uv { [0.25 + su * 0.24, 0.5 - sv * 0.49] } else { [0.75, 0.5] };
+                    let uv = if faces_uv { [cu + 0.125 + su * 0.12, cv + 0.25 - sv * 0.245] } else { [0.75, 0.5] };
                     buf.vert(pos + rot * l, rot * n, uv, c)
                 };
                 let (a, bb, cc, d) = (corner(-1.0, -1.0), corner(1.0, -1.0), corner(1.0, 1.0), corner(-1.0, 1.0));
@@ -1091,10 +1101,10 @@ fn column(env: &mut Env, c: &Colors, base: Vec3, rot: Quat, r: f32, h: f32, ston
         })
         .collect();
     let flutes = if c.abyss == AbyssKind::Chaos { (0, 0.0) } else { (8, 0.1) };
-    let start = env.buf(Key::Stone).pos.len();
+    let start = env.mark();
     env.lathe(base, rot, &prof, 16, flutes, p);
     if broken {
-        jag_top(env, Key::Stone, start, shaft1, 0.4 * r.min(1.0), v.seed);
+        jag_top(env, start, shaft1, 0.4 * r.min(1.0), v.seed);
         // Its fallen drum lies beside it.
         let d = dir(v.r(0.0, TAU));
         let at = base + wd(d) * (r * 2.2) + Vec3::Y * (r * 0.62);
@@ -1104,10 +1114,10 @@ fn column(env: &mut Env, c: &Colors, base: Vec3, rot: Quat, r: f32, h: f32, ston
     }
     // Capital: a necking ring, the echinus flaring out, the abacus slab.
     let e0 = shaft1;
-    let echinus = [(r * 0.9, e0), (r * 0.98, e0 + 0.06), (r * 0.92, e0 + 0.1), (r * 1.25, e0 + cap_h * 0.62)];
+    let echinus = [(r * 0.9, e0), (r * 0.98, e0 + 0.06), (r * 0.92, e0 + 0.1), (r * 1.16, e0 + cap_h * 0.62)];
     env.lathe(base, rot, &echinus, 12, (0, 0.0), trim);
     let ab = cap_h * 0.38;
-    env.block(base + rot * Vec3::Y * (top - ab * 0.5), rot, Vec3::new(r * 1.36, ab * 0.5, r * 1.36), 0.03, trim);
+    env.block(base + rot * Vec3::Y * (top - ab * 0.5), rot, Vec3::new(r * 1.22, ab * 0.5, r * 1.22), 0.03, trim);
     if c.abyss == AbyssKind::Sky || c.abyss == AbyssKind::Magma {
         // A gilded band at the necking (Spire) / iron collar (Cinder).
         let (col, key) = if c.abyss == AbyssKind::Sky { (c.gold, Key::Metal) } else { (c.iron, Key::Metal) };
@@ -1115,15 +1125,23 @@ fn column(env: &mut Env, c: &Colors, base: Vec3, rot: Quat, r: f32, h: f32, ston
     }
 }
 
-/// Jitter the vertices of `key` from `start` that sit at height `y` (± 0.02): a broken top.
-fn jag_top(env: &mut Env, key: Key, start: usize, y: f32, amp: f32, seed: u32) {
-    let buf = env.buf(key);
-    for i in start..buf.pos.len() {
+/// Break the top of the stone emitted since `mark` (see [`Env::mark`]): vertices at height `y`
+/// (± 0.03) drop by up to `amp`, and the part's ink hull is cut down below the break so it
+/// never shows above the jagged edge.
+fn jag_top(env: &mut Env, mark: (usize, usize), y: f32, amp: f32, seed: u32) {
+    let buf = env.buf(Key::Stone);
+    for i in mark.0..buf.pos.len() {
         let p = buf.pos[i];
         if (p[1] - y).abs() < 0.03 {
             let k =
                 h01((p[0] * 16.0).round() as i32 as u32 ^ ((p[2] * 16.0).round() as i32 as u32).rotate_left(11), seed);
             buf.pos[i][1] = y - amp * k;
+        }
+    }
+    let ink = env.buf(Key::Ink);
+    for i in mark.1..ink.pos.len() {
+        if ink.pos[i][1] > y - 0.03 {
+            ink.pos[i][1] = y - amp;
         }
     }
 }
@@ -1276,35 +1294,66 @@ fn masonry(
     ruined: bool,
     v: &mut Vr,
 ) {
-    let course = v.r(0.55, 0.75);
-    let n = ((height / course).round() as u32).max(1);
-    let ch = height / n as f32;
+    // Large, monumental courses; an intact wall is closed by a projecting coping.
+    let coping = if ruined { 0.0 } else { 0.18f32.min(height * 0.15) };
+    let body = height - coping;
+    let course = v.r(0.72, 0.95);
+    let n = ((body / course).round() as u32).max(1);
+    let ch = body / n as f32;
     let stone = vary(c.stone, v.f(), 0.05);
-    // Silhouette ink: one hull for the solid lower courses, per block on the broken top.
-    let solid_top = if ruined && n > 1 { ch * (n - 1) as f32 } else { height };
-    env.block_raw(
-        base + Vec3::Y * (solid_top * 0.5),
-        rot,
-        Vec3::new(hl, solid_top * 0.5, ht) + Vec3::splat(INK),
-        0.0,
-        Key::Ink,
-        [1.0; 4],
-        false,
-    );
+    // Silhouette ink: one hull for the solid lower courses; a ruin's broken top course (which
+    // may have gaps) inks block by block.
+    let solid_top = if ruined { ch * (n - 1) as f32 } else { height };
+    if solid_top > 0.0 {
+        env.block_raw(
+            base + Vec3::Y * (solid_top * 0.5),
+            rot,
+            Vec3::new(hl, solid_top * 0.5, ht) + Vec3::splat(INK),
+            0.0,
+            Key::Ink,
+            [1.0; 4],
+            false,
+        );
+    }
     for k in 0..n {
         let y0 = ch * k as f32;
         let last = k == n - 1;
-        let mut s = -hl + if k % 2 == 1 { v.r(0.2, 0.5) } else { 0.0 };
+        // Courses alternate long stretchers with a staggered start.
+        let mut s = -hl + if k % 2 == 1 { v.r(0.3, 0.8) } else { 0.0 };
         if s > -hl {
-            // Half block at the staggered start.
             let len = s + hl;
-            masonry_block(env, stone, base, rot, u, -hl, len, y0, ch, ht, ruined && last, false, v);
+            masonry_block(env, stone, base, rot, u, -hl, len, y0, ch, ht, ruined && last, ruined && last, v);
         }
         while s < hl - 0.05 {
-            let len = v.r(0.9, 1.7).min(hl - s);
-            let len = if hl - s - len < 0.35 { hl - s } else { len };
+            let len = v.r(1.1, 2.1).min(hl - s);
+            let len = if hl - s - len < 0.45 { hl - s } else { len };
             masonry_block(env, stone, base, rot, u, s, len, y0, ch, ht, ruined && last, ruined && last, v);
             s += len;
+        }
+    }
+    if coping > 0.0 {
+        let trim = Paint::new(Key::Stone, lighten(stone, 1.2)).ink(INK);
+        env.block(
+            base + Vec3::Y * (body + coping * 0.5),
+            rot,
+            Vec3::new(hl + 0.06, coping * 0.5, ht + 0.08),
+            0.03,
+            trim,
+        );
+    } else if height > 1.0 {
+        // Fallen blocks and scree at the foot of a ruin.
+        for _ in 0..(1 + (hl * 0.6) as u32) {
+            let side = if v.f() < 0.5 { -1.0 } else { 1.0 };
+            let along = v.r(-hl, hl);
+            let across = rot * Vec3::Z * (side * (ht + v.r(0.3, 0.8)));
+            let s = v.r(0.18, 0.32);
+            env.block(
+                base + u * along + across + Vec3::Y * s * 0.8,
+                rot * Quat::from_rotation_y(v.r(-0.6, 0.6)) * Quat::from_rotation_z(v.r(-0.3, 0.3)),
+                Vec3::new(s * 1.5, s * 0.8, s),
+                0.0,
+                Paint::new(Key::Stone, vary(stone, v.f(), 0.1)).ink(INK_S),
+            );
         }
     }
 }
@@ -1620,9 +1669,9 @@ fn statue(env: &mut Env, ctx: &Ctx, at: Vec2, r: f32, h: f32, facing: Vec2, god:
         );
     } else {
         // Broken neck: a jagged stump.
-        let start = env.buf(Key::Stone).pos.len();
+        let start = env.mark();
         env.cylinder(at3(0.0, chest + 0.35, 0.0), rot, 0.3 * s, 0.3 * s, 0.25 * s, 8, body);
-        jag_top(env, Key::Stone, start, (foot + rot * Vec3::Y * ((chest + 0.6) * s)).y, 0.15 * s, v.seed);
+        jag_top(env, start, (foot + rot * Vec3::Y * ((chest + 0.6) * s)).y, 0.15 * s, v.seed);
     }
     let sh = chest + 0.15;
     for side in [-1.0f32, 1.0] {
@@ -1689,84 +1738,115 @@ fn statue(env: &mut Env, ctx: &Ctx, at: Vec2, r: f32, h: f32, facing: Vec2, god:
 fn colossus_head(env: &mut Env, c: &Colors, at: Vec2, r: f32, facing: Vec2, variant: u8) {
     let mut v = Vr::new(at, 13);
     let base = w3(at, 0.0);
-    // Lying half-sunk, rolled onto one cheek, face turned to `facing`.
-    let roll = v.sign() * v.r(0.25, 0.45);
-    let rot = face(facing) * Quat::from_rotation_z(roll) * Quat::from_rotation_x(-0.12);
-    let stone = vary(mix(c.stone, hex("#8A8070"), 0.25), v.f(), 0.05);
+    // Toppled onto the back of its skull and half sunk: the face looks up at the sky, tipped
+    // toward `facing` and rolled a little, so the camera above reads brow, eyes, nose and mouth.
+    let tip = 0.95 + 0.15 * v.f();
+    let rot = face(facing) * Quat::from_rotation_z(v.r(-0.25, 0.25)) * Quat::from_rotation_x(-tip);
+    let stone = vary(mix(c.stone, hex("#9A9080"), 0.3), v.f(), 0.05);
     let p = Paint::new(Key::Stone, stone).ink(INK);
-    let dark = Paint::new(Key::Stone, lighten(stone, 0.45));
-    let centre = base + Vec3::Y * (r * 0.42);
+    let pale = Paint::new(Key::Stone, lighten(stone, 1.12)).ink(INK_S);
+    let hollow = Paint::new(Key::Stone, lighten(stone, 0.32));
+    let centre = base + Vec3::Y * (r * 0.28);
     let at3 = |x: f32, y: f32, z: f32| centre + rot * Vec3::new(x * r, y * r, z * r);
-    env.ball(centre, rot, Vec3::new(r * 0.92, r * 1.02, r * 0.9), 14, p);
-    // Brow, nose, cheekbones, lips, chin.
-    env.block(at3(0.0, 0.28, 0.8), rot * Quat::from_rotation_x(0.2), Vec3::new(0.62, 0.1, 0.16) * r, 0.05, p);
-    env.extrude(
-        at3(0.0, -0.05, 0.86),
-        rot * Quat::from_rotation_x(-FRAC_PI_2 + 0.15),
-        &[Vec2::new(-0.13 * r, 0.0), Vec2::new(0.13 * r, 0.0), Vec2::new(0.0, 0.34 * r)],
-        -0.12 * r,
-        0.32 * r,
-        p,
+    // Skull (local +y = crown, +z = the face).
+    env.ball(centre, rot, Vec3::new(r * 0.86, r * 1.02, r * 0.9), 14, p);
+    // Jaw and cheeks bulk out the lower face.
+    env.ball(at3(0.0, -0.42, 0.28), rot, Vec3::new(0.66, 0.5, 0.62) * r, 12, p);
+    // Brow ridge over deep sockets, with ember eyes deep inside.
+    env.ball(at3(0.0, 0.26, 0.74), rot, Vec3::new(0.62, 0.13, 0.22) * r, 10, pale);
+    let eye = match c.abyss {
+        AbyssKind::Magma => c.molten,
+        _ => c.glow,
+    };
+    for side in [-1.0f32, 1.0] {
+        env.ball(at3(side * 0.28, 0.1, 0.76), rot, Vec3::new(0.19, 0.12, 0.1) * r, 8, hollow);
+        env.ball(at3(side * 0.28, 0.1, 0.83), rot, Vec3::new(0.09, 0.06, 0.05) * r, 6, Paint::new(Key::Glow, eye));
+        // Cheekbones.
+        env.ball(at3(side * 0.44, -0.12, 0.66), rot, Vec3::new(0.2, 0.13, 0.16) * r, 8, pale);
+    }
+    // The nose: a ridge from the brow to a heavy tip, nostrils beneath.
+    env.tube(
+        &[at3(0.0, 0.2, 0.86), at3(0.0, 0.02, 0.96), at3(0.0, -0.14, 1.02)],
+        &[0.07 * r, 0.1 * r, 0.13 * r],
+        6,
+        pale,
     );
     for side in [-1.0f32, 1.0] {
-        env.ball(at3(side * 0.3, 0.12, 0.72), rot, Vec3::new(0.17, 0.1, 0.1) * r, 8, dark);
-        env.ball(at3(side * 0.45, -0.12, 0.66), rot, Vec3::new(0.22, 0.14, 0.18) * r, 8, p);
+        env.ball(at3(side * 0.07, -0.19, 0.97), rot, Vec3::new(0.05, 0.035, 0.03) * r, 5, hollow);
     }
-    env.block(at3(0.0, -0.36, 0.78), rot, Vec3::new(0.24, 0.05, 0.1) * r, 0.03, p);
-    env.block(at3(0.0, -0.44, 0.74), rot, Vec3::new(0.2, 0.035, 0.1) * r, 0.02, dark);
+    // Lips and a cleft chin.
+    env.ball(at3(0.0, -0.33, 0.86), rot, Vec3::new(0.24, 0.05, 0.08) * r, 8, pale);
+    env.ball(at3(0.0, -0.41, 0.84), rot, Vec3::new(0.21, 0.045, 0.07) * r, 8, p);
+    env.ball(at3(0.0, -0.37, 0.87), rot, Vec3::new(0.2, 0.012, 0.04) * r, 6, hollow);
+    env.ball(at3(0.0, -0.6, 0.72), rot, Vec3::new(0.24, 0.16, 0.16) * r, 8, p);
+    // The broken neck, jagged, sunk into the ground.
+    let start = env.mark();
+    env.lathe(
+        at3(0.0, -0.75, -0.05),
+        rot * Quat::from_rotation_x(PI),
+        &[(0.42 * r, 0.0), (0.4 * r, 0.35 * r)],
+        10,
+        (0, 0.0),
+        p,
+    );
+    let neck_end = (at3(0.0, -0.75, -0.05) - rot * Vec3::Y * (0.35 * r)).y;
+    jag_top(env, start, neck_end, 0.12 * r, v.seed);
     match variant % 4 {
         0 | 2 => {
-            // Crown of spikes (gilded on 2).
-            let crown = if variant % 4 == 2 { Paint::new(Key::Metal, c.gold).ink(INK_S) } else { p };
-            env.lathe(
-                at3(0.0, 0.62, 0.0),
-                rot * Quat::from_rotation_x(-0.2),
-                &[(0.72 * r, 0.0), (0.74 * r, 0.14 * r), (0.7 * r, 0.2 * r)],
-                14,
-                (0, 0.0),
-                crown,
-            );
-            for k in 0..7 {
-                let a = -0.9 + k as f32 * 0.3;
+            // A crown of rays around the crown of the head (gilded on 2).
+            let crown = if variant % 4 == 2 { Paint::new(Key::Metal, c.gold).ink(INK_S) } else { pale };
+            let band = at3(0.0, 0.66, 0.1);
+            let brot = rot * Quat::from_rotation_x(0.35);
+            env.lathe(band, brot, &[(0.62 * r, 0.0), (0.66 * r, 0.12 * r), (0.62 * r, 0.2 * r)], 14, (0, 0.0), crown);
+            for k in 0..9 {
+                let a = -1.3 + k as f32 * (2.6 / 8.0);
                 let d = Vec3::new(a.sin(), 0.0, a.cos());
-                let tip = rot * Quat::from_rotation_x(-0.2);
-                let p0 = at3(0.0, 0.68, 0.0) + tip * (d * 0.7 * r);
+                let p0 = band + brot * (d * 0.62 * r + Vec3::Y * 0.1 * r);
+                let ray = brot * (d * 0.55 + Vec3::Y).normalize();
                 env.cylinder(
                     p0,
-                    tip * Quat::from_rotation_arc(Vec3::Y, (d * 0.3 + Vec3::Y).normalize()),
-                    0.1 * r,
+                    Quat::from_rotation_arc(Vec3::Y, ray),
+                    0.09 * r,
                     0.0,
-                    0.45 * r,
+                    (0.4 + 0.12 * ((k % 2) as f32)) * r,
                     5,
                     crown,
                 );
             }
         }
         1 => {
-            // Beard of stone spikes.
-            for k in 0..6 {
-                let x = -0.4 + k as f32 * 0.16;
-                let tip = rot * Quat::from_rotation_x(PI - 0.4);
-                env.cylinder(at3(x, -0.48, 0.66), tip, 0.09 * r, 0.0, (0.35 + 0.2 * v.f()) * r, 5, p);
+            // A braided beard spilling from the chin.
+            for k in 0..7 {
+                let x = -0.36 + k as f32 * 0.12;
+                let len = (0.5 + 0.18 * v.f()) * r;
+                let root = at3(x, -0.52, 0.66);
+                let dir = rot * Vec3::new(x * 0.4, -1.0, 0.35).normalize();
+                env.tube(&[root, root + dir * len * 0.5, root + dir * len], &[0.08 * r, 0.07 * r, 0.02 * r], 5, p);
             }
         }
         _ => {
             // A great crack across the face, glowing from inside.
             let glow = Paint::new(Key::Glow, c.molten);
             env.tube(
-                &[at3(-0.3, 0.9, 0.35), at3(-0.05, 0.4, 0.8), at3(0.1, 0.0, 0.93), at3(0.35, -0.5, 0.78)],
-                &[0.03 * r, 0.035 * r, 0.03 * r, 0.02 * r],
+                &[
+                    at3(-0.36, 0.8, 0.45),
+                    at3(-0.12, 0.4, 0.84),
+                    at3(0.08, 0.02, 1.0),
+                    at3(0.3, -0.4, 0.86),
+                    at3(0.42, -0.62, 0.6),
+                ],
+                &[0.02 * r, 0.035 * r, 0.03 * r, 0.03 * r, 0.015 * r],
                 4,
                 glow,
             );
         }
     }
-    // Rubble heaped where it struck.
-    for k in 0..4 {
-        let d = dir(k as f32 * 1.7 + v.f());
-        let rr = r * v.r(0.15, 0.25);
+    // Rubble heaped where it struck, a crater of cracks.
+    for k in 0..5 {
+        let d = dir(k as f32 * 1.4 + v.f());
+        let rr = r * v.r(0.12, 0.22);
         env.rock(
-            base + wd(d) * r * v.r(0.9, 1.2) + Vec3::Y * rr * 0.3,
+            base + wd(d) * r * v.r(0.9, 1.25) + Vec3::Y * rr * 0.3,
             Quat::IDENTITY,
             Vec3::splat(rr),
             v.seed + k,
@@ -1794,17 +1874,25 @@ fn fallen_column(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, r: f32) {
         Paint::new(Key::Stone, lighten(stone, 1.2)).ink(INK),
     );
     let shaft_len = (len - r * 0.4).max(0.5);
-    let start = env.buf(Key::Stone).pos.len();
-    env.lathe(base, lie, &[(r * 0.98, 0.1), (r * 0.94, shaft_len * 0.5), (r * 0.88, shaft_len)], 18, (12, 0.1), p);
-    // Jag the far end.
+    let start = env.mark();
+    env.lathe(base, lie, &[(r * 0.98, 0.1), (r * 0.94, shaft_len * 0.5), (r * 0.88, shaft_len)], 16, (8, 0.1), p);
+    // Jag the far end, and pull its ink hull back behind the break.
     let tip = base + lie * Vec3::Y * shaft_len;
-    let buf = env.buf(Key::Stone);
     let axis = lie * Vec3::Y;
-    for i in start..buf.pos.len() {
+    let buf = env.buf(Key::Stone);
+    for i in start.0..buf.pos.len() {
         let q = Vec3::from(buf.pos[i]);
         if (q - tip).dot(axis).abs() < 0.03 {
             let k = h01((q.x * 16.0) as i32 as u32 ^ ((q.y * 16.0) as i32 as u32).rotate_left(7), v.seed);
             buf.pos[i] = (q - axis * (k * r * 0.5)).to_array();
+        }
+    }
+    let ink = env.buf(Key::Ink);
+    for i in start.1..ink.pos.len() {
+        let q = Vec3::from(ink.pos[i]);
+        let over = (q - tip).dot(axis) + r * 0.5;
+        if over > 0.0 {
+            ink.pos[i] = (q - axis * over).to_array();
         }
     }
     // A drum rolled off the end.
@@ -1816,53 +1904,94 @@ fn fallen_column(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, r: f32) {
 
 fn great_anvil(env: &mut Env, c: &Colors, at: Vec2, r: f32, horn: Vec2) {
     let base = w3(at, 0.0);
+    // Local +x runs toward the horn, +z across the face.
     let rot = face(Vec2::new(horn.y, -horn.x));
     let iron = Paint::new(Key::Metal, c.iron).ink(INK);
-    let stone = Paint::new(Key::Stone, lighten(c.stone, 0.9)).ink(INK);
-    // Stepped stone footing.
-    env.block(base + Vec3::Y * 0.2, rot, Vec3::new(r * 1.05, 0.2, r * 0.7), 0.06, stone);
-    env.block(base + Vec3::Y * 0.52, rot, Vec3::new(r * 0.85, 0.14, r * 0.55), 0.05, stone);
-    let s = r / 2.4;
-    // Split in two along its waist; molten light in the crack.
-    for (side, off) in [(-1.0f32, -0.1), (1.0, 0.1)] {
-        let sx = |x: f32| x * s + off * s;
-        let lean = Quat::from_rotation_z(side * 0.035);
-        let piece = rot * lean;
-        let at3 = |x: f32, y: f32, z: f32| base + rot * Vec3::new(sx(x), y * s, z * s);
-        if side < 0.0 {
-            // The heel half: waist, face slab, heel.
-            env.block(at3(-0.9, 1.5, 0.0), piece, Vec3::new(0.85, 0.8, 0.75) * s, 0.08, iron);
-            env.block(at3(-1.2, 2.55, 0.0), piece, Vec3::new(1.2, 0.3, 0.95) * s, 0.06, iron);
-            env.block(at3(-2.2, 2.35, 0.0), piece, Vec3::new(0.3, 0.3, 0.6) * s, 0.05, iron);
-        } else {
-            env.block(at3(0.9, 1.5, 0.0), piece, Vec3::new(0.85, 0.8, 0.75) * s, 0.08, iron);
-            env.block(at3(1.1, 2.55, 0.0), piece, Vec3::new(1.1, 0.3, 0.95) * s, 0.06, iron);
-            // The horn.
-            env.cylinder(
-                at3(2.1, 2.55, 0.0),
-                piece * Quat::from_rotation_z(-FRAC_PI_2),
-                0.62 * s,
-                0.05 * s,
-                1.9 * s,
+    let dark_iron = Paint::new(Key::Metal, lighten(c.iron, 0.7)).ink(INK);
+    let stone = Paint::new(Key::Stone, lighten(c.stone, 0.92)).ink(INK);
+    let trim = Paint::new(Key::Stone, c.trim).ink(INK_S);
+    // Stepped stone footing with a trim course.
+    env.block(base + Vec3::Y * 0.22, rot, Vec3::new(r * 1.0, 0.22, r * 0.72), 0.06, stone);
+    env.block(base + Vec3::Y * 0.5, rot, Vec3::new(r * 0.84, 0.08, r * 0.6), 0.03, trim);
+    env.block(base + Vec3::Y * 0.78, rot, Vec3::new(r * 0.7, 0.2, r * 0.5), 0.05, stone);
+    let s = r / 1.75;
+    let y0 = 0.98;
+    // The anvil, split through its waist: each half is extruded from the side profile and leans
+    // a little apart, molten light in the crack between them.
+    let feet = [Vec2::new(-0.95, 0.0), Vec2::new(0.85, 0.0), Vec2::new(0.4, 0.7), Vec2::new(-0.55, 0.7)];
+    let waist = [Vec2::new(-0.5, 0.68), Vec2::new(0.35, 0.68), Vec2::new(0.6, 1.2), Vec2::new(-0.8, 1.2)];
+    let face_slab = [Vec2::new(-1.35, 1.18), Vec2::new(0.9, 1.18), Vec2::new(0.9, 1.58), Vec2::new(-1.35, 1.58)];
+    for (side, shift) in [(-1.0f32, -0.07f32), (1.0, 0.07)] {
+        let lean = rot * Quat::from_rotation_z(-side * 0.03);
+        let origin = base + Vec3::Y * y0 + rot * Vec3::X * (shift * s);
+        let clip = |poly: &[Vec2]| -> Vec<Vec2> {
+            // Keep the half on this side of x = 0 (a vertical split through the waist).
+            let mut out = Vec::new();
+            for i in 0..poly.len() {
+                let (a, b) = (poly[i], poly[(i + 1) % poly.len()]);
+                let (ia, ib) = (a.x * side >= 0.0, b.x * side >= 0.0);
+                if ia {
+                    out.push(a);
+                }
+                if ia != ib {
+                    let t = a.x / (a.x - b.x);
+                    out.push(a + (b - a) * t);
+                }
+            }
+            out.iter().map(|p| *p * s).collect()
+        };
+        // Profiles live in the local x–y plane; extrude through ±z.
+        let stand = lean * Quat::from_rotation_x(FRAC_PI_2);
+        for (poly, depth, paint) in
+            [(&feet[..], 0.62, dark_iron), (&waist[..], 0.42, iron), (&face_slab[..], 0.5, iron)]
+        {
+            let pts: Vec<Vec2> = clip(poly).iter().map(|p| Vec2::new(p.x, -p.y)).collect();
+            if pts.len() >= 3 {
+                env.extrude(origin, stand, &pts, -depth * s, depth * s, paint);
+            }
+        }
+        if side > 0.0 {
+            // The horn: a tapering cone off the face.
+            let root = origin + lean * Vec3::new(0.9 * s, 1.4 * s, 0.0);
+            env.lathe(
+                root,
+                lean * Quat::from_rotation_z(-FRAC_PI_2),
+                &[(0.26 * s, 0.0), (0.2 * s, 0.5 * s), (0.02 * s, 1.15 * s)],
                 10,
+                (0, 0.0),
                 iron,
             );
+        } else {
+            // The heel's hardy and pritchel holes.
+            for x in [-1.1f32, -0.8] {
+                env.block(
+                    origin + lean * Vec3::new(x * s, 1.585 * s, 0.0),
+                    lean,
+                    Vec3::new(0.07, 0.01, 0.07) * s,
+                    0.0,
+                    Paint::new(Key::Stone, hex("#140C08")),
+                );
+            }
         }
     }
+    // Molten light in the split, and gold runes along the face.
     let glow = Paint::new(Key::Glow, c.molten);
-    env.block(base + rot * Vec3::new(0.0, 1.9 * s, 0.0), rot, Vec3::new(0.06 * s, 1.1 * s, 0.7 * s), 0.0, glow);
-    // Gold runes along the face.
-    for k in 0..5 {
-        let x = -1.9 + k as f32 * 0.9;
+    env.block(base + Vec3::Y * (y0 + 0.8 * s), rot, Vec3::new(0.05 * s, 0.8 * s, 0.4 * s), 0.0, glow);
+    env.disc(base + Vec3::Y * 0.9, r * 0.55, 12, lin(hdr(c.molten, 0.35)), [0.0; 4], Key::Glow);
+    for k in 0..4 {
+        let x = -1.1 + k as f32 * 0.6;
+        if x.abs() < 0.15 {
+            continue;
+        }
         env.block(
-            base + rot * Vec3::new(x * s, 2.55 * s, 0.97 * s),
+            base + Vec3::Y * y0 + rot * Vec3::new(x * s, 1.38 * s, 0.505 * s),
             rot,
-            Vec3::new(0.14, 0.14, 0.01) * s,
+            Vec3::new(0.1, 0.1, 0.01) * s,
             0.0,
-            Paint::new(Key::Glow, hdr(c.gold, 1.4)),
+            Paint::new(Key::Glow, hdr(c.gold, 1.6)),
         );
     }
-    env.flames.push(Flame { at: base + Vec3::Y * 2.5 * s, color: c.molten, power: 0.8, range: 9.0 });
+    env.flames.push(Flame { at: base + Vec3::Y * (y0 + 1.6 * s), color: c.molten, power: 0.8, range: 9.0 });
 }
 
 fn crucible(env: &mut Env, c: &Colors, at: Vec2, r: f32) {
@@ -2047,10 +2176,10 @@ fn arch(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, pier: f32, height: f32,
         let h = if broken && i == 1 { height * 0.55 } else { height };
         let b = w3(at, 0.0);
         env.block(b + Vec3::Y * 0.2, rot, Vec3::new(pier + 0.1, 0.2, pier + 0.1), 0.04, trim);
-        let start = env.buf(Key::Stone).pos.len();
+        let start = env.mark();
         env.block(b + Vec3::Y * (h * 0.5), rot, Vec3::new(pier, h * 0.5, pier), 0.05, p);
         if broken && i == 1 {
-            jag_top(env, Key::Stone, start, h, 0.5, v.seed);
+            jag_top(env, start, h, 0.5, v.seed);
         } else {
             env.block(b + Vec3::Y * (h - 0.12), rot, Vec3::new(pier + 0.08, 0.12, pier + 0.08), 0.03, trim);
         }
@@ -2143,9 +2272,9 @@ fn tree(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, variant: u8) {
             env.flames.push(Flame { at: base + Vec3::Y * (h + 0.6), color: c.crystal, power: 0.5, range: 8.0 });
         } else {
             // A broken stump.
-            let start = env.buf(Key::Stone).pos.len();
+            let start = env.mark();
             env.lathe(base, Quat::IDENTITY, &[(r * 1.1, 0.0), (r * 0.9, 0.35), (r * 0.82, h)], 12, (0, 0.0), bark);
-            jag_top(env, Key::Stone, start, h, 0.5, v.seed);
+            jag_top(env, start, h, 0.5, v.seed);
             tree_roots(env, base, r, 5, bark, &mut v);
         }
         return;
@@ -2298,9 +2427,9 @@ fn spiral_stair(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, brk: Vec2) 
     let stone = Paint::new(Key::Stone, c.stone).ink(INK);
     let trim = Paint::new(Key::Stone, c.trim).ink(INK_S);
     let newel = r * 0.28;
-    let start = env.buf(Key::Stone).pos.len();
+    let start = env.mark();
     env.lathe(base, Quat::IDENTITY, &[(newel * 1.3, 0.0), (newel, 0.4), (newel, h)], 12, (0, 0.0), stone);
-    jag_top(env, Key::Stone, start, h, 0.6, v.seed);
+    jag_top(env, start, h, 0.6, v.seed);
     let rise = 0.36;
     let steps = ((h - 0.5) / rise) as u32;
     let a_break = brk.y.atan2(brk.x);
@@ -2340,9 +2469,9 @@ fn inverted_column(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32) {
     // Abacus on the ground, the echinus flaring down to it, the shaft rising to a broken base.
     env.block(base + Vec3::Y * 0.2, tilt, Vec3::new(r * 1.35, 0.2, r * 1.35), 0.04, trim);
     env.lathe(base, tilt, &[(r * 1.25, 0.4), (r * 0.92, 0.9), (r * 0.98, 0.98), (r * 0.9, 1.05)], 16, (0, 0.0), trim);
-    let start = env.buf(Key::Stone).pos.len();
+    let start = env.mark();
     env.lathe(base, tilt, &[(r * 0.9, 1.05), (r * 0.96, h * 0.5), (r, h)], 18, (12, 0.1), stone);
-    jag_top(env, Key::Stone, start, (base + tilt * Vec3::Y * h).y, 0.5, v.seed);
+    jag_top(env, start, (base + tilt * Vec3::Y * h).y, 0.5, v.seed);
     // Fragments orbiting its top, a faint ring of light.
     let top = base + Vec3::Y * h;
     for k in 0..5 {
