@@ -424,6 +424,36 @@ def px_tall(objs):
 # ---- sleeve fit: the right forearm, gauntlet and hand inside the colossus_cannon ------------------------------------
 if armed and M_R is not None and want("fit"):
     Minv = np.array(M_R.inverted())
+    # the sleeve's OUTER skin: a plate vertex beyond it (along the ray from the barrel axis) pokes out of the cannon
+    from mathutils.bvhtree import BVHTree
+    _bm = bmesh.new()
+    _dg = bpy.context.evaluated_depsgraph_get()
+    for o in armed:
+        _b = bmesh.new()
+        _b.from_object(o, _dg)
+        _b.transform(o.matrix_world)
+        _me = bpy.data.meshes.new("_sleeve_probe")
+        _b.to_mesh(_me)
+        _b.free()
+        _bm.from_mesh(_me)
+        bpy.data.meshes.remove(_me)
+    cannon_bvh = BVHTree.FromBMesh(_bm)
+    _bm.free()
+    M_Rn = np.array(M_R)
+
+    def poke_out(loc):
+        """Per grip-frame point inside the sleeve span: how far it lies beyond the outer skin (m, < 0 = hidden)."""
+        out = np.full(len(loc), -1.0)
+        for k_, p in enumerate(loc):
+            r = math.hypot(p[0], p[2])
+            if r < 1e-4:
+                continue
+            dl = np.array([p[0] / r, 0.0, p[2] / r])
+            start = M_Rn[:3, :3] @ (np.array([0.0, p[1], 0.0]) + dl * 0.6) + M_Rn[:3, 3]
+            dw = M_Rn[:3, :3] @ -dl
+            hit, _n, _i, dist = cannon_bvh.ray_cast(Vector(start.tolist()), Vector(dw.tolist()), 0.6)
+            out[k_] = r - (0.6 - dist) if hit is not None else r
+        return out
     rows = []
     for o in prod:
         if o.name not in ("BODY", "ARMS", "GAUNTLETS"):
@@ -439,12 +469,23 @@ if armed and M_R is not None and want("fit"):
         pen = np.where(inside & ~bar, r - free, -1.0)
         # the sleeve's rear cuff hoop (inner 0.096, outer 0.172, y -0.353 .. -0.313) vs the couter / vambrace
         hoop = (y > -0.353) & (y < -0.313) & (r > 0.096) & (r < 0.172)
+        span = (y > -0.353) & (y < 0.06)
+        po = poke_out(loc[span]) if span.any() else np.zeros(0)
+        # the open rest-pose thumb hangs below the palm (grip-frame z < -0.035); it folds over the fingers in the grip
+        thumb = (loc[span][:, 2] < -0.035) & (loc[span][:, 1] > -0.06) if len(po) else np.zeros(0, bool)
+        n_thumb = int(((po > 0) & thumb).sum())
+        po = np.where(thumb, -1.0, po)
         rows.append({"object": o.name, "verts_in_cannon_span": int(inside.sum()),
                      "penetrating_verts": int((pen > 0).sum()), "max_penetration_m": round(float(max(pen.max(), 0.0)), 4),
                      "min_clearance_m": round(float(-pen[inside & ~bar].max()) if (inside & ~bar).any() else 0.0, 4),
-                     "verts_in_rear_cuff_hoop": int(hoop.sum())})
+                     "verts_in_rear_cuff_hoop": int(hoop.sum()),
+                     "verts_poking_out_of_sleeve": int((po > 0).sum()), "open_thumb_verts_poking_out": n_thumb,
+                     "min_margin_to_outer_skin_m": round(float(-po.max()) if len(po) else 0.0, 4),
+                     "worst_poke_world": (c[span][int(np.argmax(po))].round(3).tolist() if len(po) and po.max() > 0 else None)})
     metrics["sleeve_fit"] = {"free_radius_m": {"rear_cuff_y<-0.30": 0.0944, "sleeve": 0.0983, "drum_y>0.06": 0.181},
-                             "note": "grip frame of the cannon (y = barrel); the inner handle bar (|y|, |x| < 0.021) is the grip itself and not counted",
+                             "note": "grip frame of the cannon (y = barrel); the inner handle bar (|y|, |x| < 0.021) is the grip itself and not counted. "
+                                     "penetrating = inside the sleeve WALL (the bore is 0.098 m; the massive polished arm is wider on purpose and "
+                                     "lies in the wall, hidden); poking_out = beyond the sleeve's OUTER skin (visible: must be 0)",
                              "objects": rows}
     log("sleeve fit", rows)
 

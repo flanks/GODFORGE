@@ -2,7 +2,7 @@
 with ComfyUI's standalone python:
 
   <comfy-python> tools/blender/gf_hero/s2_valdris_sheets.py <render_dir> <report_dir> <concept.png> <concept_mask.png>
-                 <texture_dir> <stage1_render_dir> <stage1_stem>
+                 <texture_dir> <stage1_render_dir> <stage1_stem> [<before_render_dir>]
 
 Adapted from tools/comfy/stage2_sheets.py (Brax; label / grid / < 2 MB saving / concept-silhouette IoU), which stays
 unchanged. Sheets (reports/stage2/):
@@ -16,6 +16,9 @@ unchanged. Sheets (reports/stage2/):
   stage2_closeups.png     head, torso, anvil, pauldron, arm, hand, hips, legs, boot, cape
   stage2_wireframe.png    joint topology on the body alone, and the parts
   stage2_textures.png     base colour, emissive, tangent normal map, UV layout
+  stage2_before_after.png (with <before_render_dir>, the renders of the previous build) the stage-2 polish: the
+                          concept, before / after fronts and 3/4s, close-up pairs, the in-game camera 3x crops with the
+                          stage-1 blockout
 """
 import json
 import os
@@ -48,12 +51,16 @@ def label(img, text, size=20, pos=(8, 6), fill=FG):
     return img
 
 
-def save_small(img, path):
+def save_small(img, path, palette=False):
+    """PNG under MAX_BYTES (shrunk 12 % at a time); palette=True stores 256 adaptive colours first (large sheets)."""
     img = img.convert("RGB")
-    img.save(path, optimize=True)
+
+    def save(im):
+        (im.quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE) if palette else im).save(path, optimize=True)
+    save(img)
     while os.path.getsize(path) > MAX_BYTES:
         img = img.resize((int(img.width * 0.88), int(img.height * 0.88)), Image.LANCZOS)
-        img.save(path, optimize=True)
+        save(img)
     print("[valdris sheets] %s %dx%d %.2f MB" % (os.path.basename(path), img.width, img.height, os.path.getsize(path) / 1e6))
 
 
@@ -102,7 +109,7 @@ def main(argv):
     os.makedirs(od, exist_ok=True)
     R = lambda n: os.path.join(rd, n)  # noqa: E731
     B = lambda n: os.path.join(bdir, "%s_%s" % (bstem, n))  # noqa: E731
-    tag = "Valdris stage 2"
+    tag = "Valdris stage 2 (polished)"
     met = json.load(open(R("review_metrics.json"))) if os.path.isfile(R("review_metrics.json")) else {}
 
     # ---- concept comparison -------------------------------------------------------------------------------------
@@ -156,13 +163,16 @@ def main(argv):
     label(panel, "sleeve fit (grip frame, T-pose rest)", 18, (10, y))
     y += 34
     for r in sf:
-        txt = "%s: %d verts in span, %d inside the wall%s" % (r["object"], r["verts_in_cannon_span"], r["penetrating_verts"],
-                                                            (", max %.1f cm" % (100 * r["max_penetration_m"])) if r["penetrating_verts"] else
-                                                            (", min clearance %.1f mm" % (1000 * r["min_clearance_m"])))
+        txt = "%s: %d in span, %d in the wall (max %.1f cm), %d out of the skin" % (
+            r["object"], r["verts_in_cannon_span"], r["penetrating_verts"], 100 * r["max_penetration_m"],
+            r.get("verts_poking_out_of_sleeve", 0))
         label(panel, txt, 15, (10, y))
         y += 26
-    for line in ("free radius: 9.8 cm sleeve, 9.4 cm rear cuff,", "18 cm drum (knuckles). Remaining hits = the", "open rest-pose THUMB (points 12 cm forward-",
-                 "down); it folds over the fingers in the grip.", "Forearm, vambrace, cuffs, wrist: clear."):
+    for line in ("bore: 9.8 cm sleeve, 9.4 cm rear cuff, 18 cm drum;", "outer skin: 13.4-16.6 cm over the forearm.",
+                 "The polished MASSIVE arm (vambrace 24-27 cm across)", "is wider than the bore on purpose: it lies inside",
+                 "the sleeve WALL, hidden; nothing pokes out of the", "outer skin. Weapon track: widen the sleeve (bore",
+                 "~15 cm) for the concept's 29 cm fist arm.", "Hand hits: the open rest-pose THUMB (it folds",
+                 "over the fingers in the grip) and the palm."):
         label(panel, line, 15, (10, y))
         y += 22
     items.append((panel, ""))
@@ -221,10 +231,81 @@ def main(argv):
         sheet.paste(im, (i * S, 50))
     save_small(sheet, os.path.join(od, "stage2_textures.png"))
 
+    # ---- before / after (the stage-2 polish) ------------------------------------------------------------------------------
+    if len(argv) > 7 and os.path.isdir(argv[7]):
+        before_after(argv[7], R, B, con, tag, od)
+
     with open(R("review_metrics.json"), "w", newline="\n") as f:
         json.dump(met, f, indent=1)
         f.write("\n")
+    rj = os.path.join(od, "review.json")          # the review step's report: add this pass's IoU / aspect values
+    if os.path.isfile(rj):
+        rep = json.load(open(rj))
+        rep.update({k: v for k, v in met.items() if k.startswith(("front_iou", "aspect_"))})
+        with open(rj, "w", newline="\n") as f:
+            json.dump(rep, f, indent=1)
+            f.write("\n")
     print("[valdris sheets] IoU", {k: v for k, v in met.items() if k.startswith("front_iou")})
+
+
+def before_after(bd, R, B, con, tag, od):
+    """The polish pass side by side: the previous build's renders (bd) vs this one, same cameras and shading."""
+    P = lambda n: os.path.join(bd, n)  # noqa: E731
+    GREEN, GREY = (140, 230, 140), (200, 200, 200)
+
+    def cell(im, w, h, text, col=FG):
+        c = Image.new("RGB", (w, h), BG)
+        if im is not None:
+            im = im.copy()
+            if im.width > w or im.height > h - 4:
+                im.thumbnail((w, h - 4), Image.LANCZOS)
+            c.paste(im, ((w - im.width) // 2, (h - im.height) // 2))
+        label(c, text, 17, fill=col)
+        return c
+
+    def zoom(path, k=3, cw=150, ch=120):
+        im = load(path)
+        if im is None:
+            return None
+        x0, y0 = (im.width - cw) // 2, (im.height - ch) // 2
+        return im.crop((x0, y0, x0 + cw, y0 + ch)).resize((cw * k, ch * k), Image.NEAREST)
+    W = 2400
+    rows = []
+    t = W // 5
+    r1 = [cell(con, t, t, "approved concept")]
+    for n, lab in (("toon_front.png", "front"), ("toon_front34L.png", "3/4")):
+        r1.append(cell(load(P(n)), t, t, "BEFORE " + lab, GREY))
+        r1.append(cell(load(R(n)), t, t, "AFTER " + lab, GREEN))
+    rows.append(r1)
+    t = W // 6
+    pairs = ("pauldron_34", "arm_34", "anvil_34", "legs_34", "hand_top", "boot_34")
+    for k in range(0, len(pairs), 3):
+        r = []
+        for n in pairs[k:k + 3]:
+            r.append(cell(load(P("close_%s.png" % n)), t, t, "BEFORE " + n.replace("_", " "), GREY))
+            r.append(cell(load(R("close_%s.png" % n)), t, t, "AFTER " + n.replace("_", " "), GREEN))
+        rows.append(r)
+    t = W // 4
+    h = 380
+    rows.append([cell(zoom(P("pose45_armed_ingame_22_toon.png")), t, h, "BEFORE in game 22 m, armed, 3x", GREY),
+                 cell(zoom(R("pose45_armed_ingame_22_toon.png")), t, h, "AFTER in game 22 m, armed, 3x", GREEN),
+                 cell(zoom(R("pose45_armed_ingame_22_toon34.png")), t, h, "AFTER yaw 35, 3x", GREEN),
+                 cell(zoom(B("ingame_22_tex.png")), t, h, "stage-1 blockout 22 m, 3x", GREY)])
+    rows.append([cell(load(P("pose45_armed_ingame_22_toon.png")), t, 270, "BEFORE 1:1", GREY),
+                 cell(load(R("pose45_armed_ingame_22_toon.png")), t, 270, "AFTER 1:1", GREEN),
+                 cell(load(R("pose45_armed_ingame_28_toon.png")), t, 270, "AFTER 28 m 1:1", GREEN),
+                 cell(load(B("ingame_22_tex.png")), t, 270, "blockout 1:1", GREY)])
+    heights = [max(c.height for c in r) for r in rows]
+    sheet = Image.new("RGB", (W, 44 + sum(heights)), BG)
+    label(sheet, "%s polish: BEFORE (the first stage-2 build) / AFTER, same cameras and Cycles-CPU toon review" % tag, 22, (10, 10))
+    y = 44
+    for r, hh in zip(rows, heights):
+        x = 0
+        for c in r:
+            sheet.paste(c, (x, y))
+            x += c.width
+        y += hh
+    save_small(sheet, os.path.join(od, "stage2_before_after.png"), palette=True)
 
 
 if __name__ == "__main__":

@@ -14,7 +14,8 @@ Steps (each a headless Blender run, or ComfyUI's python for the PIL sheets):
   gltf_check  s2_gltf_check.py (shared)      scratch GLB: textures, tangents, no unloadable extensions
   review    s2_valdris_review.py             Cycles-CPU toon review renders (never EEVEE: the GPU is shared), the
                                              colossus_cannon GLB on the right hand frame, fit / penetration check
-  sheets    s2_valdris_sheets.py (ComfyUI python)   review sheets into reports/stage2/ + concept IoU
+  sheets    s2_valdris_sheets.py (ComfyUI python)   review sheets into reports/stage2/ + concept IoU (+ the before /
+                                             after sheet when work/renders/stage2_before holds an earlier build's renders)
 
 The weapon is NOT built here: colossus_cannon is owned by the weapon track (art/weapons/colossus_cannon/).
 """
@@ -75,7 +76,8 @@ def main(argv):
         "review": B + [os.path.join(G, "s2_valdris_review.py"), "--", prod, os.path.join(W, "renders", "stage2"), "--ref", start,
                        "--cannon", cannon, "--fit", os.path.join(S2, "body_fit.json"), "--report", os.path.join(S2, "review.json")],
         "sheets": [COMFY_PY, os.path.join(G, "s2_valdris_sheets.py"), os.path.join(W, "renders", "stage2"), S2, concept, mask,
-                   os.path.join(A, "textures"), os.path.join(W, "renders", "valdris_trellis2_s202"), "valdris_trellis2_s202"],
+                   os.path.join(A, "textures"), os.path.join(W, "renders", "valdris_trellis2_s202"), "valdris_trellis2_s202",
+                   os.path.join(W, "renders", "stage2_before")],
     }
     os.makedirs(os.path.join(ROOT, W, "logs"), exist_ok=True)
     os.makedirs(os.path.join(ROOT, S2), exist_ok=True)

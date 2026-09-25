@@ -80,468 +80,805 @@
   }
  },
  "anvil": {
-  "_doc": "The Anvil-Born's chest plate (brief pillar 3): a top slab (flat top face at the arm line z 1.78, square heel on his RIGHT, horn tapering to a point on his LEFT; 0.83 m) over a waisted body with two feet above the belt (bottom z 1.30). Outline [x, z] from the hero front; depth from the blockout (front face y -0.61 top, -0.57 body; back buried in the breastplate). The horn tapers in depth too. Rigid on spine_03.",
+  "_doc": "The Anvil-Born's chest plate (brief pillar 3), the centre of his silhouette: a thick top slab (flat top face z 1.788 just above the arm line; square heel on his RIGHT, horn tapering in outline and depth to a point on his LEFT; 0.88 m) over a strongly waisted body with two feet and a notch between them (bottom z 1.33). Front faces 0.30-0.33 m proud of the breastplate. Behind its outline sits the lava gasket (zone lava: crust with glowing cracks), 2-5 cm wider than the body at the waist and 4-8 cm proud of the breastplate, so a glowing seam runs round the anvil from the front and from the 55-degree camera (the concept's glowing chest tiles either side of the waist). Outline [x, z] from the hero front (2.81 mm/px); depths along -Y; chips [edge, t, width, depth] notch the heavy edges. Rigid on spine_03.",
   "slab": [
    [
-    -0.39,
-    1.78
+    -0.405,
+    1.788
    ],
    [
     0.3,
-    1.78
+    1.788
    ],
    [
-    0.445,
-    1.765
+    0.475,
+    1.772
    ],
    [
-    0.37,
-    1.738
+    0.385,
+    1.74
    ],
    [
-    0.285,
-    1.707
+    0.29,
+    1.71
    ],
    [
-    0.22,
+    0.215,
+    1.694
+   ],
+   [
+    -0.27,
     1.69
    ],
    [
-    -0.28,
-    1.69
+    -0.35,
+    1.694
    ],
    [
-    -0.345,
-    1.695
-   ],
-   [
-    -0.39,
+    -0.405,
     1.702
    ]
   ],
+  "slab_chips": [
+   [
+    5,
+    0.4,
+    0.08,
+    0.01
+   ],
+   [
+    8,
+    0.5,
+    0.03,
+    0.006
+   ]
+  ],
   "slab_depth": {
-   "back": 0.315,
-   "front": 0.615
+   "back": 0.3,
+   "front": 0.648
   },
   "body": [
    [
     0.225,
-    1.705
+    1.7
    ],
    [
     0.19,
-    1.635
-   ],
-   [
-    0.165,
-    1.575
+    1.655
    ],
    [
     0.158,
-    1.53
+    1.605
    ],
    [
-    0.172,
-    1.47
+    0.138,
+    1.56
    ],
    [
-    0.215,
-    1.425
+    0.141,
+    1.52
    ],
    [
-    0.285,
+    0.163,
+    1.482
+   ],
+   [
+    0.21,
+    1.455
+   ],
+   [
+    0.27,
+    1.44
+   ],
+   [
+    0.283,
     1.4
    ],
    [
-    0.285,
-    1.3
+    0.275,
+    1.33
    ],
    [
-    0.125,
-    1.3
+    0.108,
+    1.33
    ],
    [
-    0.1,
-    1.345
+    0.086,
+    1.372
    ],
    [
-    -0.1,
-    1.345
+    -0.086,
+    1.372
    ],
    [
-    -0.125,
-    1.3
+    -0.108,
+    1.33
    ],
    [
-    -0.285,
-    1.3
+    -0.275,
+    1.33
    ],
    [
-    -0.285,
+    -0.283,
     1.4
    ],
    [
-    -0.215,
-    1.425
+    -0.27,
+    1.44
    ],
    [
-    -0.172,
-    1.47
+    -0.21,
+    1.455
+   ],
+   [
+    -0.163,
+    1.482
+   ],
+   [
+    -0.141,
+    1.52
+   ],
+   [
+    -0.138,
+    1.56
    ],
    [
     -0.158,
-    1.53
-   ],
-   [
-    -0.165,
-    1.575
+    1.605
    ],
    [
     -0.19,
-    1.635
+    1.655
    ],
    [
     -0.25,
-    1.705
+    1.7
    ]
   ],
   "body_depth": {
    "back_top": 0.3,
-   "back_bottom": 0.27,
-   "front_top": 0.585,
-   "front_bottom": 0.565
+   "back_bottom": 0.275,
+   "front_top": 0.608,
+   "front_bottom": 0.59
   },
-  "horn_taper_from_x": 0.24,
-  "chamfer": 0.014
- },
- "pauldron": {
-  "_doc": "Huge boxy pauldrons (brief pillar 1: tops level with the crown, span 1.23-1.32 m): a chamfered main block (x 0.19-0.665, top z 2.2, y +-0.3) with gold-edged top corners and gold front/back rims, a glowing ember slot under it (visible from the front and the side), two lower lames stepping down over the upper arm, an upright plate at the inner edge rising to the crown (z 2.3), gold rivets. Rigid on clavicle (stage 3 may blend upperarm). v2: one tall main block split by the glowing groove (upper block + lower block, the lower one inset), a flared lower lame over the upper arm, a big upright plate.",
-  "block_profile": [
-   [
-    0.2,
-    2.085
-   ],
-   [
-    0.19,
-    2.15
-   ],
-   [
-    0.214,
-    2.196
-   ],
-   [
-    0.45,
-    2.212
-   ],
-   [
-    0.615,
-    2.182
-   ],
-   [
-    0.662,
-    2.14
-   ],
-   [
-    0.676,
-    2.085
-   ],
-   [
-    0.5,
-    2.08
-   ]
-  ],
-  "block_y": [
-   -0.31,
-   0.31
-  ],
-  "block_chamfer": 0.02,
-  "slot": {
-   "x": [
-    0.26,
-    0.668
-   ],
-   "z": [
-    2.058,
-    2.084
-   ],
-   "y": [
-    -0.3,
-    0.3
-   ],
-   "inset": 0.012
-  },
-  "lames": [
-   {
-    "profile": [
-     [
-      0.25,
-      2.062
-     ],
-     [
-      0.66,
-      2.062
-     ],
-     [
-      0.688,
-      2.03
-     ],
-     [
-      0.69,
-      1.99
-     ],
-     [
-      0.672,
-      1.972
-     ],
-     [
-      0.45,
-      1.985
-     ],
-     [
-      0.25,
-      2.01
-     ]
-    ],
-    "y": [
-     -0.298,
-     0.298
-    ],
-    "chamfer": 0.014,
-    "gold_sides": [
-     3,
-     4
-    ]
-   },
-   {
-    "profile": [
-     [
-      0.47,
-      1.99
-     ],
-     [
-      0.672,
-      1.975
-     ],
-     [
-      0.735,
-      1.93
-     ],
-     [
-      0.742,
-      1.9
-     ],
-     [
-      0.725,
-      1.885
-     ],
-     [
-      0.52,
-      1.93
-     ]
-    ],
-    "y": [
-     -0.27,
-     0.27
-    ],
-    "chamfer": 0.012,
-    "gold_sides": [
-     2,
-     3
-    ]
-   }
-  ],
-  "upright": {
-   "profile_yz": [
+  "horn_taper_from_x": 0.2,
+  "horn_depth_taper": 0.86,
+  "chamfer": 0.02,
+  "gasket": {
+   "outline": [
     [
-     -0.23,
-     2.14
-    ],
-    [
-     0.23,
-     2.14
+     0.25,
+     1.7
     ],
     [
      0.225,
-     2.25
+     1.66
     ],
     [
-     0.175,
-     2.315
+     0.196,
+     1.612
     ],
     [
-     -0.175,
-     2.315
+     0.182,
+     1.56
+    ],
+    [
+     0.186,
+     1.515
+    ],
+    [
+     0.21,
+     1.482
+    ],
+    [
+     0.26,
+     1.466
+    ],
+    [
+     0.312,
+     1.452
+    ],
+    [
+     0.318,
+     1.4
+    ],
+    [
+     0.305,
+     1.342
+    ],
+    [
+     -0.305,
+     1.342
+    ],
+    [
+     -0.318,
+     1.4
+    ],
+    [
+     -0.312,
+     1.452
+    ],
+    [
+     -0.26,
+     1.466
+    ],
+    [
+     -0.21,
+     1.482
+    ],
+    [
+     -0.186,
+     1.515
+    ],
+    [
+     -0.182,
+     1.56
+    ],
+    [
+     -0.196,
+     1.612
     ],
     [
      -0.225,
+     1.66
+    ],
+    [
+     -0.27,
+     1.7
+    ]
+   ],
+   "depth": [
+    0.285,
+    0.372
+   ],
+   "chamfer": 0.008
+  }
+ },
+ "pauldron": {
+  "_doc": "Huge blocky layered pauldrons (brief pillar 1: tops level with the crown). Per side, stacked: three TOP LAMES stepping up from the front to the upright back plate (each higher lame lies over the back of the one in front: from the 55-degree camera a staircase of lit bevels and dark tops; gold only on edges: a thin rim facet along each step's front edge (gold_sides) and the outer-end chamfers, a stepped gold edge down the outer side; end_chips cut the outer-end corners back), CAP_BODY (the main block under them, gold trim only on its outer front-bottom corner), the recessed glowing SLOT under it (visible from the front and the side), LAME1 (the lower block, stepping out, gold on its bottom edges), LAME2 (a boxy shell over the upper arm, stepping down, gold rim on its free edge), the UPRIGHT back plate at the inner edge rising to the crown with a rounded top (gold only on its top chamfers), gold rivets. TOP LAMES, CAP_BODY and LAME1 are side profiles [y, z] extruded along X with a draft (taper) toward the outer end and a bevelled top-front plane; the UPRIGHT is a [y, z] profile along X; chips [edge, t, width, depth] notch the heavy edges. Rigid on clavicle; LAME2 on upperarm.",
+  "top_lames": [
+   {
+    "_doc": "front lame, the lowest step",
+    "profile_yz": [
+     [
+      -0.352,
+      2.14
+     ],
+     [
+      -0.05,
+      2.14
+     ],
+     [
+      -0.05,
+      2.21
+     ],
+     [
+      -0.292,
+      2.206
+     ],
+     [
+      -0.306,
+      2.198
+     ],
+     [
+      -0.352,
+      2.172
+     ]
+    ],
+    "x": [
+     0.212,
+     0.69
+    ],
+    "taper": 0.95,
+    "chamfer": 0.02,
+    "gold_edges_outer": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "gold_edges_inner": [],
+    "end_chips": {
+     "4": 0.035,
+     "5": 0.012
+    },
+    "gold_sides": [
+     3
+    ]
+   },
+   {
+    "_doc": "middle lame: its front edge lies over the back of the front lame",
+    "profile_yz": [
+     [
+      -0.205,
+      2.17
+     ],
+     [
+      0.1,
+      2.17
+     ],
+     [
+      0.1,
+      2.255
+     ],
+     [
+      -0.145,
+      2.252
+     ],
+     [
+      -0.159,
+      2.244
+     ],
+     [
+      -0.205,
+      2.218
+     ]
+    ],
+    "x": [
+     0.212,
+     0.672
+    ],
+    "taper": 0.95,
+    "chamfer": 0.02,
+    "gold_edges_outer": [
+     2,
+     3,
+     4,
+     5
+    ],
+    "gold_edges_inner": [],
+    "end_chips": {
+     "4": 0.03
+    },
+    "gold_sides": [
+     3
+    ]
+   },
+   {
+    "_doc": "back lame, the highest (level with the crown), against the upright plate",
+    "profile_yz": [
+     [
+      -0.055,
+      2.2
+     ],
+     [
+      0.34,
+      2.2
+     ],
+     [
+      0.34,
+      2.27
+     ],
+     [
+      0.3,
+      2.292
+     ],
+     [
+      0.012,
+      2.296
+     ],
+     [
+      -0.002,
+      2.288
+     ],
+     [
+      -0.055,
+      2.262
+     ]
+    ],
+    "x": [
+     0.212,
+     0.655
+    ],
+    "taper": 0.95,
+    "chamfer": 0.02,
+    "gold_edges_outer": [
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "gold_edges_inner": [],
+    "end_chips": {
+     "5": 0.04,
+     "2": 0.02
+    },
+    "gold_sides": [
+     4
+    ]
+   }
+  ],
+  "cap_body": {
+   "profile_yz": [
+    [
+     -0.322,
+     2.092
+    ],
+    [
+     0.322,
+     2.092
+    ],
+    [
+     0.322,
+     2.19
+    ],
+    [
+     0.285,
+     2.214
+    ],
+    [
+     -0.225,
+     2.214
+    ],
+    [
+     -0.322,
+     2.158
+    ]
+   ],
+   "x": [
+    0.222,
+    0.676
+   ],
+   "taper": 0.94,
+   "chamfer": 0.02,
+   "gold_edges_outer": [
+    0,
+    5
+   ],
+   "gold_edges_inner": [
+    5
+   ]
+  },
+  "slot": {
+   "x": [
+    0.232,
+    0.662
+   ],
+   "z": [
+    2.056,
+    2.1
+   ],
+   "y": [
+    -0.306,
+    0.306
+   ],
+   "inset": 0.01
+  },
+  "lame1": {
+   "profile_yz": [
+    [
+     -0.336,
+     1.962
+    ],
+    [
+     0.336,
+     1.962
+    ],
+    [
+     0.336,
+     2.038
+    ],
+    [
+     0.3,
+     2.064
+    ],
+    [
+     -0.27,
+     2.064
+    ],
+    [
+     -0.336,
+     2.02
+    ]
+   ],
+   "x": [
+    0.226,
+    0.712
+   ],
+   "taper": 0.93,
+   "chamfer": 0.018,
+   "gold_edges_outer": [
+    0,
+    1,
+    5
+   ],
+   "gold_edges_inner": []
+  },
+  "lame2": {
+   "x": [
+    0.45,
+    0.662
+   ],
+   "ry": 0.228,
+   "rz": 0.165,
+   "theta_deg": [
+    -134,
+    134
+   ],
+   "exponent": 3.2,
+   "thick": 0.022,
+   "u": 13,
+   "v": 5,
+   "chips": 3,
+   "chip_depth": 0.014
+  },
+  "upright": {
+   "profile_yz": [
+    [
+     -0.14,
+     2.15
+    ],
+    [
+     0.3,
+     2.15
+    ],
+    [
+     0.305,
+     2.28
+    ],
+    [
+     0.265,
+     2.325
+    ],
+    [
+     0.12,
+     2.338
+    ],
+    [
+     -0.04,
+     2.328
+    ],
+    [
+     -0.12,
+     2.3
+    ],
+    [
+     -0.146,
      2.25
     ]
    ],
    "x": [
-    0.23,
-    0.32
+    0.205,
+    0.318
    ],
-   "tilt_deg": 6.0,
-   "chamfer": 0.012
+   "tilt_deg": 8.0,
+   "chamfer": 0.016,
+   "chips": [
+    [
+     4,
+     0.5,
+     0.05,
+     0.01
+    ],
+    [
+     5,
+     0.55,
+     0.04,
+     0.008
+    ]
+   ],
+   "gold_edges": [
+    2,
+    3,
+    4,
+    5,
+    6
+   ]
   },
   "rivets": [
    [
     0.3,
-    -0.311,
-    2.16,
-    0.0,
-    -1.0,
-    0.0
+    -0.353,
+    2.158,
+    0,
+    -1,
+    0
    ],
    [
     0.46,
-    -0.311,
-    2.165,
-    0.0,
-    -1.0,
-    0.0
+    -0.353,
+    2.158,
+    0,
+    -1,
+    0
    ],
    [
-    0.6,
-    -0.311,
-    2.15,
-    0.0,
-    -1.0,
-    0.0
+    0.62,
+    -0.353,
+    2.158,
+    0,
+    -1,
+    0
    ],
    [
-    0.5,
-    -0.2,
-    2.212,
-    0.0,
-    0.0,
-    1.0
+    0.36,
+    -0.1,
+    2.254,
+    0,
+    0,
+    1
    ],
    [
-    0.5,
-    0.2,
-    2.212,
-    0.0,
-    0.0,
-    1.0
+    0.58,
+    -0.1,
+    2.254,
+    0,
+    0,
+    1
    ],
    [
-    0.68,
-    -0.12,
-    2.11,
-    1.0,
-    0.0,
-    0.0
+    0.4,
+    -0.337,
+    2.02,
+    0,
+    -1,
+    0
    ],
    [
-    0.68,
-    0.12,
-    2.11,
-    1.0,
-    0.0,
-    0.0
+    0.62,
+    -0.337,
+    2.01,
+    0,
+    -1,
+    0
    ]
   ],
-  "rivet_r": 0.017
+  "rivet_r": 0.018
  },
  "arm": {
-  "_doc": "Both arms are the concept's fist-gauntlet arm. Radii around the arm axis (y 0, z 1.78). The vambrace must fit the colossus_cannon sleeve (free radius 0.098 m, 0.094 m at its elbow cuff): outer <= 0.087 m. Rerebrace rigid on upperarm, couter and vambrace on lowerarm.",
+  "_doc": "Both arms are the concept's fist-gauntlet arm: MASSIVE layered plate, as thick as the pauldron blocks. Boxy superellipse tubes around the arm axis (y 0, z 1.78): two shingled rerebrace lames under the pauldron, the glowing ELBOW ring (zone lava) in the gap at the joint, the couter with a raised gold cuff band and a cop on the elbow point, two shingled vambrace segments, the raised gold wrist cuff, the gauntlet cuff narrowing onto the hand. Plates are thick-walled (the inner wall sits ~1 cm off the under-suit) so their ends read solid. r = [radius at x0, radius at x1]. The right forearm lies in the colossus_cannon sleeve: everything from |x| 0.64 outward stays inside the sleeve's OUTER skin (ray-measured on colossus_cannon.glb: 0.134-0.141 m over the forearm, 0.166-0.169 m at the rear cuff; s2_valdris_review.py checks it), so it is hidden when armed; it is wider than the sleeve's 0.098 m bore on purpose (noted for the weapon track: a 0.29 m concept fist arm needs a wider sleeve). Rigid: rerebrace upperarm, the rest lowerarm, the gauntlet cuff hand. aspect_z squashes a piece's vertical radius (the gauntlet cuff closes onto the flat hand).",
   "axis": [
    0.0,
    1.78
   ],
-  "rerebrace": {
+  "rerebrace": [
+   {
+    "name": "REREBRACE1",
+    "x": [
+     0.385,
+     0.505
+    ],
+    "r": [
+     0.158,
+     0.15
+    ],
+    "exponent": 2.8,
+    "gold_end": false
+   },
+   {
+    "name": "REREBRACE2",
+    "x": [
+     0.492,
+     0.588
+    ],
+    "r": [
+     0.152,
+     0.146
+    ],
+    "exponent": 2.8,
+    "gold_end": true
+   }
+  ],
+  "elbow_glow": {
    "x": [
-    0.395,
-    0.585
+    0.572,
+    0.612
    ],
    "r": [
-    0.14,
     0.132,
-    0.122
+    0.126
    ],
-   "band": [
-    0.515,
-    0.55
-   ],
-   "band_lift": 0.008,
-   "thick": 0.014,
-   "n": 12,
-   "exponent": 2.4
+   "exponent": 2.6
   },
   "couter": {
    "x": [
-    0.548,
-    0.628
+    0.602,
+    0.648
    ],
-   "r": 0.108,
-   "thick": 0.014,
-   "n": 12,
+   "r": [
+    0.15,
+    0.14
+   ],
+   "band": [
+    0.61,
+    0.638
+   ],
+   "band_lift": 0.008,
+   "exponent": 2.8,
    "cop": {
-    "x": 0.583,
-    "r": 0.052,
-    "lift": 0.03
-   },
-   "_doc": "the right couter and its cop stay behind the colossus_cannon sleeve's rear cuff (0.643 m from the centre line in the T-pose hold)"
+    "x": 0.574,
+    "r": 0.066,
+    "lift": 0.022
+   }
   },
-  "vambrace": {
-   "x": [
-    0.628,
-    0.908
-   ],
-   "clear": 0.006,
-   "thick": 0.011,
-   "cuffs": [
-    [
-     0.66,
-     0.69
+  "vambrace": [
+   {
+    "name": "VAMBRACE1",
+    "x": [
+     0.636,
+     0.758
     ],
-    [
-     0.855,
-     0.885
-    ]
-   ],
-   "cuff_lift": 0.006,
-   "n": 12,
-   "exponent": 2.6,
-   "max_r": 0.087
-  },
-  "cuff": {
+    "r": [
+     0.126,
+     0.122
+    ],
+    "exponent": 2.6
+   },
+   {
+    "name": "VAMBRACE2",
+    "x": [
+     0.746,
+     0.866
+    ],
+    "r": [
+     0.124,
+     0.12
+    ],
+    "exponent": 2.6,
+    "gold_start": true
+   }
+  ],
+  "wrist_cuff": {
    "x": [
-    0.9,
-    0.95
+    0.858,
+    0.906
    ],
-   "clear": 0.006,
-   "thick": 0.009,
-   "flare": 0.006,
-   "n": 12,
-   "max_r": 0.09
-  }
+   "r": [
+    0.12,
+    0.118
+   ],
+   "exponent": 2.4
+  },
+  "gauntlet_cuff": {
+   "x": [
+    0.896,
+    0.952
+   ],
+   "r": [
+    0.118,
+    0.09
+   ],
+   "aspect_z": 0.78,
+   "exponent": 2.4
+  },
+  "thick_min": 0.016,
+  "thick_max": 0.06,
+  "inner_clear": 0.01,
+  "n": 12
  },
  "gauntlet": {
-  "_doc": "Plate gauntlet hands, fist-ready: the glove is the body's hand (leather zone); rigid plates on top: a back-of-hand plate (hand), a knuckle guard with gold studs (hand), one lame per finger phalanx (finger bones, 14 per hand), slightly overlapping the next. Finger joints = the MakeHuman joints through the same landmark warp and hand scale as the body (s2_body_fit.py).",
+  "_doc": "Plate gauntlet hands, fist-ready and chunky (the under-suit glove is the body's hand at limb_radial.hand_scale 1.6, which widens it about the arm axis): a thick back-of-hand plate (hand), a heavy knuckle guard with four gold studs (hand), one thick lame per finger phalanx (finger bones), slightly overlapping the next. Finger joints = the MakeHuman joints through the same landmark warp and hand scale as the body (s2_body_fit.py). The plates carry the thickness (the hand lies flat on the arm axis).",
   "back_plate": {
    "x": [
-    0.935,
-    1.03
+    0.93,
+    1.035
    ],
-   "clear": 0.005,
-   "thick": 0.008
+   "clear": 0.008,
+   "thick": 0.028
   },
   "knuckle": {
    "x": [
     1.022,
-    1.058
+    1.066
    ],
-   "clear": 0.004,
-   "thick": 0.014
+   "clear": 0.006,
+   "thick": 0.032
   },
   "finger": {
-   "clear": 0.0035,
-   "thick": 0.0075,
-   "overlap": 0.006,
+   "clear": 0.004,
+   "thick": 0.014,
+   "overlap": 0.008,
    "gap": 0.002,
-   "span_deg": 170
+   "half_w": [
+    0.017,
+    0.03
+   ],
+   "share_overlap": 0.003,
+   "thumb_half_w": 0.03,
+   "side_drop": 0.014,
+   "taper": 0.06,
+   "_doc": "box-section lames: half width = half the spacing to the nearest neighbour finger + share_overlap (clamped to half_w), so the four fingers close into one plated block; top = the finger's upper radius + clear + thick; the sides drop side_drop below the finger axis toward the palm; each further phalanx tapers by taper"
   }
  },
  "hips": {
@@ -613,126 +950,205 @@
   ]
  },
  "legs": {
-  "_doc": "Cuisse (thigh, partial tube over front/outer/inner), poleyn (knee cop, bulging, side wings, gold top rim and gold 'smile' at the bottom with a glow line), greave (boxy closed tube, gold rims top and bottom). Radii from the under-suit leg (conformed to the blockout's outer envelope) + clearance + thickness. Rigid: cuisse thigh, poleyn and greave calf.",
-  "cuisse": {
-   "z": [
-    0.74,
-    1.05
-   ],
-   "theta_deg": [
-    -110,
-    130
-   ],
-   "clear": 0.04,
-   "thick": 0.016,
-   "u": 11,
-   "v": 5
-  },
+  "_doc": "Segmented armoured legs around each leg's section centre line (radii from the under-suit leg + clearance): two shingled cuisse lames (front / outer / inner thigh), a big faceted poleyn (knee cop with a raised boss 12 cm proud and side wings that bulge past the greave, a gold top rim and a gold 'smile' along its curved lower edge) with a glowing lava smile strip under it, a boxy greave with a raised front shin plate over a lava gasket (glowing seams down both sides of the shin). Rigid: cuisses thigh, poleyn / smile / greave / shin plate calf.",
+  "cuisse": [
+   {
+    "name": "CUISSE1",
+    "z": [
+     0.868,
+     1.072
+    ],
+    "theta_deg": [
+     -118,
+     132
+    ],
+    "clear": 0.058,
+    "thick": 0.018,
+    "u": 11,
+    "v": 5,
+    "bulge": 0.02,
+    "gold_bottom": true
+   },
+   {
+    "name": "CUISSE2",
+    "z": [
+     0.732,
+     0.892
+    ],
+    "theta_deg": [
+     -112,
+     124
+    ],
+    "clear": 0.04,
+    "thick": 0.018,
+    "u": 11,
+    "v": 5,
+    "bulge": 0.02,
+    "gold_bottom": true
+   }
+  ],
   "poleyn": {
    "z": [
-    0.51,
-    0.79
+    0.505,
+    0.8
    ],
    "theta_deg": [
-    -100,
-    100
+    -80,
+    80
    ],
-   "clear": 0.06,
-   "thick": 0.018,
-   "bulge": 0.05,
-   "wing": 0.03,
-   "u": 11,
-   "v": 6
+   "clear": 0.07,
+   "thick": 0.02,
+   "boss": 0.12,
+   "boss_w_deg": 96,
+   "wing": 0.05,
+   "smile": 0.035,
+   "u": 13,
+   "v": 6,
+   "gold_sides": true
+  },
+  "knee_smile": {
+   "z": [
+    0.462,
+    0.522
+   ],
+   "theta_deg": [
+    -84,
+    84
+   ],
+   "lift": 0.02,
+   "thick": 0.016,
+   "u": 11
   },
   "greave": {
    "z": [
-    0.19,
-    0.575
+    0.2,
+    0.566
    ],
-   "clear": 0.045,
+   "clear": 0.055,
    "thick": 0.02,
-   "u": 12,
-   "v": 6,
-   "exponent": 2.8,
-   "front_ridge": 0.012
+   "u": 14,
+   "v": 5,
+   "exponent": 2.8
+  },
+  "shin_gasket": {
+   "z": [
+    0.228,
+    0.49
+   ],
+   "theta_deg": [
+    -60,
+    60
+   ],
+   "lift": 0.008,
+   "thick": 0.012,
+   "u": 9,
+   "v": 4
+  },
+  "shin_plate": {
+   "z": [
+    0.24,
+    0.478
+   ],
+   "theta_deg": [
+    -50,
+    50
+   ],
+   "lift": 0.02,
+   "thick": 0.016,
+   "ridge": 0.014,
+   "u": 9,
+   "v": 5,
+   "gold_sides": true
   }
  },
  "sabaton": {
-  "_doc": "Blocky gold-trimmed sabatons (0.63 m long, 0.31 m wide; the sheet's side view: long boots): a low foot shell (heel -> instep), a boxy ankle cuff (z 0.10-0.285) with a thin gold top rim that the greave sinks into, and a two-lame toe cap with gold back rims. Sections [y, half_width, top_z]. Rigid: shell and cuff on foot, toe lames on ball (toe).",
+  "_doc": "Huge blocky gold-trimmed sabatons (0.68 m long, 0.40 m wide; the sheet's side view: long boots): a closed foot shell (heel -> instep), a flared ankle cuff (z 0.10-0.31) with a gold top band that the greave sinks into, three shingled toe lames with thin gold back rims, and a separate thick sole slab that sticks out a little all round. Sections [y, half_width, top_z]. Rigid: shell, cuff and sole on foot, toe lames on ball.",
   "sections": [
    [
-    0.205,
-    0.15,
-    0.155
+    0.215,
+    0.162,
+    0.162
    ],
    [
-    0.155,
-    0.18,
-    0.18
+    0.165,
+    0.196,
+    0.192
    ],
    [
-    0.05,
-    0.188,
-    0.185
+    0.06,
+    0.202,
+    0.198
    ],
    [
-    -0.06,
-    0.186,
-    0.176
+    -0.05,
+    0.2,
+    0.188
    ],
    [
-    -0.16,
-    0.182,
-    0.158
+    -0.15,
+    0.196,
+    0.168
    ]
   ],
   "toe_sections": [
    [
-    -0.12,
-    0.184,
-    0.162
+    -0.105,
+    0.2,
+    0.176
    ],
    [
-    -0.22,
-    0.178,
-    0.137
+    -0.2,
+    0.196,
+    0.155
    ],
    [
-    -0.31,
-    0.168,
-    0.112
+    -0.29,
+    0.188,
+    0.132
    ],
    [
-    -0.39,
-    0.15,
-    0.088
+    -0.37,
+    0.176,
+    0.11
    ],
    [
-    -0.44,
-    0.12,
-    0.068
+    -0.43,
+    0.158,
+    0.09
+   ],
+   [
+    -0.468,
+    0.13,
+    0.074
    ]
   ],
-  "toe_split_y": -0.26,
-  "centre_x": 0.35,
-  "exponent": 4.0,
-  "sole": 0.035,
-  "gold_band": [
-   0.205,
-   0.26
+  "toe_splits": [
+   -0.195,
+   -0.305
   ],
+  "centre_x": 0.35,
+  "exponent": 4.2,
+  "sole": 0.04,
+  "sole_slab": {
+   "z": [
+    0.0,
+    0.042
+   ],
+   "grow": 0.014
+  },
   "u": 12,
   "ankle_cuff": {
    "z": [
     0.1,
-    0.285
+    0.312
    ],
    "y": 0.045,
    "half": [
-    0.178,
-    0.185
+    0.182,
+    0.19
    ],
-   "flare": 0.08
+   "flare": 0.1,
+   "gold_rows": 2
   }
  },
  "cape": {
@@ -1047,6 +1463,7 @@
   "skin_abs_x": 0.14,
   "glove_abs_x": 0.9
  },
- "rim_m": 0.016,
- "_doc_rim": "rim_m: width of every gold / iron rim band on the plates (1.6 cm ~ 0.8 px at 22 m, 1.4 px at Mountainfall size; painted wider where the camera needs it)"
+ "rim_m": 0.02,
+ "_doc_rim": "rim_m: width of every gold / iron rim band on the plates (2 cm ~ 1 px at 22 m, 1.8 px at Mountainfall size; the stage-2 polish widened it from 1.6 cm so the gold edges carry at game size)",
+ "zone_note": "zone lava (s2_valdris_geom.ZONES): cracked crust over glowing magma, emissive (the anvil gasket, the elbow rings, the knee smiles, the shin gaskets)"
 }

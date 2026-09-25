@@ -28,24 +28,25 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "ANVIL": {
    "name": "ANVIL",
-   "vertices": 87,
-   "faces": 108,
-   "triangles": 166,
-   "quads": 58,
-   "tri_faces": 50,
+   "vertices": 183,
+   "faces": 232,
+   "triangles": 354,
+   "quads": 122,
+   "tri_faces": 110,
    "ngons": 0,
-   "quad_ratio": 0.537,
+   "quad_ratio": 0.526,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 2,
+   "parts": 3,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -59,24 +60,25 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "PAULDRONS": {
    "name": "PAULDRONS",
-   "vertices": 422,
-   "faces": 482,
-   "triangles": 748,
-   "quads": 266,
-   "tri_faces": 216,
+   "vertices": 764,
+   "faces": 854,
+   "triangles": 1408,
+   "quads": 554,
+   "tri_faces": 300,
    "ngons": 0,
-   "quad_ratio": 0.552,
+   "quad_ratio": 0.649,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 24,
+   "parts": 30,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -90,24 +92,25 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "ARMS": {
    "name": "ARMS",
-   "vertices": 1010,
-   "faces": 1024,
-   "triangles": 2004,
-   "quads": 980,
+   "vertices": 1562,
+   "faces": 1576,
+   "triangles": 3108,
+   "quads": 1532,
    "tri_faces": 44,
    "ngons": 0,
-   "quad_ratio": 0.957,
+   "quad_ratio": 0.972,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 12,
+   "parts": 20,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -121,18 +124,19 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "GAUNTLETS": {
    "name": "GAUNTLETS",
-   "vertices": 836,
-   "faces": 792,
-   "triangles": 1504,
-   "quads": 712,
-   "tri_faces": 80,
+   "vertices": 1046,
+   "faces": 1092,
+   "triangles": 1924,
+   "quads": 832,
+   "tri_faces": 260,
    "ngons": 0,
-   "quad_ratio": 0.899,
+   "quad_ratio": 0.762,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
@@ -152,24 +156,25 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "LEGS": {
    "name": "LEGS",
-   "vertices": 594,
-   "faces": 608,
-   "triangles": 1172,
-   "quads": 564,
-   "tri_faces": 44,
+   "vertices": 1138,
+   "faces": 1160,
+   "triangles": 2228,
+   "quads": 1068,
+   "tri_faces": 92,
    "ngons": 0,
-   "quad_ratio": 0.928,
+   "quad_ratio": 0.921,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 6,
+   "parts": 14,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -183,24 +188,25 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "SABATONS": {
    "name": "SABATONS",
-   "vertices": 660,
-   "faces": 720,
-   "triangles": 1296,
-   "quads": 576,
-   "tri_faces": 144,
+   "vertices": 1000,
+   "faces": 1120,
+   "triangles": 1960,
+   "quads": 840,
+   "tri_faces": 280,
    "ngons": 0,
-   "quad_ratio": 0.8,
+   "quad_ratio": 0.75,
    "boundary_edges": 0,
    "nonmanifold_edges": 0,
    "wire_edges": 0,
    "loose_verts": 0,
    "degenerate_faces": 0,
-   "parts": 8,
+   "parts": 12,
    "uv_layers": [],
    "materials": [
     "Z_skin",
@@ -214,7 +220,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "HIPS": {
@@ -245,7 +252,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "LOINCLOTH": {
@@ -276,7 +284,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "CAPE": {
@@ -307,7 +316,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "BEARD": {
@@ -338,7 +348,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   },
   "BODY": {
@@ -371,7 +382,8 @@
     "Z_mail",
     "Z_leather",
     "Z_steel",
-    "Z_anvil"
+    "Z_anvil",
+    "Z_lava"
    ]
   }
  },
@@ -387,11 +399,12 @@
   ],
   "ANVIL": [
    "ANVIL_BODY -> spine_03",
+   "ANVIL_GASKET -> spine_03",
    "ANVIL_SLAB -> spine_03"
   ],
   "PAULDRONS": [
-   "PAULDRON_BLOCK_L -> clavicle_l",
-   "PAULDRON_BLOCK_R -> clavicle_r",
+   "PAULDRON_CAP_L -> clavicle_l",
+   "PAULDRON_CAP_R -> clavicle_r",
    "PAULDRON_LAME1_L -> clavicle_l",
    "PAULDRON_LAME2_L -> upperarm_l",
    "PAULDRON_RAME1_R -> clavicle_r",
@@ -400,6 +413,12 @@
    "PAULDRON_RIVET_R -> clavicle_r",
    "PAULDRON_SLOT_L -> clavicle_l",
    "PAULDRON_SLOT_R -> clavicle_r",
+   "PAULDRON_TOPLAME1_L -> clavicle_l",
+   "PAULDRON_TOPLAME1_R -> clavicle_r",
+   "PAULDRON_TOPLAME2_L -> clavicle_l",
+   "PAULDRON_TOPLAME2_R -> clavicle_r",
+   "PAULDRON_TOPLAME3_L -> clavicle_l",
+   "PAULDRON_TOPLAME3_R -> clavicle_r",
    "PAULDRON_UPRIGHT_L -> clavicle_l",
    "PAULDRON_UPRIGHT_R -> clavicle_r"
   ],
@@ -408,12 +427,20 @@
    "COUTER_COP_R -> lowerarm_r",
    "COUTER_L -> lowerarm_l",
    "COUTER_R -> lowerarm_r",
+   "ELBOW_GLOW_L -> lowerarm_l",
+   "ELBOW_GLOW_R -> lowerarm_r",
    "GAUNTLET_CUFF_L -> hand_l",
    "GAUNTLET_CUFF_R -> hand_r",
-   "REREBRACE_L -> upperarm_l",
-   "REREBRACE_R -> upperarm_r",
-   "VAMBRACE_L -> lowerarm_l",
-   "VAMBRACE_R -> lowerarm_r"
+   "REREBRACE1_L -> upperarm_l",
+   "REREBRACE1_R -> upperarm_r",
+   "REREBRACE2_L -> upperarm_l",
+   "REREBRACE2_R -> upperarm_r",
+   "VAMBRACE1_L -> lowerarm_l",
+   "VAMBRACE1_R -> lowerarm_r",
+   "VAMBRACE2_L -> lowerarm_l",
+   "VAMBRACE2_R -> lowerarm_r",
+   "WRIST_CUFF_L -> lowerarm_l",
+   "WRIST_CUFF_R -> lowerarm_r"
   ],
   "GAUNTLETS": [
    "FINGER_INDEX_1_L -> index_01_l",
@@ -452,22 +479,34 @@
    "GAUNTLET_KNUCKLE_R -> hand_r"
   ],
   "LEGS": [
-   "CUISSE_L -> thigh_l",
-   "CUISSE_R -> thigh_r",
+   "CUISSE1_L -> thigh_l",
+   "CUISSE1_R -> thigh_r",
+   "CUISSE2_L -> thigh_l",
+   "CUISSE2_R -> thigh_r",
    "GREAVE_L -> calf_l",
    "GREAVE_R -> calf_r",
+   "KNEE_SMILE_L -> calf_l",
+   "KNEE_SMILE_R -> calf_r",
    "POLEYN_L -> calf_l",
-   "POLEYN_R -> calf_r"
+   "POLEYN_R -> calf_r",
+   "SHIN_GASKET_L -> calf_l",
+   "SHIN_GASKET_R -> calf_r",
+   "SHIN_PLATE_L -> calf_l",
+   "SHIN_PLATE_R -> calf_r"
   ],
   "SABATONS": [
    "SABATON_CUFF_L -> foot_l",
    "SABATON_CUFF_R -> foot_r",
    "SABATON_FOOT_L -> foot_l",
    "SABATON_FOOT_R -> foot_r",
+   "SABATON_SOLE_L -> foot_l",
+   "SABATON_SOLE_R -> foot_r",
    "SABATON_TOE1_L -> ball_l",
    "SABATON_TOE1_R -> ball_r",
    "SABATON_TOE2_L -> ball_l",
-   "SABATON_TOE2_R -> ball_r"
+   "SABATON_TOE2_R -> ball_r",
+   "SABATON_TOE3_L -> ball_l",
+   "SABATON_TOE3_R -> ball_r"
   ],
   "HIPS": [
    "FAULD_1 -> pelvis",
@@ -511,76 +550,76 @@
   "thumb": [
    [
     0.9634,
-    -0.0397,
-    1.7776,
+    -0.0521,
+    1.7768,
     0.9837,
-    -0.0744,
-    1.7456
+    -0.0976,
+    1.7348
    ],
    [
     0.9837,
-    -0.0744,
-    1.7456,
+    -0.0976,
+    1.7348,
     1.0209,
-    -0.1069,
-    1.7193
+    -0.1402,
+    1.7003
    ],
    [
     1.0209,
-    -0.1069,
-    1.7193,
+    -0.1402,
+    1.7003,
     1.052,
-    -0.1185,
-    1.6969
+    -0.1554,
+    1.6711
    ]
   ],
   "index": [
    [
     1.0414,
-    -0.0372,
-    1.7806,
+    -0.0488,
+    1.7808,
     1.0725,
-    -0.0396,
-    1.7792
+    -0.052,
+    1.7789
    ],
    [
     1.0725,
-    -0.0396,
-    1.7792,
+    -0.052,
+    1.7789,
     1.1004,
-    -0.0417,
-    1.7779
+    -0.0547,
+    1.7772
    ],
    [
     1.1004,
-    -0.0417,
-    1.7779,
+    -0.0547,
+    1.7772,
     1.1334,
-    -0.0438,
-    1.7767
+    -0.0574,
+    1.7757
    ]
   ],
   "middle": [
    [
     1.0358,
-    0.008,
-    1.7854,
+    0.0105,
+    1.7871,
     1.0758,
-    0.0049,
-    1.7833
+    0.0064,
+    1.7843
    ],
    [
     1.0758,
-    0.0049,
-    1.7833,
+    0.0064,
+    1.7843,
     1.1083,
-    0.0024,
-    1.7816
+    0.0032,
+    1.7821
    ],
    [
     1.1083,
-    0.0024,
-    1.7816,
+    0.0032,
+    1.7821,
     1.14,
     -0.0,
     1.78
@@ -589,57 +628,57 @@
   "ring": [
    [
     1.0262,
-    0.0412,
-    1.7838,
+    0.054,
+    1.785,
     1.0617,
-    0.0386,
-    1.782
+    0.0506,
+    1.7826
    ],
    [
     1.0617,
-    0.0386,
-    1.782,
+    0.0506,
+    1.7826,
     1.0914,
-    0.0365,
-    1.7805
+    0.0478,
+    1.7807
    ],
    [
     1.0914,
-    0.0365,
-    1.7805,
+    0.0478,
+    1.7807,
     1.1235,
-    0.0343,
-    1.7791
+    0.045,
+    1.7788
    ]
   ],
   "pinky": [
    [
     1.0136,
-    0.072,
-    1.7737,
+    0.0944,
+    1.7717,
     1.0394,
-    0.0703,
-    1.7724
+    0.0922,
+    1.7701
    ],
    [
     1.0394,
-    0.0703,
-    1.7724,
+    0.0922,
+    1.7701,
     1.0581,
-    0.069,
-    1.7716
+    0.0905,
+    1.7689
    ],
    [
     1.0581,
-    0.069,
-    1.7716,
+    0.0905,
+    1.7689,
     1.0821,
-    0.0675,
-    1.7705
+    0.0885,
+    1.7675
    ]
   ]
  },
- "triangles_total": 20866,
+ "triangles_total": 24958,
  "piece_table": [
   {
    "id": 0,
@@ -688,47 +727,47 @@
   },
   {
    "id": 9,
-   "name": "PAULDRON_BLOCK_L",
-   "bone": "clavicle_l"
+   "name": "ANVIL_GASKET",
+   "bone": "spine_03"
   },
   {
    "id": 10,
-   "name": "PAULDRON_SLOT_L",
+   "name": "PAULDRON_TOPLAME1_L",
    "bone": "clavicle_l"
   },
   {
    "id": 11,
-   "name": "PAULDRON_LAME1_L",
+   "name": "PAULDRON_TOPLAME2_L",
    "bone": "clavicle_l"
   },
   {
    "id": 12,
-   "name": "PAULDRON_LAME2_L",
-   "bone": "upperarm_l"
+   "name": "PAULDRON_TOPLAME3_L",
+   "bone": "clavicle_l"
   },
   {
    "id": 13,
-   "name": "PAULDRON_UPRIGHT_L",
+   "name": "PAULDRON_CAP_L",
    "bone": "clavicle_l"
   },
   {
    "id": 14,
-   "name": "PAULDRON_RIVET_L",
+   "name": "PAULDRON_SLOT_L",
    "bone": "clavicle_l"
   },
   {
    "id": 15,
-   "name": "PAULDRON_RIVET_L",
+   "name": "PAULDRON_LAME1_L",
    "bone": "clavicle_l"
   },
   {
    "id": 16,
-   "name": "PAULDRON_RIVET_L",
-   "bone": "clavicle_l"
+   "name": "PAULDRON_LAME2_L",
+   "bone": "upperarm_l"
   },
   {
    "id": 17,
-   "name": "PAULDRON_RIVET_L",
+   "name": "PAULDRON_UPRIGHT_L",
    "bone": "clavicle_l"
   },
   {
@@ -748,601 +787,736 @@
   },
   {
    "id": 21,
-   "name": "PAULDRON_BLOCK_R",
-   "bone": "clavicle_r"
+   "name": "PAULDRON_RIVET_L",
+   "bone": "clavicle_l"
   },
   {
    "id": 22,
-   "name": "PAULDRON_SLOT_R",
-   "bone": "clavicle_r"
+   "name": "PAULDRON_RIVET_L",
+   "bone": "clavicle_l"
   },
   {
    "id": 23,
-   "name": "PAULDRON_RAME1_R",
-   "bone": "clavicle_r"
+   "name": "PAULDRON_RIVET_L",
+   "bone": "clavicle_l"
   },
   {
    "id": 24,
-   "name": "PAULDRON_RAME2_R",
-   "bone": "upperarm_r"
+   "name": "PAULDRON_RIVET_L",
+   "bone": "clavicle_l"
   },
   {
    "id": 25,
-   "name": "PAULDRON_UPRIGHT_R",
+   "name": "PAULDRON_TOPLAME1_R",
    "bone": "clavicle_r"
   },
   {
    "id": 26,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_TOPLAME2_R",
    "bone": "clavicle_r"
   },
   {
    "id": 27,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_TOPLAME3_R",
    "bone": "clavicle_r"
   },
   {
    "id": 28,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_CAP_R",
    "bone": "clavicle_r"
   },
   {
    "id": 29,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_SLOT_R",
    "bone": "clavicle_r"
   },
   {
    "id": 30,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_RAME1_R",
    "bone": "clavicle_r"
   },
   {
    "id": 31,
-   "name": "PAULDRON_RIVET_R",
-   "bone": "clavicle_r"
+   "name": "PAULDRON_RAME2_R",
+   "bone": "upperarm_r"
   },
   {
    "id": 32,
-   "name": "PAULDRON_RIVET_R",
+   "name": "PAULDRON_UPRIGHT_R",
    "bone": "clavicle_r"
   },
   {
    "id": 33,
-   "name": "REREBRACE_L",
-   "bone": "upperarm_l"
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
   },
   {
    "id": 34,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 35,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 36,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 37,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 38,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 39,
+   "name": "PAULDRON_RIVET_R",
+   "bone": "clavicle_r"
+  },
+  {
+   "id": 40,
+   "name": "REREBRACE1_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 41,
+   "name": "REREBRACE2_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 42,
+   "name": "ELBOW_GLOW_L",
+   "bone": "lowerarm_l"
+  },
+  {
+   "id": 43,
    "name": "COUTER_L",
    "bone": "lowerarm_l"
   },
   {
-   "id": 35,
+   "id": 44,
    "name": "COUTER_COP_L",
    "bone": "lowerarm_l"
   },
   {
-   "id": 36,
-   "name": "VAMBRACE_L",
+   "id": 45,
+   "name": "VAMBRACE1_L",
    "bone": "lowerarm_l"
   },
   {
-   "id": 37,
+   "id": 46,
+   "name": "VAMBRACE2_L",
+   "bone": "lowerarm_l"
+  },
+  {
+   "id": 47,
+   "name": "WRIST_CUFF_L",
+   "bone": "lowerarm_l"
+  },
+  {
+   "id": 48,
    "name": "GAUNTLET_CUFF_L",
    "bone": "hand_l"
   },
   {
-   "id": 38,
-   "name": "REREBRACE_R",
+   "id": 49,
+   "name": "REREBRACE1_R",
    "bone": "upperarm_r"
   },
   {
-   "id": 39,
+   "id": 50,
+   "name": "REREBRACE2_R",
+   "bone": "upperarm_r"
+  },
+  {
+   "id": 51,
+   "name": "ELBOW_GLOW_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 52,
    "name": "COUTER_R",
    "bone": "lowerarm_r"
   },
   {
-   "id": 40,
+   "id": 53,
    "name": "COUTER_COP_R",
    "bone": "lowerarm_r"
   },
   {
-   "id": 41,
-   "name": "VAMBRACE_R",
+   "id": 54,
+   "name": "VAMBRACE1_R",
    "bone": "lowerarm_r"
   },
   {
-   "id": 42,
+   "id": 55,
+   "name": "VAMBRACE2_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 56,
+   "name": "WRIST_CUFF_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 57,
    "name": "GAUNTLET_CUFF_R",
    "bone": "hand_r"
   },
   {
-   "id": 43,
+   "id": 58,
    "name": "GAUNTLET_BACK_L",
    "bone": "hand_l"
   },
   {
-   "id": 44,
+   "id": 59,
    "name": "GAUNTLET_KNUCKLE_L",
    "bone": "hand_l"
   },
   {
-   "id": 45,
+   "id": 60,
    "name": "FINGER_THUMB_1_L",
    "bone": "thumb_01_l"
   },
   {
-   "id": 46,
+   "id": 61,
    "name": "FINGER_THUMB_2_L",
    "bone": "thumb_02_l"
   },
   {
-   "id": 47,
+   "id": 62,
    "name": "FINGER_THUMB_3_L",
    "bone": "thumb_03_l"
   },
   {
-   "id": 48,
+   "id": 63,
    "name": "FINGER_INDEX_1_L",
    "bone": "index_01_l"
   },
   {
-   "id": 49,
+   "id": 64,
    "name": "FINGER_INDEX_2_L",
    "bone": "index_02_l"
   },
   {
-   "id": 50,
+   "id": 65,
    "name": "FINGER_INDEX_3_L",
    "bone": "index_03_l"
   },
   {
-   "id": 51,
+   "id": 66,
    "name": "FINGER_MIDDLE_1_L",
    "bone": "middle_01_l"
   },
   {
-   "id": 52,
+   "id": 67,
    "name": "FINGER_MIDDLE_2_L",
    "bone": "middle_02_l"
   },
   {
-   "id": 53,
+   "id": 68,
    "name": "FINGER_MIDDLE_3_L",
    "bone": "middle_03_l"
   },
   {
-   "id": 54,
+   "id": 69,
    "name": "FINGER_RING_1_L",
    "bone": "ring_01_l"
   },
   {
-   "id": 55,
+   "id": 70,
    "name": "FINGER_RING_2_L",
    "bone": "ring_02_l"
   },
   {
-   "id": 56,
+   "id": 71,
    "name": "FINGER_RING_3_L",
    "bone": "ring_03_l"
   },
   {
-   "id": 57,
+   "id": 72,
    "name": "FINGER_PINKY_1_L",
    "bone": "pinky_01_l"
   },
   {
-   "id": 58,
+   "id": 73,
    "name": "FINGER_PINKY_2_L",
    "bone": "pinky_02_l"
   },
   {
-   "id": 59,
+   "id": 74,
    "name": "FINGER_PINKY_3_L",
    "bone": "pinky_03_l"
   },
   {
-   "id": 60,
+   "id": 75,
    "name": "GAUNTLET_BACK_R",
    "bone": "hand_r"
   },
   {
-   "id": 61,
+   "id": 76,
    "name": "GAUNTLET_KNUCKLE_R",
    "bone": "hand_r"
   },
   {
-   "id": 62,
+   "id": 77,
    "name": "FINGER_THUMB_1_R",
    "bone": "thumb_01_r"
   },
   {
-   "id": 63,
+   "id": 78,
    "name": "FINGER_THUMB_2_R",
    "bone": "thumb_02_r"
   },
   {
-   "id": 64,
+   "id": 79,
    "name": "FINGER_THUMB_3_R",
    "bone": "thumb_03_r"
   },
   {
-   "id": 65,
+   "id": 80,
    "name": "FINGER_INDEX_1_R",
    "bone": "index_01_r"
   },
   {
-   "id": 66,
+   "id": 81,
    "name": "FINGER_INDEX_2_R",
    "bone": "index_02_r"
   },
   {
-   "id": 67,
+   "id": 82,
    "name": "FINGER_INDEX_3_R",
    "bone": "index_03_r"
   },
   {
-   "id": 68,
+   "id": 83,
    "name": "FINGER_MIDDLE_1_R",
    "bone": "middle_01_r"
   },
   {
-   "id": 69,
+   "id": 84,
    "name": "FINGER_MIDDLE_2_R",
    "bone": "middle_02_r"
   },
   {
-   "id": 70,
+   "id": 85,
    "name": "FINGER_MIDDLE_3_R",
    "bone": "middle_03_r"
   },
   {
-   "id": 71,
+   "id": 86,
    "name": "FINGER_RING_1_R",
    "bone": "ring_01_r"
   },
   {
-   "id": 72,
+   "id": 87,
    "name": "FINGER_RING_2_R",
    "bone": "ring_02_r"
   },
   {
-   "id": 73,
+   "id": 88,
    "name": "FINGER_RING_3_R",
    "bone": "ring_03_r"
   },
   {
-   "id": 74,
+   "id": 89,
    "name": "FINGER_PINKY_1_R",
    "bone": "pinky_01_r"
   },
   {
-   "id": 75,
+   "id": 90,
    "name": "FINGER_PINKY_2_R",
    "bone": "pinky_02_r"
   },
   {
-   "id": 76,
+   "id": 91,
    "name": "FINGER_PINKY_3_R",
    "bone": "pinky_03_r"
   },
   {
-   "id": 77,
-   "name": "CUISSE_L",
-   "bone": "thigh_l"
-  },
-  {
-   "id": 78,
-   "name": "POLEYN_L",
-   "bone": "calf_l"
-  },
-  {
-   "id": 79,
-   "name": "GREAVE_L",
-   "bone": "calf_l"
-  },
-  {
-   "id": 80,
-   "name": "CUISSE_R",
-   "bone": "thigh_r"
-  },
-  {
-   "id": 81,
-   "name": "POLEYN_R",
-   "bone": "calf_r"
-  },
-  {
-   "id": 82,
-   "name": "GREAVE_R",
-   "bone": "calf_r"
-  },
-  {
-   "id": 83,
-   "name": "SABATON_FOOT_L",
-   "bone": "foot_l"
-  },
-  {
-   "id": 84,
-   "name": "SABATON_TOE1_L",
-   "bone": "ball_l"
-  },
-  {
-   "id": 85,
-   "name": "SABATON_TOE2_L",
-   "bone": "ball_l"
-  },
-  {
-   "id": 86,
-   "name": "SABATON_CUFF_L",
-   "bone": "foot_l"
-  },
-  {
-   "id": 87,
-   "name": "SABATON_FOOT_R",
-   "bone": "foot_r"
-  },
-  {
-   "id": 88,
-   "name": "SABATON_TOE1_R",
-   "bone": "ball_r"
-  },
-  {
-   "id": 89,
-   "name": "SABATON_TOE2_R",
-   "bone": "ball_r"
-  },
-  {
-   "id": 90,
-   "name": "SABATON_CUFF_R",
-   "bone": "foot_r"
-  },
-  {
-   "id": 91,
-   "name": "TASSET1_L",
-   "bone": "pelvis"
-  },
-  {
    "id": 92,
-   "name": "TASSET2_L",
+   "name": "CUISSE1_L",
    "bone": "thigh_l"
   },
   {
    "id": 93,
+   "name": "CUISSE2_L",
+   "bone": "thigh_l"
+  },
+  {
+   "id": 94,
+   "name": "POLEYN_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 95,
+   "name": "KNEE_SMILE_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 96,
+   "name": "GREAVE_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 97,
+   "name": "SHIN_GASKET_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 98,
+   "name": "SHIN_PLATE_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 99,
+   "name": "CUISSE1_R",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 100,
+   "name": "CUISSE2_R",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 101,
+   "name": "POLEYN_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 102,
+   "name": "KNEE_SMILE_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 103,
+   "name": "GREAVE_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 104,
+   "name": "SHIN_GASKET_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 105,
+   "name": "SHIN_PLATE_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 106,
+   "name": "SABATON_FOOT_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 107,
+   "name": "SABATON_TOE1_L",
+   "bone": "ball_l"
+  },
+  {
+   "id": 108,
+   "name": "SABATON_TOE2_L",
+   "bone": "ball_l"
+  },
+  {
+   "id": 109,
+   "name": "SABATON_TOE3_L",
+   "bone": "ball_l"
+  },
+  {
+   "id": 110,
+   "name": "SABATON_SOLE_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 111,
+   "name": "SABATON_CUFF_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 112,
+   "name": "SABATON_FOOT_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 113,
+   "name": "SABATON_TOE1_R",
+   "bone": "ball_r"
+  },
+  {
+   "id": 114,
+   "name": "SABATON_TOE2_R",
+   "bone": "ball_r"
+  },
+  {
+   "id": 115,
+   "name": "SABATON_TOE3_R",
+   "bone": "ball_r"
+  },
+  {
+   "id": 116,
+   "name": "SABATON_SOLE_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 117,
+   "name": "SABATON_CUFF_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 118,
+   "name": "TASSET1_L",
+   "bone": "pelvis"
+  },
+  {
+   "id": 119,
+   "name": "TASSET2_L",
+   "bone": "thigh_l"
+  },
+  {
+   "id": 120,
    "name": "FAULD_1",
    "bone": "pelvis"
   },
   {
-   "id": 94,
+   "id": 121,
    "name": "FAULD_2",
    "bone": "pelvis"
   },
   {
-   "id": 95,
+   "id": 122,
    "name": "FAULD_3",
    "bone": "x_fauld_01"
   },
   {
-   "id": 96,
+   "id": 123,
    "name": "FAULD_4",
    "bone": "x_fauld_01"
   },
   {
-   "id": 97,
+   "id": 124,
    "name": "TASSET1_R",
    "bone": "pelvis"
   },
   {
-   "id": 98,
+   "id": 125,
    "name": "TASSET2_R",
    "bone": "thigh_r"
   },
   {
-   "id": 99,
+   "id": 126,
    "name": "LOINCLOTH",
    "bone": "x_loin_C_01"
   },
   {
-   "id": 100,
+   "id": 127,
    "name": "CAPE",
    "bone": "x_cape_C_01"
   },
   {
-   "id": 101,
+   "id": 128,
    "name": "CAPE_COLLAR",
    "bone": "spine_03"
   },
   {
-   "id": 102,
+   "id": 129,
    "name": "BEARD_BLOCK",
    "bone": "head"
   },
   {
-   "id": 103,
+   "id": 130,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 104,
+   "id": 131,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 105,
+   "id": 132,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 106,
+   "id": 133,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 107,
+   "id": 134,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 108,
+   "id": 135,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 109,
+   "id": 136,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 110,
+   "id": 137,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 111,
+   "id": 138,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 112,
+   "id": 139,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 113,
+   "id": 140,
    "name": "BEARD_LOCK",
    "bone": "head"
   },
   {
-   "id": 114,
+   "id": 141,
    "name": "MOUSTACHE",
    "bone": "head"
   },
   {
-   "id": 115,
+   "id": 142,
    "name": "MOUSTACHE",
    "bone": "head"
   },
   {
-   "id": 116,
+   "id": 143,
    "name": "BRAID1_LOBE",
    "bone": "x_beard_1_01"
   },
   {
-   "id": 117,
+   "id": 144,
    "name": "BRAID1_LOBE",
    "bone": "x_beard_1_01"
   },
   {
-   "id": 118,
+   "id": 145,
    "name": "BRAID1_LOBE",
    "bone": "x_beard_1_02"
   },
   {
-   "id": 119,
+   "id": 146,
    "name": "BRAID1_LOBE",
    "bone": "x_beard_1_02"
   },
   {
-   "id": 120,
+   "id": 147,
    "name": "BRAID1_CAP",
    "bone": "x_beard_1_02"
   },
   {
-   "id": 121,
+   "id": 148,
    "name": "BRAID2_LOBE",
    "bone": "x_beard_2_01"
   },
   {
-   "id": 122,
+   "id": 149,
    "name": "BRAID2_LOBE",
    "bone": "x_beard_2_01"
   },
   {
-   "id": 123,
+   "id": 150,
    "name": "BRAID2_LOBE",
    "bone": "x_beard_2_02"
   },
   {
-   "id": 124,
+   "id": 151,
    "name": "BRAID2_LOBE",
    "bone": "x_beard_2_02"
   },
   {
-   "id": 125,
+   "id": 152,
    "name": "BRAID2_CAP",
    "bone": "x_beard_2_02"
   },
   {
-   "id": 126,
+   "id": 153,
    "name": "BRAID3_LOBE",
    "bone": "x_beard_3_01"
   },
   {
-   "id": 127,
+   "id": 154,
    "name": "BRAID3_LOBE",
    "bone": "x_beard_3_01"
   },
   {
-   "id": 128,
+   "id": 155,
    "name": "BRAID3_LOBE",
    "bone": "x_beard_3_02"
   },
   {
-   "id": 129,
+   "id": 156,
    "name": "BRAID3_LOBE",
    "bone": "x_beard_3_02"
   },
   {
-   "id": 130,
+   "id": 157,
    "name": "BRAID3_CAP",
    "bone": "x_beard_3_02"
   },
   {
-   "id": 131,
+   "id": 158,
    "name": "BRAID4_LOBE",
    "bone": "x_beard_4_01"
   },
   {
-   "id": 132,
+   "id": 159,
    "name": "BRAID4_LOBE",
    "bone": "x_beard_4_01"
   },
   {
-   "id": 133,
+   "id": 160,
    "name": "BRAID4_LOBE",
    "bone": "x_beard_4_02"
   },
   {
-   "id": 134,
+   "id": 161,
    "name": "BRAID4_LOBE",
    "bone": "x_beard_4_02"
   },
   {
-   "id": 135,
+   "id": 162,
    "name": "BRAID4_CAP",
    "bone": "x_beard_4_02"
   },
   {
-   "id": 136,
+   "id": 163,
    "name": "BRAID5_LOBE",
    "bone": "x_beard_5_01"
   },
   {
-   "id": 137,
+   "id": 164,
    "name": "BRAID5_LOBE",
    "bone": "x_beard_5_01"
   },
   {
-   "id": 138,
+   "id": 165,
    "name": "BRAID5_LOBE",
    "bone": "x_beard_5_02"
   },
   {
-   "id": 139,
+   "id": 166,
    "name": "BRAID5_LOBE",
    "bone": "x_beard_5_02"
   },
   {
-   "id": 140,
+   "id": 167,
    "name": "BRAID5_CAP",
    "bone": "x_beard_5_02"
   }

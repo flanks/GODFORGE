@@ -13,7 +13,8 @@
   "mail",
   "leather",
   "steel",
-  "anvil"
+  "anvil",
+  "lava"
  ],
  "_doc_zones": "must equal s2_valdris_geom.ZONES (the material slot order of the parts)",
  "painter": "s2_valdris_paint",
@@ -142,17 +143,9 @@
    "white_hot": "#FFF5CE"
   },
   "_doc_declared": "the turnaround sheet's colour script (the authority for the NPR base colours, brief section 4); palette.json's measured tones shade them",
-  "plate_lift_top": 0.15,
+  "plate_lift_top": 0.12,
   "gold": {
    "declared_share": 0.3
-  },
-  "cracks": {
-   "_doc": "the plate's (non-glowing) crack mosaic: Voronoi cells of 1/freq m, warped; width = half-width of the dark line (m); lip = lighter edge beside it",
-   "freq": 12.0,
-   "warp": 0.035,
-   "width": 0.0024,
-   "lip": 0.14,
-   "dark": 0.38
   },
   "glow_regions": [
    {
@@ -242,6 +235,38 @@
      1.96
     ],
     "w": 0.5
+   },
+   {
+    "_doc": "anvil gasket surroundings: the breastplate either side of the anvil's waist",
+    "abs_x": [
+     0.12,
+     0.42
+    ],
+    "y": [
+     -0.45,
+     0.0
+    ],
+    "z": [
+     1.34,
+     1.72
+    ],
+    "w": 0.8
+   },
+   {
+    "_doc": "sabaton toes",
+    "abs_x": [
+     0.14,
+     0.56
+    ],
+    "y": [
+     -0.5,
+     -0.1
+    ],
+    "z": [
+     0.0,
+     0.2
+    ],
+    "w": 0.5
    }
   ],
   "joint_glow": [
@@ -291,7 +316,7 @@
    }
   ],
   "anvil": {
-   "top_lift": 0.75,
+   "top_lift": 0.62,
    "front_edge_y": -0.6,
    "hardy": [
     -0.26,
@@ -466,21 +491,97 @@
     "strength": 0.45
    }
   },
-  "glow_lines": {
-   "_doc": "the glowing seams: the edges of large warped Voronoi cells (1/freq m; the plate mosaic's warp x warp_mult) broken into runs by a gate on fbm at run_freq (lowered by region_boost inside glow_regions); base = the glow share outside the regions; branch = short glowing mosaic cracks within branch_reach of a path; widths are half-widths (m)",
-   "freq": 4.5,
-   "width": 0.0042,
-   "run_freq": 3.0,
-   "run": [
-    0.52,
-    0.64
+  "_doc_plate_lift_top": "up-facing plate faces (what the 55-degree camera sees) lift this far toward stone.light",
+  "stone": {
+   "_doc": "cracked stone-like gunmetal (the #2A242E family, declared.gunmetal is the plate base): light = the lit up-facing plane, edge = chipped edges and the lit block bevels, cavity = joints and inner corners; the anvil the same stone one value step lighter, its flat top the lightest face on him",
+   "light": "#3B3639",
+   "edge": "#8A8078",
+   "cavity": "#0C0A0D",
+   "anvil": "#37323A",
+   "anvil_light": "#4A454C",
+   "anvil_top": "#948B86",
+   "anvil_edge": "#B8AEA6"
+  },
+  "tiles": {
+   "_doc": "the stone-block mosaic (s2_valdris_paint.tiles): freq = blocks per metre (plate / anvil / lava crust), pnorm = the L_p metric (blocky cells), aspect = block width / height, warp (m) at warp_freq roughens the joints; gap / bevel / crack = half-widths (m); block_var = per-block value spread; crack_freq = the thin cracks across the blocks; edge_light = the chipped hard edges (edge bake); top_calm = how much calmer (block spread, bevels, joints) the up-facing planes are painted",
+   "freq": 15.0,
+   "freq_anvil": 9.0,
+   "freq_lava": 17.0,
+   "pnorm": 3.6,
+   "jitter": 0.55,
+   "aspect": 1.7,
+   "warp": 0.006,
+   "warp_freq": 22.0,
+   "gap": 0.0026,
+   "gap_dark": 0.85,
+   "bevel": 0.008,
+   "bevel_light": 0.45,
+   "bevel_dark": 0.35,
+   "block_var": 0.24,
+   "crack_freq": 5.0,
+   "crack": 0.0014,
+   "edge_light": 0.8,
+   "top_calm": 0.6,
+   "plate_var": 0.2,
+   "front_plane": 0.08
+  },
+  "veins": {
+   "_doc": "the lava seams: iso-bands |fbm(seed) - 0.5| < width (+ region_boost x glow_regions) of a low-frequency field (freq per metre, one per seed) evaluated at each block's seed pick chains of blocks whose joints glow (half-width line, m) with white-hot dots at their corners (dot, m); broken into runs by an fbm gate (run, run_freq; + run_region inside the regions); base = the vein strength outside the glow regions; up_off = normal-z range over which the veins fade out on up-facing planes (the tops read clean from the game camera)",
+   "seeds": [
+    401,
+    419
    ],
-   "region_boost": 0.18,
-   "base": 0.12,
-   "branch": 0.7,
-   "branch_reach": 0.022,
-   "branch_width": 0.0028,
-   "warp_mult": 2.2
-  }
+   "freq": 2.2,
+   "width": 0.016,
+   "region_boost": 0.03,
+   "run": [
+    0.4,
+    0.58
+   ],
+   "run_freq": 2.5,
+   "run_region": 0.25,
+   "base": 0.45,
+   "line": 0.0028,
+   "dot": 0.007,
+   "up_off": [
+    0.5,
+    0.8
+   ]
+  },
+  "lava": {
+   "_doc": "zone lava: dark crust plates (the tile mosaic at freq_lava) over glowing magma; gap = the glowing gap half-width (m); crust_glow = the dim glow through the crust",
+   "crust": "#1A1012",
+   "magma": "#E0561C",
+   "gap": 0.0032,
+   "crust_glow": 0.12,
+   "halo": 0.4
+  },
+  "edge_bake": {
+   "_doc": "baked by s2_valdris_paint.bake_extra inside the texture step (Cycles CPU): Bevel-node edge strength within radius (m) and pointiness; a second pass bakes ambient occlusion within joint_ao_distance (m) for the lava joints",
+   "radius": 0.012,
+   "samples": 16,
+   "bevel_samples": 8,
+   "joint_ao_distance": 0.03,
+   "joint_ao_samples": 8
+  },
+  "junction": {
+   "_doc": "lava in the plate joints (s2_valdris_paint.junction): where the short-range AO bake (edge_bake.joint_ao_distance) is occluded (jao range, 1 = open) an ember seam glows; fbm runs (run range at run_freq per metre) break it up; open = the parts' self-AO range over which it fades in (faces pressed flat on another plate stay dark); strength = the glow",
+   "jao": [
+    0.62,
+    0.3
+   ],
+   "run": [
+    0.38,
+    0.56
+   ],
+   "run_freq": 5.0,
+   "strength": 0.95,
+   "open": [
+    0.1,
+    0.3
+   ]
+  },
+  "gunmetal_warm": 0.35,
+  "_doc_gunmetal_warm": "the plate base = the declared Gunmetal #2A242E mixed this far toward palette.json's measured plate base (#312C27): still the #2A242E family, less lavender under the toon shader's cool shadow band"
  }
 }

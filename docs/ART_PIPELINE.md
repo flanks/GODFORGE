@@ -268,8 +268,8 @@ crack network, eyes) in a separate emissive map that Heat / Meltdown scale at ru
 network, grin, chunkier hair and beard. Brax's results,
 numbers and the acceptance checklist: `art/characters/brax/reports/stage2_production_mesh.md`.
 
-**Valdris (2026-09-25), the armoured variant of the chain.** His blockout is plate armour, not a body, so the
-same base / fit steps set only the proportions and a Valdris step makes the rest:
+**Valdris (2026-09-25, polished 2026-09-26), the armoured variant of the chain.** His blockout is plate armour, not
+a body, so the same base / fit steps set only the proportions and a Valdris step makes the rest:
 
 ```sh
 python tools/blender/gf_hero/s2_valdris_run.py            # [--from <step>] [--only <step>], 4-9 min, CPU only
@@ -278,9 +278,10 @@ python tools/blender/gf_hero/s2_valdris_run.py            # [--from <step>] [--o
 | Step | What |
 |---|---|
 | `s2_valdris_body.py` | conforms the hm08 body into an **under-suit**: the legs follow the blockout's outer armour envelope minus the plate thickness, the torso becomes a smooth barrel, the forearms are centred for the colossus_cannon sleeve, the weapon frames are recorded on the forearm axis |
-| `s2_valdris_parts.py` + `s2_valdris_geom.py` | 141 closed rigid armour pieces with suggested bones, the beard (moustache, five braids), and the separate cape with its collar |
-| `s2_valdris_paint.py` | the painter behind the shared `s2_texture.py` (its new `zones` / `painter` / `bake_device` hooks) |
-| `s2_valdris_review.py`, `s2_valdris_sheets.py` | review renders: a Cycles-CPU emission toon (never EEVEE: the GPU is shared), the weapon GLB on the hand frame with a sleeve-fit check, review sheets |
+| `s2_valdris_parts.py` + `s2_valdris_geom.py` | 168 closed rigid armour pieces with suggested bones (since the polish: massive layered arms, box-lame gauntlet fists, stepped layered pauldrons, the protruding anvil with a lava gasket, segmented legs), the beard (moustache, five braids), and the separate cape with its collar |
+| `s2_valdris_paint.py` | the painter behind the shared `s2_texture.py` (its new `zones` / `painter` / `bake_device` hooks): cracked stone-like gunmetal, lava veins and lava joints (its own edge and 3 cm joint-AO bakes) |
+| `s2_valdris_repaint.py` | look-development aid: with `GF_VALDRIS_PAINT_CACHE=<cache.npz>` the texture step keeps the painter's inputs, and this repaints the atlas from them in about a minute; shipped textures always come from a full run |
+| `s2_valdris_review.py`, `s2_valdris_sheets.py` | review renders: a Cycles-CPU emission toon (never EEVEE: the GPU is shared), the weapon GLB on the hand frame with a sleeve-fit check (its bore and its outer skin), review sheets and a before / after sheet |
 
 Results and the stage-3 helper-bone plan: `art/characters/valdris/reports/stage2_production_mesh.md`. The shared
 scripts only gained default-preserving options, so Brax's chain is unchanged (§ "Shared tool changes" in that report).

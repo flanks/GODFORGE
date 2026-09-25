@@ -8,15 +8,21 @@ the report, and the face attribute gf_piece indexes it). Paint zones: s2_valdris
 Objects:
   BODY        the under-suit (mail), skin on the head and neck, the leather glove, the eyeballs (eye)
   BEARD       lofted beard block, moustache, five braids with gold rings and steel caps
-  PAULDRONS   main blocks, ember slots, two lower lames, upright plates, rivets (both sides)
-  ANVIL       top slab (flat top face, square heel on his right, horn on his left) over the waisted body with feet
+  PAULDRONS   three top lames stepping up to the upright back plate, the cap block, the ember slot, the lower block,
+              the arm lame, rivets (both sides)
+  ANVIL       top slab (flat top face, square heel on his right, horn on his left) over the waisted body with feet,
+              and the lava gasket behind its outline (the glowing seam round the anvil)
   CUIRASS     shingled chest / ribs / belly bands, the belt with its buckle, the gorget
   HIPS        tassets (two lames per side) and the chevron fauld
   LOINCLOTH   war-red cloth behind the fauld with tattered strips
-  ARMS        rerebraces with gold bands, couters with cops, vambraces with two gold cuffs, gauntlet cuffs
-  GAUNTLETS   back-of-hand plates, knuckle guards with studs, one lame per finger phalanx
-  LEGS        cuisses, poleyns (knee cops), greaves
-  SABATONS    blocky boots: foot shell with a gold ankle band and a sole, two-lame toe caps
+  ARMS        massive layered arms: two rerebrace lames, the glowing elbow ring, couters with a gold band and a cop,
+              two vambrace segments (the second with a raised gold band), the gold wrist cuff, gauntlet cuffs
+  GAUNTLETS   back-of-hand plates, knuckle guards with studs, one box-section lame per finger phalanx (the four
+              fingers close into one plated block)
+  LEGS        two cuisse lames, faceted poleyns with a gold smile over a glowing strip, greaves with a raised shin
+              plate over a lava gasket
+  SABATONS    huge blocky boots: foot shell, three toe lames with gold rims, a thick sole slab, a flared ankle cuff
+              with a gold band
   CAPE        the cape (grid with folds and a tattered hem) and the high collar behind the head
 
   blender -b -P tools/blender/gf_hero/s2_valdris_parts.py -- <body.blend> <retopo_start.blend> <parts.json> \
@@ -69,7 +75,7 @@ def smoothstep(e0, e1, x):
 pal = {s["key"]: s["tones"] for s in read_json(os.path.join(os.path.dirname(CFG), "palette.json"))["swatches"]}
 zone_hex = {"skin": "#7C5A4A", "beard": "#48413C", "eye": "#F8AA5D", "plate": "#312C27", "iron": "#1E1A17",
             "gold": "#CF9F66", "seam": "#FF6B1A", "cape": "#7A1F1F", "mail": "#2A2624", "leather": "#3A2A22",
-            "steel": "#6F6862", "anvil": "#3A3430"}
+            "steel": "#6F6862", "anvil": "#3A3430", "lava": "#8A3A12"}
 mats = []
 for zname in VG.ZONES:
     m = bpy.data.materials.get("Z_" + zname) or bpy.data.materials.new("Z_" + zname)
@@ -78,7 +84,7 @@ for zname in VG.ZONES:
     m.use_nodes = True
     bsdf = m.node_tree.nodes.get("Principled BSDF")
     bsdf.inputs["Base Color"].default_value = c
-    if zname in ("eye", "seam"):
+    if zname in ("eye", "seam", "lava"):
         bsdf.inputs["Emission Color"].default_value = c
         bsdf.inputs["Emission Strength"].default_value = 3.0
     mats.append(m)
@@ -394,34 +400,33 @@ for k in range(gc["lames"]):
 finish(bm, "CUIRASS")
 
 # ==============================================================================================================
-# ANVIL
+# ANVIL (+ the lava gasket round its waist)
 # ==============================================================================================================
 ac = cfg["anvil"]
 bm = new_bm()
 hx = ac["horn_taper_from_x"]
+HORN_TIP = max(p[0] for p in ac["slab"])
+slab_poly, _ = VG.chipped(ac["slab"], ac.get("slab_chips", []))
 
 
-def slab_depth(i, a, b):
-    back, front = -ac["slab_depth"]["back"], -ac["slab_depth"]["front"]
-    k = float(smoothstep(hx, 0.445, a))
-    mid = (back + front) / 2
-    return mid + (back - mid) * (1 - 0.82 * k), mid + (front - mid) * (1 - 0.82 * k)
-
-
-# prism() extrudes along Nd = -Y from `back` to `front` distances; depths are distances along -Y (positive = forward)
 def slab_depth_d(i, a, b):
-    bk, fr = slab_depth(i, a, b)
-    return -bk, -fr
+    """Depths along -Y (back, front) per outline point: the horn tapers in depth toward its tip."""
+    back, front = ac["slab_depth"]["back"], ac["slab_depth"]["front"]
+    k = float(smoothstep(hx, HORN_TIP, a)) * ac.get("horn_depth_taper", 0.82)
+    mid = (back + front) / 2
+    return mid + (back - mid) * (1 - k), mid + (front - mid) * (1 - k)
 
 
-fs = VG.prism(bm, ac["slab"], (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, -1, 0), 0, 0, ac["chamfer"],
+fs = VG.prism(bm, slab_poly, (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, -1, 0), 0, 0, ac["chamfer"],
               {"front": "anvil", "side": "anvil", "chamfer": "anvil", "back": "iron"}, depth_fn=slab_depth_d, rand=0.3)
 reg(bm, fs, "ANVIL_SLAB", "spine_03")
 bd = ac["body_depth"]
+bz0 = min(p[1] for p in ac["body"])
+bz1 = max(p[1] for p in ac["body"])
 
 
 def body_depth_d(i, a, b):
-    t = float(np.clip((b - 1.3) / 0.405, 0, 1))
+    t = float(np.clip((b - bz0) / (bz1 - bz0), 0, 1))
     back = bd["back_bottom"] + (bd["back_top"] - bd["back_bottom"]) * t
     front = bd["front_bottom"] + (bd["front_top"] - bd["front_bottom"]) * t
     return back, front
@@ -430,65 +435,14 @@ def body_depth_d(i, a, b):
 fs = VG.prism(bm, ac["body"], (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, -1, 0), 0, 0, ac["chamfer"],
               {"front": "anvil", "side": "anvil", "chamfer": "anvil", "back": "iron"}, depth_fn=body_depth_d, rand=0.6)
 reg(bm, fs, "ANVIL_BODY", "spine_03")
+gk = ac["gasket"]
+fs = VG.prism(bm, gk["outline"], (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, -1, 0), gk["depth"][0], gk["depth"][1], gk["chamfer"],
+              {"front": "lava", "side": "lava", "chamfer": "lava", "back": "iron"}, rand=0.5)
+reg(bm, fs, "ANVIL_GASKET", "spine_03")
 finish(bm, "ANVIL")
 
 # ==============================================================================================================
-# PAULDRONS
-# ==============================================================================================================
-pc = cfg["pauldron"]
-
-
-def pauldron(bm, sd):
-    # main block: profile in x-z, extruded along +Y (from y0 to y1); chamfer both ends (gold rims)
-    prof = pc["block_profile"]
-    n = len(prof)
-
-    def side_zone(i):
-        # top corner chamfers are gold; the rest plate
-        a, b = prof[i], prof[(i + 1) % n]
-        if (a[1] > 2.12 and b[1] > 2.12 and (abs(a[0] - b[0]) < 0.05)) or (i in (1, 4)):
-            return "gold"
-        return "plate"
-    y0, y1 = pc["block_y"]
-    fs = VG.prism(bm, prof, (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), y0, y1, pc["block_chamfer"],
-                  {"front": "plate", "side": side_zone, "chamfer": "gold", "back": "plate", "chamfer_back": "gold"},
-                  chamfer_back=pc["block_chamfer"], rand=rng.random())
-    reg(bm, fs, "PAULDRON_BLOCK_L", "clavicle_l")
-    # ember slot under the block
-    sl = pc["slot"]
-    poly = [(sl["x"][0], sl["z"][0]), (sl["x"][1] - sl["inset"], sl["z"][0]), (sl["x"][1] - sl["inset"], sl["z"][1]), (sl["x"][0], sl["z"][1])]
-    fs = VG.prism(bm, poly, (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), sl["y"][0] + sl["inset"], sl["y"][1] - sl["inset"], 0.003,
-                  {"front": "seam", "side": "seam", "chamfer": "seam", "back": "seam"}, rand=0.5)
-    reg(bm, fs, "PAULDRON_SLOT_L", "clavicle_l")
-    for k, lm in enumerate(pc["lames"]):
-        fs = VG.prism(bm, lm["profile"], (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), lm["y"][0], lm["y"][1], lm["chamfer"],
-                      {"front": "plate", "side": lambda i, L=lm: "gold" if i in L.get("gold_sides", ()) else "plate",
-                       "chamfer": "gold", "back": "plate", "chamfer_back": "gold"}, chamfer_back=lm["chamfer"], rand=rng.random())
-        reg(bm, fs, "PAULDRON_LAME%d_L" % (k + 1), "clavicle_l" if k == 0 else "upperarm_l")
-    # upright plate: profile in y-z, extruded along x, tilted outward about the y axis
-    up = pc["upright"]
-    x0, x1 = up["x"]
-    tilt = math.radians(up["tilt_deg"])
-    Nd = np.array([math.cos(tilt), 0.0, -math.sin(tilt)])
-    Bz = np.array([math.sin(tilt), 0.0, math.cos(tilt)])
-    base_z = up["profile_yz"][0][1]
-    prof_yz = [(p[0], p[1] - base_z) for p in up["profile_yz"]]
-    O = np.array([x0, 0.0, base_z])
-    fs = VG.prism(bm, prof_yz, O, (0, 1, 0), Bz, Nd, 0.0, x1 - x0, up["chamfer"],
-                  {"front": "plate", "side": "plate", "chamfer": "gold", "back": "plate", "chamfer_back": "gold"},
-                  chamfer_back=up["chamfer"], rand=rng.random())
-    reg(bm, fs, "PAULDRON_UPRIGHT_L", "clavicle_l")
-    for r in pc["rivets"]:
-        fs = VG.stud(bm, r[:3], r[3:], pc["rivet_r"], pc["rivet_r"] * 0.8, "gold", 6)
-        reg(bm, fs, "PAULDRON_RIVET_L", "clavicle_l")
-
-
-bml = new_bm()
-pauldron(bml, 1)
-finish(new_bm(), "PAULDRONS", mirror_from=bml)
-
-# ==============================================================================================================
-# ARMS: rerebrace, couter, vambrace, gauntlet cuff
+# the arm axis and the under-suit arm radius (shared by the pauldron's arm lame and the arm plates)
 # ==============================================================================================================
 arm = cfg["arm"]
 AY, AZ = arm["axis"]
@@ -518,85 +472,165 @@ def R_arm(t, x):
     return a * (1 - ti) + b * ti
 
 
-def arm_tube(bm, xs_rows, r_fn, n, thick, zone_fn, name, bone, exponent=2.0, rand=None):
-    thetas = np.arange(n) * 2 * math.pi / n + math.pi / n
-    S = np.zeros((n, len(xs_rows), 3))
-    for i, t in enumerate(thetas):
-        for j, x in enumerate(xs_rows):
-            r = r_fn(t, x, j)
-            k = superellipse_k(t, exponent)
-            S[i, j] = np.array([x, AY - math.sin(t) * r * k, AZ + math.cos(t) * r * k])
-    fs, _, _ = VG.grid_solid(bm, S, thick, zone_fn, periodic_u=True,
-                             out_ref=lambda p: np.array([0.0, p[1] - AY, p[2] - AZ]), rand=rand, simple_inner=True)
+def arm_out(p):
+    return np.array([0.0, p[1] - AY, p[2] - AZ])
+
+
+# ==============================================================================================================
+# PAULDRONS: stepped top lames, cap block, glowing slot, lower block, arm lame, upright back plate, rivets
+# ==============================================================================================================
+pc = cfg["pauldron"]
+
+
+def gold_edges_fn(src, gold):
+    gs = set(gold)
+    return lambda i: "gold" if src[i] in gs else "plate"
+
+
+def pl_block_x(bm, spec, name, bone):
+    """A pauldron block from its side profile [y, z] extruded along +X (inner end -> outer end), drafted toward the
+    outer end (taper); the bevelled top-front plane of the profile catches the light from the game camera. Gold on
+    chosen chamfer facets of the outer / inner end."""
+    x0, x1 = spec["x"]
+    go, gi = set(spec.get("gold_edges_outer", [])), set(spec.get("gold_edges_inner", []))
+    gs = set(spec.get("gold_sides", []))            # long side facets painted gold (a thin rim facet along an edge)
+    # end_chips {outline point: inset}: that corner of the outer end is cut back (a broken, chipped corner)
+    ec = {int(k): v for k, v in spec.get("end_chips", {}).items()}
+    dfn = (lambda i, a, b: (0.0, x1 - x0 - ec.get(i, 0.0))) if ec else None
+    fs = VG.prism(bm, spec["profile_yz"], (x0, 0, 0), (0, 1, 0), (0, 0, 1), (1, 0, 0), 0.0, x1 - x0, spec["chamfer"],
+                  {"front": "plate", "side": lambda i: "gold" if i in gs else "plate", "chamfer": lambda i: "gold" if i in go else "plate",
+                   "back": "plate", "chamfer_back": lambda i: "gold" if i in gi else "plate"},
+                  depth_fn=dfn, taper=spec.get("taper", 1.0), chamfer_back=spec["chamfer"], rand=rng.random())
     reg(bm, fs, name, bone)
     return fs
 
 
-def superellipse_k(t, n):
-    """Scale that turns a circle of radius r into a superellipse |y|^n+|z|^n=r^n (boxy-round), normalised so the
-    diagonal stays at r * 0.97^... (keeps the area close)."""
-    if n == 2.0:
-        return 1.0
-    return float(VG.superellipse(t, 1.0, 1.0, n)) * 0.96
+def pauldron(bm, sd):
+    # the top: overlapping lames stepping up from the front to the upright back plate, each higher lame lying over the
+    # back of the one in front: from the 55-degree camera a staircase of lit bevels and dark tops, a stepped gold edge
+    # down the pauldron's outer end, chipped corners
+    for k, tl in enumerate(pc["top_lames"]):
+        pl_block_x(bm, tl, "PAULDRON_TOPLAME%d_L" % (k + 1), "clavicle_l")
+    pl_block_x(bm, pc["cap_body"], "PAULDRON_CAP_L", "clavicle_l")
+    sl = pc["slot"]
+    poly = [(sl["x"][0], sl["z"][0]), (sl["x"][1] - sl["inset"], sl["z"][0]), (sl["x"][1] - sl["inset"], sl["z"][1]), (sl["x"][0], sl["z"][1])]
+    fs = VG.prism(bm, poly, (0, 0, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), sl["y"][0], sl["y"][1], 0.003,
+                  {"front": "seam", "side": "seam", "chamfer": "seam", "back": "seam"}, rand=0.5)
+    reg(bm, fs, "PAULDRON_SLOT_L", "clavicle_l")
+    pl_block_x(bm, pc["lame1"], "PAULDRON_LAME1_L", "clavicle_l")
+    # LAME2: a boxy shell over the upper arm under the lower block, flaring toward its free edge (gold rim), chipped
+    l2 = pc["lame2"]
+    ths = np.radians(np.linspace(l2["theta_deg"][0], l2["theta_deg"][1], l2["u"]))
+    xs = VG.rim_rows(l2["x"][0], l2["x"][1], RIM, l2["v"] - 4)
+    S = np.zeros((len(ths), len(xs), 3))
+    for i, t in enumerate(ths):
+        k = float(VG.superellipse(t, 1.0, 1.0, l2["exponent"])) * 0.97
+        for j, x in enumerate(xs):
+            f = (x - xs[0]) / (xs[-1] - xs[0])
+            s = 1.0 + 0.05 * f
+            S[i, j] = (x, AY + math.sin(t) * l2["ry"] * k * s, AZ + math.cos(t) * l2["rz"] * k * s)
+    for _ in range(l2.get("chips", 0)):
+        i = rng.randrange(2, len(ths) - 2)
+        S[i, -1, 0] -= l2["chip_depth"] * (0.6 + 0.4 * rng.random())
+        S[i, -2, 0] -= l2["chip_depth"] * 0.5
+    fs, _, _ = VG.grid_solid(bm, S, l2["thick"], lambda i, j: "gold" if j == len(xs) - 2 else "plate", out_ref=arm_out,
+                             rand=rng.random(), lip=0.004, simple_inner=True)
+    reg(bm, fs, "PAULDRON_LAME2_L", "upperarm_l")
+    # upright back plate: a chipped [y, z] profile extruded along x, tilted outward about the y axis
+    up = pc["upright"]
+    poly, src = VG.chipped(up["profile_yz"], up.get("chips", []))
+    x0, x1 = up["x"]
+    tilt = math.radians(up["tilt_deg"])
+    Nd = np.array([math.cos(tilt), 0.0, -math.sin(tilt)])
+    Bz = np.array([math.sin(tilt), 0.0, math.cos(tilt)])
+    base_z = up["profile_yz"][0][1]
+    prof_yz = [(p[0], p[1] - base_z) for p in poly]
+    gz = gold_edges_fn(src, up.get("gold_edges", []))
+    fs = VG.prism(bm, prof_yz, np.array([x0, 0.0, base_z]), (0, 1, 0), Bz, Nd, 0.0, x1 - x0, up["chamfer"],
+                  {"front": "plate", "side": "plate", "chamfer": gz, "back": "plate", "chamfer_back": gz},
+                  chamfer_back=up["chamfer"], rand=rng.random())
+    reg(bm, fs, "PAULDRON_UPRIGHT_L", "clavicle_l")
+    for r in pc["rivets"]:
+        fs = VG.stud(bm, r[:3], r[3:], pc["rivet_r"], pc["rivet_r"] * 0.8, "gold", 6)
+        reg(bm, fs, "PAULDRON_RIVET_L", "clavicle_l")
+
+
+bml = new_bm()
+pauldron(bml, 1)
+finish(new_bm(), "PAULDRONS", mirror_from=bml)
+
+# ==============================================================================================================
+# ARMS: rerebrace lames, elbow glow ring, couter + gold band + cop, vambrace segments, gold wrist cuff, gauntlet cuff
+# ==============================================================================================================
+
+
+def arm_piece(bm, x0, x1, r0, r1, exponent, zone_fn, name, bone, rows=None, extra=None, aspect_z=1.0):
+    """A thick-walled boxy tube around the arm axis from x0 to x1 (radius r0 -> r1 on the axes; superellipse
+    `exponent`), bevelled ends; the inner wall sits ~inner_clear off the under-suit (thick_min..thick_max)."""
+    n = arm["n"]
+    xs = rows or [x0, x0 + 0.008, (x0 + x1) / 2, x1 - 0.008, x1]
+    thetas = np.arange(n) * 2 * math.pi / n + math.pi / n
+    S = np.zeros((n, len(xs), 3))
+    thick = arm["thick_max"]
+    for i, t in enumerate(thetas):
+        k = float(VG.superellipse(t, 1.0, 1.0, exponent))
+        for j, x in enumerate(xs):
+            f = (x - x0) / (x1 - x0)
+            r = r0 + (r1 - r0) * f + (extra(x, j) if extra else 0.0)
+            if j in (0, len(xs) - 1):
+                r -= 0.006
+            rr = r * k
+            az = 1.0 + (aspect_z - 1.0) * f
+            S[i, j] = (x, AY - math.sin(t) * rr, AZ + math.cos(t) * rr * az)
+            thick = min(thick, max(arm["thick_min"], rr * min(1.0, az) - float(R_arm(t, x)) - arm["inner_clear"]))
+    fs, _, _ = VG.grid_solid(bm, S, thick, zone_fn, periodic_u=True, out_ref=arm_out, rand=rng.random(), simple_inner=True)
+    reg(bm, fs, name, bone)
+    return fs
 
 
 def arms(bm, sd):
-    rb = arm["rerebrace"]
-    xs = [rb["x"][0], rb["x"][0] + 0.012, 0.47, rb["band"][0] - 0.004, rb["band"][0], rb["band"][1], rb["band"][1] + 0.004, rb["x"][1] - 0.012, rb["x"][1]]
-
-    def r_rere(t, x, j):
-        base = float(np.interp(x, [rb["x"][0], (rb["x"][0] + rb["x"][1]) / 2, rb["x"][1]], rb["r"]))
-        base = max(base, R_arm(t, x) + 0.012)
-        if rb["band"][0] <= x <= rb["band"][1]:
-            base += rb["band_lift"]
-        if j in (0, len(xs) - 1):
-            base -= 0.006
-        return base
-    arm_tube(bm, xs, r_rere, rb["n"], rb["thick"], lambda i, j: "gold" if j == 4 else "plate",
-             "REREBRACE_L", "upperarm_l", rb["exponent"], rng.random())
+    for rb in arm["rerebrace"]:
+        x0, x1 = rb["x"]
+        rows = [x0, x0 + 0.008, (x0 + x1) / 2, x1 - RIM - 0.008, x1 - 0.008, x1]
+        gold = rb.get("gold_end", False)
+        arm_piece(bm, x0, x1, rb["r"][0], rb["r"][1], rb["exponent"],
+                  lambda i, j, g=gold, n=len(rows): "gold" if (g and j == n - 3) else "plate", rb["name"] + "_L", "upperarm_l",
+                  rows=rows, extra=lambda x, j, n=len(rows): 0.004 if j in (n - 3, n - 2) and gold else 0.0)
+    eg = arm["elbow_glow"]
+    arm_piece(bm, eg["x"][0], eg["x"][1], eg["r"][0], eg["r"][1], eg["exponent"], "lava", "ELBOW_GLOW_L", "lowerarm_l",
+              rows=[eg["x"][0], (eg["x"][0] + eg["x"][1]) / 2, eg["x"][1]])
     cu = arm["couter"]
-    xs = [cu["x"][0], cu["x"][0] + 0.01, (cu["x"][0] + cu["x"][1]) / 2, cu["x"][1] - 0.01, cu["x"][1]]
-
-    def r_cout(t, x, j):
-        base = max(cu["r"], R_arm(t, x) + 0.012) + 0.01 * math.sin(math.pi * (x - cu["x"][0]) / (cu["x"][1] - cu["x"][0]))
-        return base - (0.006 if j in (0, len(xs) - 1) else 0)
-    arm_tube(bm, xs, r_cout, cu["n"], cu["thick"], "plate", "COUTER_L", "lowerarm_l",
-             2.2, rng.random())
-    # the cop: an octagonal disc plate on the back of the elbow (+Y), gold rim, a central stud
+    x0, x1 = cu["x"]
+    b0, b1 = cu["band"]
+    rows = [x0, x0 + 0.006, b0 - 0.003, b0, b1, b1 + 0.003, x1 - 0.006, x1]
+    arm_piece(bm, x0, x1, cu["r"][0], cu["r"][1], cu["exponent"], lambda i, j: "gold" if j == 3 else "plate", "COUTER_L", "lowerarm_l",
+              rows=rows, extra=lambda x, j: cu["band_lift"] if j in (3, 4) else 0.0)
+    # the cop: an octagonal disc plate on the elbow point (+Y), gold rim, a central stud
     cp = cu["cop"]
-    yc = AY + max(cu["r"], float(R_arm(-math.pi / 2, cp["x"]))) + cp["lift"] - 0.02
+    yc = AY + cu["r"][0] + cp["lift"] - 0.02
     poly = [(cp["x"] + math.cos(a) * cp["r"], AZ + math.sin(a) * cp["r"]) for a in np.arange(8) * math.pi / 4 + math.pi / 8]
-    fs = VG.prism(bm, poly, (0, yc, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), -0.03, 0.012, 0.01,
+    fs = VG.prism(bm, poly, (0, yc, 0), (1, 0, 0), (0, 0, 1), (0, 1, 0), -0.03, 0.014, 0.012,
                   {"front": "plate", "side": "gold", "chamfer": "gold", "back": "iron"}, rand=rng.random())
-    fs += VG.stud(bm, (cp["x"], yc + 0.012, AZ), (0, 1, 0), 0.016, 0.014, "gold", 6)
+    fs += VG.stud(bm, (cp["x"], yc + 0.014, AZ), (0, 1, 0), 0.02, 0.016, "gold", 6)
     reg(bm, fs, "COUTER_COP_L", "lowerarm_l")
-    va = arm["vambrace"]
-    xs = [va["x"][0], va["x"][0] + 0.01]
-    for c0, c1 in va["cuffs"]:
-        xs += [c0 - 0.004, c0, c1, c1 + 0.004]
-    xs += [va["x"][1] - 0.01, va["x"][1]]
-    xs = sorted(set(round(x, 4) for x in xs))
-    cuff_rows = [k for k, x in enumerate(xs) if any(c0 <= x < c1 for c0, c1 in va["cuffs"])]
-
-    def r_vamb(t, x, j):
-        base = R_arm(t, x) + va["clear"] + va["thick"]
-        base = max(base, 0.074)
-        if any(c0 <= x <= c1 for c0, c1 in va["cuffs"]):
-            base += va["cuff_lift"]
-        if j in (0, len(xs) - 1):
-            base -= 0.005
-        return min(base, va["max_r"])
-    arm_tube(bm, xs, r_vamb, va["n"], va["thick"], lambda i, j: "gold" if j in cuff_rows else "plate", "VAMBRACE_L", "lowerarm_l",
-             va["exponent"], rng.random())
-    cf = arm["cuff"]
-    xs = [cf["x"][0], cf["x"][0] + 0.008, (cf["x"][0] + cf["x"][1]) / 2, cf["x"][1] - 0.008, cf["x"][1]]
-
-    def r_cuff(t, x, j):
-        base = R_arm(t, x) + cf["clear"] + cf["thick"] + cf["flare"] * (x - cf["x"][0]) / (cf["x"][1] - cf["x"][0])
-        base = max(base, 0.07)
-        return min(base - (0.004 if j in (0, len(xs) - 1) else 0), cf["max_r"])
-    arm_tube(bm, xs, r_cuff, cf["n"], cf["thick"], lambda i, j: "gold" if j == len(xs) - 2 else "plate", "GAUNTLET_CUFF_L", "hand_l",
-             2.6, rng.random())
+    for va in arm["vambrace"]:
+        x0, x1 = va["x"]
+        if va.get("gold_start"):
+            # a raised gold band round the vambrace's upper end: the fist arm's second gold cuff (the concept)
+            rows = [x0, x0 + 0.006, x0 + 0.01, x0 + 0.01 + RIM, x0 + 0.016 + RIM, (x0 + x1) / 2 + 0.01, x1 - 0.008, x1]
+            arm_piece(bm, x0, x1, va["r"][0], va["r"][1], va["exponent"], lambda i, j: "gold" if j in (1, 2, 3) else "plate",
+                      va["name"] + "_L", "lowerarm_l", rows=rows, extra=lambda x, j: 0.004 if j in (2, 3) else 0.0)
+        else:
+            arm_piece(bm, x0, x1, va["r"][0], va["r"][1], va["exponent"], "plate", va["name"] + "_L", "lowerarm_l",
+                      extra=lambda x, j, va=va: 0.006 * math.sin(math.pi * (x - va["x"][0]) / (va["x"][1] - va["x"][0])))
+    wc = arm["wrist_cuff"]
+    x0, x1 = wc["x"]
+    rows = [x0, x0 + 0.006, x0 + 0.012, x1 - 0.012, x1 - 0.006, x1]
+    arm_piece(bm, x0, x1, wc["r"][0], wc["r"][1], wc["exponent"], lambda i, j: "gold" if j in (1, 2, 3) else "iron", "WRIST_CUFF_L", "lowerarm_l",
+              rows=rows, extra=lambda x, j: 0.004 if j in (2, 3) else 0.0)
+    gc2 = arm["gauntlet_cuff"]
+    arm_piece(bm, gc2["x"][0], gc2["x"][1], gc2["r"][0], gc2["r"][1], gc2["exponent"], "plate", "GAUNTLET_CUFF_L", "hand_l",
+              rows=[gc2["x"][0], gc2["x"][0] + 0.008, gc2["x"][1] - 0.008, gc2["x"][1]], aspect_z=gc2.get("aspect_z", 1.0))
 
 
 bml = new_bm()
@@ -629,50 +663,56 @@ for fname, bones in fingers.items():
     finger_joints[fname] = [joint(b) for b in bones]
 report["finger_joints_L"] = {f: [[round(float(v), 4) for v in h] + [round(float(v), 4) for v in t] for h, t in js]
                              for f, js in finger_joints.items()}
+HS = lr["hand_scale"]
 
 
 def gauntlets(bm, sd):
     bp = gc_["back_plate"]
     xs = np.linspace(bp["x"][0], bp["x"][1], 5)
-    # y span of the back plate: the hand minus the thumb side
     ys_l, ys_h = [], []
     for x in xs:
         lo, hi = hand_y_extent(x)
-        ys_l.append(max(lo, -0.058))
+        ys_l.append(max(lo, -0.058 * HS / 1.22))
         ys_h.append(hi)
     NUy = 6
     S = np.zeros((NUy, len(xs), 3))
     for j, x in enumerate(xs):
         for i in range(NUy):
             f = i / (NUy - 1)
-            y = ys_l[j] + (ys_h[j] - ys_l[j]) * (0.06 + 0.88 * f)
+            y = ys_l[j] + (ys_h[j] - ys_l[j]) * (0.04 + 0.92 * f)
             zt = hand_top_z(x, y) or (AZ + 0.02)
-            S[i, j] = (x, y, zt + bp["clear"] + bp["thick"] + 0.006 * math.sin(math.pi * f))
-    fs, _, _ = VG.grid_solid(bm, S, bp["thick"], "plate",
-                             out_ref=lambda p: np.array([0, 0, 1.0]), rand=rng.random(), lip=0.002)
+            S[i, j] = (x, y, zt + bp["clear"] + bp["thick"] + 0.008 * math.sin(math.pi * f))
+    fs, _, _ = VG.grid_solid(bm, S, bp["thick"], "plate", out_ref=lambda p: np.array([0, 0, 1.0]), rand=rng.random(), lip=0.003)
     reg(bm, fs, "GAUNTLET_BACK_L", "hand_l")
-    # knuckle guard: a raised bar across the knuckles with a gold stud per knuckle
     kn = gc_["knuckle"]
     xs = np.linspace(kn["x"][0], kn["x"][1], 3)
     S = np.zeros((NUy, len(xs), 3))
     for j, x in enumerate(xs):
         lo, hi = hand_y_extent(x)
-        lo = max(lo, -0.062)
+        lo = max(lo, -0.062 * HS / 1.22)
         for i in range(NUy):
             f = i / (NUy - 1)
-            y = lo + (hi - lo) * (0.04 + 0.92 * f)
+            y = lo + (hi - lo) * (0.03 + 0.94 * f)
             zt = hand_top_z(x, y) or (AZ + 0.015)
-            S[i, j] = (x, y, zt + kn["clear"] + kn["thick"] + 0.008 * math.sin(math.pi * j / (len(xs) - 1)))
-    fs, _, _ = VG.grid_solid(bm, S, kn["thick"], "plate", out_ref=lambda p: np.array([0, 0, 1.0]), rand=rng.random(), lip=0.003)
+            S[i, j] = (x, y, zt + kn["clear"] + kn["thick"] + 0.01 * math.sin(math.pi * j / (len(xs) - 1)))
+    fs, _, _ = VG.grid_solid(bm, S, kn["thick"], "plate", out_ref=lambda p: np.array([0, 0, 1.0]), rand=rng.random(), lip=0.004)
     for fn in ("index", "middle", "ring", "pinky"):
         h, t = finger_joints[fn][0]
         zt = hand_top_z((kn["x"][0] + kn["x"][1]) / 2, h[1]) or AZ
-        fs += VG.stud(bm, ((kn["x"][0] + kn["x"][1]) / 2, h[1], zt + kn["clear"] + kn["thick"] + 0.006), (0, 0, 1), 0.009, 0.008, "gold", 6)
+        fs += VG.stud(bm, ((kn["x"][0] + kn["x"][1]) / 2, h[1], zt + kn["clear"] + kn["thick"] + 0.008), (0, 0, 1), 0.012, 0.01, "gold", 6)
     reg(bm, fs, "GAUNTLET_KNUCKLE_L", "hand_l")
-    # finger lames: a curved plate over the top of each phalanx
+    # finger lames: chunky box sections (a flat top, straight sides reaching down toward the palm), each as wide as the
+    # finger's share of the hand, so the four fingers close into one plated block and the fist reads as a gauntlet
     fc = gc_["finger"]
-    span = math.radians(fc["span_deg"]) / 2
+    ys = {fn: finger_joints[fn][0][0][1] for fn in ("index", "middle", "ring", "pinky")}
+    order = sorted(ys, key=ys.get)
     for fn, js in finger_joints.items():
+        if fn == "thumb":
+            w = fc["thumb_half_w"]
+        else:
+            i_ = order.index(fn)
+            nb = [abs(ys[order[i_ + d_]] - ys[fn]) for d_ in (-1, 1) if 0 <= i_ + d_ < len(order)]
+            w = float(np.clip(min(nb) / 2 + fc["share_overlap"], fc["half_w"][0], fc["half_w"][1]))
         for k, (h, t) in enumerate(js):
             h, t = np.array(h), np.array(t)
             if k == 0 and fn != "thumb":
@@ -684,18 +724,21 @@ def gauntlets(bm, sd):
             _, u, v = VG.frame_axes(d, up)
             s0 = -fc["gap"] if k > 0 else 0.0
             s1 = L + fc["overlap"]
-            cols = [-span, 0.0, span]
             rows = [s0, (s0 + s1) / 2, s1]
-            S = np.zeros((len(cols), len(rows), 3))
-            for i, a in enumerate(cols):
-                dirv = u * math.cos(a) + v * math.sin(a)
-                for j, s in enumerate(rows):
-                    c = h + d * s
-                    r = ray_out(c, dirv, 0.06)
-                    r = r if r is not None else 0.012
-                    S[i, j] = c + dirv * (r + fc["clear"] + fc["thick"] * (1.0 + 0.3 * math.cos(a)))
+            taper = 1.0 - fc["taper"] * k
+            S = np.zeros((5, len(rows), 3))
+            for j, s in enumerate(rows):
+                c = h + d * s
+                r_up = ray_out(c, u, 0.06)
+                r_up = r_up if r_up is not None else 0.012
+                ht = (r_up + fc["clear"] + fc["thick"]) * taper
+                hb = fc["side_drop"] * taper
+                ww = w * taper
+                for i, (a, b) in enumerate(((-ww, -hb), (-ww, ht * 0.72), (0.0, ht * 1.06), (ww, ht * 0.72), (ww, -hb))):
+                    S[i, j] = c + v * a + u * b
             fs, _, _ = VG.grid_solid(bm, S, fc["thick"], lambda i, j: "gold" if (j == 0 and k == 0) else "plate",
-                                     out_ref=lambda p, c=h, d_=d: (p - c) - d_ * ((p - c) @ d_), rand=rng.random())
+                                     out_ref=lambda p, c=h, d_=d: (p - c) - d_ * ((p - c) @ d_), rand=rng.random(),
+                                     lip=0.002, simple_inner=True)
             reg(bm, fs, "FINGER_%s_%d_L" % (fn.upper(), k + 1), "%s_%02d_l" % (fn, k + 1))
 
 
@@ -704,7 +747,7 @@ gauntlets(bml, 1)
 finish(new_bm(), "GAUNTLETS", mirror_from=bml)
 
 # ==============================================================================================================
-# LEGS: cuisse, poleyn, greave (around each leg's section centre line)
+# LEGS: cuisse lames, poleyn + glowing smile, greave + shin plate over a lava gasket
 # ==============================================================================================================
 lc = cfg["legs"]
 ZS_L = np.arange(0.12, 1.14, 0.02)
@@ -747,46 +790,84 @@ def leg_out(p):
     return np.array([p[0] - np.interp(p[2], ZS_L, LEG_C[:, 0]), p[1] - np.interp(p[2], ZS_L, LEG_C[:, 1]), 0.0])
 
 
+gr = lc["greave"]
+
+
+def greave_r(t, z):
+    base = max(R_leg(t, z) + gr["clear"] + gr["thick"], 0.1)
+    return base * float(VG.superellipse(t, 1.0, 1.0, gr["exponent"])) * 0.95
+
+
+po = lc["poleyn"]
+
+
+def smile_dz(t):
+    """The poleyn's lower edge (and the glowing strip under it) curves up toward the sides: a smile."""
+    return po["smile"] * (1 - math.cos(min(abs(t), math.pi / 2)))
+
+
 def legs(bm, sd):
-    cu = lc["cuisse"]
-    ths = np.radians(np.linspace(cu["theta_deg"][0], cu["theta_deg"][1], cu["u"]))
-    zs = np.linspace(cu["z"][0], cu["z"][1], cu["v"])
-    S = np.array([[leg_pt(t, z, R_leg(t, z) + cu["clear"] + cu["thick"] + 0.012 * math.sin(math.pi * (z - zs[0]) / (zs[-1] - zs[0])))
-                   for z in zs] for t in ths])
-    fs, _, _ = VG.grid_solid(bm, S, cu["thick"], "plate", out_ref=leg_out, rand=rng.random(), lip=0.005, simple_inner=True)
-    reg(bm, fs, "CUISSE_L", "thigh_l")
-    po = lc["poleyn"]
+    for cu in lc["cuisse"]:
+        ths = np.radians(np.linspace(cu["theta_deg"][0], cu["theta_deg"][1], cu["u"]))
+        zs = VG.rim_rows(cu["z"][0], cu["z"][1], RIM, cu["v"] - 4)
+        S = np.array([[leg_pt(t, z, R_leg(t, z) + cu["clear"] + cu["thick"] + cu["bulge"] * math.sin(math.pi * (z - zs[0]) / (zs[-1] - zs[0])))
+                       for z in zs] for t in ths])
+        gb = cu.get("gold_bottom", False)
+        fs, _, _ = VG.grid_solid(bm, S, cu["thick"], lambda i, j, gb=gb: "gold" if (gb and j == 0) else "plate", out_ref=leg_out,
+                                 rand=rng.random(), lip=0.005, simple_inner=True)
+        reg(bm, fs, cu["name"] + "_L", "thigh_l")
+    # poleyn: a faceted boss (a pyramid in (theta, z)) on the knee front, side wings, gold top rim + gold smile edge
     ths = np.radians(np.linspace(po["theta_deg"][0], po["theta_deg"][1], po["u"]))
     zs = VG.rim_rows(po["z"][0], po["z"][1], RIM, po["v"] - 4)
     zc = (zs[0] + zs[-1]) / 2
-
-    def pr(t, z, j):
-        base = R_leg(t, z) + po["clear"] + po["thick"]
-        bul = po["bulge"] * max(0.0, math.cos(t)) ** 1.5 * max(0.0, 1 - ((z - zc) / (zs[-1] - zc)) ** 2)
-        wing = po["wing"] * smoothstep(0.55, 0.95, abs(math.sin(t))) * max(0.0, 1 - abs(z - zc) / (zs[-1] - zc))
-        return base + bul + wing
-    S = np.array([[leg_pt(t, z, pr(t, z, j)) for j, z in enumerate(zs)] for t in ths])
-    fs, _, _ = VG.grid_solid(bm, S, po["thick"], lambda i, j: "gold" if j in (0, len(zs) - 2) else "plate",
-                             out_ref=leg_out, rand=rng.random(), lip=0.005, simple_inner=True)
+    hz = (zs[-1] - zs[0]) / 2
+    bw = math.radians(po["boss_w_deg"]) / 2
+    S = np.zeros((len(ths), len(zs), 3))
+    for i, t in enumerate(ths):
+        for j, z in enumerate(zs):
+            f = 1 - (z - zs[0]) / (zs[-1] - zs[0])
+            zz = z + smile_dz(t) * f
+            base = R_leg(t, zz) + po["clear"] + po["thick"]
+            boss = po["boss"] * max(0.0, 1.0 - abs(t) / bw - abs(zz - zc) / hz) if abs(t) < bw else 0.0
+            wing = po["wing"] * smoothstep(0.55, 0.95, abs(math.sin(t))) * max(0.0, 1 - abs(zz - zc) / hz)
+            S[i, j] = leg_pt(t, zz, base + boss + wing - (0.004 if j in (0, len(zs) - 1) else 0.0))
+    gs = po.get("gold_sides", False)
+    fs, _, _ = VG.grid_solid(bm, S, po["thick"], lambda i, j: "gold" if (j in (0, len(zs) - 2) or (gs and i in (0, len(ths) - 2))) else "plate",
+                             out_ref=leg_out, rand=rng.random(), lip=0.006, simple_inner=True)
     reg(bm, fs, "POLEYN_L", "calf_l")
-    gr = lc["greave"]
+    # the glowing smile under the poleyn's lower edge (zone lava)
+    ks = lc["knee_smile"]
+    ths = np.radians(np.linspace(ks["theta_deg"][0], ks["theta_deg"][1], ks["u"]))
+    zs = [ks["z"][0], (ks["z"][0] + ks["z"][1]) / 2, ks["z"][1]]
+    S = np.array([[leg_pt(t, z + smile_dz(t), greave_r(t, z + smile_dz(t)) + ks["lift"]) for z in zs] for t in ths])
+    fs, _, _ = VG.grid_solid(bm, S, ks["thick"], "lava", out_ref=leg_out, rand=rng.random(), zone_in="lava",
+                             wall_zone=("lava", "lava", "lava", "lava"), simple_inner=True)
+    reg(bm, fs, "KNEE_SMILE_L", "calf_l")
+    # greave: a boxy closed tube (its foot end sinks into the sabaton's ankle cuff)
     ths = np.arange(gr["u"]) * 2 * math.pi / gr["u"]
-    zs = [gr["z"][0], gr["z"][0] + RIM, gr["z"][0] + RIM + 0.012, gr["z"][0] + 2 * RIM + 0.012] + \
-        list(np.linspace(gr["z"][0] + 0.09, gr["z"][1] - 0.06, gr["v"] - 3)) + [gr["z"][1] - 0.02, gr["z"][1]]
-
-    def gr_r(t, z, j):
-        base = max(R_leg(t, z) + gr["clear"] + gr["thick"], 0.1)
-        base += gr["front_ridge"] * max(0.0, math.cos(t)) ** 8
-        if j in (1, 2, 3):
-            base += 0.006
-        if j in (0, len(zs) - 1):
-            base -= 0.005
-        k = float(VG.superellipse(t, 1.0, 1.0, gr["exponent"])) * 0.95
-        return base * k
-    S = np.array([[leg_pt(t, z, gr_r(t, z, j)) for j, z in enumerate(zs)] for t in ths])
-    fs, _, _ = VG.grid_solid(bm, S, gr["thick"], lambda i, j: "gold" if j in (0, 2) else "plate", periodic_u=True,
-                             out_ref=leg_out, rand=rng.random(), simple_inner=True)
+    zs = [gr["z"][0], gr["z"][0] + 0.02] + list(np.linspace(gr["z"][0] + 0.08, gr["z"][1] - 0.05, gr["v"] - 3)) + [gr["z"][1] - 0.02, gr["z"][1]]
+    S = np.array([[leg_pt(t, z, greave_r(t, z) - (0.005 if j in (0, len(zs) - 1) else 0.0)) for j, z in enumerate(zs)] for t in ths])
+    fs, _, _ = VG.grid_solid(bm, S, gr["thick"], "plate", periodic_u=True, out_ref=leg_out, rand=rng.random(), simple_inner=True)
     reg(bm, fs, "GREAVE_L", "calf_l")
+    # the shin: a lava gasket under a raised front plate with a centre ridge -> glowing seams down both sides
+    sg = lc["shin_gasket"]
+    ths = np.radians(np.linspace(sg["theta_deg"][0], sg["theta_deg"][1], sg["u"]))
+    zs = np.linspace(sg["z"][0], sg["z"][1], sg["v"])
+    S = np.array([[leg_pt(t, z, greave_r(t, z) + sg["lift"]) for z in zs] for t in ths])
+    fs, _, _ = VG.grid_solid(bm, S, sg["thick"], "lava", out_ref=leg_out, rand=rng.random(), zone_in="lava",
+                             wall_zone=("lava", "lava", "lava", "lava"), simple_inner=True)
+    reg(bm, fs, "SHIN_GASKET_L", "calf_l")
+    sp = lc["shin_plate"]
+    ths = np.radians(np.linspace(sp["theta_deg"][0], sp["theta_deg"][1], sp["u"]))
+    zs = VG.rim_rows(sp["z"][0], sp["z"][1], RIM, sp["v"] - 4)
+    S = np.array([[leg_pt(t, z, greave_r(t, z) + sp["lift"] + sp["ridge"] * max(0.0, math.cos(t * 1.6)) ** 3) for z in zs] for t in ths])
+    gs_ = sp.get("gold_sides", False)
+    fs, _, _ = VG.grid_solid(bm, S, sp["thick"], lambda i, j: "gold" if (gs_ and (i in (0, len(ths) - 2) or j == 0)) else "plate",
+                             out_ref=leg_out, rand=rng.random(), lip=0.004,
+                             wall_zone=("iron", "iron", "gold", "gold") if gs_ else ("iron",) * 4)
+    # (a full inner surface: the shin plate's outline is concave along the leg, where a two-row inner strip poked out
+    # through its own face and showed as a black patch beside the shin)
+    reg(bm, fs, "SHIN_PLATE_L", "calf_l")
 
 
 bml = new_bm()
@@ -794,7 +875,7 @@ legs(bml, 1)
 finish(new_bm(), "LEGS", mirror_from=bml)
 
 # ==============================================================================================================
-# SABATONS
+# SABATONS: foot shell, three toe lames, sole slab, flared gold-trimmed ankle cuff
 # ==============================================================================================================
 sc = cfg["sabaton"]
 
@@ -809,42 +890,58 @@ def sab_section(y, hw, top, n, x0):
     return pts
 
 
+SAB_Y = np.array([s[0] for s in sc["sections"]] + [s[0] for s in sc["toe_sections"]])
+SAB_HW = np.array([s[1] for s in sc["sections"]] + [s[1] for s in sc["toe_sections"]])
+
+
 def sabatons(bm, sd):
     x0 = sc["centre_x"]
     n = sc["u"]
 
-    def shell(sections, name, bone, gold_rows, extra_end=None):
+    def shell(sections, name, bone, gold_rows):
         S = np.array([sab_section(y, hw, top, n, x0) for (y, hw, top) in sections])      # (v, u, 3)
         S = np.transpose(S, (1, 0, 2))                                                      # (u, v, 3)
-        # the sole: points in the bottom band are flat at z 0 and slightly wider
         S[:, :, 2] = np.maximum(S[:, :, 2], 0.0)
-        cen = lambda p: np.array([p[0] - x0, 0.0, p[2] - 0.12])  # noqa: E731
         zonef = lambda i, j: ("gold" if j in gold_rows else ("iron" if S[i, j, 2] < sc["sole"] + 0.003 and S[(i + 1) % n, j, 2] < sc["sole"] + 0.003 else "plate"))  # noqa: E731
         fs = VG.loft_solid(bm, S, zonef, rand=rng.random())
         reg(bm, fs, name, bone)
         return fs
     secs = sc["sections"]
-    # the tube closes at both ends: an end section shrunk to a small rounded nub (the heel back, the toe tip)
     heel_end = (secs[0][0] + 0.022, secs[0][1] * 0.45, secs[0][2] * 0.55)
     shell([heel_end] + secs + [(secs[-1][0] - 0.02, secs[-1][1] * 0.5, secs[-1][2] * 0.6)], "SABATON_FOOT_L", "foot_l", [])
     toe = np.array(sc["toe_sections"], dtype=np.float64)
-    sp = sc["toe_split_y"]
 
     def toe_at(y, scale=1.0, lift=0.0):
         yy = toe[:, 0][::-1]
         return (y, float(np.interp(y, yy, toe[:, 1][::-1])) * scale + lift * 0.6, float(np.interp(y, yy, toe[:, 2][::-1])) * scale + lift)
-    y0t, y1t = toe[0, 0], toe[-1, 0]
-    # lame 1 over the instep end, lame 2 (the toe cap) tucked under it; each closes at its ends; a thin gold rim
-    # band runs across the back edge of each lame
-    l1 = [toe_at(y0t + 0.012, 0.9, 0.012), toe_at(y0t, 1, 0.012), toe_at(y0t - RIM, 1, 0.012), toe_at((y0t + sp) / 2, 1, 0.012),
-          toe_at(sp - 0.02, 1, 0.012), toe_at(sp - 0.035, 0.9, 0.012)]
-    l2 = [toe_at(sp + 0.03, 0.9), toe_at(sp + 0.018), toe_at(sp + 0.018 - RIM), toe_at((sp + y1t) / 2), toe_at(y1t + 0.02),
-          (y1t, toe[-1, 1] * 0.55, toe[-1, 2] * 0.7)]
-    shell(l1, "SABATON_TOE1_L", "ball_l", [1])
-    shell(l2, "SABATON_TOE2_L", "ball_l", [1])
-    # ankle cuff: a boxy tube around the leg over the ankle, a thin gold rim at the top
+    # three shingled toe lames: each lies over the next (lifted more), a thin gold rim across its back edge
+    b = [toe[0, 0]] + list(sc["toe_splits"]) + [toe[-1, 0]]
+    nl = len(b) - 1
+    for k in range(nl):
+        yb, ye = b[k], b[k + 1]
+        lift = 0.009 * (nl - 1 - k)
+        if k < nl - 1:
+            st = [toe_at(yb + 0.012, 0.9, lift), toe_at(yb, 1, lift), toe_at(yb - RIM, 1, lift), toe_at((yb + ye) / 2, 1, lift),
+                  toe_at(ye - 0.02, 1, lift), toe_at(ye - 0.035, 0.9, lift)]
+        else:
+            st = [toe_at(yb + 0.03, 0.9), toe_at(yb + 0.018), toe_at(yb + 0.018 - RIM), toe_at((yb + ye) / 2), toe_at(ye + 0.02),
+                  (ye, toe[-1, 1] * 0.55, toe[-1, 2] * 0.7)]
+        shell(st, "SABATON_TOE%d_L" % (k + 1), "ball_l", [1])
+    # the sole: a thick slab under the whole boot, a little wider all round
+    so = sc["sole_slab"]
+    ys = np.linspace(SAB_Y.max() + 0.02, SAB_Y.min() - 0.005, 12)
+    hw = np.interp(-ys, -SAB_Y, SAB_HW) + so["grow"]
+    endk = np.clip(np.minimum(ys - ys[-1], ys[0] - ys) / 0.06, 0, 1)
+    hw = hw * (0.55 + 0.45 * np.sqrt(endk))
+    poly = [(x0 + w, y) for y, w in zip(ys, hw)] + [(x0 - w, y) for y, w in zip(ys[::-1], hw[::-1])]
+    fs = VG.prism(bm, poly, (0, 0, so["z"][0]), (1, 0, 0), (0, 1, 0), (0, 0, 1), 0.0, so["z"][1] - so["z"][0], 0.01,
+                  {"front": "iron", "side": "plate", "chamfer": "plate", "back": "iron"}, rand=rng.random())
+    reg(bm, fs, "SABATON_SOLE_L", "foot_l")
+    # ankle cuff: a boxy flared tube round the ankle; a raised gold band and a gold top rim
     ac_ = sc["ankle_cuff"]
-    zs = [ac_["z"][0], ac_["z"][0] + 0.02] + list(np.linspace(ac_["z"][0] + 0.05, ac_["z"][1] - 0.04, 2)) + [ac_["z"][1] - RIM, ac_["z"][1]]
+    z0, z1 = ac_["z"]
+    zs = [z0, z0 + 0.02, z0 + 0.07, z1 - 0.07, z1 - 0.055, z1 - 0.035, z1 - RIM, z1]
+    gold_j = (4, 6)
     ths = np.arange(sc["u"]) * 2 * math.pi / sc["u"]
     S = np.zeros((len(ths), len(zs), 3))
     for i, t in enumerate(ths):
@@ -853,10 +950,12 @@ def sabatons(bm, sd):
             a_, b_ = ac_["half"]
             r = float(VG.superellipse(t, b_, a_, sc["exponent"]))
             r *= 1.0 + ac_["flare"] * (z - zs[0]) / (zs[-1] - zs[0])
+            if j in (4, 5):
+                r += 0.008
             if j in (0, len(zs) - 1):
                 r -= 0.006
             S[i, j] = c + np.array([math.sin(t), -math.cos(t), 0.0]) * r
-    fs, _, _ = VG.grid_solid(bm, S, 0.016, lambda i, j: "gold" if j == len(zs) - 2 else "plate", periodic_u=True,
+    fs, _, _ = VG.grid_solid(bm, S, 0.018, lambda i, j: "gold" if j in gold_j else "plate", periodic_u=True,
                              out_ref=lambda p: np.array([p[0] - sc["centre_x"], p[1] - ac_["y"], 0.0]), rand=rng.random(), simple_inner=True)
     reg(bm, fs, "SABATON_CUFF_L", "foot_l")
 
@@ -890,16 +989,20 @@ def hips(bm, sd):
     for k, (zt, zb) in enumerate(ta["lames"]):
         zs = VG.rim_rows(zt, zb, RIM, ta["v"] - 4)
         S = np.zeros((len(ths), len(zs), 3))
+        # one body radius per column (the widest along the lame): a plate hangs straight, and per-row samples of the
+        # thigh made the lame's edge columns zig-zag (a jagged end wall that showed as a black notch at the hip)
+        zz_ = [[z - ta["slant"] * (j / (len(zs) - 1)) * (i / (len(ths) - 1)) for j, z in enumerate(zs)] for i in range(len(ths))]
+        rcol = [max(hip_radius(t, zz) for zz in zz_[i]) for i, t in enumerate(ths)]
         for i, t in enumerate(ths):
             for j, z in enumerate(zs):
                 f = (j / (len(zs) - 1))
-                zz = z - ta["slant"] * f * (i / (len(ths) - 1))
-                r = hip_radius(t, zz) + ta["stand_off"] + ta["flare"] * f + 0.018 * k + 0.012 * math.sin(math.pi * i / (len(ths) - 1))
+                zz = zz_[i][j]
+                r = rcol[i] + ta["stand_off"] + ta["flare"] * f + 0.018 * k + 0.012 * math.sin(math.pi * i / (len(ths) - 1))
                 C = np.array([0.0, torso_cy(max(zz, 1.1)), zz])
                 S[i, j] = C + tdir(t) * r
         fs, _, _ = VG.grid_solid(bm, S, ta["thick"], lambda i, j: "gold" if (j in (0, len(zs) - 2) or i in (0, len(ths) - 2)) else "plate",
                                  out_ref=lambda p: np.array([p[0], p[1] - torso_cy(max(p[2], 1.1)), 0.0]), rand=rng.random(), lip=0.004,
-                                 simple_inner=True)
+                                 wall_zone=("gold", "gold", "gold", "gold"), simple_inner=True)
         reg(bm, fs, "TASSET%d_L" % (k + 1), "pelvis" if k == 0 else "thigh_l")
 
 

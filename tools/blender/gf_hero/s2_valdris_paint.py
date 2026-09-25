@@ -1,49 +1,213 @@
-"""Procedural hand-painted NPR textures for Valdris (numpy only; driven by s2_texture.py through its "painter" hook).
+"""Procedural hand-painted NPR textures for Valdris (numpy; driven by s2_texture.py through its "painter" hook).
 
 Same contract as s2_paint.py (Brax): per-texel maps baked from the production mesh into its UV atlas (world
 position, world normal, paint zone, object index, the gf_mask outline mask and per-piece random, the parts' self-AO,
 the blockout's cavity / AO / hit weight) in, an sRGB base-colour and an sRGB emissive atlas out. Reuses s2_paint's
-noise, Voronoi and dilate helpers.
+noise, Voronoi and dilate helpers. One extra map is baked here, inside the texture step's Blender session
+(bake_extra: Cycles, the atlas' own UVs): an EDGE map from the Bevel node (1 - N_bevel . N within edge_bake.radius
+of a hard edge) and Cycles pointiness (convex > 0.5), so every plate gets chipped, lighter edges and darker inner
+corners wherever its geometry has them (prism side walls such as the pauldron and anvil tops carry no outline mask).
 
-Painting rules (art/characters/valdris/brief.md sections 4-6, palette.json, the sheet's declared colour script):
+Painting rules (art/characters/valdris/brief.md sections 4-6, palette.json, the sheet's declared colour script, and
+the stage-2 polish review: "dark cracked slab-armour glowing from within"):
   * the declared hexes are the base colours (Gunmetal #2A242E, Forge Gold #FFC24B, Ember Amber #FF6B1A, Deep War
-    Red #7A1F1F, white-hot #FFF5CE); the measured tones shade them. Flat painted value planes, no light direction:
-    the toon shader lights him. Art-directed cues only: faces that look up (the pauldron tops, the anvil's top face,
-    the boot tops: what the 55-degree camera sees) are lifted toward the plate highlight; undersides sink toward the
-    warm shadow; every plate outline gets a dark painted edge and a thin lighter wear line on its chamfer;
-  * the plate is cracked (a domain-warped Voronoi crack mosaic, dark lines with a lighter lip, fine enough to average
-    out at game size); the glowing seams are a sparser network of long jagged crack paths (the edges of large warped
-    Voronoi cells) broken into runs, with short glowing branches into the mosaic: EMISSIVE thin lines with white-hot
-    cores, denser on the anvil's flanks, the chest, the knees, the greave fronts and around the pauldron slots (brief
-    section 4, item 5) and kept sparse everywhere, because at game size a dense network turns the dark plate into
-    orange noise;
-    the seam zone (pauldron slots, buckle core) glows solid; the under-suit glows dimly at the joints;
-  * gold is painted metal: a flat base, a painted highlight band on up-facing trim, a dark underside, worn streaks;
-  * the anvil's top face is one value step lighter than the plate (the light bar across his chest from 55 degrees),
-    with a hardy hole and a pritchel hole near the heel;
+    Red #7A1F1F, white-hot #FFF5CE); the measured tones shade them. Painted value planes, no light direction: the
+    toon shader lights him;
+  * PLATE = cracked stone-like gunmetal: a mosaic of stone blocks (a 2D Voronoi in an L_p metric, laid in the plane
+    of each texel's dominant normal axis; blocks a little wider than tall), every block its own value around the
+    #2A242E family, every plate its own value (the per-piece random), faces that look up (what the 55-degree camera
+    sees) lifted toward the lit stone tone, undersides sunk; each block has a lit upper bevel and a dark lower one,
+    the joints are dark cavities, a few thin cracks cross the blocks; the plates' hard edges (the edge bake) are
+    chipped and lighter, inner corners darker;
+  * the LAVA SEAMS run through the joints: long meandering veins (iso-bands of a warped low-frequency noise) light up
+    the block joints they cross, emissive with a white-hot core, white-hot dots where a vein passes a block corner;
+    denser in the glow regions (the anvil flanks, the chest, the knees, the shins, round the pauldron slots, the
+    forearms), sparse elsewhere; a soft burnt halo in the base colour around them;
+  * zone LAVA (the anvil gasket, the elbow rings, the knee smiles, the shin gaskets): small dark crust plates over
+    glowing magma, emissive, white-hot where the gaps meet; zone SEAM (the pauldron slots, the buckle core) glows
+    solid; the under-suit glows dimly at the joints;
+  * the ANVIL is the same stone one value step lighter, with bigger blocks, light crack lips and the lightest face on
+    him on its flat top (the light bar across his chest from 55 degrees), a bright worn front edge, a hardy hole and a
+    pritchel hole near the heel, a few glowing veins on its flanks;
+  * gold is forge gold only on the trims and rivets: painted metal, a highlight band on up-facing trim, a dark
+    underside, worn dark chips on its edges;
   * the cape is Deep War Red with vertical fold streaks, a darker charred hem and the forge sigil on its back (a
     vertical blade with three pairs of up-swept branches and a three-point crown, the turnaround's back view), in
     emblem gold;
   * skin: warm weathered planes, heavy painted brows, deep eye sockets, the cracked scar across the scalp and
     forehead with a faint ember glow (Reforged Flesh); beard: iron-grey value planes with downward streaks, lighter
     lock tips and braid lobes; the braid caps are light steel;
-  * brush variation is low-frequency value noise (+-5 %), never grunge; AO (the parts' own and the blockout's) and
-    the blockout's cavity are folded in as darker painted planes.
+  * brush variation is low-frequency value noise, never grunge; AO (the parts' own and the blockout's) and the
+    blockout's cavity are folded in as darker painted planes.
 """
+import json
+import os
+
 import numpy as np
 
-from s2_paint import anisotropic, dilate, fbm, hex3, mix, smoothstep, value_noise, voronoi  # noqa: F401
+from s2_paint import _hash, anisotropic, dilate, fbm, hex3, mix, smoothstep, value_noise, voronoi  # noqa: F401
+
+
+def bake_extra(maps, cfg, log=print):
+    """Bake the edge map (R: Bevel-node edge strength, G: Cycles pointiness, B: coverage) with the texture step's own
+    scene, UVs and zone materials, and add maps["edge"], maps["point"] (valid texels, the same order as the other
+    maps); with edge_bake.joint_ao_distance also maps["jao"], a short-range ambient occlusion (the plate joints).
+    Needs bpy (inside s2_texture.py); a no-op when cfg has no edge_bake or the maps already carry the edge."""
+    ec = cfg.get("edge_bake")
+    if not ec or "edge" in maps:
+        return maps
+    import bpy
+    scene = bpy.context.scene
+    objs = [o for o in scene.objects if o.type == "MESH" and o.pass_index > 0 and not o.hide_render]
+    size = bpy.data.images["gf_bake"].size[0] if "gf_bake" in bpy.data.images else 2048
+    img = bpy.data.images.new("gf_edge", size, size, alpha=True, float_buffer=True)
+    img.colorspace_settings.name = "Non-Color"
+    cmbs = []
+    for m in {s.material for o in objs for s in o.material_slots if s.material is not None}:
+        nt = m.node_tree
+        nt.nodes.clear()
+        out = nt.nodes.new("ShaderNodeOutputMaterial")
+        em = nt.nodes.new("ShaderNodeEmission")
+        nt.links.new(em.outputs["Emission"], out.inputs["Surface"])
+        geo = nt.nodes.new("ShaderNodeNewGeometry")
+        bev = nt.nodes.new("ShaderNodeBevel")
+        bev.samples = ec.get("bevel_samples", 8)
+        bev.inputs["Radius"].default_value = ec["radius"]
+        dp = nt.nodes.new("ShaderNodeVectorMath")
+        dp.operation = "DOT_PRODUCT"
+        nt.links.new(bev.outputs["Normal"], dp.inputs[0])
+        nt.links.new(geo.outputs["Normal"], dp.inputs[1])
+        inv = nt.nodes.new("ShaderNodeMath")
+        inv.operation = "SUBTRACT"
+        inv.inputs[0].default_value = 1.0
+        nt.links.new(dp.outputs["Value"], inv.inputs[1])
+        cmb = nt.nodes.new("ShaderNodeCombineXYZ")
+        nt.links.new(inv.outputs[0], cmb.inputs[0])
+        nt.links.new(geo.outputs["Pointiness"], cmb.inputs[1])
+        cmb.inputs[2].default_value = 1.0
+        nt.links.new(cmb.outputs[0], em.inputs["Color"])
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        nt.nodes.active = tex
+        cmbs.append((nt, cmb, tex))
+    samples0 = scene.cycles.samples
+    scene.cycles.samples = ec.get("samples", 16)
+    for o in scene.objects:
+        o.select_set(False)
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+
+    def bake_px():
+        bpy.ops.object.bake(type="EMIT", margin=0, use_clear=True)
+        px_ = np.empty(size * size * 4, dtype=np.float32)
+        img.pixels.foreach_get(px_)
+        return px_.reshape(size, size, 4)
+    px = bake_px()
+    jao = None
+    if ec.get("joint_ao_distance"):
+        # second pass: ambient occlusion within a few cm (any object): high only where another plate closes over the
+        # surface, i.e. in the joints where one plate meets another (the painter's lava joints, s2_valdris_paint)
+        for nt, cmb, tex in cmbs:
+            ao = nt.nodes.new("ShaderNodeAmbientOcclusion")
+            ao.samples = ec.get("joint_ao_samples", 8)
+            ao.only_local = False
+            ao.inputs["Distance"].default_value = ec["joint_ao_distance"]
+            nt.links.new(ao.outputs["AO"], cmb.inputs[0])
+            for lk in list(nt.links):
+                if lk.to_node == cmb and lk.to_socket == cmb.inputs[1]:
+                    nt.links.remove(lk)
+            cmb.inputs[1].default_value = 0.0
+        jao = bake_px()[..., 0]
+    scene.cycles.samples = samples0
+    bpy.data.images.remove(img)
+    valid = px[..., 2] > 0.5
+    n = len(maps["pos"])
+    if int(valid.sum()) != n:
+        log("edge bake: coverage %d != %d texels, edge map skipped" % (int(valid.sum()), n))
+        return maps
+    if jao is not None:
+        maps["jao"] = np.clip(jao[valid], 0, 1).astype(np.float32)
+    maps["edge"] = np.clip(px[..., 0][valid], 0, 1).astype(np.float32)
+    maps["point"] = px[..., 1][valid].astype(np.float32)
+    log("edge bake: %d texels near a hard edge" % int((maps["edge"] > 0.1).sum()))
+    cache = os.environ.get("GF_VALDRIS_PAINT_CACHE")
+    if cache:
+        # iteration aid (off by default): keep every per-texel map, the atlas' valid mask and the paint inputs, so
+        # s2_valdris_repaint.py can repaint the atlas in ~1 min without the UV / bake steps
+        np.savez_compressed(cache, _valid=valid, **{k: v for k, v in maps.items() if isinstance(v, np.ndarray)})
+        log("paint cache written", cache)
+    return maps
+
+
+def tiles(P, Nn, freq, seed, pnorm=2.6, jitter=0.8, aspect=1.0, warp=None):
+    """Stone-block mosaic on the surface: a 2D Voronoi (L_p metric, so the blocks are blocky) in the plane of each
+    texel's dominant normal axis (triplanar without blending; the switch reads as a block joint), blocks `aspect`
+    times wider than tall. Returns the distance to the nearest joint (m), a per-block hash (0..1), the distance to the
+    nearest block corner (m), where the texel sits in its block along the plane's up axis (-0.5 .. 0.5) and the
+    world position of its block's seed (so a whole block can be picked by a field evaluated at the seed)."""
+    ax = np.argmax(np.abs(Nn), axis=1)
+    U = np.where(ax == 0, P[:, 1], P[:, 0]).astype(np.float64)
+    V = np.where(ax == 2, -P[:, 1], P[:, 2]).astype(np.float64)
+    if warp is not None:
+        U = U + warp[:, 0]
+        V = V + warp[:, 1]
+    qu, qv = U * freq / aspect, V * freq
+    iu, iv = np.floor(qu), np.floor(qv)
+    axi = ax.astype(np.float64)
+    f1 = np.full(len(P), 9.0)
+    f2 = np.full(len(P), 9.0)
+    f3 = np.full(len(P), 9.0)
+    cid = np.zeros(len(P), dtype=np.float32)
+    rel = np.zeros(len(P))
+    relu = np.zeros(len(P))
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            cx, cy = iu + dx, iv + dy
+            fx = cx + 0.5 + (_hash(cx, cy, axi, seed) - 0.5) * jitter
+            fy = cy + 0.5 + (_hash(cx, cy, axi, seed + 1) - 0.5) * jitter
+            ddu, ddv = qu - fx, qv - fy
+            d = (np.abs(ddu) ** pnorm + np.abs(ddv) ** pnorm) ** (1.0 / pnorm)
+            c1 = d < f1
+            c2 = (d < f2) & ~c1
+            c3 = (d < f3) & ~c1 & ~c2
+            f3 = np.where(c1 | c2, f2, np.where(c3, d, f3))
+            f2 = np.where(c1, f1, np.where(c2, d, f2))
+            f1 = np.where(c1, d, f1)
+            cid = np.where(c1, _hash(cx, cy, axi, seed + 2), cid)
+            rel = np.where(c1, ddv, rel)
+            relu = np.where(c1, ddu, relu)
+    edge = ((f2 - f1) / (2.0 * freq)).astype(np.float32)
+    vtx = ((f3 - f1) / (2.0 * freq)).astype(np.float32)
+    ou, ov = relu * aspect / freq, rel / freq                     # texel - seed, metres along the plane axes
+    seed_p = np.array(P, dtype=np.float64)
+    seed_p[:, 0] -= np.where(ax == 0, 0.0, ou)
+    seed_p[:, 1] -= np.where(ax == 0, ou, np.where(ax == 2, -ov, 0.0))
+    seed_p[:, 2] -= np.where(ax == 2, 0.0, ov)
+    return edge, cid, vtx, np.clip(rel, -0.5, 0.5).astype(np.float32), seed_p.astype(np.float32)
 
 
 def paint(maps, zones, pal, cfg, log=print):
+    maps = bake_extra(maps, cfg, log)
+    cache = os.environ.get("GF_VALDRIS_PAINT_CACHE")
+    if cache:
+        with open(os.path.splitext(cache)[0] + ".json", "w", encoding="utf-8", newline="\n") as f:
+            json.dump({"zones": zones, "pal": pal, "cfg": cfg}, f, indent=1)
     P, Nn, Z = maps["pos"], maps["nrm"], maps["zone"]
     N = len(P)
     base = np.zeros((N, 3), dtype=np.float32)
     emis = np.zeros((N, 3), dtype=np.float32)
     T = {k: {t: hex3(h) for t, h in v.items()} for k, v in pal.items()}
     D = {k: hex3(v) for k, v in cfg["declared"].items()}
+    ST = {k: hex3(v) for k, v in cfg["stone"].items() if not k.startswith("_")}
     mk_all = maps["mask"] if "mask" in maps else np.full(N, 0.6, dtype=np.float32)
     pr_all = maps["prand"] if "prand" in maps else np.full(N, 0.5, dtype=np.float32)
+    edge_all = maps["edge"] if "edge" in maps else np.zeros(N, dtype=np.float32)
+    point_all = maps["point"] if "point" in maps else np.full(N, 0.5, dtype=np.float32)
+    # Cycles pointiness is relative to each mesh: measure convexity against the median of the hard-surface texels
+    _hz = np.isin(Z, [zones[n] for n in ("plate", "anvil", "gold") if n in zones])
+    pmed = float(np.median(point_all[_hz])) if _hz.any() else 0.5
+    ao_all = maps["ao_self"] if "ao_self" in maps else np.ones(N, dtype=np.float32)
     brush = (fbm(P, 5.0, 3, seed=1) - 0.5) * 2
     fine = (fbm(P, 36.0, 2, seed=2) - 0.5) * 2
     ember_rim, ember_hot, ember_core = T["ember_seams"]["rim"], D["ember"], D["white_hot"]
@@ -53,15 +217,6 @@ def paint(maps, zones, pal, cfg, log=print):
 
     def zm(*names):
         return np.isin(Z, [zones[n] for n in names if n in zones])
-
-    def add_glow(m, dist, width, weight, hotness=0.35, halo_mult=2.6, halo_w=0.45):
-        """A glowing line at distance `dist` (m) from its centre line, half-width `width`, on texels m."""
-        c = smoothstep(width, width * 0.35, dist) * weight
-        h = smoothstep(width * hotness, width * hotness * 0.3, dist) * weight
-        hl = smoothstep(width * halo_mult, width, dist) * weight * halo_w
-        glow_core[m] = np.maximum(glow_core[m], c)
-        glow_hot[m] = np.maximum(glow_hot[m], h)
-        glow_halo[m] = np.maximum(glow_halo[m], hl)
 
     def region_w(p, regs):
         """Sum of soft boxes {x|abs_x, y, z, w} over the texels p."""
@@ -77,86 +232,149 @@ def paint(maps, zones, pal, cfg, log=print):
             w = np.maximum(w, k * r["w"])
         return w
 
-    # ---- the crack mosaic shared by the plates and the anvil ------------------------------------------------
-    cc = cfg["cracks"]
-    hard = zm("plate", "anvil", "iron")
-    ph = P[hard]
-    warp = (np.stack([fbm(ph, 9.0, 2, seed=301), fbm(ph, 9.0, 2, seed=302), fbm(ph, 9.0, 2, seed=303)], 1) - 0.5) * cc["warp"]
-    _, edge, cid = voronoi(ph + warp, cc["freq"], seed=311)
-    crack_d = np.full(N, 9.0, dtype=np.float32)
-    crack_d[hard] = edge / (2 * cc["freq"])                       # metres to the nearest crack line
-    cell = np.zeros(N, dtype=np.float32)
-    cell[hard] = cid
-    crack_line = smoothstep(cc["width"], cc["width"] * 0.3, crack_d)            # dark crack
-    crack_lip = smoothstep(cc["width"] * 2.4, cc["width"] * 1.2, crack_d) * (1 - crack_line)   # lighter lip beside it
-    # the glowing seams: long wiggly crack lines (iso-lines of a warped low-frequency noise) broken into runs, denser
-    # in the glow regions, plus short branches where the crack mosaic touches a glowing line. Sparse on purpose: at
-    # game size a dense network turns the dark plate into orange noise (brief section 5: the darkness is his pop)
-    gl = cfg["glow_lines"]
+    # ---- the stone mosaic, the cracks and the lava veins shared by the plates and the anvil -------------------
+    tc, vc = cfg["tiles"], cfg["veins"]
+    hard = zm("plate", "anvil", "iron", "lava")
+    ph, nh = P[hard], Nn[hard]
+    warp = (np.stack([fbm(ph, tc["warp_freq"], 2, seed=301), fbm(ph, tc["warp_freq"], 2, seed=302)], 1) - 0.5) * tc["warp"]
+    is_anvil = (Z[hard] == zones["anvil"])
+    is_lava = (Z[hard] == zones["lava"])
+    freq_h = np.where(is_anvil, tc["freq_anvil"], np.where(is_lava, tc["freq_lava"], tc["freq"]))
+    E, CID, VTX, UP = (np.zeros(N, dtype=np.float32) for _ in range(4))
+    SEED = np.zeros((N, 3), dtype=np.float32)
+    for fq in np.unique(freq_h):
+        s = freq_h == fq
+        idx = np.nonzero(hard)[0][s]
+        e, c, v, u, sp = tiles(ph[s], nh[s], fq, 311, tc["pnorm"], tc["jitter"], tc["aspect"], warp[s])
+        E[idx], CID[idx], VTX[idx], UP[idx], SEED[idx] = e, c, v, u, sp
+    # thin cracks across the blocks (big warped 3D Voronoi cells)
+    _, cedge, _ = voronoi(ph + np.concatenate([warp, warp[:, :1]], 1) * 2.0, tc["crack_freq"], seed=341)
+    CR = np.full(N, 9.0, dtype=np.float32)
+    CR[hard] = cedge / (2 * tc["crack_freq"])
+    # veins: iso-bands of a low-frequency noise evaluated at each block's SEED, so the blocks a vein passes light up
+    # all round their joints (lava in the mortar along a meandering chain of blocks); broken into runs
     reg = region_w(P, cfg["glow_regions"])
-    run_gate = smoothstep(gl["run"][0] - reg * gl["region_boost"], gl["run"][1] - reg * gl["region_boost"], fbm(P, gl["run_freq"], 2, seed=321))
-    gline_d = np.full(N, 9.0, dtype=np.float32)
-    _, gedge, _ = voronoi(ph + warp * gl["warp_mult"], gl["freq"], seed=331)   # big cells: long jagged crack paths
-    gline_d[hard] = gedge / (2 * gl["freq"])                                  # metres to the nearest path
-    near_line = smoothstep(gl["branch_reach"], 0.0, gline_d)
-    br_gate = (cell > 0.55).astype(np.float32) * near_line                      # some mosaic cracks next to a line glow
-    glow_gate = run_gate * (gl["base"] + (1 - gl["base"]) * reg)
+    sh = SEED[hard]
+    reg_s = region_w(sh, cfg["glow_regions"])
+    band = np.zeros(N, dtype=np.float32)
+    for k, sd in enumerate(vc["seeds"]):
+        f = fbm(sh, vc["freq"], 3, seed=sd)
+        w = vc["width"] + vc["region_boost"] * reg_s
+        band[hard] = np.maximum(band[hard], smoothstep(w, w * 0.6, np.abs(f - 0.5)))
+    run = np.zeros(N, dtype=np.float32)
+    run[hard] = smoothstep(vc["run"][0], vc["run"][1], fbm(sh, vc["run_freq"], 2, seed=361) + reg_s * vc["run_region"])
+    vein = band * run * (vc["base"] + (1 - vc["base"]) * np.clip(reg, 0, 1))
+    vein = vein * (1 - smoothstep(vc["up_off"][0], vc["up_off"][1], Nn[:, 2]))       # no lava on the up-facing tops
+    joint_glow = smoothstep(vc["line"], vc["line"] * 0.3, E) * vein
+    corner_hot = smoothstep(vc["dot"], vc["dot"] * 0.3, VTX) * smoothstep(vc["dot"] * 1.2, 0.0, E) * vein
 
-    # ---- PLATE (gunmetal) -----------------------------------------------------------------------------------
-    def plate_paint(m, tones, base_col, lift_top, top_col):
+    def add_glow(m, strength, hot, halo):
+        glow_core[m] = np.maximum(glow_core[m], strength)
+        glow_hot[m] = np.maximum(glow_hot[m], hot)
+        glow_halo[m] = np.maximum(glow_halo[m], halo)
+
+    def junction(m):
+        """Lava in the plate JOINTS: where another plate closes over the surface within a few cm (the short-range AO
+        bake, maps["jao"]) a thin ember seam glows, broken into runs; so the structure lines of the armour (a lame on
+        the next, the anvil on the breastplate, a plate on the under-layer) glow from within."""
+        jc = cfg.get("junction")
+        if not jc:
+            return
+        if "jao" not in maps:
+            return
+        # only on surfaces that are open to the view (the parts' self-AO): faces pressed flat on another plate are hidden
+        oc = smoothstep(jc["jao"][0], jc["jao"][1], maps["jao"][m]) * smoothstep(jc["open"][0], jc["open"][1], ao_all[m])
+        runs = smoothstep(jc["run"][0], jc["run"][1], fbm(P[m], jc["run_freq"], 2, seed=431))
+        j = oc * runs * jc["strength"]
+        add_glow(m, j, j * smoothstep(0.6, 0.95, runs) * 0.5, j * 0.8)
+
+    # ---- PLATE (cracked stone-like gunmetal) ---------------------------------------------------------------
+    def stone(m, base_col, light_col, edge_col, lift_top, block_var, tones):
         p, n = P[m], Nn[m]
-        mk, pr = mk_all[m], pr_all[m]
-        c = np.repeat(base_col[None], m.sum(), 0) * (0.9 + 0.2 * pr[:, None])
-        c = mix(c, top_col, smoothstep(0.3, 0.85, n[:, 2]) * lift_top)                  # up-facing value plane
-        c = mix(c, tones["shadow"] * 0.9, smoothstep(-0.15, -0.75, n[:, 2]) * 0.65)     # undersides
-        c = c * (1 + 0.05 * brush[m][:, None])
-        # the sculpt's surface: cracks of the blockout, where it coincides with the plate (cavity from the bake)
+        e, cid, up = E[m], CID[m], UP[m]
+        pr = pr_all[m]
+        upf = smoothstep(0.45, 0.85, n[:, 2])                  # up-facing planes stay calm: the game camera reads them
+        bv = block_var * (1 - tc["top_calm"] * upf)
+        c = np.repeat(base_col[None], m.sum(), 0)
+        pv = tc.get("plate_var", 0.1)
+        c = c * (1 - bv + 2 * bv * cid)[:, None] * (1 - pv + 2 * pv * pr)[:, None]                 # every block, every plate
+        # painted value planes: faces toward the viewer a step lighter than the side planes (no light direction)
+        fp = tc.get("front_plane", 0.0)
+        c = c * (1 + fp * smoothstep(0.3, 0.9, -n[:, 1]) - fp * 0.8 * smoothstep(0.5, 0.95, np.abs(n[:, 0])))[:, None]
+        c = mix(c, light_col * (0.92 + 0.16 * cid)[:, None], smoothstep(0.2, 0.85, n[:, 2]) * lift_top)   # up-facing planes
+        c = mix(c, tones["shadow"] * 0.8, smoothstep(-0.15, -0.8, n[:, 2]) * 0.6)                          # undersides
+        c = c * (1 + 0.06 * brush[m][:, None])
+        # block bevels: the upper rim of each block catches light, the lower rim falls into shadow
+        near = smoothstep(tc["bevel"], tc["bevel"] * 0.35, e)
+        chip = smoothstep(0.35, 0.6, fbm(p, 60.0, 2, seed=371))
+        calm = 1 - tc["top_calm"] * upf
+        c = mix(c, edge_col, near * smoothstep(0.05, 0.3, up) * tc["bevel_light"] * (0.5 + 0.5 * chip) * calm)
+        c = mix(c, ST["cavity"] * 1.4, near * smoothstep(-0.05, -0.3, up) * tc["bevel_dark"] * calm)
+        # the joints and the cracks: dark cavities with a light lip
+        c = mix(c, ST["cavity"], smoothstep(tc["gap"], tc["gap"] * 0.35, e) * tc["gap_dark"] * (1 - 0.4 * tc["top_calm"] * upf))
+        cr = CR[m]
+        c = mix(c, edge_col * 0.9, smoothstep(tc["crack"] * 3.0, tc["crack"] * 1.4, cr) * smoothstep(tc["crack"] * 1.2, tc["crack"] * 1.4, cr) * 0.3)
+        c = mix(c, ST["cavity"], smoothstep(tc["crack"], tc["crack"] * 0.3, cr) * 0.75)
+        # the plate's hard edges: chipped and lighter where convex, darker in the inner corners
+        ed = smoothstep(0.03, 0.2, edge_all[m])
+        convex = smoothstep(pmed + 0.005, pmed + 0.05, point_all[m])
+        chips = smoothstep(0.3, 0.55, fbm(p, 48.0, 2, seed=381))
+        c = mix(c, edge_col * 1.08, ed * convex * (0.3 + 0.55 * chips) * tc["edge_light"])
+        c = mix(c, ST["cavity"], ed * (1 - convex) * 0.5)
         if "cav" in maps:
-            c = mix(c, tones["shadow"] * 0.7, smoothstep(0.62, 0.9, maps["cav"][m]) * 0.5)
-        # crack mosaic: dark line, lighter lip, the cells slightly varied
-        c = c * (0.94 + 0.12 * cell[m][:, None])
-        c = mix(c, tones["highlight"] * 0.95, crack_lip[m] * cc["lip"])
-        c = mix(c, tones["shadow"] * 0.5, crack_line[m] * cc["dark"])
-        # painted outline (dark) and wear line on the chamfer (light)
-        c = mix(c, tones["shadow"] * 0.55, smoothstep(0.14, 0.02, mk) * 0.8)
-        c = mix(c, tones["highlight"] * 1.05, smoothstep(0.16, 0.26, mk) * smoothstep(0.42, 0.3, mk) * 0.35)
+            c = mix(c, ST["cavity"], smoothstep(0.62, 0.9, maps["cav"][m]) * 0.4)
         return c
 
     m = zm("plate")
     if m.any():
-        base[m] = plate_paint(m, T["gunmetal_plate"], D["gunmetal"], cfg["plate_lift_top"], T["gunmetal_plate"]["highlight"])
-        g = glow_gate[m] * smoothstep(0.25, 0.5, mk_all[m])        # no glow on the chamfers
-        add_glow(m, gline_d[m], gl["width"], g)
-        add_glow(m, crack_d[m], gl["branch_width"], g * br_gate[m] * gl["branch"], hotness=0.25, halo_w=0.25)
-    # ---- ANVIL (the same iron; top face a value step lighter, hardy and pritchel holes) ----------------------
+        # the declared Gunmetal, pulled a little toward the measured (warmer) plate tone so the violet cast of the label
+        # does not turn the whole mass lavender under the cool shadow band
+        gm = mix(D["gunmetal"][None], T["gunmetal_plate"]["base"][None], cfg.get("gunmetal_warm", 0.0))[0]
+        base[m] = stone(m, gm, ST["light"], ST["edge"], cfg["plate_lift_top"], tc["block_var"], T["gunmetal_plate"])
+        g = joint_glow[m] * smoothstep(0.05, 0.2, 1 - smoothstep(0.03, 0.2, edge_all[m]))       # no glow on the chipped edges
+        add_glow(m, g, np.maximum(corner_hot[m], g * 0.25), smoothstep(vc["line"] * 3.5, vc["line"], E[m]) * vein[m] * 0.6)
+        junction(m)
+    # ---- ANVIL (the same stone one value step lighter; its flat top the lightest face on him) -------------------
     m = zm("anvil")
     if m.any():
         p, n = P[m], Nn[m]
-        an = T["anvil_iron"]
-        c = plate_paint(m, an, D["gunmetal"] * 1.05, 0.0, an["highlight"])
-        top = smoothstep(0.7, 0.9, n[:, 2])
         ac = cfg["anvil"]
-        c = mix(c, an["highlight"] * (0.95 + 0.1 * brush[m][:, None]), top * ac["top_lift"])
-        # the top face's worn edge: lighter along the front edge of the face
-        c = mix(c, an["highlight"] * 1.25, top * smoothstep(ac["front_edge_y"] + 0.03, ac["front_edge_y"], p[:, 1]) * 0.5)
+        c = stone(m, ST["anvil"], ST["anvil_light"], ST["anvil_edge"], 0.0, tc["block_var"] * 0.8, T["anvil_iron"])
+        top = smoothstep(0.7, 0.92, n[:, 2])
+        c = mix(c, ST["anvil_top"] * (0.93 + 0.14 * CID[m] + 0.05 * brush[m])[:, None], top * ac["top_lift"])
+        c = mix(c, ST["anvil_edge"], top * smoothstep(tc["gap"] * 2.5, tc["gap"], E[m]) * 0.35)
+        # the top face's worn front edge and the chamfers round it
+        front_edge = smoothstep(0.03, 0.2, edge_all[m]) * smoothstep(0.1, 0.5, n[:, 2] + 0.3 * smoothstep(-0.2, -0.8, n[:, 1]))
+        c = mix(c, ST["anvil_edge"] * 1.1, front_edge * 0.55)
         hh = ac["hardy"]
         dh = np.maximum(np.abs(p[:, 0] - hh[0]), np.abs(p[:, 1] - hh[1]))
-        c = mix(c, an["shadow"] * 0.4, top * smoothstep(hh[2] + 0.004, hh[2], dh))
+        c = mix(c, ST["cavity"], top * smoothstep(hh[2] + 0.004, hh[2], dh))
         pp = ac["pritchel"]
         dp = np.hypot(p[:, 0] - pp[0], p[:, 1] - pp[1])
-        c = mix(c, an["shadow"] * 0.4, top * smoothstep(pp[2] + 0.003, pp[2], dp))
+        c = mix(c, ST["cavity"], top * smoothstep(pp[2] + 0.003, pp[2], dp))
         base[m] = c
-        g = glow_gate[m] * smoothstep(0.25, 0.5, mk_all[m]) * (1 - top)
-        add_glow(m, gline_d[m], gl["width"] * 1.15, g)
-        add_glow(m, crack_d[m], gl["branch_width"], g * br_gate[m] * gl["branch"], hotness=0.25, halo_w=0.25)
-    # ---- IRON (inner walls, undersides, plate side walls) ---------------------------------------------------
+        g = joint_glow[m] * (1 - top) * smoothstep(0.05, 0.2, 1 - smoothstep(0.03, 0.2, edge_all[m]))
+        add_glow(m, g, np.maximum(corner_hot[m] * (1 - top), g * 0.25), smoothstep(vc["line"] * 3.5, vc["line"], E[m]) * vein[m] * (1 - top) * 0.6)
+    # ---- IRON (inner walls, undersides, the sole) -----------------------------------------------------------
     m = zm("iron")
     if m.any():
         ir = T["gunmetal_plate"]
-        c = np.repeat(ir["shadow"][None], m.sum(), 0) * (0.85 + 0.25 * pr_all[m][:, None])
+        c = np.repeat(ir["shadow"][None], m.sum(), 0) * (0.8 + 0.3 * CID[m][:, None])
         c = mix(c, D["gunmetal"], smoothstep(0.2, 0.8, Nn[m][:, 2]) * 0.4)
+        c = mix(c, ST["cavity"], smoothstep(tc["gap"], tc["gap"] * 0.35, E[m]) * 0.5)
         base[m] = c * (1 + 0.04 * brush[m][:, None])
-    # ---- GOLD trim ---------------------------------------------------------------------------------------------
+    # ---- LAVA (crust over magma: the anvil gasket, the elbow rings, the knee smiles, the shin gaskets) ----------
+    m = zm("lava")
+    if m.any():
+        lv = cfg["lava"]
+        e, v = E[m], VTX[m]
+        crust = smoothstep(lv["gap"] * 0.6, lv["gap"] * 1.6, e) * (0.75 + 0.25 * CID[m])
+        c = mix(np.repeat(hex3(lv["magma"])[None], m.sum(), 0), hex3(lv["crust"]) * (0.8 + 0.4 * CID[m])[:, None], crust)
+        base[m] = c
+        hot = smoothstep(lv["gap"] * 0.9, 0.0, e) * (1 - crust)
+        corner = smoothstep(lv["gap"] * 2.2, lv["gap"] * 0.5, v) * (1 - crust * 0.7)
+        add_glow(m, np.clip((1 - crust) * 0.95 + lv["crust_glow"], 0, 1), np.maximum(hot * 0.55, corner), np.ones(m.sum(), dtype=np.float32) * lv["halo"])
+    # ---- GOLD trim and rivets ----------------------------------------------------------------------------------
     m = zm("gold")
     if m.any():
         p, n = P[m], Nn[m]
@@ -167,6 +385,8 @@ def paint(maps, zones, pal, cfg, log=print):
         c = mix(c, fg["base"], smoothstep(-0.1, -0.7, n[:, 2]) * 0.7)                   # dark underside
         c = mix(c, fg["shadow"], smoothstep(0.1, 0.0, mk_all[m]) * 0.5)
         c = mix(c, D["gold"] * 1.08, smoothstep(0.66, 0.78, fbm(p, 42.0, 2, seed=81)) * 0.3)   # worn bright streaks
+        wear = smoothstep(0.62, 0.72, fbm(p, 70.0, 2, seed=83)) * smoothstep(0.03, 0.2, edge_all[m])
+        c = mix(c, fg["shadow"] * 0.8, wear * 0.6)                                         # dark worn chips on the edges
         base[m] = np.clip(c, 0, 1)
     # ---- STEEL (braid caps) -------------------------------------------------------------------------------------
     m = zm("steel")
@@ -182,8 +402,8 @@ def paint(maps, zones, pal, cfg, log=print):
     m = zm("seam")
     if m.any():
         t = fbm(P[m], 30.0, 2, seed=71)
-        base[m] = mix(np.repeat(ember_hot[None], m.sum(), 0), ember_core, smoothstep(0.45, 0.75, t) * 0.7)
-        emis[m] = mix(mix(np.repeat(ember_hot[None], m.sum(), 0), ember_core, 0.45), ember_core, smoothstep(0.5, 0.7, t))
+        base[m] = mix(np.repeat(ember_hot[None], m.sum(), 0), ember_core, smoothstep(0.55, 0.78, t) * 0.5)
+        emis[m] = mix(np.repeat(ember_hot[None], m.sum(), 0) * 0.95, ember_core, smoothstep(0.58, 0.78, t) * 0.55)   # ember, white-hot flecks
     # ---- CAPE (war red) + the forge sigil ------------------------------------------------------------------------
     m = zm("cape")
     if m.any():
@@ -302,7 +522,7 @@ def paint(maps, zones, pal, cfg, log=print):
 
     # ---- AO folded in as darker painted planes -----------------------------------------------------------------------------
     ao = cfg.get("ao")
-    skip = np.isin(Z, [zones[z] for z in ("seam", "eye") if z in zones])
+    skip = np.isin(Z, [zones[z] for z in ("seam", "eye", "lava") if z in zones])
     if ao and "self" in ao and "ao_self" in maps:
         a = ao["self"]
         f = 1 - a["strength"] * (1 - smoothstep(a["range"][0], a["range"][1], maps["ao_self"]))
@@ -321,8 +541,11 @@ def paint(maps, zones, pal, cfg, log=print):
     e_line = np.maximum(glow_core, glow_halo * cfg.get("halo_emission", 0.35))
     emis = np.maximum(emis, glow * e_line[:, None])
     base = np.clip(base * (1 + 0.02 * fine[:, None]), 0, 1)
-    log("painted: glow texels %d (%.2f %% of the plate / anvil texels), crack texels %d" % (
-        int((glow_core > 0.5).sum()), 100.0 * float((glow_core[hard] > 0.5).mean()), int((crack_line > 0.5).sum())))
+    pa = zm("plate", "anvil")
+    po = pa & (ao_all > 0.25)
+    log("painted: glow texels %d (%.2f %% of the plate / anvil texels, %.2f %% of the open ones), white-hot %d, edge texels %d" % (
+        int((glow_core > 0.5).sum()), 100.0 * float((glow_core[pa] > 0.5).mean()), 100.0 * float((glow_core[po] > 0.5).mean()),
+        int((glow_hot > 0.5).sum()), int((edge_all > 0.1).sum())))
     return base, np.clip(emis, 0, 1)
 
 

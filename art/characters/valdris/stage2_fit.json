@@ -292,7 +292,7 @@
   ],
   "_doc_arms": "Both arms are the concept's fist-gauntlet arm (2026-09-25 decision: the siege cannon is a separate weapon, colossus_cannon). The right forearm and gauntlet must fit the cannon sleeve (free radius 0.098 m from 0.30 m behind the palm to 0.06 m in front of it, 0.094 m at the elbow cuff; measured by ray casts on assets/models/weapons/colossus_cannon.glb), so the under-suit forearm is thin (0.058-0.08 m) and the vambrace plates stay under 0.090 m.",
   "limb_radial": {
-   "_doc": "arm cross-section around the arm axis (y=axis_y, z=axis_z) scaled per x-slab to the radius profile: upper arm under the pauldron 0.12 m, elbow 0.082 m, forearm 0.072 -> 0.058 m at the wrist; the glove hand x hand_scale.",
+   "_doc": "arm cross-section around the arm axis (y=axis_y, z=axis_z) scaled per x-slab to the radius profile: upper arm under the pauldron 0.12 m, elbow 0.082 m, forearm 0.072 -> 0.058 m at the wrist; the glove hand x hand_scale (1.6 since the stage-2 polish: a chunky gauntlet hand for the massive arms, scaled about the arm axis only, so the hand frames and finger lengths stay).",
    "axis_y": 0.0,
    "axis_z": 1.78,
    "abs_x": [
@@ -315,7 +315,7 @@
    ],
    "blend_from_abs_x": 0.36,
    "hand_from_abs_x": 0.925,
-   "hand_scale": 1.22,
+   "hand_scale": 1.6,
    "smooth": {
     "abs_x": [
      0.36,

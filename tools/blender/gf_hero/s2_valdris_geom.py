@@ -21,7 +21,7 @@ from mathutils import Vector
 
 import s2_geom as G0
 
-ZONES = ["skin", "beard", "eye", "plate", "iron", "gold", "seam", "cape", "mail", "leather", "steel", "anvil"]
+ZONES = ["skin", "beard", "eye", "plate", "iron", "gold", "seam", "cape", "mail", "leather", "steel", "anvil", "lava"]
 Z = {n: i for i, n in enumerate(ZONES)}
 ensure_mask = G0.ensure_mask
 set_mask = G0.set_mask
@@ -237,7 +237,8 @@ def prism(bm, poly, origin, A, B, Nd, back, front, chamfer, zones, depth_fn=None
     (distances along Nd), with a chamfer of size `chamfer` around the front face (and chamfer_back around the back).
     depth_fn(i, a, b) -> (back_i, front_i) overrides the depths per outline point (tapering horns).
     taper scales the front outline about its centroid.
-    zones: dict with keys front, side, chamfer, back (zone names); side may be a callable(i) for the wall i->i+1.
+    zones: dict with keys front, side, chamfer, back (zone names); side, chamfer and chamfer_back may be callables
+    (i) for the wall / chamfer facet i->i+1 (gold trim on chosen edges only).
     Returns the faces. Closed."""
     ensure_mask(bm)
     O, A, B, Nd = (np.asarray(v, dtype=np.float64) for v in (origin, A, B, Nd))
@@ -265,11 +266,13 @@ def prism(bm, poly, origin, A, B, Nd, back, front, chamfer, zones, depth_fn=None
         f.material_index = Z[zs]
         faces.append(f)
         g = bm.faces.new((vt[i], vt[j], vti[j], vti[i]))
-        g.material_index = Z[zones["chamfer"]]
+        zc = zones["chamfer"](i) if callable(zones["chamfer"]) else zones["chamfer"]
+        g.material_index = Z[zc]
         faces.append(g)
         if chamfer_back > 0:
             h = bm.faces.new((vbi[j], vbi[i], vb[i], vb[j]))
-            h.material_index = Z[zones.get("chamfer_back", zones["chamfer"])]
+            zb = zones.get("chamfer_back", zones["chamfer"])
+            h.material_index = Z[zb(i) if callable(zb) else zb]
             faces.append(h)
     ff = bm.faces.new(vti)
     ff.material_index = Z[zones["front"]]
@@ -281,6 +284,37 @@ def prism(bm, poly, origin, A, B, Nd, back, front, chamfer, zones, depth_fn=None
     set_mask(bm, vti, 1.0, rand)
     bmesh.ops.recalc_face_normals(bm, faces=faces)
     return faces
+
+
+def chipped(poly, chips):
+    """Heavy chipped edges: insert flat-bottomed notches into a planar outline. chips: [(edge, t, width, depth)], the
+    notch centred at fraction t of edge i -> i+1, `width` long (m), cut `depth` inward. Returns (outline, src) where
+    src[k] = the source edge index of new edge k -> k+1 (so per-edge zones keep working)."""
+    P = [np.asarray(p, dtype=np.float64) for p in poly]
+    n = len(P)
+    area = 0.5 * sum(P[k][0] * P[(k + 1) % n][1] - P[(k + 1) % n][0] * P[k][1] for k in range(n))
+    s = 1.0 if area > 0 else -1.0
+    by_edge = {}
+    for e, t, w, d in chips:
+        by_edge.setdefault(int(e), []).append((t, w, d))
+    out, src = [], []
+    for i in range(n):
+        a, b = P[i], P[(i + 1) % n]
+        out.append(a)
+        src.append(i)
+        L = float(np.linalg.norm(b - a))
+        if L < 1e-6:
+            continue
+        e = (b - a) / L
+        inward = s * np.array([-e[1], e[0]])
+        for t, w, d in sorted(by_edge.get(i, [])):
+            h = min(w / L, 0.45) / 2
+            t0, t1 = max(t - h, 0.02), min(t + h, 0.98)
+            q = (t1 - t0) * 0.25
+            for tt, dd in ((t0, 0.0), (t0 + q, d), (t1 - q, d * 0.8), (t1, 0.0)):
+                out.append(a + (b - a) * tt + inward * dd)
+                src.append(i)
+    return [tuple(p) for p in out], src
 
 
 def frame_axes(d, up=(0.0, 0.0, 1.0)):
