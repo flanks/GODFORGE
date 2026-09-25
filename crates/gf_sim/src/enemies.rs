@@ -1,6 +1,10 @@
 //! Enemies: spawning from content, behaviour AI, boss scripts, motion & separation, contact damage
 //! and telegraphs. Every enemy attack except contact resolves through a visible telegraph with a
 //! wind-up — "no invisible damage" (§5).
+//!
+//! On biome maps, far or obstructed targets are reached along the horde flow fields
+//! ([`crate::flow`]), and guards ([`Guard`]) idle at home until woken, walk back after a leash, and
+//! close in instead of keeping their distance while hunting (OPEN_WORLD.md §5.3, §5.6).
 
 use crate::components::*;
 use crate::resources::*;
@@ -132,13 +136,16 @@ fn telegraph(
 
 struct Target {
     entity: Entity,
+    slot: u8,
     pos: Vec2,
     taunting: bool,
 }
 
-fn pick_target(targets: &[Target], pos: Vec2, taunt: Option<Vec2>) -> Option<Vec2> {
+/// Where an enemy at `pos` heads: its taunter, a taunting player within 16 u, else the nearest
+/// living player. Returns the position and, for a player, their slot (whose flow field leads there).
+fn pick_target(targets: &[Target], pos: Vec2, taunt: Option<Vec2>) -> Option<(Vec2, Option<u8>)> {
     if let Some(t) = taunt {
-        return Some(t);
+        return Some((t, None));
     }
     // Siege Stance: taunting players pull aggro from 16 units.
     if let Some(t) = targets
@@ -146,9 +153,18 @@ fn pick_target(targets: &[Target], pos: Vec2, taunt: Option<Vec2>) -> Option<Vec
         .filter(|t| t.taunting && t.pos.distance(pos) < 16.0)
         .min_by(|a, b| a.pos.distance_squared(pos).total_cmp(&b.pos.distance_squared(pos)))
     {
-        return Some(t.pos);
+        return Some((t.pos, Some(t.slot)));
     }
-    targets.iter().min_by(|a, b| a.pos.distance_squared(pos).total_cmp(&b.pos.distance_squared(pos))).map(|t| t.pos)
+    targets
+        .iter()
+        .min_by(|a, b| a.pos.distance_squared(pos).total_cmp(&b.pos.distance_squared(pos)))
+        .map(|t| (t.pos, Some(t.slot)))
+}
+
+/// An idle guard's move: back to `home` (after a leash, or when shoved), else stand still.
+fn home_dir(pos: Vec2, home: Vec2) -> Vec2 {
+    let to = home - pos;
+    if to.length_squared() > 1.5 * 1.5 { to.normalize_or_zero() } else { Vec2::ZERO }
 }
 
 fn keep_distance_dir(pos: Vec2, target: Vec2, keep: f32, phase: f32, t: f32) -> Vec2 {
@@ -164,40 +180,72 @@ fn keep_distance_dir(pos: Vec2, target: Vec2, keep: f32, phase: f32, t: f32) -> 
     }
 }
 
-#[allow(clippy::type_complexity)]
+#[allow(clippy::type_complexity, clippy::too_many_arguments)]
 pub fn enemy_ai(
     mut commands: Commands,
     clock: Res<SimClock>,
     content: Res<Content>,
     tuning: Res<Tuning>,
+    layout: Res<RoomLayout>,
+    flow: Res<Flow>,
     mut ids: ResMut<NetIds>,
     mut hits: ResMut<PlayerHits>,
-    players: Query<(Entity, &Pos, &Life, &Kit, &Stats), With<Player>>,
+    players: Query<(Entity, &Player, &Pos, &Life, &Kit), Without<Enemy>>,
     others: Query<&Pos, Without<Enemy>>,
-    mut enemies: Query<(Entity, &Pos, &mut Enemy, &mut Brain, &Statuses, &mut Facing), Without<BossBrain>>,
+    mut enemies: Query<
+        (Entity, &Pos, &mut Enemy, &mut Brain, &Statuses, &mut Facing, Option<&Guard>),
+        Without<BossBrain>,
+    >,
 ) {
     let dt = clock.gdt();
     let frozen = clock.freeze > 0.0;
     let tele = tuning.enemy.telegraph_time;
     let targets: Vec<Target> = players
         .iter()
-        .filter(|(_, _, life, ..)| life.state.is_alive())
-        .map(|(e, pos, _, kit, _)| Target { entity: e, pos: pos.0, taunting: kit.taunting() })
+        .filter(|(_, _, _, life, _)| life.state.is_alive())
+        .map(|(e, p, pos, _, kit)| Target { entity: e, slot: p.slot, pos: pos.0, taunting: kit.taunting() })
         .collect();
+    // Biome maps: far or obstructed targets are reached along their flow field (§5.6).
+    let use_flow = layout.0.map.as_ref().is_some_and(|m| flow.matches(&m.tiles));
+    let direct_tiles = content.game.expedition.horde.direct_chase_tiles as i32;
     let mut shields: Vec<(Vec2, f32, f32)> = Vec::new();
-    for (entity, pos, mut enemy, mut brain, statuses, mut facing) in &mut enemies {
+    for (entity, pos, mut enemy, mut brain, statuses, mut facing, guard) in &mut enemies {
         if frozen || enemy.hp <= 0.0 {
             brain.dir = Vec2::ZERO;
             continue;
         }
+        // An idle guard (a lair, the Warlord's court, a camp) stands at home until woken, and
+        // walks back there after a leash (§5.3). It never starts an attack.
+        if let Some(g) = guard
+            && !g.awake
+        {
+            brain.dir = if enemy.stun > 0.0 { Vec2::ZERO } else { home_dir(pos.0, g.home) };
+            brain.state = BrainState::Approach;
+            brain.timer = 0.0;
+            if brain.dir != Vec2::ZERO {
+                facing.0 = brain.dir;
+            }
+            continue;
+        }
+        // Anti-hide: a hunting guard closes in instead of keeping its distance.
+        let hunt = guard.is_some_and(|g| g.hunt);
         let taunt_pos = enemy.taunt.and_then(|(e, _)| others.get(e).ok().map(|p| p.0));
-        let Some(target) = pick_target(&targets, pos.0, taunt_pos) else {
+        let Some((target, target_slot)) = pick_target(&targets, pos.0, taunt_pos) else {
             brain.dir = Vec2::ZERO;
             continue;
         };
         let to = target - pos.0;
         let dist = to.length();
         let dir_to = to.normalize_or(Vec2::X);
+        let steer = match target_slot {
+            Some(slot) if use_flow && !flow.line_clear(pos.0, target, direct_tiles) => flow.steer(slot, pos.0),
+            _ => None,
+        };
+        // The way to walk toward the target, and the keep-distance move for ranged behaviours.
+        let dir_move = steer.unwrap_or(dir_to);
+        let keep_dir = |keep: f32, phase: f32| {
+            if steer.is_some() || hunt { dir_move } else { keep_distance_dir(pos.0, target, keep, phase, clock.time) }
+        };
         if enemy.stun > 0.0 {
             brain.dir = Vec2::ZERO;
             if brain.state == BrainState::Windup || brain.state == BrainState::Charging {
@@ -211,15 +259,15 @@ pub fn enemy_ai(
         let t = clock.time;
         match &def.behavior {
             EnemyBehavior::Chaser => {
-                brain.dir = dir_to;
+                brain.dir = dir_move;
             }
             EnemyBehavior::Swarmer { jitter } => {
                 let wobble = (t * 3.0 + brain.phase).sin() * jitter;
-                brain.dir = (dir_to + dir_to.perp() * wobble).normalize_or(dir_to);
+                brain.dir = (dir_move + dir_move.perp() * wobble).normalize_or(dir_move);
             }
             EnemyBehavior::Charger { range, windup, speed, duration, cooldown, damage, width } => match brain.state {
                 BrainState::Approach => {
-                    brain.dir = dir_to;
+                    brain.dir = dir_move;
                     if dist < *range && brain.cooldown <= 0.0 {
                         brain.state = BrainState::Windup;
                         brain.timer = windup * tele;
@@ -279,7 +327,7 @@ pub fn enemy_ai(
                 }
             },
             EnemyBehavior::Lobber { range, windup, radius, damage, cooldown, keep_distance } => {
-                brain.dir = keep_distance_dir(pos.0, target, *keep_distance, brain.phase, t);
+                brain.dir = keep_dir(*keep_distance, brain.phase);
                 if dist < *range && brain.cooldown <= 0.0 {
                     brain.cooldown = *cooldown;
                     telegraph(
@@ -307,7 +355,7 @@ pub fn enemy_ai(
                         }
                     }
                     _ => {
-                        brain.dir = keep_distance_dir(pos.0, target, *keep_distance, brain.phase, t);
+                        brain.dir = keep_dir(*keep_distance, brain.phase);
                         if dist < *range && brain.cooldown <= 0.0 {
                             brain.cooldown = *cooldown;
                             brain.state = BrainState::Windup;
@@ -340,7 +388,7 @@ pub fn enemy_ai(
                     }
                 }
                 _ => {
-                    brain.dir = dir_to * 1.1;
+                    brain.dir = dir_move * 1.1;
                     if dist < *trigger_range {
                         brain.state = BrainState::Primed;
                         brain.timer = fuse * tele;
@@ -361,7 +409,7 @@ pub fn enemy_ai(
                 }
             },
             EnemyBehavior::Support { range, shield, interval, keep_distance } => {
-                brain.dir = keep_distance_dir(pos.0, target, *keep_distance, brain.phase, t);
+                brain.dir = keep_dir(*keep_distance, brain.phase);
                 if brain.cooldown <= 0.0 {
                     brain.cooldown = *interval;
                     shields.push((pos.0, *range, *shield * tuning.enemy.hp));
@@ -397,7 +445,7 @@ pub fn boss_ai(
     mut rngs: ResMut<Rngs>,
     mut events: ResMut<Events>,
     players: Query<(&Pos, &Life), With<Player>>,
-    mut bosses: Query<(Entity, &Pos, &Enemy, &mut Brain, &mut BossBrain, &Replicated)>,
+    mut bosses: Query<(Entity, &Pos, &Enemy, &mut Brain, &mut BossBrain, &Replicated, Option<&Guard>)>,
 ) {
     let dt = clock.gdt();
     if clock.freeze > 0.0 {
@@ -405,10 +453,20 @@ pub fn boss_ai(
     }
     let tele = tuning.enemy.telegraph_time;
     let alive: Vec<Vec2> = players.iter().filter(|(_, l)| l.state.is_alive()).map(|(p, _)| p.0).collect();
-    for (entity, pos, enemy, mut brain, mut boss, rep) in &mut bosses {
+    for (entity, pos, enemy, mut brain, mut boss, rep, guard) in &mut bosses {
         if enemy.hp <= 0.0 {
             continue;
         }
+        // A guarding boss (a biome map's Warlord) holds its ground until woken and walks home
+        // after a leash, with no attacks or pending trails (§5.3).
+        if let Some(g) = guard
+            && !g.awake
+        {
+            brain.dir = if enemy.stun > 0.0 { Vec2::ZERO } else { home_dir(pos.0, g.home) };
+            boss.queue.clear();
+            continue;
+        }
+        let hunt = guard.is_some_and(|g| g.hunt);
         let script = content.bosses.get(boss.script);
         let frac = enemy.hp / enemy.max_hp.max(1.0);
         let phase_idx = script.phases.iter().rposition(|p| frac <= p.below).unwrap_or(0);
@@ -428,6 +486,8 @@ pub fn boss_ai(
         let dir_to = (target - pos.0).normalize_or(Vec2::NEG_Y);
         brain.dir = if enemy.stun > 0.0 {
             Vec2::ZERO
+        } else if hunt {
+            dir_to * phase.speed_mult
         } else {
             keep_distance_dir(pos.0, target, script.keep_distance.max(2.0), brain.phase, clock.time) * phase.speed_mult
         };

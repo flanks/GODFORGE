@@ -1,6 +1,9 @@
 //! The spawn director: releases each room's enemy budget along a rate ramp, in packs, from spawn
 //! zones out of the players' comfort radius. Escalation per room and per biome comes from content
 //! (`run.budget_growth_per_room`, …) so minute 15 is beautiful madness (§2.1).
+//!
+//! Biome maps have no budget: the horde director v2 ([`crate::horde`]) spawns around each player
+//! cluster instead. Only the chaos stress mode (`--stress`) runs here on a map.
 
 use crate::components::*;
 use crate::enemies::spawn_enemy;
@@ -15,7 +18,8 @@ use gf_net::{AnvilState, RunPhase};
 #[derive(Resource, Debug, Default, Clone, Copy)]
 pub struct StressMode(pub Option<u32>);
 
-fn pick_weighted(
+/// An enemy from a weighted pool, among those the build's content phase ships.
+pub(crate) fn pick_weighted(
     pool: &[WeightedKey],
     content: &crate::resources::Content,
     phase: gf_content::Phase,
@@ -104,6 +108,7 @@ pub fn run_director(
         return;
     }
     let room = &layout.0;
+    let on_map = room.map.is_some();
     let biome = content.biome(run.biomes[run.biome_idx]);
     let player_pos: Vec<Vec2> = players.iter().filter(|(_, l)| l.state.is_alive()).map(|(p, _)| p.0).collect();
     let dt = clock.gdt();
@@ -115,7 +120,8 @@ pub fn run_director(
     } else {
         enc.stall += dt;
     }
-    if enc.budget_left <= 0.0 && enc.alive <= 5 && enc.stall > 15.0 && !player_pos.is_empty() {
+    // (Rooms only: a map's far stragglers are culled and refunded instead, §5.6.)
+    if !on_map && enc.budget_left <= 0.0 && enc.alive <= 5 && enc.stall > 15.0 && !player_pos.is_empty() {
         enc.stall = 0.0;
         for (_, mut pos) in &mut enemies {
             let anchor = player_pos[0];
@@ -134,7 +140,7 @@ pub fn run_director(
         }
         return;
     }
-    if run.phase != RunPhase::Combat || enc.budget_left <= 0.0 {
+    if on_map || run.phase != RunPhase::Combat || enc.budget_left <= 0.0 {
         return;
     }
     let mut intensity = 1.0;
