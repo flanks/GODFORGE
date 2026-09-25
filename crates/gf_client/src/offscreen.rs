@@ -141,7 +141,7 @@ fn update_indicators(
             EntityKind::Door { reward, .. } => {
                 targets.push((w3(e.pos.to_vec2(), 1.5), hex("#FFE3A3"), door_label(db, reward)))
             }
-            EntityKind::Anvil if world.run.anvil.is_some_and(|a| !matches!(a.state, AnvilState::Spent)) => {
+            EntityKind::Anvil if AnvilState::from_u8(e.status) != AnvilState::Spent => {
                 targets.push((w3(e.pos.to_vec2(), 1.0), hex("#FFC940"), "Anvil".into()))
             }
             _ => {}

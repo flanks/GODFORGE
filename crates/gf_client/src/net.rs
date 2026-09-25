@@ -235,6 +235,11 @@ fn poll_link(
                 let new_room = room.sync(&w.run, &cfg.content);
                 if new_room {
                     pred.arena = Arc::new(room.def.arena());
+                    // Every peer rebuilds a biome map from (template, seed): the host's hash must match.
+                    let local = room.def.map.as_ref().map_or(0, |m| m.hash as u32);
+                    if local != w.run.layout_hash {
+                        error!("Map desync (host {:08X} / local {local:08X}) in {}", w.run.layout_hash, room.def.key);
+                    }
                 }
                 if let Some(slot) = link.slot {
                     reconcile(&mut pred, &w, slot, &cfg, new_room);

@@ -15,8 +15,11 @@ pub mod components;
 pub mod damage;
 pub mod director;
 pub mod enemies;
+pub mod flow;
+pub mod horde;
 pub mod nav;
 pub mod players;
+pub mod poi;
 pub mod projectiles;
 pub mod resources;
 pub mod run;
@@ -78,7 +81,7 @@ pub fn build_schedule(app: &mut App) {
             .in_set(SimSet::Players),
     );
     schedule.add_systems((enemies::enemy_ai, enemies::boss_ai, enemies::enemy_motion).chain().in_set(SimSet::Enemies));
-    schedule.add_systems(enemies::rebuild_grid.in_set(SimSet::Spatial));
+    schedule.add_systems((enemies::rebuild_grid, flow::refresh_flow).chain().in_set(SimSet::Spatial));
     schedule.add_systems(
         (weapons::aim_and_fire, weapons::update_turrets, weapons::update_blades).chain().in_set(SimSet::Weapons),
     );
@@ -98,15 +101,22 @@ pub fn build_schedule(app: &mut App) {
     schedule.add_systems(
         (damage::resolve_damage, damage::resolve_player_hits, damage::process_kills).chain().in_set(SimSet::Damage),
     );
+    // World (OPEN_WORLD.md §5.8): POIs after the anvils they wrap; the horde after the legacy
+    // director (which keeps the stress mode on maps); the map's gate after the room flow.
     schedule.add_systems(
         (
             players::collect_pickups,
             anvil::anvil_update,
+            poi::poi_update,
             anvil::forge_actions,
             boons::boon_actions,
             director::run_director,
+            horde::run_horde,
+            horde::guards,
+            horde::far_cull,
             players::life_update,
             run::room_flow,
+            poi::expedition_flow,
             run::door_choice,
             run::room_transition,
         )

@@ -8,13 +8,15 @@ use gf_core::damage::DamageType;
 use gf_core::forge::{ForgeAction, ForgeError, ForgeOutcome, ForgeWallet, PartBag, WeaponBuild};
 use gf_core::ids::NetId;
 use gf_core::movement::MoverState;
+pub use gf_core::poi::{PoiKind, PoiState};
 use gf_core::rarity::Rarity;
 use gf_core::revive::LifeState;
 use gf_core::weapon::ProjectileStyle;
 use serde::{Deserialize, Serialize};
 
-/// Bump on any wire-incompatible change.
-pub const PROTOCOL_VERSION: u16 = 2;
+/// Bump on any wire-incompatible change. v3: biome maps (POIs, the stage view, per-player anvil
+/// and boss views, map pings; OPEN_WORLD.md §6.1).
+pub const PROTOCOL_VERSION: u16 = 3;
 /// Maximum players per session.
 pub const MAX_PLAYERS: usize = 4;
 /// Commands carried redundantly in every input packet (loss resilience).
@@ -62,6 +64,8 @@ pub enum PlayerAction {
     /// Pick one of the offered boons.
     PickBoon(u8),
     RerollBoons,
+    /// A ping placed on the full map (becomes a `GameEvent::Ping` at that spot).
+    MapPing(QPos),
 }
 
 /// One simulation tick of player intent.
@@ -140,7 +144,11 @@ pub enum RunPhase {
     Defeat,
 }
 
+/// Lifecycle of an anvil. Legacy anvil rooms replicate it as `EntityView.status` of
+/// `EntityKind::Anvil`; on biome maps an anvil is a POI and its state maps to [`PoiState`]
+/// (Dormant → Dormant, Kindling → Active, Hot → Hot, Spent → Done).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[repr(u8)]
 pub enum AnvilState {
     #[default]
     Dormant,
@@ -151,6 +159,45 @@ pub enum AnvilState {
     Spent,
 }
 
+impl AnvilState {
+    #[inline]
+    pub const fn to_u8(self) -> u8 {
+        self as u8
+    }
+
+    /// The state a wire byte encodes (unknown values read as `Dormant`).
+    pub const fn from_u8(v: u8) -> Self {
+        match v {
+            1 => AnvilState::Kindling,
+            2 => AnvilState::Hot,
+            3 => AnvilState::Spent,
+            _ => AnvilState::Dormant,
+        }
+    }
+
+    /// The POI state a map anvil shows as.
+    pub const fn poi_state(self) -> PoiState {
+        match self {
+            AnvilState::Dormant => PoiState::Dormant,
+            AnvilState::Kindling => PoiState::Active,
+            AnvilState::Hot => PoiState::Hot,
+            AnvilState::Spent => PoiState::Done,
+        }
+    }
+
+    /// The anvil state a map anvil's POI state stands for (the inverse of [`Self::poi_state`]).
+    pub const fn from_poi_state(s: PoiState) -> Self {
+        match s {
+            PoiState::Active => AnvilState::Kindling,
+            PoiState::Hot => AnvilState::Hot,
+            PoiState::Done => AnvilState::Spent,
+            _ => AnvilState::Dormant,
+        }
+    }
+}
+
+/// An anvil as one player sees it (`PrivateView.anvil`): the anvil their forge charges come from,
+/// else the nearest one that is not Spent.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct AnvilView {
     pub id: NetId,
@@ -163,6 +210,8 @@ pub struct AnvilView {
     pub contested: bool,
 }
 
+/// A boss health bar: the arena boss (`RunView.boss`) or the nearest awake guard boss, such as a
+/// Warlord (`PrivateView.boss`).
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BossView {
     pub id: NetId,
@@ -192,11 +241,65 @@ pub struct RunView {
     pub encounter_left: f32,
     pub overdrive_meter: f32,
     pub overdrive_active: f32,
-    pub anvil: Option<AnvilView>,
+    /// The arena boss (never a guard such as a Warlord: see `PrivateView.boss`).
     pub boss: Option<BossView>,
     pub chaos_tier: u8,
     pub ember: u32,
     pub party: u8,
+    /// `MapLayout.hash as u32` of the current biome map (0 for rooms). Clients compare it with the
+    /// map they rebuilt from `(room, room_seed)`.
+    pub layout_hash: u32,
+    /// The biome map's objective state (`Some` on maps only).
+    pub stage: Option<StageView>,
+}
+
+/// The Boss Gate as the HUD shows it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum GateView {
+    /// Short of Seals (or the Warlord).
+    #[default]
+    Sealed,
+    /// Open: interact inside the ring to start the gathering.
+    Open,
+    /// The countdown into the boss arena, in deciseconds.
+    Gathering { left_ds: u8 },
+}
+
+/// Objective state of a biome map (OPEN_WORLD.md §2, §6.1).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+pub struct StageView {
+    pub seals: u8,
+    pub required: u8,
+    /// The Warlord is dead.
+    pub warlord: bool,
+    pub gate: GateView,
+    /// Seconds since the party made landfall.
+    pub time: f32,
+    /// Threat clock: `level × 16 + sixteenths` of the way to the next level.
+    pub threat: u8,
+    /// A horde surge (its warning or the surge itself): the direction it comes from (16-bit angle).
+    pub surge: Option<u16>,
+    /// POIs completed on this map.
+    pub objectives: u8,
+    /// The gate was forced open short of Seals (Unworthy).
+    pub forced: bool,
+}
+
+impl StageView {
+    /// Pack a threat level (saturating at 15) and the fraction (0..1) toward the next one.
+    pub fn pack_threat(level: u8, frac: f32) -> u8 {
+        level.min(15) * 16 + (frac.clamp(0.0, 1.0) * 16.0).min(15.0) as u8
+    }
+
+    /// Threat level (0..=15).
+    pub fn threat_level(&self) -> u8 {
+        self.threat / 16
+    }
+
+    /// Fraction (0..1) of the way to the next threat level.
+    pub fn threat_frac(&self) -> f32 {
+        (self.threat % 16) as f32 / 16.0
+    }
 }
 
 bitflags_lite! {
@@ -276,6 +379,15 @@ pub struct PrivateView {
     pub boon_offer: Vec<BoonOffer>,
     pub boon_rerolls: u8,
     pub rekindles: u8,
+    /// The anvil my forge charges come from, else the nearest anvil that is not Spent (within
+    /// 40 u on biome maps). Drives the anvil prompt, the forge panel and bots.
+    pub anvil: Option<AnvilView>,
+    /// The nearest awake guard boss (a Warlord) within 40 u of me.
+    pub boss: Option<BossView>,
+    /// Boon offers waiting behind the current one (shrines claimed while an offer is open).
+    pub boon_queue: u8,
+    /// Downed with no living ally in reach: the Forge will reforge me beside the nearest ally.
+    pub hopeless: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -329,6 +441,11 @@ pub enum DoorReward {
     Onward,
 }
 
+/// What a replicated entity is.
+///
+/// `Poi { index }` is a point of interest on a biome map: `MapLayout.pois[index]` gives its kind and
+/// site, `EntityView.status` is its [`PoiState`] (`to_u8`) and `hp` its progress (the hold fill, or
+/// the share of its guards slain). A legacy room's `Anvil` carries its [`AnvilState`] in `status`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EntityKind {
     Enemy { def: u16 },
@@ -344,6 +461,7 @@ pub enum EntityKind {
     Echo { owner: u8 },
     Blade { owner: u8 },
     Chest,
+    Poi { index: u8 },
 }
 
 bitflags_lite! {
@@ -362,6 +480,10 @@ bitflags_lite! {
         const PRIMED = 1024;
         /// Player-side effect (ally telegraphs, player hazards): drawn gold, never red.
         const ALLY = 2048;
+        /// A hold POI or anvil ring with no living player inside (progress paused or decaying).
+        const CONTESTED = 4096;
+        /// An enemy the horde director just spawned, still rising from the ground.
+        const EMERGING = 8192;
     }
 }
 
@@ -386,6 +508,14 @@ pub struct EntityView {
 }
 
 /// Cosmetic, fire-and-forget events (lossy is fine; gameplay state is in the snapshot).
+///
+/// Biome maps (POI `index` into `MapLayout.pois`):
+/// * `PoiStarted`: `slot` activated it (hold ring started, guards woken, spring used).
+/// * `PoiCompleted`: it paid its reward. `PoiReset`: it went back to Dormant (guards leashed home).
+/// * `PoiHint`: "The Forge whispers…", the nearest incomplete seal-bearing POI after a long stall.
+/// * `GateGathering`: `slot` started the gathering at the open gate.
+/// * `Surge`: a horde surge from direction `dir` (16-bit angle), first the warning (`warn`), then
+///   the surge itself.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub enum GameEvent {
     Hit { target: NetId, amount: u16, crit: bool, precision: bool, element: DamageType, source: u8 },
@@ -412,6 +542,16 @@ pub enum GameEvent {
     RoomCleared,
     AnvilLit,
     AnvilHot,
+    PoiStarted { index: u8, slot: u8 },
+    PoiCompleted { index: u8 },
+    PoiReset { index: u8 },
+    PoiHint { index: u8 },
+    SealGained { seals: u8, required: u8 },
+    GateOpened { forced: bool },
+    GateGathering { slot: u8 },
+    Surge { dir: u16, warn: bool },
+    ThreatRose { level: u8 },
+    CampCleared { at: QPos },
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -429,6 +569,9 @@ pub struct SnapshotPacket {
     pub changed: Vec<EntityView>,
     pub removed: Vec<NetId>,
     pub events: Vec<GameEvent>,
+    /// Biome maps, full snapshots only: the party's explored 4 u tiles, run-length encoded (seeds
+    /// a joining client's fog of war).
+    pub fog: Option<Vec<u8>>,
 }
 
 /// A fully reconstructed world snapshot (client side, after applying deltas).
@@ -442,4 +585,6 @@ pub struct WorldSnapshot {
     /// Sorted by id.
     pub entities: Vec<EntityView>,
     pub events: Vec<GameEvent>,
+    /// Explored-tile RLE from a full snapshot (see `SnapshotPacket.fog`).
+    pub fog: Option<Vec<u8>>,
 }

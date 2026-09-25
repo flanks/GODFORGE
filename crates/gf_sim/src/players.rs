@@ -145,6 +145,7 @@ pub fn spawn_player(world: &mut World, slot: u8, name: &str, loadout: Loadout) -
         boons: Vec::new(),
         discovered: Vec::new(),
         active_recipes: Vec::new(),
+        charges_from: None,
     };
     if let Some(s) = sigil {
         let inst = arsenal.instance(s, Rarity::Common);
@@ -169,7 +170,7 @@ pub fn spawn_player(world: &mut World, slot: u8, name: &str, loadout: Loadout) -
             PlayerInput::default(),
             Mover(MoverState { pos, dash_charges: stats.dash_charges, ..Default::default() }),
             Vitals { hp: stats.max_hp, shield: stats.max_shield, shield_delay: 0.0, bonus_shield: 0.0 },
-            Life { state: LifeState::Alive, rekindles },
+            Life { state: LifeState::Alive, rekindles, hopeless: false },
             Gun {
                 profile: Arc::new(profile),
                 cooldown: 0.0,

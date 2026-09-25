@@ -366,7 +366,7 @@ fn spawn_from_events(
                 }
             }
             GameEvent::AnvilLit | GameEvent::AnvilHot => {
-                if let Some(a) = world.run.anvil
+                if let Some(a) = world.private.anvil
                     && let Some((p, _, _)) = visual_pos(a.id)
                 {
                     fx.pillar(p, hex("#FFB82E"), 9.0, 1.2);

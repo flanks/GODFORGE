@@ -184,6 +184,7 @@ impl<T: ClientTransport> NetClient<T> {
             private: p.private,
             entities,
             events: p.events,
+            fog: p.fog,
         })
     }
 

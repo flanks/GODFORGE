@@ -623,7 +623,7 @@ fn prompt(db: &ContentDb, w: &WorldSnapshot, p: &PlayerView, input: &InputState)
     if !w.private.boon_offer.is_empty() {
         return "A god offers a boon — choose below".into();
     }
-    if let Some(a) = w.run.anvil {
+    if let Some(a) = w.private.anvil {
         match a.state {
             AnvilState::Dormant => return "[F] at the anvil to kindle it".into(),
             AnvilState::Kindling if a.contested => {

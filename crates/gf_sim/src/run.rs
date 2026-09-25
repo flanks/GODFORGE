@@ -182,12 +182,17 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     // The anvil.
     if let Some(at) = room.anvil {
         let net = world.resource_mut::<NetIds>().alloc();
-        world.spawn((
-            Replicated(net),
-            Pos(at),
-            RoomScoped,
-            AnvilStation { state: AnvilState::Dormant, progress: 0.0, forge_left: 0.0, contested: false },
-        ));
+        world.spawn((Replicated(net), Pos(at), RoomScoped, AnvilStation::dormant()));
+    }
+
+    // A biome map: its points of interest and objective state (rooms keep an inactive stage).
+    match room.map.as_ref() {
+        Some(map) => {
+            crate::poi::spawn_pois(world, map);
+            let required = room.expedition.as_ref().map_or(0, |x| x.seals_required);
+            world.insert_resource(Expedition { active: true, required, ..Default::default() });
+        }
+        None => world.insert_resource(Expedition::default()),
     }
 
     // Move the party to the entrance.

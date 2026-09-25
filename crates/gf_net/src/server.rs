@@ -306,6 +306,7 @@ impl<T: ServerTransport> NetServer<T> {
                 changed,
                 removed,
                 events,
+                fog: None,
             };
             self.last_bytes_sent += self.send(peer, Channel::Unreliable, &ServerMsg::Snapshot(Box::new(packet)));
         }

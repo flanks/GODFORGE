@@ -14,6 +14,7 @@ use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
 use crate::terrain::{self, TerrainStores};
 use crate::{ClientConfig, ClientSet};
+use gf_content::schema::{MapLayout, PoiSite};
 use gf_content::{ContentDb, Decor, EnemyShape, RoomDef};
 use gf_core::aim::AimMode;
 use gf_core::ids::NetId;
@@ -509,6 +510,7 @@ fn sync_entities(
     mut pal: ResMut<Palette>,
     mut stores: Stores,
     mut index: ResMut<SceneIndex>,
+    room: Res<CurrentRoom>,
     mut visuals: Query<&mut Visual>,
 ) {
     let Some(world) = link.latest.clone() else { return };
@@ -539,7 +541,7 @@ fn sync_entities(
             }
             continue;
         }
-        let ent = spawn_visual(&mut kit, &cfg.content, e, me, ally_alpha);
+        let ent = spawn_visual(&mut kit, &cfg.content, room.def.map.as_deref(), e, me, ally_alpha);
         index.visuals.insert(e.id, (ent, stamp));
     }
     index.effect_count = effects;
@@ -581,7 +583,14 @@ fn source_slot(owner: u8) -> Option<u8> {
     (owner < 12).then_some(owner % 4)
 }
 
-fn spawn_visual(kit: &mut Kit, db: &ContentDb, e: &EntityView, me: Option<u8>, ally_alpha: f32) -> Entity {
+fn spawn_visual(
+    kit: &mut Kit,
+    db: &ContentDb,
+    map: Option<&MapLayout>,
+    e: &EntityView,
+    me: Option<u8>,
+    ally_alpha: f32,
+) -> Entity {
     let pos = e.pos.to_vec2();
     let parent = kit.commands.spawn((Transform::from_translation(w3(pos, 0.0)), Visibility::default())).id();
     let mut v = match e.kind {
@@ -800,6 +809,13 @@ fn spawn_visual(kit: &mut Kit, db: &ContentDb, e: &EntityView, me: Option<u8>, a
             let mut v = Visual::new(e, hex(GOLD), 0.5, 0.0);
             v.body = Some(body);
             v
+        }
+        EntityKind::Poi { index } => {
+            let site = map.and_then(|m| m.pois.get(index as usize));
+            match site {
+                Some(s) if s.kind == PoiKind::Anvil => spawn_anvil(kit, db, parent, e),
+                _ => spawn_poi(kit, db, parent, e, site),
+            }
         }
     };
     v.fresh = true;
@@ -1116,6 +1132,64 @@ fn spawn_anvil(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView) ->
     v
 }
 
+/// Beacon colour of a POI kind (a shrine takes its god's colour).
+fn poi_color(db: &ContentDb, site: Option<&PoiSite>) -> Color {
+    let Some(site) = site else { return hex(GOLD) };
+    match site.kind {
+        PoiKind::Anvil => hex("#FFB82E"),
+        PoiKind::Warlord => hex("#FF3B30"),
+        PoiKind::Lair => hex("#C8402E"),
+        PoiKind::Shrine => site.god.and_then(|g| db.gods.try_get(g as u16)).map_or(hex(GOLD), |g| hex(&g.color)),
+        PoiKind::Reliquary => hex("#B865FF"),
+        PoiKind::Vein => hex("#8FF7FF"),
+        PoiKind::Spring => hex("#FF4D6D"),
+        PoiKind::Watchfire => hex("#FFB347"),
+        PoiKind::Gate => hex("#F4E3C1"),
+    }
+}
+
+/// A generic POI marker until the per-kind silhouettes land: a stone plinth, a pillar and a cap in
+/// the kind's colour, the interaction ring with its hold fill, and a beacon while it is live.
+fn spawn_poi(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, site: Option<&PoiSite>) -> Visual {
+    let c = poi_color(db, site);
+    let radius = site.map_or(4.0, |s| s.radius).max(1.0);
+    let stone = kit.mat(hex("#4A403A"), Look::Matte);
+    let pillar = kit.mat(mix(c, hex("#3A2E28"), 0.55), Look::Matte);
+    let cap = kit.mat(c, Look::Glow);
+    let beacon = kit.mat(hdr(c, 2.0).with_alpha(0.3), Look::Decal);
+    let ring_mat = kit.mat(hdr(c, 2.2).with_alpha(0.85), Look::Decal);
+    let fill_mat = kit.mat(hdr(c, 1.4).with_alpha(0.22), Look::Decal);
+    let (cyl, sphere, ring, disc) =
+        (kit.pal.cylinder.clone(), kit.pal.sphere.clone(), kit.pal.ring.clone(), kit.pal.disc.clone());
+    kit.child(parent, &cyl, stone, Transform::from_xyz(0.0, 0.15, 0.0).with_scale(Vec3::new(1.1, 0.3, 1.1)));
+    let body =
+        kit.child(parent, &cyl, pillar, Transform::from_xyz(0.0, 1.5, 0.0).with_scale(Vec3::new(0.35, 2.4, 0.35)));
+    kit.child(parent, &sphere, cap, Transform::from_xyz(0.0, 2.95, 0.0).with_scale(Vec3::splat(0.42)));
+    let glow = kit.hidden_child(
+        parent,
+        &cyl,
+        beacon,
+        Transform::from_xyz(0.0, 9.0, 0.0).with_scale(Vec3::new(0.3, 18.0, 0.3)),
+    );
+    let ring_ent = kit.hidden_child(
+        parent,
+        &ring,
+        ring_mat,
+        Transform { translation: Vec3::Y * 0.025, rotation: flat(FRAC_PI_2), scale: Vec3::splat(radius) },
+    );
+    let fill = kit.hidden_child(
+        parent,
+        &disc,
+        fill_mat,
+        Transform { translation: Vec3::Y * 0.02, rotation: flat(FRAC_PI_2), scale: Vec3::splat(0.001) },
+    );
+    kit.shadow(parent, 1.1, 0.0);
+    let mut v = Visual::new(e, c, radius, 0.0);
+    v.body = Some(body);
+    v.parts = [Some(fill), Some(ring_ent), Some(glow)];
+    v
+}
+
 fn hit_flash(link: Res<Link>, index: Res<SceneIndex>, mut visuals: Query<&mut Visual>) {
     for ev in &link.fresh_events {
         if let GameEvent::Hit { target, .. } = *ev
@@ -1279,20 +1353,32 @@ fn tint_entities(
     }
 }
 
-/// Anvil state comes from the run view (one anvil per room): kindling ring + fill, hot glow.
+/// Anvils and POIs animate from their own replicated state (`status`, `hp` = progress and the
+/// CONTESTED flag): the ring while it can be used, the hold fill while active, the glow while hot
+/// (an anvil's forge window, a POI's beacon).
 fn animate_anvils(
     time: Res<Time>,
-    link: Res<Link>,
+    room: Res<CurrentRoom>,
     q: Query<&Visual>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<Visual>>,
 ) {
-    let Some(world) = &link.latest else { return };
-    let Some(anvil) = world.run.anvil else { return };
     let t = time.elapsed_secs();
     for v in &q {
-        if !matches!(v.kind, EntityKind::Anvil) || v.id != anvil.id {
-            continue;
-        }
+        let (ring_on, fill_on, glow_on) = match v.kind {
+            EntityKind::Anvil => {
+                let s = AnvilState::from_u8(v.status);
+                (s != AnvilState::Spent, s == AnvilState::Kindling, s == AnvilState::Hot)
+            }
+            EntityKind::Poi { index } => {
+                let s = PoiState::from_u8(v.status);
+                let anvil = room.def.map.as_ref().and_then(|m| m.pois.get(index as usize)).map(|p| p.kind)
+                    == Some(PoiKind::Anvil);
+                let live = matches!(s, PoiState::Hot | PoiState::Open | PoiState::Gathering)
+                    || (!anvil && s == PoiState::Active);
+                (s != PoiState::Done, s == PoiState::Active, live)
+            }
+            _ => continue,
+        };
         let [fill, ring, glow] = v.parts;
         let show =
             |parts: &mut Query<(&mut Transform, &mut Visibility), Without<Visual>>, e: Option<Entity>, on: bool| {
@@ -1302,20 +1388,19 @@ fn animate_anvils(
                     *vis = if on { Visibility::Inherited } else { Visibility::Hidden };
                 }
             };
-        let kindling = anvil.state == AnvilState::Kindling;
-        let hot = anvil.state == AnvilState::Hot;
-        show(&mut parts, ring, kindling || hot || anvil.state == AnvilState::Dormant);
-        show(&mut parts, fill, kindling);
-        show(&mut parts, glow, hot);
+        show(&mut parts, ring, ring_on);
+        show(&mut parts, fill, fill_on);
+        show(&mut parts, glow, glow_on);
         if let Some(f) = fill
             && let Ok((mut tf, _)) = parts.get_mut(f)
         {
-            tf.scale = Vec3::splat((v.radius * anvil.progress).max(0.001));
+            tf.scale = Vec3::splat((v.radius * v.hp).max(0.001));
         }
         if let Some(r) = ring
             && let Ok((mut tf, _)) = parts.get_mut(r)
         {
-            let pulse = if anvil.contested { 1.0 + 0.03 * (t * 10.0).sin() } else { 1.0 };
+            let contested = v.flags.contains(EntityFlags::CONTESTED);
+            let pulse = if contested { 1.0 + 0.03 * (t * 10.0).sin() } else { 1.0 };
             tf.scale = Vec3::splat(v.radius * pulse);
         }
     }

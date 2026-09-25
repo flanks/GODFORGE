@@ -60,7 +60,7 @@ fn wallet_line(wallet: &ForgeWallet, time_left: f32) -> String {
 
 fn update_forge_timer(link: Res<Link>, mut q: Query<&mut Text, With<ForgeTimer>>) {
     let Some(w) = link.latest.as_deref() else { return };
-    let line = wallet_line(&w.private.wallet, w.run.anvil.map_or(0.0, |a| a.time_left));
+    let line = wallet_line(&w.private.wallet, w.private.anvil.map_or(0.0, |a| a.time_left));
     for mut t in &mut q {
         if t.0 != line {
             t.0 = line.clone();
@@ -232,7 +232,7 @@ fn rebuild_panels(
     let wanted: [Option<u64>; 4] = [
         match (world, me) {
             (Some(w), Some(p)) if input.forge_open && w.private.at_anvil => {
-                let t = w.run.anvil.map_or(0, |a| a.time_left as u32);
+                let t = w.private.anvil.map_or(0, |a| a.time_left as u32);
                 Some(key_of((&w.private.bag, &w.private.wallet, &p.weapon, t)))
             }
             _ => None,
@@ -357,7 +357,7 @@ fn forge_panel(commands: &mut Commands, db: &ContentDb, w: &WorldSnapshot, p: &P
     let rules = &db.game.forge;
     let now = build_dps(db, &p.weapon);
     let chassis = db.chassis.try_get(p.weapon.chassis.0).map_or("?", |c| c.name.as_str());
-    let time_left = w.run.anvil.map_or(0.0, |a| a.time_left);
+    let time_left = w.private.anvil.map_or(0.0, |a| a.time_left);
     let prof = gf_sim::bot::weapon_for(db, p);
     let recipes: Vec<String> = db
         .recipes

@@ -85,7 +85,6 @@ struct MapEntry {
     navs: Vec<(u32, Arc<NavGrid>)>,
 }
 
-
 /// The shared layout, arena and nav grid (for `clearance`) of `room`, building what is missing.
 fn shared_room(db: &ContentDb, room: RoomKey, clearance: f32) -> (Arc<RoomDef>, Arc<Arena>, Arc<NavGrid>) {
     let key = (std::ptr::from_ref(db) as usize, db.hash, room);
@@ -180,7 +179,6 @@ impl BotBrain {
         let mut in_danger = false;
         let mut pickups: Vec<Vec2> = Vec::new();
         let mut doors: Vec<(Vec2, DoorReward, u8)> = Vec::new();
-        let mut anvil_pos: Option<Vec2> = None;
         for e in &w.entities {
             let p = entity_pos(e, tick);
             match e.kind {
@@ -228,13 +226,17 @@ impl BotBrain {
                     }
                 }
                 EntityKind::Door { reward, index } => doors.push((p, reward, index)),
-                EntityKind::Anvil => anvil_pos = Some(p),
                 _ => {}
             }
         }
 
         // ── goal ──
-        let anvil_state = w.run.anvil.map(|a| a.state);
+        // My anvil (the one my charges come from, else the nearest that still burns): an `Anvil`
+        // entity in legacy rooms, an anvil `Poi` on maps.
+        let anvil = w.private.anvil.and_then(|a| {
+            let i = w.entities.binary_search_by_key(&a.id, |e| e.id).ok()?;
+            Some((w.entities[i].pos.to_vec2(), a.state))
+        });
         let radius = db.game.anvil.radius;
         let bag = &w.private.bag;
         let mut goal: Option<(Vec2, f32)> = None;
@@ -259,7 +261,7 @@ impl BotBrain {
                 goal = Some((p, 0.8));
                 interact = p.distance(pos) < 1.8;
             }
-        } else if let (Some(a), Some(state)) = (anvil_pos, anvil_state) {
+        } else if let Some((a, state)) = anvil {
             match state {
                 AnvilState::Dormant => {
                     goal = Some((a, radius * 0.5));
@@ -619,6 +621,11 @@ pub fn run_headless(
             let run = crate::snapshot::run_view(world);
             let players = crate::snapshot::player_views(world);
             let room_key = world.resource::<crate::resources::RoomLayout>().0.key.clone();
+            let anvils: Vec<(AnvilState, u32)> = world
+                .query::<&crate::components::AnvilStation>()
+                .iter(world)
+                .map(|a| (a.state, (a.progress * 100.0) as u32))
+                .collect();
             let enc = world.resource::<crate::resources::Encounter>();
             eprintln!(
                 "[{:>5.1}s] phase={:?} biome={} step={}/{} room={} depth={} kills={} alive={} budget={:.0}/{:.0} anvil={:?} hp={:?} pos={:?} build={:?}",
@@ -633,7 +640,7 @@ pub fn run_headless(
                 enc.alive,
                 enc.budget_left,
                 enc.budget_total,
-                run.anvil.map(|a| (a.state, (a.progress * 100.0) as u32)),
+                anvils,
                 players.iter().map(|p| p.hp as i32).collect::<Vec<_>>(),
                 players.iter().map(|p| (p.mover.pos.x as i32, p.mover.pos.y as i32)).collect::<Vec<_>>(),
                 players

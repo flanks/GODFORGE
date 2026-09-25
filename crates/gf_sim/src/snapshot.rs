@@ -3,6 +3,7 @@
 use crate::components::*;
 use crate::resources::*;
 use gf_content::schema::{EnemyClass, TelegraphShape};
+use gf_core::poi::PoiState;
 use gf_engine::prelude::*;
 use gf_net::quant::{QPos, QVel, angle_to_u8, angle_to_u16, frac_to_u8};
 use gf_net::*;
@@ -35,14 +36,21 @@ fn base(id: gf_core::ids::NetId, kind: EntityKind, pos: Vec2) -> EntityView {
     }
 }
 
+/// How far (u) a player's `PrivateView.anvil` and `PrivateView.boss` reach on a biome map.
+pub const PERSONAL_VIEW_RANGE: f32 = 40.0;
+
 /// Every replicated non-player entity.
 pub fn entity_views(world: &mut World) -> Vec<EntityView> {
     let frozen = world.resource::<SimClock>().freeze > 0.0;
     let dt = world.resource::<SimClock>().dt;
+    let tick = world.resource::<SimClock>().tick;
+    let emerge_ticks = (world.resource::<Content>().game.expedition.horde.emerge_time / dt).round().max(0.0) as u32;
     let mut out = Vec::with_capacity(512);
 
-    let mut q = world.query::<(&Replicated, &Pos, &Enemy, &Brain, &Statuses, &Facing, Option<&BossBrain>)>();
-    for (rep, pos, e, brain, statuses, facing, boss) in q.iter(world) {
+    #[allow(clippy::type_complexity)]
+    let mut q =
+        world.query::<(&Replicated, &Pos, &Enemy, &Brain, &Statuses, &Facing, Option<&BossBrain>, Option<&Born>)>();
+    for (rep, pos, e, brain, statuses, facing, boss, born) in q.iter(world) {
         let mut v = base(rep.0, EntityKind::Enemy { def: e.def.0 }, pos.0);
         v.facing = angle_to_u8(facing.0);
         v.hp = frac_to_u8(e.hp / e.max_hp.max(1.0));
@@ -58,6 +66,7 @@ pub fn entity_views(world: &mut World) -> Vec<EntityView> {
         f.set(EntityFlags::FROZEN, frozen);
         f.set(EntityFlags::TAUNTED, e.taunt.is_some());
         f.set(EntityFlags::PINGED, e.pinged > 0.0);
+        f.set(EntityFlags::EMERGING, born.is_some_and(|b| tick.wrapping_sub(b.0) < emerge_ticks));
         v.flags = f;
         v.status = statuses.0.bits();
         out.push(v);
@@ -125,10 +134,27 @@ pub fn entity_views(world: &mut World) -> Vec<EntityView> {
         out.push(base(rep.0, EntityKind::Pickup { kind, owner: p.owner }, pos.0));
     }
 
-    let mut q = world.query::<(&Replicated, &Pos, &AnvilStation)>();
+    // Legacy anvil rooms: the anvil replicates its own state. Map anvils are POIs (below).
+    let mut q = world.query_filtered::<(&Replicated, &Pos, &AnvilStation), Without<Poi>>();
     for (rep, pos, a) in q.iter(world) {
         let mut v = base(rep.0, EntityKind::Anvil, pos.0);
         v.hp = frac_to_u8(a.progress);
+        v.status = a.state.to_u8();
+        v.flags.set(EntityFlags::CONTESTED, a.state == AnvilState::Kindling && a.contested);
+        out.push(v);
+    }
+
+    let mut q = world.query::<(&Replicated, &Pos, &Poi, Option<&AnvilStation>)>();
+    for (rep, pos, poi, anvil) in q.iter(world) {
+        let mut v = base(rep.0, EntityKind::Poi { index: poi.index }, pos.0);
+        let (state, progress, contested) = match anvil {
+            // A map anvil's station is the source of truth for its lifecycle.
+            Some(a) => (a.state.poi_state(), a.progress, a.state == AnvilState::Kindling && a.contested),
+            None => (poi.state, poi.progress, poi.state == PoiState::Active && poi.contested),
+        };
+        v.status = state.to_u8();
+        v.hp = frac_to_u8(progress);
+        v.flags.set(EntityFlags::CONTESTED, contested);
         out.push(v);
     }
 
@@ -241,13 +267,75 @@ pub fn player_views(world: &mut World) -> Vec<PlayerView> {
     out
 }
 
+/// Every anvil in the room: its entity, position and view.
+fn anvil_views(world: &mut World) -> Vec<(Entity, Vec2, AnvilView)> {
+    world
+        .query::<(Entity, &Replicated, &Pos, &AnvilStation)>()
+        .iter(world)
+        .map(|(e, rep, pos, a)| {
+            let view = AnvilView {
+                id: rep.0,
+                state: a.state,
+                progress: a.progress,
+                time_left: a.forge_left,
+                contested: a.state == AnvilState::Kindling && a.contested,
+            };
+            (e, pos.0, view)
+        })
+        .collect()
+}
+
+/// A player's anvil: the one their forge charges come from while it burns, else the nearest one
+/// that is not Spent within `reach`.
+fn personal_anvil(
+    anvils: &[(Entity, Vec2, AnvilView)],
+    charges_from: Option<Entity>,
+    at: Vec2,
+    reach: f32,
+) -> Option<AnvilView> {
+    if let Some(src) = charges_from
+        && let Some((_, _, v)) = anvils.iter().find(|(e, _, v)| *e == src && v.state != AnvilState::Spent)
+    {
+        return Some(*v);
+    }
+    anvils
+        .iter()
+        .filter(|(_, p, v)| v.state != AnvilState::Spent && p.distance_squared(at) <= reach * reach)
+        .min_by(|a, b| a.1.distance_squared(at).total_cmp(&b.1.distance_squared(at)))
+        .map(|(_, _, v)| *v)
+}
+
+fn boss_view(rep: &Replicated, e: &Enemy, brain: Option<&BossBrain>) -> BossView {
+    BossView {
+        id: rep.0,
+        enemy: e.def.0,
+        hp_frac: (e.hp / e.max_hp.max(1.0)).max(0.0),
+        phase: brain.map_or(0, |b| b.phase as u8),
+    }
+}
+
 pub fn private_views(world: &mut World) -> Vec<(u8, PrivateView)> {
     let radius = world.resource::<Content>().game.anvil.radius;
-    let hot: Vec<(Vec2, AnvilState)> =
-        world.query::<(&Pos, &AnvilStation)>().iter(world).map(|(p, a)| (p.0, a.state)).collect();
+    // One anvil per legacy room: it is everyone's wherever they stand. Maps have several.
+    let on_map = world.resource::<RoomLayout>().0.map.is_some();
+    let reach = if on_map { PERSONAL_VIEW_RANGE } else { f32::INFINITY };
+    let anvils = anvil_views(world);
+    let hot: Vec<(Vec2, AnvilState)> = anvils.iter().map(|(_, p, v)| (*p, v.state)).collect();
+    // Awake guard bosses (a Warlord): a personal bar for whoever is near.
+    let bosses: Vec<(Vec2, BossView)> = world
+        .query::<(&Replicated, &Pos, &Enemy, &Guard, Option<&BossBrain>)>()
+        .iter(world)
+        .filter(|(_, _, e, g, _)| g.awake && e.hp > 0.0 && e.is_boss_like())
+        .map(|(rep, pos, e, _, brain)| (pos.0, boss_view(rep, e, brain)))
+        .collect();
     let mut q = world.query::<(&Player, &Pos, &Arsenal, &BoonChoice, &Life)>();
     q.iter(world)
         .map(|(p, pos, arsenal, choice, life)| {
+            let boss = bosses
+                .iter()
+                .filter(|(b, _)| b.distance_squared(pos.0) <= PERSONAL_VIEW_RANGE * PERSONAL_VIEW_RANGE)
+                .min_by(|a, b| a.0.distance_squared(pos.0).total_cmp(&b.0.distance_squared(pos.0)))
+                .map(|(_, v)| *v);
             (
                 p.slot,
                 PrivateView {
@@ -257,28 +345,47 @@ pub fn private_views(world: &mut World) -> Vec<(u8, PrivateView)> {
                     boon_offer: choice.offer.iter().map(|(b, r)| BoonOffer { boon: b.0, rarity: *r }).collect(),
                     boon_rerolls: choice.rerolls,
                     rekindles: life.rekindles,
+                    anvil: personal_anvil(&anvils, arsenal.charges_from, pos.0, reach),
+                    boss,
+                    boon_queue: choice.queue.len().min(u8::MAX as usize) as u8,
+                    hopeless: life.hopeless,
                 },
             )
         })
         .collect()
 }
 
+/// The biome map's objective state (`None` in rooms).
+fn stage_view(world: &World) -> Option<StageView> {
+    world.resource::<RoomLayout>().0.map.as_ref()?;
+    let ex = world.get_resource::<Expedition>()?;
+    let gate = match ex.gate {
+        GateState::Sealed => GateView::Sealed,
+        GateState::Open => GateView::Open,
+        GateState::Gathering { left } => GateView::Gathering { left_ds: (left * 10.0).ceil().clamp(0.0, 255.0) as u8 },
+    };
+    Some(StageView {
+        seals: ex.seals,
+        required: ex.required,
+        warlord: ex.warlord_done,
+        gate,
+        time: ex.time,
+        threat: StageView::pack_threat(ex.threat_level, ex.threat_frac),
+        surge: ex.surge.map(|s| angle_to_u16(s.dir)),
+        objectives: ex.objectives,
+        forced: ex.forced,
+    })
+}
+
 pub fn run_view(world: &mut World) -> RunView {
-    let anvil = world.query::<(&Replicated, &AnvilStation)>().iter(world).next().map(|(rep, a)| AnvilView {
-        id: rep.0,
-        state: a.state,
-        progress: a.progress,
-        time_left: a.forge_left,
-        contested: a.contested,
-    });
-    let boss = world.query::<(&Replicated, &Enemy, &BossBrain)>().iter(world).max_by_key(|(_, e, _)| e.class).map(
-        |(rep, e, b)| BossView {
-            id: rep.0,
-            enemy: e.def.0,
-            hp_frac: (e.hp / e.max_hp.max(1.0)).max(0.0),
-            phase: b.phase as u8,
-        },
-    );
+    // The arena boss: guards (a map's Warlord) get personal bars instead (`PrivateView.boss`).
+    let boss = world
+        .query_filtered::<(&Replicated, &Enemy, &BossBrain), Without<Guard>>()
+        .iter(world)
+        .max_by_key(|(_, e, _)| e.class)
+        .map(|(rep, e, b)| boss_view(rep, e, Some(b)));
+    let stage = stage_view(world);
+    let layout_hash = world.resource::<RoomLayout>().0.map.as_ref().map_or(0, |m| m.hash as u32);
     let party = world.query::<&Player>().iter(world).count() as u8;
     let clock = world.resource::<SimClock>();
     let (time, time_scale) = (clock.time, clock.scale);
@@ -306,10 +413,11 @@ pub fn run_view(world: &mut World) -> RunView {
         encounter_left: (enc.budget_left / enc.budget_total.max(1.0)).clamp(0.0, 1.0),
         overdrive_meter: od.meter,
         overdrive_active: od.active,
-        anvil,
         boss,
         chaos_tier: settings.chaos_tier,
         ember: run.ember.round() as u32,
         party,
+        layout_hash,
+        stage,
     }
 }

@@ -7,6 +7,7 @@ use crate::resources::*;
 use crate::{SimTick, build_schedule, players, run, snapshot};
 use gf_content::ContentDb;
 use gf_content::schema::Phase;
+use gf_core::poi::PoiKind;
 use gf_core::scaling::{compile_enemy_tuning, party_scaling};
 use gf_engine::prelude::*;
 use gf_net::{NetServer, ServerConfig, ServerTransport, SessionEvent};
@@ -31,6 +32,8 @@ pub struct SimConfig {
     /// key is laid out from the run seed; `key~seed` (hex, as reports print it) pins one layout
     /// and `key~0` loads the authored template.
     pub start_room: Option<String>,
+    /// QA: on a biome map, start the party beside the first POI of this kind (`--start-at`).
+    pub start_at: Option<PoiKind>,
 }
 
 impl Default for SimConfig {
@@ -45,6 +48,7 @@ impl Default for SimConfig {
             allow_join_in_progress: true,
             stress_enemies: None,
             start_room: None,
+            start_at: None,
         }
     }
 }
@@ -112,14 +116,19 @@ impl SimServer {
             },
         );
         let mut app = App::new();
-        let tuning =
-            compile_enemy_tuning(&party_scaling(&content.party_scaling, 1), &content.chaos_tiers, cfg.chaos_tier);
+        let tuning_for = |k: u8| {
+            compile_enemy_tuning(&party_scaling(&content.party_scaling, k), &content.chaos_tiers, cfg.chaos_tier)
+        };
+        let tuning = tuning_for(1);
+        // Horde clusters scale by their own size (1..=4 players), whatever the party size.
+        let clusters = ClusterTuning([tuning_for(1), tuning_for(2), tuning_for(3), tuning_for(4)]);
         app.insert_resource(Content(content))
             .insert_resource(SimSettings {
                 seed: cfg.seed,
                 phase: cfg.phase,
                 chaos_tier: cfg.chaos_tier,
                 start_room: cfg.start_room.clone(),
+                start_at: cfg.start_at,
             })
             .insert_resource(SimClock {
                 tick: 0,
@@ -144,6 +153,9 @@ impl SimServer {
             .insert_resource(TeamBoons::default())
             .insert_resource(RunState::default())
             .insert_resource(Encounter::default())
+            .insert_resource(Expedition::default())
+            .insert_resource(clusters)
+            .insert_resource(Flow::default())
             .insert_resource(StressMode(cfg.stress_enemies));
         build_schedule(&mut app);
         Self { app, net, cfg, stats: ServerStats::default() }

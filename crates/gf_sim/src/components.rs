@@ -7,6 +7,7 @@ use gf_core::forge::{PartBag, PartInstance, WeaponBuild};
 use gf_core::ids::{BoonId, CharacterId, EnemyId, NetId, RecipeId, SourceId};
 use gf_core::modifier::Modifier;
 use gf_core::movement::MoverState;
+use gf_core::poi::{PoiKind, PoiState};
 use gf_core::rarity::Rarity;
 use gf_core::revive::LifeState;
 use gf_core::stats::PlayerStats;
@@ -81,6 +82,9 @@ pub struct Vitals {
 pub struct Life {
     pub state: LifeState,
     pub rekindles: u8,
+    /// Downed with no living ally within `coop.tether_hopeless`: the Soul-Tether timer is clamped
+    /// short and the HUD says the Forge will reforge me beside the nearest ally (§5.9).
+    pub hopeless: bool,
 }
 
 /// The player's forge state: the weapon build, carried parts, run currencies, boons.
@@ -93,6 +97,9 @@ pub struct Arsenal {
     pub boons: Vec<(BoonId, Rarity)>,
     pub discovered: Vec<RecipeId>,
     pub active_recipes: Vec<RecipeId>,
+    /// The anvil whose Hot window granted my current forge charges: only its going Spent takes
+    /// them away (per-anvil charges on biome maps, §5.3).
+    pub charges_from: Option<Entity>,
 }
 
 impl Arsenal {
@@ -235,6 +242,9 @@ pub struct BoonChoice {
     pub offer: Vec<(BoonId, Rarity)>,
     pub rerolls: u8,
     pub god: Option<u16>,
+    /// Gods (index into the gods table) waiting to make an offer once the current one is picked:
+    /// shrines completed while an offer is open (replicated as `PrivateView.boon_queue`).
+    pub queue: Vec<u8>,
 }
 
 // ───────────────────────────── enemies ─────────────────────────────
@@ -463,7 +473,105 @@ pub struct AnvilStation {
     pub progress: f32,
     pub forge_left: f32,
     pub contested: bool,
+    /// Player slots (bits) this anvil has granted forge charges to during its Hot window.
+    pub granted: u8,
 }
+
+impl AnvilStation {
+    pub fn dormant() -> Self {
+        Self { state: AnvilState::Dormant, progress: 0.0, forge_left: 0.0, contested: false, granted: 0 }
+    }
+}
+
+// ───────────────────────────── biome maps ─────────────────────────────
+
+/// A point of interest on a biome map (OPEN_WORLD.md §2.3, §5.3), spawned from
+/// `MapLayout.pois[index]`. Replicated as `EntityKind::Poi { index }` with `status` = `state` and
+/// `hp` = `progress`. A map anvil also carries an [`AnvilStation`], which is then the source of
+/// truth for its state (the snapshot maps `AnvilState` to `PoiState`).
+#[derive(Component, Clone, Debug)]
+pub struct Poi {
+    /// Index into `MapLayout.pois`.
+    pub index: u8,
+    pub kind: PoiKind,
+    pub state: PoiState,
+    /// 0..=1: the hold fill, or the share of the guards slain.
+    pub progress: f32,
+    /// Lifecycle timer: seconds contested in a row (Hold: the wave stops after 30 s), or the
+    /// Touch channel.
+    pub timer: f32,
+    /// Hold POIs: no living player inside the ring (replicated as `EntityFlags::CONTESTED`).
+    pub contested: bool,
+    /// Player slots (bits) that claimed their share: a Spring's heal, a Shrine's late offer.
+    pub claimed: u8,
+    /// Clear POIs: guards still alive.
+    pub guards: u8,
+    /// Seals this POI grants when completed.
+    pub seals: u8,
+    /// Shrines: the god (index into the gods table) whose boon it grants.
+    pub god: Option<u8>,
+    /// Interaction / hold ring radius (from the site).
+    pub radius: f32,
+    /// Clear POIs: guards spawned when it woke (progress = 1 − guards / guards_total).
+    pub guards_total: u8,
+    /// The breaker elite has spawned (Hold POIs with `breaker_at`).
+    pub breaker: bool,
+}
+
+impl Poi {
+    /// A dormant POI for `site` (the gate starts Sealed).
+    pub fn from_site(index: u8, site: &gf_content::schema::PoiSite) -> Self {
+        Self {
+            index,
+            kind: site.kind,
+            state: if site.kind == PoiKind::Gate { PoiState::Sealed } else { PoiState::Dormant },
+            progress: 0.0,
+            timer: 0.0,
+            contested: false,
+            claimed: 0,
+            guards: 0,
+            seals: site.seals,
+            god: site.god,
+            radius: site.radius,
+            guards_total: 0,
+            breaker: false,
+        }
+    }
+}
+
+/// Lair elites, the Warlord and camp members: they idle at `home` until woken (§5.3, §5.5).
+#[derive(Component, Clone, Debug, Default)]
+pub struct Guard {
+    pub home: Vec2,
+    /// The POI (index into `MapLayout.pois`) this guard defends.
+    pub poi: Option<u8>,
+    /// The camp (index into `MapLayout.camps`) this guard belongs to.
+    pub camp: Option<u16>,
+    /// Attacking (a player came within `guards.aggro`, or it was hit).
+    pub awake: bool,
+    /// Seconds every player has been beyond `guards.leash` from home.
+    pub away: f32,
+    /// Seconds without taking damage while a player is within `guards.hunt_radius`.
+    pub untouched: f32,
+    /// Anti-hide: chase instead of keeping distance.
+    pub hunt: bool,
+}
+
+/// An enemy the horde director spawned for a player cluster: culled (and refunded) when it
+/// falls far behind (§5.6).
+#[derive(Component, Clone, Copy, Debug, Default)]
+pub struct Roaming {
+    /// Cluster id (its lowest player slot).
+    pub cluster: u8,
+    /// Seconds its nearest living player has been beyond `horde.cull_distance`.
+    pub far: f32,
+    /// Spawn weight refunded to the cluster when it is culled.
+    pub cost: f32,
+}
+
+/// Spawn tick of a horde enemy: it replicates `EntityFlags::EMERGING` for `horde.emerge_time`.
+#[derive(Component, Clone, Copy, Debug)]
+pub struct Born(pub u32);
 
 #[derive(Component, Debug)]
 pub struct Door {

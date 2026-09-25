@@ -7,6 +7,7 @@ use gf_core::damage::DamageType;
 use gf_core::ids::{BiomeId, BoonId, EnemyId, NetId, RoomId, SourceId};
 use gf_core::movement::Arena;
 use gf_core::overdrive::TeamOverdrive;
+use gf_core::poi::PoiKind;
 use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
 use gf_core::scaling::EnemyTuning;
@@ -35,6 +36,8 @@ pub struct SimSettings {
     pub chaos_tier: u8,
     /// QA override for the opening room (content key).
     pub start_room: Option<String>,
+    /// QA: on a biome map, start the party beside the first POI of this kind (`--start-at`).
+    pub start_at: Option<PoiKind>,
 }
 
 #[derive(Resource, Debug)]
@@ -68,12 +71,21 @@ pub struct Rngs {
     pub director: GfRng,
     pub ai: GfRng,
     pub boons: GfRng,
+    /// Biome maps: camps, surges and other world events (never the horde's spawn rolls).
+    pub world: GfRng,
 }
 
 impl Rngs {
     pub fn new(seed: u64) -> Self {
         let base = GfRng::new(seed);
-        Self { combat: base.fork(1), loot: base.fork(2), director: base.fork(3), ai: base.fork(4), boons: base.fork(5) }
+        Self {
+            combat: base.fork(1),
+            loot: base.fork(2),
+            director: base.fork(3),
+            ai: base.fork(4),
+            boons: base.fork(5),
+            world: base.fork(6),
+        }
     }
 }
 
@@ -240,6 +252,9 @@ pub struct RunState {
     pub rooms_in_biome: u8,
     pub pending_door: Option<DoorReward>,
     pub transition: f32,
+    /// HP multiplier for the next boss room's fixed spawns (set when the party walks through a
+    /// biome map's gate: `boss_hp_mult × Unworthy`), reset to 1.0 once applied.
+    pub next_boss_hp: f32,
 }
 
 impl Default for RunState {
@@ -264,6 +279,7 @@ impl Default for RunState {
             rooms_in_biome: 0,
             pending_door: None,
             transition: 0.0,
+            next_boss_hp: 1.0,
         }
     }
 }
@@ -293,4 +309,125 @@ pub struct Encounter {
     /// Anti-stall: kills seen and seconds since the last one.
     pub last_kills: u32,
     pub stall: f32,
+}
+
+// ───────────────────────────── biome maps ─────────────────────────────
+
+/// The Boss Gate of a biome map (§5.3).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub enum GateState {
+    /// Short of Seals (or the Warlord).
+    #[default]
+    Sealed,
+    /// Waiting for a player to interact inside the ring.
+    Open,
+    /// The countdown into the boss arena (seconds left).
+    Gathering { left: f32 },
+}
+
+/// A horde surge (§2.5): `warn` seconds of warning, then `left` seconds of spawns confined to an
+/// arc facing `dir` (a unit vector from the cluster toward the surge's side).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Surge {
+    pub dir: Vec2,
+    pub warn: f32,
+    pub left: f32,
+}
+
+/// A group of living players within `horde.cluster_link` of each other (single linkage).
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Cluster {
+    /// Player slots (bits) in this cluster. Its id is the lowest slot.
+    pub members: u8,
+    /// Living players in it.
+    pub n: u8,
+    pub centroid: Vec2,
+    /// Living enemies near its players this tick (the census).
+    pub count: u32,
+}
+
+impl Cluster {
+    /// Cluster id: the lowest member slot.
+    pub fn id(&self) -> u8 {
+        self.members.trailing_zeros().min(3) as u8
+    }
+}
+
+/// Runtime state of `MapLayout.camps[i]`.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CampState {
+    #[default]
+    Asleep,
+    Awake,
+    Cleared,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct CampRuntime {
+    pub state: CampState,
+    /// Members still alive (respawned from this when the camp wakes again).
+    pub left: u8,
+}
+
+/// Objective and horde state of the current biome map (§5.2). `active` only on maps; `load_room`
+/// resets it for every room.
+#[derive(Resource, Clone, Debug, Default)]
+pub struct Expedition {
+    pub active: bool,
+    /// Seconds since landfall (gameplay time).
+    pub time: f32,
+    pub seals: u8,
+    pub required: u8,
+    pub warlord_done: bool,
+    pub gate: GateState,
+    /// The gate was forced open at `gate_force_minute` (Unworthy).
+    pub forced: bool,
+    /// POIs completed (heat for the threat clock, depth).
+    pub objectives: u8,
+    /// `time` of the last objective progress (the stall hint).
+    pub last_progress: f32,
+    /// Threat clock: the current `ThreatKey` segment and the fraction (0..1) toward the next row
+    /// (replicated as `StageView.threat`; `GameEvent::ThreatRose` when the level rises).
+    pub threat_level: u8,
+    pub threat_frac: f32,
+    pub surge: Option<Surge>,
+    /// `time` of the next surge.
+    pub next_surge: f32,
+    pub clusters: Vec<Cluster>,
+    /// Spawn weight accrued per cluster id (its lowest slot).
+    pub accum: [f32; 4],
+    /// One per `MapLayout.camps`.
+    pub camps: Vec<CampRuntime>,
+    /// Host-side explored 4 u tiles (bit per tile, row-major): seeds a joining client's fog.
+    pub explored: Vec<u64>,
+}
+
+/// Enemy tuning per cluster size (`[k - 1]` for a cluster of `k` players): the horde scales each
+/// cluster's density, HP and elites by its own size, not the party's.
+#[derive(Resource, Clone, Copy, Debug)]
+pub struct ClusterTuning(pub [EnemyTuning; 4]);
+
+impl ClusterTuning {
+    /// Tuning for a cluster of `n` players (clamped to 1..=4).
+    pub fn get(&self, n: u8) -> &EnemyTuning {
+        &self.0[(n.clamp(1, 4) - 1) as usize]
+    }
+}
+
+/// Horde flow fields over the map's 4 u tiles (§5.6), host only. One field per player slot,
+/// refreshed round robin.
+#[derive(Resource, Clone, Debug, Default)]
+pub struct Flow {
+    pub w: u16,
+    pub h: u16,
+    /// The tile grid's south-west corner (world units); tiles are `TileGrid::TILE` wide.
+    pub origin: Vec2,
+    /// Step cost per tile (`u8::MAX` = impassable).
+    pub cost: Vec<u8>,
+    /// Path cost to each slot's player (`u16::MAX` = unreached).
+    pub dist: [Vec<u16>; 4],
+    /// Tile each slot's field was built from (`None` = no field).
+    pub src: [Option<u32>; 4],
+    /// The slot refreshed next.
+    pub next: u8,
 }
