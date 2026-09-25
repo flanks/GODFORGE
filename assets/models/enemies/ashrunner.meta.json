@@ -1,0 +1,181 @@
+{
+ "kind": "enemy",
+ "key": "ashrunner",
+ "tier": "swarm",
+ "tris": 1262,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "ashrunner_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 81923
+  },
+  {
+   "name": "ashrunner_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 318035
+  }
+ ],
+ "sockets": {
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.405,
+    0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.43,
+    0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    0.54,
+    0.55
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    0.92,
+    0.3
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "ashrunner_idle@loop",
+  "ashrunner_move@loop",
+  "ashrunner_windup",
+  "ashrunner_attack",
+  "ashrunner_hit",
+  "ashrunner_death"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.1546,
+   0.0,
+   -0.7894
+  ],
+  "max": [
+   0.1417,
+   0.8193,
+   0.655
+  ]
+ },
+ "size_m": 0.819,
+ "glb": "assets/models/enemies/ashrunner.glb",
+ "glb_bytes": 563928,
+ "glb_sha256": "3f9d45b1be0891162277beffc551a962ca41360f65867b954f4353528f451f6d",
+ "source_blend": "art/enemies/ashrunner/source/ashrunner.blend",
+ "build_script": "tools/blender/gf_assets/enemies/ashrunner.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "ashrunner",
+ "faction": "unmade",
+ "verb": "SPRINT",
+ "gait": "double-suspension gallop: legs_a = both front legs (pivot: shoulders), legs_b = both hind legs (pivot: hips); the tail bone is the loin + rump + tail and flexes the spine each stride",
+ "jaw": "the head bone is the skull + upper jaw hinged at the jaw joint: pitching it nose-up (-X) opens the mouth and shows the teal maw (the bite telegraph in windup)",
+ "move_cycle_m": 1.4,
+ "move_note": "play move@loop at speed / move_cycle_m cycles per second (row speed 5.2 m/s -> about 3.7 strides/s, a 0.27 s gallop stride)",
+ "content_row": {
+  "key": "ashrunner",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 18,
+  "speed": 5.2,
+  "radius": 0.36,
+  "scale": 1.0,
+  "behavior": "Swarmer(jitter: 0.6)",
+  "color": "#F2A541",
+  "shape": "Hound",
+  "pack": "(2, 4)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 191.7,
+   "p10": 121.7,
+   "p90": 268.1
+  },
+  "coverage": 0.351
+ },
+ "skin": {
+  "vertices": 802,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 387,
+   "head": 116,
+   "legs_a": 78,
+   "legs_b": 88,
+   "tail": 133
+  }
+ }
+}

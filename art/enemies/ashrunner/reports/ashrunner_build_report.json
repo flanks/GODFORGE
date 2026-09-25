@@ -1,0 +1,594 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\ashrunner.glb",
+  "key": "ashrunner",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 1262,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "ashrunner_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 81923
+   },
+   {
+    "name": "ashrunner_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 318035
+   }
+  ],
+  "materials": [
+   "M_ashrunner"
+  ],
+  "sockets": {
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.405,
+     0.02
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.43,
+     0.02
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.54,
+     0.55
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     0.92,
+     0.3
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.1546,
+    0.0,
+    -0.7894
+   ],
+   "max": [
+    0.1417,
+    0.8193,
+    0.655
+   ]
+  },
+  "height_m": 0.819,
+  "height_vs_hero": 0.372,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "ashrunner_idle@loop",
+   "ashrunner_move@loop",
+   "ashrunner_windup",
+   "ashrunner_attack",
+   "ashrunner_hit",
+   "ashrunner_death"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 191.7,
+   "p10": 121.7,
+   "p90": 268.1
+  },
+  "coverage": 0.351,
+  "zones": [
+   "hide",
+   "char",
+   "rib",
+   "ember",
+   "maw",
+   "eye",
+   "bone"
+  ],
+  "decals": 6,
+  "basecolor": "art/enemies/ashrunner/textures/ashrunner_basecolor.png",
+  "emissive": "art/enemies/ashrunner/textures/ashrunner_emissive.png",
+  "emissive_texels": 38373,
+  "seconds": 25.2
+ },
+ "skin": {
+  "vertices": 802,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 387,
+   "head": 116,
+   "legs_a": 78,
+   "legs_b": 88,
+   "tail": 133
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "forechest_char",
+   "zone": "char",
+   "bone": "body",
+   "faces": 14
+  },
+  {
+   "id": 1,
+   "name": "forechest_hide",
+   "zone": "hide",
+   "bone": "body",
+   "faces": 28
+  },
+  {
+   "id": 2,
+   "name": "ember_core",
+   "zone": "ember",
+   "bone": "body",
+   "faces": 48
+  },
+  {
+   "id": 3,
+   "name": "keel",
+   "zone": "char",
+   "bone": "body",
+   "faces": 12
+  },
+  {
+   "id": 4,
+   "name": "rib0",
+   "zone": "rib",
+   "bone": "body",
+   "faces": 34
+  },
+  {
+   "id": 5,
+   "name": "rib1",
+   "zone": "rib",
+   "bone": "body",
+   "faces": 34
+  },
+  {
+   "id": 6,
+   "name": "rib2",
+   "zone": "rib",
+   "bone": "body",
+   "faces": 34
+  },
+  {
+   "id": 7,
+   "name": "rib3",
+   "zone": "rib",
+   "bone": "body",
+   "faces": 34
+  },
+  {
+   "id": 8,
+   "name": "spine_bar",
+   "zone": "rib",
+   "bone": "body",
+   "faces": 12
+  },
+  {
+   "id": 9,
+   "name": "hide_flap_R",
+   "zone": "hide",
+   "bone": "body",
+   "faces": 18
+  },
+  {
+   "id": 10,
+   "name": "rump_char",
+   "zone": "char",
+   "bone": "tail",
+   "faces": 16
+  },
+  {
+   "id": 11,
+   "name": "rump_hide",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 26
+  },
+  {
+   "id": 12,
+   "name": "skull_char",
+   "zone": "char",
+   "bone": "head",
+   "faces": 16
+  },
+  {
+   "id": 13,
+   "name": "skull_hide",
+   "zone": "hide",
+   "bone": "head",
+   "faces": 19
+  },
+  {
+   "id": 14,
+   "name": "skull_maw",
+   "zone": "maw",
+   "bone": "head",
+   "faces": 3
+  },
+  {
+   "id": 15,
+   "name": "jaw_char",
+   "zone": "char",
+   "bone": "body",
+   "faces": 20
+  },
+  {
+   "id": 16,
+   "name": "jaw_maw",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 6
+  },
+  {
+   "id": 17,
+   "name": "fang_up",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 18,
+   "name": "fang_lo",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 19,
+   "name": "fang_up",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 20,
+   "name": "fang_lo",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 21,
+   "name": "eye",
+   "zone": "eye",
+   "bone": "head",
+   "faces": 18
+  },
+  {
+   "id": 22,
+   "name": "eye",
+   "zone": "eye",
+   "bone": "head",
+   "faces": 18
+  },
+  {
+   "id": 23,
+   "name": "ear_L",
+   "zone": "char",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 24,
+   "name": "ear_R",
+   "zone": "char",
+   "bone": "head",
+   "faces": 5
+  },
+  {
+   "id": 25,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 26,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 27,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 28,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 29,
+   "name": "mane",
+   "zone": "char",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 30,
+   "name": "upperarm",
+   "zone": "hide",
+   "bone": "legs_a",
+   "faces": 8
+  },
+  {
+   "id": 31,
+   "name": "forearm",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 12
+  },
+  {
+   "id": 32,
+   "name": "paw_f",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 15
+  },
+  {
+   "id": 33,
+   "name": "thigh",
+   "zone": "hide",
+   "bone": "legs_b",
+   "faces": 8
+  },
+  {
+   "id": 34,
+   "name": "shin",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 12
+  },
+  {
+   "id": 35,
+   "name": "hock_spur",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 5
+  },
+  {
+   "id": 36,
+   "name": "paw_h",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 15
+  },
+  {
+   "id": 37,
+   "name": "upperarm",
+   "zone": "hide",
+   "bone": "legs_a",
+   "faces": 8
+  },
+  {
+   "id": 38,
+   "name": "forearm",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 12
+  },
+  {
+   "id": 39,
+   "name": "paw_f",
+   "zone": "char",
+   "bone": "legs_a",
+   "faces": 15
+  },
+  {
+   "id": 40,
+   "name": "thigh",
+   "zone": "hide",
+   "bone": "legs_b",
+   "faces": 8
+  },
+  {
+   "id": 41,
+   "name": "shin",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 12
+  },
+  {
+   "id": 42,
+   "name": "hock_spur",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 5
+  },
+  {
+   "id": 43,
+   "name": "paw_h",
+   "zone": "char",
+   "bone": "legs_b",
+   "faces": 15
+  },
+  {
+   "id": 44,
+   "name": "tail_char",
+   "zone": "char",
+   "bone": "tail",
+   "faces": 8
+  },
+  {
+   "id": 45,
+   "name": "tail_hide",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 46,
+   "name": "tail_tatter",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 47,
+   "name": "tail_tatter",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 48,
+   "name": "tail_tatter",
+   "zone": "hide",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 49,
+   "name": "tail_cinder",
+   "zone": "ember",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 50,
+   "name": "tail_cinder_b",
+   "zone": "ember",
+   "bone": "tail",
+   "faces": 5
+  }
+ ],
+ "tris_blender": 1262,
+ "clips": [
+  {
+   "name": "ashrunner_idle@loop",
+   "frames": [
+    0,
+    48
+   ],
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "ashrunner_move@loop",
+   "frames": [
+    0,
+    10
+   ],
+   "seconds": 0.333,
+   "loop": true
+  },
+  {
+   "name": "ashrunner_windup",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "ashrunner_attack",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "ashrunner_hit",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": false
+  },
+  {
+   "name": "ashrunner_death",
+   "frames": [
+    0,
+    27
+   ],
+   "seconds": 0.9,
+   "loop": false
+  }
+ ]
+}
