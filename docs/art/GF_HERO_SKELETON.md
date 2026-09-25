@@ -163,17 +163,24 @@ aim, identity attach. Only the bone name differs, and the armory agent should up
 
 1. **Load the hero.** Spawn `SceneRoot(assets.load("models/characters/<key>.glb#Scene0"))`. Every glTF node,
    bones included, becomes an entity with a `Name`. Once the scene is spawned (`SceneInstanceReady`), look up
-   the descendants named `weapon_R`, `weapon_L`, `head_top` and `chest_sigil`.
+   the descendants named `weapon_R`, `weapon_L`, `head_top` and `chest_sigil`. The sidecar
+   `models/characters/<key>.meta.json` (stage 5, §9) carries what glTF cannot: clip events, weapon-variant swap
+   frames, design speeds, the default weapon.
 2. **Weapon.**
    - Spawn `SceneRoot(assets.load("models/weapons/<chassis>.glb#Scene0"))` as a child of the `weapon_R`
      entity, with **`Transform::IDENTITY`**.
    - Dual weapons and gauntlet pairs: re-parent the weapon scene's `offhand` node, the left gauntlet, to
      `weapon_L`, also with `Transform::IDENTITY`.
    - Two-handed weapons: the weapon scene's `grip_L` node (world transform) is the left hand's IK target.
-   - The weapon scene's `muzzle` node is the projectile / strike origin.
+   - The weapon scene's `muzzle` node is the projectile / strike origin (`muzzle_2`, under `offhand`, for the
+     left fist of a pair).
+   - A weapon with hand variants (the anvil_gauntlets: `<chassis>_fist_R`, `<chassis>_open_R`, `<chassis>_fist_L`,
+     `<chassis>_open_L`) spawns with all four visible: hide the open pair (`Visibility::Hidden`), then swap per hand
+     at `clip_info.<clip>.weapon_variant` (start variant and swap frames) of the hero sidecar.
 3. **Animation.**
    - Shared clips are authored on GF_Hero_v1 and baked per hero (§8); the target ids match across heroes.
-   - Clip names, loops, layers, design speeds and events: §8.
+   - Clip names, loops, layers, design speeds and events: §8; the events per clip (frame and time) are in the
+     sidecar's `clip_info.<clip>.events`.
    - Sockets are ordinary joints: they ride on their parents. No clip keys them.
    - Recoil, aim offsets and hit flinches stay procedural (ARCHITECTURE §9) and act on core bones or on the
      weapon entity.
@@ -390,3 +397,25 @@ width, hip yaw (strafe), lift, heel roll and a ground-speed-matched swing.
 **A new hero** gets the whole shared set for free: its landmark file (§5) sets the proportions, `Kit` scales every
 offset by the hero's leg and arm length, and `characters.csv` gives the move speed. The hero only writes
 `s4_<key>.py` with its unique clips.
+
+## 9. The shipped file (stage 5)
+
+`tools/blender/gf_hero/export_glb.py` writes `assets/models/characters/<key>.glb` from the stage-4 file
+(`python tools/blender/gf_hero/run_stage5.py <key>`; docs/ART_PIPELINE.md §5 "Stage 5"). Its node tree:
+
+```text
+GF_Hero_v1          the scene's only root: the armature node (Bevy's animation target paths start here)
+  root              the 63 contract joints (core, twist, fingers, sockets) + any x_ extras, parented as in §2
+    pelvis ...
+  <key>_mesh        the ONE skinned mesh (every body part joined; one material, skin 0)
+```
+
+- +Y up, the hero faces +Z; the rest pose is the T-pose; the inverse bind matrices equal the node rest pose.
+- Every clip is one animation `<key>_<clip>[@loop]`, sampled at 30 fps from t = 0, with all the joints keyed
+  (the twist bones carry their baked Copy Rotation; `root` and the sockets hold their rest transform).
+- The sidecar `<key>.meta.json` gives `skeleton`, `sockets` (rest frames in glTF), `clips` + `clip_info` (loop,
+  layer, frames, events, design speed, weapon-variant swaps, sim state), `playback` rules, the default `weapon`,
+  `status` and the GLB's sha256.
+- The gate is `tools/blender/gf_hero/validate_glb.py` (standard library, CI job `hero-glb`, with a Blender re-import
+  smoke test). The clips it requires are listed in `tools/blender/gf_hero/required_clips.json`: the shared set of §8,
+  which must equal `s4_contract.SHARED_CLIPS`, plus each hero's unique block.

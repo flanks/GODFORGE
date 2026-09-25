@@ -1,0 +1,1322 @@
+{
+ "kind": "character",
+ "key": "brax",
+ "name": "Brax, The Furnace-Born",
+ "skeleton": "GF_Hero_v1 v1",
+ "armature": "GF_Hero_v1",
+ "joints": 63,
+ "extra_bones": [],
+ "tris": 15048,
+ "tris_budget": [
+  15000,
+  25000
+ ],
+ "textures": [
+  {
+   "name": "brax_emissive",
+   "role": "emissive",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 414389
+  },
+  {
+   "name": "brax_normal",
+   "role": "normal",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 927315
+  },
+  {
+   "name": "brax_basecolor",
+   "role": "base_color",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 3432557
+  }
+ ],
+ "material": {
+  "name": "M_brax",
+  "double_sided": false,
+  "emissive_strength": 3,
+  "textures": {
+   "base_color": true,
+   "emissive": true,
+   "normal": true
+  }
+ },
+ "sockets": {
+  "weapon_R": {
+   "parent": "hand_R",
+   "translation": [
+    -1.01645,
+    1.7339,
+    -0.03267
+   ],
+   "forward": [
+    -1.0,
+    0.0,
+    -0.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "weapon_L": {
+   "parent": "hand_L",
+   "translation": [
+    1.01645,
+    1.7339,
+    -0.03267
+   ],
+   "forward": [
+    1.0,
+    0.0,
+    -0.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "head_top": {
+   "parent": "head",
+   "translation": [
+    -0.0,
+    2.19878,
+    -0.014
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "chest_sigil": {
+   "parent": "spine_03",
+   "translation": [
+    -0.0,
+    1.72,
+    0.17369
+   ],
+   "forward": [
+    -0.0,
+    0.19408,
+    0.98099
+   ],
+   "up": [
+    -0.0,
+    0.98099,
+    -0.19408
+   ],
+   "vs_landmarks": 4.1e-06
+  }
+ },
+ "clips": [
+  "brax_idle@loop",
+  "brax_idle_combat@loop",
+  "brax_walk@loop",
+  "brax_run@loop",
+  "brax_strafe_left@loop",
+  "brax_strafe_right@loop",
+  "brax_backpedal@loop",
+  "brax_dash",
+  "brax_dash_recover",
+  "brax_fire_light",
+  "brax_fire_heavy",
+  "brax_fire_charge@loop",
+  "brax_hit_light",
+  "brax_hit_heavy",
+  "brax_knockdown",
+  "brax_get_up",
+  "brax_death",
+  "brax_downed@loop",
+  "brax_revive",
+  "brax_reforge_in",
+  "brax_victory",
+  "brax_ping",
+  "brax_interact",
+  "brax_forge_hammer@loop",
+  "brax_idle_signature@loop",
+  "brax_jab_l",
+  "brax_jab_r",
+  "brax_hook",
+  "brax_uppercut",
+  "brax_furnace_rush@loop",
+  "brax_furnace_rush_end",
+  "brax_meltdown_start",
+  "brax_meltdown@loop",
+  "brax_heat_vent"
+ ],
+ "clip_info": {
+  "brax_idle@loop": {
+   "clip": "idle",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 90,
+   "duration_s": 3.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "alive, not moving, out of combat (no enemy near, no attack for 2 s; hub)",
+   "purpose": "relaxed breathing stance, weight drifting between the feet"
+  },
+  "brax_idle_combat@loop": {
+   "clip": "idle_combat",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 32,
+   "duration_s": 1.06667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "alive, not moving, in combat (enemies near or an attack in the last 2 s). Frame 0 is the reference pose of every upper-layer clip",
+   "purpose": "combat-ready stance: guard up, a light bounce on the knees"
+  },
+  "brax_walk@loop": {
+   "clip": "walk",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 28,
+   "duration_s": 0.93333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 1.799,
+   "travel_mps": [
+    0.0,
+    -1.7994697034573806
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "moving at under about 55 % of move speed (stick partly pushed, slows); playback rate = speed / 1.80 m/s",
+   "purpose": "heavy walk, gauntlets swinging at the sides"
+  },
+  "brax_run@loop": {
+   "clip": "run",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 6.2,
+   "travel_mps": [
+    0.0,
+    -6.2
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "moving within 45 deg of the aim at move speed; playback rate = speed / 6.2 m/s",
+   "purpose": "brawler run: forward lean, gauntlets pumping in front of the ribs"
+  },
+  "brax_strafe_left@loop": {
+   "clip": "strafe_left",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 6.2,
+   "travel_mps": [
+    6.2,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "moving 45-135 deg to the left of the aim; playback rate = speed / 6.2 m/s",
+   "purpose": "side run to the hero's left, hips opened toward the travel, chest and guard kept on the aim"
+  },
+  "brax_strafe_right@loop": {
+   "clip": "strafe_right",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 6.2,
+   "travel_mps": [
+    -6.2,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "moving 45-135 deg to the right of the aim; playback rate = speed / 6.2 m/s",
+   "purpose": "side run to the hero's right (the mirror of strafe_left)"
+  },
+  "brax_backpedal@loop": {
+   "clip": "backpedal",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 6.2,
+   "travel_mps": [
+    0.0,
+    6.2
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "moving more than 135 deg away from the aim; playback rate = speed / 6.2 m/s",
+   "purpose": "backpedal on the balls of the feet, guard up, weight forward"
+  },
+  "brax_dash": {
+   "clip": "dash",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the 0.16 s dash (MoverState.dash_left > 0); the client faces the hero along the dash for its duration",
+   "purpose": "the dash burst: a low shoulder-led lunge-glide, the lead gauntlet driving forward, the rear one trailing"
+  },
+  "brax_dash_recover": {
+   "clip": "dash_recover",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 14,
+   "duration_s": 0.46667,
+   "fps": 30,
+   "events": {
+    "land": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the first 0.45 s after a dash ends when the hero is not moving on (else blend into locomotion)",
+   "purpose": "landing out of the dash: the lead foot plants, a heavy absorb, back to the guard"
+  },
+  "brax_fire_light": {
+   "clip": "fire_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 2,
+     "time_s": 0.06667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "each primary shot of a light chassis (fire_rate >= 2/s); Brax plays brax_jab_l / brax_jab_r instead",
+   "purpose": "generic light shot: the weapon hand thrusts along the aim and snaps back (recoil stays procedural)"
+  },
+  "brax_fire_heavy": {
+   "clip": "fire_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 7,
+     "time_s": 0.23333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "a heavy / charged release (fire_rate < 1/s, charge release, splash chassis)",
+   "purpose": "generic heavy shot: load back, both arms drive forward, the body takes the kick"
+  },
+  "brax_fire_charge@loop": {
+   "clip": "fire_charge",
+   "family": "shared",
+   "loop": true,
+   "layer": "upper",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "fire held on a Charge chassis (FireKind::Charge) until release (then fire_heavy)",
+   "purpose": "holding a charge: rear hand loaded at the hip, braced, trembling with stored power"
+  },
+  "brax_hit_light": {
+   "clip": "hit_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 12,
+   "duration_s": 0.4,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "PlayerFlags::HIT on a light hit (damage < 10 % max HP), layered over whatever plays",
+   "purpose": "a flinch: head snaps, the guard is knocked back, absorb, recover"
+  },
+  "brax_hit_heavy": {
+   "clip": "hit_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 26,
+   "duration_s": 0.86667,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "PlayerFlags::HIT on a heavy hit (damage >= 10 % max HP or a stun); interrupts upper-layer clips",
+   "purpose": "a big stagger: blown back, the lead foot steps back, absorb low, step back in"
+  },
+  "brax_knockdown": {
+   "clip": "knockdown",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "ground": {
+     "frame": 14,
+     "time_s": 0.46667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "a knockback / launch strong enough to floor the hero (stun >= 0.8 s); holds its last frame until get_up",
+   "purpose": "blown off the feet: impact, a backward fall, the bounce, lying on the back"
+  },
+  "brax_get_up": {
+   "clip": "get_up",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "stand": {
+     "frame": 30,
+     "time_s": 1.0
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the knockdown's stun ends",
+   "purpose": "from the back: sit up on the hands, roll onto one knee, push up into the guard"
+  },
+  "brax_death": {
+   "clip": "death",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 48,
+   "duration_s": 1.6,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "knee": {
+     "frame": 20,
+     "time_s": 0.66667
+    },
+    "ground": {
+     "frame": 36,
+     "time_s": 1.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "LifeState::Downed begins (GameEvent::Downed); holds its last frame, then downed@loop (wraith look)",
+   "purpose": "the fatal blow: head snaps back, knees buckle to the ground, topples face down"
+  },
+  "brax_downed@loop": {
+   "clip": "downed",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "LifeState::Downed (the Soul-Tether wraith; moves at 45 % speed with no gait, the client adds the ghost material)",
+   "purpose": "the wraith drift: slumped, floating 0.35 m off the ground, limbs trailing, a slow bob"
+  },
+  "brax_revive": {
+   "clip": "revive",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "jolt": {
+     "frame": 6,
+     "time_s": 0.2
+    },
+    "land": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "an ally completes the Soul-Tether revive (Downed -> Alive)",
+   "purpose": "pulled back into the body: a jolt, the feet slam down, crouch, rise into the guard"
+  },
+  "brax_reforge_in": {
+   "clip": "reforge_in",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 45,
+   "duration_s": 1.5,
+   "fps": 30,
+   "events": {
+    "clash": {
+     "frame": 28,
+     "time_s": 0.93333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "LifeState::Reforging ends: the hero reappears next to an ally",
+   "purpose": "forged anew: rises from a one-knee landing (fist planted), clashes the gauntlets, takes the guard"
+  },
+  "brax_victory": {
+   "clip": "victory",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {
+    "roar": {
+     "frame": 17,
+     "time_s": 0.56667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the run is won (GameEvent victory / boss down, results screen); holds its last frame",
+   "purpose": "the roar: a crouch, then one gauntlet thrust to the sky, chest out; holds the pose"
+  },
+  "brax_ping": {
+   "clip": "ping",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {
+    "ping": {
+     "frame": 5,
+     "time_s": 0.16667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": [
+      4,
+      16
+     ]
+    }
+   },
+   "maps_to": "the ping / marker input (party callout); the open gauntlet variant shows while the hand is open",
+   "purpose": "a ping: the right arm points along the aim with the hand open, the head follows"
+  },
+  "brax_interact": {
+   "clip": "interact",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "contact": {
+     "frame": 12,
+     "time_s": 0.4
+    },
+    "release": {
+     "frame": 26,
+     "time_s": 0.86667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the interact input at an anvil / forge / shrine POI (PoiState use); 1.3 s",
+   "purpose": "work the anvil: lean over and press both gauntleted fists onto it (knuckles down), then straighten"
+  },
+  "brax_forge_hammer@loop": {
+   "clip": "forge_hammer",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "hammer_hit": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the forge / hub anvil upgrade (Forge screen open, hub idle at the anvil)",
+   "purpose": "hammering the anvil with the right fist, the left fist bracing the work"
+  },
+  "brax_idle_signature@loop": {
+   "clip": "idle_signature",
+   "family": "brax",
+   "loop": true,
+   "layer": "full",
+   "frames": 120,
+   "duration_s": 4.0,
+   "fps": 30,
+   "events": {
+    "knock_1": {
+     "frame": 86,
+     "time_s": 2.86667
+    },
+    "knock_2": {
+     "frame": 92,
+     "time_s": 3.06667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "alive and idle for 6 s or more (out of combat); in the hub and the character select",
+   "purpose": "signature idle: rolls each shoulder, cracks the neck side to side, knocks the gauntlets together twice"
+  },
+  "brax_jab_l": {
+   "clip": "jab_l",
+   "family": "brax",
+   "loop": false,
+   "layer": "upper",
+   "frames": 10,
+   "duration_s": 0.33333,
+   "fps": 30,
+   "events": {
+    "hit": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "anvil_gauntlets strike (fire_rate 3/s), alternating with jab_r; the strike lands on frame 3",
+   "purpose": "lead jab: the left gauntlet snaps straight down the aim line and back"
+  },
+  "brax_jab_r": {
+   "clip": "jab_r",
+   "family": "brax",
+   "loop": false,
+   "layer": "upper",
+   "frames": 10,
+   "duration_s": 0.33333,
+   "fps": 30,
+   "events": {
+    "hit": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "anvil_gauntlets strike (fire_rate 3/s), alternating with jab_l; the strike lands on frame 3",
+   "purpose": "rear straight: hips and the rear heel turn, the right gauntlet drives down the aim line"
+  },
+  "brax_hook": {
+   "clip": "hook",
+   "family": "brax",
+   "loop": false,
+   "layer": "upper",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "hit": {
+     "frame": 6,
+     "time_s": 0.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "every third strike of a held string, and every strike at max Heat (ignite + stagger); lands on frame 6",
+   "purpose": "lead hook: load to the left, the torso whips through, the left gauntlet sweeps across at head height"
+  },
+  "brax_uppercut": {
+   "clip": "uppercut",
+   "family": "brax",
+   "loop": false,
+   "layer": "full",
+   "frames": 48,
+   "duration_s": 1.6,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 10,
+     "time_s": 0.33333
+    },
+    "slam": {
+     "frame": 25,
+     "time_s": 0.83333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "kits.ron brax active1 Cinder Uppercut: Nova (launch) on 'launch', Field (flame geysers) on 'slam'",
+   "purpose": "Cinder Uppercut: coil low, a rising uppercut that launches, a hang, a double-fist slam into the ground"
+  },
+  "brax_furnace_rush@loop": {
+   "clip": "furnace_rush",
+   "family": "brax",
+   "loop": true,
+   "layer": "full",
+   "frames": 12,
+   "duration_s": 0.4,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 20.0,
+   "travel_mps": [
+    0.0,
+    -20.0
+   ],
+   "slide_exempt": true,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "kits.ron brax active2 Furnace Rush while the Rush moves (8 m in 0.4 s = 12 frames); the enemy drag is sim-side",
+   "purpose": "Furnace Rush: head down behind both gauntlets like a ram, legs churning, very low"
+  },
+  "brax_furnace_rush_end": {
+   "clip": "furnace_rush_end",
+   "family": "brax",
+   "loop": false,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {
+    "plant": {
+     "frame": 3,
+     "time_s": 0.1
+    },
+    "release": {
+     "frame": 5,
+     "time_s": 0.16667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "Furnace Rush ends (after 0.4 s): the drag releases on 'release'",
+   "purpose": "the brake: the lead foot plants in a skid, both gauntlets shove the dragged line away, back to the guard"
+  },
+  "brax_meltdown_start": {
+   "clip": "meltdown_start",
+   "family": "brax",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "ignite": {
+     "frame": 13,
+     "time_s": 0.43333
+    },
+    "clash": {
+     "frame": 27,
+     "time_s": 0.9
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "kits.ron brax ultimate Meltdown cast: the buff starts on 'ignite', the clash is the shockwave VFX cue",
+   "purpose": "Meltdown ignition: gather low, a chest-out roar with the arms flung wide, the gauntlets slam together"
+  },
+  "brax_meltdown@loop": {
+   "clip": "meltdown",
+   "family": "brax",
+   "loop": true,
+   "layer": "full",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "replaces idle_combat while the Meltdown buff lasts (8 s); strikes layer on top as usual",
+   "purpose": "Meltdown stance: lower and wider, fists forward, a fast bounce and rolling shoulders"
+  },
+  "brax_heat_vent": {
+   "clip": "heat_vent",
+   "family": "brax",
+   "loop": false,
+   "layer": "upper",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "vent": {
+     "frame": 6,
+     "time_s": 0.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "maps_to": "the Heat Gauge passive reaches max (attacks start to ignite); the steam / ember VFX sit on chest_sigil",
+   "purpose": "Heat vent: shoulders thrown back, arms dropped wide, chest out, head back as the cracks vent"
+  }
+ },
+ "playback": {
+  "fps": 30,
+  "naming": "<key>_<clip>, loops <key>_<clip>@loop (docs/art/GF_HERO_SKELETON.md section 8)",
+  "locomotion": "playback rate = ground speed / clip_info.design_speed_mps (walk, run, strafe_*, backpedal)",
+  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are brax_idle_combat@loop frame 0",
+  "events": "glTF has no events: clip_info.<clip>.events gives the frame and time of each (30 fps)",
+  "weapon_variant": "clip_info.<clip>.weapon_variant: per hand, the sleeve weapon's start variant (fist/open) and the frames where it swaps",
+  "in_place": "only pelvis translates; the entity moves in the sim"
+ },
+ "weapon": {
+  "default": "anvil_gauntlets",
+  "glb": "assets/models/weapons/anvil_gauntlets.glb",
+  "attach": "weapon scene = identity child of weapon_R; its offhand node re-parented to weapon_L with an identity transform"
+ },
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. The hero faces +Z, origin on the ground between the feet, rest pose = T-pose. Socket nodes: -Z = forward (grip +Y), +Y = up, +X = right; a weapon scene attaches as an identity child.",
+ "bounds_m": {
+  "min": [
+   -1.174,
+   0.0037,
+   -0.3444
+  ],
+  "max": [
+   1.174,
+   2.1988,
+   0.3271
+  ]
+ },
+ "height_m": 2.195,
+ "glb": "assets/models/characters/brax.glb",
+ "glb_bytes": 9967940,
+ "glb_sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+ "source_blend": "art/characters/brax/production/brax_anim.blend",
+ "build_script": "tools/blender/gf_hero/export_glb.py",
+ "pipeline": "docs/ART_PIPELINE.md stage 5",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "tool": "tools/blender/gf_hero/validate_glb.py",
+  "source_fidelity_max_error": 1.8996306552221398e-05
+ }
+}

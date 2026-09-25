@@ -33,13 +33,14 @@ glTF, because Bevy 0.20 can load neither Draco nor meshopt (§6).
 | 2 | production mesh + NPR textures: **made by AI**, no human artist (user decision, 2026-09-25); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the review sheets |
 | 3 | rig + skin weights: **made by AI** (the same decision; stage 3 has no weight-paint artist either); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the stage-3 sheets |
 | 4 | the clips: **made by AI** (no animator; the same decision), validated by metrics and review renders; the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human`. Mixamo/ActorCore-seeded clips would be `stand_in` |
-| 5 | the final Hades-II bar | **human** | `done` with `signed_off_by`. Only then may the hero's `final` be `true` |
+| 5 | export & validation: **made by AI** (the exporter, the stdlib gate, a Blender re-import, the CI job `hero-glb`); the user's final visual approval is the Hades-II bar | the **user** | `done` with `produced_by`; an item `user_final_approval` stays `pending_human`. When the user signs it off, the item and the stage get `signed_off_by` / `signed_off_on`; only then may the hero's `final` be `true` |
 
 **Decision of 2026-09-25 (the user, relayed by the workflow coordinator): there is no human artist for
 stage 2.** The production mesh, UVs and NPR textures are made by the AI pipeline in §5 at production
 quality, not as a stand-in. The human gate that remains at stage 2 is the user's own visual approval. The
 same holds for stage 3 (the rig and its weights are AI-made and validated by poses, metrics and review renders;
-the user gives the final visual approval).
+the user gives the final visual approval), stage 4 (the clips) and stage 5 (the export: validators and review
+renders are the quality gate, the user's final visual approval is the only human gate).
 
 **Human gates are real.** Every gate above is recorded as `pending_human` in the hero's
 `art/characters/<key>/status.json` until a person signs it off. When engineering needs something
@@ -106,7 +107,9 @@ art/characters/<key>/
   reports/        review sheets (PNG < 2 MB) and stage reports (committed); reports/stage2/ = stage-2 sheets + JSON;
                   reports/stage3/ + rig_report.md = the rig's sheets, metrics and glTF check;
                   reports/anim/ + anim_report.md = one contact sheet per clip, the game-size boards, clips.json
-                  (the clip manifest: frames, loops, layers, events, design speeds, metrics) and the glTF clip check
+                  (the clip manifest: frames, loops, layers, events, design speeds, metrics) and the glTF clip check;
+                  export_report.json + reports/stage5/export_review.png = the stage-5 export: Blender-side checks, the
+                  gate, source fidelity, the Blender re-import, the signature weapon, the review sheet of the shipped file
   stage2_fit.json / stage2_parts.json / stage2_texture.json   the hero's stage-2 inputs (landmarks, part
                   parameters, paint settings; committed, hand-edited)
   production/     <key>_stage2.blend: the production mesh + material (committed, Git LFS);
@@ -124,14 +127,39 @@ tools/comfy/      ComfyUI drivers and the user's graphs (API format), plus the s
 tools/blender/gf_hero/   headless Blender scripts: stage-1 review renders, the stage-2 chain (run_stage2.py, s2_*.py),
                   the stage-3 rig chain (gf_hero_rig.py = the GF_Hero_v1 contract, run_stage3.py, s3_*.py, check_skeleton.py),
                   the stage-4 clip chain (run_stage4.py, s4lib.py = the solver, s4_clips.py = the shared library,
-                  s4_<key>.py = a hero's unique set, s4_contract.py, check_clips.py), later the stage-5 export
-assets/models/characters/<key>.glb   shipped hero mesh only (stage 5 output; the client falls back to greybox when missing)
-assets/models/weapons/<chassis>.glb  shipped weapon model (stage 5 output), attached to the weapon sockets
+                  s4_<key>.py = a hero's unique set, s4_contract.py, check_clips.py), the stage-5 export (run_stage5.py,
+                  export_glb.py, validate_glb.py = the gate, smoke_import.py, s5_sheets.py, required_clips.json)
+assets/models/characters/<key>.glb   the shipped hero: GF_Hero_v1 + one skinned mesh + every clip (stage 5 output; the
+                  client falls back to greybox when missing) and <key>.meta.json, its sidecar (clip events, sockets, status)
+assets/models/weapons/<chassis>.glb  shipped weapon model (stage 5 output) + <chassis>.meta.json, attached to the weapon sockets
 ```
 
 Git LFS is enabled (repo `.gitattributes`, 2026-09-25): `.blend`, `.glb` and `art/**/textures/**/*.png` go
 through LFS. No file over 20 MB is committed outside LFS; `art/.gitignore` keeps scratch and unselected raw
 output local (§8).
+
+### Commands per stage
+
+Run from the repo root. `<blender>` is `"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"` (the chain
+runners read `BLENDER`), `<comfy-python>` is `D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe` (PIL;
+the runners read `COMFY_PY`). Review renders use Cycles on the CPU or Workbench, never EEVEE: the GPU is shared.
+
+| Stage | Command | Output |
+|---|---|---|
+| 0 palette | `<comfy-python> tools/comfy/palette_extract.py art/characters/<key>/palette_spec.json` | `palette.json`, `color_script.png` |
+| 0 readability | `<comfy-python> tools/comfy/readability_sheet.py <key> <front.png>` | `reports/stage0_readability.png` |
+| 0 approval (human) | `python tools/comfy/approve_sheet.py <key> <sheet> <png> --by "<name>"` | `references/<KEY>_<sheet>_approved.png`, status item `done` |
+| 1 input check | `python tools/comfy/run_trellis.py <key> <concept.png> --mask-only --out art/characters/<key>/work/maskcheck_raw` | mask + conditioning crop |
+| 1 generate | `python -u tools/comfy/run_trellis.py <key> <concept.png> --seed 101 --seed 202 --seed 303` | `source/<key>_trellis2_s<seed>.glb` + provenance JSON |
+| 1 review | `<blender> -b -P tools/blender/gf_hero/render_blockout.py -- <glb> art/characters/<key>/work/renders/<stem> <stem>`, then `<comfy-python> tools/comfy/blockout_sheets.py <renders> <reports/blockout> <concept> <mask> <stems...> --selected <stem>` and `python tools/comfy/art_manifest.py <key> --selected <glb>` | review sheets, `manifest.json` |
+| 2 production mesh | `python tools/blender/gf_hero/run_stage2.py <key>` (armoured variant: `python tools/blender/gf_hero/s2_valdris_run.py`) | `production/<key>_stage2.blend`, `textures/`, the signature weapon pack, `reports/stage2/` |
+| 3 rig | `python tools/blender/gf_hero/run_stage3.py <key>` | `production/<key>_rig.blend`, `work/<key>_landmarks.json`, `reports/stage3/` |
+| 4 animation | `python tools/blender/gf_hero/run_stage4.py <key>` | `production/<key>_anim.blend`, `reports/anim/` |
+| 5 export & validate | `python tools/blender/gf_hero/run_stage5.py <key>` | `assets/models/characters/<key>.glb` + `.meta.json`, `assets/models/weapons/<chassis>.glb` + `.meta.json`, `reports/export_report.json`, `reports/stage5/` |
+| 5 gate only (CI) | `python tools/blender/gf_hero/validate_glb.py assets/models/characters/*.glb [--blender <blender>] [--json <report>]` | exit 1 on any error |
+| CI (stdlib) | `python tools/comfy/check_art.py`, `python tools/blender/gf_hero/check_skeleton.py`, `python tools/blender/gf_hero/check_clips.py` | the `.github/workflows/art.yml` jobs |
+
+Every runner takes `--from <step>` / `--only <step>` and writes one log per step to `art/characters/<key>/work/logs/`.
 
 ## 3. Stage 0: concept and reference (implemented)
 
@@ -205,7 +233,7 @@ which has PIL and numpy. The other art tools use only the standard library.
 Result for Brax (2026-09-25): three seeds; **s202** picked (faceted gauntlet plates, head/beard,
 colour blocking). Known defects are listed in `art/characters/brax/reports/blockout_report.md` §6.
 
-## 5. Stages 2-4 (implemented)
+## 5. Stages 2-5 (implemented)
 
 ### Stage 2: production mesh (implemented; made by AI, 2026-09-25)
 
@@ -338,17 +366,123 @@ start and end on the `idle_combat` reference pose. Aim offsets are not authored:
 turns to the aim, and the torso-versus-legs split is covered by the strafe and backpedal clips. Brax's results:
 `art/characters/brax/reports/anim_report.md`.
 
-## 6. Export format note (stage 5, checked now so nobody plans around a dead end)
+### Stage 5: export & validate (implemented; made by AI, 2026-09-25)
+
+No human step: the export is headless Blender, and the quality gate is the validators and the review renders of the
+shipped file (the user's decision: content over tests, no test sweeps). The user's final visual approval is the only
+human gate. One command exports, checks and reviews a hero and its signature chassis weapon, in under a minute:
+
+```sh
+python tools/blender/gf_hero/run_stage5.py <key>          # [--from <step>] [--only <step>]
+```
+
+| Step | Script | What it does |
+|---|---|---|
+| weapon | `export_glb.py --weapon <chassis>` | the signature chassis weapon, when the gf_hero chain built it (`art/weapons/<chassis>/production/<chassis>_stage2.blend`) → `assets/models/weapons/<chassis>.glb` + `.meta.json` in the `docs/art/WEAPONS.md` layout |
+| export | `export_glb.py --key <key>` | `production/<key>_anim.blend` → `assets/models/characters/<key>.glb` + `<key>.meta.json`: Blender-side checks, the export, the gate, source fidelity → `reports/export_report.json` |
+| reimport | `smoke_import.py` | a fresh factory-settings Blender re-imports the shipped files: names, every clip played one frame, the weapon on the sockets, review renders (`work/renders/stage5/`) |
+| sheet | `s5_sheets.py` (PIL) | `reports/stage5/export_review.png`: the stage-4 source next to the shipped file, and the client camera at true pixel size |
+| validate | `validate_glb.py --blender` | exactly what CI runs |
+
+What each step runs, for use on its own:
+
+```sh
+<blender> -b --python-exit-code 1 art/weapons/<chassis>/production/<chassis>_stage2.blend -P tools/blender/gf_hero/export_glb.py -- --weapon <chassis>
+<blender> -b --python-exit-code 1 art/characters/<key>/production/<key>_anim.blend -P tools/blender/gf_hero/export_glb.py -- --key <key>
+<blender> -b --factory-startup --python-exit-code 1 -P tools/blender/gf_hero/smoke_import.py -- assets/models/characters/<key>.glb \
+        --weapon assets/models/weapons/<chassis>.glb --render art/characters/<key>/work/renders/stage5 --report art/characters/<key>/reports/export_report.json
+<comfy-python> tools/blender/gf_hero/s5_sheets.py <key>
+python tools/blender/gf_hero/validate_glb.py assets/models/characters/<key>.glb --blender <blender> [--json <report.json>]
+```
+
+**The shipped hero file** (`assets/models/characters/<key>.glb`):
+- glTF binary, +Y up, 1 unit = 1 m, the hero faces +Z, rest pose = the T-pose; uncompressed (§6), PNG textures
+  embedded;
+- the scene's single root is the armature node `GF_Hero_v1`: the 63 deform bones of the contract (core, twist,
+  fingers, the four sockets, any `x_` extras) and nothing else;
+- **one** skinned mesh `<key>_mesh`: the body parts are joined at export (one draw call). It has one material `M_<key>`
+  with base colour, emissive and normal textures (≤ 2048 px), KHR_materials_emissive_strength (used, not required),
+  and TANGENT. It is single-sided when every part is closed, as Brax's are;
+- **no vertex colours**: Bevy multiplies the base colour by `COLOR_0`, and the stage-2 paint masks (`gf_mask`,
+  `src_col`) would otherwise ship as `COLOR_0` / `COLOR_1` (the stage-4 scratch export had them);
+- every clip is one animation `<key>_<clip>[@loop]`, sampled at 30 fps from t = 0 (frames + 1 samples). All the bones
+  are keyed, so blending never keeps a stale pose, and the twist constraints are baked;
+- re-exporting an unchanged source gives a byte-identical file, so a rerun never adds an LFS blob.
+
+**The sidecar** `<key>.meta.json` holds what glTF cannot:
+- `skeleton` and `joints`, plus `tris`, `textures` and `material`;
+- `sockets`: the rest frames in glTF, with parents;
+- `clips` (the names), `clip_info` and `playback` (the engine rules). Per clip, `clip_info` gives loop, layer, frames,
+  duration, the `events` (frame and time: strike, launch, slam and so on), the design speed, the weapon-variant swap
+  frames per hand and the sim state it maps to;
+- `weapon`: the default chassis and its GLB;
+- `status: ai_final_pending_user_approval`, and the GLB's `glb_sha256`. The gate rejects a stale sidecar.
+
+**The gate** (`validate_glb.py`, standard library only, CI) rejects:
+- a container that is not GLB 2.0, a file over 20 MB, or a required extension that bevy_gltf 0.20 cannot load
+  (Draco, meshopt and quantisation are banned outright);
+- an unnamed or duplicated node (Bevy drops the animation of an unnamed path);
+- a skeleton whose names or parents differ from GF_Hero_v1, more than 256 joints, or inverse bind matrices that
+  disagree with the rest pose;
+- missing sockets, sockets off the hands or not facing forward, sockets that differ from the committed landmark
+  file, or animated sockets;
+- unweighted vertices, more than 4 influences, weights that do not sum to 1, weight on root or a socket, vertex
+  colours, or a missing NORMAL / TANGENT / TEXCOORD_0;
+- more than 25k triangles for the hero, a texture over 2048 px, a texture that is not PNG, or a missing base colour /
+  emissive / normal texture;
+- clips: every clip of `tools/blender/gf_hero/required_clips.json` must be there (the shared set, kept equal to
+  `s4_contract.SHARED_CLIPS`, plus the hero's unique block) with the right `@loop` suffix. Bad or duplicate names,
+  a clip that is not 30 fps from t = 0, a moving root, a bone other than the pelvis translating, scaling bones and
+  open loops are all rejected;
+- a rest height outside 1.8-2.5 m, or feet off y = 0;
+- a stale sidecar;
+- a weapon that does not enclose each hand once it sits on the sockets.
+
+The export adds **Blender-side checks** before writing: the same weight rules per part, closed surfaces, one UV
+map, the NLA tracks against `clips.json` and `required_clips.json`. After writing it runs a **source-fidelity** check:
+for every clip, at its first, middle and last frame, every joint's world matrix from the GLB's own forward
+kinematics must equal the Blender pose bone within 1e-4. The **re-import smoke test** covers everything that depends
+on Blender's importer:
+- the armature name;
+- bone names and parents, and the sockets;
+- skinning;
+- one action per animation, each played one frame against the GLB's kinematics;
+- a sane mesh at every clip;
+- the weapon scene on `weapon_R` with its `offhand` on `weapon_L`.
+
+A new hero adds its unique clips to `required_clips.json`; everything else is generic.
+
+**CI.** The job `hero-glb` in `.github/workflows/art.yml` runs on changes to `assets/models/**` or `tools/blender/**`
+(the workflow's paths). It fetches the shipped models from Git LFS, downloads the newest Blender 5.2.x LTS for Linux
+(cached), and runs `validate_glb.py --blender` on every `assets/models/characters/*.glb`. The export itself runs on the
+dev machine; CI checks what is committed. The **Bevy-side import** is a Rust test that loads the GLB through
+bevy_gltf, spawns `#Scene0` and plays each clip. It belongs to the engine integration (`crates/`, not the art track).
+
+**The weapon file.** A chassis that the gf_hero stage-2 chain builds ships in the WEAPONS.md layout. The root
+`<chassis>` is the right grip frame. Under it sit `grip_R` (the origin), `muzzle` (the strike point),
+`glow_core` and `grip_L`. The `offhand` node holds the left pair and `muzzle_2`; the client re-parents it to
+`weapon_L` with an identity transform. A weapon with hand variants ships them as separate mesh nodes:
+`<chassis>_fist_R` / `<chassis>_open_R` / `<chassis>_fist_L` / `<chassis>_open_L`. All four are visible when the
+scene spawns; the client hides the pair it does not show, per hand, at the swap frames the hero's `clip_info` gives.
+
+Brax's results (2026-09-25):
+- `brax.glb`: 9.97 MB, 15,048 tris, 63 joints, 34 clips, three 2048² textures;
+- source fidelity 1.9e-5, Blender re-import 1.8e-6, bind pose 1.1e-6;
+- `anvil_gauntlets.glb`: 3.65 MB, 7,716 tris shown, 15,432 with both variants;
+- all of it in `art/characters/brax/reports/export_report.json` and `reports/stage5/export_review.png`.
+
+## 6. Export format note (stage 5)
 
 `bevy_gltf-0.20.0-rc.1` (`src/lib.rs`, "Supported KHR Extensions" table) supports **none** of
 `KHR_draco_mesh_compression`, `KHR_mesh_quantization` or `EXT_meshopt_compression`. A GLB that
 lists any of them in `extensionsRequired` will not load. Stage 5 therefore exports **uncompressed**
 glTF (float positions, no quantisation) and stays inside the per-hero budget instead
-(~15-25k tris, textures sized for 6-8 % of screen height). `docs/ARCHITECTURE.md` §9 still says
-"(meshopt)"; that line needs updating by its owner when stage 5 lands.
+(~15-25k tris, textures sized for 6-8 % of screen height). The client enables only `bevy/png`, so textures ship
+as PNG (no JPEG, WebP or KTX2). `docs/ARCHITECTURE.md` §9 still says "(meshopt)"; its owner needs to update that
+line now that stage 5 has landed.
 
-§9 also names `tools/blender/export.py`. The exporter will live in `tools/blender/gf_hero/` with
-the rest of the hero scripts, so that line needs the same update.
+§9 also names `tools/blender/export.py`. The exporter is `tools/blender/gf_hero/export_glb.py` (§5, stage 5), so that
+line needs the same update.
 
 **CI already guards the format.** `.github/workflows/art.yml` runs `tools/comfy/check_art.py` on
 every change under `art/`, `assets/models/` or the art tools. It rejects:
@@ -357,8 +491,8 @@ every change under `art/`, `assets/models/` or the art tools. It rejects:
 - a local-only file that git tracks;
 - a status.json that breaks the gate rules (§1).
 
-The headless Blender export and the import smoke test join that workflow with the stage-5
-exporter.
+Since stage 5 the job `hero-glb` adds the full gate and the Blender 5.2 re-import smoke test for every shipped hero
+GLB (§5, stage 5).
 
 ## 7. Licensing and provenance
 

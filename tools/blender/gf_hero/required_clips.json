@@ -1,0 +1,46 @@
+{
+ "_doc": "The clips every shipped hero GLB must contain (stage 5 gate, read by validate_glb.py). In the GLB each clip is the glTF animation '<key>_<clip>', loops add '@loop' (docs/art/GF_HERO_SKELETON.md section 8). 'shared' must equal tools/blender/gf_hero/s4_contract.py SHARED_CLIPS (validate_glb.py checks it); 'heroes.<key>' is that hero's unique kit set (6-10 clips). A new hero adds its block here when its stage-4 clips land.",
+ "contract": "GF_Hero_v1 v1",
+ "fps": 30,
+ "shared": [
+  {"clip": "idle", "loop": true, "layer": "full"},
+  {"clip": "idle_combat", "loop": true, "layer": "full"},
+  {"clip": "walk", "loop": true, "layer": "full"},
+  {"clip": "run", "loop": true, "layer": "full"},
+  {"clip": "strafe_left", "loop": true, "layer": "full"},
+  {"clip": "strafe_right", "loop": true, "layer": "full"},
+  {"clip": "backpedal", "loop": true, "layer": "full"},
+  {"clip": "dash", "loop": false, "layer": "full"},
+  {"clip": "dash_recover", "loop": false, "layer": "full"},
+  {"clip": "fire_light", "loop": false, "layer": "upper"},
+  {"clip": "fire_heavy", "loop": false, "layer": "upper"},
+  {"clip": "fire_charge", "loop": true, "layer": "upper"},
+  {"clip": "hit_light", "loop": false, "layer": "upper"},
+  {"clip": "hit_heavy", "loop": false, "layer": "full"},
+  {"clip": "knockdown", "loop": false, "layer": "full"},
+  {"clip": "get_up", "loop": false, "layer": "full"},
+  {"clip": "death", "loop": false, "layer": "full"},
+  {"clip": "downed", "loop": true, "layer": "full"},
+  {"clip": "revive", "loop": false, "layer": "full"},
+  {"clip": "reforge_in", "loop": false, "layer": "full"},
+  {"clip": "victory", "loop": false, "layer": "full"},
+  {"clip": "ping", "loop": false, "layer": "upper"},
+  {"clip": "interact", "loop": false, "layer": "full"},
+  {"clip": "forge_hammer", "loop": true, "layer": "full"}
+ ],
+ "unique_count": [6, 10],
+ "heroes": {
+  "brax": [
+   {"clip": "idle_signature", "loop": true, "layer": "full", "kit": "signature idle"},
+   {"clip": "jab_l", "loop": false, "layer": "upper", "kit": "anvil_gauntlets strike (left)"},
+   {"clip": "jab_r", "loop": false, "layer": "upper", "kit": "anvil_gauntlets strike (right)"},
+   {"clip": "hook", "loop": false, "layer": "upper", "kit": "third strike of a string / max-Heat strike"},
+   {"clip": "uppercut", "loop": false, "layer": "full", "kit": "active1 Cinder Uppercut"},
+   {"clip": "furnace_rush", "loop": true, "layer": "full", "kit": "active2 Furnace Rush (moving)"},
+   {"clip": "furnace_rush_end", "loop": false, "layer": "full", "kit": "active2 Furnace Rush (brake and release)"},
+   {"clip": "meltdown_start", "loop": false, "layer": "full", "kit": "ultimate Meltdown (cast)"},
+   {"clip": "meltdown", "loop": true, "layer": "full", "kit": "ultimate Meltdown (stance while the buff lasts)"},
+   {"clip": "heat_vent", "loop": false, "layer": "upper", "kit": "passive Heat Gauge at max"}
+  ]
+ }
+}

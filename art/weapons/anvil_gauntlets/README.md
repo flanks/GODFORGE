@@ -84,6 +84,35 @@ The gauntlet encloses the wearer's hand and forearm:
 For another hero, rebuild it against that hero's fitted body (`s2_weapon.py` takes the body) or scale it on
 the socket.
 
+## Shipped GLB (stage 5, 2026-09-25)
+
+`assets/models/weapons/anvil_gauntlets.glb` (+ `anvil_gauntlets.meta.json`) is exported by
+`tools/blender/gf_hero/export_glb.py --weapon anvil_gauntlets` (the `weapon` step of `python tools/blender/gf_hero/run_stage5.py brax`)
+in the `docs/art/WEAPONS.md` layout. It is glTF with +Y up: -Z runs along the fingers, +Y is the back of the hand, +X is right.
+
+```text
+anvil_gauntlets            root = the RIGHT grip frame (identity): identity child of the hero's weapon_R
+  anvil_gauntlets_fist_R   right gauntlet, closed fist (3,858 tris; the default)
+  anvil_gauntlets_open_R   right gauntlet, open hand (3,858 tris; same topology / UVs / texture)
+  grip_R                   the right palm centre (= the origin)
+  muzzle                   the right fist's strike point, (-0.025, -0.027, -0.198)
+  glow_core                the lava core of the right forearm, (-0.020, 0.003, 0.092)
+  grip_L                   = offhand's origin
+  offhand                  the LEFT pair; the client re-parents it to weapon_L with an identity transform
+    anvil_gauntlets_fist_L / anvil_gauntlets_open_L    left gauntlet, fist / open
+    muzzle_2               the left fist's strike point
+```
+
+- The -0.65 m X offset of `offhand` is only a display layout. On the hero, the identity on `weapon_L` replaces it.
+- All four meshes spawn visible. The client hides the open pair (`Visibility::Hidden`), then swaps each hand at the frames
+  Brax's sidecar gives (`clip_info.<clip>.weapon_variant`). For example, `brax_ping` opens the right hand on frame 4 and
+  closes it on frame 16.
+- One single-sided material, `M_anvil_gauntlets`: 1024² base colour, emissive and normal PNGs, tangents, no vertex colours.
+- The file is 3.65 MB. The game draws 7,716 tris (a fist pair); both variants together are 15,432. The armory's
+  `gfa_validate.py` counts every mesh, so it reports the pair as over its 8,000 budget.
+- Checked on the shipped files: attached through Brax's re-imported sockets within 2e-7 m, and each gauntlet encloses its
+  hand (the wrist, palm centre and knuckle all fall inside its bounds).
+
 ## Files
 
 | Path | What | In git |
@@ -96,4 +125,5 @@ the socket.
 | `reports/stage2_weapon.md` | the stage-2 report for the weapon | yes |
 | `work/` | parts file with the bake sources, renders, scratch GLB | no (regenerated) |
 
-Rebuild (with Brax, whose signature weapon it is): `python tools/blender/gf_hero/run_stage2.py brax --from weapon`.
+Rebuild (with Brax, whose signature weapon it is): `python tools/blender/gf_hero/run_stage2.py brax --from weapon`, then
+`python tools/blender/gf_hero/run_stage5.py brax` for the shipped GLB.

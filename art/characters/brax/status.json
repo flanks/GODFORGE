@@ -507,10 +507,116 @@
    }
   },
   "5_export_validate": {
-   "status": "not_started",
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated headless Blender 5.2 chain tools/blender/gf_hero/run_stage5.py; no human step",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator). Content over tests: the validators and the review renders are the quality gate.",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "Headless Blender CI writes assets/models/characters/brax.glb, uncompressed because bevy_gltf 0.20 supports no Draco, meshopt or quantisation. A human applies the final Hades-II bar."
+   "outputs": [
+    "assets/models/characters/brax.glb (Git LFS)",
+    "assets/models/characters/brax.meta.json",
+    "assets/models/weapons/anvil_gauntlets.glb (Git LFS)",
+    "assets/models/weapons/anvil_gauntlets.meta.json",
+    "art/characters/brax/reports/export_report.json",
+    "art/characters/brax/reports/stage5/export_review.png"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage5.py",
+    "tools/blender/gf_hero/export_glb.py",
+    "tools/blender/gf_hero/validate_glb.py",
+    "tools/blender/gf_hero/smoke_import.py",
+    "tools/blender/gf_hero/s5_sheets.py",
+    "tools/blender/gf_hero/required_clips.json",
+    ".github/workflows/art.yml (job hero-glb)"
+   ],
+   "metrics": {
+    "glb_bytes": 9967940,
+    "glb_sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+    "tris": 15048,
+    "joints": 63,
+    "meshes": 1,
+    "materials": 1,
+    "double_sided": false,
+    "textures_px": {
+     "emissive": 2048,
+     "normal": 2048,
+     "base_color": 2048
+    },
+    "clips": 34,
+    "required_clips_missing": 0,
+    "vertices_exported": 12539,
+    "unweighted_vertices": 0,
+    "weight_sum_max_error": 1.1920928955078125e-07,
+    "max_influences": 4,
+    "vertex_colour_sets": 0,
+    "extensions_required": [],
+    "extensions_used": [
+     "KHR_materials_emissive_strength"
+    ],
+    "bind_pose_max_error": 1.1374063887043079e-06,
+    "source_fidelity_max_error": 1.8996306552221398e-05,
+    "blender_reimport_clip_pose_max_error": 1.8477439880371094e-06,
+    "blender_reimport_clips_played": 34,
+    "weapon_attach_rest_error": 2.0723582849768718e-07,
+    "height_m": 2.195,
+    "deterministic_reexport": true,
+    "weapon_glb_bytes": 3652108,
+    "weapon_tris_shown_pair": 7716,
+    "weapon_tris_all_variants": 15432
+   },
+   "notes": "brax.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 deform joints incl. the 4 sockets) + ONE skinned mesh brax_mesh (the 8 body parts joined: one draw call, single-sided M_brax with 2048 base colour / emissive / normal PNGs, tangents, NO vertex colours - the stage-4 scratch export had shipped the paint masks as COLOR_0/COLOR_1, which Bevy multiplies into the base colour), 34 clips named brax_<clip>[@loop] sampled at 30 fps. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend. The sidecar brax.meta.json carries the clip events, weapon-variant swaps, design speeds, sockets and status ai_final_pending_user_approval. The anvil_gauntlets ship as assets/models/weapons/anvil_gauntlets.glb (open + fist variants as separate nodes, left pair under offhand). Re-export is byte-identical. The Bevy-side import test comes with the engine integration.",
+   "items": {
+    "glb_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "assets/models/characters/brax.glb",
+      "assets/models/characters/brax.meta.json"
+     ]
+    },
+    "validation": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/reports/export_report.json",
+      "tools/blender/gf_hero/validate_glb.py",
+      "tools/blender/gf_hero/required_clips.json"
+     ],
+     "notes": "0 errors, 0 warnings on brax.glb; CI job hero-glb runs the same gate with the Blender re-import"
+    },
+    "blender_reimport_smoke_test": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/smoke_import.py",
+      "art/characters/brax/reports/stage5/export_review.png"
+     ]
+    },
+    "weapon_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "assets/models/weapons/anvil_gauntlets.glb",
+      "assets/models/weapons/anvil_gauntlets.meta.json"
+     ],
+     "notes": "the armory's gfa_validate counts both variants (15,432 tris > its 8,000 gauntlet_pair budget); the pair shown is 7,716"
+    },
+    "bevy_import_test": {
+     "status": "not_started",
+     "human_signoff_required": false,
+     "notes": "a Rust test that loads brax.glb through bevy_gltf, spawns #Scene0 and plays each clip; it comes with the engine integration (crates/, the engine agent)"
+    },
+    "user_final_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the shipped files: the Hades-II bar (reports/stage5/export_review.png, and the stage 2-4 sheets). Record signed_off_by / signed_off_on on this item and on the stage; only then may final be true."
+    }
+   }
   }
  },
  "human_gates": [
@@ -552,8 +658,9 @@
    "via": "art/characters/brax/reports/anim/ + reports/anim_report.md"
   },
   {
-   "gate": "stage 5: final Hades-II bar",
-   "state": "not_started"
+   "gate": "stage 5: the user's final visual approval of the shipped files (the Hades-II bar)",
+   "state": "pending_human",
+   "via": "art/characters/brax/reports/stage5/export_review.png + reports/export_report.json (and the stage 2-4 sheets)"
   }
  ],
  "decisions": [

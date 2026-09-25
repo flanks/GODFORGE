@@ -113,10 +113,66 @@
    "notes": "None of its own; open/fist variant swap is driven by the hero's punch clips."
   },
   "5_export_validate": {
-   "status": "not_started",
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude), tools/blender/gf_hero/export_glb.py --weapon anvil_gauntlets (step 'weapon' of run_stage5.py brax); no human step",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "Headless export to assets/models/weapons/anvil_gauntlets.glb, uncompressed (bevy_gltf 0.20). The final Hades-II bar is a human gate."
+   "outputs": [
+    "assets/models/weapons/anvil_gauntlets.glb (Git LFS)",
+    "assets/models/weapons/anvil_gauntlets.meta.json",
+    "art/characters/brax/reports/export_report.json (section weapons.anvil_gauntlets)"
+   ],
+   "sockets": {
+    "root": "anvil_gauntlets = the right grip frame; identity child of the hero's weapon_R",
+    "offhand": "the left pair (+ muzzle_2), re-parented to weapon_L with an identity transform; its origin = grip_L",
+    "grip_R": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "grip_L": [
+     -0.65,
+     0.0,
+     0.0
+    ],
+    "muzzle": [
+     -0.0248,
+     -0.027,
+     -0.1975
+    ],
+    "muzzle_2": [
+     -0.6269,
+     -0.027,
+     -0.1975
+    ],
+    "glow_core": [
+     -0.0199,
+     0.0034,
+     0.0923
+    ],
+    "frame": "glTF: -Z = along the fingers, +Y = back of the hand, +X = right"
+   },
+   "metrics": {
+    "glb_bytes": 3652108,
+    "tris_shown_pair": 7716,
+    "tris_all_variants": 15432,
+    "textures_px": 1024,
+    "double_sided": false,
+    "vertex_colour_sets": 0
+   },
+   "notes": "Open + fist variants as separate mesh nodes (anvil_gauntlets_{fist,open}_{R,L}); all four spawn visible and the client hides the pair it does not show, per hand, at the swap frames of the hero sidecar (clip_info.<clip>.weapon_variant). Attached to Brax through the re-imported sockets within 2e-7 m (rest) and 9e-7 m (brax_jab_r f3); each mesh encloses its hand (wrist, palm, knuckle). The armory's gfa_validate counts every mesh, so it reports 15,432 tris > its 8,000 gauntlet_pair budget; the pair shown is 7,716.",
+   "items": {
+    "glb_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI"
+    },
+    "user_final_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "notes": "The user's final visual approval (the Hades-II bar); record signed_off_by / signed_off_on here and on the stage."
+    }
+   }
   }
  },
  "human_gates": [
@@ -125,8 +181,9 @@
    "state": "pending_human"
   },
   {
-   "gate": "stage 5: final Hades-II bar",
-   "state": "not_started"
+   "gate": "stage 5: the user's final visual approval of the shipped weapon (the Hades-II bar)",
+   "state": "pending_human",
+   "via": "art/characters/brax/reports/stage5/export_review.png + art/weapons/anvil_gauntlets/reports/stage2/"
   }
  ]
 }

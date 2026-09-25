@@ -8,9 +8,12 @@
 #   hero-clips  the GF_Hero_v1 clip contract (docs/art/GF_HERO_SKELETON.md section 8): for every animated hero, the
 #              shared clip set and names, 6-10 unique clips, loops closed, planted feet, the sleeve-weapon wrist rule
 #              and the stage-4 glTF clip check (tools/blender/gf_hero/check_clips.py, stdlib)
-#
-# Stage 5 adds the headless Blender export + import smoke test here (it needs a Blender install
-# on the runner, so it lands with the exporter, not before).
+#   hero-glb   stage 5: every shipped assets/models/characters/*.glb (fetched from Git LFS) through the GF_Hero_v1 gate
+#              (tools/blender/gf_hero/validate_glb.py: weights, influences, skeleton names / parents, sockets, the
+#              required clip set and naming, triangle and texture budgets, 20 MB, the sidecar) and a re-import smoke test
+#              in headless Blender 5.2 LTS for Linux (smoke_import.py: bone / socket names, every clip played one frame,
+#              the signature weapon on the sockets). The export itself runs on the dev machine
+#              (tools/blender/gf_hero/run_stage5.py); CI checks what is committed.
 
 name: Art
 
@@ -67,3 +70,51 @@ jobs:
           python-version: "3.12"
       - name: GF_Hero_v1 clip contract (stage-4 clip manifests and glTF clip checks)
         run: python tools/blender/gf_hero/check_clips.py
+
+  hero-glb:
+    runs-on: ubuntu-latest
+    env:
+      BLENDER_SERIES: "5.2"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the shipped models from Git LFS
+        run: |
+          git lfs install --local
+          git lfs pull --include="assets/models/**"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cache Blender
+        id: blender-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/blender
+          key: blender-${{ env.BLENDER_SERIES }}-linux-x64-v1
+      - name: Download Blender 5.2 LTS (Linux x64, the newest 5.2.x release)
+        if: steps.blender-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          base="https://download.blender.org/release/Blender${BLENDER_SERIES}/"
+          tarball=$(curl -fsSL "$base" | grep -oE "blender-${BLENDER_SERIES}\.[0-9]+-linux-x64\.tar\.xz" | sort -uV | tail -1)
+          test -n "$tarball"
+          echo "Blender: $tarball"
+          mkdir -p ~/blender
+          curl -fsSL "$base$tarball" | tar -xJ -C ~/blender --strip-components=1
+      - name: Blender runtime libraries (headless)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libx11-6 libxi6 libxxf86vm1 libxfixes3 libxrender1 \
+            libxkbcommon0 libsm6 libice6 libgl1 libegl1
+      - name: Validate every hero GLB (stdlib gate + Blender re-import smoke test)
+        run: |
+          shopt -s nullglob
+          glbs=(assets/models/characters/*.glb)
+          if [ ${#glbs[@]} -eq 0 ]; then echo "no hero GLB shipped yet"; exit 0; fi
+          ~/blender/blender --version
+          python tools/blender/gf_hero/validate_glb.py "${glbs[@]}" --blender ~/blender/blender --json hero_glb_report.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: hero-glb-report
+          path: hero_glb_report.json
+          if-no-files-found: ignore

@@ -1,0 +1,1935 @@
+{
+ "hero": "brax",
+ "stage": "5_export_validate",
+ "updated": "2026-09-25",
+ "weapons": {
+  "anvil_gauntlets": {
+   "ok": true,
+   "errors": [],
+   "warnings": [
+    "gfa_validate (tools/blender/gf_assets, read only): ['15432 tris > weapon_gauntlet_pair budget 8000']"
+   ],
+   "glb": "assets/models/weapons/anvil_gauntlets.glb",
+   "meta": "assets/models/weapons/anvil_gauntlets.meta.json",
+   "bytes": 3652108,
+   "tris_shown_pair": 7716,
+   "tris_per_mesh": {
+    "anvil_gauntlets_fist_R": 3858,
+    "anvil_gauntlets_open_R": 3858,
+    "anvil_gauntlets_fist_L": 3858,
+    "anvil_gauntlets_open_L": 3858
+   },
+   "sockets": {
+    "grip_R": {
+     "translation": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "anvil_gauntlets"
+    },
+    "grip_L": {
+     "translation": [
+      -0.65,
+      0.0,
+      0.0
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "anvil_gauntlets"
+    },
+    "muzzle": {
+     "translation": [
+      -0.0248,
+      -0.027,
+      -0.1975
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "anvil_gauntlets"
+    },
+    "glow_core": {
+     "translation": [
+      -0.0199,
+      0.0034,
+      0.0923
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "anvil_gauntlets"
+    },
+    "offhand": {
+     "translation": [
+      -0.65,
+      0.0,
+      0.0
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "anvil_gauntlets"
+    },
+    "muzzle_2": {
+     "translation": [
+      -0.6269,
+      -0.027,
+      -0.1975
+     ],
+     "forward": [
+      -0.0,
+      -0.0,
+      -1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "offhand"
+    }
+   },
+   "textures": [
+    {
+     "name": "anvil_gauntlets_emissive",
+     "px": [
+      1024,
+      1024
+     ],
+     "format": "png",
+     "bytes": 555817,
+     "role": "emissive"
+    },
+    {
+     "name": "anvil_gauntlets_normal",
+     "px": [
+      1024,
+      1024
+     ],
+     "format": "png",
+     "bytes": 706601,
+     "role": "normal"
+    },
+    {
+     "name": "anvil_gauntlets_basecolor",
+     "px": [
+      1024,
+      1024
+     ],
+     "format": "png",
+     "bytes": 1136044,
+     "role": "base_color"
+    }
+   ],
+   "blender_checks": {
+    "objects": {
+     "GAUNTLET_L": {
+      "verts": 2123,
+      "tris": 3858,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "uv_layers": [
+       "UVMap"
+      ],
+      "color_attributes": [
+       "gf_mask"
+      ],
+      "socket": "weapon_L",
+      "variant": "open",
+      "materials": [
+       "M_anvil_gauntlets"
+      ],
+      "tpose_placement": [
+       [
+        0.0,
+        1.0,
+        0.0,
+        1.01645
+       ],
+       [
+        -1.0,
+        0.0,
+        0.0,
+        0.03267
+       ],
+       [
+        0.0,
+        0.0,
+        1.0,
+        1.7339
+       ],
+       [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ]
+     },
+     "GAUNTLET_R": {
+      "verts": 2123,
+      "tris": 3858,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "uv_layers": [
+       "UVMap"
+      ],
+      "color_attributes": [
+       "gf_mask"
+      ],
+      "socket": "weapon_R",
+      "variant": "open",
+      "materials": [
+       "M_anvil_gauntlets"
+      ],
+      "tpose_placement": [
+       [
+        0.0,
+        -1.0,
+        0.0,
+        -1.01645
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        0.03267
+       ],
+       [
+        0.0,
+        0.0,
+        1.0,
+        1.7339
+       ],
+       [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ]
+     },
+     "GAUNTLET_FIST_L": {
+      "verts": 2123,
+      "tris": 3858,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "uv_layers": [
+       "UVMap"
+      ],
+      "color_attributes": [
+       "gf_mask"
+      ],
+      "socket": "weapon_L",
+      "variant": "fist",
+      "materials": [
+       "M_anvil_gauntlets"
+      ],
+      "tpose_placement": [
+       [
+        0.0,
+        1.0,
+        0.0,
+        1.01645
+       ],
+       [
+        -1.0,
+        0.0,
+        0.0,
+        0.03267
+       ],
+       [
+        0.0,
+        0.0,
+        1.0,
+        1.7339
+       ],
+       [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ]
+     },
+     "GAUNTLET_FIST_R": {
+      "verts": 2123,
+      "tris": 3858,
+      "boundary_edges": 0,
+      "nonmanifold_edges": 0,
+      "uv_layers": [
+       "UVMap"
+      ],
+      "color_attributes": [
+       "gf_mask"
+      ],
+      "socket": "weapon_R",
+      "variant": "fist",
+      "materials": [
+       "M_anvil_gauntlets"
+      ],
+      "tpose_placement": [
+       [
+        0.0,
+        -1.0,
+        0.0,
+        -1.01645
+       ],
+       [
+        1.0,
+        0.0,
+        0.0,
+        0.03267
+       ],
+       [
+        0.0,
+        0.0,
+        1.0,
+        1.7339
+       ],
+       [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+       ]
+      ]
+     }
+    },
+    "material": {
+     "name": "M_anvil_gauntlets",
+     "images": [
+      {
+       "name": "anvil_gauntlets_basecolor.png",
+       "px": [
+        1024,
+        1024
+       ],
+       "colorspace": "sRGB",
+       "file": "//..\\textures\\anvil_gauntlets_basecolor.png"
+      },
+      {
+       "name": "anvil_gauntlets_emissive.png",
+       "px": [
+        1024,
+        1024
+       ],
+       "colorspace": "sRGB",
+       "file": "//..\\textures\\anvil_gauntlets_emissive.png"
+      },
+      {
+       "name": "anvil_gauntlets_normal.png",
+       "px": [
+        1024,
+        1024
+       ],
+       "colorspace": "Non-Color",
+       "file": "//..\\textures\\anvil_gauntlets_normal.png"
+      }
+     ]
+    },
+    "sockets_blender": {
+     "muzzle_R": [
+      -0.02477067895233631,
+      0.19750487804412842,
+      -0.026974808424711227
+     ],
+     "muzzle_L": [
+      0.023086505010724068,
+      0.19750487804412842,
+      -0.0269759614020586
+     ],
+     "glow_core": [
+      -0.01989731378853321,
+      -0.09234026074409485,
+      0.003437046892940998
+     ]
+    }
+   },
+   "attach_on_brax": {
+    "weapon": "assets/models/weapons/anvil_gauntlets.glb",
+    "meshes": {
+     "anvil_gauntlets_fist_R": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_open_R": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_fist_L": {
+      "socket": "weapon_L",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_open_L": {
+      "socket": "weapon_L",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     }
+    },
+    "ok": true
+   },
+   "gfa_validate": {
+    "ok": false,
+    "errors": [
+     "15432 tris > weapon_gauntlet_pair budget 8000"
+    ],
+    "warnings": [
+     "image anvil_gauntlets_normal is not used by the material"
+    ],
+    "tris": 15432
+   },
+   "export_settings": {
+    "export_format": "GLB",
+    "use_selection": true,
+    "export_yup": true,
+    "export_apply": false,
+    "export_texcoords": true,
+    "export_normals": true,
+    "export_tangents": true,
+    "export_materials": "EXPORT",
+    "export_image_format": "AUTO",
+    "export_vertex_color": "NONE",
+    "export_all_vertex_colors": false,
+    "export_active_vertex_color_when_no_material": false,
+    "export_attributes": false,
+    "export_cameras": false,
+    "export_lights": false,
+    "export_extras": false,
+    "export_morph": false,
+    "export_draco_mesh_compression_enable": false,
+    "export_meshopt_compression_enable": false,
+    "export_use_gltfpack": false,
+    "export_gpu_instances": false,
+    "export_leaf_bone": false,
+    "export_skins": false,
+    "export_animations": false
+   }
+  }
+ },
+ "ok": true,
+ "hero_export": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "glb": "assets/models/characters/brax.glb",
+  "meta": "assets/models/characters/brax.meta.json",
+  "bytes": 9967940,
+  "sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+  "source_blend": "art/characters/brax/production/brax_anim.blend",
+  "export_settings": {
+   "export_format": "GLB",
+   "use_selection": true,
+   "export_yup": true,
+   "export_apply": false,
+   "export_texcoords": true,
+   "export_normals": true,
+   "export_tangents": true,
+   "export_materials": "EXPORT",
+   "export_image_format": "AUTO",
+   "export_vertex_color": "NONE",
+   "export_all_vertex_colors": false,
+   "export_active_vertex_color_when_no_material": false,
+   "export_attributes": false,
+   "export_cameras": false,
+   "export_lights": false,
+   "export_extras": false,
+   "export_morph": false,
+   "export_draco_mesh_compression_enable": false,
+   "export_meshopt_compression_enable": false,
+   "export_use_gltfpack": false,
+   "export_gpu_instances": false,
+   "export_leaf_bone": false,
+   "export_skins": true,
+   "export_influence_nb": 4,
+   "export_all_influences": false,
+   "export_def_bones": true,
+   "export_rest_position_armature": true,
+   "export_armature_object_remove": false,
+   "export_hierarchy_flatten_bones": false,
+   "export_animations": true,
+   "export_animation_mode": "NLA_TRACKS",
+   "export_force_sampling": true,
+   "export_frame_step": 1,
+   "export_optimize_animation_size": false,
+   "export_anim_single_armature": true,
+   "export_reset_pose_bones": true,
+   "export_anim_slide_to_zero": false,
+   "export_pointer_animation": false
+  },
+  "joined_mesh": {
+   "name": "brax_mesh",
+   "verts": 7724,
+   "tris": 15048,
+   "double_sided": false
+  },
+  "blender_checks": {
+   "hierarchy_problems": [],
+   "parts": {
+    "BELT": {
+     "verts": 264,
+     "tris": 524,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "SASH": {
+     "verts": 546,
+     "tris": 1076,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "SKIRT_CLOTH": {
+     "verts": 336,
+     "tris": 672,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "SKIRT_PLATES": {
+     "verts": 840,
+     "tris": 1440,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "WRAPS": {
+     "verts": 704,
+     "tris": 1408,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "HAIR": {
+     "verts": 612,
+     "tris": 1132,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "BEARD": {
+     "verts": 495,
+     "tris": 954,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    },
+    "BODY": {
+     "verts": 3927,
+     "tris": 7842,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_brax"
+     ]
+    }
+   },
+   "tris": 15048,
+   "closed": true,
+   "material": {
+    "name": "M_brax",
+    "images": [
+     {
+      "name": "brax_basecolor.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\brax_basecolor.png"
+     },
+     {
+      "name": "brax_emissive.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\brax_emissive.png"
+     },
+     {
+      "name": "brax_normal.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "Non-Color",
+      "file": "//..\\textures\\brax_normal.png"
+     }
+    ]
+   },
+   "nla_tracks": {
+    "hero_tracks": 34,
+    "missing_vs_clips_json": [],
+    "missing_vs_required_clips": [],
+    "not_exported": [
+     "GF_ValidationPoses"
+    ]
+   }
+  },
+  "source_fidelity": {
+   "frames_per_clip": "first, middle, last",
+   "joints": 63,
+   "max_error": 1.8996306552221398e-05,
+   "per_clip": {
+    "brax_idle@loop": 1.132377460940151e-06,
+    "brax_idle_combat@loop": 1.243460436617383e-06,
+    "brax_walk@loop": 1.2054665872729409e-06,
+    "brax_run@loop": 1.564371078566218e-06,
+    "brax_strafe_left@loop": 9.060866093757447e-06,
+    "brax_strafe_right@loop": 8.99575961185034e-06,
+    "brax_backpedal@loop": 1.3192782496451727e-06,
+    "brax_dash": 1.5563172953425575e-06,
+    "brax_dash_recover": 1.4867213931901713e-06,
+    "brax_fire_light": 1.2481002729103352e-06,
+    "brax_fire_heavy": 1.241647894278941e-06,
+    "brax_fire_charge@loop": 1.196510636167214e-06,
+    "brax_hit_light": 1.241647894278941e-06,
+    "brax_hit_heavy": 1.2932222080985767e-06,
+    "brax_knockdown": 1.5410177595098773e-06,
+    "brax_get_up": 1.6713684413138807e-06,
+    "brax_death": 1.5669039038768151e-06,
+    "brax_downed@loop": 1.2443098628966975e-06,
+    "brax_revive": 1.5199463107018474e-06,
+    "brax_reforge_in": 1.470382008816884e-06,
+    "brax_victory": 1.28550611568079e-06,
+    "brax_ping": 1.241647894278941e-06,
+    "brax_interact": 1.1577826174499067e-06,
+    "brax_forge_hammer@loop": 1.109363154172538e-06,
+    "brax_idle_signature@loop": 1.132377460940151e-06,
+    "brax_jab_l": 1.2891193371111775e-06,
+    "brax_jab_r": 1.241647894278941e-06,
+    "brax_hook": 1.806027812967237e-06,
+    "brax_uppercut": 1.490231012701848e-06,
+    "brax_furnace_rush@loop": 1.1909011962546456e-06,
+    "brax_furnace_rush_end": 1.2643419886188e-06,
+    "brax_meltdown_start": 1.8996306552221398e-05,
+    "brax_meltdown@loop": 1.3857762697355724e-06,
+    "brax_heat_vent": 1.2670832126721043e-06
+   },
+   "ok": true
+  },
+  "validation": {
+   "file": "assets/models/characters/brax.glb",
+   "key": "brax",
+   "bytes": 9967940,
+   "sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+   "generator": "Khronos glTF Blender I/O v5.2.39",
+   "extensions_used": [
+    "KHR_materials_emissive_strength"
+   ],
+   "extensions_required": [],
+   "scene_roots": [
+    "GF_Hero_v1"
+   ],
+   "nodes": 65,
+   "joints": 63,
+   "extra_bones": [],
+   "bind_pose_max_error": 1.1374063887043079e-06,
+   "sockets": {
+    "weapon_R": {
+     "parent": "hand_R",
+     "translation": [
+      -1.01645,
+      1.7339,
+      -0.03267
+     ],
+     "forward": [
+      -1.0,
+      0.0,
+      -0.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "weapon_L": {
+     "parent": "hand_L",
+     "translation": [
+      1.01645,
+      1.7339,
+      -0.03267
+     ],
+     "forward": [
+      1.0,
+      0.0,
+      -0.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "head_top": {
+     "parent": "head",
+     "translation": [
+      -0.0,
+      2.19878,
+      -0.014
+     ],
+     "forward": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      -0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "chest_sigil": {
+     "parent": "spine_03",
+     "translation": [
+      -0.0,
+      1.72,
+      0.17369
+     ],
+     "forward": [
+      -0.0,
+      0.19408,
+      0.98099
+     ],
+     "up": [
+      -0.0,
+      0.98099,
+      -0.19408
+     ],
+     "vs_landmarks": 4.1e-06
+    }
+   },
+   "tris": 15048,
+   "skin": {
+    "vertices": 12539,
+    "unweighted": 0,
+    "over_4": 0,
+    "not_normalized": 0,
+    "on_non_weight_bones": 0,
+    "bad_joint_index": 0,
+    "weight_sum_max_error": 1.1920928955078125e-07
+   },
+   "bounds_m": {
+    "min": [
+     -1.174,
+     0.0037,
+     -0.3444
+    ],
+    "max": [
+     1.174,
+     2.1988,
+     0.3271
+    ]
+   },
+   "height_m": 2.195,
+   "materials": [
+    {
+     "name": "M_brax",
+     "double_sided": false,
+     "emissive_strength": 3,
+     "textures": {
+      "base_color": true,
+      "emissive": true,
+      "normal": true
+     }
+    }
+   ],
+   "textures": [
+    {
+     "name": "brax_emissive",
+     "role": "emissive",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 414389
+    },
+    {
+     "name": "brax_normal",
+     "role": "normal",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 927315
+    },
+    {
+     "name": "brax_basecolor",
+     "role": "base_color",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 3432557
+    }
+   ],
+   "clips": [
+    "brax_idle@loop",
+    "brax_idle_combat@loop",
+    "brax_walk@loop",
+    "brax_run@loop",
+    "brax_strafe_left@loop",
+    "brax_strafe_right@loop",
+    "brax_backpedal@loop",
+    "brax_dash",
+    "brax_dash_recover",
+    "brax_fire_light",
+    "brax_fire_heavy",
+    "brax_fire_charge@loop",
+    "brax_hit_light",
+    "brax_hit_heavy",
+    "brax_knockdown",
+    "brax_get_up",
+    "brax_death",
+    "brax_downed@loop",
+    "brax_revive",
+    "brax_reforge_in",
+    "brax_victory",
+    "brax_ping",
+    "brax_interact",
+    "brax_forge_hammer@loop",
+    "brax_idle_signature@loop",
+    "brax_jab_l",
+    "brax_jab_r",
+    "brax_hook",
+    "brax_uppercut",
+    "brax_furnace_rush@loop",
+    "brax_furnace_rush_end",
+    "brax_meltdown_start",
+    "brax_meltdown@loop",
+    "brax_heat_vent"
+   ],
+   "clip_checks": {
+    "brax_idle@loop": {
+     "channels": 189,
+     "duration_s": 3.0,
+     "samples": 91,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_idle_combat@loop": {
+     "channels": 189,
+     "duration_s": 1.06667,
+     "samples": 33,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_walk@loop": {
+     "channels": 189,
+     "duration_s": 0.93333,
+     "samples": 29,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_run@loop": {
+     "channels": 189,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_strafe_left@loop": {
+     "channels": 189,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_strafe_right@loop": {
+     "channels": 189,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_backpedal@loop": {
+     "channels": 189,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_dash": {
+     "channels": 189,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 63
+    },
+    "brax_dash_recover": {
+     "channels": 189,
+     "duration_s": 0.46667,
+     "samples": 15,
+     "animated_joints": 63
+    },
+    "brax_fire_light": {
+     "channels": 189,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 63
+    },
+    "brax_fire_heavy": {
+     "channels": 189,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 63
+    },
+    "brax_fire_charge@loop": {
+     "channels": 189,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_hit_light": {
+     "channels": 189,
+     "duration_s": 0.4,
+     "samples": 13,
+     "animated_joints": 63
+    },
+    "brax_hit_heavy": {
+     "channels": 189,
+     "duration_s": 0.86667,
+     "samples": 27,
+     "animated_joints": 63
+    },
+    "brax_knockdown": {
+     "channels": 189,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 63
+    },
+    "brax_get_up": {
+     "channels": 189,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 63
+    },
+    "brax_death": {
+     "channels": 189,
+     "duration_s": 1.6,
+     "samples": 49,
+     "animated_joints": 63
+    },
+    "brax_downed@loop": {
+     "channels": 189,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_revive": {
+     "channels": 189,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 63
+    },
+    "brax_reforge_in": {
+     "channels": 189,
+     "duration_s": 1.5,
+     "samples": 46,
+     "animated_joints": 63
+    },
+    "brax_victory": {
+     "channels": 189,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 63
+    },
+    "brax_ping": {
+     "channels": 189,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 63
+    },
+    "brax_interact": {
+     "channels": 189,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 63
+    },
+    "brax_forge_hammer@loop": {
+     "channels": 189,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_idle_signature@loop": {
+     "channels": 189,
+     "duration_s": 4.0,
+     "samples": 121,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_jab_l": {
+     "channels": 189,
+     "duration_s": 0.33333,
+     "samples": 11,
+     "animated_joints": 63
+    },
+    "brax_jab_r": {
+     "channels": 189,
+     "duration_s": 0.33333,
+     "samples": 11,
+     "animated_joints": 63
+    },
+    "brax_hook": {
+     "channels": 189,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 63
+    },
+    "brax_uppercut": {
+     "channels": 189,
+     "duration_s": 1.6,
+     "samples": 49,
+     "animated_joints": 63
+    },
+    "brax_furnace_rush@loop": {
+     "channels": 189,
+     "duration_s": 0.4,
+     "samples": 13,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_furnace_rush_end": {
+     "channels": 189,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 63
+    },
+    "brax_meltdown_start": {
+     "channels": 189,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 63
+    },
+    "brax_meltdown@loop": {
+     "channels": 189,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 63,
+     "loop_first_last_max_diff": 0.0
+    },
+    "brax_heat_vent": {
+     "channels": 189,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 63
+    }
+   },
+   "sidecar": "checked",
+   "weapon_attach": {
+    "weapon": "assets/models/weapons/anvil_gauntlets.glb",
+    "meshes": {
+     "anvil_gauntlets_fist_R": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_open_R": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_fist_L": {
+      "socket": "weapon_L",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     },
+     "anvil_gauntlets_open_L": {
+      "socket": "weapon_L",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     }
+    }
+   },
+   "errors": [],
+   "warnings": [],
+   "ok": true
+  }
+ },
+ "blender_reimport": {
+  "file": "assets/models/characters/brax.glb",
+  "blender": "5.2.0 LTS",
+  "importer": [
+   "FINISHED"
+  ],
+  "objects": [
+   "GF_Hero_v1",
+   "brax_mesh"
+  ],
+  "bones": 63,
+  "sockets": {
+   "weapon_R": true,
+   "weapon_L": true,
+   "head_top": true,
+   "chest_sigil": true
+  },
+  "meshes": {
+   "brax_mesh": {
+    "verts": 12539,
+    "skinned": true,
+    "vertex_groups_not_bones": [],
+    "materials": [
+     "M_brax"
+    ],
+    "uv_layers": [
+     "UVMap"
+    ]
+   }
+  },
+  "images": {
+   "brax_basecolor": [
+    2048,
+    2048
+   ],
+   "brax_emissive": [
+    2048,
+    2048
+   ],
+   "brax_normal": [
+    2048,
+    2048
+   ]
+  },
+  "socket_axes_restored_vs_authoring": {
+   "weapon_R": 6.486415600193141e-07,
+   "weapon_L": 6.556510925292969e-07,
+   "head_top": 3.1237749453794095e-07,
+   "chest_sigil": 1.825392246246338e-07
+  },
+  "clips_played": 34,
+  "clip_pose_max_error": 1.8477439880371094e-06,
+  "clips": {
+   "brax_idle@loop": {
+    "frame": 45,
+    "frame_range": [
+     0.0,
+     90.0
+    ],
+    "max_bone_error": 1.5497207641601562e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.184,
+      0.835,
+      2.178
+     ]
+    }
+   },
+   "brax_idle_combat@loop": {
+    "frame": 16,
+    "frame_range": [
+     0.0,
+     32.0
+    ],
+    "max_bone_error": 1.2367963790893555e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.884,
+      1.096,
+      2.059
+     ]
+    }
+   },
+   "brax_walk@loop": {
+    "frame": 14,
+    "frame_range": [
+     0.0,
+     28.0
+    ],
+    "max_bone_error": 1.4901161193847656e-06,
+    "mesh": {
+     "min_z": 0.0065,
+     "extent": [
+      1.183,
+      1.348,
+      2.093
+     ]
+    }
+   },
+   "brax_run@loop": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 1.3709068298339844e-06,
+    "mesh": {
+     "min_z": -0.0026,
+     "extent": [
+      1.128,
+      1.601,
+      2.065
+     ]
+    }
+   },
+   "brax_strafe_left@loop": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 1.3851094990968704e-06,
+    "mesh": {
+     "min_z": 0.0124,
+     "extent": [
+      1.591,
+      1.013,
+      2.052
+     ]
+    }
+   },
+   "brax_strafe_right@loop": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 1.430511474609375e-06,
+    "mesh": {
+     "min_z": 0.0124,
+     "extent": [
+      1.203,
+      1.082,
+      2.052
+     ]
+    }
+   },
+   "brax_backpedal@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 1.2516975402832031e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.878,
+      1.498,
+      2.024
+     ]
+    }
+   },
+   "brax_dash": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 1.4156103134155273e-06,
+    "mesh": {
+     "min_z": 0.1247,
+     "extent": [
+      0.986,
+      1.717,
+      1.656
+     ]
+    }
+   },
+   "brax_dash_recover": {
+    "frame": 7,
+    "frame_range": [
+     0.0,
+     14.0
+    ],
+    "max_bone_error": 1.4007091522216797e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.91,
+      1.148,
+      1.928
+     ]
+    }
+   },
+   "brax_fire_light": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 1.430511474609375e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.916,
+      1.232,
+      2.053
+     ]
+    }
+   },
+   "brax_fire_heavy": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 1.4007091522216797e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.904,
+      1.279,
+      2.04
+     ]
+    }
+   },
+   "brax_fire_charge@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 1.4156103134155273e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.997,
+      1.21,
+      2.007
+     ]
+    }
+   },
+   "brax_hit_light": {
+    "frame": 6,
+    "frame_range": [
+     0.0,
+     12.0
+    ],
+    "max_bone_error": 1.5348196029663086e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.906,
+      1.111,
+      2.036
+     ]
+    }
+   },
+   "brax_hit_heavy": {
+    "frame": 13,
+    "frame_range": [
+     0.0,
+     26.0
+    ],
+    "max_bone_error": 1.6093254089355469e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.951,
+      1.096,
+      1.773
+     ]
+    }
+   },
+   "brax_knockdown": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 1.1920928955078125e-06,
+    "mesh": {
+     "min_z": -0.0837,
+     "extent": [
+      1.729,
+      2.159,
+      1.142
+     ]
+    }
+   },
+   "brax_get_up": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 1.7285346984863281e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.256,
+      1.162,
+      1.355
+     ]
+    }
+   },
+   "brax_death": {
+    "frame": 24,
+    "frame_range": [
+     0.0,
+     48.0
+    ],
+    "max_bone_error": 1.3113021850585938e-06,
+    "mesh": {
+     "min_z": 0.0001,
+     "extent": [
+      1.092,
+      1.171,
+      1.47
+     ]
+    }
+   },
+   "brax_downed@loop": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 1.5348196029663086e-06,
+    "mesh": {
+     "min_z": 0.1665,
+     "extent": [
+      1.057,
+      1.248,
+      1.387
+     ]
+    }
+   },
+   "brax_revive": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 1.6391277313232422e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.904,
+      1.121,
+      1.905
+     ]
+    }
+   },
+   "brax_reforge_in": {
+    "frame": 22,
+    "frame_range": [
+     0.0,
+     45.0
+    ],
+    "max_bone_error": 1.564621925354004e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.894,
+      1.265,
+      1.979
+     ]
+    }
+   },
+   "brax_victory": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 1.3709068298339844e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.152,
+      1.1,
+      2.301
+     ]
+    }
+   },
+   "brax_ping": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 1.3262033462524414e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.913,
+      1.42,
+      2.051
+     ]
+    }
+   },
+   "brax_interact": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 1.5497207641601562e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.126,
+      0.931,
+      1.859
+     ]
+    }
+   },
+   "brax_forge_hammer@loop": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 1.430511474609375e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.175,
+      0.992,
+      1.996
+     ]
+    }
+   },
+   "brax_idle_signature@loop": {
+    "frame": 60,
+    "frame_range": [
+     0.0,
+     120.0
+    ],
+    "max_bone_error": 1.5497207641601562e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.184,
+      0.825,
+      2.176
+     ]
+    }
+   },
+   "brax_jab_l": {
+    "frame": 5,
+    "frame_range": [
+     0.0,
+     10.0
+    ],
+    "max_bone_error": 1.519918441772461e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.957,
+      1.289,
+      2.038
+     ]
+    }
+   },
+   "brax_jab_r": {
+    "frame": 5,
+    "frame_range": [
+     0.0,
+     10.0
+    ],
+    "max_bone_error": 1.8477439880371094e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.071,
+      1.3,
+      2.032
+     ]
+    }
+   },
+   "brax_hook": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 1.1920928955078125e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.132,
+      1.125,
+      2.022
+     ]
+    }
+   },
+   "brax_uppercut": {
+    "frame": 24,
+    "frame_range": [
+     0.0,
+     48.0
+    ],
+    "max_bone_error": 1.7583370208740234e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.221,
+      1.169,
+      1.559
+     ]
+    }
+   },
+   "brax_furnace_rush@loop": {
+    "frame": 6,
+    "frame_range": [
+     0.0,
+     12.0
+    ],
+    "max_bone_error": 1.2069940567016602e-06,
+    "mesh": {
+     "min_z": 0.0044,
+     "extent": [
+      1.064,
+      1.478,
+      1.859
+     ]
+    }
+   },
+   "brax_furnace_rush_end": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 1.3262033462524414e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.887,
+      1.364,
+      1.964
+     ]
+    }
+   },
+   "brax_meltdown_start": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 1.3113021850585938e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.723,
+      1.098,
+      2.071
+     ]
+    }
+   },
+   "brax_meltdown@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 1.5050172805786133e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      0.9,
+      1.269,
+      1.838
+     ]
+    }
+   },
+   "brax_heat_vent": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 1.5497207641601562e-06,
+    "mesh": {
+     "min_z": 0.0051,
+     "extent": [
+      1.331,
+      1.077,
+      2.087
+     ]
+    }
+   }
+  },
+  "weapon": {
+   "file": "assets/models/weapons/anvil_gauntlets.glb",
+   "objects": [
+    "anvil_gauntlets",
+    "anvil_gauntlets_fist_L",
+    "anvil_gauntlets_fist_R",
+    "anvil_gauntlets_open_L",
+    "anvil_gauntlets_open_R",
+    "glow_core",
+    "grip_L",
+    "grip_R",
+    "muzzle",
+    "muzzle_2",
+    "offhand"
+   ],
+   "root_is_identity": true,
+   "attach_rest_error": 2.0723582849768718e-07,
+   "variants": {
+    "fist": [
+     "anvil_gauntlets_fist_L",
+     "anvil_gauntlets_fist_R"
+    ],
+    "open": [
+     "anvil_gauntlets_open_L",
+     "anvil_gauntlets_open_R"
+    ]
+   },
+   "attach_jab_r_f3_error": 8.940696716308594e-07
+  },
+  "review_renders": {
+   "dir": "art/characters/brax/work/renders/stage5",
+   "shots": [
+    {
+     "shot": "idle_combat_f000",
+     "clip": "brax_idle_combat@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "fist"
+     }
+    },
+    {
+     "shot": "jab_r_f003",
+     "clip": "brax_jab_r",
+     "frame": 3,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "fist"
+     }
+    },
+    {
+     "shot": "uppercut_f010",
+     "clip": "brax_uppercut",
+     "frame": 10,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "fist"
+     }
+    },
+    {
+     "shot": "meltdown_start_f027",
+     "clip": "brax_meltdown_start",
+     "frame": 27,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "fist"
+     }
+    },
+    {
+     "shot": "run_f006",
+     "clip": "brax_run@loop",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "fist"
+     }
+    },
+    {
+     "shot": "ping_f014",
+     "clip": "brax_ping",
+     "frame": 14,
+     "weapon_shown": {
+      "L": "fist",
+      "R": "open"
+     }
+    }
+   ]
+  },
+  "errors": [],
+  "warnings": [],
+  "ok": true,
+  "seconds": 8.5
+ }
+}

@@ -1,0 +1,228 @@
+{
+ "kind": "weapon",
+ "key": "anvil_gauntlets",
+ "tier": "gauntlet_pair",
+ "tris": 7716,
+ "tris_budget": [
+  4000,
+  8000
+ ],
+ "tris_all_variants": 15432,
+ "tris_per_mesh": {
+  "anvil_gauntlets_fist_R": 3858,
+  "anvil_gauntlets_open_R": 3858,
+  "anvil_gauntlets_fist_L": 3858,
+  "anvil_gauntlets_open_L": 3858
+ },
+ "textures": [
+  {
+   "name": "anvil_gauntlets_emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 555817,
+   "role": "emissive"
+  },
+  {
+   "name": "anvil_gauntlets_normal",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 706601,
+   "role": "normal"
+  },
+  {
+   "name": "anvil_gauntlets_basecolor",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 1136044,
+   "role": "base_color"
+  }
+ ],
+ "sockets": {
+  "grip_R": {
+   "translation": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "anvil_gauntlets"
+  },
+  "grip_L": {
+   "translation": [
+    -0.65,
+    0.0,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "anvil_gauntlets"
+  },
+  "muzzle": {
+   "translation": [
+    -0.0248,
+    -0.027,
+    -0.1975
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "anvil_gauntlets"
+  },
+  "glow_core": {
+   "translation": [
+    -0.0199,
+    0.0034,
+    0.0923
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "anvil_gauntlets"
+  },
+  "offhand": {
+   "translation": [
+    -0.65,
+    0.0,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "anvil_gauntlets"
+  },
+  "muzzle_2": {
+   "translation": [
+    -0.6269,
+    -0.027,
+    -0.1975
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "parent": "offhand"
+  }
+ },
+ "variants": {
+  "default": "fist",
+  "fist": {
+   "R": "anvil_gauntlets_fist_R",
+   "L": "anvil_gauntlets_fist_L"
+  },
+  "open": {
+   "R": "anvil_gauntlets_open_R",
+   "L": "anvil_gauntlets_open_L"
+  },
+  "note": "all four meshes are visible when the scene spawns: hide the open pair by node name (Visibility::Hidden) and swap per hand at the frames the hero sidecar gives (clip_info.<clip>.weapon_variant). The two variants of a hand share topology, UVs and the texture."
+ },
+ "clips": [],
+ "skeleton": null,
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = the right palm centre, -Z = along the fingers (the strike direction), +Y = out of the back of the hand, +X = right. The scene attaches as an identity child of the hero's weapon_R; offhand (the left pair, its origin = grip_L = the left palm centre) is re-parented to weapon_L with an identity transform. offhand's own offset (-0.65 m) is a display layout only.",
+ "attach": {
+  "root": "weapon_R",
+  "offhand": "weapon_L",
+  "sleeve_weapon": true,
+  "rules": "a sleeve weapon: the wrist stays straight (bend 0, twist free); the elbow cuff presses into the biceps past about 40 deg of elbow flexion (docs/art/GF_HERO_SKELETON.md section 7)"
+ },
+ "designed_on": "brax",
+ "bounds_m": {
+  "min": [
+   -0.8263,
+   -0.176,
+   -0.3687
+  ],
+  "max": [
+   0.176,
+   0.1952,
+   0.4364
+  ]
+ },
+ "size_m": 1.002,
+ "glb": "assets/models/weapons/anvil_gauntlets.glb",
+ "glb_bytes": 3652108,
+ "glb_sha256": "325233983cb0a65ffc378227be7be3013e7ec05443ebab8c1ae0b61791558b78",
+ "source_blend": "art/weapons/anvil_gauntlets/production/anvil_gauntlets_stage2.blend",
+ "build_script": "tools/blender/gf_hero/export_glb.py (mesh: tools/blender/gf_hero/s2_weapon.py + s2_gauntlet.py)",
+ "toolkit": "tools/blender/gf_hero",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": [
+   "gfa_validate (tools/blender/gf_assets, read only): ['15432 tris > weapon_gauntlet_pair budget 8000']"
+  ],
+  "tool": "tools/blender/gf_hero/export_glb.py",
+  "gfa_validate": {
+   "ok": false,
+   "errors": [
+    "15432 tris > weapon_gauntlet_pair budget 8000"
+   ],
+   "warnings": [
+    "image anvil_gauntlets_normal is not used by the material"
+   ],
+   "tris": 15432
+  }
+ },
+ "chassis": {
+  "damage_type": "Kinetic",
+  "style": "Fist",
+  "tags": [
+   "melee"
+  ]
+ }
+}
