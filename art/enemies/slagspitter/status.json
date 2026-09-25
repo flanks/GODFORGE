@@ -1,0 +1,35 @@
+{
+ "asset": "slagspitter",
+ "kind": "enemy",
+ "tier": "swarm",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/slagspitter.glb",
+    "assets/models/enemies/slagspitter.meta.json",
+    "art/enemies/slagspitter/source/slagspitter.blend",
+    "art/enemies/slagspitter/textures/slagspitter_basecolor.png",
+    "art/enemies/slagspitter/textures/slagspitter_emissive.png",
+    "art/enemies/slagspitter/reports/slagspitter_review.png",
+    "art/enemies/slagspitter/reports/slagspitter_clips.png",
+    "art/enemies/slagspitter/reports/slagspitter_crowd.png",
+    "art/enemies/slagspitter/reports/slagspitter_crowd_review.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/slagspitter.py and reviewed by the same script with --crowd (40 slagspitters among the clinker family through the game camera)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ },
+ "skeleton": "GF_Swarm_v1",
+ "faction": "unmade"
+}

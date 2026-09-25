@@ -1,0 +1,433 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\slagspitter.glb",
+  "key": "slagspitter",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 942,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "slagspitter_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 113180
+   },
+   {
+    "name": "slagspitter_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 256631
+   }
+  ],
+  "materials": [
+   "M_slagspitter"
+  ],
+  "sockets": {
+   "head_top": {
+    "translation": [
+     0.0,
+     1.2,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     -0.0314,
+     0.628,
+     0.0722
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.4,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_mouth": {
+    "translation": [
+     -0.03,
+     0.67,
+     0.066
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     -0.0314,
+     0.766,
+     0.0722
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.6288,
+    0.0,
+    -0.69
+   ],
+   "max": [
+    0.5673,
+    0.8451,
+    0.594
+   ]
+  },
+  "height_m": 0.845,
+  "height_vs_hero": 0.384,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "slagspitter_idle@loop",
+   "slagspitter_move@loop",
+   "slagspitter_windup",
+   "slagspitter_attack",
+   "slagspitter_hit",
+   "slagspitter_death"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 165.8,
+   "p10": 123.4,
+   "p90": 174.9
+  },
+  "coverage": 0.456,
+  "zones": [
+   "slag",
+   "crust",
+   "core",
+   "molten",
+   "spill",
+   "obsidian",
+   "under"
+  ],
+  "broad_zones": [
+   "crust",
+   "slag"
+  ],
+  "decals": 10,
+  "basecolor": "art/enemies/slagspitter/textures/slagspitter_basecolor.png",
+  "emissive": "art/enemies/slagspitter/textures/slagspitter_emissive.png",
+  "emissive_texels": 77917,
+  "seconds": 53.4
+ },
+ "skin": {
+  "vertices": 603,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 452,
+   "head": 52,
+   "legs_a": 54,
+   "legs_b": 27,
+   "tail": 18
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "core_core",
+   "zone": "core",
+   "bone": "body",
+   "faces": 120
+  },
+  {
+   "id": 1,
+   "name": "core_under",
+   "zone": "under",
+   "bone": "body",
+   "faces": 12
+  },
+  {
+   "id": 2,
+   "name": "plate0_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 3,
+   "name": "plate0_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 4,
+   "name": "plate1_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 5,
+   "name": "plate1_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 6,
+   "name": "plate2_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 7,
+   "name": "plate2_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 8,
+   "name": "plate3_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 9,
+   "name": "plate3_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 10,
+   "name": "plate4_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 11,
+   "name": "plate4_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 12,
+   "name": "plate5_crust",
+   "zone": "crust",
+   "bone": "body",
+   "faces": 10
+  },
+  {
+   "id": 13,
+   "name": "plate5_slag",
+   "zone": "slag",
+   "bone": "body",
+   "faces": 22
+  },
+  {
+   "id": 14,
+   "name": "glob",
+   "zone": "molten",
+   "bone": "head",
+   "faces": 60
+  },
+  {
+   "id": 15,
+   "name": "spill",
+   "zone": "spill",
+   "bone": "body",
+   "faces": 26
+  },
+  {
+   "id": 16,
+   "name": "toe_L",
+   "zone": "slag",
+   "bone": "legs_a",
+   "faces": 28
+  },
+  {
+   "id": 17,
+   "name": "claw_L",
+   "zone": "obsidian",
+   "bone": "legs_a",
+   "faces": 4
+  },
+  {
+   "id": 18,
+   "name": "toe_B",
+   "zone": "slag",
+   "bone": "legs_a",
+   "faces": 28
+  },
+  {
+   "id": 19,
+   "name": "claw_B",
+   "zone": "obsidian",
+   "bone": "legs_a",
+   "faces": 4
+  },
+  {
+   "id": 20,
+   "name": "toe_R",
+   "zone": "slag",
+   "bone": "legs_b",
+   "faces": 28
+  },
+  {
+   "id": 21,
+   "name": "claw_R",
+   "zone": "obsidian",
+   "bone": "legs_b",
+   "faces": 4
+  },
+  {
+   "id": 22,
+   "name": "shard",
+   "zone": "obsidian",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 23,
+   "name": "shard",
+   "zone": "obsidian",
+   "bone": "tail",
+   "faces": 6
+  },
+  {
+   "id": 24,
+   "name": "shard",
+   "zone": "obsidian",
+   "bone": "tail",
+   "faces": 6
+  }
+ ],
+ "tris_blender": 942,
+ "clips": [
+  {
+   "name": "slagspitter_idle@loop",
+   "frames": [
+    0,
+    48
+   ],
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "slagspitter_move@loop",
+   "frames": [
+    0,
+    14
+   ],
+   "seconds": 0.467,
+   "loop": true
+  },
+  {
+   "name": "slagspitter_windup",
+   "frames": [
+    0,
+    18
+   ],
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "slagspitter_attack",
+   "frames": [
+    0,
+    18
+   ],
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "slagspitter_hit",
+   "frames": [
+    0,
+    10
+   ],
+   "seconds": 0.333,
+   "loop": false
+  },
+  {
+   "name": "slagspitter_death",
+   "frames": [
+    0,
+    28
+   ],
+   "seconds": 0.933,
+   "loop": false
+  }
+ ]
+}

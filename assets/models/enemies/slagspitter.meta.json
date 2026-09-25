@@ -1,0 +1,209 @@
+{
+ "kind": "enemy",
+ "key": "slagspitter",
+ "tier": "swarm",
+ "tris": 942,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "slagspitter_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 113180
+  },
+  {
+   "name": "slagspitter_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 256631
+  }
+ ],
+ "sockets": {
+  "head_top": {
+   "translation": [
+    0.0,
+    1.2,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    -0.0314,
+    0.628,
+    0.0722
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.4,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    -0.03,
+    0.67,
+    0.066
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    -0.0314,
+    0.766,
+    0.0722
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "slagspitter_idle@loop",
+  "slagspitter_move@loop",
+  "slagspitter_windup",
+  "slagspitter_attack",
+  "slagspitter_hit",
+  "slagspitter_death"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.6288,
+   0.0,
+   -0.69
+  ],
+  "max": [
+   0.5673,
+   0.8451,
+   0.594
+  ]
+ },
+ "size_m": 0.845,
+ "glb": "assets/models/enemies/slagspitter.glb",
+ "glb_bytes": 494160,
+ "glb_sha256": "e6d26458348ef93cb9110ae2fc70c420096b35b81bb467280ab121290c6b647e",
+ "source_blend": "art/enemies/slagspitter/source/slagspitter.blend",
+ "build_script": "tools/blender/gf_assets/enemies/slagspitter.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "slagspitter",
+ "faction": "unmade",
+ "move_cycle_m": 1.0,
+ "move_note": "a rocking tripod waddle: play move@loop at speed / move_cycle_m cycles per second (row speed 2.6 m/s -> 2.6 cycles/s)",
+ "lob": {
+  "windup": "ends on the loaded pose (the glob swollen out of the maw); time-stretch it into the telegraph",
+  "attack_release_frame": 2,
+  "attack_origin": "on the head bone, on top of the glob: spawn the lobbed slag there at the release frame",
+  "note": "Lobber(windup 1.1 s): e.g. play windup over the first ~0.5 s of the telegraph, then attack, so the thrown glob flies for the rest of it and lands with the damage"
+ },
+ "bones": {
+  "body": "the cone, crust plates, teeth, core and the overflow tongue",
+  "head": "the molten glob in the maw (swells, is thrown, refills)",
+  "legs_a": "the two left toes",
+  "legs_b": "the big right toe",
+  "tail": "the obsidian back shards",
+  "root": "hops and the death sink"
+ },
+ "content_row": {
+  "key": "slagspitter",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 40,
+  "speed": 2.6,
+  "radius": 0.48,
+  "scale": 1.0,
+  "behavior": "Lobber(range: 11.0, windup: 1.1, radius: 1.4, damage: 18.0, cooldown: 3.2, keep_distance: 7.0)",
+  "color": "#C24A1C",
+  "shape": "Spire",
+  "pack": "(1, 2)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 165.8,
+   "p10": 123.4,
+   "p90": 174.9
+  },
+  "coverage": 0.456
+ },
+ "skin": {
+  "vertices": 603,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 452,
+   "head": 52,
+   "legs_a": 54,
+   "legs_b": 27,
+   "tail": 18
+  }
+ }
+}
