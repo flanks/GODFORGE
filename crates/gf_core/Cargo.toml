@@ -1,0 +1,19 @@
+[package]
+name = "gf_core"
+description = "GODFORGE core rules: engine-agnostic, deterministic game math (forge, damage, aim, scaling)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+glam = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+ron = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,5 @@
+[toolchain]
+# Pinned: Bevy 0.20.0-rc.1 requires rustc >= 1.96.0.
+channel = "1.96.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"
