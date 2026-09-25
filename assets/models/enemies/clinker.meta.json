@@ -1,0 +1,189 @@
+{
+ "kind": "enemy",
+ "key": "clinker",
+ "tier": "swarm",
+ "tris": 948,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "clinker_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 69187
+  },
+  {
+   "name": "clinker_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 275641
+  }
+ ],
+ "sockets": {
+  "head_top": {
+   "translation": [
+    0.0,
+    0.7028,
+    -0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.2892,
+    -0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.4383,
+    -0.07
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    0.165,
+    0.405
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "clinker_idle@loop",
+  "clinker_move@loop",
+  "clinker_windup",
+  "clinker_attack",
+  "clinker_hit",
+  "clinker_death"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.356,
+   -0.0,
+   -0.385
+  ],
+  "max": [
+   0.4128,
+   0.5544,
+   0.495
+  ]
+ },
+ "size_m": 0.554,
+ "glb": "assets/models/enemies/clinker.glb",
+ "glb_bytes": 493256,
+ "glb_sha256": "4ee7ebc1a106078c17d70cd54af78b1f893783cdfe130e4f36829d18a23c2fc2",
+ "source_blend": "art/enemies/clinker/source/clinker.blend",
+ "build_script": "tools/blender/gf_assets/enemies/clinker.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "clinker",
+ "variant": "base",
+ "variant_name": "Shardling",
+ "variant_set": [
+  "clinker",
+  "clinker_v1",
+  "clinker_v2",
+  "clinker_v3"
+ ],
+ "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named {file_stem}_{clip}. Pick one of variant_set per spawn (clinker.glb alone is complete).",
+ "mirrored": false,
+ "limbs": "three shard legs on the left, one huge clawed arm on the right",
+ "gait": "legs_a = front + rear leg of the three-leg side; legs_b = middle leg + the big arm (limps)",
+ "move_cycle_m": 0.6,
+ "move_note": "rigid-group skitter: play move@loop at speed / move_cycle_m cycles per second (row speed 3.8 m/s -> about 6 cycles/s, the frantic flicker that reads as SKITTER at 35 px)",
+ "content_row": {
+  "key": "clinker",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 9,
+  "speed": 3.8,
+  "radius": 0.26,
+  "scale": 0.8,
+  "behavior": "Swarmer(jitter: 1.0)",
+  "color": "#9A5B3C",
+  "shape": "Crawler",
+  "pack": "(6, 10)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 196.8,
+   "p10": 168.4,
+   "p90": 281.5
+  },
+  "coverage": 0.434
+ },
+ "skin": {
+  "vertices": 648,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 244,
+   "head": 74,
+   "legs_a": 62,
+   "legs_b": 117,
+   "tail": 151
+  }
+ }
+}

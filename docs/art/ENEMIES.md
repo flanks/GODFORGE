@@ -192,6 +192,14 @@ Every `Swarm` row does, whatever its greybox shape:
 * **Colour:** obsidian black, wet sheen streaks, teal glow `#2FBFA8` from the cracks and the jaw, pale
   bone inner shell. Use the row colour `#9A5B3C` (slag brown) only as a faint warm tint in the shell's
   light plane, to keep it apart from the other variants.
+* **Built (2026-09-25, `ai_final_pending_user_approval`).** There are four looks of this one key, one
+  GLB each: `clinker.glb` (Shardling), `clinker_v1.glb` (Crested, mirrored), `clinker_v2.glb`
+  (Brood-back) and `clinker_v3.glb` (Split-back, mirrored). All four have the same GF_Swarm_v1, sockets
+  and clip suffixes, and their clips are named `{file_stem}_{clip}`. The client can pick one per spawn
+  from meta.json `variant_set`; `clinker.glb` alone is complete. The `head` bone is the hinged half of the
+  vertically split skull, and a yaw opens it into the glowing wind-up wedge. Build script:
+  `tools/blender/gf_assets/enemies/clinker.py`. Brief, metrics and the 40-copy horde review:
+  [art/enemies/clinker/README.md](../../art/enemies/clinker/README.md).
 
 ### The variant rule (cheap roster width)
 

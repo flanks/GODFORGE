@@ -1,0 +1,58 @@
+{
+ "asset": "clinker",
+ "kind": "enemy",
+ "tier": "swarm",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/clinker.glb",
+    "assets/models/enemies/clinker.meta.json",
+    "art/enemies/clinker/source/clinker.blend",
+    "art/enemies/clinker/textures/clinker_basecolor.png",
+    "art/enemies/clinker/textures/clinker_emissive.png",
+    "art/enemies/clinker/reports/clinker_review.png",
+    "assets/models/enemies/clinker_v1.glb",
+    "assets/models/enemies/clinker_v1.meta.json",
+    "art/enemies/clinker/source/clinker_v1.blend",
+    "art/enemies/clinker/textures/clinker_v1_basecolor.png",
+    "art/enemies/clinker/textures/clinker_v1_emissive.png",
+    "art/enemies/clinker/reports/clinker_v1_review.png",
+    "assets/models/enemies/clinker_v2.glb",
+    "assets/models/enemies/clinker_v2.meta.json",
+    "art/enemies/clinker/source/clinker_v2.blend",
+    "art/enemies/clinker/textures/clinker_v2_basecolor.png",
+    "art/enemies/clinker/textures/clinker_v2_emissive.png",
+    "art/enemies/clinker/reports/clinker_v2_review.png",
+    "assets/models/enemies/clinker_v3.glb",
+    "assets/models/enemies/clinker_v3.meta.json",
+    "art/enemies/clinker/source/clinker_v3.blend",
+    "art/enemies/clinker/textures/clinker_v3_basecolor.png",
+    "art/enemies/clinker/textures/clinker_v3_emissive.png",
+    "art/enemies/clinker/reports/clinker_v3_review.png",
+    "art/enemies/clinker/reports/clinker_family_review.png",
+    "art/enemies/clinker/reports/clinker_crowd.png",
+    "art/enemies/clinker/reports/clinker_lineup.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/clinker.py (--variant base|v1|v2|v3) and reviewed by enemies/clinker_crowd.py. Four looks of the content key clinker, one GLB each, identical GF_Swarm_v1 skeleton, sockets and clip suffixes."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ },
+ "variants": {
+  "clinker": "Shardling",
+  "clinker_v1": "Crested",
+  "clinker_v2": "Brood-back",
+  "clinker_v3": "Split-back"
+ },
+ "skeleton": "GF_Swarm_v1"
+}

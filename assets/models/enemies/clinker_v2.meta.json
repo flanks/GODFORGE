@@ -1,0 +1,189 @@
+{
+ "kind": "enemy",
+ "key": "clinker_v2",
+ "tier": "swarm",
+ "tris": 1024,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "clinker_v2_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 71281
+  },
+  {
+   "name": "clinker_v2_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 276882
+  }
+ ],
+ "sockets": {
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.2543,
+    -0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    0.56,
+    -0.02
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_mouth": {
+   "translation": [
+    0.0,
+    0.1377,
+    0.4198
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.38,
+    -0.07
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "clinker_v2_idle@loop",
+  "clinker_v2_move@loop",
+  "clinker_v2_windup",
+  "clinker_v2_attack",
+  "clinker_v2_hit",
+  "clinker_v2_death"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.4084,
+   -0.0125,
+   -0.3635
+  ],
+  "max": [
+   0.4338,
+   0.4564,
+   0.5512
+  ]
+ },
+ "size_m": 0.469,
+ "glb": "assets/models/enemies/clinker_v2.glb",
+ "glb_bytes": 502660,
+ "glb_sha256": "43f9cbb67f82705a5248946a37984fed642dea84334582eb2de70722b15c367d",
+ "source_blend": "art/enemies/clinker/source/clinker_v2.blend",
+ "build_script": "tools/blender/gf_assets/enemies/clinker.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "clinker",
+ "variant": "v2",
+ "variant_name": "Brood-back",
+ "variant_set": [
+  "clinker",
+  "clinker_v1",
+  "clinker_v2",
+  "clinker_v3"
+ ],
+ "variant_rule": "one file per look; identical GF_Swarm_v1, sockets and clip suffixes; clips are named {file_stem}_{clip}. Pick one of variant_set per spawn (clinker.glb alone is complete).",
+ "mirrored": false,
+ "limbs": "three shard legs on the left, one huge clawed arm on the right",
+ "gait": "legs_a = front + rear leg of the three-leg side; legs_b = middle leg + the big arm (limps)",
+ "move_cycle_m": 0.55,
+ "move_note": "rigid-group skitter: play move@loop at speed / move_cycle_m cycles per second (row speed 3.8 m/s -> about 6 cycles/s, the frantic flicker that reads as SKITTER at 35 px)",
+ "content_row": {
+  "key": "clinker",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 9,
+  "speed": 3.8,
+  "radius": 0.26,
+  "scale": 0.8,
+  "behavior": "Swarmer(jitter: 1.0)",
+  "color": "#9A5B3C",
+  "shape": "Crawler",
+  "pack": "(6, 10)"
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 189.9,
+   "p10": 155.6,
+   "p90": 274.7
+  },
+  "coverage": 0.419
+ },
+ "skin": {
+  "vertices": 692,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 252,
+   "head": 78,
+   "legs_a": 62,
+   "legs_b": 117,
+   "tail": 183
+  }
+ }
+}

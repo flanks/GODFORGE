@@ -1,0 +1,581 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\enemies\\clinker_v3.glb",
+  "key": "clinker_v3",
+  "kind": "enemy",
+  "tier": "swarm",
+  "extensions_used": [],
+  "tris": 980,
+  "budget": [
+   600,
+   1500
+  ],
+  "textures": [
+   {
+    "name": "clinker_v3_emissive",
+    "role": "emissive",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 70006
+   },
+   {
+    "name": "clinker_v3_basecolor",
+    "role": "base_color",
+    "px": [
+     512,
+     512
+    ],
+    "format": "png",
+    "bytes": 275369
+   }
+  ],
+  "materials": [
+   "M_clinker_v3"
+  ],
+  "sockets": {
+   "fx_mouth": {
+    "translation": [
+     0.0,
+     0.1591,
+     0.4194
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     0.7024,
+     -0.02
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     0.0,
+     0.2817,
+     -0.02
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "fx_core": {
+    "translation": [
+     0.0,
+     0.4259,
+     -0.07
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.4222,
+    -0.0,
+    -0.4065
+   ],
+   "max": [
+    0.3482,
+    0.5699,
+    0.495
+   ]
+  },
+  "height_m": 0.57,
+  "height_vs_hero": 0.259,
+  "joints": [
+   "root",
+   "body",
+   "head",
+   "legs_a",
+   "legs_b",
+   "tail"
+  ],
+  "clips": [
+   "clinker_v3_idle@loop",
+   "clinker_v3_move@loop",
+   "clinker_v3_windup",
+   "clinker_v3_attack",
+   "clinker_v3_hit",
+   "clinker_v3_death"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 185.5,
+   "p10": 157.5,
+   "p90": 261.5
+  },
+  "coverage": 0.401,
+  "zones": [
+   "hull",
+   "plate",
+   "limb",
+   "skull",
+   "bone",
+   "core",
+   "maw",
+   "ichor"
+  ],
+  "decals": 11,
+  "basecolor": "art/enemies/clinker/textures/clinker_v3_basecolor.png",
+  "emissive": "art/enemies/clinker/textures/clinker_v3_emissive.png",
+  "emissive_texels": 46670,
+  "seconds": 46.9
+ },
+ "skin": {
+  "vertices": 669,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 242,
+   "head": 74,
+   "legs_a": 62,
+   "legs_b": 117,
+   "tail": 174
+  }
+ },
+ "parts": [
+  {
+   "id": 0,
+   "name": "hull_bone",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 12
+  },
+  {
+   "id": 1,
+   "name": "hull_core",
+   "zone": "core",
+   "bone": "body",
+   "faces": 6
+  },
+  {
+   "id": 2,
+   "name": "hull_hull",
+   "zone": "hull",
+   "bone": "body",
+   "faces": 43
+  },
+  {
+   "id": 3,
+   "name": "scute0L",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 4,
+   "name": "scute0R",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 5,
+   "name": "scute1L",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 6,
+   "name": "scute1R",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 7,
+   "name": "scute2L",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 8,
+   "name": "scute2R",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 18
+  },
+  {
+   "id": 9,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 10,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 11,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 12,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 13,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 14,
+   "name": "shard",
+   "zone": "plate",
+   "bone": "tail",
+   "faces": 5
+  },
+  {
+   "id": 15,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 4
+  },
+  {
+   "id": 16,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 4
+  },
+  {
+   "id": 17,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 4
+  },
+  {
+   "id": 18,
+   "name": "skull_L_bone",
+   "zone": "bone",
+   "bone": "head",
+   "faces": 4
+  },
+  {
+   "id": 19,
+   "name": "skull_L_maw",
+   "zone": "maw",
+   "bone": "head",
+   "faces": 2
+  },
+  {
+   "id": 20,
+   "name": "skull_L_skull",
+   "zone": "skull",
+   "bone": "head",
+   "faces": 20
+  },
+  {
+   "id": 21,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 4
+  },
+  {
+   "id": 22,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 4
+  },
+  {
+   "id": 23,
+   "name": "tooth",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 4
+  },
+  {
+   "id": 24,
+   "name": "skull_R_bone",
+   "zone": "bone",
+   "bone": "body",
+   "faces": 4
+  },
+  {
+   "id": 25,
+   "name": "skull_R_maw",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 2
+  },
+  {
+   "id": 26,
+   "name": "skull_R_skull",
+   "zone": "skull",
+   "bone": "body",
+   "faces": 20
+  },
+  {
+   "id": 27,
+   "name": "skull_B_maw",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 4
+  },
+  {
+   "id": 28,
+   "name": "skull_B_skull",
+   "zone": "skull",
+   "bone": "body",
+   "faces": 21
+  },
+  {
+   "id": 29,
+   "name": "maw_slab",
+   "zone": "maw",
+   "bone": "body",
+   "faces": 26
+  },
+  {
+   "id": 30,
+   "name": "leg_L1",
+   "zone": "limb",
+   "bone": "legs_a",
+   "faces": 16
+  },
+  {
+   "id": 31,
+   "name": "knee_L1",
+   "zone": "bone",
+   "bone": "legs_a",
+   "faces": 12
+  },
+  {
+   "id": 32,
+   "name": "spur_L1",
+   "zone": "limb",
+   "bone": "legs_a",
+   "faces": 5
+  },
+  {
+   "id": 33,
+   "name": "leg_L2",
+   "zone": "limb",
+   "bone": "legs_b",
+   "faces": 16
+  },
+  {
+   "id": 34,
+   "name": "knee_L2",
+   "zone": "bone",
+   "bone": "legs_b",
+   "faces": 12
+  },
+  {
+   "id": 35,
+   "name": "spur_L2",
+   "zone": "limb",
+   "bone": "legs_b",
+   "faces": 5
+  },
+  {
+   "id": 36,
+   "name": "leg_L3",
+   "zone": "limb",
+   "bone": "legs_a",
+   "faces": 16
+  },
+  {
+   "id": 37,
+   "name": "knee_L3",
+   "zone": "bone",
+   "bone": "legs_a",
+   "faces": 12
+  },
+  {
+   "id": 38,
+   "name": "spur_L3",
+   "zone": "limb",
+   "bone": "legs_a",
+   "faces": 5
+  },
+  {
+   "id": 39,
+   "name": "arm_R",
+   "zone": "limb",
+   "bone": "legs_b",
+   "faces": 20
+  },
+  {
+   "id": 40,
+   "name": "elbow_R",
+   "zone": "bone",
+   "bone": "legs_b",
+   "faces": 12
+  },
+  {
+   "id": 41,
+   "name": "elbow_spike",
+   "zone": "limb",
+   "bone": "legs_b",
+   "faces": 5
+  },
+  {
+   "id": 42,
+   "name": "hand_R",
+   "zone": "limb",
+   "bone": "legs_b",
+   "faces": 24
+  },
+  {
+   "id": 43,
+   "name": "claw0",
+   "zone": "bone",
+   "bone": "legs_b",
+   "faces": 9
+  },
+  {
+   "id": 44,
+   "name": "claw1",
+   "zone": "bone",
+   "bone": "legs_b",
+   "faces": 9
+  },
+  {
+   "id": 45,
+   "name": "claw2",
+   "zone": "bone",
+   "bone": "legs_b",
+   "faces": 9
+  },
+  {
+   "id": 46,
+   "name": "drip",
+   "zone": "ichor",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 47,
+   "name": "drip",
+   "zone": "ichor",
+   "bone": "body",
+   "faces": 5
+  },
+  {
+   "id": 48,
+   "name": "drip",
+   "zone": "ichor",
+   "bone": "body",
+   "faces": 5
+  }
+ ],
+ "tris_blender": 980,
+ "clips": [
+  {
+   "name": "clinker_v3_idle@loop",
+   "frames": [
+    0,
+    40
+   ],
+   "seconds": 1.333,
+   "loop": true
+  },
+  {
+   "name": "clinker_v3_move@loop",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": true
+  },
+  {
+   "name": "clinker_v3_windup",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "clinker_v3_attack",
+   "frames": [
+    0,
+    15
+   ],
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "clinker_v3_hit",
+   "frames": [
+    0,
+    9
+   ],
+   "seconds": 0.3,
+   "loop": false
+  },
+  {
+   "name": "clinker_v3_death",
+   "frames": [
+    0,
+    27
+   ],
+   "seconds": 0.9,
+   "loop": false
+  }
+ ]
+}
