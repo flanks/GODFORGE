@@ -151,8 +151,21 @@ colour and readability rules are final:
 * Players: P1 gold, P2 cyan, P3 violet, P4 green ground rings (`game.ron: player_colors`).
 * Enemy danger: telegraphs fill red-white from the centre until they resolve, and winding-up enemies blink red.
   Enemy shots are magenta-cored so they never read as player projectiles.
-* Look: a warm shadow-casting key light against cool fill, HDR + bloom (TonyMcMapface), a painted-flagstone
-  ground tinted per biome, inverted-hull ink outlines on characters and enemies, and a UI vignette.
+* Look: a warm shadow-casting key light against a cool ambient (per biome), HDR + bloom
+  (TonyMcMapface), a painterly colour grade and a UI vignette. Inverted-hull ink outlines sit on
+  characters, enemies and architecture.
+* NPR materials (`gf_client::materials`, embedded WESL in `src/shaders`): every lit surface is an
+  `ExtendedMaterial<StandardMaterial, _>`, so Bevy's lights, shadows and fog still apply.
+  - `ToonMaterial` posterizes light into flat bands with saturated cool shadows, a coloured rim and
+    an ink edge. The rim is the player colour on heroes, warm red on foes and soft gold on props.
+    Build new ones with `toon()` / `toon_from_standard()` and a `ToonStyle` preset.
+  - `FloorMaterial` paints the floor in world space: plaza pavers around a gold mosaic, broken
+    flagstones over bare ground, worn paths, soot at the walls, and the room's lava cracks as rifts.
+  - `AbyssMaterial` animates the sea at y = -7 below the thick platform (`terrain.rs`): magma,
+    deep water, night sky or chaos, chosen by `BiomeLook`.
+  Glow, decal, additive and ink looks stay `StandardMaterial`. `palette` caches every material per
+  (colour, look), so a 400-enemy horde shares a handful of handles and batches. The room seed may
+  vary the paint; it never feeds the simulation.
 * Type: DejaVu Serif Bold for headings and DejaVu Sans for body (bundled, redistributable; `assets/fonts`).
   The body face replaces Bevy's ASCII-only default font, so every glyph the UI uses renders.
 
@@ -191,6 +204,7 @@ The production path is:
 | Chaos stress | `godforge --stress 400 --bots 4` | p99 tick < 16.67 ms |
 | Attack-mode parity | `godforge --bot-run --aim auto --seed 7` vs `--aim manual --seed 7` | both complete (acceptance #8) |
 | Client smoke | `godforge --autoplay --screenshot shot.png --shots 4` | renders under Xvfb/lavapipe |
+| Peak-horde look | `godforge --autoplay --bots 3 --horde 400 --fps` | holds 400 enemies in a windowed session; logs FPS and worst frame |
 
 ## 11. Known gaps (tracked for P2)
 
