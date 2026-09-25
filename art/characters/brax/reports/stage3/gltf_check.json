@@ -1,0 +1,203 @@
+{
+ "hero": "brax",
+ "file": "art/characters/brax/work/gltf_check/brax_rig.glb (local scratch)",
+ "checks": {
+  "joints": {
+   "count": 63,
+   "missing": [],
+   "unexpected": []
+  },
+  "hierarchy": {
+   "armature_node": true,
+   "wrong_parents": []
+  },
+  "primitives": [
+   {
+    "mesh": "BEARD",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "BELT",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "BODY",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "HAIR",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "SASH",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "SKIRT_CLOTH",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "SKIRT_PLATES",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "WRAPS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   }
+  ],
+  "extensionsRequired": [],
+  "weights_sum_max_error": 1.1920928955078125e-07,
+  "socket_frames": {
+   "weapon_R": {
+    "gltf_world": [
+     [
+      0.0,
+      0.0,
+      1.0,
+      -1.01645
+     ],
+     [
+      -0.0,
+      1.0,
+      -0.0,
+      1.7339
+     ],
+     [
+      -1.0,
+      0.0,
+      -0.0,
+      -0.03267
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 5.960464477539062e-07
+   },
+   "weapon_L": {
+    "gltf_world": [
+     [
+      0.0,
+      -0.0,
+      -1.0,
+      1.01645
+     ],
+     [
+      0.0,
+      1.0,
+      -0.0,
+      1.7339
+     ],
+     [
+      1.0,
+      0.0,
+      -0.0,
+      -0.03267
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 7.152557373046875e-07
+   },
+   "head_top": {
+    "gltf_world": [
+     [
+      -1.0,
+      -0.0,
+      -0.0,
+      -0.0
+     ],
+     [
+      0.0,
+      1.0,
+      -0.0,
+      2.19878
+     ],
+     [
+      0.0,
+      -0.0,
+      -1.0,
+      -0.014
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 7.152557373046875e-07
+   },
+   "chest_sigil": {
+    "gltf_world": [
+     [
+      -1.0,
+      -0.0,
+      0.0,
+      -0.0
+     ],
+     [
+      -0.0,
+      0.98099,
+      -0.19408,
+      1.72
+     ],
+     [
+      -0.0,
+      -0.19408,
+      -0.98099,
+      0.17369
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 3.5762786865234375e-07
+   }
+  },
+  "weapon_identity_attach": {
+   "GAUNTLET_FIST_R": {
+    "socket": "weapon_R",
+    "weapon_node_local_is_identity": true,
+    "vertices": 5977,
+    "max_distance_m": 7.183534194155072e-07,
+    "mean_distance_m": 6.155867776721274e-07
+   },
+   "GAUNTLET_FIST_L": {
+    "socket": "weapon_L",
+    "weapon_node_local_is_identity": true,
+    "vertices": 6058,
+    "max_distance_m": 8.679846246195666e-07,
+    "mean_distance_m": 7.248393749824183e-07
+   }
+  }
+ },
+ "ok": true,
+ "failures": []
+}

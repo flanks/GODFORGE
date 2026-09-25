@@ -290,16 +290,132 @@
    }
   },
   "3_rig": {
-   "status": "not_started",
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/run_stage3.py; no human artist",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes the rig and weights, the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "The GF_Hero_v1 master skeleton does not exist yet (docs/ART_PIPELINE.md describes the plan). Auto-rig plus hand weight-paint fixes; a human signs off the weight painting (shoulders, hands, face). Weapon sockets weapon_L / weapon_R (children of hand_L / hand_R) go at the frames in reports/stage2/body_fit.json hand_frames: origin palm centre, +Y along the fingers, +Z out of the back of the hand."
+   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md, tools/blender/gf_hero/gf_hero_rig.py)",
+   "outputs": [
+    "art/characters/brax/production/brax_rig.blend (Git LFS)",
+    "art/characters/brax/work/brax_landmarks.json (committed, git add -f)",
+    "art/characters/brax/stage3_skin.json",
+    "art/characters/brax/reports/rig_report.md",
+    "art/characters/brax/reports/stage3/stage3_{skeleton,poses_1,poses_2,poses_3,ingame,weapon}.png",
+    "art/characters/brax/reports/stage3/{landmarks,mh_seed,skin,poses,gltf_check}.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/gf_hero_rig.py",
+    "tools/blender/gf_hero/run_stage3.py",
+    "tools/blender/gf_hero/s3_landmarks.py",
+    "tools/blender/gf_hero/s3_mh_seed.py",
+    "tools/blender/gf_hero/s3_skin.py",
+    "tools/blender/gf_hero/s3_pose_set.py",
+    "tools/blender/gf_hero/s3_poses.py",
+    "tools/blender/gf_hero/s3_gltf_check.py",
+    "tools/blender/gf_hero/s3_sheets.py",
+    "tools/blender/gf_hero/s3lib.py",
+    "tools/blender/gf_hero/check_skeleton.py"
+   ],
+   "metrics": {
+    "bones": 63,
+    "bones_by_group": {
+     "core": 23,
+     "twist": 6,
+     "fingers": 30,
+     "sockets": 4,
+     "extras": 0
+    },
+    "weighted_objects": 8,
+    "unweighted_vertices": 0,
+    "max_influences": 4,
+    "body_influence_histogram": {
+     "1": 497,
+     "2": 2118,
+     "3": 754,
+     "4": 558
+    },
+    "seed": "MakeHuman CC0 game_engine weights, exact per vertex (match p99 0.9 mm), 50/50 with bone heat on torso and limbs, 0 on the hands, 20 % on the head",
+    "gltf_joints": 63,
+    "gltf_socket_frame_error_max": 7.2e-07,
+    "weapon_identity_attach_error_m": {
+     "GAUNTLET_FIST_L": 8.7e-07,
+     "GAUNTLET_FIST_R": 7.2e-07
+    },
+    "validation_poses": 13,
+    "forearm_radius_at_100deg_twist": {
+     "mean": 0.898,
+     "worst_vertex": 0.845
+    },
+    "gauntlet_poke_through_straight_wrist_max_verts": 3,
+    "gauntlet_cuff_into_biceps_verts_at_60_100deg_elbow": [
+     12,
+     17
+    ],
+    "weapon_limits_clean_deg": {
+     "elbow_flexion": [
+      0,
+      30
+     ],
+     "wrist_extension_flexion": [
+      0,
+      0
+     ],
+     "wrist_deviation": [
+      -5,
+      0
+     ],
+     "forearm_twist": [
+      -100,
+      60
+     ]
+    }
+   },
+   "notes": "GF_Hero_v1 built from Brax's landmark file (the stage-2 fit's joints, fingers refined on the fitted mesh, weapon sockets exactly at the stage-2 hand frames the anvil_gauntlets were authored in). Weights: MakeHuman CC0 seed + bone heat + twist split + hand-style fixes (knee cap with the thigh, olecranon with the forearm, jaw fold, shoulders, knees); rest-shape prep moves the stage-2 extra loop vertices off their chords (102 verts, <= 8 mm). Parts: hair/beard to head, wraps/belt copy the body, skirt cloth and 60 rigid plates hang from the pelvis and follow the thigh on their side. The identity attach of any weapon GLB on weapon_L/weapon_R is proven in glTF with the exported gauntlets (< 1 um). Honest findings (reports/rig_report.md section 5): front-shoulder crease with the arms forward; knees flatten past ~110 deg (partly stage-2 knee topology); cloth tails need secondary x_ bones (stage 4); the gauntlets are a sleeve weapon: wrist straight, and the elbow cuff presses into the biceps past ~40 deg of elbow flexion (weapon geometry). The user's visual approval is the remaining gate.",
+   "items": {
+    "skeleton_and_sockets": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "docs/art/GF_HERO_SKELETON.md",
+      "tools/blender/gf_hero/gf_hero_rig.py",
+      "art/characters/brax/work/brax_landmarks.json"
+     ]
+    },
+    "skin_weights": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/production/brax_rig.blend",
+      "art/characters/brax/stage3_skin.json",
+      "art/characters/brax/reports/stage3/skin.json"
+     ]
+    },
+    "validation_poses": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/brax/reports/stage3/poses.json",
+      "art/characters/brax/reports/stage3/gltf_check.json",
+      "art/characters/brax/reports/rig_report.md"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made rig and weights (sheets in reports/stage3/, findings in reports/rig_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "4_animation": {
    "status": "not_started",
    "human_signoff_required": false,
    "outputs": [],
-   "notes": "The shared clip set on GF_Hero_v1 plus Brax's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only."
+   "notes": "The shared clip set on GF_Hero_v1 plus Brax's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only. Rules from stage 3 (docs/art/GF_HERO_SKELETON.md section 7): FK on core bones, never key root / twist / sockets; with the anvil_gauntlets keep the wrist straight and play the fist clench with the fist variant; the validation poses (tools/blender/gf_hero/s3_pose_set.py) are the reference range; the sash tails and underskirt want secondary x_ bones."
   },
   "5_export_validate": {
    "status": "not_started",
@@ -337,8 +453,9 @@
    "via": "art/characters/brax/reports/stage2/"
   },
   {
-   "gate": "stage 3: weight-paint sign-off",
-   "state": "not_started"
+   "gate": "stage 3: the user's visual approval of the AI-made rig and weights (no weight-paint artist, 2026-09-25)",
+   "state": "pending_human",
+   "via": "art/characters/brax/reports/stage3/ + reports/rig_report.md"
   },
   {
    "gate": "stage 5: final Hades-II bar",
@@ -347,12 +464,13 @@
  ],
  "decisions": [
   "2026-09-25: no human artist for stage 2; the AI pipeline makes the production mesh at production quality (the user's decision, relayed by the workflow coordinator).",
-  "2026-09-25: weapons come off the hero bodies; each chassis weapon is its own model attached to hand sockets (the user's decision, relayed by the workflow coordinator). Brax keeps bare forearms and hands; the rock forge-gauntlets are the anvil_gauntlets weapon (art/weapons/anvil_gauntlets/)."
+  "2026-09-25: weapons come off the hero bodies; each chassis weapon is its own model attached to hand sockets (the user's decision, relayed by the workflow coordinator). Brax keeps bare forearms and hands; the rock forge-gauntlets are the anvil_gauntlets weapon (art/weapons/anvil_gauntlets/).",
+  "2026-09-25: no human artist at any stage; the AI makes every stage (stage 3 included) and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator)."
  ],
  "signature_weapon": {
   "chassis": "anvil_gauntlets",
   "path": "art/weapons/anvil_gauntlets/",
   "status": "art/weapons/anvil_gauntlets/status.json",
-  "sockets": "weapon_L / weapon_R (stage 3), frames in reports/stage2/body_fit.json hand_frames"
+  "sockets": "weapon_L / weapon_R on GF_Hero_v1 (stage 3 done): exactly the stage-2 hand_frames; in glTF the weapon GLB is an identity child of the socket node (proven, reports/stage3/gltf_check.json)"
  }
 }

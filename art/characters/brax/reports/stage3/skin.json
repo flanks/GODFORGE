@@ -1,0 +1,204 @@
+{
+ "hero": "brax",
+ "contract": "GF_Hero_v1 v1",
+ "landmarks": "art/characters/brax/work/brax_landmarks.json",
+ "bones": {
+  "total": 63,
+  "core": 23,
+  "twist": 6,
+  "fingers": 30,
+  "sockets": 4,
+  "extras": 0
+ },
+ "rest_relax": [
+  {
+   "name": "extra_loops_onto_the_profile",
+   "vertices_moved": 102,
+   "max_move_m": 0.008
+  }
+ ],
+ "body_seed": {
+  "base_vertices": 3657,
+  "extra_loop_vertices": 166,
+  "extra_left_unfilled": 0,
+  "separate_pieces_to_head": 104
+ },
+ "body_heat": {
+  "weighted_vertices": 3823,
+  "mix_min": 0.0,
+  "mix_max": 0.5,
+  "seed_filled_by_heat": 0,
+  "mean_abs_diff_seed_vs_heat_per_bone": {
+   "pelvis": 0.187,
+   "spine_01": 0.12,
+   "spine_02": 0.092,
+   "spine_03": 0.208,
+   "neck": 0.267,
+   "head": 0.363,
+   "clavicle_L": 0.228,
+   "upperarm_L": 0.114,
+   "lowerarm_L": 0.104,
+   "hand_L": 0.275,
+   "clavicle_R": 0.229,
+   "upperarm_R": 0.114,
+   "lowerarm_R": 0.104,
+   "hand_R": 0.276,
+   "thigh_L": 0.134,
+   "shin_L": 0.18,
+   "foot_L": 0.286,
+   "toe_L": 0.219,
+   "thigh_R": 0.135,
+   "shin_R": 0.17,
+   "foot_R": 0.288,
+   "toe_R": 0.217
+  }
+ },
+ "body_fixes": {
+  "joint_blend_knee_L": 81,
+  "joint_blend_elbow_L": 104,
+  "joint_blend_knee_R": 81,
+  "joint_blend_elbow_R": 104,
+  "spatial_smooth_neck_jaw_fold": 1071,
+  "spatial_smooth_shoulder_L": 84,
+  "spatial_smooth_shoulder_R": 84,
+  "spatial_smooth_knee_L": 144,
+  "spatial_smooth_knee_R": 144
+ },
+ "objects": {
+  "HAIR": {
+   "mode": "head",
+   "pieces": 23,
+   "rigid_pieces": 0,
+   "vertices": 612,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 612
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "BEARD": {
+   "mode": "head",
+   "pieces": 10,
+   "rigid_pieces": 0,
+   "vertices": 495,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 495
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "WRAPS": {
+   "mode": "copy",
+   "pieces": 6,
+   "rigid_pieces": 0,
+   "vertices": 704,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 87,
+    "2": 373,
+    "3": 242,
+    "4": 2
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "BELT": {
+   "mode": "copy",
+   "pieces": 3,
+   "rigid_pieces": 2,
+   "vertices": 264,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 43,
+    "4": 221
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "SASH": {
+   "mode": "hang",
+   "pieces": 5,
+   "rigid_pieces": 0,
+   "vertices": 546,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 171,
+    "3": 210,
+    "4": 165
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "SKIRT_CLOTH": {
+   "mode": "hang",
+   "pieces": 1,
+   "rigid_pieces": 0,
+   "vertices": 336,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 235,
+    "3": 45,
+    "4": 56
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "SKIRT_PLATES": {
+   "mode": "hang",
+   "pieces": 60,
+   "rigid_pieces": 60,
+   "vertices": 840,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 504,
+    "3": 84,
+    "4": 252
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "BODY": {
+   "mode": "seed+heat+fixes",
+   "vertices": 3927,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 497,
+    "2": 2118,
+    "3": 754,
+    "4": 558
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  }
+ },
+ "weight_check": {
+  "ok": true,
+  "problems": []
+ },
+ "preview_weapon": {
+  "file": "art/weapons/anvil_gauntlets/production/anvil_gauntlets_stage2.blend",
+  "objects": [
+   "PREVIEW_GAUNTLET_R",
+   "PREVIEW_GAUNTLET_L",
+   "PREVIEW_GAUNTLET_FIST_R",
+   "PREVIEW_GAUNTLET_FIST_L"
+  ],
+  "rest_attach_vs_authored_placement_max_abs": 1.7881393432617188e-07
+ },
+ "seconds": 0.4
+}

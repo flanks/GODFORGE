@@ -68,8 +68,11 @@ In Brax's T-pose (Blender axes, Z up, facing −Y), the left socket sits at (1.0
 X = −Y world, Y = +X world, Z = +Z world. The right socket is the mirror, with X = +Y world and
 Y = −X world.
 
-Stage 3 adds `weapon_L` / `weapon_R` sockets on GF_Hero_v1, children of `hand_L` / `hand_R`, at exactly
-this frame. The weapon objects then parent with an identity local transform: their object transform in
+GF_Hero_v1 (stage 3, 2026-09-25) has `weapon_L` / `weapon_R` sockets, children of `hand_L` / `hand_R`, at exactly
+this frame; in glTF the gauntlet is an identity child of the socket node, proven to < 1 µm with the exported
+gauntlets (`art/characters/brax/reports/stage3/gltf_check.json`, `docs/art/GF_HERO_SKELETON.md` §3). It is a sleeve
+weapon: clips keep the wrist straight, and the elbow cuff presses into the biceps past about 40° of elbow flexion
+(`art/characters/brax/reports/rig_report.md` §4). The weapon objects then parent with an identity local transform: their object transform in
 `production/anvil_gauntlets_stage2.blend` is only the T-pose placement, so the review renders line up with
 Brax. The frame values are recorded in `reports/stage2/parts.json` (`socket_frame_tpose`) and in Brax's
 `reports/stage2/body_fit.json` (`hand_frames`).

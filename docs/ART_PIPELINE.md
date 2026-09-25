@@ -31,13 +31,15 @@ glTF, because Bevy 0.20 can load neither Draco nor meshopt (§6).
 | 0 | every new sheet is approved (front, side, 3/4, back, expression, weapon, colour script) | **human** approver | each sheet is an item: `pending_human` until approved, then `done` with `approved_by` / `approved_on` (`tools/comfy/approve_sheet.py`) |
 | 1 | none; judged by eye against the concept in review renders | automated + reviewer | `in_progress` → `done`, with the note SCULPT REFERENCE ONLY |
 | 2 | production mesh + NPR textures: **made by AI**, no human artist (user decision, 2026-09-25); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the review sheets |
-| 3 | weight-paint sign-off (shoulders, hands, face) | **human** | `pending_human` → `done` with `signed_off_by` |
+| 3 | rig + skin weights: **made by AI** (the same decision; stage 3 has no weight-paint artist either); the user's final visual approval | the **user** | `done` with `produced_by`; an item `user_visual_approval` stays `pending_human` until the user approves the stage-3 sheets |
 | 4 | none for the clips themselves | — | Mixamo/ActorCore-seeded clips are `stand_in` |
 | 5 | the final Hades-II bar | **human** | `done` with `signed_off_by`. Only then may the hero's `final` be `true` |
 
 **Decision of 2026-09-25 (the user, relayed by the workflow coordinator): there is no human artist for
 stage 2.** The production mesh, UVs and NPR textures are made by the AI pipeline in §5 at production
-quality, not as a stand-in. The human gate that remains at stage 2 is the user's own visual approval.
+quality, not as a stand-in. The human gate that remains at stage 2 is the user's own visual approval. The
+same holds for stage 3 (the rig and its weights are AI-made and validated by poses, metrics and review renders;
+the user gives the final visual approval).
 
 **Human gates are real.** Every gate above is recorded as `pending_human` in the hero's
 `art/characters/<key>/status.json` until a person signs it off. When engineering needs something
@@ -100,10 +102,14 @@ art/characters/<key>/
   source/         raw generator output: TRELLIS GLBs + ComfyUI previews (LOCAL, gitignored)
                   and one provenance JSON per GLB (committed)
   work/           full-size renders, mask checks, .blend files (LOCAL, gitignored)
-  reports/        review sheets (PNG < 2 MB) and stage reports (committed); reports/stage2/ = stage-2 sheets + JSON
+  reports/        review sheets (PNG < 2 MB) and stage reports (committed); reports/stage2/ = stage-2 sheets + JSON;
+                  reports/stage3/ + rig_report.md = the rig's sheets, metrics and glTF check
   stage2_fit.json / stage2_parts.json / stage2_texture.json   the hero's stage-2 inputs (landmarks, part
                   parameters, paint settings; committed, hand-edited)
-  production/     <key>_stage2.blend: the production mesh + material (committed, Git LFS)
+  production/     <key>_stage2.blend: the production mesh + material (committed, Git LFS);
+                  <key>_rig.blend: GF_Hero_v1 + the skinned parts + the validation poses (stage 3, Git LFS)
+  stage3_skin.json  the hero's stage-3 skinning numbers (committed, hand-edited)
+  work/<key>_landmarks.json  the hero's GF_Hero_v1 landmark file (committed with git add -f; the rest of work/ is local)
   textures/       <key>_basecolor.png, <key>_emissive.png (committed, Git LFS)
   manifest.json   sha256 of the references + every local-only file: path, bytes, sha256 (committed)
   status.json     per stage: status, outputs, human_signoff_required, notes (committed)
@@ -112,6 +118,7 @@ art/weapons/<chassis>/   one folder per chassis weapon model, same layout and th
 tools/comfy/      ComfyUI drivers and the user's graphs (API format), plus the stdlib/PIL art tools:
                   palette_extract.py, readability_sheet.py, approve_sheet.py, art_manifest.py, check_art.py
 tools/blender/gf_hero/   headless Blender scripts: stage-1 review renders, the stage-2 chain (run_stage2.py, s2_*.py),
+                  the stage-3 rig chain (gf_hero_rig.py = the GF_Hero_v1 contract, run_stage3.py, s3_*.py, check_skeleton.py),
                   later rig/export
 assets/models/characters/<key>.glb   shipped hero mesh only (stage 5 output; the client falls back to greybox when missing)
 assets/models/weapons/<chassis>.glb  shipped weapon model (stage 5 output), attached to the weapon sockets
@@ -193,7 +200,7 @@ which has PIL and numpy. The other art tools use only the standard library.
 Result for Brax (2026-09-25): three seeds; **s202** picked (faceted gauntlet plates, head/beard,
 colour blocking). Known defects are listed in `art/characters/brax/reports/blockout_report.md` §6.
 
-## 5. Stages 2-4 (stage 2 implemented; 3-4 planned)
+## 5. Stages 2-4 (stages 2-3 implemented; 4 planned)
 
 ### Stage 2: production mesh (implemented; made by AI, 2026-09-25)
 
@@ -236,9 +243,10 @@ hero can wield any chassis (6+ chassis; a hero's signature chassis is only the d
 * Source work lives in `art/weapons/<chassis>/` (own `status.json` / `manifest.json`, same schema as a hero);
   stage 5 exports `assets/models/weapons/<chassis>.glb`.
 * A weapon is rigid and authored in its **socket frame**: origin at the palm centre, **+Y along the fingers,
-  +Z out of the back of the hand**, +X = Y × Z (mirrored hands get mirrored frames). Stage 3 adds
-  `weapon_L` / `weapon_R` sockets on GF_Hero_v1 at exactly that frame; the weapon then parents with an
-  identity local transform. The frame's T-pose position for the hero it was designed on is recorded in the
+  +Z out of the back of the hand**, +X = Y × Z (mirrored hands get mirrored frames). GF_Hero_v1 has
+  `weapon_L` / `weapon_R` sockets at exactly that frame (stage 3, done 2026-09-25); in glTF the weapon scene is an
+  **identity child** of the socket node (proven on Brax with the exported gauntlets:
+  [`GF_HERO_SKELETON.md`](art/GF_HERO_SKELETON.md) §3). The frame's T-pose position for the hero it was designed on is recorded in the
   hero's `reports/stage2/body_fit.json` (`hand_frames`) and the weapon's `reports/stage2/parts.json`.
 * Worn weapons enclose the hand and forearm; a weapon that hides the fingers ships an open and a
   closed-fist variant with identical topology (one UV layout, one texture).
@@ -248,29 +256,40 @@ hero can wield any chassis (6+ chassis; a hero's signature chassis is only the d
   source of the weapon's normal bake (never shipped).
 * The hero body keeps bare forearms and hands with fist-capable loops.
 
-### Stage 3: GF_Hero_v1, the one master skeleton
+### Stage 3: GF_Hero_v1, the one master skeleton (implemented; made by AI, 2026-09-25)
 
-GF_Hero_v1 is adapted from the user's `AC_Player_Humanoid_v1` (Ashen Covenant
-`tools/blender/ac_player_rig/`), which is proven there from landmarks to game import.
+The contract is [`docs/art/GF_HERO_SKELETON.md`](art/GF_HERO_SKELETON.md) (code: `tools/blender/gf_hero/gf_hero_rig.py`).
+GF_Hero_v1 is adapted from the user's `AC_Player_Humanoid_v1` (Ashen Covenant `tools/blender/ac_player_rig/`), which is
+proven there from landmarks to game import: identical core names, parents and roll, twist bones driven by Copy
+Rotation, 15-bone hands, deform flags.
 
 | Group | Bones | Notes |
 |---|---|---|
-| Core (23) | `root`, `pelvis`, `spine_01..03`, `neck`, `head`, `clavicle/upperarm/lowerarm/hand_L/R`, `thigh/shin/foot/toe_L/R` | identical names and parenting for every hero |
+| Core (23) | `root`, `pelvis`, `spine_01..03`, `neck`, `head`, `clavicle/upperarm/lowerarm/hand_L/R`, `thigh/shin/foot/toe_L/R` | identical names and parenting for every hero; `root` at the feet, never keyed (no root motion) |
 | Twist (6) | `upperarm/lowerarm/thigh_twist_L/R` | driven by Copy Rotation constraints, so FK animation bakes the twist into the export |
 | Hands (15 per side) | `thumb/index/middle/ring/pinky_01..03_L/R` | roll aligned to the palm normal, so +X curls toward the palm on both hands |
-| Sockets (exported, never weighted) | `weapon_L` / `weapon_R` (child of `hand_L/R`, at the weapon socket frame: origin palm centre, +Y along the fingers, +Z out of the back of the hand); proposed: `hand_fx_L/R`, `chest_fx_socket`, `head_fx_socket`, `feet_fx_L/R`, `back_socket` | the weapon sockets are fixed by the 2026-09-25 weapons decision (§5); the rest is trimmed or extended when the roster's chassis are mapped |
+| Sockets (4, exported, never weighted) | `weapon_R` / `weapon_L` (children of `hand_R/L`, at the weapon grip frame), `head_top` (child of `head`), `chest_sigil` (child of `spine_03`) | built from full frames so a weapon GLB (or VFX) attaches as an identity child in glTF; further sockets are appended only when a chassis needs them |
 | Per-hero extras | leaf chains prefixed `x_` (e.g. `x_sash_L_01`) | cloth, hair and tails; never rename or reparent a contract bone |
 
-* **Conventions** (from the source rig): 1 unit = 1 m, the character faces −Y in Blender (+Z in
-  glTF), +X is the character's left, Z is up, and local +Y runs along each bone. Every runtime bone
-  has `use_deform = True`, so the glTF exporter keeps it. Control bones from Rigify or AccuRIG
-  have `use_deform = False`. The armature object is named **`GF_Hero_v1` in every hero file**
-  (Bevy target IDs, §2).
-* **Proportions** come from each hero's landmark JSON (bone head and tail positions, the Ashen
-  Covenant `make_landmarks_*.py` pattern). The hierarchy never changes.
-* **Weights** start as auto weights, get hand fixes on the shoulders, hands and face, and then
-  need a human sign-off. Validation poses and a retarget test between two heroes (the Ashen
-  Covenant p04/p07 steps) come before any clip work.
+* **Conventions**: 1 unit = 1 m, the character faces −Y in Blender (+Z in glTF), +X is the character's left, Z is up,
+  local +Y runs along each bone, rest pose = the stage-2 T-pose. Every runtime bone has `use_deform = True`; the
+  armature object is named **`GF_Hero_v1` in every hero file** (Bevy target IDs, §2).
+* **Proportions** come from each hero's landmark JSON (`work/<key>_landmarks.json`, committed), derived by
+  `s3_landmarks.py` from the stage-2 fit for MakeHuman-based bodies, or written by any means for other bodies.
+* **Weights** (`s3_skin.py`, numbers in `stage3_skin.json`): the MakeHuman CC0 game_engine weights, exact per vertex on
+  the hm08-derived body (MPFB as a tool only), blended with Blender's bone-heat automatic weights (half on the torso
+  and limbs, none on the hands, 20 % on the head); twist shares along each limb; hand-style fixes (knee cap with the
+  thigh and olecranon with the forearm, spatial smoothing of the jaw fold, shoulders and knees, a relaxed knee
+  dimple); parts: hair and beard 100 % head, tight parts copy the body, skirt cloth copies the body at the belt and
+  then hangs from the pelvis following the thigh on its side, rigid pieces (plates, buckle, knot) one row each; at most
+  4 influences, normalised, nothing unweighted (checked).
+* **Validation** (`s3_poses.py`): A-pose, both-arms punch, guard, deep squat, lunge + cross, torso twist, head turns,
+  fist clench, uppercut, forearm twist and a bare elbow/knee maximum, each with the signature weapon on the sockets
+  (closed-fist variant), measured (stretch, collapse, volume, forearm section, weapon poke-through / cuts, weapon joint
+  limits) and rendered close-up and at the client camera; `s3_gltf_check.py` exports the rig and the weapon and
+  proves the identity attach numerically. CI (`check_skeleton.py`) checks every landmark file and the stage-3 reports.
+* Rebuild: `python tools/blender/gf_hero/run_stage3.py <key>` (about a minute). Brax's results:
+  `art/characters/brax/reports/rig_report.md`. A retarget test between two heroes comes when the second hero is rigged.
 
 ### Stage 4: animation
 

@@ -93,10 +93,18 @@
    }
   },
   "3_rig": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": false,
-   "outputs": [],
-   "notes": "No skin: rigid. Stage 3 adds weapon_L / weapon_R sockets on GF_Hero_v1 at the documented frame; the objects parent to them with an identity local transform."
+   "outputs": [
+    "art/characters/brax/reports/stage3/gltf_check.json",
+    "art/characters/brax/reports/stage3/poses.json",
+    "docs/art/GF_HERO_SKELETON.md"
+   ],
+   "sockets": {
+    "GAUNTLET_R, GAUNTLET_FIST_R": "weapon_R",
+    "GAUNTLET_L, GAUNTLET_FIST_L": "weapon_L"
+   },
+   "notes": "No skin: rigid. GF_Hero_v1 (stage 3, 2026-09-25) has weapon_L / weapon_R exactly at this weapon's authoring frame: the authored T-pose placement equals the rest attach within 1.8e-7, and in glTF each gauntlet exported alone in its grip frame lands on the rig-held gauntlet within 0.9 um as an identity child of the socket node (docs/art/GF_HERO_SKELETON.md section 3). Measured on Brax (reports/stage3/poses.json weapon_limits): a sleeve weapon, so the wrist must stay straight (clean bend 0 deg, twist -100..60 deg clean, +-120 within 2 vertices); the elbow cuff overlaps the elbow joint by 2 cm and presses into the biceps past about 40 deg of elbow flexion (12-17 vertices at 60-100 deg) - end the sleeve about 4 cm before the elbow or flare the cuff to lift that limit. The fist variant goes with the body's fist clench. Stage 5: export the left gauntlet as the offhand node in its own left grip frame."
   },
   "4_animation": {
    "status": "not_started",

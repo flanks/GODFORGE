@@ -1,0 +1,87 @@
+{
+ "_doc": "Stage-3 skinning inputs for Brax (tools/blender/gf_hero/s3_skin.py). Metres, Blender axes (Z up, faces -Y, +X = his left). Hand-edited; rerun python tools/blender/gf_hero/run_stage3.py brax after a change.",
+ "body": {
+  "_doc": "BODY = the fitted MakeHuman hm08 mesh. seed = MakeHuman CC0 game_engine weights (exact per vertex, s3_mh_seed.py). heat_mix blends Blender's bone-heat automatic weights into the seed per region (0 = seed only); heat also fills any vertex the seed leaves empty.",
+  "heat_mix": {
+   "_doc": "0 = MakeHuman seed only, 1 = bone heat only. Torso and limbs take half of each (heat smooths the seed's sharp shoulder and hip borders); the hands keep the seed (heat is unreliable on fingers); the head keeps most of the seed (face loops).",
+   "default": 0.5,
+   "regions": [{"bones": ["hand_L", "hand_R"], "radius": 0.17, "mix": 0.0}, {"bones": ["head"], "radius": 0.16, "mix": 0.2}]
+  },
+  "twist": {
+   "_doc": "share of a limb class moved onto its twist bone along the bone (t = 0 at the bone head, 1 at the tail): upper arm and thigh fade out from the head over [0, fade_end]; the forearm fades in over [fade_start, 1].",
+   "upperarm_fade_end": 0.85,
+   "thigh_fade_end": 0.85,
+   "lowerarm_fade_start": 0.15
+  },
+  "joint_blend": [
+   {
+    "name": "knee_L",
+    "parent_class": ["thigh_L", "thigh_twist_L"],
+    "child_class": ["shin_L"],
+    "axis_bone": "shin_L",
+    "half_width": 0.065,
+    "offset": 0.0,
+    "radius": 0.2,
+    "outer_dir": [0, -1, 0],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_L",
+    "parent_class": ["upperarm_L", "upperarm_twist_L"],
+    "child_class": ["lowerarm_L", "lowerarm_twist_L"],
+    "axis_bone": "lowerarm_L",
+    "half_width": 0.06,
+    "offset": 0.0,
+    "radius": 0.18,
+    "outer_dir": [0, 1, 0],
+    "offset_outer": -0.03
+   },
+   {
+    "name": "knee_R",
+    "parent_class": ["thigh_R", "thigh_twist_R"],
+    "child_class": ["shin_R"],
+    "axis_bone": "shin_R",
+    "half_width": 0.065,
+    "offset": 0.0,
+    "radius": 0.2,
+    "outer_dir": [0, -1, 0],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_R",
+    "parent_class": ["upperarm_R", "upperarm_twist_R"],
+    "child_class": ["lowerarm_R", "lowerarm_twist_R"],
+    "axis_bone": "lowerarm_R",
+    "half_width": 0.06,
+    "offset": 0.0,
+    "radius": 0.18,
+    "outer_dir": [0, 1, 0],
+    "offset_outer": -0.03
+   }
+  ],
+  "smooth": [],
+  "spatial_smooth": [
+   {"name": "neck_jaw_fold", "bone": "neck", "radius": 0.13, "sigma": 0.015, "iters": 2},
+   {"name": "shoulder_L", "bone": "upperarm_twist_L", "radius": 0.17, "sigma": 0.025, "iters": 2},
+   {"name": "shoulder_R", "bone": "upperarm_twist_R", "radius": 0.17, "sigma": 0.025, "iters": 2},
+   {"name": "knee_L", "bone": "shin_L", "radius": 0.16, "sigma": 0.035, "iters": 3},
+   {"name": "knee_R", "bone": "shin_R", "radius": 0.16, "sigma": 0.035, "iters": 3}
+  ],
+  "_doc_fixes": "Hand-style fixes. rest_relax runs first (positions only, before any weight). Then, after the seed/heat mix and the twist split: joint_blend (a blend band across a joint plane), smooth (Laplacian over the edge graph), spatial_smooth (a Euclidean Gaussian, so folds like the jaw over the throat and the armpit move together). A region is the vertices within radius of the named bone's segment, faded over its outer 30 %.",
+  "_doc_joint_blend": "joint_blend: the pair (parent class, child class) is re-split by a smoothstep across the joint plane (the child bone's head, along the child bone), half_width either side, shifted by offset (+ = toward the child) and, on the outside of the bend (outer_dir, rest-pose world direction), by offset_outer: the knee cap stays with the thigh and the olecranon with the forearm, as on a hand-painted rig.",
+  "rest_relax": [
+   {"name": "extra_loops_onto_the_profile", "mode": "extra_loops_4pt", "_doc": "the stage-2 knee / elbow / wrist loops were inserted at edge midpoints after the fit (chords inside the curved profile: groove rings); each loop vertex moves onto the 4-point subdivision curve of its longitudinal edge loop"}
+  ]
+ },
+ "parts": {
+  "_doc": "Separate closed meshes. head: 100 % head. copy: the body's weights at the closest body point (tight wraps, belt band). rigid: one weight row for the whole connected piece (mean of its copied or hanging weights). hang: skirt-style cloth: the top copies the body, lower down it hangs from the pelvis and follows the thigh on its side (both thighs at the centre line) by up to follow_max at the knee.",
+  "HAIR": {"mode": "head"},
+  "BEARD": {"mode": "head"},
+  "WRAPS": {"mode": "copy"},
+  "BELT": {"mode": "copy", "rigid_below_diag_m": 0.16},
+  "SASH": {"mode": "hang", "rigid_below_diag_m": 0.16, "attach_z": 1.36, "copy_band_m": 0.07},
+  "SKIRT_CLOTH": {"mode": "hang", "attach_z": 1.33, "copy_band_m": 0.07},
+  "SKIRT_PLATES": {"mode": "hang", "rigid_pieces": true, "attach_z": 1.33, "copy_band_m": 0.07},
+  "hang": {"knee_z": 0.72, "follow_max": 0.85, "side_blend_m": 0.07}
+ }
+}

@@ -1,0 +1,1840 @@
+{
+ "hero": "brax",
+ "poses": {
+  "bind": {
+   "stretch_mm_p99_9": 0.0,
+   "stretch_mm_max": 0.0,
+   "stretch_rel_max": 0.0,
+   "compress_rel_min": -0.0,
+   "edges_over_40pct": 0,
+   "edges_under_minus40pct": 0,
+   "collapsed_verts_area_lt_0_4": 0,
+   "volume_ratio": 1.0,
+   "worst_stretch_edges": [
+    {
+     "mm": 0.0,
+     "at_rest": [
+      1.142,
+      0.04,
+      1.758
+     ],
+     "bones": "middle_02_L|middle_03_L"
+    },
+    {
+     "mm": 0.0,
+     "at_rest": [
+      0.08,
+      -0.014,
+      2.031
+     ],
+     "bones": "head|head"
+    },
+    {
+     "mm": 0.0,
+     "at_rest": [
+      -0.08,
+      -0.014,
+      2.031
+     ],
+     "bones": "head|head"
+    }
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_variant": "open",
+   "seconds": 2.2
+  },
+  "apose": {
+   "stretch_mm_p99_9": 20.3,
+   "stretch_mm_max": 25.5,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 88,
+   "edges_under_minus40pct": 88,
+   "collapsed_verts_area_lt_0_4": 14,
+   "volume_ratio": 0.9929,
+   "worst_stretch_edges": [
+    {
+     "mm": 25.5,
+     "at_rest": [
+      -1.026,
+      -0.055,
+      1.723
+     ],
+     "bones": "hand_R|thumb_02_R"
+    },
+    {
+     "mm": 25.5,
+     "at_rest": [
+      1.026,
+      -0.055,
+      1.723
+     ],
+     "bones": "hand_L|thumb_02_L"
+    },
+    {
+     "mm": 23.6,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "index_02_R|index_02_R",
+     8
+    ],
+    [
+     "hand_R|hand_R",
+     7
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_R": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_L": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_variant": "fist",
+   "seconds": 1.0
+  },
+  "punch_both": {
+   "stretch_mm_p99_9": 36.1,
+   "stretch_mm_max": 43.6,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 167,
+   "edges_under_minus40pct": 116,
+   "collapsed_verts_area_lt_0_4": 18,
+   "volume_ratio": 0.9377,
+   "worst_stretch_edges": [
+    {
+     "mm": 43.6,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    },
+    {
+     "mm": 43.6,
+     "at_rest": [
+      0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_L|clavicle_L"
+    },
+    {
+     "mm": 41.1,
+     "at_rest": [
+      -0.346,
+      0.11,
+      1.655
+     ],
+     "bones": "upperarm_R|upperarm_twist_R"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "clavicle_R|clavicle_R",
+     12
+    ],
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "clavicle_L|clavicle_L",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "upperarm_twist_R|upperarm_twist_R",
+     10
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    0.991
+   ],
+   "forearm_section_R": [
+    1.0,
+    0.991
+   ],
+   "weapon_R": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 12,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      12
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 12,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      12
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 1.0
+  },
+  "guard": {
+   "stretch_mm_p99_9": 36.7,
+   "stretch_mm_max": 45.1,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 172,
+   "edges_under_minus40pct": 102,
+   "collapsed_verts_area_lt_0_4": 15,
+   "volume_ratio": 0.9323,
+   "worst_stretch_edges": [
+    {
+     "mm": 45.1,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    },
+    {
+     "mm": 45.1,
+     "at_rest": [
+      0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_L|clavicle_L"
+    },
+    {
+     "mm": 38.3,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "clavicle_L|clavicle_L",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "clavicle_R|clavicle_R",
+     11
+    ],
+    [
+     "upperarm_twist_R|upperarm_twist_R",
+     8
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    0.948,
+    0.923
+   ],
+   "forearm_section_R": [
+    0.948,
+    0.923
+   ],
+   "weapon_R": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 16,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      16
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 16,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 1.0
+  },
+  "deep_squat": {
+   "stretch_mm_p99_9": 40.2,
+   "stretch_mm_max": 49.8,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 235,
+   "edges_under_minus40pct": 156,
+   "collapsed_verts_area_lt_0_4": 34,
+   "volume_ratio": 0.8638,
+   "worst_stretch_edges": [
+    {
+     "mm": 49.8,
+     "at_rest": [
+      -0.23,
+      0.158,
+      1.821
+     ],
+     "bones": "clavicle_R|upperarm_twist_R"
+    },
+    {
+     "mm": 49.7,
+     "at_rest": [
+      0.23,
+      0.158,
+      1.821
+     ],
+     "bones": "clavicle_L|upperarm_twist_L"
+    },
+    {
+     "mm": 47.4,
+     "at_rest": [
+      0.13,
+      0.073,
+      0.534
+     ],
+     "bones": "shin_L|shin_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pelvis|pelvis",
+     15
+    ],
+    [
+     "upperarm_twist_R|upperarm_twist_R",
+     13
+    ],
+    [
+     "upperarm_twist_L|upperarm_twist_L",
+     13
+    ],
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "thigh_twist_R",
+     5
+    ],
+    [
+     "thigh_twist_L",
+     5
+    ],
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "thigh_R",
+     3
+    ],
+    [
+     "thigh_L",
+     3
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    0.991
+   ],
+   "forearm_section_R": [
+    1.0,
+    0.991
+   ],
+   "weapon_R": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 17,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 17,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      17
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 1.0
+  },
+  "lunge_cross": {
+   "stretch_mm_p99_9": 43.6,
+   "stretch_mm_max": 59.5,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 197,
+   "edges_under_minus40pct": 167,
+   "collapsed_verts_area_lt_0_4": 32,
+   "volume_ratio": 0.8649,
+   "worst_stretch_edges": [
+    {
+     "mm": 59.5,
+     "at_rest": [
+      -0.347,
+      0.161,
+      1.709
+     ],
+     "bones": "upperarm_twist_R|upperarm_twist_R"
+    },
+    {
+     "mm": 57.2,
+     "at_rest": [
+      -0.23,
+      0.158,
+      1.821
+     ],
+     "bones": "clavicle_R|upperarm_twist_R"
+    },
+    {
+     "mm": 50.1,
+     "at_rest": [
+      0.346,
+      0.11,
+      1.655
+     ],
+     "bones": "upperarm_L|upperarm_twist_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "clavicle_L|clavicle_L",
+     16
+    ],
+    [
+     "clavicle_R|clavicle_R",
+     15
+    ],
+    [
+     "upperarm_twist_R|upperarm_twist_R",
+     13
+    ],
+    [
+     "upperarm_twist_L|upperarm_twist_L",
+     13
+    ],
+    [
+     "pelvis|pelvis",
+     12
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "upperarm_R",
+     3
+    ],
+    [
+     "upperarm_twist_L",
+     3
+    ],
+    [
+     "lowerarm_R",
+     3
+    ],
+    [
+     "pelvis",
+     2
+    ]
+   ],
+   "forearm_section_L": [
+    0.948,
+    0.923
+   ],
+   "forearm_section_R": [
+    1.0,
+    0.991
+   ],
+   "weapon_R": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 3,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      3
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_variant": "fist",
+   "seconds": 1.0
+  },
+  "torso_twist": {
+   "stretch_mm_p99_9": 25.1,
+   "stretch_mm_max": 29.8,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 108,
+   "edges_under_minus40pct": 110,
+   "collapsed_verts_area_lt_0_4": 20,
+   "volume_ratio": 0.9739,
+   "worst_stretch_edges": [
+    {
+     "mm": 29.8,
+     "at_rest": [
+      0.319,
+      0.132,
+      1.868
+     ],
+     "bones": "upperarm_twist_L|upperarm_twist_L"
+    },
+    {
+     "mm": 29.8,
+     "at_rest": [
+      -0.319,
+      0.132,
+      1.868
+     ],
+     "bones": "upperarm_twist_R|upperarm_twist_R"
+    },
+    {
+     "mm": 28.8,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "index_02_R|index_02_R",
+     8
+    ],
+    [
+     "lowerarm_R|lowerarm_R",
+     7
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "upperarm_R",
+     2
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "upperarm_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_R": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 9,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      9
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 2,
+    "covered_ref": 553,
+    "weapon_cuts_body": 9,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      2
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      9
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "head_left_down": {
+   "stretch_mm_p99_9": 25.1,
+   "stretch_mm_max": 28.1,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 114,
+   "edges_under_minus40pct": 95,
+   "collapsed_verts_area_lt_0_4": 14,
+   "volume_ratio": 0.9906,
+   "worst_stretch_edges": [
+    {
+     "mm": 28.1,
+     "at_rest": [
+      0.0,
+      -0.064,
+      1.859
+     ],
+     "bones": "neck|spine_03"
+    },
+    {
+     "mm": 27.5,
+     "at_rest": [
+      0.028,
+      -0.062,
+      1.86
+     ],
+     "bones": "clavicle_L|neck"
+    },
+    {
+     "mm": 26.6,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "head|head",
+     12
+    ],
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "index_02_R|index_02_R",
+     8
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_R": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_L": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "head_right_up": {
+   "stretch_mm_p99_9": 26.5,
+   "stretch_mm_max": 44.0,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 126,
+   "edges_under_minus40pct": 90,
+   "collapsed_verts_area_lt_0_4": 14,
+   "volume_ratio": 0.9924,
+   "worst_stretch_edges": [
+    {
+     "mm": 44.0,
+     "at_rest": [
+      0.0,
+      -0.064,
+      1.859
+     ],
+     "bones": "neck|spine_03"
+    },
+    {
+     "mm": 43.4,
+     "at_rest": [
+      0.028,
+      -0.062,
+      1.86
+     ],
+     "bones": "clavicle_L|neck"
+    },
+    {
+     "mm": 34.8,
+     "at_rest": [
+      0.072,
+      -0.076,
+      1.85
+     ],
+     "bones": "clavicle_L|neck"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "head|head",
+     20
+    ],
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "index_02_R|index_02_R",
+     8
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_R": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_L": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 0
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "fist_clench": {
+   "stretch_mm_p99_9": 25.9,
+   "stretch_mm_max": 37.6,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 122,
+   "edges_under_minus40pct": 100,
+   "collapsed_verts_area_lt_0_4": 16,
+   "volume_ratio": 0.9725,
+   "worst_stretch_edges": [
+    {
+     "mm": 37.6,
+     "at_rest": [
+      -0.23,
+      0.158,
+      1.821
+     ],
+     "bones": "clavicle_R|upperarm_twist_R"
+    },
+    {
+     "mm": 37.5,
+     "at_rest": [
+      0.23,
+      0.158,
+      1.821
+     ],
+     "bones": "clavicle_L|upperarm_twist_L"
+    },
+    {
+     "mm": 35.2,
+     "at_rest": [
+      0.319,
+      0.132,
+      1.868
+     ],
+     "bones": "upperarm_twist_L|upperarm_twist_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "index_02_R|index_02_R",
+     8
+    ],
+    [
+     "lowerarm_R|upperarm_R",
+     7
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_R": {
+    "poke_through": 3,
+    "covered_ref": 553,
+    "weapon_cuts_body": 17,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      3
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 3,
+    "covered_ref": 553,
+    "weapon_cuts_body": 16,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      3
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      16
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "uppercut": {
+   "stretch_mm_p99_9": 28.3,
+   "stretch_mm_max": 40.2,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 108,
+   "edges_under_minus40pct": 97,
+   "collapsed_verts_area_lt_0_4": 16,
+   "volume_ratio": 0.9878,
+   "worst_stretch_edges": [
+    {
+     "mm": 40.2,
+     "at_rest": [
+      0.346,
+      0.11,
+      1.655
+     ],
+     "bones": "upperarm_L|upperarm_twist_L"
+    },
+    {
+     "mm": 39.4,
+     "at_rest": [
+      0.342,
+      0.033,
+      1.658
+     ],
+     "bones": "upperarm_twist_L|upperarm_twist_L"
+    },
+    {
+     "mm": 39.3,
+     "at_rest": [
+      0.347,
+      0.161,
+      1.709
+     ],
+     "bones": "upperarm_twist_L|upperarm_twist_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "lowerarm_R|upperarm_R",
+     8
+    ],
+    [
+     "index_02_L|index_02_L",
+     8
+    ],
+    [
+     "upperarm_twist_L|upperarm_twist_L",
+     8
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "middle_01_R",
+     1
+    ],
+    [
+     "ring_01_R",
+     1
+    ]
+   ],
+   "forearm_section_L": [
+    0.916,
+    0.874
+   ],
+   "forearm_section_R": [
+    0.933,
+    0.9
+   ],
+   "weapon_R": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 18,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      17
+     ],
+     [
+      "spine_02",
+      1
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 0,
+    "covered_ref": 553,
+    "weapon_cuts_body": 1,
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      1
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "forearm_twist": {
+   "stretch_mm_p99_9": 35.3,
+   "stretch_mm_max": 42.6,
+   "stretch_rel_max": 1.757,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 154,
+   "edges_under_minus40pct": 124,
+   "collapsed_verts_area_lt_0_4": 27,
+   "volume_ratio": 0.9381,
+   "worst_stretch_edges": [
+    {
+     "mm": 42.6,
+     "at_rest": [
+      -0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_R|clavicle_R"
+    },
+    {
+     "mm": 42.5,
+     "at_rest": [
+      0.175,
+      0.044,
+      1.913
+     ],
+     "bones": "clavicle_L|clavicle_L"
+    },
+    {
+     "mm": 36.9,
+     "at_rest": [
+      0.319,
+      0.132,
+      1.868
+     ],
+     "bones": "upperarm_twist_L|upperarm_twist_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "clavicle_L|clavicle_L",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "clavicle_R|clavicle_R",
+     11
+    ],
+    [
+     "upperarm_twist_R|upperarm_twist_R",
+     9
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "upperarm_R",
+     3
+    ],
+    [
+     "upperarm_L",
+     3
+    ],
+    [
+     "lowerarm_L",
+     3
+    ],
+    [
+     "lowerarm_R",
+     3
+    ]
+   ],
+   "forearm_section_L": [
+    0.898,
+    0.845
+   ],
+   "forearm_section_R": [
+    0.898,
+    0.845
+   ],
+   "weapon_R": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 4,
+    "poke_by_bone": [
+     [
+      "lowerarm_R",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_R",
+      4
+     ]
+    ]
+   },
+   "weapon_L": {
+    "poke_through": 1,
+    "covered_ref": 553,
+    "weapon_cuts_body": 4,
+    "poke_by_bone": [
+     [
+      "lowerarm_L",
+      1
+     ]
+    ],
+    "cuts_by_bone": [
+     [
+      "upperarm_L",
+      4
+     ]
+    ]
+   },
+   "weapon_variant": "fist",
+   "seconds": 0.9
+  },
+  "elbow_knee_max": {
+   "stretch_mm_p99_9": 45.6,
+   "stretch_mm_max": 96.8,
+   "stretch_rel_max": 1.982,
+   "compress_rel_min": -0.927,
+   "edges_over_40pct": 166,
+   "edges_under_minus40pct": 114,
+   "collapsed_verts_area_lt_0_4": 23,
+   "volume_ratio": 0.9343,
+   "worst_stretch_edges": [
+    {
+     "mm": 96.8,
+     "at_rest": [
+      0.251,
+      0.169,
+      0.608
+     ],
+     "bones": "shin_L|thigh_L"
+    },
+    {
+     "mm": 72.2,
+     "at_rest": [
+      0.251,
+      0.169,
+      0.608
+     ],
+     "bones": "shin_L|thigh_L"
+    },
+    {
+     "mm": 69.9,
+     "at_rest": [
+      0.307,
+      -0.04,
+      0.463
+     ],
+     "bones": "shin_L|thigh_L"
+    }
+   ],
+   "worst_bone_pairs": [
+    [
+     "pinky_01_R|pinky_01_R",
+     11
+    ],
+    [
+     "thigh_L|thigh_L",
+     11
+    ],
+    [
+     "pinky_01_L|pinky_01_L",
+     11
+    ],
+    [
+     "shin_L|thigh_L",
+     11
+    ],
+    [
+     "lowerarm_R|upperarm_R",
+     10
+    ]
+   ],
+   "collapsed_by_bone": [
+    [
+     "thigh_twist_L",
+     4
+    ],
+    [
+     "pinky_01_R",
+     3
+    ],
+    [
+     "pinky_01_L",
+     2
+    ],
+    [
+     "hand_L",
+     2
+    ],
+    [
+     "thigh_L",
+     2
+    ]
+   ],
+   "forearm_section_L": [
+    1.0,
+    1.0
+   ],
+   "forearm_section_R": [
+    1.0,
+    1.0
+   ],
+   "weapon_variant": "none",
+   "seconds": 0.9
+  }
+ },
+ "weapon_reference": {
+  "R": {
+   "arm_hand_vertices": 553,
+   "covered_with_fist": 553,
+   "uncovered_at_rest": 0
+  },
+  "L": {
+   "arm_hand_vertices": 553,
+   "covered_with_fist": 553,
+   "uncovered_at_rest": 0
+  }
+ },
+ "weapon_limits": {
+  "weapon": "anvil_gauntlets fist variant on weapon_L",
+  "arm": "upper arm in the A-pose, fist clenched; wrist sweeps with the elbow at 30 deg",
+  "limits": {
+   "elbow_flexion": {
+    "samples_deg_poke_cut": [
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      10,
+      0,
+      0
+     ],
+     [
+      20,
+      0,
+      0
+     ],
+     [
+      30,
+      0,
+      0
+     ],
+     [
+      40,
+      0,
+      2
+     ],
+     [
+      50,
+      2,
+      5
+     ],
+     [
+      60,
+      2,
+      9
+     ],
+     [
+      70,
+      3,
+      14
+     ],
+     [
+      80,
+      3,
+      15
+     ],
+     [
+      90,
+      3,
+      17
+     ],
+     [
+      100,
+      3,
+      19
+     ],
+     [
+      110,
+      2,
+      23
+     ],
+     [
+      120,
+      2,
+      23
+     ],
+     [
+      130,
+      1,
+      30
+     ],
+     [
+      140,
+      0,
+      53
+     ],
+     [
+      150,
+      0,
+      61
+     ]
+    ],
+    "range_clean_deg": [
+     0,
+     30
+    ],
+    "range_le2_verts_deg": [
+     0,
+     40
+    ]
+   },
+   "wrist_extension(+)/flexion(-)": {
+    "samples_deg_poke_cut": [
+     [
+      -40,
+      34,
+      2
+     ],
+     [
+      -35,
+      29,
+      2
+     ],
+     [
+      -30,
+      24,
+      3
+     ],
+     [
+      -25,
+      22,
+      3
+     ],
+     [
+      -20,
+      15,
+      3
+     ],
+     [
+      -15,
+      7,
+      6
+     ],
+     [
+      -10,
+      1,
+      2
+     ],
+     [
+      -5,
+      1,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      5,
+      0,
+      3
+     ],
+     [
+      10,
+      8,
+      5
+     ],
+     [
+      15,
+      15,
+      1
+     ],
+     [
+      20,
+      19,
+      3
+     ],
+     [
+      25,
+      24,
+      1
+     ],
+     [
+      30,
+      34,
+      0
+     ],
+     [
+      35,
+      34,
+      1
+     ],
+     [
+      40,
+      37,
+      3
+     ]
+    ],
+    "range_clean_deg": [
+     0,
+     0
+    ],
+    "range_le2_verts_deg": [
+     -10,
+     0
+    ]
+   },
+   "wrist_radial(+)/ulnar(-)_deviation": {
+    "samples_deg_poke_cut": [
+     [
+      -40,
+      37,
+      1
+     ],
+     [
+      -35,
+      34,
+      2
+     ],
+     [
+      -30,
+      31,
+      2
+     ],
+     [
+      -25,
+      26,
+      2
+     ],
+     [
+      -20,
+      19,
+      0
+     ],
+     [
+      -15,
+      12,
+      1
+     ],
+     [
+      -10,
+      1,
+      0
+     ],
+     [
+      -5,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      5,
+      2,
+      2
+     ],
+     [
+      10,
+      7,
+      8
+     ],
+     [
+      15,
+      14,
+      2
+     ],
+     [
+      20,
+      15,
+      2
+     ],
+     [
+      25,
+      21,
+      1
+     ],
+     [
+      30,
+      27,
+      0
+     ],
+     [
+      35,
+      29,
+      2
+     ],
+     [
+      40,
+      33,
+      0
+     ]
+    ],
+    "range_clean_deg": [
+     -5,
+     0
+    ],
+    "range_le2_verts_deg": [
+     -10,
+     5
+    ]
+   },
+   "forearm_twist": {
+    "samples_deg_poke_cut": [
+     [
+      -120,
+      0,
+      1
+     ],
+     [
+      -100,
+      0,
+      0
+     ],
+     [
+      -80,
+      0,
+      0
+     ],
+     [
+      -60,
+      0,
+      0
+     ],
+     [
+      -40,
+      0,
+      0
+     ],
+     [
+      -20,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      0
+     ],
+     [
+      20,
+      0,
+      0
+     ],
+     [
+      40,
+      0,
+      0
+     ],
+     [
+      60,
+      0,
+      0
+     ],
+     [
+      80,
+      0,
+      2
+     ],
+     [
+      100,
+      0,
+      2
+     ],
+     [
+      120,
+      0,
+      2
+     ]
+    ],
+    "range_clean_deg": [
+     -100,
+     60
+    ],
+    "range_le2_verts_deg": [
+     -120,
+     120
+    ]
+   }
+  }
+ },
+ "seconds": 16.0
+}

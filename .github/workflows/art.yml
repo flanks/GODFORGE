@@ -3,6 +3,8 @@
 #   art-gates  status.json rules (human gates, stand-ins never final), nothing > 20 MB in git,
 #              manifest local-only files not tracked, shipped GLBs loadable by bevy_gltf 0.20
 #              (no Draco / meshopt / quantisation), every art tool script compiles
+#   hero-skeleton  the GF_Hero_v1 contract (docs/art/GF_HERO_SKELETON.md): every hero landmark file and, for a
+#              rigged hero, the stage-3 weight and glTF checks (tools/blender/gf_hero/check_skeleton.py, stdlib)
 #
 # Stage 5 adds the headless Blender export + import smoke test here (it needs a Blender install
 # on the runner, so it lands with the exporter, not before).
@@ -42,3 +44,13 @@ jobs:
         run: |
           shopt -s nullglob
           python -m py_compile tools/comfy/*.py tools/blender/gf_hero/*.py
+
+  hero-skeleton:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: GF_Hero_v1 contract (landmark files, stage-3 reports)
+        run: python tools/blender/gf_hero/check_skeleton.py
