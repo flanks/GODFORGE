@@ -2,7 +2,7 @@
  "asset": "brax",
  "name": "Brax, The Furnace-Born",
  "pipeline": "docs/ART_PIPELINE.md",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
@@ -437,7 +437,8 @@
     "tools/blender/gf_hero/s4_render.py",
     "tools/blender/gf_hero/s4_sheets.py",
     "tools/blender/gf_hero/s4_gltf_check.py",
-    "tools/blender/gf_hero/check_clips.py"
+    "tools/blender/gf_hero/check_clips.py",
+    "tools/blender/gf_hero/review/run_review.py"
    ],
    "metrics": {
     "clips": 34,
@@ -452,21 +453,32 @@
      "furnace_rush"
     ],
     "wrist_swing_max_deg": 0.0,
-    "ik_miss_max_mm": 55.1,
+    "ik_miss_max_mm": 54.7,
     "pelvis_drift_max_mm": 420.5,
-    "solver_vs_blender_max_error": 8.539288510021211e-07,
+    "solver_vs_blender_max_error": 9.238719940185547e-07,
     "gltf_animations": 34,
     "gltf_check_ok": true,
-    "gltf_bytes": 10073528,
+    "gltf_bytes": 9977116,
     "key_frames_rendered": 225,
-    "gauntlet_cuts_body_max_verts": 58,
-    "gauntlets_touch_max_verts": 43,
+    "gauntlet_cuts_body_max_verts": 54,
+    "gauntlets_touch_max_verts": 106,
     "lowest_body_vertex_mm": -3.8,
-    "lowest_rigid_cloth_vertex_mm": -233.3,
+    "lowest_rigid_cloth_vertex_mm": -230.5,
     "design_speed_run_mps": 6.2,
-    "design_speed_walk_mps": 1.799
+    "design_speed_walk_mps": 1.799,
+    "elbow_flexion_max_deg": 137.5,
+    "knee_flexion_max_deg": 150.0,
+    "joint_limits_deg": {
+     "elbow": 145.0,
+     "knee": 150.0
+    },
+    "keepout_clips_pushed": 16,
+    "keepout_push_max_mm": 351.3,
+    "keepout_residual_verts_max": 42,
+    "solid_body_in_gauntlet_every_frame_max_verts": 61,
+    "solid_body_in_gauntlet_every_frame_max_verts_before_review": 416
    },
-   "notes": "34 clips on GF_Hero_v1 (24 shared + 10 Brax), keyed in Python Cascadeur-style (effector-driven strong poses: anticipation, contact, follow-through, weight) and solved every frame with an analytic two-bone IK (s4lib.py); in place, 30 fps, loops closed by construction, locomotion speed-matched (playback rate = speed / design speed), planted feet at most 0.9 mm in every clip but the Furnace Rush skid-charge (slide_exempt by design), the anvil_gauntlets wrist rule kept (hand twist only). Naming <key>_<clip>[@loop] (docs/art/GF_HERO_SKELETON.md section 8); events in reports/anim/clips.json (stage 5 writes them to the GLB sidecar). Honest findings (reports/anim_report.md section 6): the gauntlet cuff presses into the biceps in every bent-arm pose (weapon geometry, ~15-25 verts a side), the rigid skirt plates and sash clip the ground and the thighs in lying / kneeling / high-knee poses (no x_ cloth bones yet), deep knee flexion shows the stage-3 knee flattening. The user's visual approval is the remaining gate.",
+   "notes": "34 clips on GF_Hero_v1 (24 shared + 10 Brax), keyed in Python Cascadeur-style (effector-driven strong poses: anticipation, contact, follow-through, weight) and solved every frame with an analytic two-bone IK (s4lib.py); in place, 30 fps, loops closed by construction, locomotion speed-matched (playback rate = speed / design speed), planted feet at most 0.9 mm in every clip but the Furnace Rush skid-charge (slide_exempt by design), the anvil_gauntlets wrist rule kept (hand twist only). Naming <key>_<clip>[@loop] (docs/art/GF_HERO_SKELETON.md section 8); events in reports/anim/clips.json (stage 5 writes them to the GLB sidecar). Honest findings (reports/anim_report.md section 6): the gauntlet cuff presses into the biceps in every bent-arm pose (weapon geometry, ~15-25 verts a side), the rigid skirt plates and sash clip the ground and the thighs in lying / kneeling / high-knee poses (no x_ cloth bones yet), deep knee flexion shows the stage-3 knee flattening. The user's visual approval is the remaining gate. REVIEW 2026-09-26 (reports/review_stage3_5.md): the first bake folded elbows to 173-179 deg (dash, death, uppercut: the gauntlet crushed into the shoulder, head or chest), a knee to 172 deg (get_up) and drove the gauntlets through thighs, knees, the chest and the belt between key frames (up to 416 solid-body vertices inside a gauntlet); the stage-4 checks sampled key frames only and did not see it. Fixed and re-baked: soft joint limits (elbow 145, knee 150), the arm keep-out (s4lib.KeepOut: the hand's weapon volume pushed out of the skinned body), three key poses (get_up GU2, heat_vent's return, the uppercut slam), and new gates in check_clips.py (knee, keep-out residual). Now at most 61 solid-body vertices inside a gauntlet in any frame (get_up), 0 in 29 of 34 clips.",
    "items": {
     "shared_clip_library": {
      "status": "done",
@@ -527,11 +539,12 @@
     "tools/blender/gf_hero/smoke_import.py",
     "tools/blender/gf_hero/s5_sheets.py",
     "tools/blender/gf_hero/required_clips.json",
-    ".github/workflows/art.yml (job hero-glb)"
+    ".github/workflows/art.yml (job hero-glb)",
+    "tools/blender/gf_hero/review/run_review.py"
    ],
    "metrics": {
     "glb_bytes": 9967940,
-    "glb_sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+    "glb_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
     "tris": 15048,
     "joints": 63,
     "meshes": 1,
@@ -562,9 +575,10 @@
     "deterministic_reexport": true,
     "weapon_glb_bytes": 3652108,
     "weapon_tris_shown_pair": 7716,
-    "weapon_tris_all_variants": 15432
+    "weapon_tris_all_variants": 15432,
+    "reproduced_from_clean_checkout": true
    },
-   "notes": "brax.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 deform joints incl. the 4 sockets) + ONE skinned mesh brax_mesh (the 8 body parts joined: one draw call, single-sided M_brax with 2048 base colour / emissive / normal PNGs, tangents, NO vertex colours - the stage-4 scratch export had shipped the paint masks as COLOR_0/COLOR_1, which Bevy multiplies into the base colour), 34 clips named brax_<clip>[@loop] sampled at 30 fps. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend. The sidecar brax.meta.json carries the clip events, weapon-variant swaps, design speeds, sockets and status ai_final_pending_user_approval. The anvil_gauntlets ship as assets/models/weapons/anvil_gauntlets.glb (open + fist variants as separate nodes, left pair under offhand). Re-export is byte-identical. The Bevy-side import test comes with the engine integration.",
+   "notes": "brax.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 deform joints incl. the 4 sockets) + ONE skinned mesh brax_mesh (the 8 body parts joined: one draw call, single-sided M_brax with 2048 base colour / emissive / normal PNGs, tangents, NO vertex colours - the stage-4 scratch export had shipped the paint masks as COLOR_0/COLOR_1, which Bevy multiplies into the base colour), 34 clips named brax_<clip>[@loop] sampled at 30 fps. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend. The sidecar brax.meta.json carries the clip events, weapon-variant swaps, design speeds, sockets and status ai_final_pending_user_approval. The anvil_gauntlets ship as assets/models/weapons/anvil_gauntlets.glb (open + fist variants as separate nodes, left pair under offhand). Re-export is byte-identical. The Bevy-side import test comes with the engine integration. REVIEW 2026-09-26 (reports/review_stage3_5.md): the documented chain reproduces from a clean checkout (run_stage2 base -> run_stage3 -> run_stage4 anim -> run_stage5: brax.glb and anvil_gauntlets.glb byte-identical; only dates / timings differ in the JSON). An independent audit of the file (tools/blender/gf_hero/review/) confirms the skeleton, sockets, weights, clip names, seams, in-place and planted feet. Re-exported after the stage-4 fixes.",
    "items": {
     "glb_export": {
      "status": "done",
@@ -673,5 +687,15 @@
   "path": "art/weapons/anvil_gauntlets/",
   "status": "art/weapons/anvil_gauntlets/status.json",
   "sockets": "weapon_L / weapon_R on GF_Hero_v1 (stage 3 done): exactly the stage-2 hand_frames; in glTF the weapon GLB is an identity child of the socket node (proven, reports/stage3/gltf_check.json)"
- }
+ },
+ "reviews": [
+  {
+   "review": "adversarial review of stages 3-5 (rig, clips, shipped GLB)",
+   "date": "2026-09-26",
+   "by": "AI (Claude)",
+   "report": "art/characters/brax/reports/review_stage3_5.md",
+   "tools": "tools/blender/gf_hero/review/ (independent glTF reader, audit and review renders)",
+   "verdict": "stage 3 holds; stage 4 had confirmed defects (joint folds, gauntlets through the body), fixed and re-baked; stage 5 reproduces byte-identically and was re-exported; the user visual approvals stay pending_human"
+  }
+ ]
 }

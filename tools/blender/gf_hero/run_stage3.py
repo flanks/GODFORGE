@@ -13,7 +13,8 @@ Steps (each one a headless Blender run, or ComfyUI's python for the PIL sheets):
   contract    check_skeleton.py the stdlib contract check CI runs (every hero's landmark file + stage-3 reports)
 
 Inputs per hero: the stage-2 outputs (production/<key>_stage2.blend, stage2_fit.json, reports/stage2/body_fit.json,
-work/<key>_s2_mh_landmarks.json and work/<key>_s2_body_base.blend from run_stage2.py's base step) and stage3_skin.json.
+work/<key>_s2_mh_landmarks.json and work/<key>_s2_body_base.blend from run_stage2.py's base step, rebuilt
+automatically when missing, e.g. on a fresh clone) and stage3_skin.json.
 About a minute on the dev machine; the review renders use Cycles on the CPU and Workbench only (the GPU is shared).
 """
 import os
@@ -24,7 +25,9 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 BLENDER = os.environ.get("BLENDER", r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe")
-COMFY_PY = os.environ.get("COMFY_PY", r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe")
+# the PIL review sheets run in any Python with Pillow: $COMFY_PY, else the dev machine's ComfyUI env, else this Python
+COMFY_PY = os.environ.get("COMFY_PY") or next(
+    (p for p in (r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe",) if os.path.isfile(p)), sys.executable)
 STEPS = ["landmarks", "seed", "skin", "poses", "gltf_check", "sheets", "contract"]
 
 
@@ -61,6 +64,13 @@ def main(argv):
     }
     todo = [only] if only else STEPS[STEPS.index(frm):]
     t0 = time.time()
+    # work/ is not in git: on a fresh clone the stage-2 base intermediates (MakeHuman landmarks and the reduced hm08
+    # body, deterministic, a few seconds) are rebuilt first
+    base_out = [os.path.join(ROOT, W, "%s_s2_mh_landmarks.json" % key), os.path.join(ROOT, W, "%s_s2_body_base.blend" % key)]
+    if {"landmarks", "seed"} & set(todo) and not all(os.path.isfile(p) for p in base_out):
+        print("[stage3] stage-2 base intermediates missing in work/: run_stage2.py %s --only base" % key)
+        run([sys.executable, os.path.join(HERE, "run_stage2.py"), key, "--only", "base"],
+            os.path.join(ROOT, W, "logs", "stage3_stage2_base.log"))
     for st in todo:
         print("[stage3] %s" % st)
         run(cmds[st], os.path.join(ROOT, W, "logs", "stage3_%s.log" % st))

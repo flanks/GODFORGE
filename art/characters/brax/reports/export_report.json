@@ -1,7 +1,7 @@
 {
  "hero": "brax",
  "stage": "5_export_validate",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "weapons": {
   "anvil_gauntlets": {
    "ok": true,
@@ -470,7 +470,7 @@
   "glb": "assets/models/characters/brax.glb",
   "meta": "assets/models/characters/brax.meta.json",
   "bytes": 9967940,
-  "sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+  "sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
   "source_blend": "art/characters/brax/production/brax_anim.blend",
   "export_settings": {
    "export_format": "GLB",
@@ -772,12 +772,12 @@
     "brax_jab_l": 1.2891193371111775e-06,
     "brax_jab_r": 1.241647894278941e-06,
     "brax_hook": 1.806027812967237e-06,
-    "brax_uppercut": 1.490231012701848e-06,
+    "brax_uppercut": 3.3507019926992676e-06,
     "brax_furnace_rush@loop": 1.1909011962546456e-06,
     "brax_furnace_rush_end": 1.2643419886188e-06,
     "brax_meltdown_start": 1.8996306552221398e-05,
     "brax_meltdown@loop": 1.3857762697355724e-06,
-    "brax_heat_vent": 1.2670832126721043e-06
+    "brax_heat_vent": 1.2795728108888627e-06
    },
    "ok": true
   },
@@ -785,7 +785,7 @@
    "file": "assets/models/characters/brax.glb",
    "key": "brax",
    "bytes": 9967940,
-   "sha256": "13ebdcf78096dc04d9129181d7eae2e3ef2f67a273b3088b3f242d544e9ea5e1",
+   "sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
    "generator": "Khronos glTF Blender I/O v5.2.39",
    "extensions_used": [
     "KHR_materials_emissive_strength"
@@ -1352,7 +1352,7 @@
     "mesh": {
      "min_z": -0.0026,
      "extent": [
-      1.128,
+      1.131,
       1.601,
       2.065
      ]
@@ -1417,7 +1417,7 @@
      "min_z": 0.1247,
      "extent": [
       0.986,
-      1.717,
+      1.75,
       1.656
      ]
     }
@@ -1476,11 +1476,11 @@
      0.0,
      24.0
     ],
-    "max_bone_error": 1.4156103134155273e-06,
+    "max_bone_error": 1.4007091522216797e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      0.997,
+      1.094,
       1.21,
       2.007
      ]
@@ -1540,12 +1540,12 @@
      0.0,
      36.0
     ],
-    "max_bone_error": 1.7285346984863281e-06,
+    "max_bone_error": 1.4901161193847656e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      1.256,
-      1.162,
+      1.258,
+      1.164,
       1.355
      ]
     }
@@ -1560,8 +1560,8 @@
     "mesh": {
      "min_z": 0.0001,
      "extent": [
-      1.092,
-      1.171,
+      1.119,
+      1.188,
       1.47
      ]
     }
@@ -1604,11 +1604,11 @@
      0.0,
      45.0
     ],
-    "max_bone_error": 1.564621925354004e-06,
+    "max_bone_error": 1.475214958190918e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      0.894,
+      0.924,
       1.265,
       1.979
      ]
@@ -1672,7 +1672,7 @@
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      1.175,
+      1.177,
       0.992,
       1.996
      ]
@@ -1732,7 +1732,7 @@
      0.0,
      16.0
     ],
-    "max_bone_error": 1.1920928955078125e-06,
+    "max_bone_error": 1.1771917343139648e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
@@ -1748,11 +1748,11 @@
      0.0,
      48.0
     ],
-    "max_bone_error": 1.7583370208740234e-06,
+    "max_bone_error": 1.6093254089355469e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      1.221,
+      1.171,
       1.169,
       1.559
      ]
@@ -1828,13 +1828,13 @@
      0.0,
      30.0
     ],
-    "max_bone_error": 1.5497207641601562e-06,
+    "max_bone_error": 1.4901161193847656e-06,
     "mesh": {
      "min_z": 0.0051,
      "extent": [
-      1.331,
+      1.335,
       1.077,
-      2.087
+      2.086
      ]
     }
    }
@@ -1930,6 +1930,6 @@
   "errors": [],
   "warnings": [],
   "ok": true,
-  "seconds": 8.5
+  "seconds": 6.7
  }
 }

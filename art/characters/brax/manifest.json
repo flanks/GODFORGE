@@ -43,7 +43,7 @@
   }
  ],
  "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The 'files' list below is written by tools/comfy/art_manifest.py (raw output that stays local).",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "policy": "in_git=false files stay local (art/.gitignore, scratch or unselected raw output); lfs=true files are committed through Git LFS; verify any copy by sha256",
  "files": [
   {
@@ -196,7 +196,8 @@
   "production": "art/characters/brax/production/brax_stage2.blend",
   "textures": [
    "art/characters/brax/textures/brax_basecolor.png",
-   "art/characters/brax/textures/brax_emissive.png"
+   "art/characters/brax/textures/brax_emissive.png",
+   "art/characters/brax/textures/brax_normal.png"
   ],
   "base_topology": "MakeHuman hm08 base mesh, CC0 (released September 2020; header of data/3dobjs/base.obj in MPFB 2.0.17), loaded with MPFB as a tool only",
   "weapon": "art/weapons/anvil_gauntlets/manifest.json"
@@ -206,5 +207,48 @@
   "landmarks": "art/characters/brax/work/brax_landmarks.json",
   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md)",
   "seed_weights": "MakeHuman game_engine weights (CC0), via MPFB used as a tool only; nothing from MPFB is shipped"
- }
+ },
+ "stage4": {
+  "anim": "art/characters/brax/production/brax_anim.blend",
+  "clips": "art/characters/brax/reports/anim/clips.json",
+  "report": "art/characters/brax/reports/anim_report.md",
+  "library": "tools/blender/gf_hero/s4_clips.py (shared, 24 clips) + tools/blender/gf_hero/s4_brax.py (10 clips); solver tools/blender/gf_hero/s4lib.py"
+ },
+ "stage5": {
+  "shipped": [
+   {
+    "path": "assets/models/characters/brax.glb",
+    "bytes": 9967940,
+    "sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
+    "in_git": true,
+    "lfs": true
+   },
+   {
+    "path": "assets/models/characters/brax.meta.json",
+    "bytes": 28134,
+    "sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62",
+    "in_git": true,
+    "lfs": false
+   },
+   {
+    "path": "assets/models/weapons/anvil_gauntlets.glb",
+    "bytes": 3652108,
+    "sha256": "325233983cb0a65ffc378227be7be3013e7ec05443ebab8c1ae0b61791558b78",
+    "in_git": true,
+    "lfs": true
+   },
+   {
+    "path": "assets/models/weapons/anvil_gauntlets.meta.json",
+    "bytes": 4405,
+    "sha256": "704d9efdb6ed570d2c48160ec16515b342530e52a375922eeff7cad1f574d1e9",
+    "in_git": true,
+    "lfs": false
+   }
+  ],
+  "report": "art/characters/brax/reports/export_report.json",
+  "note": "brax.meta.json carries glb_sha256; re-exporting from production/brax_anim.blend is byte-identical (verified from a clean checkout, reports/review_stage3_5.md)"
+ },
+ "reviews": [
+  "art/characters/brax/reports/review_stage3_5.md (2026-09-26): adversarial review of stages 3-5, evidence in reports/review35/"
+ ]
 }

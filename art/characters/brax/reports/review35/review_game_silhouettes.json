@@ -1,0 +1,202 @@
+[
+ {
+  "pose": "idle",
+  "clip": "brax_idle@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 3124,
+  "gauntlet_share": 0.229,
+  "height_px": 75
+ },
+ {
+  "pose": "idle",
+  "clip": "brax_idle@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2790,
+  "gauntlet_share": 0.191,
+  "height_px": 74
+ },
+ {
+  "pose": "run contact",
+  "clip": "brax_run@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2272,
+  "gauntlet_share": 0.364,
+  "height_px": 73
+ },
+ {
+  "pose": "run contact",
+  "clip": "brax_run@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2587,
+  "gauntlet_share": 0.104,
+  "height_px": 101
+ },
+ {
+  "pose": "run passing",
+  "clip": "brax_run@loop",
+  "frame": 5,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2390,
+  "gauntlet_share": 0.356,
+  "height_px": 67
+ },
+ {
+  "pose": "run passing",
+  "clip": "brax_run@loop",
+  "frame": 5,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2408,
+  "gauntlet_share": 0.125,
+  "height_px": 77
+ },
+ {
+  "pose": "jab guard",
+  "clip": "brax_jab_r",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2326,
+  "gauntlet_share": 0.247,
+  "height_px": 73
+ },
+ {
+  "pose": "jab guard",
+  "clip": "brax_jab_r",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2974,
+  "gauntlet_share": 0.296,
+  "height_px": 100
+ },
+ {
+  "pose": "jab hit",
+  "clip": "brax_jab_r",
+  "frame": 3,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2359,
+  "gauntlet_share": 0.324,
+  "height_px": 70
+ },
+ {
+  "pose": "jab hit",
+  "clip": "brax_jab_r",
+  "frame": 3,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2972,
+  "gauntlet_share": 0.289,
+  "height_px": 100
+ },
+ {
+  "pose": "uppercut windup",
+  "clip": "brax_uppercut",
+  "frame": 4,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2300,
+  "gauntlet_share": 0.325,
+  "height_px": 66
+ },
+ {
+  "pose": "uppercut windup",
+  "clip": "brax_uppercut",
+  "frame": 4,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2653,
+  "gauntlet_share": 0.179,
+  "height_px": 94
+ },
+ {
+  "pose": "uppercut launch",
+  "clip": "brax_uppercut",
+  "frame": 10,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2874,
+  "gauntlet_share": 0.27,
+  "height_px": 83
+ },
+ {
+  "pose": "uppercut launch",
+  "clip": "brax_uppercut",
+  "frame": 10,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2632,
+  "gauntlet_share": 0.305,
+  "height_px": 98
+ },
+ {
+  "pose": "uppercut apex",
+  "clip": "brax_uppercut",
+  "frame": 17,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2963,
+  "gauntlet_share": 0.282,
+  "height_px": 81
+ },
+ {
+  "pose": "uppercut apex",
+  "clip": "brax_uppercut",
+  "frame": 17,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2946,
+  "gauntlet_share": 0.315,
+  "height_px": 96
+ },
+ {
+  "pose": "uppercut slam",
+  "clip": "brax_uppercut",
+  "frame": 25,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2180,
+  "gauntlet_share": 0.401,
+  "height_px": 62
+ },
+ {
+  "pose": "uppercut slam",
+  "clip": "brax_uppercut",
+  "frame": 25,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 2250,
+  "gauntlet_share": 0.04,
+  "height_px": 78
+ },
+ {
+  "pose": "downed",
+  "clip": "brax_downed@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 0,
+  "hero_px": 2051,
+  "gauntlet_share": 0.208,
+  "height_px": 68
+ },
+ {
+  "pose": "downed",
+  "clip": "brax_downed@loop",
+  "frame": 0,
+  "view_height_m": 22,
+  "yaw": 180,
+  "hero_px": 3116,
+  "gauntlet_share": 0.267,
+  "height_px": 87
+ }
+]

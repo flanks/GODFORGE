@@ -208,13 +208,41 @@ def soft_reach(d, lmax, start=0.985, end=0.9995):
     return s + span * (1.0 - math.exp(-(d - s) / span))
 
 
-def two_bone(S, T, pole, L1, L2, sign):
+def soft_fold(d, dmin, band=0.03):
+    """Soft IK at the other end: a target closer than dmin (the reach at the hinge's maximum flexion) is eased toward
+    dmin instead of folding the limb flat (C1-continuous at dmin + band)."""
+    s = dmin + band
+    if d >= s:
+        return d
+    return dmin + band * math.exp(-(s - d) / band)
+
+
+# The deepest elbow the clips may ask for: the stage-3 validation set's bare maximum (docs/art/GF_HERO_SKELETON.md
+# section 7; the weights are only validated up to it). Folding further puts a sleeve weapon inside the upper arm,
+# shoulder or head (review of stages 3-5, art/characters/brax/reports/review_stage3_5.md).
+ELBOW_MAX_DEG = 145.0
+# The deepest knee: a real knee stops at about 150-160 deg with the calf against the thigh; linear-blend skinning
+# crushes the calf into the thigh long before that (get_up folded the right knee to 172 deg: a flattened lump). The
+# stage-3 weights are validated to 135 deg; 135-150 is the documented knee soft spot (kneels and tucks).
+KNEE_MAX_DEG = 150.0
+
+
+def fold_reach(L1, L2, max_flex_deg):
+    """Shoulder-to-effector distance at the given hinge flexion (0 = straight)."""
+    g = math.radians(180.0 - max_flex_deg)
+    return math.sqrt(max(L1 * L1 + L2 * L2 - 2.0 * L1 * L2 * math.cos(g), 0.0))
+
+
+def two_bone(S, T, pole, L1, L2, sign, max_flex_deg=None):
     """Upper-bone frame (3x3: X hinge, Y along the bone) + lower direction for a two-bone chain from S reaching T, bending
-    toward pole. sign = +1 for arms (elbow flexion is +X), -1 for legs (knee flexion is -X)."""
+    toward pole. sign = +1 for arms (elbow flexion is +X), -1 for legs (knee flexion is -X). max_flex_deg: the deepest
+    hinge flexion allowed (a softer, closer target is eased out to it)."""
     dv = T - S
     d = max(dv.length, 1e-6)
     w = dv / d
     d = min(soft_reach(d, L1 + L2), L1 + L2 - 1e-5)
+    if max_flex_deg is not None:
+        d = soft_fold(d, fold_reach(L1, L2, max_flex_deg))
     d = max(d, abs(L1 - L2) + 1e-4)
     p = pole - S
     pp = p - w * p.dot(w)
@@ -245,6 +273,118 @@ def rot_world(fwd=0.0, yaw=0.0, side=0.0):
             @ Matrix.Rotation(math.radians(-side), 3, "Y"))
 
 
+class KeepOut:
+    """The arm keep-out (added by the review of stages 3-5, art/characters/brax/reports/review_stage3_5.md): the rigid
+    volume a hand carries (a sleeve weapon such as the anvil_gauntlets, or the bare forearm and fist) must not pass
+    through the hero's own body. Effector targets are written as points; nothing in the IK knows how thick a
+    38 cm gauntlet is, so kneeling, tucked and wind-up poses drove it through thighs, knees, the chest and the skirt.
+
+    shape[side]: a star-shaped radial map of that volume around the grip frame's +Y axis (the forearm / fingers
+    direction): rmax[iy, ith] = the largest radius of the volume's vertices in slab iy (y0 + iy*dy) and sector ith, in
+    the grip frame (docs/art/GF_HERO_SKELETON.md section 3). A point is inside when its radius is under the map.
+    body: every skinned vertex at rest (armature space) with its top-4 skin weights; own[side] marks the vertices that
+    can never be obstacles for that arm (its own upper arm (the known cuff overlap, handled by ELBOW_MAX_DEG), forearm,
+    hand and fingers, and the other arm's forearm and hand: gauntlet-on-gauntlet contact is a pose's intent).
+
+    resolve() pushes the fist target out, perpendicular to the forearm, by the deepest overlap, and re-solves the arm
+    (a few iterations per frame); bake() smooths the per-frame pushes over time. A frame with no overlap is untouched,
+    so clean poses (the guard, the jabs) do not change."""
+
+    def __init__(self, bones, rest_inv, verts, joints, weights, own, shape, lengths, margin=0.006, step_max=0.06, iters=6):
+        import numpy as np
+        self.np = np
+        self.bones = list(bones)
+        self.lengths = np.asarray(lengths, dtype=np.float64)
+        self.rest_inv = np.array([np.array(m) for m in rest_inv])          # (nb, 4, 4)
+        self.V = np.asarray(verts, dtype=np.float64)
+        self.J = np.asarray(joints, dtype=np.int64)
+        self.W = np.asarray(weights, dtype=np.float64)
+        self.own = {s: np.asarray(own[s], dtype=bool) for s in ("L", "R")}
+        self.dom = self.J[np.arange(len(self.J)), self.W.argmax(1)]      # each vertex's dominant bone
+        self.shape = shape
+        self.margin = margin
+        self.step_max = step_max
+        self.iters = iters
+        self.g2s = np.array(Matrix(R.SOCKET_TO_GRIP))
+
+    def skin(self, M):
+        np = self.np
+        S = np.array([np.array(M[b]) for b in self.bones]) @ self.rest_inv
+        blend = (S[self.J] * self.W[:, :, None, None]).sum(1)
+        return np.einsum("vij,vj->vi", blend[:, :3, :3], self.V) + blend[:, :3, 3]
+
+    def overlap(self, s, M, pts):
+        """-> (push Vector in armature space or None, overlapping vertex count, deepest overlap m)."""
+        np = self.np
+        sh = self.shape[s]
+        G = np.array(M["weapon_" + s]) @ self.g2s
+        loc = (pts - G[:3, 3]) @ G[:3, :3]
+        x = loc[:, 0] - sh["cx"]
+        z = loc[:, 2] - sh["cz"]
+        iy = np.floor((loc[:, 1] - sh["y0"]) / sh["dy"]).astype(np.int64)
+        ok = (~self.own[s]) & (iy >= 0) & (iy < sh["ny"])
+        if not ok.any():
+            return None, 0, 0.0
+        r = np.hypot(x, z)
+        ith = np.floor((np.arctan2(z, x) + math.pi) / (2 * math.pi) * sh["nth"]).astype(np.int64) % sh["nth"]
+        rm = np.where(ok, sh["rmax"][np.clip(iy, 0, sh["ny"] - 1), ith], 0.0)
+        depth = rm + self.margin - r
+        hit = ok & (depth > 0)
+        n = int(hit.sum())
+        if n == 0:
+            return None, 0, 0.0
+        d = depth[hit]
+        mag = float(d.max())
+        # the way out is the body's own outward normal at the overlap: from the axis of each overlapping vertex's
+        # dominant bone out through the vertex (a fist crossing the chest slides out in front of it, a fist planted on
+        # a knee slides off to the side of the leg), weighted by depth
+        Mb = np.array([np.array(M[self.bones[i]]) for i in self.dom[hit]])
+        a = Mb[:, :3, 3]
+        ax = Mb[:, :3, 1] * self.lengths[self.dom[hit]][:, None]
+        t = np.clip(((pts[hit] - a) * ax).sum(1) / np.maximum((ax * ax).sum(1), 1e-12), 0.0, 1.0)
+        nb = pts[hit] - (a + ax * t[:, None])
+        nb /= np.maximum(np.linalg.norm(nb, axis=1), 1e-9)[:, None]
+        away = (nb * d[:, None]).sum(0)
+        if np.linalg.norm(away) < 1e-6 * d.sum():
+            # normals cancel (between two limbs): away from the overlapping vertices, across the forearm
+            u = np.stack([x[hit], z[hit]], 1) / np.maximum(r[hit], 1e-6)[:, None]
+            aw = -(u * d[:, None]).sum(0)
+            away = G[:3, :3] @ np.array([aw[0], 0.0, aw[1]])
+        nrm = np.linalg.norm(away)
+        if nrm < 1e-9:
+            return None, n, mag
+        push = away / nrm * mag
+        return Vector(push.tolist()), n, mag
+
+    def resolve(self, solver, pose, M, info):
+        """Per-frame pushes {side: Vector} (armature space) that clear the arm volumes out of the body."""
+        off = {}
+        sides = [s for s in ("L", "R") if ("arm_" + s) in pose and ("target_" + s) in info]
+        cur = M
+        for _it in range(self.iters):
+            pts = self.skin(cur)
+            moved = False
+            for s in sides:
+                push, n, _deep = self.overlap(s, cur, pts)
+                if push is None:
+                    continue
+                if push.length > self.step_max:
+                    push = push * (self.step_max / push.length)
+                T = info["target_" + s] + off.get(s, Vector())
+                if T.z < 0.25 * solver.K.ls and push.z < 0.0:     # a planted / low fist is never pushed into the ground
+                    push.z = 0.0
+                off[s] = off.get(s, Vector()) + push
+                moved = True
+            if not moved:
+                break
+            _l, cur, _i = solver.solve(pose, arm_target={s: info["target_" + s] + v for s, v in off.items()})
+        return off
+
+    def residual(self, M):
+        pts = self.skin(M)
+        return {s: self.overlap(s, M, pts)[1] for s in ("L", "R")}
+
+
 class Solver:
     def __init__(self, rig, kit):
         self.rig = rig
@@ -257,9 +397,13 @@ class Solver:
         # the heel's ground point (under and behind the ankle) and the toe tip
         self.heel_rest = {s: Vector((self.ankle_rest[s].x, self.ankle_rest[s].y + 0.09 * kit.ls, 0.0)) for s in ("L", "R")}
         self.toe_tip_z = {s: b["toe_" + s].tail.z for s in ("L", "R")}
+        self.elbow_max = ELBOW_MAX_DEG
+        self.knee_max = KNEE_MAX_DEG
+        self.keepout = None          # a KeepOut (s4_anim builds it from the hero's skinned parts and signature weapon)
 
-    def solve(self, pose):
-        """pose -> (local {bone: (Quaternion, Vector)}, armature-space matrices {bone: Matrix})."""
+    def solve(self, pose, arm_target=None):
+        """pose -> (local {bone: (Quaternion, Vector)}, armature-space matrices {bone: Matrix}). arm_target {side: point}
+        replaces an arm's effector target (the keep-out's corrected fist)."""
         rig, K = self.rig, self.K
         local = {}
         M = {}
@@ -290,10 +434,11 @@ class Solver:
                 q = (x.rest3.inverted() @ Rw @ x.rest3).to_quaternion()
                 setM(n, q, t)
                 continue
-            if n.startswith("upperarm_") and ("arm_" + n[-1]) in pose:
-                self._arm(n[-1], pose["arm_" + n[-1]], M, local, setM, info)
+            if n in ("upperarm_L", "upperarm_R") and ("arm_" + n[-1]) in pose:   # not the twist bones
+                self._arm(n[-1], pose["arm_" + n[-1]], M, local, setM, info,
+                          T=(arm_target or {}).get(n[-1]))
                 continue
-            if n.startswith("thigh_") and ("foot_" + n[-1]) in pose:
+            if n in ("thigh_L", "thigh_R") and ("foot_" + n[-1]) in pose:
                 self._leg(n[-1], pose["foot_" + n[-1]], M, local, setM, info)
                 continue
             if n.startswith("hand_") and n.count("_") == 1:
@@ -375,17 +520,18 @@ class Solver:
         out["space"] = "hero"
         return out
 
-    def _arm(self, s, spec, M, local, setM, info):
+    def _arm(self, s, spec, M, local, setM, info, T=None):
         rig = self.rig
         up, lo = "upperarm_" + s, "lowerarm_" + s
         eff = rig.fist_eff[s] if "fist" in spec else Vector((0.0, self.len[lo], 0.0))
-        T, Pp, _d = self.arm_world(s, spec, M)
+        T0, Pp, _d = self.arm_world(s, spec, M)
+        T = T0 if T is None else T
         # upper arm head, with the clavicle already posed
         Mu0 = rig.world_of_identity(M, up)
         S = Mu0.translation.copy()
         L1 = self.len[up]
         L2 = eff.length
-        F, dl, mid = two_bone(S, T, Pp, L1, L2, +1)
+        F, dl, mid = two_bone(S, T, Pp, L1, L2, +1, max_flex_deg=self.elbow_max)
         qu = (Mu0.to_3x3().inverted() @ F).to_quaternion()
         setM(up, qu)
         Ml0 = rig.world_of_identity(M, lo)
@@ -396,6 +542,10 @@ class Solver:
         setM(lo, ql)
         info["reach_" + s] = (T - S).length / (L1 + L2)
         info["target_" + s] = T
+        info["target0_" + s] = T0          # as written (before a keep-out push)
+        # the target sits inside the fold zone: the elbow limit eased the fist out (usually an in-between frame whose
+        # interpolated effector path passes close to the shoulder), not a pose that asks for more than the arm reaches
+        info["fold_eased_" + s] = (T - S).length < fold_reach(L1, L2, self.elbow_max) + 0.03
 
     # -- legs --------------------------------------------------------------------------------------------------------
     def foot_frame(self, s, spec):
@@ -429,7 +579,16 @@ class Solver:
         out = Vector((1.0 if s == "L" else -1.0, 0.0, 0.0))
         kn = Vector(spec.get("knee", (0.0, 0.0, 0.0)))
         pole = (S + A) * 0.5 + fwd * 1.0 + out * 0.12 + kn
-        F, dl, mid = two_bone(S, A, pole, L1, L2, -1)
+        # the knee limit: a target closer than the reach at KNEE_MAX_DEG is eased out HORIZONTALLY (the ankle keeps its
+        # height, so a kneeling foot never goes into the ground); straight under the hip, along the hip-ankle line
+        cap = self.knee_max
+        h = A - S
+        de = soft_fold(h.length, fold_reach(L1, L2, self.knee_max))
+        hor = Vector((h.x, h.y, 0.0))
+        if de > h.length + 1e-9 and hor.length > 1e-3 and de * de > h.z * h.z:
+            A = S + hor.normalized() * math.sqrt(de * de - h.z * h.z) + Vector((0.0, 0.0, h.z))
+            cap = None
+        F, dl, mid = two_bone(S, A, pole, L1, L2, -1, max_flex_deg=cap)
         setM(th, (Mt0.to_3x3().inverted() @ F).to_quaternion())
         Ms0 = rig.world_of_identity(M, sn)
         c = (Ms0.to_3x3() @ Vector((0.0, 1.0, 0.0))).normalized()
@@ -451,6 +610,7 @@ class Solver:
         P3 = rig.world_of_identity(M, toe).to_3x3()
         setM(toe, (P3.inverted() @ Ft).to_quaternion())
         info["reach_leg_" + s] = (A - S).length / (L1 + L2)
+        info["knee_eased_" + s] = h.length < fold_reach(L1, L2, self.knee_max) + 0.03
 
 
 def expand_pose(pose):
@@ -687,12 +847,57 @@ def canonical_arm_spaces(solver, keys):
     return out
 
 
+def _smooth_pushes(offs, loop):
+    """Per-side push sequences, dilated by one frame (the peak survives) then smoothed [1, 2, 1] / 4; cyclic for a loop
+    (its last frame is its first), clip ends pinned otherwise (an upper-layer clip starts and ends on the idle_combat
+    pose, whose own push is computed from the same pose)."""
+    n = len(offs)
+    out = [dict() for _ in range(n)]
+    for s in ("L", "R"):
+        seq = [o.get(s, Vector()) for o in offs]
+        if all(v.length == 0.0 for v in seq):
+            continue
+
+        def at(i):
+            if loop:
+                return seq[i % (n - 1)] if n > 1 else seq[0]
+            return seq[max(0, min(n - 1, i))]
+        dil = []
+        for i in range(n):
+            dil.append(max((at(i - 1), at(i), at(i + 1)), key=lambda v: v.length))
+
+        def dat(i):
+            if loop:
+                return dil[i % (n - 1)] if n > 1 else dil[0]
+            return dil[max(0, min(n - 1, i))]
+        for i in range(n):
+            v = (dat(i - 1) + dat(i) * 2.0 + dat(i + 1)) * 0.25
+            if not loop and i in (0, n - 1):
+                v = seq[i]
+            if v.length > 1e-6:
+                out[i][s] = v
+    if loop and n > 1:
+        out[-1] = dict(out[0])
+    return out
+
+
 def bake(solver, clip):
-    """-> list per frame of (local, M, info, pose)."""
+    """-> list per frame of (local, M, info, pose). With solver.keepout, the arms are cleared out of the body (KeepOut):
+    per-frame pushes, smoothed over time, then the final solve."""
+    poses = clip.poses(solver)
+    first = [solver.solve(pose) for pose in poses]
+    KO = solver.keepout
+    if KO is None:
+        return [(l_, M, i_, p) for (l_, M, i_), p in zip(first, poses)]
+    raw = [KO.resolve(solver, p, M, i_) for (_l, M, i_), p in zip(first, poses)]
+    pushes = _smooth_pushes(raw, clip.loop)
     out = []
-    for pose in clip.poses(solver):
-        local, M, info = solver.solve(pose)
-        out.append((local, M, info, pose))
+    for (l_, M, i_), p, off in zip(first, poses, pushes):
+        if off:
+            l_, M, i_ = solver.solve(p, arm_target={s: i_["target_" + s] + v for s, v in off.items()})
+            for s, v in off.items():
+                i_["keepout_" + s] = v.length
+        out.append((l_, M, i_, p))
     return out
 
 

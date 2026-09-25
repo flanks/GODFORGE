@@ -10,7 +10,9 @@ docs/art/GF_HERO_SKELETON.md section 8) on its own muted NLA track, and measures
   * foot sliding: every contact interval of each foot's ball joint, in WORLD space (the design travel added back), and
     how far the ball drifts inside it; ground penetration of the ball / toe / heel points;
   * the sleeve-weapon rule: wrist swing (must be 0: the hand only twists), hand twist range, elbow flexion (the
-    anvil_gauntlets cuff presses into the biceps past ~40 deg), knee flexion, IK misses (soft reach);
+    anvil_gauntlets cuff presses into the biceps past ~40 deg; the solver caps it at s4lib.ELBOW_MAX_DEG, the stage-3
+    validated maximum), knee flexion, IK misses (soft reach; frames where the elbow cap eased the fist out of the fold
+    zone are counted separately as elbow_fold_eased);
   * the solver against Blender: pose-bone matrices after frame_set vs the solver's (every clip, 3 frames).
 Outputs: production/<key>_anim.blend (Git LFS: rig + skinned parts + the clips), reports/anim/clips.json.
 """
@@ -73,6 +75,86 @@ LM = read_json(P["landmarks"])
 K = L.Kit(LM, move_speed(KEY))
 rig = L.Rig(arm)
 solver = L.Solver(rig, K)
+
+
+# parts that hang and swing (stage-2 part names): not obstacles for the arm keep-out
+LOOSE_CLOTH = {"SKIRT_PLATES", "SKIRT_CLOTH", "SASH"}
+
+
+def build_keepout():
+    """s4lib.KeepOut from this file: every skinned part at rest (top-4 weights), and per hand the rigid volume it
+    carries - the signature weapon's fist + open meshes when it is a sleeve weapon (the PREVIEW objects stage 3 linked
+    onto the sockets reach back past the wrist), else the hero's own forearm, hand and fingers."""
+    import numpy as np
+    bones = [b.name for b in arm.data.bones]
+    bidx = {n: i for i, n in enumerate(bones)}
+    V, J, W, dom = [], [], [], []
+    for o in scene.objects:
+        if o.type != "MESH" or o.name.startswith(("PREVIEW", "REF", "WIRE")) or not o.vertex_groups:
+            continue
+        if o.name in LOOSE_CLOTH:      # hanging cloth / plates move out of the way (secondary motion), they never steer an arm
+            continue
+        gname = {g.index: g.name for g in o.vertex_groups}
+        mw = o.matrix_world
+        for v in o.data.vertices:
+            gs = sorted(((g.weight, gname[g.group]) for g in v.groups if g.weight > 0 and gname.get(g.group) in bidx), reverse=True)[:4]
+            if not gs:
+                continue
+            tot = sum(w for w, _ in gs)
+            V.append(tuple(mw @ v.co))
+            J.append([bidx[n] for _, n in gs] + [0] * (4 - len(gs)))
+            W.append([w / tot for w, _ in gs] + [0.0] * (4 - len(gs)))
+            dom.append(gs[0][1])
+    V = np.array(V)
+    dom = np.array(dom)
+    fingers = {s: {b[0] for b in R.finger_bones(s)} for s in ("L", "R")}
+
+    def arm_set(s, upper=True):
+        out = {"lowerarm_" + s, "lowerarm_twist_" + s, "hand_" + s} | fingers[s]
+        if upper:
+            out |= {"upperarm_" + s, "upperarm_twist_" + s}
+        return out
+    own = {s: np.isin(dom, list(arm_set(s) | arm_set("R" if s == "L" else "L", upper=False))) for s in ("L", "R")}
+
+    def radial_map(pts, dy=0.02, nth=36):
+        cx, cz = float(np.median(pts[:, 0])), float(np.median(pts[:, 2]))
+        y0 = float(pts[:, 1].min())
+        ny = int(math.ceil((pts[:, 1].max() - y0) / dy)) + 1
+        x, z = pts[:, 0] - cx, pts[:, 2] - cz
+        iy = np.clip(((pts[:, 1] - y0) / dy).astype(np.int64), 0, ny - 1)
+        ith = np.floor((np.arctan2(z, x) + math.pi) / (2 * math.pi) * nth).astype(np.int64) % nth
+        rm = np.zeros((ny, nth))
+        np.maximum.at(rm, (iy, ith), np.hypot(x, z))
+        for _ in range(nth):
+            empty = rm == 0.0
+            if not empty.any():
+                break
+            nb = np.maximum(np.roll(rm, 1, 1), np.roll(rm, -1, 1))
+            rm[empty] = nb[empty]
+        return {"cx": cx, "cz": cz, "y0": y0, "dy": dy, "ny": ny, "nth": nth, "rmax": rm}
+    shape, used = {}, {}
+    for s in ("L", "R"):
+        G = R.grip_matrix(arm, "weapon_" + s, pose=False)
+        wrist_y = (G.inverted() @ rig.b["hand_" + s].head).y
+        prev = [o for o in scene.objects if o.type == "MESH" and o.name.startswith("PREVIEW") and o.name.endswith("_" + s)]
+        pts = [tuple(v.co) for o in prev for v in o.data.vertices]      # mesh-local = the grip frame
+        if pts and min(p[1] for p in pts) < wrist_y:
+            shape[s] = radial_map(np.array(pts))
+            used[s] = "sleeve weapon: " + ", ".join(sorted(o.name for o in prev))
+        else:
+            Gi = np.array(G.inverted())
+            m = np.isin(dom, list(arm_set(s, upper=False)))
+            loc = V[m] @ Gi[:3, :3].T + Gi[:3, 3]
+            shape[s] = radial_map(loc)
+            used[s] = "bare forearm, hand and fingers (%d vertices)" % int(m.sum())
+    ko = L.KeepOut(bones, [rig.b[n].rest.inverted() for n in bones], V, J, W, own, shape,
+                   [rig.b[n].length for n in bones], margin=0.003)
+    return ko, {"vertices": int(len(V)), "volumes": used, "margin_m": ko.margin,
+                "radius_p50_m": {s: round(float(np.median(shape[s]["rmax"])), 3) for s in shape}}
+
+
+solver.keepout, KEEPOUT_INFO = build_keepout()
+log("keep-out: %s" % KEEPOUT_INFO)
 CLIPS = library(K)
 names = [c.clip for c in CLIPS]
 assert len(names) == len(set(names)), "duplicate clip names"
@@ -198,6 +280,9 @@ def clip_metrics(clip, frames, eul):
     knee = {"L": 0.0, "R": 0.0}
     reach = 0.0
     miss = 0.0
+    fold_ease, fold_frames = 0.0, 0
+    knee_ease, knee_frames = 0.0, 0
+    ko_short = 0.0
     for fr in frames:
         local, Mb, info, pose = fr
         for s in ("L", "R"):
@@ -214,16 +299,39 @@ def clip_metrics(clip, frames, eul):
             reach = max(reach, info.get("reach_" + s, 0.0), info.get("reach_leg_" + s, 0.0))
             if ("foot_" + s) in pose:
                 _Rf, _B, A, _y, _h = solver.foot_frame(s, pose["foot_" + s])
-                miss = max(miss, (Mb["shin_" + s] @ Vector((0.0, rig.b["shin_" + s].length, 0.0)) - A).length)
+                e = (Mb["shin_" + s] @ Vector((0.0, rig.b["shin_" + s].length, 0.0)) - A).length
+                if info.get("knee_eased_" + s):      # the knee limit (s4lib.KNEE_MAX_DEG) moved the ankle out
+                    knee_ease = max(knee_ease, e)
+                    knee_frames += 1
+                else:
+                    miss = max(miss, e)
             if ("arm_" + s) in pose and "target_" + s in info:
                 eff = Mb["lowerarm_" + s] @ (rig.fist_eff[s] if "fist" in pose["arm_" + s] else Vector((0.0, rig.b["lowerarm_" + s].length, 0.0)))
-                miss = max(miss, (eff - info["target_" + s]).length)
+                e = (eff - info["target_" + s]).length
+                if info.get("fold_eased_" + s):      # the elbow limit (s4lib.ELBOW_MAX_DEG) moved the fist out
+                    fold_ease = max(fold_ease, e)
+                    fold_frames += 1
+                elif info.get("keepout_" + s):        # the keep-out pushed the fist target past the arm's reach
+                    ko_short = max(ko_short, e)
+                else:
+                    miss = max(miss, e)
     m["wrist_swing_max_deg"] = round(wrist, 3)
     m["hand_twist_range_deg"] = {s: [round(min(v), 1), round(max(v), 1)] for s, v in tw.items()}
     m["elbow_flexion_max_deg"] = {s: round(v, 1) for s, v in elbow.items()}
     m["knee_flexion_max_deg"] = {s: round(v, 1) for s, v in knee.items()}
     m["ik_reach_max"] = round(reach, 4)
     m["ik_miss_max_mm"] = round(miss * 1000, 1)
+    m["elbow_limit_deg"] = L.ELBOW_MAX_DEG
+    m["elbow_fold_eased"] = {"arm_frames": fold_frames, "max_mm": round(fold_ease * 1000, 1)}
+    m["knee_limit_deg"] = L.KNEE_MAX_DEG
+    m["knee_fold_eased"] = {"leg_frames": knee_frames, "max_mm": round(knee_ease * 1000, 1)}
+    # the arm keep-out (s4lib.KeepOut): how far fists were pushed out of the body, and what still overlaps
+    ko = [max(fr[2].get("keepout_L", 0.0), fr[2].get("keepout_R", 0.0)) for fr in frames]
+    m["keepout_push"] = {"frames": sum(1 for v in ko if v > 0), "max_mm": round(max(ko) * 1000, 1),
+                         "reach_short_mm": round(ko_short * 1000, 1)}
+    if solver.keepout is not None:
+        res = [solver.keepout.residual(fr[1]) for fr in frames]
+        m["keepout_residual_verts_max"] = {s: max(r[s] for r in res) for s in ("L", "R")}
     # fist curve (the anvil_gauntlets variant: fist when the fingers are curled past half)
     fc = {}
     for s in ("L", "R"):
@@ -239,7 +347,7 @@ report = {"hero": KEY, "skeleton": "%s v%d" % (R.RIG_NAME, R.CONTRACT_VERSION), 
           "kit": {"leg_m": round(K.leg, 4), "arm_m": round(K.arm, 4), "leg_scale": round(K.ls, 4), "arm_scale": round(K.as_, 4),
                   "height_m": round(K.height, 3), "move_speed_mps": K.move_speed},
           "naming": "<key>_<clip> for one-shots, <key>_<clip>@loop for loops (docs/art/GF_HERO_SKELETON.md section 8)",
-          "keyed_bones": rig.keyed, "clips": {}}
+          "keyed_bones": rig.keyed, "keepout": KEEPOUT_INFO, "elbow_limit_deg": L.ELBOW_MAX_DEG, "knee_limit_deg": L.KNEE_MAX_DEG, "clips": {}}
 old = {}
 man_p = os.path.join(OUT_DIR, "clips.json")
 if ONLY and os.path.exists(man_p):
@@ -271,9 +379,10 @@ for clip in CLIPS:
             "slide_exempt": clip.slide_exempt, "metrics": m}
     report["clips"][clip.clip] = info
     tracks.append((name, act))
-    log("%-24s %3d f %s slide %5.1f mm seam %s wrist %.2f elbow %s miss %.1f mm twist %s (%.1fs)" % (
+    log("%-24s %3d f %s slide %5.1f mm seam %s wrist %.2f elbow %s miss %.1f mm keep-out %s left %s (%.1fs)" % (
         name, clip.length, "loop" if clip.loop else "    ", m["foot_slide_max_mm"], m.get("seam_ok", "-"),
-        m["wrist_swing_max_deg"], m["elbow_flexion_max_deg"], m["ik_miss_max_mm"], m["hand_twist_range_deg"], time.time() - t))
+        m["wrist_swing_max_deg"], m["elbow_flexion_max_deg"], m["ik_miss_max_mm"], m["keepout_push"],
+        m.get("keepout_residual_verts_max"), time.time() - t))
     if PRINT_KEYS:
         for f in clip.key_frames():
             local, Mb, inf, pose = frames[f]

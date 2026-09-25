@@ -22,7 +22,9 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 BLENDER = os.environ.get("BLENDER", r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe")
-COMFY_PY = os.environ.get("COMFY_PY", r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe")
+# the PIL review sheets run in any Python with Pillow: $COMFY_PY, else the dev machine's ComfyUI env, else this Python
+COMFY_PY = os.environ.get("COMFY_PY") or next(
+    (p for p in (r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe",) if os.path.isfile(p)), sys.executable)
 STEPS = ["anim", "render", "sheets", "gltf_check", "contract"]
 
 

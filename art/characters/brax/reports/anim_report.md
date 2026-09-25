@@ -117,52 +117,61 @@ separate `cinder_slam`, because the slam lives inside `uppercut`: one ability, o
     brake step or hop, they never skate.
   - The slam and forge fists land on points in absolute space: the ground, and one shared anvil top at 1.07 m, 0.58 m
     in front.
-  - A pair of gauntlets never interpenetrates beyond contact. Knocks and clashes are spaced so that only the knuckle
-    faces meet: at most 43 vertices touch.
+  - Knocks and clashes are spaced so that only the knuckle faces meet (at most 43 vertices touch). The exception is
+    the `uppercut` double-fist slam, where the fists press together (up to 106 vertices, §3).
 - **Gauntlet variants.** The fist or open variant follows the fingers. Only `ping` opens a hand: the right hand opens
   on frame 4 and closes on frame 16 (`clips.json` `weapon_variant`). Every other clip shows the fist variant, with the
   body's fingers clenched inside it.
 
 ## 3. Validation
 
+> **Revised by the review of stages 3-5 (2026-09-26, [`review_stage3_5.md`](review_stage3_5.md)).** The first bake
+> folded elbows to 173-179° (`dash`, `death`, `uppercut`: the gauntlet crushed into the shoulder, head or chest), a
+> knee to 172° (`get_up`), and drove the gauntlets through thighs, knees, the chest and the belt between key frames
+> (up to 416 solid-body vertices inside a gauntlet in `get_up`, 413 in `uppercut`). The "gauntlet cuts body" column
+> below never saw it: it samples key frames only and counts vertices inside gauntlet material, not inside its cavity.
+> The solver now has soft limits (elbow 145°, knee 150°) and the arm keep-out (`s4lib.KeepOut`), and three key poses
+> moved (`get_up` GU2's free fist, `heat_vent`'s return through the front, the `uppercut` slam in front of the knees).
+> The table is the re-bake. "Keep-out push" is how far the solver moved a fist target out of the body.
+
 Every number comes from `reports/anim/*.json`. The chain re-runs everything with `python tools/blender/gf_hero/run_stage4.py brax`.
 
-| Clip | Foot slide max (mm) | Loop seam | IK miss (mm) | Wrist swing (deg) | Elbow max L/R (deg) | Knee max (deg) | Gauntlet cuts body (max verts) | Gauntlets touch (max) | Lowest body / cloth vertex (mm) |
-|---|---|---|---|---|---|---|---|---|---|
-| `idle` | 0.0 | closed, 0.01 / 0.05 deg | 0.0 | 0.00 | 37 / 37 | 32 | 0 | 0 | 5.1 / 305.5 |
-| `idle_combat` | 0.0 | closed, 0.50 / 0.50 deg | 0.0 | 0.00 | 93 / 102 | 61 | 32 | 0 | 5.1 / 352.5 |
-| `walk` | 0.9 | closed, 6.91 / 14.57 deg | 0.0 | 0.00 | 48 / 48 | 75 | 6 | 0 | 5.1 / 126.2 |
-| `run` | 0.0 | closed, 38.23 / 59.81 deg | 0.0 | 0.00 | 110 / 110 | 126 | 40 | 0 | -2.6 / 169.8 |
-| `strafe_left` | 0.0 | closed, 9.00 / 27.64 deg | 3.7 | 0.00 | 90 / 100 | 117 | 32 | 0 | 5.1 / 293.7 |
-| `strafe_right` | 0.0 | closed, 9.31 / 27.64 deg | 3.7 | 0.00 | 90 / 100 | 117 | 32 | 0 | 5.1 / 193.9 |
-| `backpedal` | 0.0 | closed, 19.11 / 31.14 deg | 0.8 | 0.00 | 89 / 99 | 109 | 30 | 0 | 5.1 / 115.0 |
-| `dash` | 0.0 | - | 0.0 | 0.00 | 91 / 173 | 120 | 31 | 0 | 5.1 / 174.4 |
-| `dash_recover` | 0.0 | - | 0.0 | 0.00 | 95 / 144 | 113 | 36 | 0 | 5.1 / 174.4 |
-| `fire_light` | 0.0 | - | 0.0 | 0.00 | 91 / 100 | 56 | 31 | 0 | 5.1 / 356.2 |
-| `fire_heavy` | 0.0 | - | 0.0 | 0.00 | 103 / 122 | 56 | 43 | 0 | 5.1 / 356.0 |
-| `fire_charge` | 0.0 | closed, 0.56 / 0.59 deg | 0.0 | 0.00 | 78 / 134 | 62 | 49 | 0 | 5.1 / 352.3 |
-| `hit_light` | 0.0 | - | 0.0 | 0.00 | 108 / 100 | 56 | 38 | 0 | 5.1 / 356.1 |
-| `hit_heavy` | 0.0 | - | 0.0 | 0.00 | 138 / 126 | 90 | 54 | 0 | 5.1 / 190.5 |
-| `knockdown` | 0.0 | - | 2.8 | 0.00 | 121 / 118 | 144 | 40 | 0 | 5.1 / -91.4 |
-| `get_up` | 0.0 | - | 0.0 | 0.00 | 108 / 116 | 172 | 58 | 0 | 0.8 / -97.7 |
-| `death` | 0.0 | - | 17.6 | 0.00 | 146 / 179 | 153 | 37 | 0 | -3.8 / -233.3 |
-| `downed` | 0.0 | closed, 0.10 / 0.10 deg | 0.0 | 0.00 | 44 / 45 | 140 | 6 | 0 | 156.5 / 237.0 |
-| `revive` | 0.0 | - | 0.0 | 0.00 | 122 / 127 | 140 | 46 | 0 | 5.1 / 191.8 |
-| `reforge_in` | 0.0 | - | 0.0 | 0.00 | 128 / 128 | 137 | 50 | 42 | -3.4 / -79.1 |
-| `victory` | 0.0 | - | 0.0 | 0.00 | 118 / 126 | 75 | 48 | 0 | 5.1 / 304.3 |
-| `ping` | 0.0 | - | 12.3 | 0.00 | 91 / 101 | 56 | 33 | 0 | 5.1 / 356.3 |
-| `interact` | 0.0 | - | 0.0 | 0.00 | 105 / 105 | 64 | 36 | 43 | 5.1 / 276.3 |
-| `forge_hammer` | 0.0 | closed, 8.89 / 19.86 deg | 0.0 | 0.00 | 85 / 126 | 64 | 33 | 26 | 5.1 / 361.4 |
-| `idle_signature` | 0.0 | closed, 0.19 / 12.13 deg | 32.3 | 0.00 | 95 / 95 | 29 | 32 | 19 | 5.1 / 304.0 |
-| `jab_l` | 0.0 | - | 0.0 | 0.00 | 101 / 103 | 60 | 32 | 0 | 5.1 / 356.3 |
-| `jab_r` | 0.0 | - | 0.0 | 0.00 | 104 / 113 | 73 | 37 | 0 | 5.1 / 356.3 |
-| `hook` | 0.0 | - | 0.0 | 0.00 | 116 / 110 | 69 | 42 | 0 | 5.1 / 354.3 |
-| `uppercut` | 0.0 | - | 55.1 | 0.00 | 173 / 165 | 133 | 37 | 12 | 3.4 / -25.9 |
-| `furnace_rush` | 1200.2 (exempt) | closed, 65.67 / 65.67 deg | 0.0 | 0.00 | 98 / 102 | 127 | 32 | 0 | 4.4 / 100.3 |
-| `furnace_rush_end` | 0.0 | - | 0.0 | 0.00 | 95 / 100 | 108 | 31 | 0 | 2.6 / 100.3 |
-| `meltdown_start` | 0.0 | - | 0.0 | 0.00 | 130 / 130 | 89 | 44 | 39 | 5.1 / 231.3 |
-| `meltdown` | 0.0 | closed, 0.69 / 0.93 deg | 0.0 | 0.00 | 82 / 93 | 89 | 29 | 0 | 5.1 / 231.3 |
-| `heat_vent` | 0.0 | - | 0.0 | 0.00 | 132 / 143 | 56 | 46 | 0 | 5.1 / 356.2 |
+| Clip | Foot slide max (mm) | Loop seam | IK miss (mm) | Wrist swing (deg) | Elbow max L/R (deg) | Knee max (deg) | Keep-out push (max mm) | Gauntlet cuts body (max verts) | Gauntlets touch (max) | Lowest body / cloth vertex (mm) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `idle` | 0.0 | closed, 0.01 / 0.05 deg | 0.0 | 0.00 | 37 / 37 | 32 | 0 | 0 | 0 | 5.1 / 305.5 |
+| `idle_combat` | 0.0 | closed, 0.50 / 0.50 deg | 0.0 | 0.00 | 93 / 102 | 61 | 0 | 32 | 0 | 5.1 / 352.5 |
+| `walk` | 0.9 | closed, 6.91 / 14.57 deg | 0.0 | 0.00 | 48 / 48 | 75 | 0 | 6 | 0 | 5.1 / 126.2 |
+| `run` | 0.0 | closed, 38.23 / 59.81 deg | 0.0 | 0.00 | 104 / 104 | 126 | 116 | 33 | 0 | -2.6 / 169.8 |
+| `strafe_left` | 0.0 | closed, 9.00 / 27.64 deg | 3.7 | 0.00 | 90 / 100 | 117 | 0 | 32 | 0 | 5.1 / 293.7 |
+| `strafe_right` | 0.0 | closed, 9.31 / 27.64 deg | 3.7 | 0.00 | 90 / 100 | 117 | 0 | 32 | 0 | 5.1 / 193.9 |
+| `backpedal` | 0.0 | closed, 19.11 / 31.14 deg | 0.8 | 0.00 | 89 / 99 | 109 | 0 | 30 | 0 | 5.1 / 115.0 |
+| `dash` | 0.0 | - | 0.0 | 0.00 | 91 / 130 | 120 | 231 | 31 | 0 | 5.1 / 174.4 |
+| `dash_recover` | 0.0 | - | 0.0 | 0.00 | 95 / 114 | 113 | 254 | 36 | 0 | 5.1 / 174.4 |
+| `fire_light` | 0.0 | - | 0.0 | 0.00 | 91 / 100 | 56 | 0 | 31 | 0 | 5.1 / 356.2 |
+| `fire_heavy` | 0.0 | - | 0.0 | 0.00 | 103 / 110 | 56 | 89 | 37 | 0 | 5.1 / 356.0 |
+| `fire_charge` | 0.0 | closed, 0.92 / 0.92 deg | 0.0 | 0.00 | 78 / 118 | 62 | 138 | 35 | 0 | 5.1 / 352.3 |
+| `hit_light` | 0.0 | - | 0.0 | 0.00 | 108 / 100 | 56 | 0 | 38 | 0 | 5.1 / 356.1 |
+| `hit_heavy` | 0.0 | - | 0.0 | 0.00 | 138 / 126 | 90 | 0 | 54 | 0 | 5.1 / 190.5 |
+| `knockdown` | 0.0 | - | 2.8 | 0.00 | 121 / 118 | 144 | 0 | 40 | 0 | 5.1 / -91.4 |
+| `get_up` | 0.0 | - | 0.0 | 0.00 | 111 / 113 | 150 | 282 | 36 | 0 | 0.8 / -97.7 |
+| `death` | 0.0 | - | 0.0 | 0.00 | 108 / 133 | 150 | 351 | 35 | 0 | -3.8 / -230.5 |
+| `downed` | 0.0 | closed, 0.10 / 0.10 deg | 0.0 | 0.00 | 44 / 45 | 140 | 0 | 6 | 0 | 156.5 / 237.0 |
+| `revive` | 0.0 | - | 0.0 | 0.00 | 117 / 121 | 140 | 61 | 39 | 0 | 5.1 / 191.8 |
+| `reforge_in` | 0.0 | - | 0.0 | 0.00 | 115 / 119 | 137 | 173 | 44 | 42 | -3.4 / -79.1 |
+| `victory` | 0.0 | - | 0.0 | 0.00 | 118 / 122 | 75 | 102 | 35 | 0 | 5.1 / 304.3 |
+| `ping` | 0.0 | - | 12.3 | 0.00 | 91 / 101 | 56 | 0 | 33 | 0 | 5.1 / 356.3 |
+| `interact` | 0.0 | - | 0.0 | 0.00 | 105 / 105 | 64 | 0 | 36 | 43 | 5.1 / 276.3 |
+| `forge_hammer` | 0.0 | closed, 8.64 / 19.37 deg | 0.0 | 0.00 | 85 / 122 | 64 | 100 | 33 | 26 | 5.1 / 361.4 |
+| `idle_signature` | 0.0 | closed, 0.19 / 12.13 deg | 11.1 | 0.00 | 93 / 93 | 29 | 69 | 27 | 21 | 5.1 / 304.0 |
+| `jab_l` | 0.0 | - | 0.0 | 0.00 | 101 / 103 | 60 | 0 | 32 | 0 | 5.1 / 356.3 |
+| `jab_r` | 0.0 | - | 0.0 | 0.00 | 104 / 113 | 73 | 0 | 37 | 0 | 5.1 / 356.3 |
+| `hook` | 0.0 | - | 0.0 | 0.00 | 116 / 110 | 69 | 60 | 41 | 0 | 5.1 / 354.3 |
+| `uppercut` | 0.0 | - | 54.7 | 0.00 | 127 / 126 | 133 | 286 | 37 | 106 | 3.4 / -25.9 |
+| `furnace_rush` | 1200.2 (exempt) | closed, 65.67 / 65.67 deg | 0.0 | 0.00 | 98 / 102 | 127 | 0 | 32 | 0 | 4.4 / 100.3 |
+| `furnace_rush_end` | 0.0 | - | 0.0 | 0.00 | 95 / 100 | 108 | 0 | 31 | 0 | 2.6 / 100.3 |
+| `meltdown_start` | 0.0 | - | 0.0 | 0.00 | 130 / 129 | 89 | 121 | 44 | 39 | 5.1 / 231.3 |
+| `meltdown` | 0.0 | closed, 0.69 / 0.93 deg | 0.0 | 0.00 | 82 / 93 | 89 | 0 | 29 | 0 | 5.1 / 231.3 |
+| `heat_vent` | 0.0 | - | 0.0 | 0.00 | 116 / 123 | 56 | 238 | 44 | 0 | 5.1 / 356.2 |
 
 How to read the columns:
 - **Foot slide**: the largest world-space drift of a ball joint inside one contact interval. The design travel is added
@@ -172,9 +181,16 @@ How to read the columns:
   roughest point.
 - **IK miss**: a target the limb cannot reach, which the soft IK eases. The largest are the full extensions in the
   uppercut launch (55 mm) and in the signature idle's hanging arms (32 mm). All are under the 60 mm gate.
+- **Keep-out push**: the largest move of a fist target out of the body by the arm keep-out (`clips.json`
+  `keepout_push`; `keepout_residual_verts_max` is what still overlaps, gated at 60 per arm). 0 means the clip was
+  clean as written.
 - **Gauntlet cuts body**: body vertices inside gauntlet material on the key frames, the weapon's own forearm and hand
-  excluded. The 29-58 vertices are almost all the known elbow cuff pressing into the biceps (15-27 a side)
-  whenever the elbow bends past about 40° (§6).
+  excluded. The 21-44 vertices are almost all the known elbow cuff pressing into the biceps (15-27 a side)
+  whenever the elbow bends past about 40° (§6). Every frame, and the gauntlet cavity too, is measured by the review's
+  audit (`tools/blender/gf_hero/review/`): after the re-bake at most 61 solid-body vertices sit inside a gauntlet
+  (`get_up` f15, the right gauntlet against the tucked right leg), 0 in 29 of the 34 clips.
+- **Gauntlets touch**: at the `uppercut` slam the two fists press together (50-106 vertices of one shell inside the
+  other on the slam frames): a double-fist slam. Before the review they sat on the knees instead.
 - **Lowest vertex**: the body set (skin, wraps, hair, beard, belt) and the rigid cloth (skirt plates, sash, underskirt)
   are reported separately. The body stays within 4 mm of the ground in every clip. The cloth goes through the ground
   only in the lying and kneeling poses (§6).
@@ -245,7 +261,7 @@ I looked at every clip sheet and the three boards (`anim/anim_board_{1,2,3}.png`
 ## 6. Honest findings and open issues
 
 1. **The gauntlet cuff presses into the biceps** in every bent-arm pose: the guard, the strikes, the run pump. The
-   cost is 15-27 vertices a side, and 29-58 per key frame in total. It is weapon geometry: the stage-3 report
+   cost is 15-27 vertices a side, and 21-44 per key frame in total. It is weapon geometry: the stage-3 report
    measured a clean elbow range of 0-30°. A brawler cannot keep his elbows that straight, so the clips accept the
    overlap. It is invisible at game size, but visible in the close-ups. The fix belongs to the weapon: end the sleeve
    about 4 cm before the elbow, or flare the cuff (`art/weapons/anvil_gauntlets`, the armory agent's pack).
@@ -262,12 +278,14 @@ I looked at every clip sheet and the three boards (`anim/anim_board_{1,2,3}.png`
    so the legs churn at an 8 m/s stride and the feet slide 1.2 m per contact in the world: a skid-charge. The clip is
    marked `slide_exempt` and the contract lets it through. `furnace_rush_end` plants cleanly (0.0 mm): it hops out of
    the rush pose for 2 frames.
-4. **Deep knee flexion shows the stage-3 knee flattening** past about 110°. The worst are:
+4. **Deep knee flexion shows the stage-3 knee flattening** past about 110°. The solver now stops a knee at 150°
+   (it reached 172° in the `get_up` tuck, a crushed lump). The worst are:
    - the uppercut slam (133°);
-   - `get_up` (172° in the tuck);
-   - the death kneel and the wraith float (140-153°).
+   - `get_up` (150° in the tuck, at the limit);
+   - the death kneel and the wraith float (140-150°).
 
-   It is hidden by the skirt at game size.
+   It is hidden by the skirt at game size. The uppercut slam's kneeling knee still sinks about 6 cm into the ground
+   (the lowest skinned vertex, -60 mm).
 5. **The fire clips are generic.** `fire_light`, `fire_heavy` and `fire_charge` are body-and-arm thrusts that any
    chassis can use. A two-handed gun's left hand still needs the engine's IK to `grip_L`, and recoil and aim stay
    procedural. **Aim offsets are not authored**: at the 55° top-down camera the hero turns to the aim, and the

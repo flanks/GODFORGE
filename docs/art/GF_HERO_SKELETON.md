@@ -266,6 +266,20 @@ Brax's results: `art/characters/brax/reports/rig_report.md`.
   squat, lunge, torso twist, head turns, fist clench, uppercut, forearm twist, and a bare maximum of 145° elbow
   and 135° knee. The weights hold up through that range. The known soft spots are listed in the hero's report:
   a front-shoulder crease with the arms forward, and a flattened knee cap beyond about 120° of flexion.
+- **The solver enforces the range** (`s4lib.py`, added by the review of stages 3-5): an elbow never folds past
+  `ELBOW_MAX_DEG` = 145° and a knee never past `KNEE_MAX_DEG` = 150°. A target closer than that is eased out
+  softly (the knee's ankle horizontally, so a kneeling foot never goes into the ground). Before the limit, in-between
+  frames folded Brax's elbow to 173-179° (the gauntlet crushed into the shoulder or head) and a knee to 172°.
+  `clips.json` reports the eased frames (`elbow_fold_eased`, `knee_fold_eased`); knees between 135° and 150° are the
+  documented soft spot (kneels, tucks).
+- **The hand's rigid volume never passes through the body** (the arm keep-out, `s4lib.KeepOut`). A sleeve weapon is
+  a 30-40 cm rigid shell around the forearm and fist, and effector targets are only points, so a fist written next
+  to a knee or a path from the hip to the chin drove the gauntlet through thighs, knees, the chest and the belt.
+  Each frame the solver skins the body (body, belt, wraps, hair, beard; hanging cloth such as skirt plates and sash
+  is not an obstacle) and tests it against the hand's volume (the signature weapon's fist + open meshes in the grip
+  frame when it is a sleeve weapon, else the bare forearm and fist); an overlap pushes the fist target out along the
+  body's own surface normal and re-solves the arm, and the pushes are smoothed over time. Clean poses are untouched.
+  Write key poses that keep the fists clear anyway: the push is a safety net, and big pushes change the gesture.
 - **Sleeve weapons** are weapons that enclose the forearm (the anvil_gauntlets, arm cannons). They are rigid on
   the hand socket, so:
   - **keep the wrist straight**: bend 0°, twist free. In straight-wrist poses at most 3 vertices at the elbow end
@@ -358,8 +372,9 @@ Each hero's `reports/anim/clips.json` holds the exact frames, the events, the de
   measure at most 0.9 mm. Clips marked `slide_exempt` break this rule on purpose (Brax's `furnace_rush` skid-charge), and the
   report says why.
 - **Upper layer.** Clips with `layer: "upper"` keep the lower body on the combat stance. Mask `spine_01` and its
-  children to layer them over locomotion, or play them whole over `idle_combat`. Their first and last frames are
-  `idle_combat` frame 0, so an additive layer can use that frame as its reference pose.
+  children to layer them over locomotion, or play them whole over `idle_combat`. The first and last frames of every
+  one-shot upper clip are `idle_combat` frame 0 (to 3e-8 m in the shipped GLB), so an additive layer can use that
+  frame as its reference pose. `fire_charge@loop` is a held loop that starts and ends on its own charge pose.
 - **Events** (hit frames, launch, slam, footfalls of the big moves) are Blender pose markers on each action and are
   listed in `clips.json` `events`. glTF has no events, so stage 5 writes them to the hero's
   `assets/models/characters/<key>.meta.json`.
@@ -387,9 +402,13 @@ analytic two-bone IK:
 
 - the hinge is the lower bone's local X, so the elbow and knee never twist off their axis;
 - the reach is soft: a limb never snaps straight;
-- the toes never go through the ground.
+- the toes never go through the ground;
+- the elbow stops at 145° and the knee at 150° (soft limits, §7);
+- the hand's rigid volume (the sleeve weapon) is kept out of the body (the arm keep-out, §7).
 
 Every frame is baked as LINEAR keys. The solver matches Blender's own evaluation of the baked action to 1.3e-6.
+`check_clips.py` gates the limits and what the keep-out leaves (`s4_contract.MAX_ELBOW_FLEXION_DEG`,
+`MAX_KNEE_FLEXION_DEG`, `MAX_KEEPOUT_RESIDUAL_VERTS`).
 
 Locomotion clips are procedural (`s4_clips.locomotion`): a gait cycle from the design speed, duty factor, stance
 width, hip yaw (strafe), lift, heel roll and a ground-speed-matched swing.

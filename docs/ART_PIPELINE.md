@@ -70,7 +70,9 @@ these violations:
   with the origin on the ground between the feet. glTF is Y-up and its assets face +Z; the client
   applies the facing when it wires the scene in. Heroes are seen from a fixed 55°
   orthographic iso camera at about **6 to 8 % of screen height** (65 to 86 px at 1080p), so the
-  silhouette matters more than micro-detail.
+  silhouette matters more than micro-detail. That holds for 1-2 players: the camera widens to 28 m of view height for
+  4 players (up to 32 m when they spread), where a 2.2 m hero is about 58 px (5.4 %), so check the 4-player read too
+  (Brax: `art/characters/brax/reports/review_stage3_5.md`).
 * **Procedural stays procedural.** Weapon fire, recoil, aim offsets and hit flinches stay
   procedural in `scene.rs`, so they don't multiply authored clips.
 
@@ -356,11 +358,11 @@ python tools/blender/gf_hero/run_stage4.py <key>          # [--from <step>] [--o
 
 | Step | Script | What it does |
 |---|---|---|
-| anim | `s4_anim.py` (+ `s4lib.py`, `s4_clips.py`, `s4_<key>.py`) | the shared set (24 clips) + the hero's unique set, key poses interpolated in parameter space and solved every frame with an analytic two-bone IK; one action + one NLA track per clip in `production/<key>_anim.blend`; metrics per clip in `reports/anim/clips.json`: loop seam, foot slide in world space, in-place drift, wrist rule, elbow / knee range, IK misses, the gauntlet variant swaps |
+| anim | `s4_anim.py` (+ `s4lib.py`, `s4_clips.py`, `s4_<key>.py`) | the shared set (24 clips) + the hero's unique set, key poses interpolated in parameter space and solved every frame with an analytic two-bone IK (soft limits: elbow 145°, knee 150°) and the arm keep-out (the hand's weapon volume is pushed out of the skinned body; GF_HERO_SKELETON §7); one action + one NLA track per clip in `production/<key>_anim.blend`; metrics per clip in `reports/anim/clips.json`: loop seam, foot slide in world space, in-place drift, wrist rule, elbow / knee range and eased frames, IK misses, keep-out pushes and residual overlap, the gauntlet variant swaps |
 | render | `s4_render.py` | the key frames: toon close-ups (front 3/4 + side on a 0.5 m grid) and the 55° client camera at true 1080p pixels; mesh checks (ground, the sleeve weapon against the body and against the other gauntlet) |
 | sheets | `s4_sheets.py` | a contact sheet per clip (key frames, game size at 1x and 3x, the feet's world track, the numbers) + the game-size boards |
 | gltf_check | `s4_gltf_check.py` | a scratch GLB with every clip read back: names, durations, 30 fps, in place, loops closed, twist bones baked, no required extensions |
-| contract | `check_clips.py` | the stdlib contract (also a CI job) |
+| contract | `check_clips.py` | the stdlib contract (also a CI job): names, loops, planted feet, the wrist rule, reach, the elbow / knee limits, the keep-out residual, the ground |
 
 Weapon fire stays procedural (recoil, aim, hit-stop); the fire and strike clips are short upper-layer clips that
 start and end on the `idle_combat` reference pose. Aim offsets are not authored: at the 55° top-down camera the hero

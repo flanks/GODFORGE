@@ -102,13 +102,15 @@ def unique_clips(K):
                     arm("L", (-0.05, -0.10, 0.70), pole=(0.8, 0.3, 0.0), back=(0.0, 0.9, 0.3)),
                     arm("R", (-0.05, -0.10, 0.70), pole=(0.8, 0.3, 0.0), back=(0.0, 0.9, 0.3)), fists(1.0),
                     head(-20.0), clav((-8.0, 0.0, 16.0)))
+    # the fists land in front of the knees, not on them (at y -0.62 the 38 cm gauntlets sat on the knees, and the
+    # arm keep-out squeezed them into each other; review of stages 3-5)
     UC_SLAM = merge(combat(dz=-0.50, lean=44.0, twist=0.0),
-                    arm("L", (0.22, -0.62, 0.24), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"),
-                    arm("R", (0.22, -0.62, 0.24), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"), fists(1.0),
+                    arm("L", (0.22, -0.66, 0.24), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"),
+                    arm("R", (0.22, -0.66, 0.24), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"), fists(1.0),
                     head(20.0), clav((10.0, 0.0, 0.0)))
     UC_REB = merge(UC_SLAM, combat(dz=-0.46, lean=40.0),
-                   arm("L", (0.22, -0.60, 0.32), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"),
-                   arm("R", (0.22, -0.60, 0.32), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"))
+                   arm("L", (0.22, -0.64, 0.32), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"),
+                   arm("R", (0.22, -0.64, 0.32), pole=(1.0, 0.0, 1.2), back=(0.1, -0.9, 0.4), space="abs"))
     C.append(Clip("uppercut", 48, family="brax", keys=[
         (0, combat_guard(), {}), (5, UC_LOAD, HOLD), (8, UC_RISE, LIN), (10, UC_TOP, {}), (15, UC_HANG, {}),
         (21, UC_WIND, HOLD), (25, UC_SLAM, {"lin_in": True}), (30, UC_REB, {}),
@@ -177,6 +179,10 @@ def unique_clips(K):
                  clav((-14.0, 0.0, 12.0)))
     C.append(Clip("heat_vent", 30, layer="upper", family="brax", keys=[
         (0, combat_guard(), {}), (6, VENT, {}), (14, merge(VENT, head(-26.0), clav((-16.0, 0.0, 14.0))), HOLD),
+        # the fists come round in front of the hips before they rise into the guard (a straight path from the dropped
+        # arms to the chin runs the 38 cm gauntlets through the ribs; review of stages 3-5)
+        (18, merge(combat(lean=-4.0), arm("L", (0.30, -0.38, -0.30), pole=(0.4, 0.4, -0.8), back=(0.5, 0.2, 0.8)),
+                   arm("R", (0.30, -0.38, -0.30), pole=(0.4, 0.4, -0.8), back=(0.5, 0.2, 0.8)), head(-8.0), clav((0.0, 0.0, 4.0))), {}),
         (22, merge(combat(lean=2.0), guard(dl=(0.06, 0.08, -0.12), dr=(0.06, 0.08, -0.12)), clav((6.0, 0.0, 0.0))), {}),
         (30, combat_guard(), {})],
         purpose="Heat vent: shoulders thrown back, arms dropped wide, chest out, head back as the cracks vent",

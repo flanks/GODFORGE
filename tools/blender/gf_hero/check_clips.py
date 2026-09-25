@@ -9,7 +9,10 @@ For every hero whose status.json marks stage 4 (4_animation) done, reads art/cha
   * 30 fps; clips are in place (root, twist bones and sockets are not in the keyed set);
   * loops: the last frame is the first and the seam is no rougher than the clip itself;
   * planted feet drift <= s4_contract.MAX_FOOT_SLIDE_MM in world space (clips marked slide_exempt excepted), the wrist of a
-    sleeve weapon never bends, no effector is asked for more than the limb can reach, the feet stay out of the ground;
+    sleeve weapon never bends, no effector is asked for more than the limb can reach, no elbow folds past the stage-3
+    validated maximum (s4_contract.MAX_ELBOW_FLEXION_DEG), no knee past s4_contract.MAX_KNEE_FLEXION_DEG, the arm
+    keep-out leaves at most s4_contract.MAX_KEEPOUT_RESIDUAL_VERTS body vertices inside a hand's weapon volume, the feet
+    stay out of the ground;
   * the glTF export check passed (one animation per clip, durations, in place, loops closed, no required extensions).
 Exit 1 on any problem.
 """
@@ -77,6 +80,19 @@ def check_hero(key, A):
             probs.append("%s: %s bends the wrist %.2f deg under a sleeve weapon" % (key, n, m["wrist_swing_max_deg"]))
         if m.get("ik_miss_max_mm", 0) > SC.MAX_IK_MISS_MM:
             probs.append("%s: %s asks a limb for %.0f mm more than it reaches" % (key, n, m["ik_miss_max_mm"]))
+        elbow = max((m.get("elbow_flexion_max_deg") or {}).values() or [0.0])
+        if elbow > SC.MAX_ELBOW_FLEXION_DEG:
+            probs.append("%s: %s folds an elbow to %.0f deg (gate %.0f: the stage-3 validated maximum is 145)" % (key, n, elbow, SC.MAX_ELBOW_FLEXION_DEG))
+        knee = max((m.get("knee_flexion_max_deg") or {}).values() or [0.0])
+        if knee > SC.MAX_KNEE_FLEXION_DEG:
+            probs.append("%s: %s folds a knee to %.0f deg (gate %.0f)" % (key, n, knee, SC.MAX_KNEE_FLEXION_DEG))
+        if "keepout_residual_verts_max" not in m:
+            probs.append("%s: %s has no arm keep-out metrics (bake with the current s4_anim.py)" % (key, n))
+        else:
+            left = max(m["keepout_residual_verts_max"].values() or [0])
+            if left > SC.MAX_KEEPOUT_RESIDUAL_VERTS:
+                probs.append("%s: %s leaves %d body vertices inside a hand's weapon volume (gate %d)" % (
+                    key, n, left, SC.MAX_KEEPOUT_RESIDUAL_VERTS))
         if m.get("ground_penetration_mm", 0) < -SC.MAX_GROUND_PENETRATION_MM:
             probs.append("%s: %s puts a foot %.0f mm into the ground" % (key, n, -m["ground_penetration_mm"]))
     if not os.path.exists(gl_p):

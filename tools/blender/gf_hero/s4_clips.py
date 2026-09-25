@@ -363,7 +363,9 @@ def shared_clips(K):
                 arm("R", (0.40, 0.84, 0.14), pole=(0.9, 1.4, 1.2), back=(0.0, 0.6, 0.8), space="abs"), fists(1.0))
     GU2 = merge(pelvis((0.0, 0.22, -0.72), (22.0, -12.0, 0.0)), spine(18.0, 6.0), head(8.0),
                 foot("L", CL, 10.0), foot("R", (0.22, 0.42), 14.0, heel=72.0),
-                arm("L", (0.10, -0.50, -0.30), pole=(0.6, 0.2, -0.6), back=(0.4, 0.3, 0.8)),
+                # the free fist rides outside and above the raised knee (in front of it, a 38 cm gauntlet goes through the
+                # knee and thigh: review of stages 3-5)
+                arm("L", (0.30, -0.42, -0.10), pole=(0.8, 0.2, -0.6), back=(0.4, 0.3, 0.8)),
                 arm("R", (0.32, -0.22, 0.22), pole=(0.8, -0.2, 1.4), back=(-0.2, -0.8, 0.4), space="abs"), fists(1.0))
     GU_TUCK = merge(pelvis((0.0, 0.34, -0.90), (-6.0, -6.0, 0.0)), spine(22.0, 4.0), head(10.0),
                     foot("L", CL, 10.0, knee=(0.4, 0.0, 1.0)), foot("R", (0.22, -0.20), 12.0, lift=0.16, heel=30.0, knee=(0.0, 0.0, 1.0)),

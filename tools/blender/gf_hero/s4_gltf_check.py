@@ -63,7 +63,8 @@ bpy.ops.export_scene.gltf(
     export_skins=True, export_influence_nb=4, export_all_influences=False, export_def_bones=True,
     export_rest_position_armature=True, export_animations=True, export_animation_mode="NLA_TRACKS",
     export_force_sampling=True, export_frame_step=1, export_optimize_animation_size=False,
-    export_anim_single_armature=True, export_cameras=False, export_lights=False, export_extras=False)
+    export_anim_single_armature=True, export_cameras=False, export_lights=False, export_extras=False,
+    export_vertex_color="NONE", export_all_vertex_colors=False, export_active_vertex_color_when_no_material=False)
 
 
 def read_glb(path):

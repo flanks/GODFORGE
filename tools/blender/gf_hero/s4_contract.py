@@ -44,6 +44,14 @@ MAX_FOOT_SLIDE_MM = 10.0        # a planted ball joint may drift this much in wo
 MAX_WRIST_SWING_DEG = 0.01      # sleeve weapons: the hand only twists
 MAX_IK_MISS_MM = 60.0           # an effector the limb cannot reach (soft IK) - larger means a pose asks for too much
 MAX_GROUND_PENETRATION_MM = 15.0
+# the deepest elbow a clip may reach: the stage-3 validated maximum (145 deg, s4lib.ELBOW_MAX_DEG caps the solver there)
+# plus the soft cap's overshoot. A deeper fold puts a sleeve weapon inside the upper arm, the shoulder or the head.
+MAX_ELBOW_FLEXION_DEG = 147.0
+# the deepest knee (s4lib.KNEE_MAX_DEG = 150 caps the solver; 135-150 is the documented knee soft spot)
+MAX_KNEE_FLEXION_DEG = 152.0
+# the arm keep-out (s4lib.KeepOut): skinned body vertices still inside a hand's rigid volume (the sleeve weapon or the
+# bare forearm) after the push, per arm per frame. The review of stages 3-5 found 958 before the keep-out existed.
+MAX_KEEPOUT_RESIDUAL_VERTS = 60
 
 
 def action_name(key, clip, loop):
