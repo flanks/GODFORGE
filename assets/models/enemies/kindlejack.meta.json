@@ -1,0 +1,184 @@
+{
+ "kind": "enemy",
+ "key": "kindlejack",
+ "tier": "swarm",
+ "tris": 1352,
+ "tris_budget": [
+  600,
+  1500
+ ],
+ "textures": [
+  {
+   "name": "kindlejack_emissive",
+   "role": "emissive",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 35032
+  },
+  {
+   "name": "kindlejack_basecolor",
+   "role": "base_color",
+   "px": [
+    512,
+    512
+   ],
+   "format": "png",
+   "bytes": 336416
+  }
+ ],
+ "sockets": {
+  "hit_center": {
+   "translation": [
+    0.0,
+    0.6154,
+    0.0037
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    1.24,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "fx_core": {
+   "translation": [
+    0.0,
+    0.6554,
+    0.0582
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "kindlejack_idle@loop",
+  "kindlejack_move@loop",
+  "kindlejack_windup",
+  "kindlejack_attack",
+  "kindlejack_hit",
+  "kindlejack_death",
+  "kindlejack_primed@loop"
+ ],
+ "skeleton": "GF_Swarm_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.3628,
+   0.0,
+   -0.4426
+  ],
+  "max": [
+   0.2888,
+   1.0321,
+   0.2254
+  ]
+ },
+ "size_m": 1.032,
+ "glb": "assets/models/enemies/kindlejack.glb",
+ "glb_bytes": 574440,
+ "glb_sha256": "0b0abaa5ac64fa4c14ed607f026c5886a1427fefacbb8ccd7b921e6caecb5beb",
+ "source_blend": "art/enemies/kindlejack/source/kindlejack.blend",
+ "build_script": "tools/blender/gf_assets/enemies/kindlejack.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "content_key": "kindlejack",
+ "content_row": {
+  "key": "kindlejack",
+  "class": "Swarm",
+  "biome": "cinder_wastes",
+  "hp": 26,
+  "speed": 4.6,
+  "radius": 0.4,
+  "scale": 1.0,
+  "contact_damage": 0,
+  "behavior": "Bomber(trigger_range: 1.6, fuse: 0.9, radius: 2.2, damage: 32.0)",
+  "color": "#FF7A1A",
+  "shape": "Blob",
+  "pack": "(1, 2)"
+ },
+ "verb": "RUSH",
+ "design": "a tall, thin, forward-leaning sheaf of kindling tied by two obsidian collars, a charred splinter crown, a lit fuse with a teal-white spark; two obsidian stilt legs, one stick arm trailing back, one snapped stump",
+ "bones": {
+  "root": "bob, lean, knock-back",
+  "body": "the sheaf (sticks, crown, collars, core, shoulder shards); scale = the swell",
+  "head": "the fuse + spark (pivot at the fuse's root; scale = the fuse burning down)",
+  "legs_a": "left leg",
+  "legs_b": "right leg",
+  "tail": "both arms (pivot at the shoulders)"
+ },
+ "clip_map": {
+  "move@loop": "Approach (the sprint)",
+  "windup": "PRIMED: plant, swell, the fuse burns down; time-stretch it to fuse x telegraph_time; ends on the loaded pose",
+  "primed@loop": "optional: hold the loaded, trembling swell if PRIMED outlasts windup",
+  "attack": "the detonation when the fuse runs out (play on the despawn; the blast is the engine's VFX at fx_core)",
+  "death": "shot down before it blows: stagger, sputtering swell, a small burst",
+  "hit": "flinch",
+  "idle@loop": "bouncing on its toes"
+ },
+ "extra_sockets": {
+  "fx_fuse": "on head: the spark at the fuse tip (moves down as the fuse burns in windup)"
+ },
+ "move_cycle_m": 0.9,
+ "move_note": "rigid-group sprint: play move@loop at speed / move_cycle_m cycles per second (the Bomber runs at 1.1 x 4.6 m/s -> about 5.6 cycles/s, 11 strides a second: the frantic RUSH)",
+ "paint": {
+  "size": 512,
+  "texel_density_px_per_m": {
+   "median": 162.4,
+   "p10": 96.9,
+   "p90": 214.5
+  },
+  "coverage": 0.359
+ },
+ "skin": {
+  "vertices": 782,
+  "unweighted": 0,
+  "multi_bone": 0,
+  "per_bone": {
+   "root": 0,
+   "body": 582,
+   "head": 96,
+   "legs_a": 26,
+   "legs_b": 26,
+   "tail": 52
+  }
+ }
+}

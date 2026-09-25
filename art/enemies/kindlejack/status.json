@@ -1,0 +1,33 @@
+{
+ "asset": "kindlejack",
+ "kind": "enemy",
+ "tier": "swarm",
+ "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/enemies/kindlejack.glb",
+    "assets/models/enemies/kindlejack.meta.json",
+    "art/enemies/kindlejack/source/kindlejack.blend",
+    "art/enemies/kindlejack/textures/kindlejack_basecolor.png",
+    "art/enemies/kindlejack/textures/kindlejack_emissive.png",
+    "art/enemies/kindlejack/reports/kindlejack_review.png",
+    "art/enemies/kindlejack/reports/kindlejack_horde_review.png",
+    "art/enemies/kindlejack/reports/kindlejack_crowd.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/enemies/kindlejack.py (model, paint, GF_Swarm_v1 rig, 7 clips, export, validation, review and the horde read mixed with clinkers)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ },
+ "skeleton": "GF_Swarm_v1"
+}
