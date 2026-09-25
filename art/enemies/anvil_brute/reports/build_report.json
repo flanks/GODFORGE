@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 299162
+    "bytes": 297655
    },
    {
     "name": "anvil_brute_basecolor",
@@ -29,13 +29,64 @@
      1024
     ],
     "format": "png",
-    "bytes": 1039648
+    "bytes": 879492
    }
   ],
   "materials": [
    "M_anvil_brute"
   ],
   "sockets": {
+   "fx_mouth": {
+    "translation": [
+     -0.0,
+     1.6,
+     0.9
+    ],
+    "forward": [
+     -0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     -0.0,
+     1.45,
+     0.95
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     -0.0,
+     3.0,
+     -0.0
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     -0.0
+    ]
+   },
    "fx_core": {
     "translation": [
      -0.0,
@@ -58,57 +109,6 @@
      -0.0,
      1.62,
      0.3
-    ],
-    "forward": [
-     0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     -0.0,
-     1.0,
-     -0.0
-    ]
-   },
-   "attack_origin": {
-    "translation": [
-     -0.0,
-     1.45,
-     0.95
-    ],
-    "forward": [
-     0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     -0.0,
-     1.0,
-     -0.0
-    ]
-   },
-   "fx_mouth": {
-    "translation": [
-     -0.0,
-     1.6,
-     0.9
-    ],
-    "forward": [
-     -0.0,
-     -0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     -0.0
-    ]
-   },
-   "head_top": {
-    "translation": [
-     -0.0,
-     3.0,
-     -0.0
     ],
     "forward": [
      0.0,
@@ -199,28 +199,32 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 115.8,
-   "p10": 104.6,
-   "p90": 123.3
+   "median": 115.5,
+   "p10": 104.4,
+   "p90": 123.0
   },
-  "coverage": 0.463,
+  "coverage": 0.461,
   "zones": [
    "obsidian",
    "flesh",
    "iron",
    "iron_crk",
+   "iron_dark",
+   "iron_dark_crk",
    "crack",
    "ichor"
   ],
   "broad_zones": [
    "iron",
-   "iron_crk"
+   "iron_crk",
+   "iron_dark",
+   "iron_dark_crk"
   ],
   "decals": 18,
   "basecolor": "art/enemies/anvil_brute/textures/anvil_brute_basecolor.png",
   "emissive": "art/enemies/anvil_brute/textures/anvil_brute_emissive.png",
-  "emissive_texels": 182657,
-  "seconds": 30.2
+  "emissive_texels": 184229,
+  "seconds": 21.1
  },
  "clips": [
   {

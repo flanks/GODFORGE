@@ -13,6 +13,9 @@ clips, the GLB, validation and the review sheets.
 python tools/blender/gf_assets/gfa_validate.py assets/models/enemies/anvil_brute.glb
 ```
 
+The before/after sheet of the art review fixes comes from `enemies/anvil_brute_fix_sheet.py -- --before DIR`, where
+DIR holds the pre-fix GLB and `anvil_brute_34.png` (see its docstring).
+
 A full run takes about 100 s on the CPU. The fast loops:
 
 * `--preview [--state intact|cracked|stripped|all]` renders the geometry in flat zone colours (about 10 s).
@@ -28,6 +31,7 @@ A full run takes about 100 s on the CPU. The fast loops:
 | [reports/anvil_brute_scale.png](reports/anvil_brute_scale.png) | front lineup with the 2.2 m hero mannequin (rest and the loaded windup), five key poses through the game camera at true 1080p pixel size (1x and 3x), and the game-size silhouette |
 | [reports/anvil_brute_clips.png](reports/anvil_brute_clips.png) | the key poses of all eight clips |
 | [reports/anvil_brute_review.png](reports/anvil_brute_review.png) | the standard toolkit review: rest-pose turnaround, four frames of every clip, the in-game camera at 1x, 3x and as a silhouette, the textures and the palette |
+| [reports/anvil_brute_review_fix.png](reports/anvil_brute_review_fix.png) | the art review fixes, before and after: both GLBs through the game camera at true pixel size on the Cinder flagstones and on the spec floor, the L* band maps and the value metric, and the 3/4 view |
 
 ## Brief and content row
 
@@ -57,8 +61,8 @@ wind-up.
   - The other plates are two stepped iron domes on the right shoulder, an iron visor with one teal eye slit
     under a V of brow, and a cuff on each forearm (the heavier one on the slam arm).
   - The horn on one side and the pauldron on the other give the Unmade asymmetry, and the left arm is bigger.
-* **Three readable states.** Intact is grey plates. Cracked adds jagged gaps whose walls glow teal, with burnt
-  lips on the iron. Stripped leaves the black body, and a glowing ichor wound where the anvil sat, which reads
+* **Three readable states.** Intact is the plated look: the light anvil, the dark iron domes, visor and cuffs.
+  Cracked adds jagged gaps whose walls glow teal, with burnt lips on the iron. Stripped leaves the black body, and a glowing ichor wound where the anvil sat, which reads
   as "vulnerable now". The engine switches between them (see "Plate states" below).
 * **The verb: the overhead slam that launches the charge.**
   - `windup` rears up onto its legs with both fists clasped overhead, 3.8 m up, above the anvil. The height jump is the
@@ -68,12 +72,18 @@ wind-up.
 * **Value hierarchy at game size.**
   - The anvil's face is the one bright metal: `#737B87` with a hammer-struck band `#9AA2AD`, and the hardy
     and pritchel holes painted dark.
-  - The other plates are mid iron `#545A66`, from the row colour `#7A7F8C`, with forge-scale patches. They
-    use the broad-plane painter `gfa_brush`, whose broad value planes and brush strokes on the edges keep
+  - The rest of the anvil is iron `#545A66`, from the row colour `#7A7F8C`, with dark forge-scale patches. It
+    uses the broad-plane painter `gfa_brush`, whose broad value planes and brush strokes on the edges keep
     the iron from streaking.
-  - The obsidian is `#1A1720`. Its up-facing planes are lifted to a cool `#444053`, so the dark body separates
-    from the warm `#3A2C24` Cinder floor (the Slag King lesson). Its sharp creases carry bright broken strokes.
-  - The flesh is a dark plum `#26202C` with a faint wet sheen.
+  - The other plates (the pauldron domes, the visor and the cuffs) are iron shadow `#181A20` in broad value
+    planes, with ONE brushy light stroke `#7E8694` on the edge that faces up: the cuff's upper rim, the visor's
+    brow V and crown, and the lit arc of the big dome's rim.
+  - The obsidian is `#1A1720` and the flesh a dark plum `#1B1721` with a faint wet sheen. Their up-facing planes
+    (the shoulders, the back, the arms, the thighs) are painted in the faction's obsidian light `#4B4658` and a
+    step above it, with a glassy sheen on some facets. The sides and undersides stay dark, so every form has two
+    values and few mid values, which are the floor's own. Light crest strokes (`#9896A0` on the obsidian,
+    `#8E8998` on the flesh) run along the trapezius ridge under the anvil, the left shoulder cap, the upper arms,
+    the forearms above the cuffs and the thighs, and the obsidian's sharp creases carry broken light strokes.
 * **Emissive budget.** Teal `#2FBFA8` is used only in these places:
   - the eye slit and the maw;
   - the weld round the anvil's waist and six short fissures radiating from it;
@@ -83,6 +93,36 @@ wind-up.
 
   Mint `#B8FFE8` appears only as the core of those lines. There are no player colours and no red-white: the
   engine draws the charge telegraph.
+
+## Art review fixes (6.5/10)
+
+The Cinder bestiary art review scored the brute 6.5/10 with two must-fix items. Both are paint fixes: the mesh,
+rig, clips, sockets, plate states and file names are unchanged.
+[reports/anvil_brute_review_fix.png](reports/anvil_brute_review_fix.png) shows before and after.
+
+* **Floor separation.** The plum-obsidian body melted into the mid-dark Cinder floor, carried only by the ink and
+  the rim light. The up-facing planes of the shoulders, back, arms and thighs are now painted in obsidian light
+  `#4B4658` and a step above it, with a narrow brushy border to the dark sides. Light crest strokes, 2-3 game
+  pixels wide, run along the crests of those forms, as in the clinker fix.
+* **The dark plates.** The cuffs, shoulder domes and visor were flat mid-grey blocks (`#8A909C` in the flat
+  preview) that read as untextured primitives and competed with the anvil. They are a separate paint zone,
+  `iron_dark`, in iron shadow with one brushy top-edge stroke. The anvil face is the only bright metal.
+
+The value metric repeats the art review's. It covers the creature's pixels through the game camera at true pixel
+size and takes the mean of three poses (idle facing the camera, idle 3/4, the loaded windup):
+
+| | Before | After |
+|---|---|---|
+| Median L* | 29.1 | 32.5 |
+| Within ±7 L* of the spec floor `#3A2C24` | 34 % | 12 % |
+| Within ±7 L* of the mid flagstone `#603320` | 34 % | 16 % |
+
+On the idle pose facing the camera, the review measured L* 29 and 36 % / 37 %. The sheet's own before render
+gives the same numbers, and the after render gives L* 35.8 and 11 % / 17 %. The loaded windup stays the darkest
+pose (median L* 25): reared up, it shows the camera the dark chest front and the undersides.
+
+The review's two should-fix items are open: the anvil's plan-view read (a pinched waist and a stepped heel seen
+from above), and the fists that sink 0.30 m into the ground on the slam impact and 0.45 m in death.
 
 ## Plate states (the engine contract)
 
@@ -179,7 +219,7 @@ meta.json `clip_aliases` maps the brief's names: `walk@loop`, `slam_windup`, `sl
 | Triangles | 5,804 (elite budget 4,000-8,000). About 1,160 are the intact plates and 2,030 the cracked copies and their crack walls. |
 | Textures | base colour 1024² and emissive 1024² (PNG, embedded); one material `M_anvil_brute` |
 | UVs | 46 % coverage, texel density about 115 px/m |
-| GLB | about 2.2 MB, uncompressed (bevy_gltf 0.20 safe). `gfa_validate` reports OK with no warnings. |
+| GLB | about 2.0 MB, uncompressed (bevy_gltf 0.20 safe). `gfa_validate` reports OK with no warnings. |
 | Bones and clips | 44 bones and 8 clips. Every clip keys all 44 joints. |
 
 ## Files
@@ -191,6 +231,7 @@ meta.json `clip_aliases` maps the brief's names: `walk@loop`, `slam_windup`, `sl
 | `textures/anvil_brute_basecolor.png`, `_emissive.png` | yes (LFS) |
 | `reports/*.png`, `reports/build_report.json`, `status.json` | yes |
 | `work/` | no (local previews and review frames) |
+| `tools/blender/gf_assets/enemies/anvil_brute_fix_sheet.py` | the before/after sheet of the art review fixes (imports both GLBs) |
 | `tools/blender/gf_assets/enemies/anvil_brute.py` | the build script. The cracked plates come from `crack_solid()` (an EXACT boolean with a jagged polyline prism whose walls keep their own material), which can be reused for the other plated Brute rows (`barkhide_aurochs`, `nightglass_lancer`). |
 
 ## Open points for the user and the engine

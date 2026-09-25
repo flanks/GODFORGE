@@ -61,9 +61,10 @@ import gfa_shell as S  # noqa: E402
 KEY, KIND, TIER = "anvil_brute", "enemy", "elite"
 RIG_NAME = "GF_AnvilBrute_v1"
 
-ZONES = ["obsidian", "flesh", "iron", "iron_crk", "crack", "ichor"]
-PREVIEW = {"obsidian": "#2A2632", "flesh": "#24222A", "iron": "#8A909C", "iron_crk": "#7C8290", "crack": "#2FBFA8",
-           "ichor": "#3FE0C4"}
+# iron = the anvil (the one bright metal); iron_dark = the other plates (pauldron domes, visor, cuffs) in iron shadow
+ZONES = ["obsidian", "flesh", "iron", "iron_crk", "iron_dark", "iron_dark_crk", "crack", "ichor"]
+PREVIEW = {"obsidian": "#2A2632", "flesh": "#24222A", "iron": "#8A909C", "iron_crk": "#7C8290", "iron_dark": "#3A3F4A",
+           "iron_dark_crk": "#343842", "crack": "#2FBFA8", "ichor": "#3FE0C4"}
 
 # ---- landmarks (rest pose = the idle stance: hunched, knuckles planted; metres, faces -Y, +X = its LEFT) -------
 LM = {
@@ -89,6 +90,8 @@ ANVIL_C = Vector((0.03, 0.12, 2.4))
 ANVIL_M = (Matrix.Translation(ANVIL_C) @ Matrix.Rotation(math.radians(-13), 4, "Z")
            @ Matrix.Rotation(math.radians(-7), 4, "Y") @ Matrix.Rotation(math.radians(13), 4, "X"))
 CORE_POS = Vector((0.0, 0.0, 1.72))          # the ichor heart inside the hump (fx_core: glow, death burst)
+GAME_VIEW = Vector((0.0, -math.cos(math.radians(55.0)), math.sin(math.radians(55.0))))   # toward the game camera
+RIM_LIT = Vector((-0.55, 0.25, 0.8)).normalized()   # the lit upper edge of a plate: toward the key light, up, back
 
 
 def P_(k):
@@ -304,6 +307,9 @@ FRAGS = {}
 PLATE_C = {}
 PLATE_OUT = {}
 CRACK_DECALS = []          # (lines, frame, width) of every crack, for the glow decals
+CRESTS = []                # painted crest strokes on the muscles and obsidian masses (crest_pass), filled while modelling
+EDGE_SKIP = set()          # part ids that get no edge strokes (edge_pass)
+PLATE_PIDS = {}            # plate -> {"intact": [part ids], "crk": [part ids of the cracked surfaces]}
 
 
 def plate_bones():
@@ -317,9 +323,9 @@ BONE_NAMES = [b for b, _ in RD.HERO_CORE] + plate_bones()
 
 
 def add_plate(a, name, parts, lines, frame, gap, seeds, out_dir, inset=0.975, sink=0.012, nudge=0.008, tilt=1.2,
-              seed=0):
-    """Add one plate twice: the intact parts on plate_<name>, and the cracked fragments (surface zone iron_crk,
-    crack walls zone crack) on plate_<name>_crk_<n>. parts: [bmesh] (closed solids, merged for the cut).
+              seed=0, zone="iron"):
+    """Add one plate twice: the intact parts (zone `zone`) on plate_<name>, and the cracked fragments (surface zone
+    <zone>_crk, crack walls zone crack) on plate_<name>_crk_<n>. parts: [bmesh] (closed solids, merged for the cut).
     out_dir: the plate's outward direction (world); the cracked copy is scaled by `inset` about the plate centre
     and sunk `sink` m inward, so the intact plate hides it; fragments are nudged `nudge` m apart and tilted up
     to `tilt` degrees."""
@@ -332,8 +338,8 @@ def add_plate(a, name, parts, lines, frame, gap, seeds, out_dir, inset=0.975, si
     PLATE_OUT[name] = out_dir
     frags = crack_solid(solid, lines, frame, gap, seeds)
     CRACK_DECALS.append((lines, frame, gap))
-    for p in parts:
-        a.add(p, "iron", bone="plate_" + name, name="plate_" + name, shading="auto")
+    pids = [a.add(p, zone, bone="plate_" + name, name="plate_" + name, shading="auto") for p in parts]
+    crk = []
     info = []
     for k, fr in enumerate(frags):
         fc = fr["centroid"]
@@ -345,18 +351,101 @@ def add_plate(a, name, parts, lines, frame, gap, seeds, out_dir, inset=0.975, si
         T = (Matrix.Translation(cen - out_dir * sink) @ Matrix.Scale(inset, 4) @ Matrix.Translation(-cen))
         Mf = Matrix.Translation(away * nudge) @ Matrix.Translation(fc) @ R @ Matrix.Translation(-fc)
         bone = "plate_%s_crk_%d" % (name, k + 1)
-        for key_, zone in (("surface", "iron_crk"), ("wall", "crack")):
+        for key_, zone_ in (("surface", zone + "_crk"), ("wall", "crack")):
             b = fr[key_]
             if not len(b.faces):
                 b.free()
                 continue
             M.xform(b, matrix=Mf @ T)
-            a.add(b, zone, bone=bone, name="plate_%s_crk" % name, shading="auto" if zone == "iron_crk" else "flat")
+            pid = a.add(b, zone_, bone=bone, name="plate_%s_crk" % name, shading="flat" if zone_ == "crack" else "auto")
+            if zone_ != "crack":
+                crk.append(pid)
         c2 = Mf @ T @ fc
         o2 = (out_dir + away * 0.6).normalized()
         info.append((c2, o2))
     FRAGS[name] = info
+    PLATE_PIDS[name] = {"intact": pids, "crk": crk}
     solid.free()
+    return pids
+
+
+# ---- crest strokes (art review fix: floor separation) -----------------------------------------------------------
+# A crest stroke is a hand-painted light line, 2-3 game pixels wide at its middle, along the crest of a form that the
+# 55 deg camera sees (the outer ridge of a muscle, the front ridge of the trapezius, the shoulder cap, the lit arc of
+# the pauldron's rim). It frames the dark mass against the mid-dark Cinder floor, like the clinker's scute-lip
+# strokes. Each stroke is a 3-D polyline on
+# its part's surface plus the direction the crest faces. crest_pass() paints it onto the texels of its OWN parts
+# only (projected along that direction, depth-windowed), tapered at both ends, with a brushy width and one break.
+
+def add_crest(pids, pts, facing, width=0.03, kind="flesh", gap=True, seed=0):
+    CRESTS.append({"parts": list(pids), "pts": [tuple(p) for p in pts], "dir": tuple(Vector(facing).normalized()),
+                   "width": width, "kind": kind, "gap": gap, "seed": seed})
+
+
+def tube_crest(p0, p1, prof, bow, facing, t0, t1, n=10):
+    """Points along the crest of a muscle() tube (p0, p1, prof, bow) on the side facing `facing` (made
+    perpendicular to the tube at every point), from t0 to t1."""
+    p0, p1, bw, F = Vector(p0), Vector(p1), Vector(bow), Vector(facing).normalized()
+    ts, rs = [t for t, _ in prof], [r for _, r in prof]
+
+    def cen(t):
+        return p0.lerp(p1, t) + bw * math.sin(math.pi * t)
+
+    def rad(t):
+        for i in range(len(ts) - 1):
+            if ts[i] <= t <= ts[i + 1]:
+                return rs[i] + (rs[i + 1] - rs[i]) * (t - ts[i]) / max(1e-6, ts[i + 1] - ts[i])
+        return rs[-1]
+    out = []
+    for i in range(n + 1):
+        t = t0 + (t1 - t0) * i / n
+        tan = (cen(min(1.0, t + 0.01)) - cen(max(0.0, t - 0.01))).normalized()
+        d = (F - tan * F.dot(tan)).normalized()
+        out.append(cen(t) + d * rad(t))
+    return out
+
+
+def blob_crest(center, radii, rot, d0, d1, n=10):
+    """Points on a blob() ellipsoid (before its noise) along the arc of directions d0 -> d1 (world)."""
+    R = M.trs(rot=rot).to_3x3()
+    Ri = R.inverted()
+    a, b = Vector(d0).normalized(), Vector(d1).normalized()
+    out = []
+    for i in range(n + 1):
+        d = Ri @ a.slerp(b, i / n)
+        s = 1.0 / math.sqrt(sum((d[k] / radii[k]) ** 2 for k in range(3)))
+        out.append(Vector(center) + R @ (d * s))
+    return out
+
+
+def blob_ridge(center, radii, rot, dir_yz, x0=-0.85, x1=0.85, n=14):
+    """Points along a blob() ellipsoid (before its noise) across its local X, at the local (y, z) direction dir_yz:
+    a ridge running the whole width of the mass (x0..x1 of the X radius)."""
+    R = M.trs(rot=rot).to_3x3()
+    u, v = Vector((dir_yz[0] / radii[1], dir_yz[1] / radii[2])).normalized()
+    out = []
+    for i in range(n + 1):
+        x = (x0 + (x1 - x0) * i / n) * radii[0]
+        c = math.sqrt(max(0.0, 1.0 - (x / radii[0]) ** 2))
+        out.append(Vector(center) + R @ Vector((x, radii[1] * u * c, radii[2] * v * c)))
+    return out
+
+
+def rim_arc(fn_rim, view_up, share=0.42, n=16):
+    """The arc of a closed rim fn_rim(u) (u in 0..1 -> world point) that reaches furthest along view_up: the top
+    `share` of the rim's range along it, as one polyline."""
+    us = [i / 180.0 for i in range(180)]
+    hs = [fn_rim(u).dot(view_up) for u in us]
+    lo, hi = min(hs), max(hs)
+    keep = [h >= hi - share * (hi - lo) for h in hs]
+    top = max(range(180), key=lambda i: hs[i])
+    i0 = top
+    while keep[(i0 - 1) % 180] and (i0 - 1) % 180 != top:
+        i0 -= 1
+    i1 = top
+    while keep[(i1 + 1) % 180] and (i1 + 1) % 180 != top:
+        i1 += 1
+    return [fn_rim(((i0 + (i1 - i0) * k / n) % 180) / 180.0) for k in range(n + 1)]
 
 
 # ---- the model ----------------------------------------------------------------------------------------------------
@@ -369,8 +458,12 @@ def build_body(a):
     a.add(blob((0.02, 0.04, 1.9), (0.62, 0.44, 0.3), rot=(8, 0, 5), sub=2, noise=0.04, freq=2.6, seed=2, taper=-0.15),
           "obsidian", bone="spine_03", name="hump", shading="flat")
     # the trapezius ridge that carries the anvil: a wide flat mass from shoulder to shoulder
-    a.add(blob((0.0, -0.06, 1.98), (0.7, 0.3, 0.18), rot=(-10, 0, 3), sub=2, noise=0.03, freq=3.0, seed=5),
-          "obsidian", bone="spine_03", name="traps", shading="flat")
+    tr_c, tr_r, tr_rot = (0.0, -0.06, 1.98), (0.7, 0.3, 0.18), (-10, 0, 3)
+    pid = a.add(blob(tr_c, tr_r, rot=tr_rot, sub=2, noise=0.03, freq=3.0, seed=5),
+                "obsidian", bone="spine_03", name="traps", shading="flat")
+    # review fix: a crest stroke along its front ridge, the shoulder line in front of the anvil
+    add_crest([pid], blob_ridge(tr_c, tr_r, tr_rot, (-0.62, 0.78), -0.8, 0.8, n=16),
+              (0.0, -0.62, 0.78), width=0.065, kind="obsidian", seed=1)
     a.add(blob((0.0, 0.02, 1.27), (0.47, 0.41, 0.32), rot=(-14, 0, 0), sub=2, noise=0.03, freq=3.0, seed=3),
           "obsidian", bone="spine_01", name="belly", shading="flat")
     a.add(blob((0.0, 0.16, 0.98), (0.41, 0.34, 0.25), sub=1, noise=0.02, freq=3.0, seed=4),
@@ -494,14 +587,21 @@ def build_plates(a):
     # --- the right pauldron ----------------------------------------------------------------------------------
     parts, fr = pauldron_parts()
     lines = [_jag(random.Random(9), (-0.5, 0.04), (0.5, -0.04), 4, 0.04)]
-    add_plate(a, "pauldron", parts, lines, fr, 0.045, [(0.0, -0.2), (0.0, 0.2)],
-              out_dir=fr.to_3x3() @ Vector((0, 0, 1)), inset=0.965, sink=0.012, nudge=0.008, tilt=1.2, seed=5)
+    pids = add_plate(a, "pauldron", parts, lines, fr, 0.045, [(0.0, -0.2), (0.0, 0.2)],
+                     out_dir=fr.to_3x3() @ Vector((0, 0, 1)), inset=0.965, sink=0.012, nudge=0.008, tilt=1.2, seed=5,
+                     zone="iron_dark")
+    # ONE top-edge stroke on the pauldron: the arc of the big dome's rim that is highest on the game screen (the
+    # crease strokes of both domes made concentric arcs - a target - or only a short arc near the neck)
+    EDGE_SKIP.update(pids + PLATE_PIDS["pauldron"]["crk"])
+    d1 = S.cap_fn(0.34, 0.15, 0, 360, sx=1.08, sy=1.0, matrix=fr)
+    arc = rim_arc(lambda u: Vector(d1(u, 0.06)), RIM_LIT, share=0.5)
+    add_crest([pids[0]] + PLATE_PIDS["pauldron"]["crk"], arc, GAME_VIEW, width=0.05, kind="iron", gap=False, seed=6)
     # --- the visor -------------------------------------------------------------------------------------------
     parts, hc = helm_parts()
     hf = frame_z(hc, (0, -1.0, 0.0), (1, 0, 0))              # local X = the brute's left, Y = up, Z = forward
     lines = [_jag(random.Random(12), (0.025, -0.5), (-0.03, 0.5), 5, 0.028)]
     add_plate(a, "helm", parts, lines, hf, 0.032, [(-0.15, 0.0), (0.15, 0.0)], out_dir=(0, -0.7, 0.7), inset=0.95,
-              sink=0.0, nudge=0.004, tilt=0.6, seed=8)
+              sink=0.0, nudge=0.004, tilt=0.6, seed=8, zone="iron_dark")
     # --- the forearm cuffs -------------------------------------------------------------------------------------
     for side in ("L", "R"):
         parts, fr, c, ax = cuff_parts(side)
@@ -510,7 +610,7 @@ def build_plates(a):
         cf = frame_z(c, (sx, 0.0, 0.0), tuple(ax))
         lines = [_jag(random.Random(20 + sx), (-0.4, 0.02), (0.4, -0.02), 4, 0.03)]
         add_plate(a, "cuff_" + side, parts, lines, cf, 0.038, [(0.0, 0.3), (0.0, -0.3)],
-                  out_dir=(sx, -0.4, 0.3), inset=0.93, sink=0.0, nudge=0.004, tilt=0.5, seed=30 + sx)
+                  out_dir=(sx, -0.4, 0.3), inset=0.93, sink=0.0, nudge=0.004, tilt=0.5, seed=30 + sx, zone="iron_dark")
 
 
 def _jag(rng, p0, p1, n, amp):
@@ -541,12 +641,27 @@ def build_arm(a, side):
     sh, el, wr, tip = P_("shoulder_" + side), P_("elbow_" + side), P_("wrist_" + side), P_("hand_%s_tip" % side)
     k = 1.0 if big else 0.87
     # deltoid mass + upper arm (flesh), forearm thickening toward the fist (gorilla)
-    a.add(blob(sh + Vector((sx * 0.08, -0.02, 0.0)), (0.27 * k, 0.26 * k, 0.25 * k), sub=2, noise=0.02, seed=40 + sx),
-          "flesh", bone="upperarm_" + side, name="deltoid", shading="smooth")
-    a.add(muscle(sh, el, [(0.0, 0.2 * k), (0.3, 0.24 * k), (0.55, 0.215 * k), (0.85, 0.16 * k), (1.0, 0.15 * k)],
-                 bow=(sx * 0.05, -0.04, 0.0)), "flesh", bone="upperarm_" + side, name="upperarm", shading="smooth")
-    a.add(muscle(el, wr, [(0.0, 0.15 * k), (0.22, 0.205 * k), (0.5, 0.215 * k), (0.8, 0.19 * k), (1.0, 0.165 * k)],
-                 bow=(sx * 0.03, -0.03, 0.0)), "flesh", bone="lowerarm_" + side, name="forearm", shading="smooth")
+    dc, dr = sh + Vector((sx * 0.08, -0.02, 0.0)), (0.27 * k, 0.26 * k, 0.25 * k)
+    pid_d = a.add(blob(dc, dr, sub=2, noise=0.02, seed=40 + sx), "flesh", bone="upperarm_" + side, name="deltoid",
+                  shading="smooth")
+    up_prof, up_bow = [(0.0, 0.2 * k), (0.3, 0.24 * k), (0.55, 0.215 * k), (0.85, 0.16 * k), (1.0, 0.15 * k)], \
+        (sx * 0.05, -0.04, 0.0)
+    pid_u = a.add(muscle(sh, el, up_prof, bow=up_bow), "flesh", bone="upperarm_" + side, name="upperarm",
+                  shading="smooth")
+    fa_prof, fa_bow = [(0.0, 0.15 * k), (0.22, 0.205 * k), (0.5, 0.215 * k), (0.8, 0.19 * k), (1.0, 0.165 * k)], \
+        (sx * 0.03, -0.03, 0.0)
+    pid_f = a.add(muscle(el, wr, fa_prof, bow=fa_bow), "flesh", bone="lowerarm_" + side, name="forearm",
+                  shading="smooth")
+    # review fix: crest strokes on the muscles the game camera sees - the shoulder cap (the right one is under the
+    # pauldron), the outer ridge of the upper arm, and the forearm between the elbow and the cuff
+    if big:
+        add_crest([pid_d], blob_crest(dc, dr, (0, 0, 0), (sx * 0.15, -0.3, 0.94), (sx * 0.96, -0.12, 0.25), n=10),
+                  (sx * 0.62, -0.28, 0.73), width=0.06, seed=10 + sx)
+    add_crest([pid_u, pid_d], tube_crest(sh, el, up_prof, up_bow, (sx * 0.8, -0.32, 0.5), 0.14, 0.9),
+              (sx * 0.8, -0.32, 0.5), width=0.06, seed=20 + sx)
+    cuff_t0 = 0.62 - (0.18 if big else 0.14) / (wr - el).length
+    add_crest([pid_f], tube_crest(el, wr, fa_prof, fa_bow, (sx * 0.72, -0.5, 0.48), 0.03, cuff_t0 - 0.02, n=6),
+              (sx * 0.72, -0.5, 0.48), width=0.055, gap=False, seed=30 + sx)
     # the fist: a lumpy obsidian block with a knuckle row where it meets the ground, crystals over the knuckles
     fc = wr.lerp(tip, 0.58)
     for b_ in fist_parts(wr, tip, sx, k, 50 + sx):
@@ -575,8 +690,11 @@ def build_arm(a, side):
 def build_leg(a, side):
     sx = 1 if side == "L" else -1
     hip, kn, an, ball = (P_(k + "_" + side) for k in ("hip", "knee", "ankle", "ball"))
-    a.add(muscle(hip, kn, [(0.0, 0.24), (0.35, 0.27), (0.7, 0.22), (1.0, 0.17)], bow=(sx * 0.03, 0.0, 0.0)), "flesh",
-          bone="thigh_" + side, name="thigh", shading="smooth")
+    th_prof, th_bow = [(0.0, 0.24), (0.35, 0.27), (0.7, 0.22), (1.0, 0.17)], (sx * 0.03, 0.0, 0.0)
+    pid = a.add(muscle(hip, kn, th_prof, bow=th_bow), "flesh", bone="thigh_" + side, name="thigh", shading="smooth")
+    # review fix: a crest stroke down the front-outer ridge of the thigh
+    add_crest([pid], tube_crest(hip, kn, th_prof, th_bow, (sx * 0.55, -0.55, 0.62), 0.22, 0.88, n=8),
+              (sx * 0.55, -0.55, 0.62), width=0.055, seed=40 + sx)
     a.add(muscle(kn, an, [(0.0, 0.16), (0.3, 0.19), (0.7, 0.15), (1.0, 0.13)], bow=(0.0, 0.035, 0.0)), "flesh",
           bone="shin_" + side, name="shin", shading="smooth")
     out = Vector((sx * 1.0, -0.2, 0.0)).normalized()
@@ -598,6 +716,9 @@ def build_mesh(col):
     PLATE_C.clear()
     PLATE_OUT.clear()
     CRACK_DECALS.clear()
+    CRESTS.clear()
+    EDGE_SKIP.clear()
+    PLATE_PIDS.clear()
     a = M.Assembly(KEY + "_mesh", ZONES, bones=BONE_NAMES)
     build_body(a)
     build_head(a)
@@ -1016,16 +1137,46 @@ def build_clips(arm, mesh):
 
 
 # ---- paint (THE UNMADE, ENEMIES.md section 4) --------------------------------------------------------------------
-# Value hierarchy at game size: the anvil's polished face is the ONE bright metal; the other plates are mid iron;
-# the body is black obsidian whose up-facing planes are lifted to a cool violet-grey (so it separates from the warm
-# #3A2C24 Cinder floor) and whose knapped creases carry bright broken strokes; teal only in the eye slit, the maw,
-# the ichor welds where iron is fused into flesh, and (cracked) the crack walls.
+# Value hierarchy at game size: the anvil's polished face is the ONE bright metal; the other plates (pauldron domes,
+# visor, cuffs) are dark iron in the iron-shadow range with one brushy light stroke on their top edge; the body is
+# black obsidian and dark plum flesh whose up-facing planes are lifted to the faction's obsidian light #4B4658 and
+# whose crests carry light hand-painted strokes (so it separates from the mid-dark Cinder floor, whose flagstones
+# run from L* 6 in the gaps to L* 44); teal only in the eye slit, the maw, the ichor welds where iron is fused into
+# flesh, and (cracked) the crack walls.
+#
+# Art review fixes (6.5/10, 2026-09-25; before / after: reports/anvil_brute_review_fix.png):
+#   * floor separation - the plum-obsidian body sat at a median L* 29, with 36-37 % of its pixels within +-7 L* of
+#     the spec floor and of the mid flagstones. The up-facing planes of the obsidian AND the flesh (shoulders, back,
+#     arms, thighs) are now painted in obsidian light #4B4658 and a step above it (lift_pass), with a narrow brushy
+#     border, and the sides and undersides stay dark (the flesh base went from #26202C to #1B1721): two values per
+#     form, and few mid values, which are the floor's own. Light crest strokes (CRESTS, crest_pass) run along the
+#     trapezius ridge under the anvil, the left shoulder cap, the upper arms, the forearms above the cuffs and the
+#     thighs, and the obsidian's own creases get strokes weighted toward the up-facing side (edge_pass; the
+#     painter's own edge strokes are off for these zones, as in the Slag King fix);
+#   * dark plates - the cuffs, pauldron domes and visor were a flat mid grey (#8A909C) that read as untextured
+#     primitives and competed with the anvil. They are a separate zone, iron_dark: broad value planes in iron shadow
+#     and ONE brushy light stroke on the edge that faces up (the cuff's upper rim, the brow V of the visor: EDGE;
+#     the pauldron: the lit arc of the big dome's rim, a crest stroke), so the anvil face stays the only bright metal.
+
+
+def mix_hex(a, b, t):
+    ca, cb = C.hex_rgb(a), C.hex_rgb(b)
+    return "#" + "".join("%02X" % int(round(255 * (x + (y - x) * t))) for x, y in zip(ca, cb))
+
+
+OBS_LIGHT = "#4B4658"                                                  # faction obsidian light: the top planes
+CREST_OBS = mix_hex(mix_hex(OBS_LIGHT, "#FFFFFF", 0.45), "#7A7F8C", 0.12)  # the crest strokes (row colour tint)
+CREST_FLESH = mix_hex(CREST_OBS, "#6E6282", 0.25)                          # the same, a touch of plum on the flesh
+CREST_HALO = mix_hex(OBS_LIGHT, CREST_OBS, 0.35)                           # the soft mid tone the stroke sits in
+FLESH = "#1B1721"                                                      # fused flesh: dark plum (the sides)
+DARK_IRON = {"base": "#181A20", "shadow": "#08090B", "light": "#272A32"}   # iron shadow: cuffs, domes, visor
+DARK_EDGE = "#7E8694"                                                  # their one top-edge stroke
 
 PALETTE = [  # (name, hex) for the review sheets
-    ("obsidian", "#1A1720"), ("obsidian top", "#444053"), ("obsidian edge", "#8A8298"), ("fused flesh", "#26202C"),
-    ("flesh sheen", "#6E6282"), ("anvil iron", "#545A66"), ("iron light", "#858D9A"), ("forge scale", "#343842"),
-    ("polished face", "#9AA2AD"), ("iron shadow", "#1E2128"), ("ichor", "#1F8F7E"), ("unmade teal", "#2FBFA8"),
-    ("mint core", "#B8FFE8"),
+    ("obsidian", "#1A1720"), ("obsidian light", OBS_LIGHT), ("crest stroke", CREST_OBS), ("obsidian edge", "#8A8298"),
+    ("fused flesh", FLESH), ("anvil iron", "#545A66"), ("polished face", "#737B87"), ("striking band", "#9AA2AD"),
+    ("plate iron", DARK_IRON["base"]), ("plate edge", DARK_EDGE), ("iron shadow", "#1E2128"), ("ichor", "#1F8F7E"),
+    ("unmade teal", "#2FBFA8"), ("mint core", "#B8FFE8"),
 ]
 TEAL = {"color": "#2FBFA8", "core": "#B8FFE8"}
 TEAL_DIM = {"color": "#1F8F7E", "core": "#2FBFA8"}
@@ -1037,20 +1188,27 @@ def recipes():
                   brush_freq=3.0, cavity=0.85, cavity_width=0.012, ao=0.65, ao_range=(0.2, 0.6), edge=0.8,
                   edge_width=0.012, edge_breakup=0.3,
                   gradient={"axis": (0, 0, -1), "range": (-1.6, -0.4), "color": "#2A2D36", "amount": 0.45})
+    # the other plates: iron shadow, broad planes only (their one top-edge stroke: edge_pass, the pauldron crest_pass)
+    dark = P.zone(base=DARK_IRON["base"], shadow=DARK_IRON["shadow"], light=DARK_IRON["light"], planes=0.08,
+                  parts=0.05, brush=0.03, brush_freq=3.0, cavity=0.8, cavity_width=0.012, ao=0.6, ao_range=(0.2, 0.6),
+                  edge=0.0, gradient={"axis": (0, 0, -1), "range": (-1.6, -0.5), "color": "shadow", "amount": 0.35})
     return {
+        # edge=0 on obsidian and flesh: their strokes are painted after the top-plane lift (edge_pass, crest_pass)
         "obsidian": P.faction_zone("unmade", "obsidian", light="#8A8298", planes=0.14, parts=0.06, brush=0.05,
-                                   brush_freq=3.0, edge=1.0, edge_width=0.014, edge_breakup=0.42, cavity=0.8,
-                                   cavity_width=0.012, ao=0.7, ao_range=(0.2, 0.6),
+                                   brush_freq=3.0, edge=0.0, cavity=0.8, cavity_width=0.012, ao=0.7,
+                                   ao_range=(0.2, 0.6),
                                    gradient={"axis": (0, 0, -1), "range": (-1.2, -0.1), "color": "shadow",
                                              "amount": 0.4}),
-        "flesh": P.faction_zone("unmade", "obsidian_wet", base="#26202C", shadow="#0C0A10", light="#6E6282",
+        "flesh": P.faction_zone("unmade", "obsidian_wet", base=FLESH, shadow="#0C0A10", light="#6E6282",
                                 planes=0.05, parts=0.05,
-                                brush=0.06, brush_freq=3.0, edge=0.3, edge_width=0.01, cavity=0.7, cavity_width=0.012,
+                                brush=0.06, brush_freq=3.0, edge=0.0, cavity=0.7, cavity_width=0.012,
                                 ao=0.75, ao_range=(0.2, 0.6), stroke=(0.0, 0.0, -1.0), stroke_amount=0.1,
                                 stroke_freq=(26.0, 3.0),
                                 gradient={"axis": (0, 0, -1), "range": (-1.2, -0.2), "color": "shadow", "amount": 0.35}),
         "iron": iron,
         "iron_crk": dict(iron),
+        "iron_dark": dark,
+        "iron_dark_crk": dict(dark),
         "crack": P.faction_zone("unmade", "ichor", glow=True,
                                 emit={"color": "#1F8F7E", "hot": "#2FBFA8", "core": "#B8FFE8", "mode": "flat",
                                       "base_mix": 0.2}),
@@ -1065,7 +1223,10 @@ def broad_recipes():
     b = B.broad(levels=(-0.3, -0.12, 0.04, 0.16), wobble=0.28, wobble_freq=5.0, inner=0.03, stroke=0.85,
                 stroke_width=0.013, stroke_len=0.16, stroke_cover=0.55, glint=0.35, glint_color="#B4BBC6",
                 edge_min_angle=20.0)
-    return {"iron": b, "iron_crk": dict(b)}
+    # the dark plates: broad planes, no painter strokes on every bevel (one top-edge stroke comes from edge_pass)
+    d = B.broad(levels=(-0.25, -0.08, 0.08, 0.24), wobble=0.28, wobble_freq=5.0, inner=0.03, stroke=0.0, glint=0.0,
+                edge_min_angle=20.0)
+    return {"iron": b, "iron_crk": dict(b), "iron_dark": d, "iron_dark_crk": dict(d)}
 
 
 def frame_at(origin, normal, up=(0, 0, 1)):
@@ -1085,8 +1246,8 @@ def decals():
     # the cracks of every cracked plate: a burnt lip, a teal line, a mint core - on the fragments and their walls
     for lines, fr, gap in CRACK_DECALS:
         w = gap + 0.035
-        out.append(P.decal_lines(lines, fr, w, zones=["iron_crk", "crack"], color="#2FBFA8", rim="#0B0D12",
-                                 rim_width=w * 2.2, emit=TEAL, depth=(-1.0, 1.0), facing=-1.1))
+        out.append(P.decal_lines(lines, fr, w, zones=["iron_crk", "iron_dark_crk", "crack"], color="#2FBFA8",
+                                 rim="#0B0D12", rim_width=w * 2.2, emit=TEAL, depth=(-1.0, 1.0), facing=-1.1))
     # the anvil: hardy (square) and pritchel (round) holes near the heel, painted dark on the polished face
     hardy = [[(-0.44, -0.035), (-0.44, 0.035)]]
     out.append(P.decal_lines(hardy, ANVIL_M, 0.07, zones=["iron", "iron_crk"], color="#15171C", rim=None,
@@ -1123,30 +1284,213 @@ def decals():
     return out
 
 
-# the top-plane lift and the anvil polish: a painted pass between the zone paint and the decals
-LIFT = {"obsidian": ("#444053", 0.8), "flesh": ("#3A3244", 0.6)}
+# the painted passes between the zone paint and the decals: the top-plane lift, the edge and crest strokes, the anvil
+# polish and the wound. gfa_paint / gfa_brush stay unchanged (other assets build with them): paint_mesh() wraps their
+# decal step for this build's one paint call.
+LIFT = {"obsidian": 1.0, "flesh": 1.0}           # zone -> amount of the lift to OBS_LIGHT on fully up-facing planes
+SHEEN = {"obsidian": ("#625C72", 0.5, 0.7), "flesh": ("#5A5268", 1.0, 0.45)}   # zone -> (colour, share of facets, amount)
+# edge strokes on a part's OWN convex creases (a neighbouring part's edge never paints a halo onto it), weighted
+# toward the up-facing side of the crease: width = half-width at mid wobble (m), breakup = the share the brush skips
+EDGE = {
+    "obsidian": {"color": "#8A8298", "width": 0.014, "breakup": 0.3, "up": (0.05, 0.45), "amount": 0.95,
+                 "min_angle": 34.0},
+    # the dark plates: ONE stroke, on the edge that faces up (the cuff's upper rim, the V of the brow and the visor's
+    # crown); the octagon's side creases and the lower rims face sideways or down and stay dark. The pauldron domes
+    # are skipped here (EDGE_SKIP): their stroke is a crest stroke on the lit arc of the big dome's rim
+    "iron_dark": {"color": DARK_EDGE, "width": 0.03, "breakup": 0.1, "up": (0.5, 0.75), "amount": 1.0,
+                  "min_angle": 20.0},
+}
+EDGE["iron_dark_crk"] = dict(EDGE["iron_dark"])
 POLISH = {"color": "#737B87", "band": "#9AA2AD", "horn": 0.4}   # the face, its hammer-struck band, the horn top
 SCALE = {"color": "#343842", "amount": 0.5, "freq": 4.0, "threshold": (0.56, 0.68)}   # dark forge-scale patches
 WOUND = {"base": "#0D3B35", "emit": "#1F8F7E", "core": "#2FBFA8"}                    # raw flesh under the anvil
 
 
-def lift_pass(base, emis, P_pos, Nt, Z, zones_order):
+def lift_pass(base, maps, zones_order, recipes_, seed=11):
+    """Top planes to obsidian light #4B4658: the planes that face up are painted over with the light value; the
+    sides and the undersides keep the dark zone paint - two clear values per form with a brushy, narrow border
+    (up-facing, so it holds whichever way the brute turns; a wide soft border put mid values, the floor's own, on
+    every rounded form). The light value is itself painted: the painter's facet value steps (upward from #4B4658),
+    a slow brush, a slightly darker tone toward the feet (the shoulders and the back are the lightest) and, on some
+    facets facing straight up, a glassy sheen. The baked contact shadows are then put back inside the lifted planes,
+    so the forms keep their occlusion."""
     import numpy as np
     import gfa_paint as P
-    brush = P.spread01(P.fbm(P_pos, 3.0, 2, seed=501))
-    for zname, (col, amt) in LIFT.items():
+    pos, Nt, Z, ao = maps["pos"], maps["tnrm"], maps["zone"], maps["ao"]
+    brush = P.spread01(P.fbm(pos, 3.0, 2, seed=501))
+    dabs = P.spread01(P.fbm(pos, 11.0, 2, seed=seed + 6))
+    qn = np.round(Nt * 2.5).astype(np.int64)
+    plane_h = P._hash(qn[:, 0], qn[:, 1], qn[:, 2], seed + 101) * 2 - 1       # the painter's per-facet value step
+    tgt = P.hex3(OBS_LIGHT)
+    for zname, amt in LIFT.items():
         if zname not in zones_order:
             continue
         m = Z == zones_order.index(zname)
         if not m.any():
             continue
-        c = base[m]
+        r = recipes_[zname]
         nz = Nt[m, 2] + (brush[m] - 0.5) * 0.3
-        k = 0.35 * P.smoothstep(-0.2, 0.1, nz) + 0.65 * P.smoothstep(0.35, 0.6, nz)
-        lum = c @ np.array([0.3, 0.59, 0.11], dtype=np.float32)
-        k = k * amt * (1.0 - P.smoothstep(0.24, 0.4, lum))           # leave the edge strokes alone
-        c = P.mix(c, P.hex3(col), k)
-        base[m] = c
+        k = P.smoothstep(0.2, 0.27, nz) * amt
+        val = ((1.0 + 0.9 * r["planes"] * (0.5 + 0.5 * plane_h[m])) * (1.0 + 0.05 * (brush[m] * 2 - 1))
+               * (1.0 - 0.1 * P.smoothstep(1.1, 0.2, pos[m, 2])))
+        top = tgt[None, :] * val[:, None]
+        # the glassy sheen: some of the facets facing straight up catch the light (a painted facet, not a gradient)
+        sh_sel = (P._hash(qn[m][:, 0], qn[m][:, 1], qn[m][:, 2], seed + 131) < SHEEN[zname][1]).astype(np.float32)
+        top = P.mix(top, P.hex3(SHEEN[zname][0]), sh_sel * P.smoothstep(0.45, 0.7, nz) * SHEEN[zname][2])
+        c = P.mix(base[m], top, k)
+        occ = 1 - ao[m]
+        ka = P.smoothstep(r["ao_range"][0], r["ao_range"][1], occ + (dabs[m] - 0.5) * 0.1) * r["ao"]
+        base[m] = P.mix(c, P.hex3(r["shadow"]), ka * k * 0.5)
+        C.log("lift %s: %d texels, mean lift %.2f, mean value %.3f" % (zname, int(m.sum()), float(k.mean()),
+                                                                     float(base[m].mean())))
+    return base
+
+
+def part_crease_points(obj, min_angle, spacing=0.002, sharp_only_below=60.0):
+    """Convex crease samples grouped by part id {part: (points [(x, y, z)], crease up-ness [nz])}: gfa_paint's
+    edge rule, but an edge counts only inside ONE part (adapted from enemies/slag_king.py). The up-ness is the z of
+    the mean normal of the crease's two faces: a top edge is near 1, a side edge near 0, a bottom edge below 0."""
+    from collections import defaultdict
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.normal_update()
+    layer = bm.faces.layers.int.get("gfa_part")
+    out = defaultdict(lambda: ([], []))
+    lim, big = math.radians(min_angle), math.radians(sharp_only_below)
+    for e in bm.edges:
+        if not e.is_manifold:
+            continue
+        ang = e.calc_face_angle_signed(0.0)
+        if ang <= 0 or ang < lim or (e.smooth and ang < big):
+            continue
+        f0, f1 = e.link_faces
+        if f0[layer] != f1[layer]:
+            continue
+        nzc = (f0.normal + f1.normal).normalized().z
+        p0, p1 = e.verts[0].co.copy(), e.verts[1].co.copy()
+        n = max(1, int((p1 - p0).length / spacing))
+        pts, ups = out[f0[layer]]
+        pts.extend(tuple(p0.lerp(p1, (i + 0.5) / n)) for i in range(n))
+        ups.extend([nzc] * n)
+    bm.free()
+    return out
+
+
+def edge_pass(base, maps, zones_order, obj, seed=11):
+    """Brushy light strokes on the obsidian creases and the ONE top-edge stroke of each dark plate (EDGE). A stroke
+    follows its part's own creases, weighted by how much the CREASE faces up, and it is painted on both sides of
+    the crease (the rim's top face and the band below it), so a cuff gets one light line along its upper rim."""
+    import numpy as np
+    import gfa_brush as B
+    import gfa_paint as P
+    pos, Z, part = maps["pos"], maps["zone"], maps["part"]
+    wobble = P.spread01(P.fbm(pos, 30.0, 2, seed=seed + 5))
+    dabs = P.spread01(P.fbm(pos, 11.0, 2, seed=seed + 6))
+    crease = {}
+    for zname, ed in EDGE.items():
+        if zname not in zones_order:
+            continue
+        m = np.nonzero(Z == zones_order.index(zname))[0]
+        if not len(m):
+            continue
+        if ed["min_angle"] not in crease:
+            crease[ed["min_angle"]] = part_crease_points(obj, ed["min_angle"])
+        cr = crease[ed["min_angle"]]
+        d = np.full(len(m), 0.05, dtype=np.float32)
+        up = np.zeros(len(m), dtype=np.float32)
+        for pid in np.unique(part[m]):
+            pts, ups = cr.get(int(pid), ([], []))
+            if pts and int(pid) not in EDGE_SKIP:
+                sub = np.nonzero(part[m] == pid)[0]
+                dd, ii = B._kd_nearest(np.asarray(pts, dtype=np.float32), pos[m][sub])
+                d[sub] = np.minimum(dd, 0.05)
+                up[sub] = np.asarray(ups, dtype=np.float32)[ii]
+        ew = ed["width"] * (0.35 + 1.1 * wobble[m])
+        k = P.smoothstep(ew, ew * 0.3, d)
+        k = k * P.smoothstep(ed["breakup"] - 0.12, ed["breakup"] + 0.12, dabs[m])
+        k = k * P.smoothstep(ed["up"][0], ed["up"][1], up) * ed["amount"]
+        base[m] = P.mix(base[m], P.hex3(ed["color"]), k)
+        C.log("edge %s: %d texels, %.1f%% stroked (d<3cm %.1f%%, crease up>%.2f %.1f%%)" % (
+            zname, len(m), 100 * float((k > 0.3).mean()), 100 * float((d < 0.03).mean()), ed["up"][0],
+            100 * float((up > ed["up"][0]).mean())))
+    return base
+
+
+def _polyline_ds(uv, line):
+    """Distance from 2D points to a polyline, the arc-length parameter (0..1) of the nearest point, the length."""
+    import numpy as np
+    L = np.asarray(line, dtype=np.float32)
+    seg = np.linalg.norm(L[1:] - L[:-1], axis=1)
+    cum = np.concatenate([[0.0], np.cumsum(seg)])
+    total = max(float(cum[-1]), 1e-6)
+    d = np.full(len(uv), 9.0, dtype=np.float32)
+    s = np.zeros(len(uv), dtype=np.float32)
+    for i in range(len(L) - 1):
+        a, ab = L[i], L[i + 1] - L[i]
+        l2 = float(ab @ ab)
+        if l2 < 1e-12:
+            continue
+        t = np.clip(((uv - a) @ ab) / l2, 0, 1)
+        di = np.linalg.norm(uv - (a + t[:, None] * ab), axis=1)
+        better = di < d
+        d[better] = di[better]
+        s[better] = (cum[i] + t[better] * seg[i]) / total
+    return d, s, total
+
+
+def crest_pass(base, maps, seed=11):
+    """The crest strokes (CRESTS): each is projected along the direction its crest faces onto its OWN parts' texels
+    (depth-windowed, facing that direction): a light stroke 2-3 game pixels wide at its middle, tapered at both
+    ends, its width wobbling with the brush, broken once off-centre, sitting in a soft mid-tone halo (none on iron)."""
+    import numpy as np
+    import gfa_paint as P
+    pos, part, nt = maps["pos"], maps["part"], maps["tnrm"]
+    wob_all = P.spread01(P.fbm(pos, 22.0, 2, seed=seed + 41))
+    halo = P.hex3(CREST_HALO)
+    for cr in CRESTS:
+        idx = np.nonzero(np.isin(part, cr["parts"]))[0]
+        if not len(idx):
+            continue
+        F = np.array(cr["dir"], dtype=np.float32)
+        X = np.cross(F, np.array([0.0, 0.0, 1.0], dtype=np.float32))
+        if np.linalg.norm(X) < 1e-3:
+            X = np.array([1.0, 0.0, 0.0], dtype=np.float32)
+        X = X / np.linalg.norm(X)
+        Y = np.cross(F, X)
+        pts = np.array(cr["pts"], dtype=np.float32)
+        o = pts.mean(0)
+        q = pos[idx] - o
+        uv, zt = np.stack([q @ X, q @ Y], 1), q @ F
+        pl = pts - o
+        luv, lz = np.stack([pl @ X, pl @ Y], 1), pl @ F
+        pad = cr["width"] * 2.0
+        lo, hi = luv.min(0) - pad, luv.max(0) + pad
+        facing = nt[idx] @ F
+        ok = ((zt > lz.min() - 0.1) & (zt < lz.max() + 0.1) & (facing > 0.15) & (uv[:, 0] > lo[0])
+              & (uv[:, 0] < hi[0]) & (uv[:, 1] > lo[1]) & (uv[:, 1] < hi[1]))
+        sel = idx[ok]
+        if not len(sel):
+            continue
+        d, s, total = _polyline_ds(uv[ok], luv)
+        taper = P.smoothstep(0.0, 0.16, s) * P.smoothstep(1.0, 0.84, s)
+        hw = cr["width"] * 0.5 * (0.45 + 0.55 * taper) * (0.8 + 0.4 * wob_all[sel])
+        load = (0.4 + 0.6 * taper) * P.smoothstep(0.15, 0.4, facing[ok])
+        if cr["gap"]:
+            rng = random.Random(cr["seed"])
+            gc, gw = rng.uniform(0.36, 0.64), 0.03 / total           # one ~6 cm break, off-centre
+            load = load * P.smoothstep(gw * 0.5, gw, np.abs(s - gc))
+        k = P.smoothstep(hw, hw * 0.55, d) * load
+        kh = P.smoothstep(hw * 2.6, hw, d) * load * (0.0 if cr["kind"] == "iron" else 0.5)
+        col = P.hex3({"obsidian": CREST_OBS, "flesh": CREST_FLESH, "iron": DARK_EDGE}[cr["kind"]])
+        base[sel] = P.mix(P.mix(base[sel], halo, kh), col, k)
+    return base
+
+
+def plate_pass(base, emis, P_pos, Nt, Z, zones_order):
+    """The anvil's polished face and horn top, forge scale on the rest of the anvil, and the wound under its waist."""
+    import numpy as np
+    import gfa_paint as P
+    brush = P.spread01(P.fbm(P_pos, 3.0, 2, seed=501))
     # the anvil's polished face (and the worn top of the horn): the brightest metal on the model
     A = np.array(ANVIL_M.inverted(), dtype=np.float32)
     up = np.array(ANVIL_M.to_3x3() @ Vector((0, 0, 1)), dtype=np.float32)
@@ -1161,7 +1505,8 @@ def lift_pass(base, emis, P_pos, Nt, Z, zones_order):
         k = k * (0.85 + 0.15 * brush[m])
         # the striking band down the middle of the face: a lighter painted plane with a brushy border
         wob = (P.spread01(P.fbm(P_pos[m], 9.0, 2, seed=612)) - 0.5) * 0.05
-        band = (1.0 - P.smoothstep(0.1, 0.14, np.abs(q[:, 1]) + wob)) *             (1.0 - P.smoothstep(0.24, 0.32, q[:, 0] + wob)) * P.smoothstep(-0.56, -0.48, q[:, 0] - wob)
+        band = ((1.0 - P.smoothstep(0.1, 0.14, np.abs(q[:, 1]) + wob))
+                * (1.0 - P.smoothstep(0.24, 0.32, q[:, 0] + wob)) * P.smoothstep(-0.56, -0.48, q[:, 0] - wob))
         band = band * face * P.smoothstep(0.75, 0.92, nd)
         # dark forge scale in patches everywhere but the polished face
         sc = P.smoothstep(SCALE["threshold"][0], SCALE["threshold"][1], P.fbm(P_pos[m], SCALE["freq"], 3, seed=611))
@@ -1183,19 +1528,33 @@ def lift_pass(base, emis, P_pos, Nt, Z, zones_order):
 
 
 def paint_mesh(mesh, tex_dir, size=1024):
+    """gfa_brush.paint_asset with this build's passes run between the (broad) zone paint and the decals. The zone
+    painter's flat maps (part ids, smooth normals) are captured from its gfa_paint.paint call for the passes."""
     import gfa_brush as B
-    orig = B.apply_decals
+    import gfa_paint as P
+    orig_decals, orig_paint = B.apply_decals, P.paint
+    cap = {}
+    rec = recipes()
 
-    def with_lift(base, emis, P_pos, Nt, Z, zones_order, decals_):
-        base, emis = lift_pass(base, emis, P_pos, Nt, Z, zones_order)
-        return orig(base, emis, P_pos, Nt, Z, zones_order, decals_)
-    B.apply_decals = with_lift
+    def paint_capture(maps, *args, **kw):
+        cap["maps"] = maps
+        return orig_paint(maps, *args, **kw)
+
+    def with_passes(base, emis, P_pos, Nt, Z, zones_order, decals_):
+        maps = cap["maps"]
+        assert len(maps["part"]) == len(P_pos)
+        base = lift_pass(base, maps, zones_order, rec)
+        base = edge_pass(base, maps, zones_order, mesh)
+        base = crest_pass(base, maps)
+        base, emis = plate_pass(base, emis, P_pos, Nt, Z, zones_order)
+        return orig_decals(base, emis, P_pos, Nt, Z, zones_order, decals_)
+    B.apply_decals, P.paint = with_passes, paint_capture
     try:
-        return B.paint_asset(mesh, KEY, recipes(), tex_dir, size=size, decals=decals(), broad=broad_recipes(),
+        return B.paint_asset(mesh, KEY, rec, tex_dir, size=size, decals=decals(), broad=broad_recipes(),
                              ao_distance=0.14, ao_samples=24, edge_min_angle=34.0, margin_px=3, seed=11, uv_angle=66.0,
                              uv_small_islands=(0.0015, 0.5))
     finally:
-        B.apply_decals = orig
+        B.apply_decals, P.paint = orig_decals, orig_paint
 
 
 def state_copy(mesh, state):
@@ -1706,9 +2065,15 @@ def main():
                C.rel(blend), C.rel(os.path.join(tex_dir, KEY + "_basecolor.png")),
                C.rel(os.path.join(tex_dir, KEY + "_emissive.png"))]
     outputs += [C.rel(os.path.join(reports, "%s_%s.png" % (KEY, n))) for n in ("review", "clips", "plates", "scale", "34")]
+    fix_sheet = os.path.join(reports, KEY + "_review_fix.png")        # enemies/anvil_brute_fix_sheet.py
+    if os.path.exists(fix_sheet):
+        outputs.append(C.rel(fix_sheet))
     C.write_pack_status(KIND, KEY, outputs,
                         "Built from code by tools/blender/gf_assets/enemies/anvil_brute.py (model with intact + cracked "
-                        "plates, NPR paint, GF_AnvilBrute_v1 rig, 8 clips, export + validation, review sheets).",
+                        "plates, NPR paint, GF_AnvilBrute_v1 rig, 8 clips, export + validation, review sheets). Art "
+                        "review fixes (6.5/10): up-facing planes in obsidian light #4B4658 with light crest strokes, and "
+                        "the cuffs, domes and visor in iron shadow with one top-edge stroke; before/after in "
+                        "reports/anvil_brute_review_fix.png (enemies/anvil_brute_fix_sheet.py).",
                         tier=TIER)
     C.log("DONE", KEY)
 

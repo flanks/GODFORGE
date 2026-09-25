@@ -3,7 +3,7 @@
  "kind": "enemy",
  "tier": "elite",
  "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
@@ -20,9 +20,10 @@
     "art/enemies/anvil_brute/reports/anvil_brute_clips.png",
     "art/enemies/anvil_brute/reports/anvil_brute_plates.png",
     "art/enemies/anvil_brute/reports/anvil_brute_scale.png",
-    "art/enemies/anvil_brute/reports/anvil_brute_34.png"
+    "art/enemies/anvil_brute/reports/anvil_brute_34.png",
+    "art/enemies/anvil_brute/reports/anvil_brute_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/anvil_brute.py (model with intact + cracked plates, NPR paint, GF_AnvilBrute_v1 rig, 8 clips, export + validation, review sheets)."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/anvil_brute.py (model with intact + cracked plates, NPR paint, GF_AnvilBrute_v1 rig, 8 clips, export + validation, review sheets). Art review fixes (6.5/10): up-facing planes in obsidian light #4B4658 with light crest strokes, and the cuffs, domes and visor in iron shadow with one top-edge stroke; before/after in reports/anvil_brute_review_fix.png (enemies/anvil_brute_fix_sheet.py)."
   },
   "2_user_approval": {
    "status": "pending_human",

@@ -16,7 +16,7 @@
     1024
    ],
    "format": "png",
-   "bytes": 299162
+   "bytes": 297655
   },
   {
    "name": "anvil_brute_basecolor",
@@ -26,10 +26,61 @@
     1024
    ],
    "format": "png",
-   "bytes": 1039648
+   "bytes": 879492
   }
  ],
  "sockets": {
+  "fx_mouth": {
+   "translation": [
+    -0.0,
+    1.6,
+    0.9
+   ],
+   "forward": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    -0.0,
+    1.45,
+    0.95
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    -0.0,
+    3.0,
+    -0.0
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ]
+  },
   "fx_core": {
    "translation": [
     -0.0,
@@ -52,57 +103,6 @@
     -0.0,
     1.62,
     0.3
-   ],
-   "forward": [
-    0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    -0.0,
-    1.0,
-    -0.0
-   ]
-  },
-  "attack_origin": {
-   "translation": [
-    -0.0,
-    1.45,
-    0.95
-   ],
-   "forward": [
-    0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    -0.0,
-    1.0,
-    -0.0
-   ]
-  },
-  "fx_mouth": {
-   "translation": [
-    -0.0,
-    1.6,
-    0.9
-   ],
-   "forward": [
-    -0.0,
-    -0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    -0.0
-   ]
-  },
-  "head_top": {
-   "translation": [
-    -0.0,
-    3.0,
-    -0.0
    ],
    "forward": [
     0.0,
@@ -143,13 +143,13 @@
  },
  "size_m": 2.809,
  "glb": "assets/models/enemies/anvil_brute.glb",
- "glb_bytes": 2163236,
- "glb_sha256": "728d9f3095e006c110ad3ab652273475f5b893963ddf912e0c36087ab0da1f09",
+ "glb_bytes": 2001416,
+ "glb_sha256": "5341c82165453ee9797ff3e7e79b952c10790d0eb79ff79769177d64d8be23d3",
  "source_blend": "art/enemies/anvil_brute/source/anvil_brute.blend",
  "build_script": "tools/blender/gf_assets/enemies/anvil_brute.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
  "generator": "Blender 5.2.0 LTS",
- "built": "2026-09-25",
+ "built": "2026-09-26",
  "validation": {
   "ok": true,
   "errors": [],
@@ -406,10 +406,10 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 115.8,
-   "p10": 104.6,
-   "p90": 123.3
+   "median": 115.5,
+   "p10": 104.4,
+   "p90": 123.0
   },
-  "coverage": 0.463
+  "coverage": 0.461
  }
 }
