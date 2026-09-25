@@ -1,7 +1,9 @@
 """Godsbane Rifle - the PRECISE / PIERCE long rifle, built end to end from code with tools/blender/gf_assets.
 
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b --factory-startup --python-exit-code 1 \
-      -P tools/blender/gf_assets/weapons/godsbane_rifle.py -- [--size 1024] [--no-review]
+      -P tools/blender/gf_assets/weapons/godsbane_rifle.py -- [--size 1024] [--no-review] [--details-only]
+
+(--details-only: paint iteration, renders only the close-up sheet and the 4x in-game hold; no export.)
 
 (art/weapons/godsbane_rifle/godsbane_rifle_build.py is a launcher for this same script.)
 
@@ -13,12 +15,13 @@ Design (docs/art/WEAPONS.md section 5, family PRECISE / PIERCE):
   * silhouette verb THE NEEDLE: the longest, thinnest line of the arsenal so far (1.6 m, about 78 px
     at 1080p), a crystal scope and a sight blade on top, ONE sharp point at the front (a bone fang
     bayonet under a tapered gold muzzle), nothing sticking out sideways except a short bolt knob;
-  * value rhythm: pale god-bone stock -> dark leather grip + dark iron receiver under a white-hot
-    crystal scope -> dark octagonal barrel framed by three gilded lines (two side rails, one top rib)
-    -> gold muzzle crown with a glowing bore and a pale bone fang: the brightest values at the front;
+  * value rhythm: pale god-bone stock -> dark leather grip + dark iron receiver under a cut Kinetic-cream
+    crystal scope (three painted facet values and a darker core, no glow) -> dark octagonal barrel framed
+    by three gilded lines (two side rails, one top rib) -> gold muzzle crown with a glowing bore and a
+    pale bone fang: the brightest values at the front;
   * story ("It remembers"): the stock is a god's femur whose butt ends in the bone's double knuckle,
-    a carved god-eye with a faintly glowing slit iris sits on both stock sides, and faint Kinetic
-    runes run along the barrel between the gold bands;
+    a carved god-eye with a faintly glowing slit iris sits on both stock sides, and three large
+    engraved Kinetic sigils (forked stave, god-eye, fang) sit on the barrel between the gold bands;
   * palette: the warm metals of the player's arsenal (bone-ivory, gold, dark iron, dark leather) + the
     Kinetic element cream #F4E3C1 (palette.rs element_color) for every glow.
 
@@ -35,6 +38,7 @@ import shutil
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import bmesh  # noqa: E402
 import bpy  # noqa: E402
 from mathutils import Matrix, Vector  # noqa: E402
 
@@ -61,7 +65,8 @@ FANG = [(0, 0.95, AX - 0.037), (0, 1.03, AX - 0.041), (0, 1.11, AX - 0.037), (0,
 ZONES = ["bone", "leather", "iron", "gold", "crystal", "fang", "glow_bore", "glow_ring"]
 PALETTE = [  # (name, hex) for the review sheet
     ("bone", "#E3D4B4"), ("bone shadow", "#8A6A4C"), ("leather", "#4A2622"), ("iron", "#3E3746"),
-    ("gold", "#E4B24A"), ("crystal", "#F1E4C8"), ("glow rim", "#D8B679"), ("kinetic", "#F4E3C1"), ("core", "#FFFFFF"),
+    ("gold", "#E4B24A"), ("crystal lit", "#E0CA9C"), ("crystal flank", "#957250"), ("crystal pavilion", "#43375A"),
+    ("crystal core", "#5E4230"), ("glow rim", "#D8B679"), ("kinetic", "#F4E3C1"), ("core", "#FFFFFF"),
 ]
 
 # barrel radius (to the octagon's corners) along +Y: chamber, taper, muzzle
@@ -104,6 +109,44 @@ def ellip_tube(points, heights, widths, sides=10):
     radii = [h / 2 for h in heights]
     sc = [(1.0, (w / h) if h > 1e-6 else 1.0) for h, w in zip(heights, widths)]
     return M.tube(points, radii, sides=sides, up=(0, 0, 1), scale_xy=sc)
+
+
+# the crystal's rings along +Y: (y, radius, rotation in degrees); a point at each end
+CRYSTAL = [(-0.090, 0.0175, 0.0), (-0.052, 0.0222, 30.0), (0.056, 0.0240, 0.0), (0.164, 0.0222, 30.0),
+           (0.204, 0.0172, 0.0)]
+CRYSTAL_TIPS = (-0.128, 0.25)
+
+
+def crystal_mesh():
+    """A hand-cut quartz: an irregular hexagon section (alternating wide / narrow facets, a ridge on top)
+    whose rings turn 30 degrees against each other, so every band between two rings is cut into twelve
+    triangular facets (kites and diamonds along the body) with a pointed termination at each end. The
+    cut facets each take one painted value; a straight prism read as a round rod, whatever its paint."""
+    bm = bmesh.new()
+    rings = []
+    for y, r, rot in CRYSTAL:
+        ring = []
+        for k in range(6):
+            ang = math.radians(60 * k + (10 if k % 2 else -10) + rot)
+            rk = 1.0 if k % 2 == 0 else 0.86
+            ring.append(bm.verts.new((math.sin(ang) * r * rk, y, SCOPE_Z + math.cos(ang) * r * rk)))
+        rings.append(ring)
+    for A, B in zip(rings[:-1], rings[1:]):
+        # the ring with the larger rotation sits half a facet ahead: B[k] lies between A[k] and A[k + 1]
+        lead, trail = (B, A) if CRYSTAL[rings.index(B)][2] > CRYSTAL[rings.index(A)][2] else (A, B)
+        for k in range(6):
+            k1 = (k + 1) % 6
+            if lead is B:
+                bm.faces.new((A[k], A[k1], B[k]))
+                bm.faces.new((A[k1], B[k1], B[k]))
+            else:
+                bm.faces.new((B[k], B[k1], A[k]))
+                bm.faces.new((B[k1], A[k1], A[k]))
+    for y, ring in ((CRYSTAL_TIPS[0], rings[0]), (CRYSTAL_TIPS[1], rings[-1])):
+        tip = bm.verts.new((0.0, y, SCOPE_Z))
+        for k in range(6):
+            bm.faces.new((ring[k], ring[(k + 1) % 6], tip))
+    return M.recalc(bm)
 
 
 def build_mesh(col):
@@ -180,18 +223,7 @@ def build_mesh(col):
           "iron", name="trigger", shading="smooth")
 
     # -- crystal scope: a long faceted Kinetic crystal held by gold claw rings --
-    # a hand-cut quartz: an irregular hexagon (alternating wide / narrow facets, a sharp ridge on top) so the
-    # facets read as crisp planes (a regular or strongly twisted prism shaded like a round rod), slightly
-    # bulged and twisted, pointed terminations at both ends
-    prof = []
-    for k in range(6):
-        ang = math.radians(60 * k + (10 if k % 2 else -10))
-        rk = 1.0 if k % 2 == 0 else 0.86
-        prof.append((math.cos(ang) * rk, math.sin(ang) * rk))
-    cy = [-0.128, -0.084, 0.05, 0.188, 0.25]
-    cr = [0.0, 0.0196, 0.0232, 0.0198, 0.0]
-    cry = M.tube([(0, y, SCOPE_Z) for y in cy], cr, profile=prof, twist=14.0, up=(0, 0, 1))
-    a.add(cry, "crystal", name="crystal", shading="flat")
+    a.add(crystal_mesh(), "crystal", name="crystal", shading="flat")
     for y in (-0.04, 0.152):
         rg = M.ring(0.0185, 0.0275, 0.018, sides=12, bevel=0.002, axis="Y")
         M.xform(rg, loc=(0, y, SCOPE_Z))
@@ -301,11 +333,16 @@ RECIPES = {
     "gold": P.zone(base="#E4B24A", shadow="#86511A", light="#FFF2BE", planes=0.08, edge=0.8, edge_width=0.0032,
                    cavity=0.6, ao=0.5,
                    spots={"color": "#B97F2E", "amount": 0.25, "freq": 16.0, "threshold": (0.62, 0.74)}),
-    # the crystal is PAINTED as a faceted gem (a glow zone would replace the painted planes with the flat
-    # emission colour); its light lives in emissive decal streaks, see decals()
-    "crystal": P.zone(base="#E6D8BE", shadow="#5A4C6E", light="#FFFFFF", planes=0.5, parts=0.0, brush=0.03,
-                      edge=1.0, edge_width=0.0048, edge_breakup=0.08, cavity=0.0, ao=0.3,
-                      gradient={"center": SCOPE, "range": (0.16, 0.02), "color": "#FFF1D6", "amount": 0.3}),
+    # the crystal is PAINTED as a faceted gem in three Kinetic-cream value planes picked by facet orientation
+    # (lit cream table on top, warm tan flanks, violet pavilion underneath) with a darker core in the middle of
+    # its length, so it reads as a cut stone and never as a white tube. It carries almost no emission (a few
+    # small glints, see decals()): the brightest value of the rifle stays at the muzzle.
+    "crystal": P.zone(base="#B8976A", shadow="#3F3452", light="#F2DEB4",
+                      facets={"dir": (0, 0, 1), "soft": 0.04,
+                              "stops": [(-1.0, "#43375A"), (-0.42, "#957250"), (0.45, "#E0CA9C")]},
+                      planes=0.1, parts=0.0, brush=0.05, brush_freq=11.0, edge=0.85, edge_width=0.0032,
+                      edge_breakup=0.15, cavity=0.0, ao=0.35,
+                      gradient={"center": SCOPE, "range": (0.085, 0.035), "color": "#5E4230", "amount": 0.5}),
     "fang": P.zone(base="#EDE2C8", shadow="#8C7254", light="#FFFBF0", planes=0.07, edge=0.9, edge_width=0.004,
                    cavity=0.5, ao=0.45, edge_breakup=0.3,
                    gradient={"axis": (0, 1, 0), "range": (0.98, 1.18), "color": "light", "amount": 0.55}),
@@ -343,6 +380,17 @@ def god_eye(w=0.074, h_up=0.018, h_dn=0.013, iris=0.0105, n=9):
     return [up, dn, tail] + lashes, ring, pupil
 
 
+def barrel_glyphs(hu=0.0055, hv=0.014):
+    """The three barrel sigils as 2D polylines, u across the flat, v along the barrel (+v = toward the muzzle):
+    the forked stave (the god that fell), the god-eye lozenge (it remembers) and the fang, a tooth-shaped
+    triangle pointing at the muzzle (the kill). Big, simple, angular shapes spaced far apart, so the 0.0042 m
+    engraving reads as three carved sigils and not as a line of type."""
+    stave = [[(0.0, -hv), (0.0, hv)], [(-hu, -hv), (0.0, -0.0025)], [(hu, -hv), (0.0, -0.0025)]]
+    eye = [[(0.0, -hv), (hu, 0.0), (0.0, hv), (-hu, 0.0), (0.0, -hv)]]
+    fang = [[(-hu, -hv), (0.0, hv), (hu, -hv), (-hu, -hv)]]
+    return stave, eye, fang
+
+
 def decals():
     out = []
     # the god-eye on both stock sides: gold inlay in a burnt carved groove, the slit iris glows faintly
@@ -366,24 +414,17 @@ def decals():
         line = [[(p.y * sx, p.z + 0.001) for p in cl]]
         out.append(P.decal_lines(line, fr, 0.0036, zones=["fang"], color="#FFF6DC", rim="#6E5238", rim_width=0.0068,
                                  depth=(0.0, 0.03), emit={"color": "#E0BF84", "core": "#FFFFFF"}))
-    # the crystal's light: long glowing streaks along the side and top facets + short refraction glints
+    # the crystal: no glowing streaks (they bleached it into a white tube). Short painted glints on a few facet
+    # edges toward the ends, where the stone is lightest, with only a dim warm emission
     for sx in (-1, 1):
         fr = _side_frame(sx, (0, 0, 0))
-        streak = [[(y * sx, SCOPE_Z - 0.0015) for y in (-0.066, 0.02, 0.172)]]
-        glints = [[((y - 0.011) * sx, SCOPE_Z - 0.008), ((y + 0.011) * sx, SCOPE_Z + 0.007)] for y in (-0.03, 0.11)]
-        out.append(P.decal_lines(streak, fr, 0.028, zones=["crystal"], color=None, depth=(0.0, 0.04), facing=0.2,
-                                 emit={"color": "#2E2416", "core": "#6E5838"}))
-        out.append(P.decal_lines(streak, fr, 0.0056, zones=["crystal"], color="#FFF6E0", depth=(0.0, 0.04),
-                                 emit={"color": "#F4E3C1", "core": "#FFFFFF"}))
-        out.append(P.decal_lines(glints, fr, 0.0028, zones=["crystal"], color="#FFFBF0", depth=(0.0, 0.04),
-                                 emit={"color": "#E6CFA0", "core": "#FFF8EA"}))
+        glints = [[((y - 0.008) * sx, SCOPE_Z - 0.005), ((y + 0.008) * sx, SCOPE_Z + 0.005)] for y in (-0.068, 0.178)]
+        out.append(P.decal_lines(glints, fr, 0.003, zones=["crystal"], color="#FFF6E2", depth=(0.0, 0.04),
+                                 emit={"color": "#3A2E1E", "core": "#8C7450"}))
     top = Matrix(((0, -1, 0, 0), (1, 0, 0, 0), (0, 0, 1, SCOPE_Z), (0, 0, 0, 1)))   # u = +Y, v = -X, out = +Z
-    ridge = [[(y, 0.0) for y in (-0.066, 0.05, 0.172)]]
-    out.append(P.decal_lines(ridge, top, 0.03, zones=["crystal"], color=None, depth=(0.0, 0.04), facing=0.2,
-                             emit={"color": "#2E2416", "core": "#6E5838"}))
-    lines = [[(y, v) for y in (-0.06, 0.05, 0.165)] for v in (-0.0098, 0.0098)]
-    out.append(P.decal_lines(lines, top, 0.0045, zones=["crystal"], color="#FFFBF0", depth=(0.0, 0.04),
-                             emit={"color": "#F4E3C1", "core": "#FFFFFF"}))
+    tg = [[(0.168, 0.006), (0.19, 0.004)], [(-0.078, -0.006), (-0.062, -0.007)]]
+    out.append(P.decal_lines(tg, top, 0.003, zones=["crystal"], color="#FFF6E2", depth=(0.0, 0.04),
+                             emit={"color": "#3A2E1E", "core": "#8C7450"}))
     # four glowing channels running up the muzzle crown's taper to the bore
     cfr = Matrix(((1, 0, 0, 0), (0, 0, 1, 0), (0, -1, 0, AX), (0, 0, 0, 1)))
     ch = [[(math.radians(a) * 0.018, 1.052), (math.radians(a) * 0.018, 1.109)] for a in (-135.0, -45.0, 45.0, 135.0)]
@@ -400,17 +441,18 @@ def decals():
         cr = [[(p[0] * sx, p[1]) for p in ln] for ln in cr]
         out.append(P.decal_lines(cr, fr, 0.0017, zones=["bone"], color="#4E3624", rim="#9C7E58",
                                  rim_width=0.0038, depth=(0.0, 0.06)))
-    # "It remembers": faint Kinetic runes along the barrel's upper flats, between the two bands
-    rng = random.Random(11)
+    # "It remembers": three large engraved Kinetic glyphs on each upper barrel flat between the two bands,
+    # widely spaced so they read as sigils, not as a line of text (the old nine-glyph rune band did)
     fr = Matrix(((1, 0, 0, 0), (0, 0, 1, 0), (0, -1, 0, AX), (0, 0, 0, 1)))   # x = +X, y = -Z, z = +Y (barrel axis)
     rr = 0.024
     for ang_deg in (-45.0, -135.0):
-        glyphs = M.rune_band(rng, count=9, size=0.0145, spacing=2.3, strokes=3, broken=0.3, origin=(0.0, 0.0))
-        # rune_band runs along +x: turn it so it runs along the barrel (v) and centre it on the flat (u)
-        lines = [[(ang_deg * math.pi / 180.0 * rr + p[1], 0.515 + p[0]) for p in ln] for ln in glyphs]
-        out.append(P.decal_lines(lines, fr, 0.0028, zones=["iron"], color="#A48C68", rim="#15101A",
-                                 rim_width=0.0052, mapping="cylinder", radius=rr,
-                                 emit={"color": "#3E3222", "core": "#A89070"}))
+        su = 1.0 if ang_deg == -45.0 else -1.0          # mirror across the rib so both flats read the same way
+        lines = []
+        for yc, glyph in zip((0.548, 0.622, 0.696), barrel_glyphs()):
+            lines += [[(ang_deg * math.pi / 180.0 * rr + p[0] * su, yc + p[1]) for p in ln] for ln in glyph]
+        out.append(P.decal_lines(lines, fr, 0.0042, zones=["iron"], color="#B09470", rim="#15101A",
+                                 rim_width=0.0068, mapping="cylinder", radius=rr,
+                                 emit={"color": "#3E3222", "core": "#A08868"}))
     # engraved gold border on both receiver sides (classic engraved action)
     y0, y1, z0, z1, c = -0.012, 0.172, AX - 0.013, AX + 0.021, 0.008
     border = [[(y0 + c, z0), (y1 - c, z0), (y1, z0 + c), (y1, z1 - c), (y1 - c, z1), (y0 + c, z1), (y0, z1 - c),
@@ -455,6 +497,40 @@ def wide_views(mesh, work, reports, w=1500, h=380, ink=0.0035, samples=16):
                            for n, p in paths.items()],
               "swatches": [{"hex": x, "label": n} for n, x in PALETTE], "notes": []}
     return R.contact_sheet(layout, os.path.join(reports, "%s_views.png" % KEY), work)
+
+# close-ups: name -> (camera direction, y range, z range, width, height) of the region to frame
+DETAIL_VIEWS = {
+    "scope_34_above": ((0.62, 0.45, 0.64), (-0.135, 0.255), (AX + 0.03, 1.0), 740, 440),
+    "scope_side_R": ((1.0, 0.0, 0.06), (-0.135, 0.255), (AX + 0.03, 1.0), 740, 440),
+    "barrel_sigils_above_R": ((0.5, 0.0, 0.87), (0.46, 0.785), (-1.0, 1.0), 1500, 330),
+}
+
+
+def detail_views(mesh, work, reports, ink=0.0012, samples=16):
+    """Close-up toon-preview renders of the crystal scope and the barrel sigils (the details a 1.6 m rifle
+    loses in the whole-weapon views), stacked into <reports>/<key>_details.png."""
+    scene = bpy.context.scene
+    pts = R._points([mesh])
+    R.setup_cycles(scene, samples)
+    paths = {}
+    with R.toon_preview([mesh], ink=ink):
+        for name, (d, yr, zr, w, h) in DETAIL_VIEWS.items():
+            sub = [p for p in pts if yr[0] <= p.y <= yr[1] and zr[0] <= p.z <= zr[1]]
+            c, ew, eh = R.frame(sub, d)
+            R.aim(scene, c, d, max(ew * 1.08, eh * 1.2 * w / h))
+            paths[name] = R.render(scene, os.path.join(work, "%s_detail_%s.png" % (KEY, name)), w, h)
+    layout = {"title": "Godsbane Rifle  (godsbane_rifle): details",
+              "subtitle": "Toon preview close-ups of the final textures (engine-like ramp, rim, ink; emissive x1.6)",
+              "width": 1540,
+              "sections": [
+                  {"label": "Crystal scope: cut facets in three Kinetic-cream values, a darker core, small glints (no glow)",
+                   "height": 440, "images": [{"path": paths["scope_34_above"], "label": "3/4 from above"},
+                                             {"path": paths["scope_side_R"], "label": "right side"}]},
+                  {"label": "Barrel sigils between the bands: forked stave, god-eye, fang pointing at the muzzle",
+                   "height": 330, "images": [{"path": paths["barrel_sigils_above_R"], "label": "from above right"}]}],
+              "swatches": [{"hex": x, "label": n} for n, x in PALETTE], "notes": []}
+    return R.contact_sheet(layout, os.path.join(reports, "%s_details.png" % KEY), work)
+
 
 def relayout_review(work, reports):
     """Re-flow the standard review sheet: with the 190 px in-game crop the 3x game-size silhouettes no longer fit
@@ -517,6 +593,14 @@ def main():
     tex_dir = os.path.join(pack, "textures")
     paint_rep = P.paint_asset(mesh, KEY, RECIPES, tex_dir, size=size, decals=decals(), ao_distance=0.03,
                               ao_samples=24, seed=7)
+    if C.flag(argv, "--details-only"):
+        # paint iteration: close-ups (+ the 4x in-game hold) only; no .blend, no export, no status
+        work = C.ensure_dir(os.path.join(pack, "work", "review"))
+        reports = C.ensure_dir(os.path.join(pack, "reports"))
+        detail_views(mesh, work, reports)
+        hold_closeup(root, mesh, work, reports)
+        C.log("DONE (details only)", KEY)
+        return
     blend = os.path.join(pack, "source", KEY + ".blend")
     C.save_blend(blend)
     bpy.ops.file.make_paths_relative()
@@ -552,8 +636,9 @@ def main():
         shutil.copyfile(rv["turn_34_front"], os.path.join(reports, KEY + "_34.png"))
         hold = hold_closeup(root, mesh, work, reports)
         views = wide_views(mesh, work, reports)
+        details = detail_views(mesh, work, reports)
         outputs += [C.rel(os.path.join(reports, KEY + "_review.png")), C.rel(os.path.join(reports, KEY + "_34.png")),
-                    C.rel(hold), C.rel(views)]
+                    C.rel(hold), C.rel(views), C.rel(details)]
     C.write_json(os.path.join(reports, "build_report.json"), {"export": rep, "paint": paint_rep})
     C.write_pack_status(KIND, KEY, outputs,
                         "Built from code by tools/blender/gf_assets/weapons/godsbane_rifle.py "

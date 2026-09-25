@@ -57,6 +57,10 @@ ZONE_DEFAULTS = {
     "gradient": None,        # {"axis": (x,y,z) | "center": (x,y,z) [+ "axis": line], "range": (a, b),
                              #  "color": hex|"light"|"shadow", "amount": 0.3}: planar, radial or cylindrical
     "spots": None,           # {"color": hex, "amount": 0.4, "freq": 12.0, "threshold": (0.6, 0.72)}
+    "facets": None,          # {"dir": (x,y,z), "stops": [(t, hex), ...], "soft": 0.04}: painted facet value
+                             #  planes for gems / crystals: the base colour is picked per texel by
+                             #  dot(true normal, dir), stop colours from low t to high t (dark pavilion, mid
+                             #  flanks, lit table) replacing "base"; every other layer applies on top
     "emit": None,            # {"color": rim hex, "hot": hex, "core": hex, "mode": flat|radial|axis|plane,
                              #  "center": (x,y,z), "axis": (x,y,z), "radius": r, "range": (a,b), "base_mix": 0.3,
                              #  "fade": (d0, d1) emission only beyond d0 (normalised distance), "strength": 1}
@@ -609,6 +613,16 @@ def paint(maps, zones_order, recipes, dist_convex, dist_concave, decals=(), seed
         p, nt = P[m], Nt[m]
         n = m.sum()
         c = np.repeat(b0[None], n, 0)
+        fc = r.get("facets")
+        if fc:
+            # facet value planes chosen by the facet's orientation (flat-shaded gems read as 2-3 painted values)
+            fd = np.asarray(fc["dir"], dtype=np.float32)
+            fdot = nt @ (fd / np.linalg.norm(fd))
+            stops = sorted(fc["stops"], key=lambda s: s[0])
+            soft = fc.get("soft", 0.04)
+            c = np.repeat(hex3(stops[0][1])[None], n, 0)
+            for t, hx in stops[1:]:
+                c = mix(c, hex3(hx), smoothstep(t - soft, t + soft, fdot))
         # flat value planes + per-part values
         c = c * (1 + r["planes"] * plane_h[m][:, None]) * (1 + r["parts"] * part_h[m][:, None])
         # gradient along an axis

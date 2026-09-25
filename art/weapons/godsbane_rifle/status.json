@@ -19,7 +19,8 @@
     "art/weapons/godsbane_rifle/reports/godsbane_rifle_review.png",
     "art/weapons/godsbane_rifle/reports/godsbane_rifle_34.png",
     "art/weapons/godsbane_rifle/reports/godsbane_rifle_hold_ingame_x4.png",
-    "art/weapons/godsbane_rifle/reports/godsbane_rifle_views.png"
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_views.png",
+    "art/weapons/godsbane_rifle/reports/godsbane_rifle_details.png"
    ],
    "notes": "Built from code by tools/blender/gf_assets/weapons/godsbane_rifle.py (launcher: art/weapons/godsbane_rifle/godsbane_rifle_build.py)."
   },

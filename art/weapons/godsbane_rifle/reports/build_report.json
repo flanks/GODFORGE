@@ -5,7 +5,7 @@
   "kind": "weapon",
   "tier": "two_handed",
   "extensions_used": [],
-  "tris": 3136,
+  "tris": 3160,
   "budget": [
    2000,
    4000
@@ -19,7 +19,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 96813
+    "bytes": 59990
    },
    {
     "name": "godsbane_rifle_basecolor",
@@ -29,7 +29,7 @@
      1024
     ],
     "format": "png",
-    "bytes": 896885
+    "bytes": 958795
    }
   ],
   "materials": [
@@ -45,23 +45,6 @@
    "godsbane_rifle"
   ],
   "sockets": {
-   "eject": {
-    "translation": [
-     0.03,
-     0.097,
-     -0.075
-    ],
-    "forward": [
-     0.9119,
-     0.4104,
-     -0.0
-    ],
-    "up": [
-     -0.4104,
-     0.9119,
-     -0.0
-    ]
-   },
    "grip_L": {
     "translation": [
      0.0,
@@ -79,11 +62,11 @@
      0
     ]
    },
-   "grip_R": {
+   "glow_core": {
     "translation": [
-     0,
-     0,
-     0
+     0.0,
+     0.159,
+     -0.058
     ],
     "forward": [
      0,
@@ -113,11 +96,11 @@
      0
     ]
    },
-   "glow_core": {
+   "grip_R": {
     "translation": [
-     0.0,
-     0.159,
-     -0.058
+     0,
+     0,
+     0
     ],
     "forward": [
      0,
@@ -128,6 +111,23 @@
      0,
      1,
      0
+    ]
+   },
+   "eject": {
+    "translation": [
+     0.03,
+     0.097,
+     -0.075
+    ],
+    "forward": [
+     0.9119,
+     0.4104,
+     -0.0
+    ],
+    "up": [
+     -0.4104,
+     0.9119,
+     -0.0
     ]
    }
   },
@@ -151,11 +151,11 @@
  "paint": {
   "size": 1024,
   "texel_density_px_per_m": {
-   "median": 753.3,
-   "p10": 669.7,
-   "p90": 817.4
+   "median": 737.5,
+   "p10": 654.6,
+   "p90": 799.5
   },
-  "coverage": 0.388,
+  "coverage": 0.372,
   "zones": [
    "bone",
    "leather",
@@ -166,10 +166,10 @@
    "glow_bore",
    "glow_ring"
   ],
-  "decals": 23,
+  "decals": 18,
   "basecolor": "art/weapons/godsbane_rifle/textures/godsbane_rifle_basecolor.png",
   "emissive": "art/weapons/godsbane_rifle/textures/godsbane_rifle_emissive.png",
-  "emissive_texels": 72346,
-  "seconds": 16.1
+  "emissive_texels": 28151,
+  "seconds": 17.9
  }
 }
