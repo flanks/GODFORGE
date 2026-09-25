@@ -1,0 +1,18 @@
+{
+ "glb": "valdris.glb",
+ "bytes": 6601856,
+ "materials": [
+  {
+   "name": "M_valdris",
+   "baseColorTexture": true,
+   "emissiveTexture": true,
+   "normalTexture": true,
+   "emissiveStrength": 3
+  }
+ ],
+ "primitives": 12,
+ "missing_tangents": 0,
+ "extensionsRequired": [],
+ "images": 3,
+ "ok": true
+}

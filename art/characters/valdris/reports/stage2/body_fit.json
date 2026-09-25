@@ -1,0 +1,234 @@
+{
+ "base": "valdris_s2_body_base.blend",
+ "reference": "valdris_retopo_start.blend",
+ "tps": {
+  "landmarks": 36,
+  "residual_max_m": 1.1184636066197129e-06,
+  "global_scale": 1.305
+ },
+ "head_dark_threshold": 0.1241,
+ "mirror_pairs_missing": 3439,
+ "fit": {
+  "iterations": 34,
+  "free_form_fitted_verts": 0,
+  "mean_abs_dist_m": 0.0,
+  "p95_abs_dist_m": 0.0,
+  "max_abs_dist_m": 0.0,
+  "rigid_regions": {}
+ },
+ "extra_loops": [
+  {
+   "z": 0.62,
+   "edges_split": 24
+  },
+  {
+   "z": 0.575,
+   "edges_split": 24
+  },
+  {
+   "z": 0.665,
+   "edges_split": 26
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.595,
+   "edges_split": 24
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.56,
+   "edges_split": 26
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.63,
+   "edges_split": 28
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.915,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.885,
+   "edges_split": 20
+  }
+ ],
+ "limb_radial": {
+  "verts": 1263,
+  "slab_scale_min_max": [
+   1.0,
+   2.116
+  ],
+  "radius_before_m": [
+   0.1049,
+   0.0778,
+   0.067,
+   0.0615,
+   0.0612,
+   0.0587,
+   0.0525,
+   0.0471,
+   0.0456,
+   0.0374,
+   0.0344,
+   0.0345
+  ],
+  "radius_target_m": [
+   0.125,
+   0.1201,
+   0.112,
+   0.1014,
+   0.0907,
+   0.0812,
+   0.0772,
+   0.0733,
+   0.0698,
+   0.0662,
+   0.0623,
+   0.0584
+  ]
+ },
+ "hand_frames": {
+  "L": {
+   "origin": [
+    0.99671,
+    0.0,
+    1.78
+   ],
+   "x_axis": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "y_axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.915,
+   "knuckle_abs_x": 1.0358,
+   "hand_verts": 155,
+   "note": "origin = palm centre x on the forearm axis (s2_valdris_body.py); vertex mean in hand_frames_vertex_mean"
+  },
+  "R": {
+   "origin": [
+    -0.99532,
+    0.0,
+    1.78
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.915,
+   "knuckle_abs_x": 1.0358,
+   "hand_verts": 150,
+   "note": "origin = palm centre x on the forearm axis (s2_valdris_body.py); vertex mean in hand_frames_vertex_mean"
+  }
+ },
+ "eyes": {
+  "centres": [
+   [
+    0.033,
+    -0.188,
+    2.195
+   ],
+   [
+    -0.033,
+    -0.188,
+    2.195
+   ]
+  ],
+  "radius_m": 0.0136
+ },
+ "stats": {
+  "name": "BODY",
+  "vertices": 3953,
+  "faces": 4216,
+  "triangles": 7894,
+  "quads": 3678,
+  "tri_faces": 538,
+  "ngons": 0,
+  "quad_ratio": 0.872,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 3,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": []
+ },
+ "hand_frames_vertex_mean": {
+  "L": {
+   "origin": [
+    0.99671,
+    -0.00126,
+    1.76055
+   ],
+   "x_axis": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "y_axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.915,
+   "knuckle_abs_x": 1.0358,
+   "hand_verts": 155
+  },
+  "R": {
+   "origin": [
+    -0.99532,
+    -0.00429,
+    1.75972
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.915,
+   "knuckle_abs_x": 1.0358,
+   "hand_verts": 150
+  }
+ }
+}

@@ -20,6 +20,7 @@
   5. one material M_<key> (base colour + emissive + normal map) on every part; the paint zone stays on
      the faces as the integer attribute `gf_zone` so the textures can be repainted later.
 """
+import importlib
 import math
 import os
 import sys
@@ -47,6 +48,12 @@ fitrep = read_json(FITREP) if os.path.isfile(FITREP) else None
 pal_path = os.path.join(ROOT, cfg["palette"]) if "palette" in cfg else os.path.join(os.path.dirname(CFG), "palette.json")
 pal = {s["key"]: s["tones"] for s in read_json(pal_path)["swatches"]}
 report = {"size": SIZE}
+# per-hero hooks (absent for Brax, whose defaults are the s2_geom zones and the s2_paint painter): "zones" = the
+# paint-zone list its parts script used for the material slots, "painter" = the module with paint() / dilate()
+ZONES = cfg.get("zones", G.ZONES)
+ZI = {n: i for i, n in enumerate(ZONES)}
+if "painter" in cfg:
+    PT = importlib.import_module(cfg["painter"])
 T0 = time.time()
 
 bpy.ops.wm.open_mainfile(filepath=PARTS)
@@ -69,7 +76,7 @@ for o in objs + list(copies):
 
 # ---- 2. UVs -------------------------------------------------------------------------------------------
 if body is not None:
-    counts, cuts = UV.body_seams(body, dict(cfg["uv"]["body"], eye_zone=G.Z["eye"]))
+    counts, cuts = UV.body_seams(body, dict(cfg["uv"]["body"], eye_zone=ZI["eye"]))
     report["uv_body_regions"] = counts
     report["uv_body_cuts"] = cuts
 bvh_all = UV.build_bvh_all(objs)
@@ -87,7 +94,8 @@ for name in cfg.get("shell_objects", []):
     bm.to_mesh(me)
     bm.free()
 smart = [bpy.data.objects[n] for n in cfg.get("smart_objects", [])]
-hidden_faces = UV.unwrap_all(objs, body, smart, [], density_hidden=cfg["uv"]["hidden_density"], margin_px=cfg["uv"]["margin_px"], size=SIZE)
+hidden_faces = UV.unwrap_all(objs, body, smart, [], density_hidden=cfg["uv"]["hidden_density"], margin_px=cfg["uv"]["margin_px"], size=SIZE,
+                             hidden_reach=cfg["uv"].get("hidden_reach", 0.03), hidden_start=cfg["uv"].get("hidden_start", 1e-4))
 for t, s_ in copies.items():
     # same construction order (e.g. the fist variant of a gauntlet) -> identical loops -> copy the UVs
     if len(t.data.loops) != len(s_.data.loops):
@@ -115,7 +123,7 @@ for i, o in enumerate(objs):
 co_all = np.concatenate([get_co(o.data) @ np.array(o.matrix_world)[:3, :3].T + np.array(o.matrix_world)[:3, 3] for o in objs])
 LO = co_all.min(0) - 0.01
 HI = co_all.max(0) + 0.01
-zone_mats = [bpy.data.materials["Z_" + z] for z in G.ZONES]
+zone_mats = [bpy.data.materials["Z_" + z] for z in ZONES]
 img = bpy.data.images.new("gf_bake", SIZE, SIZE, alpha=True, float_buffer=True)
 img.colorspace_settings.name = "Non-Color"
 
@@ -207,7 +215,10 @@ def enable_gpu():
     return "CPU"
 
 
-report["bake_device"] = enable_gpu()
+# "bake_device": "CPU" keeps the bakes off a GPU that other jobs share (default: the GPU when there is one)
+report["bake_device"] = enable_gpu() if cfg.get("bake_device", "GPU") != "CPU" else "CPU"
+if report["bake_device"] == "CPU":
+    scene.cycles.device = "CPU"
 log("bake device", report["bake_device"])
 if scene.world is None:
     scene.world = bpy.data.worlds.new("bake_world")
@@ -415,7 +426,7 @@ if hi_maps:
     Ws = np.zeros((SIZE, SIZE), dtype=np.float32)
     Tz = np.zeros((SIZE, SIZE), dtype=bool)
     for hl, src, tg in pairs:
-        m = valid & np.isin(Of, [objs.index(o) + 1 for o in tg]) & np.isin(np.rint(zone_f).astype(np.int64), [G.Z[z] for z in hl["zones"]])
+        m = valid & np.isin(Of, [objs.index(o) + 1 for o in tg]) & np.isin(np.rint(zone_f).astype(np.int64), [ZI[z] for z in hl["zones"]])
         for ex in hl.get("exclude", []):
             e = np.ones_like(m)
             if "abs_x_min" in ex:
@@ -443,6 +454,15 @@ if hi_maps:
     NM /= np.linalg.norm(NM, axis=2, keepdims=True) + 1e-9
     NM[..., 2] = np.maximum(NM[..., 2], 0.3)
     NM /= np.linalg.norm(NM, axis=2, keepdims=True) + 1e-9
+    mt = cfg.get("normal_max_tilt_deg")
+    if mt:
+        # bad-bake filter: where the sculpt surface is not the low-poly surface (a plate edge that the blockout
+        # rounds off, a strand of the fused cape) the baked normal tilts far from the face; fade those texels to flat
+        c0, c1 = math.cos(math.radians(mt[1])), math.cos(math.radians(mt[0]))
+        kf = np.clip((NM[..., 2] - c0) / (c1 - c0), 0, 1)[..., None]
+        NM = NM * kf + np.array([0.0, 0.0, 1.0], dtype=np.float32) * (1 - kf)
+        NM /= np.linalg.norm(NM, axis=2, keepdims=True) + 1e-9
+        report["normal_tilt_filter"] = {"deg": mt, "texels_faded": int(((kf[..., 0] < 0.99) & (Ws > 0.05)).sum())}
     maps["hi_w"] = Wv[valid]
     maps["cav"] = (hi_maps["hi"][..., 0] * Wv)[valid].astype(np.float32)
     maps["ao_hi"] = hi_maps["hi"][..., 1][valid].astype(np.float32)
@@ -464,7 +484,7 @@ if lips:
     pc["mouth"] = {"slit_z": float(np.median(inner[:, 2])), "half_w": float(np.abs(lp[:, 0]).max()),
                    "y_inner": float(np.median(inner[:, 1]))}
 t = time.time()
-base, emis = PT.paint(maps, G.Z, pal, pc, log=log)
+base, emis = PT.paint(maps, ZI, pal, pc, log=log)
 log("painted %d texels (%.0fs)" % (len(pos), time.time() - t))
 B = np.zeros((SIZE, SIZE, 3), dtype=np.float32)
 E = np.zeros((SIZE, SIZE, 3), dtype=np.float32)

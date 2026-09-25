@@ -1,0 +1,23 @@
+{
+ "purpose": "Brax regression check for the backwards-compatible shared gf_hero changes made for Valdris's stage 2 (s2_prepare_blockout.py --concept-fig; s2_body_fit.py feet landmarks_only mode + all-bands-off guard; s2_texture.py zones / painter / bake_device / normal_max_tilt_deg / uv.hidden_reach hooks; s2_uv.py hidden_reach). Brax's configs set none of the new keys.",
+ "date": "2026-09-25",
+ "method": "Brax's stage-2 chain (prepare -> base -> fit -> parts -> texture) run in a scratch copy of the repo twice: once with the HEAD (4a7d54c) gf_hero scripts, once with the changed working-tree scripts. Both copies had the same one-line patch forcing the bakes onto the CPU (the GPU is shared); nothing under art/characters/brax/ was written.",
+ "results": {
+  "blockout_prepare.json": "identical",
+  "mh_landmarks.json": "identical",
+  "body_fit.json": "identical",
+  "parts.json": "identical",
+  "texture.json": "identical",
+  "brax_emissive.png": "identical (sha256 e1a6aeeb27..., the same as the committed LFS object)",
+  "brax_normal.png": "identical",
+  "brax_basecolor.png": "7 of 4,194,304 pixels differ by 1 level (8-bit), nowhere more",
+  "committed reports": "the new run's blockout_prepare.json, body_fit.json and parts.json equal art/characters/brax/reports/stage2/ (paths ignored)"
+ },
+ "base_colour_difference_explained": [
+  "HEAD s2_texture.py run on the CHANGED chain's intermediates reproduces the changed chain's base colour exactly (sha256 39cba2ee...): the texture / UV changes are output-neutral.",
+  "HEAD s2_texture.py run on the HEAD parts with the changed chain's sculpt reference reproduces HEAD's base colour (7774ef42...): the prepare change is output-neutral.",
+  "The HEAD s2_body_fit.py alone is not deterministic in face-corner order: three runs on identical inputs gave identical vertex positions but two different corner orders (runs 1 and 3: corner_vert 80ce67cf, run 2: 98feb3a8). The changed script's run matched one of them. The corner order changes the UV unwrap slightly, hence the 7 pixels. This is a pre-existing property of the shared fit, not of the Valdris changes."
+ ],
+ "verdict": "The shared-code changes are output-neutral for Brax. Strictly byte-identical Brax rebuilds need the pre-existing face-corner nondeterminism of s2_body_fit.py fixed (flagged separately).",
+ "later_change": "s2_uv.py face_hidden(start=1e-4) / unwrap_all(hidden_start=1e-4) and the s2_texture.py uv.hidden_start hook were added after this run; the default is the literal the code used before (c + n * 1e-4), so Brax's output cannot change."
+}

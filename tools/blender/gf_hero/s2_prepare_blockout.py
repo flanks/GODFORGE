@@ -39,8 +39,10 @@ def opt(name, default, cast=float):
 HEIGHT = opt("--height", 2.2)
 REPORT = opt("--report", None, str)
 MIN_PART_SHARE = 0.01          # connected pieces below 1 % of the vertices are generator crumbs
-# The approved concept (1536x1024): figure from crown y=28 px to sole y=995 px, centred at x=768 px.
-CONCEPT_FIG = {"crown_px": 28, "sole_px": 995, "centre_x_px": 768}
+# The approved concept (Brax's 1536x1024 front by default): figure from crown y=28 px to sole y=995 px, centred at
+# x=768 px. Another hero's concept passes --concept-fig <crown_px>,<sole_px>,<centre_x_px>.
+_cf = [float(v) for v in opt("--concept-fig", "28,995,768", str).split(",")]
+CONCEPT_FIG = {"crown_px": _cf[0], "sole_px": _cf[1], "centre_x_px": _cf[2]}
 
 report = {"source": rel(SRC), "height_m": HEIGHT}
 scene = reset_scene()

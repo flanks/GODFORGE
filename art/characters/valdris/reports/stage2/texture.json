@@ -1,0 +1,401 @@
+{
+ "size": 2048,
+ "uv_body_regions": {
+  "head": 880,
+  "torso": 614,
+  "sole_L": 75,
+  "sole_R": 75,
+  "foot_L": 270,
+  "ear_R": 78,
+  "handpalm_R": 216,
+  "handtop_L": 256,
+  "foot_R": 270,
+  "handtop_R": 256,
+  "arm_L": 196,
+  "leg_R": 207,
+  "leg_L": 207,
+  "ear_L": 78,
+  "handpalm_L": 216,
+  "arm_R": 202,
+  "eye_L": 60,
+  "eye_R": 60
+ },
+ "uv_body_cuts": {
+  "head": 8,
+  "torso": 20,
+  "arm_L": 21,
+  "leg_L": 19,
+  "foot_L": 1,
+  "arm_R": 21,
+  "leg_R": 19,
+  "foot_R": 1
+ },
+ "uv_copied": {},
+ "uv_hidden_faces_packed_small": 5411,
+ "texel_density_px_per_m": {
+  "BODY": {
+   "median": 109.7,
+   "p10": 75.0,
+   "p90": 334.1
+  },
+  "BEARD": {
+   "median": 262.6,
+   "p10": 96.9,
+   "p90": 356.1
+  },
+  "PAULDRONS": {
+   "median": 334.1,
+   "p10": 287.2,
+   "p90": 341.8
+  },
+  "ANVIL": {
+   "median": 326.6,
+   "p10": 100.2,
+   "p90": 342.9
+  },
+  "CUIRASS": {
+   "median": 122.2,
+   "p10": 94.5,
+   "p90": 350.7
+  },
+  "HIPS": {
+   "median": 332.0,
+   "p10": 100.2,
+   "p90": 351.1
+  },
+  "LOINCLOTH": {
+   "median": 334.6,
+   "p10": 331.3,
+   "p90": 334.9
+  },
+  "ARMS": {
+   "median": 310.4,
+   "p10": 95.5,
+   "p90": 350.8
+  },
+  "GAUNTLETS": {
+   "median": 312.0,
+   "p10": 100.0,
+   "p90": 341.8
+  },
+  "LEGS": {
+   "median": 306.1,
+   "p10": 95.9,
+   "p90": 351.3
+  },
+  "SABATONS": {
+   "median": 335.1,
+   "p10": 103.0,
+   "p90": 347.1
+  },
+  "CAPE": {
+   "median": 335.8,
+   "p10": 290.0,
+   "p90": 351.8
+  },
+  "_all": {
+   "median": 209.9,
+   "p10": 91.0,
+   "p90": 348.4
+  }
+ },
+ "uv_zero_area_faces": {
+  "BODY": {
+   "count": 1,
+   "first": [
+    [
+     -0.37,
+     0.124,
+     0.033
+    ]
+   ]
+  }
+ },
+ "bake_device": "CPU",
+ "normal_tilt_filter": {
+  "deg": [
+   32,
+   52
+  ],
+  "texels_faded": 50827
+ },
+ "normal_bake": {
+  "texels_with_detail": 387248,
+  "valid_fraction_of_target_zones": 0.2623,
+  "blur_px": 1.5
+ },
+ "atlas_coverage": 0.5342,
+ "textures": {
+  "base_color": "art/characters/valdris/textures/valdris_basecolor.png",
+  "emissive": "art/characters/valdris/textures/valdris_emissive.png",
+  "normal": "art/characters/valdris/textures/valdris_normal.png"
+ },
+ "stats": {
+  "BODY": {
+   "name": "BODY",
+   "vertices": 3953,
+   "faces": 4216,
+   "triangles": 7894,
+   "quads": 3678,
+   "tri_faces": 538,
+   "ngons": 0,
+   "quad_ratio": 0.872,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 3,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "BEARD": {
+   "name": "BEARD",
+   "vertices": 1177,
+   "faces": 1334,
+   "triangles": 2178,
+   "quads": 844,
+   "tri_faces": 490,
+   "ngons": 0,
+   "quad_ratio": 0.633,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 44,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "PAULDRONS": {
+   "name": "PAULDRONS",
+   "vertices": 422,
+   "faces": 482,
+   "triangles": 748,
+   "quads": 266,
+   "tri_faces": 216,
+   "ngons": 0,
+   "quad_ratio": 0.552,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 24,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "ANVIL": {
+   "name": "ANVIL",
+   "vertices": 87,
+   "faces": 108,
+   "triangles": 166,
+   "quads": 58,
+   "tri_faces": 50,
+   "ngons": 0,
+   "quad_ratio": 0.537,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "CUIRASS": {
+   "name": "CUIRASS",
+   "vertices": 1080,
+   "faces": 1076,
+   "triangles": 2152,
+   "quads": 1076,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 8,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "HIPS": {
+   "name": "HIPS",
+   "vertices": 268,
+   "faces": 288,
+   "triangles": 504,
+   "quads": 216,
+   "tri_faces": 72,
+   "ngons": 0,
+   "quad_ratio": 0.75,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 8,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "LOINCLOTH": {
+   "name": "LOINCLOTH",
+   "vertices": 126,
+   "faces": 124,
+   "triangles": 248,
+   "quads": 124,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 1,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "ARMS": {
+   "name": "ARMS",
+   "vertices": 1010,
+   "faces": 1024,
+   "triangles": 2004,
+   "quads": 980,
+   "tri_faces": 44,
+   "ngons": 0,
+   "quad_ratio": 0.957,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 12,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "GAUNTLETS": {
+   "name": "GAUNTLETS",
+   "vertices": 836,
+   "faces": 792,
+   "triangles": 1504,
+   "quads": 712,
+   "tri_faces": 80,
+   "ngons": 0,
+   "quad_ratio": 0.899,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 42,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "LEGS": {
+   "name": "LEGS",
+   "vertices": 594,
+   "faces": 608,
+   "triangles": 1172,
+   "quads": 564,
+   "tri_faces": 44,
+   "ngons": 0,
+   "quad_ratio": 0.928,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "SABATONS": {
+   "name": "SABATONS",
+   "vertices": 660,
+   "faces": 720,
+   "triangles": 1296,
+   "quads": 576,
+   "tri_faces": 144,
+   "ngons": 0,
+   "quad_ratio": 0.8,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 8,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  },
+  "CAPE": {
+   "name": "CAPE",
+   "vertices": 504,
+   "faces": 500,
+   "triangles": 1000,
+   "quads": 500,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_valdris"
+   ]
+  }
+ },
+ "triangles_total": 20866,
+ "triangles_variants": {}
+}

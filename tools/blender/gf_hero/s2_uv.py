@@ -172,14 +172,15 @@ def shell_seams(obj, bvh_all):
     return n
 
 
-def face_hidden(bm, bvh_all, reach=0.03):
-    """True for a face whose normal ray hits other geometry within `reach` (inner walls, undersides)."""
+def face_hidden(bm, bvh_all, reach=0.03, start=1e-4):
+    """True for a face whose normal ray hits other geometry within `reach` (inner walls, undersides). The ray starts
+    `start` metres off the face, so a face in a shallow concave crease does not count its own neighbours."""
     bm.faces.ensure_lookup_table()
     out = np.zeros(len(bm.faces), bool)
     for f in bm.faces:
         c = f.calc_center_median()
         n = f.normal
-        loc, nn, idx, dist = bvh_all.ray_cast(c + n * 1e-4, n, reach)
+        loc, nn, idx, dist = bvh_all.ray_cast(c + n * start, n, reach)
         out[f.index] = loc is not None
     return out
 
@@ -196,8 +197,10 @@ def build_bvh_all(objs):
     return BVHTree.FromPolygons(verts, polys)
 
 
-def unwrap_all(objs, body, smart_objs, shell_objs, density_hidden=0.3, margin_px=8, size=2048):
-    """Unwrap every object into a fresh 'UVMap', equalise texel density, shrink hidden islands, pack."""
+def unwrap_all(objs, body, smart_objs, shell_objs, density_hidden=0.3, margin_px=8, size=2048, hidden_reach=0.03,
+               hidden_start=1e-4):
+    """Unwrap every object into a fresh 'UVMap', equalise texel density, shrink hidden islands, pack.
+    hidden_reach: how far (m) along its normal a face may find other geometry and still count as hidden."""
     for o in objs:
         me = o.data
         while me.uv_layers:
@@ -228,7 +231,7 @@ def unwrap_all(objs, body, smart_objs, shell_objs, density_hidden=0.3, margin_px
         me = o.data
         bm = bmesh.new()
         bm.from_mesh(me)
-        hid = face_hidden(bm, bvh)
+        hid = face_hidden(bm, bvh, reach=hidden_reach, start=hidden_start)
         uvl = bm.loops.layers.uv.active
         # islands through non-seam, uv-connected edges: shrink an island when most of it is hidden
         parent = list(range(len(bm.faces)))

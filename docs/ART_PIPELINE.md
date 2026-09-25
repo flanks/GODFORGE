@@ -240,6 +240,23 @@ crack network, eyes) in a separate emissive map that Heat / Meltdown scale at ru
 network, grin, chunkier hair and beard. Brax's results,
 numbers and the acceptance checklist: `art/characters/brax/reports/stage2_production_mesh.md`.
 
+**Valdris (2026-09-25), the armoured variant of the chain.** His blockout is plate armour, not a body, so the
+same base / fit steps set only the proportions and a Valdris step makes the rest:
+
+```sh
+python tools/blender/gf_hero/s2_valdris_run.py            # [--from <step>] [--only <step>], 4-9 min, CPU only
+```
+
+| Step | What |
+|---|---|
+| `s2_valdris_body.py` | conforms the hm08 body into an **under-suit**: the legs follow the blockout's outer armour envelope minus the plate thickness, the torso becomes a smooth barrel, the forearms are centred for the colossus_cannon sleeve, the weapon frames are recorded on the forearm axis |
+| `s2_valdris_parts.py` + `s2_valdris_geom.py` | 141 closed rigid armour pieces with suggested bones, the beard (moustache, five braids), and the separate cape with its collar |
+| `s2_valdris_paint.py` | the painter behind the shared `s2_texture.py` (its new `zones` / `painter` / `bake_device` hooks) |
+| `s2_valdris_review.py`, `s2_valdris_sheets.py` | review renders: a Cycles-CPU emission toon (never EEVEE: the GPU is shared), the weapon GLB on the hand frame with a sleeve-fit check, review sheets |
+
+Results and the stage-3 helper-bone plan: `art/characters/valdris/reports/stage2_production_mesh.md`. The shared
+scripts only gained default-preserving options, so Brax's chain is unchanged (§ "Shared tool changes" in that report).
+
 ### Weapons (chassis models, user decision 2026-09-25)
 
 Weapons are **not part of hero bodies**. Every chassis has its own model, attached to hand sockets, so any

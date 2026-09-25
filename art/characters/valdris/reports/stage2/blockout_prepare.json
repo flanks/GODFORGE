@@ -1,0 +1,61 @@
+{
+ "source": "art/characters/valdris/source/valdris_trellis2_s202.glb",
+ "height_m": 2.3,
+ "raw": {
+  "vertices_split": 577012,
+  "triangles": 690005
+ },
+ "scale_factor": 2.29953,
+ "weld": {
+  "verts_before": 577012,
+  "verts_after": 332769
+ },
+ "parts_kept": [
+  332269
+ ],
+ "parts_dropped": {
+  "count": 29,
+  "verts": 500,
+  "largest": 140
+ },
+ "bounds_m": {
+  "min": [
+   -1.0757,
+   -0.8147,
+   0.0
+  ],
+  "max": [
+   1.0757,
+   0.8147,
+   2.3
+  ]
+ },
+ "span_over_height": 0.9354,
+ "stats": {
+  "name": "REF_blockout",
+  "vertices": 332269,
+  "faces": 689101,
+  "triangles": 689101,
+  "quads": 0,
+  "tri_faces": 689101,
+  "ngons": 0,
+  "quad_ratio": 0.0,
+  "boundary_edges": 328,
+  "nonmanifold_edges": 1574,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 1,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": [
+   "MAT_REF_blockout_trellis"
+  ]
+ },
+ "concept": {
+  "path": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+  "m_per_px": 0.002808
+ },
+ "out": "art/characters/valdris/work/valdris_retopo_start.blend"
+}

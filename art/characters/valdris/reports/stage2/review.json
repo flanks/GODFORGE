@@ -1,0 +1,127 @@
+{
+ "source": "valdris_stage2.blend",
+ "bounds_m": {
+  "min": [
+   -1.1492,
+   -0.615,
+   0.0
+  ],
+  "max": [
+   1.1492,
+   0.623,
+   2.3128
+  ]
+ },
+ "height_m": 2.3128,
+ "span_m": 2.2985,
+ "cannon": {
+  "glb": "colossus_cannon.glb",
+  "attached_at": "hand_frames.R (identity)",
+  "frame": {
+   "origin": [
+    -0.99532,
+    0.0,
+    1.78
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.915,
+   "knuckle_abs_x": 1.0358,
+   "hand_verts": 150,
+   "note": "origin = palm centre x on the forearm axis (s2_valdris_body.py); vertex mean in hand_frames_vertex_mean"
+  }
+ },
+ "sleeve_fit": {
+  "free_radius_m": {
+   "rear_cuff_y<-0.30": 0.0944,
+   "sleeve": 0.0983,
+   "drum_y>0.06": 0.181
+  },
+  "note": "grip frame of the cannon (y = barrel); the inner handle bar (|y|, |x| < 0.021) is the grip itself and not counted",
+  "objects": [
+   {
+    "object": "BODY",
+    "verts_in_cannon_span": 533,
+    "penetrating_verts": 39,
+    "max_penetration_m": 0.0511,
+    "min_clearance_m": -0.0511,
+    "verts_in_rear_cuff_hoop": 0
+   },
+   {
+    "object": "ARMS",
+    "verts_in_cannon_span": 216,
+    "penetrating_verts": 0,
+    "max_penetration_m": 0.0,
+    "min_clearance_m": 0.0039,
+    "verts_in_rear_cuff_hoop": 0
+   },
+   {
+    "object": "GAUNTLETS",
+    "verts_in_cannon_span": 418,
+    "penetrating_verts": 25,
+    "max_penetration_m": 0.069,
+    "min_clearance_m": -0.069,
+    "verts_in_rear_cuff_hoop": 0
+   }
+  ]
+ },
+ "ingame_px_bare_tpose": {
+  "22": {
+   "tall_px": 91.9,
+   "wide_px": 112.8
+  },
+  "28": {
+   "tall_px": 72.2,
+   "wide_px": 88.7
+  }
+ },
+ "ingame_px_armed_tpose": {
+  "22": {
+   "tall_px": 91.9,
+   "wide_px": 144.7
+  },
+  "28": {
+   "tall_px": 72.2,
+   "wide_px": 113.7
+  }
+ },
+ "ingame_px_armed_pose45": {
+  "22": {
+   "tall_px": 91.9,
+   "wide_px": 121.6
+  },
+  "28": {
+   "tall_px": 72.2,
+   "wide_px": 95.5
+  }
+ },
+ "ingame": {
+  "pitch_deg": 55.0,
+  "view_heights_m": [
+   22.0,
+   28.0
+  ],
+  "screen_px": 1080,
+  "renderer": "Cycles CPU emission toon"
+ },
+ "front_iou_vs_concept_bare_tpose": 0.809,
+ "aspect_mesh_bare_tpose": 0.9933,
+ "front_iou_vs_concept_armed_tpose": 0.6713,
+ "aspect_mesh_armed_tpose": 1.2752,
+ "front_iou_vs_concept_armed_pose45": 0.6901,
+ "aspect_mesh_armed_pose45": 1.0714,
+ "aspect_concept": 0.9366
+}

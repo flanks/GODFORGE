@@ -281,9 +281,10 @@ for it, (dmax, alpha, sm, relax) in enumerate(schedule):
         fitted_head, Sh, Th = res
         new = new + (fitted_head - co) * s_head[:, None] * alpha
         rigid_log["head"] = {"scale": np.round(Sh, 4).tolist(), "translate_m": np.round(Th, 4).tolist()}
-    # -- near-rigid feet, one fit per foot (the mirror step keeps them symmetric)
+    # -- near-rigid feet, one fit per foot (the mirror step keeps them symmetric); mode landmarks_only keeps the
+    #    landmark warp (feet inside armoured boots: the sculpt there is the boot, not the foot)
     fc_ = rig_cfg["feet"]
-    for side in (1, -1):
+    for side in ((1, -1) if fc_.get("mode") != "landmarks_only" else ()):
         fm = (s_feet > 0.01) & (co[:, 0] * side > 0)
         gf = tgt - hn * fc_["inset"]
         wf = np.where(ok & fm, 1.0, 0.0)
@@ -305,6 +306,8 @@ nrm = get_normals(me)
 tgt, hn, face, depth, ok = query(co, nrm, 0.05)
 fitted = ok & (bp["weight"] > 0.5)
 err = np.abs(depth + bp["inset"])[fitted]
+if not len(err):                 # every band at weight 0 (a hero whose body is fitted by a later step)
+    err = np.zeros(1)
 report["fit"] = {"iterations": len(schedule), "free_form_fitted_verts": int(fitted.sum()),
                  "mean_abs_dist_m": round(float(err.mean()), 5), "p95_abs_dist_m": round(float(np.percentile(err, 95)), 5),
                  "max_abs_dist_m": round(float(err.max()), 5), "rigid_regions": rigid_log}

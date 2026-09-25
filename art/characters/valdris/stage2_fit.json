@@ -1,0 +1,547 @@
+{
+ "hero": "valdris",
+ "height_m": 2.3,
+ "base": {
+  "_doc": "MPFB (tool only) macro sliders and CC0 MakeHuman targets applied before baking. Valdris: an older, very heavy, maximally muscled man; the face toward the hero front's stern forge-lord: heavy brow ridge set forward and angled down over deep-set small eyes, a broad flared nose with a hump, mouth corners down, strong cheekbones, a wide jaw and chin (under the beard), a thick neck.",
+  "macro": {
+   "gender": 1.0,
+   "age": 0.8,
+   "muscle": 1.0,
+   "weight": 1.0,
+   "proportions": 1.0,
+   "height": 0.6
+  },
+  "targets": {
+   "head-square": 0.7,
+   "head-age-incr": 0.6,
+   "eyebrows-trans-forward": 1.0,
+   "eyebrows-angle-down": 1.0,
+   "eyebrows-trans-down": 0.8,
+   "forehead-trans-backward": 0.25,
+   "l-eye-scale-decr": 0.35,
+   "r-eye-scale-decr": 0.35,
+   "l-eye-bag-incr": 0.5,
+   "r-eye-bag-incr": 0.5,
+   "nose-volume-incr": 0.8,
+   "nose-scale-horiz-incr": 0.6,
+   "nose-flaring-incr": 0.7,
+   "nose-hump-incr": 0.6,
+   "nose-point-width-incr": 0.5,
+   "nose-scale-vert-incr": 0.2,
+   "mouth-angles-down": 1.0,
+   "mouth-upperlip-volume-decr": 0.3,
+   "chin-prominent-incr": 0.6,
+   "chin-width-incr": 0.9,
+   "chin-bones-incr": 0.7,
+   "l-cheek-bones-incr": 0.7,
+   "r-cheek-bones-incr": 0.7,
+   "l-cheek-volume-decr": 0.3,
+   "r-cheek-volume-decr": 0.3,
+   "measure-neck-circ-incr": 1.0,
+   "neck-scale-horiz-incr": 0.8
+  }
+ },
+ "height_rationale": "The brief (section 3) proposes 2.3 m, the top of the roster range 2.0-2.3 m: Valdris is the juggernaut (collision radius 0.55, the largest). Brax stands 2.2 m. The stage-1 blockout was normalised to 2.3 m. Mountainfall scales him x1.8 to 4.14 m.",
+ "units": "metres, Blender axes: Z up, hero faces -Y, +X = his left, feet on z = 0",
+ "source": "measured on art/characters/valdris/work/valdris_retopo_start.blend (REF_blockout = TRELLIS s202 normalised to 2.3 m: sections through the legs, hips, torso and head) and the resolved hero front references/valdris_concept_front_mirrored.png (crown y=190 px, sole y=1009 px, centre x=394 px; 2.81 mm/px). Where they disagree on the pose the concept wins (the blockout's arms reach 45 deg forward); the T-pose is built from the concept.",
+ "concept_fig_px": [
+  190,
+  1009,
+  394
+ ],
+ "landmarks": {
+  "_doc": "MakeHuman (MPFB game_engine rig, T-posed) landmark -> Valdris position. _l entries are mirrored to _r. Head: the MakeHuman head moved as a block (scale 1.0) to the hero front's sunk, forward-hunched head: crown 2.30 level with the pauldron tops, eyes 2.195, the face 0.23 m in front of the spine line (blockout sagittal section). Arms: the arm line at z 1.78 (the anvil's top face; blockout 1.75-1.78, concept 1.80-1.85); a short upper arm swallowed by the pauldron (shoulder |x| 0.37 -> elbow 0.595) and the elbow-to-palm distance 0.38 m that the colossus_cannon sleeve needs (its elbow cuff sits 0.345-0.38 m behind the palm). Legs from the blockout: crotch ~1.10, knee 0.62, ankle 0.14 inside the sabaton, boot centres at |x| 0.29. Stance widened from the blockout's (boot centres |x| 0.29) to |x| 0.345 toward the brief's pillar 1 (outer boot to outer boot 0.52 H); the legs keep the blockout's armour envelope (s2_valdris_body.py samples it around the blockout's own leg centres).",
+  "skull_top": [
+   0.0,
+   -0.085,
+   2.305
+  ],
+  "eye_l": [
+   0.033,
+   -0.188,
+   2.195
+  ],
+  "nose_tip": [
+   0.0,
+   -0.232,
+   2.154
+  ],
+  "ear_l": [
+   0.093,
+   -0.09,
+   2.193
+  ],
+  "skull_back": [
+   0.0,
+   -0.004,
+   2.207
+  ],
+  "head.head": [
+   0.0,
+   -0.1,
+   2.153
+  ],
+  "neck_01.head": [
+   0.0,
+   -0.035,
+   2.04
+  ],
+  "spine_03.tail": [
+   0.0,
+   0.0,
+   1.9
+  ],
+  "spine_03.head": [
+   0.0,
+   0.03,
+   1.56
+  ],
+  "spine_02.head": [
+   0.0,
+   0.03,
+   1.43
+  ],
+  "spine_01.head": [
+   0.0,
+   0.03,
+   1.3
+  ],
+  "pelvis.head": [
+   0.0,
+   0.01,
+   1.19
+  ],
+  "clavicle_l.head": [
+   0.035,
+   -0.02,
+   1.96
+  ],
+  "upperarm_l.head": [
+   0.37,
+   0.0,
+   1.78
+  ],
+  "lowerarm_l.head": [
+   0.595,
+   0.0,
+   1.78
+  ],
+  "hand_l.head": [
+   0.915,
+   0.0,
+   1.78
+  ],
+  "middle_03_l.tail": [
+   1.14,
+   0.0,
+   1.78
+  ],
+  "thigh_l.head": [
+   0.165,
+   0.0,
+   1.14
+  ],
+  "calf_l.head": [
+   0.29,
+   -0.02,
+   0.62
+  ],
+  "foot_l.head": [
+   0.345,
+   0.03,
+   0.14
+  ],
+  "ball_l.head": [
+   0.35,
+   -0.2,
+   0.035
+  ],
+  "toe_l": [
+   0.345,
+   -0.315,
+   0.025
+  ],
+  "heel_l": [
+   0.355,
+   0.15,
+   0.04
+  ]
+ },
+ "fit": {
+  "_doc": "Valdris's body is the UNDER-SUIT (mail, leather, padded cloth, the face and the gauntlet glove); the armour is separate rigid plates (stage2_parts.json). The blockout surface is armour, so the legs are fitted INSIDE it (inset = plate thickness + clearance) and the torso, neck and arms are not fitted (weight 0: the blockout there is the anvil, the pauldrons, the tassets and the fused cape); s2_valdris_body.py then sets the torso girth. The head keeps the landmark warp (the TRELLIS face is soft).",
+  "arm_fit_max_abs_x": 0.3,
+  "arm_cut_abs_x": null,
+  "bands": [
+   {
+    "name": "feet",
+    "z": [
+     0.0,
+     0.14
+    ],
+    "weight": 0.0,
+    "_doc": "legs: no per-vertex fit here. The blockout's leg armour is a hollow double-walled shell, so the along-the-normal fit lands on its INNER wall; s2_valdris_body.py conforms the legs to its OUTER envelope minus an inset instead."
+   },
+   {
+    "name": "shin",
+    "z": [
+     0.14,
+     0.5
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "knee",
+    "z": [
+     0.5,
+     0.76
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "thigh",
+    "z": [
+     0.76,
+     1.06
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "torso",
+    "z": [
+     1.06,
+     2.02
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "neck",
+    "z": [
+     2.02,
+     2.12
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "head",
+    "z": [
+     2.12,
+     2.4
+    ],
+    "weight": 0.0
+   }
+  ],
+  "rigid": {
+   "head": {
+    "z_min": 2.1,
+    "ramp": 0.04,
+    "mode": "landmarks_only",
+    "contain": 0.02,
+    "face_front_y": -0.1,
+    "keep_weight": 0.3
+   },
+   "feet": {
+    "z_max": 0.14,
+    "ramp": 0.04,
+    "inset": 0.045,
+    "mode": "landmarks_only",
+    "_doc": "the feet keep the landmark warp (heel, ball, toe, ankle); the sculpt there is the sabaton"
+   }
+  },
+  "post_smooth": [],
+  "extra_loops": [
+   {
+    "_doc": "knee: one loop through the joint (calf head z 0.62) and one each side",
+    "z": 0.62,
+    "abs_x_min": 0.1
+   },
+   {
+    "z": 0.575,
+    "abs_x_min": 0.1
+   },
+   {
+    "z": 0.665,
+    "abs_x_min": 0.1
+   },
+   {
+    "_doc": "elbow: a loop through the joint (lowerarm head |x| 0.595) and one each side",
+    "axis": "x",
+    "abs_x": 0.595,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.56,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.63,
+    "z_min": 1.5
+   },
+   {
+    "_doc": "wrist: a loop through the joint (hand head |x| 0.915) and one just before it",
+    "axis": "x",
+    "abs_x": 0.915,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.885,
+    "z_min": 1.5
+   }
+  ],
+  "_doc_arms": "Both arms are the concept's fist-gauntlet arm (2026-09-25 decision: the siege cannon is a separate weapon, colossus_cannon). The right forearm and gauntlet must fit the cannon sleeve (free radius 0.098 m from 0.30 m behind the palm to 0.06 m in front of it, 0.094 m at the elbow cuff; measured by ray casts on assets/models/weapons/colossus_cannon.glb), so the under-suit forearm is thin (0.058-0.08 m) and the vambrace plates stay under 0.090 m.",
+  "limb_radial": {
+   "_doc": "arm cross-section around the arm axis (y=axis_y, z=axis_z) scaled per x-slab to the radius profile: upper arm under the pauldron 0.12 m, elbow 0.082 m, forearm 0.072 -> 0.058 m at the wrist; the glove hand x hand_scale.",
+   "axis_y": 0.0,
+   "axis_z": 1.78,
+   "abs_x": [
+    0.38,
+    0.46,
+    0.54,
+    0.6,
+    0.7,
+    0.8,
+    0.915
+   ],
+   "radius_m": [
+    0.125,
+    0.112,
+    0.095,
+    0.082,
+    0.074,
+    0.067,
+    0.058
+   ],
+   "blend_from_abs_x": 0.36,
+   "hand_from_abs_x": 0.925,
+   "hand_scale": 1.22,
+   "smooth": {
+    "abs_x": [
+     0.36,
+     0.92
+    ],
+    "iters": 8,
+    "amount": 0.5
+   }
+  },
+  "hand_frame": {
+   "_doc": "weapon attach frame per hand (stage 3 adds weapon_L / weapon_R sockets here): origin = palm centre (mean of the hand vertices between the wrist joint and the knuckle line), +Y along the fingers, +Z out of the back of the hand, +X = Y x Z. The colossus_cannon's grip_R is attached here with an identity transform in the review renders.",
+   "wrist_joint": "hand_l.head",
+   "knuckle_joint": "middle_01_l.head"
+  }
+ },
+ "signature_weapon": "colossus_cannon",
+ "_doc_signature_weapon": "Built and owned by the weapon track (art/weapons/colossus_cannon/, assets/models/weapons/colossus_cannon.glb); stage 2 only attaches its GLB at hand_frames.R in the review renders and checks the fit.",
+ "conform": {
+  "_doc": "s2_valdris_body.py: the under-suit girth. legs: blockout OUTER envelope around each leg minus inset (plate thickness + clearance), radius clamped to [r_min, r_max]; torso: per-slab target half-width / front y / back y (z, half_width, front_y, back_y), measured on the blockout's plate faces beside the anvil (front ~-0.33 at |x| 0.3), its flanks (|x| ~0.42-0.45) and under the fused cape (back ~+0.26), minus ~5 cm of plate and clearance.",
+  "legs": {
+   "z": [
+    0.12,
+    1.12
+   ],
+   "dz": 0.02,
+   "dtheta_deg": 15,
+   "ray_start": 0.24,
+   "smooth_z_cells": 2.0,
+   "smooth_theta_cells": 1.0,
+   "inset": [
+    [
+     0.12,
+     0.035
+    ],
+    [
+     0.45,
+     0.035
+    ],
+    [
+     0.55,
+     0.05
+    ],
+    [
+     0.7,
+     0.05
+    ],
+    [
+     0.8,
+     0.04
+    ],
+    [
+     1.12,
+     0.045
+    ]
+   ],
+   "r_min": [
+    [
+     0.12,
+     0.07
+    ],
+    [
+     0.6,
+     0.075
+    ],
+    [
+     1.12,
+     0.1
+    ]
+   ],
+   "r_max": [
+    [
+     0.12,
+     0.14
+    ],
+    [
+     0.6,
+     0.14
+    ],
+    [
+     0.9,
+     0.17
+    ],
+    [
+     1.12,
+     0.18
+    ]
+   ],
+   "blend_bottom": [
+    0.14,
+    0.22
+   ],
+   "blend_top": [
+    1.02,
+    1.12
+   ],
+   "medial_min_abs_x": 0.012,
+   "radius_scale": 1.05,
+   "blockout_offset_x": [
+    [
+     0.14,
+     0.055
+    ],
+    [
+     0.62,
+     0.035
+    ],
+    [
+     1.0,
+     0.0
+    ]
+   ],
+   "_doc_offset": "blockout_offset_x [z, dx]: our leg centre minus the blockout's, lateral (the stance was widened: ankle 0.345 vs 0.29, knee 0.29 vs 0.255, hip unchanged); the envelope is sampled around the blockout's leg"
+  },
+  "torso": {
+   "slabs": [
+    [
+     1.08,
+     0.24,
+     -0.16,
+     0.16
+    ],
+    [
+     1.18,
+     0.31,
+     -0.2,
+     0.19
+    ],
+    [
+     1.3,
+     0.34,
+     -0.23,
+     0.2
+    ],
+    [
+     1.45,
+     0.35,
+     -0.26,
+     0.2
+    ],
+    [
+     1.6,
+     0.37,
+     -0.28,
+     0.21
+    ],
+    [
+     1.75,
+     0.37,
+     -0.27,
+     0.21
+    ],
+    [
+     1.88,
+     0.34,
+     -0.23,
+     0.2
+    ],
+    [
+     1.98,
+     0.26,
+     -0.15,
+     0.16
+    ],
+    [
+     2.06,
+     0.2,
+     -0.12,
+     0.13
+    ]
+   ],
+   "arm_from_z": 1.6,
+   "arm_abs_x": [
+    0.3,
+    0.42
+   ],
+   "blend_bottom": [
+    1.04,
+    1.14
+   ],
+   "blend_top": [
+    1.98,
+    2.08
+   ],
+   "mode": "barrel",
+   "exponent": 2.6
+  },
+  "relax": {
+   "iters": 6,
+   "amount": 0.5
+  },
+  "forearm": {
+   "_doc": "centre the forearm slabs on the arm axis and set the mean radius (the right forearm lies in the colossus_cannon sleeve: free radius 0.098 m, 0.094 m at its elbow cuff; plate outer radius must stay <= 0.088 m)",
+   "axis_y": 0.0,
+   "axis_z": 1.78,
+   "abs_x": [
+    0.55,
+    0.93
+   ],
+   "radius_x": [
+    0.55,
+    0.62,
+    0.7,
+    0.8,
+    0.9,
+    0.93
+   ],
+   "radius_m": [
+    0.085,
+    0.066,
+    0.062,
+    0.058,
+    0.052,
+    0.052
+   ],
+   "blend_in": [
+    0.56,
+    0.62
+   ],
+   "blend_out": [
+    0.905,
+    0.93
+   ]
+  },
+  "hand_frame_on_axis": {
+   "axis_y": 0.0,
+   "axis_z": 1.78
+  }
+ }
+}
