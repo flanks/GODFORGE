@@ -1,0 +1,149 @@
+{
+ "kind": "weapon",
+ "key": "sunspike_shotgun",
+ "tier": "two_handed",
+ "tris": 2948,
+ "tris_budget": [
+  2000,
+  4000
+ ],
+ "textures": [
+  {
+   "name": "sunspike_shotgun_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 119087
+  },
+  {
+   "name": "sunspike_shotgun_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 760970
+  }
+ ],
+ "sockets": {
+  "grip_L": {
+   "translation": [
+    0.0,
+    0.012,
+    -0.31
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "glow_core": {
+   "translation": [
+    0.0,
+    0.14,
+    -0.06
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "grip_R": {
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.14,
+    -0.592
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  }
+ },
+ "clips": [],
+ "skeleton": null,
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = palm centre of the main hand, -Z = barrel/forward, +Y = up, +X = right; attach as a child of the hand socket / aim pivot with an identity transform.",
+ "bounds_m": {
+  "min": [
+   -0.2478,
+   -0.1219,
+   -0.65
+  ],
+  "max": [
+   0.2478,
+   0.4006,
+   0.395
+  ]
+ },
+ "size_m": 1.045,
+ "glb": "assets/models/weapons/sunspike_shotgun.glb",
+ "glb_bytes": 1024448,
+ "glb_sha256": "b8b1f5d8af46de71537fe1ea5c83f0397f97585314b6ad3fe7f9a8a5078a2416",
+ "source_blend": "art/weapons/sunspike_shotgun/source/sunspike_shotgun.blend",
+ "build_script": "tools/blender/gf_assets/weapons/sunspike_shotgun.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "chassis": {
+  "damage_type": "Radiant",
+  "style": "Pellet",
+  "tags": [
+   "spread",
+   "close"
+  ]
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 587.0,
+   "p10": 529.3,
+   "p90": 637.2
+  },
+  "coverage": 0.388
+ }
+}

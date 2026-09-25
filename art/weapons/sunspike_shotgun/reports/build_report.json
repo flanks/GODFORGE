@@ -1,0 +1,159 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\weapons\\sunspike_shotgun.glb",
+  "key": "sunspike_shotgun",
+  "kind": "weapon",
+  "tier": "two_handed",
+  "extensions_used": [],
+  "tris": 2948,
+  "budget": [
+   2000,
+   4000
+  ],
+  "textures": [
+   {
+    "name": "sunspike_shotgun_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 119087
+   },
+   {
+    "name": "sunspike_shotgun_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 760970
+   }
+  ],
+  "materials": [
+   "M_sunspike_shotgun"
+  ],
+  "nodes": [
+   "glow_core",
+   "grip_L",
+   "grip_R",
+   "muzzle",
+   "sunspike_shotgun_mesh",
+   "sunspike_shotgun"
+  ],
+  "sockets": {
+   "grip_L": {
+    "translation": [
+     0.0,
+     0.012,
+     -0.31
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "glow_core": {
+    "translation": [
+     0.0,
+     0.14,
+     -0.06
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "grip_R": {
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.14,
+     -0.592
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.2478,
+    -0.1219,
+    -0.65
+   ],
+   "max": [
+    0.2478,
+    0.4006,
+    0.395
+   ]
+  },
+  "length_m": 1.045,
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 587.0,
+   "p10": 529.3,
+   "p90": 637.2
+  },
+  "coverage": 0.388,
+  "zones": [
+   "iron",
+   "bronze",
+   "gold",
+   "sunray",
+   "wood",
+   "leather",
+   "shell",
+   "glow_bell",
+   "glow_core",
+   "glow_line"
+  ],
+  "decals": 2,
+  "basecolor": "art/weapons/sunspike_shotgun/textures/sunspike_shotgun_basecolor.png",
+  "emissive": "art/weapons/sunspike_shotgun/textures/sunspike_shotgun_emissive.png",
+  "emissive_texels": 107315,
+  "seconds": 18.2
+ }
+}

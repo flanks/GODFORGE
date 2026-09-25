@@ -1,0 +1,30 @@
+{
+ "asset": "sunspike_shotgun",
+ "kind": "weapon",
+ "tier": "two_handed",
+ "pipeline": "docs/art/WEAPONS.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/weapons/sunspike_shotgun.glb",
+    "assets/models/weapons/sunspike_shotgun.meta.json",
+    "art/weapons/sunspike_shotgun/source/sunspike_shotgun.blend",
+    "art/weapons/sunspike_shotgun/textures/sunspike_shotgun_basecolor.png",
+    "art/weapons/sunspike_shotgun/textures/sunspike_shotgun_emissive.png",
+    "art/weapons/sunspike_shotgun/reports/sunspike_shotgun_review.png"
+   ],
+   "notes": "Built from code by tools/blender/gf_assets/weapons/sunspike_shotgun.py (gf_assets proof weapon)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}
