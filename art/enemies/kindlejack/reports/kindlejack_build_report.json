@@ -5,7 +5,7 @@
   "kind": "enemy",
   "tier": "swarm",
   "extensions_used": [],
-  "tris": 1352,
+  "tris": 1472,
   "budget": [
    600,
    1500
@@ -19,7 +19,7 @@
      512
     ],
     "format": "png",
-    "bytes": 35032
+    "bytes": 45894
    },
    {
     "name": "kindlejack_basecolor",
@@ -29,7 +29,7 @@
      512
     ],
     "format": "png",
-    "bytes": 336416
+    "bytes": 355656
    }
   ],
   "materials": [
@@ -41,23 +41,6 @@
      0.0,
      0.6154,
      0.0037
-    ],
-    "forward": [
-     -0.0,
-     0.0,
-     -1.0
-    ],
-    "up": [
-     0.0,
-     1.0,
-     0.0
-    ]
-   },
-   "head_top": {
-    "translation": [
-     0.0,
-     1.24,
-     0.0
     ],
     "forward": [
      -0.0,
@@ -86,22 +69,39 @@
      1.0,
      0.0
     ]
+   },
+   "head_top": {
+    "translation": [
+     0.0,
+     1.3,
+     0.0
+    ],
+    "forward": [
+     -0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
    }
   },
   "bounds": {
    "min": [
-    -0.3628,
+    -0.4418,
     0.0,
-    -0.4426
+    -0.5073
    ],
    "max": [
-    0.2888,
-    1.0321,
-    0.2254
+    0.4144,
+    1.0903,
+    0.3865
    ]
   },
-  "height_m": 1.032,
-  "height_vs_hero": 0.469,
+  "height_m": 1.09,
+  "height_vs_hero": 0.496,
   "joints": [
    "root",
    "body",
@@ -126,37 +126,40 @@
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 162.4,
-   "p10": 96.9,
-   "p90": 214.5
+   "median": 139.6,
+   "p10": 61.7,
+   "p90": 166.0
   },
-  "coverage": 0.359,
+  "coverage": 0.326,
   "zones": [
    "wood",
    "char",
+   "crown",
    "bind",
    "limb",
    "core",
+   "heart",
+   "flame",
    "fuse",
    "spark"
   ],
   "decals": 2,
   "basecolor": "art/enemies/kindlejack/textures/kindlejack_basecolor.png",
   "emissive": "art/enemies/kindlejack/textures/kindlejack_emissive.png",
-  "emissive_texels": 16340,
-  "seconds": 26.0
+  "emissive_texels": 20819,
+  "seconds": 16.9
  },
  "skin": {
-  "vertices": 782,
+  "vertices": 847,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 582,
-   "head": 96,
+   "body": 629,
+   "head": 78,
    "legs_a": 26,
    "legs_b": 26,
-   "tail": 52
+   "tail": 88
   }
  },
  "parts": [
@@ -165,175 +168,175 @@
    "name": "stick0",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 1,
    "name": "stick1",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 2,
    "name": "stick2",
    "zone": "char",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 3,
    "name": "stick3",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 4,
    "name": "stick4",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 5,
    "name": "stick5",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 6,
    "name": "stick6",
    "zone": "char",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 7,
    "name": "stick7",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 8,
    "name": "stick8",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 9,
    "name": "stick9",
    "zone": "wood",
    "bone": "body",
-   "faces": 26
+   "faces": 22
   },
   {
    "id": 10,
    "name": "stick_snapped",
    "zone": "wood",
    "bone": "body",
-   "faces": 19
+   "faces": 16
   },
   {
    "id": 11,
    "name": "stick_top0",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 11
   },
   {
    "id": 12,
    "name": "stick_top1",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 12
   },
   {
    "id": 13,
    "name": "stick_top2",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
-   "faces": 11
+   "faces": 12
   },
   {
    "id": 14,
    "name": "stick_top3",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 12
   },
   {
    "id": 15,
    "name": "stick_top4",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 11
   },
   {
    "id": 16,
    "name": "stick_top5",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
-   "faces": 11
+   "faces": 12
   },
   {
    "id": 17,
    "name": "stick_top6",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 12
   },
   {
    "id": 18,
    "name": "stick_top7",
-   "zone": "char",
-   "bone": "body",
-   "faces": 11
-  },
-  {
-   "id": 19,
-   "name": "stick_top8",
-   "zone": "char",
+   "zone": "crown",
    "bone": "body",
    "faces": 12
   },
   {
-   "id": 20,
-   "name": "stick_top9",
-   "zone": "char",
+   "id": 19,
+   "name": "stick_top8",
+   "zone": "crown",
    "bone": "body",
    "faces": 11
   },
   {
-   "id": 21,
-   "name": "inner_splinter",
-   "zone": "char",
+   "id": 20,
+   "name": "stick_top9",
+   "zone": "crown",
    "bone": "body",
-   "faces": 4
+   "faces": 12
+  },
+  {
+   "id": 21,
+   "name": "stick_top10",
+   "zone": "crown",
+   "bone": "body",
+   "faces": 11
   },
   {
    "id": 22,
-   "name": "inner_splinter",
-   "zone": "char",
+   "name": "stick_top11",
+   "zone": "crown",
    "bone": "body",
-   "faces": 4
+   "faces": 12
   },
   {
    "id": 23,
-   "name": "inner_splinter",
-   "zone": "char",
+   "name": "stick_top12",
+   "zone": "crown",
    "bone": "body",
-   "faces": 4
+   "faces": 11
   },
   {
    "id": 24,
-   "name": "inner_splinter",
-   "zone": "char",
+   "name": "stick_top13",
+   "zone": "crown",
    "bone": "body",
-   "faces": 4
+   "faces": 12
   },
   {
    "id": 25,
@@ -423,116 +426,137 @@
    "id": 37,
    "name": "arm_R",
    "zone": "wood",
-   "bone": "tail",
+   "bone": "body",
    "faces": 22
   },
   {
    "id": 38,
    "name": "finger",
    "zone": "char",
-   "bone": "tail",
+   "bone": "body",
    "faces": 4
   },
   {
    "id": 39,
    "name": "finger",
    "zone": "char",
-   "bone": "tail",
+   "bone": "body",
    "faces": 4
   },
   {
    "id": 40,
    "name": "finger",
    "zone": "char",
-   "bone": "tail",
+   "bone": "body",
    "faces": 4
   },
   {
    "id": 41,
    "name": "stump_L",
    "zone": "wood",
-   "bone": "tail",
+   "bone": "body",
    "faces": 7
   },
   {
    "id": 42,
    "name": "stump_break",
    "zone": "char",
-   "bone": "tail",
+   "bone": "body",
    "faces": 5
   },
   {
    "id": 43,
-   "name": "fuse",
-   "zone": "fuse",
+   "name": "flame_heart",
+   "zone": "heart",
    "bone": "head",
-   "faces": 42
+   "faces": 30
   },
   {
    "id": 44,
-   "name": "spark",
-   "zone": "spark",
+   "name": "flame_tongue",
+   "zone": "flame",
    "bone": "head",
-   "faces": 24
+   "faces": 13
   },
   {
    "id": 45,
-   "name": "spark_ray",
-   "zone": "spark",
+   "name": "flame_tongue",
+   "zone": "flame",
    "bone": "head",
-   "faces": 3
+   "faces": 13
   },
   {
    "id": 46,
-   "name": "spark_ray",
-   "zone": "spark",
+   "name": "flame_tongue",
+   "zone": "flame",
    "bone": "head",
-   "faces": 3
+   "faces": 13
   },
   {
    "id": 47,
-   "name": "spark_ray",
-   "zone": "spark",
+   "name": "flame_tongue",
+   "zone": "flame",
    "bone": "head",
-   "faces": 3
+   "faces": 13
   },
   {
    "id": 48,
-   "name": "spark_ray",
-   "zone": "spark",
-   "bone": "head",
-   "faces": 3
+   "name": "fuse",
+   "zone": "fuse",
+   "bone": "tail",
+   "faces": 42
   },
   {
    "id": 49,
-   "name": "spark_ray",
+   "name": "spark",
    "zone": "spark",
-   "bone": "head",
-   "faces": 3
+   "bone": "tail",
+   "faces": 24
   },
   {
    "id": 50,
    "name": "spark_ray",
    "zone": "spark",
-   "bone": "head",
+   "bone": "tail",
    "faces": 3
   },
   {
    "id": 51,
    "name": "spark_ray",
    "zone": "spark",
-   "bone": "head",
+   "bone": "tail",
    "faces": 3
   },
   {
    "id": 52,
    "name": "spark_ray",
    "zone": "spark",
-   "bone": "head",
+   "bone": "tail",
+   "faces": 3
+  },
+  {
+   "id": 53,
+   "name": "spark_ray",
+   "zone": "spark",
+   "bone": "tail",
+   "faces": 3
+  },
+  {
+   "id": 54,
+   "name": "spark_ray",
+   "zone": "spark",
+   "bone": "tail",
+   "faces": 3
+  },
+  {
+   "id": 55,
+   "name": "spark_ray",
+   "zone": "spark",
+   "bone": "tail",
    "faces": 3
   }
  ],
- "tris_blender": 1352,
+ "tris_blender": 1472,
  "clips": [
   {
    "name": "kindlejack_idle@loop",

@@ -3,7 +3,7 @@
  "kind": "enemy",
  "tier": "swarm",
  "pipeline": "docs/art/ENEMIES.md (built with tools/blender/gf_assets)",
- "updated": "2026-09-25",
+ "updated": "2026-09-26",
  "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
  "final": false,
  "stages": {
@@ -18,9 +18,10 @@
     "art/enemies/kindlejack/textures/kindlejack_emissive.png",
     "art/enemies/kindlejack/reports/kindlejack_review.png",
     "art/enemies/kindlejack/reports/kindlejack_horde_review.png",
-    "art/enemies/kindlejack/reports/kindlejack_crowd.png"
+    "art/enemies/kindlejack/reports/kindlejack_crowd.png",
+    "art/enemies/kindlejack/reports/kindlejack_review_fix.png"
    ],
-   "notes": "Built from code by tools/blender/gf_assets/enemies/kindlejack.py (model, paint, GF_Swarm_v1 rig, 7 clips, export, validation, review and the horde read mixed with clinkers)."
+   "notes": "Built from code by tools/blender/gf_assets/enemies/kindlejack.py (model, paint, GF_Swarm_v1 rig, 7 clips, export, validation, review and the horde read mixed with clinkers). Art review fix (5/10): it fills its collider (footprint 0.65 x 0.67 -> 0.86 x 0.89 m, on a par with a clinker on screen), the crown flares into a pale ash torch head, the spark is a 0.14 m white-teal core (2.5 x the area), the slits between the sticks are banked dark, and primed@loop throbs a teal fire in the torch head (the brightest swarm on screen while primed); before/after in reports/kindlejack_review_fix.png (enemies/kindlejack_fix_sheet.py)."
   },
   "2_user_approval": {
    "status": "pending_human",
@@ -29,5 +30,7 @@
    "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
   }
  },
- "skeleton": "GF_Swarm_v1"
+ "skeleton": "GF_Swarm_v1",
+ "faction": "unmade",
+ "verb": "RUSH"
 }

@@ -2,7 +2,7 @@
  "kind": "enemy",
  "key": "kindlejack",
  "tier": "swarm",
- "tris": 1352,
+ "tris": 1472,
  "tris_budget": [
   600,
   1500
@@ -16,7 +16,7 @@
     512
    ],
    "format": "png",
-   "bytes": 35032
+   "bytes": 45894
   },
   {
    "name": "kindlejack_basecolor",
@@ -26,7 +26,7 @@
     512
    ],
    "format": "png",
-   "bytes": 336416
+   "bytes": 355656
   }
  ],
  "sockets": {
@@ -35,23 +35,6 @@
     0.0,
     0.6154,
     0.0037
-   ],
-   "forward": [
-    -0.0,
-    0.0,
-    -1.0
-   ],
-   "up": [
-    0.0,
-    1.0,
-    0.0
-   ]
-  },
-  "head_top": {
-   "translation": [
-    0.0,
-    1.24,
-    0.0
    ],
    "forward": [
     -0.0,
@@ -80,6 +63,23 @@
     1.0,
     0.0
    ]
+  },
+  "head_top": {
+   "translation": [
+    0.0,
+    1.3,
+    0.0
+   ],
+   "forward": [
+    -0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
   }
  },
  "clips": [
@@ -96,25 +96,25 @@
  "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
  "bounds_m": {
   "min": [
-   -0.3628,
+   -0.4418,
    0.0,
-   -0.4426
+   -0.5073
   ],
   "max": [
-   0.2888,
-   1.0321,
-   0.2254
+   0.4144,
+   1.0903,
+   0.3865
   ]
  },
- "size_m": 1.032,
+ "size_m": 1.09,
  "glb": "assets/models/enemies/kindlejack.glb",
- "glb_bytes": 574440,
- "glb_sha256": "0b0abaa5ac64fa4c14ed607f026c5886a1427fefacbb8ccd7b921e6caecb5beb",
+ "glb_bytes": 612848,
+ "glb_sha256": "aa1035dc71bfbd87fd2ad752d05ab38d9d808cc86eb628958bee42a3c9ea9900",
  "source_blend": "art/enemies/kindlejack/source/kindlejack.blend",
  "build_script": "tools/blender/gf_assets/enemies/kindlejack.py",
  "toolkit": "tools/blender/gf_assets (spec v1)",
  "generator": "Blender 5.2.0 LTS",
- "built": "2026-09-25",
+ "built": "2026-09-26",
  "validation": {
   "ok": true,
   "errors": [],
@@ -136,49 +136,49 @@
   "pack": "(1, 2)"
  },
  "verb": "RUSH",
- "design": "a tall, thin, forward-leaning sheaf of kindling tied by two obsidian collars, a charred splinter crown, a lit fuse with a teal-white spark; two obsidian stilt legs, one stick arm trailing back, one snapped stump",
+ "design": "a forward-leaning sheaf of kindling tied by two obsidian collars, flaring into a pale ash torch head around a teal Unmade fire, a lit fuse with a big white-teal spark; two obsidian stilt legs, one stick arm trailing back, one snapped stump",
  "bones": {
   "root": "bob, lean, knock-back",
-  "body": "the sheaf (sticks, crown, collars, core, shoulder shards); scale = the swell",
-  "head": "the fuse + spark (pivot at the fuse's root; scale = the fuse burning down)",
+  "body": "the sheaf (sticks, torch head, collars, core, shoulder shards) and both arms; scale = the swell",
+  "head": "the torch-head fire (pivot at the neck collar's centre; scale = the fire blazing and throbbing)",
   "legs_a": "left leg",
   "legs_b": "right leg",
-  "tail": "both arms (pivot at the shoulders)"
+  "tail": "the fuse + spark (pivot at the fuse's root; scale = the fuse burning down)"
  },
  "clip_map": {
   "move@loop": "Approach (the sprint)",
-  "windup": "PRIMED: plant, swell, the fuse burns down; time-stretch it to fuse x telegraph_time; ends on the loaded pose",
-  "primed@loop": "optional: hold the loaded, trembling swell if PRIMED outlasts windup",
+  "windup": "PRIMED begins: skid, the fire catches and flares, swell, the fuse burns down; ends on primed@loop's first frame",
+  "primed@loop": "PRIMED: loop it after windup for the rest of the fuse - the fire blazes about 2 x and throbs three times a second (the brightest swarm on screen)",
   "attack": "the detonation when the fuse runs out (play on the despawn; the blast is the engine's VFX at fx_core)",
   "death": "shot down before it blows: stagger, sputtering swell, a small burst",
   "hit": "flinch",
   "idle@loop": "bouncing on its toes"
  },
  "extra_sockets": {
-  "fx_fuse": "on head: the spark at the fuse tip (moves down as the fuse burns in windup)"
+  "fx_fuse": "on tail: the spark at the fuse tip (moves down as the fuse burns in windup)"
  },
  "move_cycle_m": 0.9,
  "move_note": "rigid-group sprint: play move@loop at speed / move_cycle_m cycles per second (the Bomber runs at 1.1 x 4.6 m/s -> about 5.6 cycles/s, 11 strides a second: the frantic RUSH)",
  "paint": {
   "size": 512,
   "texel_density_px_per_m": {
-   "median": 162.4,
-   "p10": 96.9,
-   "p90": 214.5
+   "median": 139.6,
+   "p10": 61.7,
+   "p90": 166.0
   },
-  "coverage": 0.359
+  "coverage": 0.326
  },
  "skin": {
-  "vertices": 782,
+  "vertices": 847,
   "unweighted": 0,
   "multi_bone": 0,
   "per_bone": {
    "root": 0,
-   "body": 582,
-   "head": 96,
+   "body": 629,
+   "head": 78,
    "legs_a": 26,
    "legs_b": 26,
-   "tail": 52
+   "tail": 88
   }
  }
 }

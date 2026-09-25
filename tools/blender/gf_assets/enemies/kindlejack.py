@@ -20,34 +20,40 @@ windup's loaded pose) and death (shot down before it blows: a stagger, a sputter
 Design (docs/art/ENEMIES.md; the user's enemy pack; must read apart from the clinker and the cinderling):
   * verb RUSH: a tall, forward-leaning SHEAF of split kindling - ten sticks tied at the waist and the neck by two
     jagged obsidian collars, their bottom ends cut at angles and flaring below the waist, their tops running on
-    through the neck collar into a crown of charred stick ends (some splintered, some snapped blunt, pale with
-    ash at the tip) - and a lit FUSE rising out of the crown and arcing back over the shoulders to a teal-white
-    spark: a walking bundle of dynamite. Two long obsidian stilt legs (digitigrade, knee and heel spurs) sprint
+    through the neck collar and flaring out into a TORCH HEAD of fourteen stick ends (burnt black at the collar,
+    bleached to pale ash above; some splintered, some snapped blunt) around a teal Unmade fire - and a lit FUSE
+    rising out of the fire and arcing back over the shoulders to a big white-teal spark: a walking bundle of
+    dynamite with a torch for a head. Two long obsidian stilt legs (digitigrade, knee and heel spurs) sprint
     under it; one long stick arm trails straight back, the other is a snapped stump under a pair of obsidian
-    shoulder shards (the Unmade's wrong asymmetry). 1.03 m tall, about 0.4 m wide at the belly: taller and
-    thinner than the cinderling blob (0.84 x 0.67 m greybox), upright where the clinker is low and wide;
-  * the sheaf is stuffed with Unmade fire: a teal core shows through narrow slits between the sticks, bursts out
-    of a torn chest opening (the front stick is snapped) and glows inside the crown, where the 55 deg camera
-    looks down into it. The spark hangs BEHIND the crown's glow (two lights, not one blob) and streams back like a
-    comet's tail in the sprint;
+    shoulder shards (the Unmade's wrong asymmetry). 1.09 m tall, a 0.86 x 0.89 m footprint (the torch head is the
+    widest thing on it): it fills its 0.4 m collider, upright where the clinker is low and wide;
+  * the sheaf is stuffed with Unmade fire: it bursts out of a torn chest opening (the front stick is snapped) and
+    burns in the torch head, where the 55 deg camera looks down into it. The spark hangs BEHIND and above the
+    torch head (two lights, not one blob) and streams back like a comet's tail in the sprint. PRIMED, the fire
+    blazes up to about twice its size and throbs three times a second (primed@loop): the brightest swarm on screen
+    for the 0.9 s fuse;
   * value plan at game size: weathered warm wood (bone warmed toward the row colour, a different value per stick,
     two sticks burnt black, scorched toward the neck; a different hue from the clinker's cream bone clubs and
-    value from its violet-black shells) framed by two dark obsidian bands, a charred crown whose ash tips
-    separate the top from the #3A2C24 floor, dark legs, and three teal accents - the chest, the crown and the
-    spark (the brightest pixel, the "lit fuse" read);
+    value from its violet-black shells) framed by two dark obsidian bands, a pale ash ring of flared stick ends
+    (the one light top plane in the Cinder horde, separating the kindlejack from the #3A2C24 floor and from the
+    dark teal-slit clinker), dark legs, and teal accents - the chest, the torch-head fire and the spark;
   * palette: THE UNMADE (gfa_spec.FACTIONS): obsidian, slag char, ichor teal #2FBFA8 / #1F8F7E (#8FF2D8 in the
-    chest, #B8FFE8 only in the spark), plus the kindling wood. The only glow is faction teal; no player colours,
-    no #7CFF6B, no red-white. The row colour #FF7A1A appears only as a painted, non-glowing tint (wood, scorch);
+    chest and the fire's heart, #B8FFE8 / #E4FFF6 only in the fire's centre line and the spark), plus the kindling
+    wood and its pale ash. The only glow is faction teal; no player colours, no #7CFF6B, no red-white. The row
+    colour #FF7A1A appears only as a painted, non-glowing tint (wood, scorch);
   * iterations (art/enemies/kindlejack/README.md): stave-like planks read as a barrel -> round, bent sticks
     through the collars; a dark crown turned to speckle -> few big charred ends with ash tips; a slim first pass
     looked smaller than a clinker in the horde -> girth G = 1.45 (radial sizes only); the sprint was invisible
-    from the front -> bounce, roll, twist, fuse whip, leg kick.
+    from the front -> bounce, roll, twist, fuse whip, leg kick. ART REVIEW FIX (5/10): lost among the clinkers
+    (about 540 px at 1x against a clinker's 960, the same dark body and teal slits) -> G 1.9, thicker sticks
+    closing the slits, the crown flared into a pale ash torch head, a 2.5 x white-teal spark; the primed state
+    read only at detonation -> a teal fire in the torch head that blazes and throbs through primed@loop.
 
-Rig GF_Swarm_v1 (rigid): body = the sheaf (sticks, crown, collars, core, shoulder shards); head = the fuse and
-its spark (pivot at the fuse's root: scaling it burns the fuse down); tail = both arms (pivot at the shoulders:
-they flap and fling); legs_a = left leg, legs_b = right leg (pivot on the hip line). The legs are posed in world
-space (Poser.legs): they ride on the hip point the body carries but never inherit its lean or swell, so the
-feet stay on the ground while the bundle inflates.
+Rig GF_Swarm_v1 (rigid): body = the sheaf (sticks, crown, collars, core, shoulder shards) and both arms; head =
+the torch-head fire (pivot at the neck collar's centre: scaling it makes the fire blaze and throb); tail = the
+fuse and its spark (pivot at the fuse's root: scaling it burns the fuse down); legs_a = left leg, legs_b = right
+leg (pivot on the hip line). The legs are posed in world space (Poser.legs): they ride on the hip point the body
+carries but never inherit its lean or swell, so the feet stay on the ground while the bundle inflates.
 """
 import math
 import os
@@ -77,10 +83,15 @@ SEED = 71
 ROW = {"key": "kindlejack", "class": "Swarm", "biome": "cinder_wastes", "hp": 26, "speed": 4.6, "radius": 0.4,
        "scale": 1.0, "contact_damage": 0, "behavior": "Bomber(trigger_range: 1.6, fuse: 0.9, radius: 2.2, damage: 32.0)",
        "color": "#FF7A1A", "shape": "Blob", "pack": "(1, 2)"}
-ZONES = ["wood", "char", "bind", "limb", "core", "fuse", "spark"]
+ZONES = ["wood", "char", "crown", "bind", "limb", "core", "heart", "flame", "fuse", "spark"]
 MOVE_FRAMES = 12            # one full sprint cycle (two strides) = 0.4 s
 IDLE_FRAMES = 42
 MOVE_CYCLE_M = 0.9          # metres per move@loop cycle: 4.6 m/s / 0.9 = ~5 cycles (10 strides) per second
+PRIMED_FRAMES = 10          # primed@loop: one throb of the fire = 0.33 s, three a second through the 0.9 s fuse
+# the torch-head fire (bone `head`) as a multiple of its modelled size: small licks in the bowl while it runs, a
+# blaze of about 2 x (x the 1.32 swell) that throbs +-20-26 % while PRIMED
+FL_IDLE, FL_MOVE = 0.72, 0.66
+FP_W, FP_H, FP_K, FP_KH = 1.95, 2.3, 0.17, 0.22
 
 
 def mix_hex(a, b, t):
@@ -89,23 +100,29 @@ def mix_hex(a, b, t):
 
 
 # ---- palette ------------------------------------------------------------------------------------------------
-WOOD = "#8A6C52"            # weathered split kindling: faction bone darkened and warmed toward the row colour
-WOOD_LIGHT = "#CDAE88"
+WOOD = "#94745A"            # weathered split kindling: faction bone darkened and warmed toward the row colour
+WOOD_LIGHT = "#D4B690"
 WOOD_SHADOW = "#3E2822"     # red-violet leaning painted shadow
 SCORCH = mix_hex("#4E3A30", ROW["color"], 0.22)          # the scorched band under the neck collar
 CHAR_EDGE = "#6E625A"       # ash-grey edges on the charred splinters
-ASH = "#A39A90"             # the pale ash on the burnt splinter tips (separates the crown from the floor)
+CHAR = "#231A17"
+# the torch head: every crown stick is burnt black where it leaves the neck collar and bleached to pale ash
+# over its flared upper two thirds - a pale ring around the fire, the one light top plane in the Cinder horde
+ASH = "#CBC2B5"
+CROWN_CHAR = "#33261F"      # charred kindling (warm, a step lighter than the slag char)
+ASH_R = (0.2, 0.27)         # m from the bundle axis: charred inside, pale ash on the flared ends beyond
 OBS_EDGE = "#7D7078"        # knapped obsidian edge light (the clinker's scute edge family)
 CORD = "#A8916E"
 SPILL_TEAL = "#5E9C90"      # teal light painted on the wood beside the chest opening
 BURN = "#2E1C14"            # burnt rim of the chest opening
-PALETTE = [("wood", WOOD), ("wood light", WOOD_LIGHT), ("scorch", SCORCH), ("char", "#231A17"), ("ash edge", CHAR_EDGE),
-           ("obsidian", "#1A1720"), ("obsidian edge", OBS_EDGE), ("fuse cord", CORD), ("ichor", "#1F8F7E"),
-           ("glow", "#2FBFA8"), ("hot core", "#B8FFE8"), ("row colour (tint only)", ROW["color"])]
-ZONE_FLAT = {"wood": WOOD, "char": "#2A201C", "bind": "#221E28", "limb": "#1E1A22", "core": "#2FBFA8",
-             "fuse": CORD, "spark": "#B8FFE8"}
-# UV importance (linear texel scale per zone before packing): the sheaf gets the pixels
-UV_SCALE = {"wood": 1.2, "char": 0.9, "bind": 1.0, "limb": 0.85, "core": 0.55, "fuse": 0.8, "spark": 0.45}
+PALETTE = [("wood", WOOD), ("wood light", WOOD_LIGHT), ("scorch", SCORCH), ("char", CHAR), ("crown char", CROWN_CHAR),
+           ("ash tips", ASH), ("obsidian", "#1A1720"), ("obsidian edge", OBS_EDGE), ("fuse cord", CORD),
+           ("ichor", "#1F8F7E"), ("glow", "#2FBFA8"), ("hot core", "#B8FFE8"), ("row colour (tint only)", ROW["color"])]
+ZONE_FLAT = {"wood": WOOD, "char": "#2A201C", "crown": ASH, "bind": "#221E28", "limb": "#1E1A22", "core": "#2FBFA8",
+             "heart": "#B8FFE8", "flame": "#2FBFA8", "fuse": CORD, "spark": "#E8FFF6"}
+# UV importance (linear texel scale per zone before packing): the sheaf and the torch head get the pixels
+UV_SCALE = {"wood": 1.15, "char": 0.9, "crown": 1.1, "bind": 0.95, "limb": 0.8, "core": 0.5, "heart": 0.4,
+            "flame": 0.45, "fuse": 0.75, "spark": 0.4}
 
 # ---- the sheaf frame --------------------------------------------------------------------------------------------
 LEAN = math.radians(12.0)                                  # the whole sheaf leans into the run
@@ -116,13 +133,17 @@ B0 = Vector((0.0, 0.04, 0.41))                            # the waist collar (s 
 BL = 0.42                                                  # waist collar to the neck collar (s = 1)
 # girth: every radial size (sheaf, sticks, collars, core, limbs) is scaled by G, the heights are not. The collider
 # is radius 0.4 (ENEMIES.md: footprint 2.2-3 x that); a slimmer first pass looked SMALLER than a clinker in the horde
-# (the 55 deg camera reads the footprint first), so the sheaf is a thick bundle - still twice as tall as it is wide
-G = 1.45
+# (the 55 deg camera reads the footprint first). The art review (5/10) still measured it at ~540 px against a
+# clinker's ~960 at 1x, so the review fix fills the collider: G 1.45 -> 1.9, thicker sticks, the crown flared out
+# into a torch head, a wider stance and a longer trailing arm - a 0.86 x 0.89 m footprint at 1.09 m tall.
+# GR rescales the sizes that were hand-placed at G 1.45 (collars, shoulders, arms, shards).
+G = 1.9
+GR = G / 1.45
+STICK_GIRTH = 1.14          # the sticks thicken with the bundle (closes the teal slits between them)
 # centre-line radius of the sticks along s: the skirt ends flare, the waist and neck are tied, the belly bulges
 STICK_R = [(-0.27, 0.12), (0.0, 0.084), (0.22, 0.096), (0.46, 0.1), (0.72, 0.097), (1.0, 0.082)]
 # split-wood cross-sections (unit): irregular polygons, so the facets paint as different planes
 PENT = [(1.0, 0.0), (0.33, 0.95), (-0.78, 0.66), (-0.95, -0.38), (0.22, -0.97)]
-HEXW = [(1.0, 0.0), (0.55, 0.85), (-0.45, 0.9), (-1.0, 0.1), (-0.6, -0.8), (0.45, -0.9)]
 CHARRED_STICKS = (2, 6)     # two sticks burnt black through: the bundle reads as separate sticks, not staves
 
 
@@ -172,7 +193,7 @@ class Build:
             gap_side = 0.0
             if abs(((th0 + 180) % 360) - 180) < 40:                 # the two sticks flanking the front
                 gap_side = 1.0 if ((th0 + 180) % 360) - 180 > 0 else -1.0
-            r = rng.uniform(0.034, 0.04)
+            r = rng.uniform(0.034, 0.04) * STICK_GIRTH
             k = rng.uniform(0.96, 1.04)
             s_bot = rng.uniform(-0.27, -0.16)
             ss = [s_bot, 0.0, 0.3, 0.62, 1.0]
@@ -182,7 +203,7 @@ class Build:
                 th = th0 + 14.0 * (s_ - 0.5) + gap_side * 8.0 * math.exp(-((s_ - 0.62) / 0.22) ** 2)
                 pts.append(apt(s_) + radial(th) * rad_at(s_) * k + radial(th + 90) * bd)
             radii = [r * 0.88, r, r * 1.04, r * 1.02, r * 0.95]
-            b = M.tube(pts, radii, profile=HEXW, up=radial(th0), scale_xy=[(1.0, 1.08)] * len(pts))
+            b = M.tube(pts, radii, profile=PENT, up=radial(th0), scale_xy=[(1.0, 1.1)] * len(pts))
             cut = (radial(th0 + rng.uniform(-70, 70)) * rng.uniform(0.5, 0.9)).normalized()
             for v in b.verts:
                 if (v.co - pts[0]).length < r * 1.4:
@@ -192,53 +213,59 @@ class Build:
             self.tops.append((th0 + 7.0, k, r * 0.95))
         # the snapped front stick: only the lower half is left, ending in a splintered point at the chest
         th0 = rng.uniform(-4, 4)
-        r = 0.037
+        r = 0.037 * STICK_GIRTH
         pts = [apt(s_) + radial(th0 + 14.0 * (s_ - 0.5)) * rad_at(s_) * 1.02 for s_ in (-0.22, 0.0, 0.24)]
         top = apt(0.44) + radial(th0 - 2) * rad_at(0.44) * 1.08
-        b = M.tube(pts + [top], [r * 0.9, r, r * 1.02, 0.0], profile=HEXW, up=radial(th0),
-                   scale_xy=[(1.0, 1.08)] * 4)
+        b = M.tube(pts + [top], [r * 0.9, r, r * 1.02, 0.0], profile=PENT, up=radial(th0),
+                   scale_xy=[(1.0, 1.1)] * 4)
         a.add(b, "wood", bone="body", name="stick_snapped", shading="flat")
 
     def crown(self, a):
-        """The sheaf's top: every stick runs on through the neck collar and flares out into a charred end that
-        breaks off in a splintered point, pale with ash at the tip - the fire is eating the kindling from the top
-        down. Shorter at the front, so the camera sees the glow inside and the fuse stands clear. A few inner
-        splinters around the fuse keep the glow in broken pieces instead of one disc."""
+        """The TORCH HEAD: every stick runs on through the neck collar and flares out, about 40 deg off the axis
+        and bending further out toward the top (a trumpet), so the crown opens into a 0.65 m ring of stick ends
+        around the fire - the widest thing on the creature and what the 55 deg camera sees first. Each end is
+        burnt black at the collar and bleached to pale ash above (the "crown" zone); some break off in a
+        splintered point, some are snapped blunt. Shorter at the front, so the camera looks down into the fire
+        and the fuse stands clear behind."""
         rng = self.rng
         self.crown_top = 0.0
-        for j, (th, k, r) in enumerate(self.tops):
+        self.crown_r = 0.0
+        # four extra splints pushed in through the neck collar fill the torch head to 14 ends
+        tops = list(self.tops) + [(th + rng.uniform(-5, 5), 0.97, 0.033 * STICK_GIRTH) for th in (62.0, 170.0, 206.0, 296.0)]
+        # the ends are ROUND sticks of mixed thickness (a first pass with broad slats and pale sticks read as a
+        # daisy of petals from above): most snapped off blunt and jagged, some splintered to a point, two burnt off
+        # short; length, lean and spacing vary stick by stick. A V-shaped flare, about 35 deg off the axis.
+        order = rng.sample(range(len(tops)), len(tops))
+        pointed, short = set(order[:5]), set(order[5:7])
+        for j, (th, k, r) in enumerate(tops):
             front = math.cos(math.radians(th))                     # 1 at the front, -1 at the back
-            ln = rng.uniform(0.26, 0.46) * (1.0 - 0.35 * max(0.0, front))
-            flare = rng.uniform(0.03, 0.055) * (1.0 + 0.4 * max(0.0, front))
-            thj = th + rng.uniform(-6, 6)
+            ln = rng.uniform(0.36, 0.5) * (1.0 - 0.3 * max(0.0, front)) * (0.6 if j in short else 1.0)
+            flare = rng.uniform(0.14, 0.2) * (1.0 + 0.12 * max(0.0, front)) * (0.7 if j in short else 1.0)
+            thj = th + rng.uniform(-8, 8)
             p0 = apt(0.94) + radial(th) * rad_at(0.94) * k
-            p1 = apt(1.0 + ln * 0.45) + radial(th) * (rad_at(1.0) * k + flare * 0.45)
-            p2 = apt(1.0 + ln) + radial(thj) * (rad_at(1.0) * k + flare) + radial(thj + 90) * rng.uniform(-0.014, 0.014)
-            blunt = j % 5 in (1, 3)                                 # some ends snapped off blunt and jagged
+            p1 = apt(1.0 + ln * 0.45) + radial(th) * (rad_at(1.0) * k + flare * 0.4)
+            p2 = apt(1.0 + ln) + radial(thj) * (rad_at(1.0) * k + flare) + radial(thj + 90) * rng.uniform(-0.025, 0.025)
+            blunt = j not in pointed                                # snapped off blunt and jagged
             if blunt:
-                p2 = p1.lerp(p2, 0.72)
-            b = M.tube([p0, p1, p2], [r, r * 0.92, r * 0.72 if blunt else 0.0], profile=PENT, up=radial(th),
-                       scale_xy=[(1.0, 1.08)] * 3)
+                p2 = p1.lerp(p2, 0.85)
+            rr = r * rng.uniform(0.9, 1.2)
+            b = M.tube([p0, p1, p2], [rr, rr * 0.95, rr * 0.8 if blunt else 0.0], profile=PENT, up=radial(th),
+                       scale_xy=[(1.0, 1.12)] * 3)
             if blunt:
                 dn = (p2 - p1).normalized()
                 for v in b.verts:
-                    if (v.co - p2).length < r * 1.2:
-                        v.co += dn * rng.uniform(-0.02, 0.015)
-            a.add(b, "char", bone="body", name="stick_top%d" % j, shading="flat")
+                    if (v.co - p2).length < rr * 1.25:
+                        v.co += dn * rng.uniform(-0.025, 0.015)
+            a.add(b, "crown", bone="body", name="stick_top%d" % j, shading="flat")
             self.crown_top = max(self.crown_top, p2.z)
-        for j in range(4):
-            th = j * 90.0 + 45.0 + rng.uniform(-15, 15)
-            base = apt(0.98) + radial(th) * rng.uniform(0.036, 0.046) * G
-            d = (AX * 0.92 + radial(th) * 0.3).normalized()
-            sp = M.spike(0.028, rng.uniform(0.075, 0.105), sides=3, rot_offset=rng.uniform(0, 90))
-            M.xform(sp, matrix=M.orient(base, d, radial(th + 90)))
-            a.add(sp, "char", bone="body", name="inner_splinter", shading="flat")
+            ax_p = apt(0.0) + AX * (p2 - apt(0.0)).dot(AX)
+            self.crown_r = max(self.crown_r, (p2 - ax_p).length)
 
     def collars(self, a):
         """Two cracked obsidian collars binding the sheaf (the Unmade crust growing over the wood), and a pair
         of obsidian shards breaking out of the neck collar over the stump shoulder."""
         for tag, s, r_in, r_out, h, seed in (("waist", 0.0, 0.1, 0.176, 0.05, 3), ("neck", 1.0, 0.098, 0.178, 0.055, 5)):
-            ring = M.ring(r_in, r_out, h, sides=8, start_angle=11.0 * seed)
+            ring = M.ring(r_in * GR, r_out * GR, h, sides=8, start_angle=11.0 * seed)
             jr = random.Random(SEED + seed)
             for v in ring.verts:                                   # a jagged crust, not a machined hoop
                 if abs(v.co.z) > h * 0.4:
@@ -247,8 +274,8 @@ class Build:
             M.xform(ring, matrix=frame_at(apt(s), AX, LEFT))
             a.add(ring, "bind", bone="body", name="collar_" + tag, shading="flat")
         rng = random.Random(SEED + 40)
-        root = apt(1.0) + radial(92) * 0.152
-        for d, ln, r in (((0.85, 0.25, 0.45), 0.18, 0.046), ((0.6, 0.55, 0.55), 0.13, 0.036), ((0.95, -0.15, 0.2), 0.1, 0.028)):
+        root = apt(0.96) + radial(92) * 0.152 * GR
+        for d, ln, r in (((0.85, 0.25, 0.3), 0.2, 0.05), ((0.6, 0.55, 0.4), 0.15, 0.04), ((0.95, -0.15, 0.1), 0.12, 0.03)):
             sp = M.spike(r, ln, sides=4, base_scale=(1.0, 0.62), rot_offset=rng.uniform(0, 90))
             M.xform(sp, matrix=M.orient(root - Vector(d).normalized() * 0.02, d, (0, 0, 1)))
             a.add(sp, "bind", bone="body", name="shoulder_shard", shading="flat")
@@ -256,14 +283,17 @@ class Build:
     def core(self, a):
         """The teal fire the sheaf is stuffed with: a spindle inside the sticks, bulging out of the chest opening,
         its top a glowing dome inside the crown."""
-        prof = [(0.0, -0.05), (0.045 * G, 0.02), (0.062 * G, 0.16), (0.066 * G, 0.3), (0.052 * G, 0.38), (0.034 * G, 0.42),
-                (0.0, 0.44)]
+        # held back a little inside the thicker sticks (0.9 x), so the gaps between them read dark, not as teal
+        # slits (the review: "the same dark body and teal slits" as the clinker); only the chest opening glows
+        cg = 0.9 * G
+        prof = [(0.0, -0.05), (0.045 * cg, 0.02), (0.062 * cg, 0.16), (0.066 * cg, 0.3), (0.052 * cg, 0.38),
+                (0.034 * cg, 0.42), (0.0, 0.44)]
         b = M.lathe(prof, sides=8, start_angle=22.5)
         for v in b.verts:
             x, y, z = v.co
             # local frame: x = LEFT, y = -FRONT (the lathe's y is mapped by frame_at below), z = the axis
             if y < -0.02 and 0.17 < z < 0.4:
-                v.co.y -= 0.036 * G * math.sin(math.pi * (z - 0.17) / 0.23)   # bulge through the chest opening
+                v.co.y -= 0.042 * G * math.sin(math.pi * (z - 0.17) / 0.23)   # bulge through the chest opening
         M.xform(b, matrix=frame_at(B0, AX, LEFT))
         a.add(b, "core", bone="body", name="core", shading="smooth")
         self.core_c = apt(0.62) + FRONT * 0.045
@@ -273,11 +303,11 @@ class Build:
         """Two long obsidian stilt legs (digitigrade: the knee forward, the ankle back), a spur on each knee and
         heel. The right one is a little heavier."""
         rng = self.rng
-        for side, bone, th in ((1, "legs_a", 1.0), (-1, "legs_b", 1.07)):
-            hip = Vector((0.09 * side, 0.05, 0.445))
-            knee = Vector((0.122 * side, -0.075, 0.27))
-            ankle = Vector((0.122 * side, 0.065, 0.09))
-            toe = Vector((0.135 * side, -0.065, 0.0))
+        for side, bone, th in ((1, "legs_a", 1.12), (-1, "legs_b", 1.2)):
+            hip = Vector((0.1 * side, 0.05, 0.445))
+            knee = Vector((0.148 * side, -0.08, 0.27))
+            ankle = Vector((0.152 * side, 0.07, 0.09))
+            toe = Vector((0.168 * side, -0.075, 0.0))
             b = M.tube([hip, knee, ankle, toe], [0.063 * th, 0.05 * th, 0.037 * th, 0.0], sides=5)
             a.add(b, "limb", bone=bone, name="leg_%s" % ("L" if side > 0 else "R"), shading="flat")
             for p, d, ln, r in ((knee, (0.2 * side, -1.0, 0.55), 0.09, 0.025), (ankle, (0.1 * side, 1.0, 0.25), 0.075, 0.021)):
@@ -288,55 +318,98 @@ class Build:
 
     def arms(self, a):
         """The long right arm trails straight back (the RUSH read), three charred twig fingers; the left is a
-        snapped stump ending in a charred splinter."""
-        sh_r = apt(0.86) + radial(-90) * 0.158
-        el_r = sh_r + Vector((-0.12, 0.16, -0.085))
-        wr_r = el_r + Vector((-0.045, 0.21, 0.04))
+        snapped stump ending in a charred splinter. Both ride rigidly on `body` since the review fix: `head`
+        now carries the torch-head fire and `tail` the fuse (GF_Swarm_v1 has exactly six bones)."""
+        sh_r = apt(0.86) + radial(-90) * 0.158 * GR
+        el_r = sh_r + Vector((-0.13, 0.18, -0.1))
+        wr_r = el_r + Vector((-0.06, 0.24, 0.035))
         mid1 = sh_r.lerp(el_r, 0.5) + Vector((-0.012, 0.0, 0.015))
         mid2 = el_r.lerp(wr_r, 0.5) + Vector((0.01, 0.0, -0.015))
-        b = M.tube([sh_r, mid1, el_r, mid2, wr_r], [0.032, 0.029, 0.027, 0.024, 0.021], profile=PENT, up=(0, 0, 1))
-        a.add(b, "wood", bone="tail", name="arm_R", shading="flat")
+        b = M.tube([sh_r, mid1, el_r, mid2, wr_r], [0.04, 0.037, 0.034, 0.031, 0.027], profile=PENT, up=(0, 0, 1))
+        a.add(b, "wood", bone="body", name="arm_R", shading="flat")
         rng = random.Random(SEED + 60)
-        for d, ln in (((-0.25, 1.0, 0.45), 0.105), ((0.2, 1.0, 0.05), 0.12), ((-0.5, 0.8, -0.35), 0.09)):
-            sp = M.spike(0.022, ln, sides=3, rot_offset=rng.uniform(0, 90))
+        for d, ln in (((-0.25, 1.0, 0.45), 0.12), ((0.2, 1.0, 0.05), 0.135), ((-0.5, 0.8, -0.35), 0.1)):
+            sp = M.spike(0.026, ln, sides=3, rot_offset=rng.uniform(0, 90))
             M.xform(sp, matrix=M.orient(wr_r - Vector(d).normalized() * 0.01, d, (0, 0, 1)))
-            a.add(sp, "char", bone="tail", name="finger", shading="flat")
-        sh_l = apt(0.84) + radial(90) * 0.158
-        el_l = sh_l + Vector((0.1, 0.13, -0.08))
-        b = M.tube([sh_l, el_l], [0.034, 0.03], profile=PENT, up=(0, 0, 1))
-        a.add(b, "wood", bone="tail", name="stump_L", shading="flat")
+            a.add(sp, "char", bone="body", name="finger", shading="flat")
+        sh_l = apt(0.84) + radial(90) * 0.158 * GR
+        el_l = sh_l + Vector((0.16, 0.13, -0.1))
+        b = M.tube([sh_l, el_l], [0.04, 0.036], profile=PENT, up=(0, 0, 1))
+        a.add(b, "wood", bone="body", name="stump_L", shading="flat")
         d = (el_l - sh_l).normalized()
-        sp = M.spike(0.03, 0.065, sides=4, tip=(0.012, -0.01), rot_offset=20)
+        sp = M.spike(0.036, 0.075, sides=4, tip=(0.012, -0.01), rot_offset=20)
         M.xform(sp, matrix=M.orient(el_l - d * 0.004, d, (0, 0, 1)))
-        a.add(sp, "char", bone="tail", name="stump_break", shading="flat")
+        a.add(sp, "char", bone="body", name="stump_break", shading="flat")
         self.shoulders = (sh_l + sh_r) / 2
 
+    def flame(self, a):
+        """The Unmade fire in the torch head (bone `head`, pivot at the neck collar's centre): a teardrop heart that
+        sways in an S and hooks over at the tip, and four flattened tongues that bulge out of the bowl, rise and
+        curl back in with a sideways flick (a triangle section: a lit ridge outside, a flat face to the heart), so
+        from the side they read as licking tongues, not as a bouquet of crystals (the first pass, round pointed
+        prisms painted white along the axis, did). The heart is the white-teal hot core (its own zone), the tongues
+        saturated faction teal, deeper at every tip (gfa_paint radial stops). At rest it only fills the torch
+        head's bowl; windup and primed@loop
+        scale the bone up about 2 x and throb it, so a PRIMED kindlejack becomes a teal-white blaze wider than the
+        torch head - the brightest swarm on screen for its 0.9 s fuse."""
+        rng = random.Random(SEED + 90)
+        self.flame_c = apt(0.98)
+        # the heart: a teardrop (widest low in the bowl), an S-sway and a tip hooked over toward the stump side
+        prof = [(0.0, -0.02), (0.06 * GR, 0.035), (0.056 * GR, 0.095), (0.036 * GR, 0.165), (0.014 * GR, 0.235),
+                (0.0, 0.29)]
+        b = M.lathe(prof, sides=6, start_angle=15.0, cap=False)
+        for v in b.verts:
+            z = v.co.z
+            v.co.x += 0.03 * math.sin(z * 14.0) * min(1.0, z / 0.1) + 0.06 * max(0.0, z - 0.2) / 0.09
+            v.co.y += 0.012 * math.sin(z * 26.0 + 1.0)
+        M.xform(b, matrix=frame_at(apt(0.95), AX, LEFT))
+        a.add(b, "heart", bone="head", name="flame_heart", shading="smooth")
+        tri = [(1.0, 0.0), (-0.5, 0.87), (-0.5, -0.87)]
+        for i in range(4):
+            th = i * 90.0 + 30.0 + rng.uniform(-14, 14)
+            out, tan = radial(th), radial(th + 90)
+            sw = 1.0 if i % 2 else -1.0                              # neighbours flick opposite ways
+            h = rng.uniform(0.17, 0.24)                              # m above the neck collar
+            rr = rng.uniform(0.11, 0.14)                             # how far the tongue bulges out
+            c0 = apt(0.95)
+            pts = [c0 + out * 0.03 + AX * 0.0,
+                   c0 + out * rr * 0.8 + AX * (0.04 + h * 0.12) + tan * 0.012 * sw,
+                   c0 + out * rr + AX * (0.02 + h * 0.45) - tan * 0.022 * sw,
+                   c0 + out * rr * 0.78 + AX * (0.02 + h * 0.78) + tan * 0.03 * sw,
+                   c0 + out * rr * 0.42 + AX * (0.02 + h) + tan * 0.06 * sw]      # the tip curls in and flicks
+            w = 0.042 * GR
+            b = M.tube(pts, [w * 0.55, w, w * 0.85, w * 0.5, 0.0], profile=tri, up=out,
+                       scale_xy=[(0.62, 1.0)] * 5)
+            a.add(b, "flame", bone="head", name="flame_tongue", shading="smooth")
+        self.flame_top = apt(0.95) + AX * 0.29
+
     def fuse(self, a):
-        """The fuse: a cord rising out of the crown and arcing back over the shoulders, a teal-white spark on its
-        tip. From the 55 deg camera the spark hangs BEHIND the crown's glow (two separate lights, not one blob), and
-        in the sprint the fuse streams back like a comet's tail - the RUSH read from above."""
+        """The fuse (bone `tail`, pivot at the fuse's root: scaling it burns the fuse down): a cord rising out of the
+        fire and arcing back over the shoulders, past the torch head's rim, to a teal-white spark. The spark is the
+        kindlejack's own signal in the horde - a 0.14 m white-teal core (7 px at 1x; 2.5 x the first pass in area) in six
+        short teal rays. From the 55 deg camera it hangs BEHIND and above the crown (two separate lights), and in the
+        sprint the fuse streams back like a comet's tail - the RUSH read from above."""
         base = apt(1.08)
-        ctrl = [apt(0.98), base + Vector((0.0, -0.004, 0.065)), base + Vector((-0.006, 0.03, 0.13)),
-                base + Vector((-0.016, 0.095, 0.16)), base + Vector((-0.026, 0.165, 0.145)), base + Vector((-0.034, 0.225, 0.1))]
+        ctrl = [apt(0.98), base + Vector((0.0, -0.004, 0.07)), base + Vector((-0.006, 0.035, 0.145)),
+                base + Vector((-0.018, 0.12, 0.185)), base + Vector((-0.03, 0.235, 0.17)), base + Vector((-0.04, 0.33, 0.115))]
         pts = M.catmull(ctrl, 2)
         n = len(pts)
-        radii = [0.024 - 0.006 * i / (n - 1) for i in range(n)]
+        radii = [0.03 - 0.008 * i / (n - 1) for i in range(n)]
         b = M.tube(pts, radii, sides=4, twist=120.0)
-        a.add(b, "fuse", bone="head", name="fuse", shading="flat")
-        tip = pts[-1] + (pts[-1] - pts[-2]).normalized() * 0.012
+        a.add(b, "fuse", bone="tail", name="fuse", shading="flat")
+        tip = pts[-1] + (pts[-1] - pts[-2]).normalized() * 0.03
         self.fuse_base = base
         self.spark = tip
-        s = M.sphere(0.044, 6, 4)
+        s = M.sphere(0.07, 6, 4)
         M.xform(s, loc=tip)
-        a.add(s, "spark", bone="head", name="spark", shading="flat")
+        a.add(s, "spark", bone="tail", name="spark", shading="smooth")
         rng = random.Random(SEED + 80)
-        dirs = [(1, 0.2, 0.35), (-1, 0.3, 0.3), (0.2, -1, 0.4), (-0.2, 1, 0.2), (0.5, -0.2, 0.8), (-0.4, 0.3, 0.75),
-                (0.6, 0.6, -0.4), (-0.6, -0.5, -0.3)]
+        dirs = [(1, 0.2, 0.35), (-1, 0.3, 0.3), (0.2, -1, 0.5), (-0.1, 1, 0.2), (0.3, 0.7, 0.55), (-0.3, -0.4, -0.6)]
         for d in dirs:
-            ln = rng.uniform(0.065, 0.085)
-            sp = M.spike(0.018, ln, sides=3, cap=False, rot_offset=rng.uniform(0, 90))
+            ln = rng.uniform(0.12, 0.15)
+            sp = M.spike(0.03, ln, sides=3, cap=False, rot_offset=rng.uniform(0, 90))
             M.xform(sp, matrix=M.orient(tip, d, (0, 0, 1)))
-            a.add(sp, "spark", bone="head", name="spark_ray", shading="flat")
+            a.add(sp, "spark", bone="tail", name="spark_ray", shading="flat")
 
     def build(self, col):
         a = M.Assembly(KEY + "_mesh", ZONES, bones=RIG.BONE_NAMES)
@@ -346,6 +419,7 @@ class Build:
         self.core(a)
         self.legs(a)
         self.arms(a)
+        self.flame(a)
         self.fuse(a)
         self.tris = a.tris()
         self.parts = a.parts
@@ -355,12 +429,12 @@ class Build:
 
     # -- rig anchors --
     def pivots(self):
-        return {"root": (0.0, 0.03, 0.0), "body": tuple(apt(0.46)), "head": tuple(self.fuse_base),
-                "legs_a": tuple(self.hip), "legs_b": tuple(self.hip), "tail": tuple(self.shoulders)}
+        return {"root": (0.0, 0.03, 0.0), "body": tuple(apt(0.46)), "head": tuple(self.flame_c),
+                "legs_a": tuple(self.hip), "legs_b": tuple(self.hip), "tail": tuple(self.fuse_base)}
 
     def sockets(self):
         return [("body", "hit_center", tuple(apt(0.5))), ("body", "fx_core", tuple(self.core_c)),
-                ("body", "head_top", (0.0, 0.0, 1.24))]
+                ("body", "head_top", (0.0, 0.0, 1.3))]
 
     # -- paint --
     def recipes(self):
@@ -373,37 +447,63 @@ class Build:
                            brush_freq=5.0, stroke=tuple(AX), stroke_amount=0.16, stroke_freq=(70.0, 5.0),
                            cavity=0.8, cavity_width=0.006, ao=0.7, ao_range=(0.22, 0.6), edge=0.55, edge_width=0.006,
                            edge_breakup=0.55,
-                           gradient={"axis": tuple(AX), "range": (proj(0.5), proj(0.97)), "color": SCORCH, "amount": 0.8}),
-            # charred wood: black at the collar, pale ash on the crown's tips (a plane gradient up the axis)
+                           gradient={"axis": tuple(AX), "range": (proj(0.62), proj(1.0)), "color": SCORCH, "amount": 0.55}),
+            # charred wood (the two burnt sticks, the fingers, the stump's break)
             "char": P.faction_zone("unmade", "slag", light=CHAR_EDGE, planes=0.14, parts=0.08, brush=0.05, edge=0.6,
-                                   edge_width=0.006, edge_breakup=0.45, cavity=0.6, ao=0.4,
-                                   gradient={"axis": tuple(AX), "range": (proj(1.16), proj(1.36)), "color": ASH,
-                                             "amount": 0.85}),
+                                   edge_width=0.006, edge_breakup=0.45, cavity=0.6, ao=0.4),
+            # the torch head: charred wood around the fire, bleached to pale ash toward the flared ends (a
+            # cylindrical gradient out from the bundle axis) - from above a dark ring framing the fire inside a
+            # broken pale rim; broad flat planes (one value per facet and per stick), a few brushy edges, no speckle
+            "crown": P.zone(base=CROWN_CHAR, shadow="#120D0B", light=CHAR_EDGE, planes=0.12, parts=0.12, brush=0.04,
+                            brush_freq=5.0, cavity=0.5, cavity_width=0.006, ao=0.35, ao_range=(0.3, 0.72), edge=0.55,
+                            edge_width=0.007, edge_breakup=0.5,
+                            gradient={"center": tuple(apt(1.0)), "axis": tuple(AX), "range": (ASH_R[0], ASH_R[1]),
+                                      "color": ASH, "amount": 0.97}),
             "bind": P.faction_zone("unmade", "obsidian", light=OBS_EDGE, planes=0.2, parts=0.08, brush=0.06,
                                    brush_freq=4.0, edge=1.0, edge_width=0.009, edge_breakup=0.32, cavity=0.85,
                                    cavity_width=0.007, ao=0.6),
             "limb": P.faction_zone("unmade", "obsidian", light=mix_hex("#4B4658", OBS_EDGE, 0.6), planes=0.14, parts=0.06,
                                    edge=0.95, edge_width=0.008, edge_breakup=0.3, cavity=0.7, ao=0.5,
                                    gradient={"axis": (0, 0, 1), "range": (0.25, 0.0), "color": "shadow", "amount": 0.3}),
-            # hottest in a column down the chest opening, hot on the dome in the crown, a dim rim at the back
+            # hottest in a column down the chest opening, teal round its flanks, then banked down to a dark ember
+            # teal toward the back: the gaps between the sticks read dark, not as the clinker's teal slits (the art
+            # review), so the chest opening and the torch-head fire are the only glow on the bundle
             "core": P.faction_zone("unmade", "ichor", glow=True,
-                                   emit=dict(rim, core="#8FF2D8", mode="axis", center=tuple(apt(0.6) + FRONT * 0.1), axis=tuple(AX),
-                                             radius=0.3, base_mix=0.1)),
+                                   emit=dict(rim, mode="axis", center=tuple(apt(0.6) + FRONT * 0.1), axis=tuple(AX),
+                                             radius=0.3, base_mix=0.08,
+                                             stops=[(0.0, "#8FF2D8"), (0.28, "#2FBFA8"), (0.42, "#1F8F7E"),
+                                                    (0.56, "#0B2F2B"), (1.0, "#071C19")])),
+            # the fire in the torch head. Its heart is the hot core the 55 deg camera looks down onto: white-teal
+            # low in the bowl, pale ichor up its body, cooling to faction teal only at the hooked tip...
+            "heart": P.faction_zone("unmade", "ichor", glow=True,
+                                    emit=dict(rim, mode="radial", center=tuple(apt(0.95)), radius=0.3,
+                                              stops=[(0.0, "#E4FFF6"), (0.35, "#B8FFE8"), (0.62, "#8FF2D8"),
+                                                     (1.0, "#2FBFA8")], base_mix=0.2)),
+            # ...and its tongues are saturated faction teal, paler only where they leave the bowl, a deeper teal at
+            # every tip (the first pass painted the whole fire white along its axis: a white crystal spike)
+            "flame": P.faction_zone("unmade", "ichor", glow=True,
+                                    emit=dict(rim, mode="radial", center=tuple(apt(0.95) + AX * 0.035), radius=0.27,
+                                              stops=[(0.0, "#B8FFE8"), (0.2, "#8FF2D8"), (0.4, "#2FBFA8"),
+                                                     (0.75, "#2FBFA8"), (1.0, "#1F8F7E")], base_mix=0.12)),
             # a braided cord: painted bands across it (streaks along z at a high frequency)
             "fuse": P.zone(base=CORD, shadow="#3A302A", light="#C8B89E", planes=0.12, parts=0.0, brush=0.04,
                            stroke=(0, 0, 1), stroke_amount=0.45, stroke_freq=(6.0, 70.0),
                            edge=0.6, edge_width=0.004, edge_breakup=0.4, cavity=0.5, ao=0.3,
-                           emit=dict(rim, mode="radial", center=tuple(self.spark), radius=0.07, fade=(1.0, 0.6),
+                           emit=dict(rim, mode="radial", center=tuple(self.spark), radius=0.12, fade=(1.0, 0.6),
                                      base_mix=0.2)),
+            # the spark: a white-teal core (#E4FFF6, the ichor core pushed toward white: never red-white) in teal rays
             "spark": P.faction_zone("unmade", "ichor", glow=True,
-                                    emit=dict(rim, mode="radial", center=tuple(self.spark), radius=0.065, base_mix=0.35)),
+                                    emit=dict(rim, core="#E4FFF6", mode="radial", center=tuple(self.spark), radius=0.3,
+                                              base_mix=0.45)),
         }
 
     def decals(self):
         """The torn chest opening: a burnt rim on the sticks around it, then teal light right at its edges."""
-        o = apt(0.62) + FRONT * 0.18
+        o = apt(0.62) + FRONT * 0.18 * GR
         fr = frame_at(o, FRONT, LEFT)
-        lines = [[(-0.082, -0.15), (-0.075, -0.02), (-0.067, 0.13)], [(0.08, -0.15), (0.073, -0.02), (0.067, 0.13)]]
+        k = 1.12                                          # the flanking sticks sit further out on the thicker sheaf
+        lines = [[(-0.082 * k, -0.15), (-0.075 * k, -0.02), (-0.067 * k, 0.13)],
+                 [(0.08 * k, -0.15), (0.073 * k, -0.02), (0.067 * k, 0.13)]]
         return [P.decal_lines(lines, fr, 0.001, zones=["wood"], color=None, rim=BURN, rim_width=0.05,
                               depth=(-0.1, 0.06), facing=-0.3),
                 P.decal_lines(lines, fr, 0.001, zones=["wood"], color=None, rim=SPILL_TEAL, rim_width=0.024,
@@ -477,13 +577,15 @@ def pulse(t, t0, w):
 
 
 def make_clips(arm, bld):
-    """The six required clips + primed@loop. Poses are dicts; the legs are solved in world space per pose."""
+    """The six required clips + primed@loop. Poses are dicts; the legs are solved in world space per pose.
+    Bones: body = the sheaf and both arms (scale = the swell), head = the torch-head fire (scale = its flare),
+    tail = the fuse + spark (scale = the fuse burning down), legs_a / legs_b = the stilts."""
     piv = bld.pivots()
     pz = Poser(arm, piv["legs_a"])
     bp = piv["body"]
     sin, cos, tau = math.sin, math.cos, 2 * math.pi
 
-    def P_(root=None, body=None, head=None, tail=None, legs=((0, 0, 0), (0, 0, 0)), swell=1.0, leg_scale=1.0,
+    def P_(root=None, body=None, fuse=None, flame=None, legs=((0, 0, 0), (0, 0, 0)), swell=1.0, leg_scale=1.0,
            leg_drop=0.0, follow=1.0):
         p = {}
         if root:
@@ -496,114 +598,129 @@ def make_clips(arm, bld):
             bd["loc"] = tuple(x + y for x, y in zip(l0, sl))
         if bd:
             p["body"] = bd
-        if head:
-            p["head"] = dict(head)
-        if tail:
-            p["tail"] = dict(tail)
+        if flame:
+            p["head"] = dict(flame)
+        if fuse:
+            p["tail"] = dict(fuse)
         return pz.legs(p, legs[0], legs[1], follow=follow, scale=leg_scale, drop=leg_drop)
+
+    def fl(w, h, rot=(0.0, 0.0, 0.0), loc=None):
+        """The fire: w = width scale, h = height scale (bone Y = up), about the neck collar's centre."""
+        d = {"rot": tuple(rot), "scale": (w, h, w)}
+        if loc:
+            d["loc"] = tuple(loc)
+        return d
 
     def idle(t):
         w = tau * t
         tw = pulse(t, 0.32, 0.035)
         bob = 0.012 * (0.5 - 0.5 * cos(2 * w))
+        fk = 0.05 * sin(3 * w + 1.0)
         return P_(root={"loc": (0, bob, 0)},
                   body={"rot": (5 + 2 * sin(w) + 4 * tw, 6 * tw, 2 * sin(w + 1))},
-                  head={"rot": (-5 + 5 * sin(2 * w + 1) - 8 * tw, 0, 7 * sin(w + 0.5))},
-                  tail={"rot": (5 * sin(w - 0.8) - 14 * tw, 0, 3 * sin(w))},
+                  fuse={"rot": (-5 + 5 * sin(2 * w + 1) - 8 * tw, 0, 7 * sin(w + 0.5))},
+                  flame=fl(FL_IDLE * (1 + fk), FL_IDLE * (1 + 0.1 * sin(3 * w) + 0.05 * sin(5 * w + 0.3)),
+                           (-3 + 3 * sin(2 * w) - 6 * tw, 0, 4 * sin(w + 0.4))),
                   swell=1.0 + 0.035 * (0.5 + 0.5 * sin(w - 0.4)),
                   legs=((5 * sin(w), 0.03 * pulse(t, 0.25, 0.07), 2), (-5 * sin(w), 0.03 * pulse(t, 0.75, 0.07), 2)))
 
     def move(t):
         # the sprint reads from every side: a big bounce, a side-to-side roll and twist (seen from the front, where
-        # the fore-aft leg swing is foreshortened), the fuse whipping behind, the arms flapping, the lifted leg
+        # the fore-aft leg swing is foreshortened), the fuse whipping and the fire streaming back, the lifted leg
         # kicking out
         w = tau * t
         bob = 0.055 * (0.5 - 0.5 * cos(2 * w))
         la, lb = max(0.0, cos(w)), max(0.0, -cos(w))
         return P_(root={"loc": (0, bob, 0)},
                   body={"rot": (8 + 3 * sin(2 * w + 0.4), 11 * sin(w), 9 * sin(w))},
-                  head={"rot": (-26 - 10 * sin(2 * w - 1.0), 0, 16 * sin(w - 1.3))},
-                  tail={"rot": (-10 - 18 * sin(2 * w - 0.7), -8 * sin(w), 6 * sin(w))},
+                  fuse={"rot": (-26 - 10 * sin(2 * w - 1.0), 0, 16 * sin(w - 1.3))},
+                  flame=fl(FL_MOVE * 0.92, FL_MOVE * (1.12 + 0.1 * sin(2 * w + 0.3)),
+                           (-28 - 6 * sin(2 * w - 0.5), -6 * sin(w), 8 * sin(w - 0.8))),
                   legs=((-42 * sin(w), 0.09 * la, 3 + 10 * la), (42 * sin(w), 0.09 * lb, 3 + 10 * lb)))
 
-    rest = P_()
-    skid = P_(body={"rot": (-14, 0, 2)}, head={"rot": (-26, 0, -6)}, tail={"rot": (-24, 0, 0)}, swell=1.06,
-              root={"loc": (0, -0.01, 0)}, legs=((-30, 0.0, 6), (20, 0.0, 6)))
-    swelling = P_(body={"rot": (-8, 0, -2)}, head={"rot": (6, 0, 4), "scale": (0.78, 0.66, 0.74)},
-                  tail={"rot": (-38, 0, 0), "scale": 1.05}, swell=1.2, root={"loc": (0, -0.02, 0)},
-                  legs=((-22, 0.0, 9), (16, 0.0, 9)))
-    tremble = P_(body={"rot": (-5, 0, 3)}, head={"rot": (10, 0, -4), "scale": (0.6, 0.42, 0.56)},
-                 tail={"rot": (-46, 3, 0), "scale": 1.08}, swell=1.29, root={"loc": (0, -0.025, 0)},
-                 legs=((-20, 0.0, 10), (15, 0.0, 10)))
-    loaded = P_(body={"rot": (-4, 0, -3)}, head={"rot": (8, 0, 3), "scale": (0.55, 0.36, 0.5)},
-                tail={"rot": (-50, -3, 0), "scale": 1.1}, swell=1.32, root={"loc": (0, -0.025, 0)},
-                legs=((-20, 0.0, 10), (15, 0.0, 10)))
-
     def primed(t):
+        # PRIMED: planted, swollen, the fuse burnt to a stub - and the fire in the torch head blazes up to ~2 x and
+        # throbs three times a second (pulse k), a flicker on top (f); frame 0 is windup's last (loaded) pose
         w = tau * t
+        k = sin(w)
+        f = 0.06 * sin(3 * w + 0.5)
         return P_(body={"rot": (-4 + 1.5 * sin(2 * w), 0, 3 * sin(2 * w))},
-                  head={"rot": (8, 0, 3 * sin(2 * w + 1)), "scale": (0.55, 0.36, 0.5)},
-                  tail={"rot": (-50 + 4 * sin(2 * w + 0.5), 3 * sin(w), 0), "scale": 1.1},
-                  swell=1.32 + 0.03 * sin(2 * w), root={"loc": (0, -0.025, 0)}, legs=((-20, 0.0, 10), (15, 0.0, 10)))
+                  fuse={"rot": (8, 0, 3 * sin(2 * w + 1)), "scale": (0.5, 0.3, 0.46)},
+                  flame=fl(FP_W * (1 + FP_K * k + f), FP_H * (1 + FP_KH * k + f), (3 * sin(2 * w + 0.5), 0, 5 * sin(w + 1))),
+                  swell=1.32 + 0.04 * k, root={"loc": (0, -0.025, 0)}, legs=((-20, 0.0, 10), (15, 0.0, 10)))
 
-    # attack = the detonation, from the loaded pose
-    peak = P_(body={"rot": (-6, 0, 0)}, head={"rot": (0, 0, 0), "scale": (0.3, 0.12, 0.3)},
-              tail={"rot": (-70, 0, 0), "scale": 1.15}, swell=1.55, root={"loc": (0, -0.03, 0)},
-              legs=((-26, 0.0, 16), (22, 0.0, 16)))
-    blast = P_(body={"rot": (-4, 0, 0)}, head={"loc": (0, 0.12, 0), "scale": (0.3, 0.05, 0.3)},
-               tail={"rot": (-95, 0, 0), "loc": (0, 0.12, 0), "scale": 1.2}, swell=1.85, root={"loc": (0, 0.0, 0)},
-               legs=((-45, 0.05, 40), (40, 0.05, 40)))
-    shards = P_(body={"rot": (0, 0, 0)}, head={"loc": (0, 0.3, 0), "scale": 0.02},
-                tail={"rot": (-140, 20, 0), "loc": (0, 0.35, -0.1), "scale": 0.5}, swell=0.3, root={"loc": (0, 0.0, 0)},
-                legs=((-80, 0.15, 75), (75, 0.15, 75)), leg_scale=0.55)
-    gone_a = P_(body={}, head={"loc": (0, 0.3, 0), "scale": 0.01}, tail={"loc": (0, 0.4, -0.1), "scale": 0.02},
+    # windup = PRIMED begins: skid to a stop, the fire catches and flares twice while the bundle swells and the fuse
+    # burns down; it ends on primed@loop's first frame, so the loop follows with no hitch
+    rest = P_()
+    skid = P_(body={"rot": (-14, 0, 2)}, fuse={"rot": (-26, 0, -6)}, flame=fl(1.3, 1.5, (-12, 0, 0)), swell=1.06,
+              root={"loc": (0, -0.01, 0)}, legs=((-30, 0.0, 6), (20, 0.0, 6)))
+    catch = P_(body={"rot": (-10, 0, -1)}, fuse={"rot": (0, 0, 2), "scale": (0.9, 0.82, 0.88)},
+               flame=fl(2.05, 2.6, (-4, 0, 3)), swell=1.14, root={"loc": (0, -0.015, 0)},
+               legs=((-24, 0.0, 8), (17, 0.0, 8)))
+    dip = P_(body={"rot": (-8, 0, -2)}, fuse={"rot": (6, 0, 4), "scale": (0.72, 0.58, 0.68)},
+             flame=fl(1.55, 1.8, (4, 0, -3)), swell=1.22, root={"loc": (0, -0.02, 0)},
+             legs=((-22, 0.0, 9), (16, 0.0, 9)))
+    flare2 = P_(body={"rot": (-5, 0, 3)}, fuse={"rot": (10, 0, -4), "scale": (0.6, 0.42, 0.56)},
+                flame=fl(2.2, 2.75, (3, 0, -5)), swell=1.29, root={"loc": (0, -0.025, 0)},
+                legs=((-20, 0.0, 10), (15, 0.0, 10)))
+    loaded = primed(0.0)
+
+    # attack = the detonation, from the loaded pose: the fire flashes up, then flat and wide, then gone
+    peak = P_(body={"rot": (-6, 0, 0)}, fuse={"rot": (0, 0, 0), "scale": (0.3, 0.12, 0.3)}, flame=fl(2.7, 3.2),
+              swell=1.55, root={"loc": (0, -0.03, 0)}, legs=((-26, 0.0, 16), (22, 0.0, 16)))
+    blast = P_(body={"rot": (-4, 0, 0)}, fuse={"loc": (0, 0.12, 0), "scale": (0.3, 0.05, 0.3)}, flame=fl(2.5, 2.1),
+               swell=1.85, root={"loc": (0, 0.0, 0)}, legs=((-45, 0.05, 40), (40, 0.05, 40)))
+    shards = P_(body={"rot": (0, 0, 0)}, fuse={"loc": (0, 0.3, 0), "scale": 0.02}, flame=fl(0.02, 0.02, loc=(0, 0.1, 0)),
+                swell=0.3, root={"loc": (0, 0.0, 0)}, legs=((-80, 0.15, 75), (75, 0.15, 75)), leg_scale=0.55)
+    gone_a = P_(body={}, fuse={"loc": (0, 0.3, 0), "scale": 0.01}, flame=fl(0.01, 0.01, loc=(0, 0.1, 0)),
                 swell=0.02, legs=((-90, 0.1, 90), (90, 0.1, 90)), leg_scale=0.02)
 
-    # hit
-    flinch = P_(root={"loc": (0, -0.01, -0.05)}, body={"rot": (-17, -5, 9)}, head={"rot": (20, 0, -10)},
-                tail={"rot": (22, 0, 4)}, swell=0.94, legs=((10, 0.0, 4), (-6, 0.0, 4)))
-    settle = P_(body={"rot": (6, 2, -4)}, head={"rot": (-10, 0, 6)}, tail={"rot": (-8, 0, 0)}, swell=1.02)
+    # hit: a flinch back with a squash; the fuse and the fire whip forward and gutter
+    flinch = P_(root={"loc": (0, -0.01, -0.05)}, body={"rot": (-17, -5, 9)}, fuse={"rot": (20, 0, -10)},
+                flame=fl(0.75, 0.6, (26, 0, -10)), swell=0.94, legs=((10, 0.0, 4), (-6, 0.0, 4)))
+    settle = P_(body={"rot": (6, 2, -4)}, fuse={"rot": (-10, 0, 6)}, flame=fl(1.12, 1.25, (-8, 0, 4)), swell=1.02)
 
     # death: stagger, a sputtering swell, a hitch, a smaller burst; the pieces scatter and shrink away
-    stagger = P_(root={"loc": (0, -0.015, -0.07)}, body={"rot": (-24, 6, 13)}, head={"rot": (28, 0, -14)},
-                 tail={"rot": (26, 0, 6)}, swell=0.95, legs=((14, 0.0, 6), (-10, 0.0, 6)))
+    stagger = P_(root={"loc": (0, -0.015, -0.07)}, body={"rot": (-24, 6, 13)}, fuse={"rot": (28, 0, -14)},
+                 flame=fl(0.7, 0.55, (30, 0, -12)), swell=0.95, legs=((14, 0.0, 6), (-10, 0.0, 6)))
     sputter = P_(root={"loc": (0, -0.03, -0.05)}, body={"rot": (-8, 0, -7)},
-                 head={"rot": (34, 0, 10), "scale": (0.85, 0.74, 0.82)}, tail={"rot": (-30, 0, 0)}, swell=1.22,
+                 fuse={"rot": (34, 0, 10), "scale": (0.85, 0.74, 0.82)}, flame=fl(1.45, 1.8, (10, 0, 6)), swell=1.22,
                  legs=((-8, 0.0, 12), (6, 0.0, 12)))
     hitch = P_(root={"loc": (0, -0.035, -0.05)}, body={"rot": (-12, 0, 9)},
-               head={"rot": (40, 0, -8), "scale": (0.78, 0.64, 0.74)}, tail={"rot": (-20, 0, 0)}, swell=1.12,
+               fuse={"rot": (40, 0, -8), "scale": (0.78, 0.64, 0.74)}, flame=fl(0.85, 0.7, (18, 0, -6)), swell=1.12,
                legs=((-8, 0.0, 14), (6, 0.0, 14)))
     swell2 = P_(root={"loc": (0, -0.035, -0.05)}, body={"rot": (-6, 0, -4)},
-                head={"rot": (30, 0, 6), "scale": (0.55, 0.4, 0.5)}, tail={"rot": (-58, 0, 0), "scale": 1.1},
+                fuse={"rot": (30, 0, 6), "scale": (0.55, 0.4, 0.5)}, flame=fl(1.9, 2.3, (6, 0, 4)),
                 swell=1.42, legs=((-12, 0.0, 16), (10, 0.0, 16)))
     pop = P_(root={"loc": (0, -0.03, -0.05)}, body={"rot": (-4, 0, 0)},
-             head={"rot": (50, 0, 0), "loc": (0, 0.08, 0), "scale": (0.6, 0.3, 0.6)},
-             tail={"rot": (-90, 0, 0), "loc": (0, 0.1, 0), "scale": 1.12}, swell=1.62,
+             fuse={"rot": (50, 0, 0), "loc": (0, 0.08, 0), "scale": (0.6, 0.3, 0.6)}, flame=fl(2.2, 1.7), swell=1.62,
              legs=((-30, 0.04, 34), (28, 0.04, 34)))
     scatter = P_(root={"loc": (0, -0.06, -0.05)}, body={"rot": (10, 0, 25)},
-                 head={"rot": (160, 40, 0), "loc": (0.05, 0.22, 0.05), "scale": 0.45},
-                 tail={"rot": (-150, 30, 30), "loc": (-0.05, 0.2, -0.2), "scale": 0.55}, swell=0.45,
+                 fuse={"rot": (160, 40, 0), "loc": (0.05, 0.22, 0.05), "scale": 0.45},
+                 flame=fl(0.25, 0.25, (20, 0, 0), loc=(0, 0.1, 0)), swell=0.45,
                  legs=((-70, 0.0, 70), (65, 0.0, 70)), leg_scale=0.7, leg_drop=0.05)
     crumble = P_(root={"loc": (0, -0.08, -0.05)}, body={"rot": (20, 0, 35)},
-                 head={"rot": (200, 60, 0), "loc": (0.06, 0.05, 0.1), "scale": 0.2},
-                 tail={"rot": (-170, 40, 40), "loc": (-0.08, 0.02, -0.28), "scale": 0.25}, swell=0.2,
+                 fuse={"rot": (200, 60, 0), "loc": (0.06, 0.05, 0.1), "scale": 0.2},
+                 flame=fl(0.03, 0.03), swell=0.2,
                  legs=((-88, 0.0, 88), (85, 0.0, 88)), leg_scale=0.4, leg_drop=0.08)
-    gone_d = P_(root={"loc": (0, -0.1, -0.05)}, body={"rot": (20, 0, 35)}, head={"scale": 0.01},
-                tail={"scale": 0.01}, swell=0.02, legs=((-90, 0.0, 90), (90, 0.0, 90)), leg_scale=0.02, leg_drop=0.1)
+    gone_d = P_(root={"loc": (0, -0.1, -0.05)}, body={"rot": (20, 0, 35)}, fuse={"scale": 0.01},
+                flame=fl(0.01, 0.01), swell=0.02, legs=((-90, 0.0, 90), (90, 0.0, 90)), leg_scale=0.02, leg_drop=0.1)
 
     RIG.cycle_clip(arm, KEY, "idle@loop", IDLE_FRAMES, idle)
     RIG.cycle_clip(arm, KEY, "move@loop", MOVE_FRAMES, move)
-    RIG.keyed_clip(arm, KEY, "windup", [(0, rest), (3, skid), (8, swelling), (12, tremble), (15, loaded)])
+    RIG.keyed_clip(arm, KEY, "windup", [(0, rest), (3, skid), (6, catch), (9, dip), (12, flare2), (15, loaded)])
     RIG.keyed_clip(arm, KEY, "attack", [(0, loaded), (2, peak), (4, blast), (7, shards), (10, gone_a), (11, gone_a)])
     RIG.keyed_clip(arm, KEY, "hit", [(0, rest), (2, flinch), (5, settle), (9, rest)])
     RIG.keyed_clip(arm, KEY, "death", [(0, rest), (3, stagger), (7, sputter), (10, hitch), (14, swell2), (16, pop),
                                         (19, scatter), (23, crumble), (26, gone_d), (27, gone_d)])
-    RIG.cycle_clip(arm, KEY, "primed@loop", 10, primed)
+    RIG.cycle_clip(arm, KEY, "primed@loop", PRIMED_FRAMES, primed)
     return [RIG.clip_name(KEY, c) for c in SPEC.ENEMY_CLIPS_REQUIRED] + [RIG.clip_name(KEY, "primed@loop")]
 
 
-KEY_FRAMES = {"idle@loop": [0, 13, 21, 32], "move@loop": [0, 3, 6, 9], "windup": [0, 3, 8, 15],
-              "attack": [0, 2, 4, 7], "hit": [0, 2, 5, 9], "death": [0, 3, 7, 14, 16, 19, 23], "primed@loop": [0, 5]}
+KEY_FRAMES = {"idle@loop": [0, 13, 21, 32], "move@loop": [0, 3, 6, 9], "windup": [0, 3, 6, 9, 12, 15],
+              "attack": [0, 2, 4, 7], "hit": [0, 2, 5, 9], "death": [0, 3, 7, 14, 16, 19, 23],
+              "primed@loop": [0, 3, 5, 8]}
+PRIMED_PEAK, PRIMED_LOW = 3, 8          # primed@loop frames at the top and the bottom of the throb
 
 
 # ---- review --------------------------------------------------------------------------------------------------------
@@ -657,12 +774,15 @@ def preview(bld, arm, mesh, work):
     ims = [{"path": p, "label": k} for k, p in fv.items()]
     game = []
     for label, clip, f in (("rest", None, 0), ("sprint", "move@loop", 3), ("sprint", "move@loop", 9),
-                           ("primed", "windup", 15), ("burst", "attack", 4), ("hit", "hit", 2), ("death", "death", 16)):
+                           ("primed", "windup", 15), ("primed peak", "primed@loop", PRIMED_PEAK),
+                           ("primed low", "primed@loop", PRIMED_LOW), ("burst", "attack", 4), ("hit", "hit", 2),
+                           ("death", "death", 16)):
         pose_track(arm, clip, f)
         for yaw, tag in ((-35.0, "toward"), (90.0, "side"), (145.0, "away")):
             arm.rotation_euler = (0, 0, math.radians(yaw))
             bpy.context.view_layer.update()
-            p = preview_game([mesh], os.path.join(work, "pv_%s_%d_%d.png" % (label, f, yaw)), px=64)
+            p = preview_game([mesh], os.path.join(work, "pv_%s_%d_%d.png" % (label.replace(" ", "_"), f, yaw)), px=72,
+                             target=(0.0, 0.0, 0.6))
             game.append({"path": p, "label": "%s f%d %s" % (label, f, tag), "scale": 3})
         arm.rotation_euler = (0, 0, 0)
     RIG.unmute_none(arm)
@@ -675,13 +795,15 @@ def preview(bld, arm, mesh, work):
 
 def ingame_poses(arm, mesh, work, yaw=-35.0):
     out = []
-    poses = [("rest", None, 0), ("sprint", "move@loop", 3), ("primed (loaded)", "windup", 15),
+    poses = [("rest", None, 0), ("sprint", "move@loop", 3), ("primed: windup end", "windup", 15),
+             ("primed@loop: throb peak", "primed@loop", PRIMED_PEAK), ("primed@loop: throb low", "primed@loop", PRIMED_LOW),
              ("detonation", "attack", 4), ("hit", "hit", 2), ("death burst", "death", 16)]
     arm.rotation_euler = (0.0, 0.0, math.radians(yaw))
     for label, clip, f in poses:
         pose_track(arm, clip, f)
-        r = R.ingame([mesh], work, "%s_pose_%s" % (KEY, label.split()[0]), px=64, view_height=SPEC.GAME_VIEW_HEIGHTS[0],
-                     target=(0.0, 0.0, 0.5), silhouette_too=False, ink=0.01)
+        tag = "".join(ch if ch.isalnum() else "_" for ch in label.split(":")[-1].strip())[:24]
+        r = R.ingame([mesh], work, "%s_pose_%s" % (KEY, tag), px=80, view_height=SPEC.GAME_VIEW_HEIGHTS[0],
+                     target=(0.0, 0.0, 0.75), silhouette_too=False, ink=0.01)
         out.append((label, r["color"]))
     RIG.unmute_none(arm)
     arm.rotation_euler = (0.0, 0.0, 0.0)
@@ -702,7 +824,7 @@ def review(bld, arm, mesh, rep, reports, work, tex, notes):
     tracks = [RIG.clip_name(KEY, c) for c in KEY_FRAMES]
     strips = B.clip_frames(arm, [mesh], tracks, work, KEY, size=190, direction=R.CREATURE_VIEWS["34_front"], ink=0.006,
                            samples=8, frame_lists={RIG.clip_name(KEY, c): f for c, f in KEY_FRAMES.items()},
-                           ext=1.7, center=(0.0, 0.03, 0.66))
+                           ext=2.1, center=(0.0, 0.03, 0.85))
     ing = []
     for label, yaw, clip, f in (("sprinting at the camera", -35.0, "move@loop", 3), ("sprinting away", 145.0, "move@loop", 9)):
         pose_track(arm, clip, f)
@@ -880,8 +1002,9 @@ def crowd(out_notes):
             u = rng.random()
             if is_kj:
                 d = (tgt - p).length
-                if d < 1.7 and u < 0.7:
-                    clip, f = "windup", rng.choice((8.0, 12.0, 15.0))
+                if d < 1.7 and u < 0.7:              # PRIMED: late windup or anywhere in the primed@loop throb
+                    clip, f = rng.choice((("windup", 12.0), ("windup", 15.0), ("primed@loop", float(PRIMED_PEAK)),
+                                          ("primed@loop", 5.0), ("primed@loop", float(PRIMED_LOW))))
                 elif u < 0.85:
                     clip, f = "move@loop", rng.uniform(0, MOVE_FRAMES)
                 else:
@@ -929,12 +1052,14 @@ def crowd(out_notes):
     strip = []
     for clip, frames, yaw, tag in (("move@loop", [0, 2, 4, 6, 8, 10], 90.0, "across"),
                                    ("move@loop", [0, 2, 4, 6, 8, 10], -30.0, "toward"),
-                                   ("windup", [0, 5, 10, 15], -30.0, ""), ("attack", [0, 2, 4, 7], -30.0, "")):
+                                   ("windup", [0, 3, 6, 9, 12, 15], -30.0, ""),
+                                   ("primed@loop", [0, PRIMED_PEAK, 5, PRIMED_LOW], -30.0, ""),
+                                   ("attack", [0, 2, 4, 7], -30.0, "")):
         for f in frames:
             made = list(spawn(kj, (0.0, 0.0, 0.0), math.radians(yaw), clip, f))
             bpy.context.view_layer.update()
             p = os.path.join(work, "kj_%s_%s_%02d.png" % (clip.replace("@", "_"), tag or "c", f))
-            CC.game_render([o for o in made if o.type == "MESH"], {}, p, 64, 64, (0.0, 0.0, 0.5), samples=12)
+            CC.game_render([o for o in made if o.type == "MESH"], {}, p, 84, 84, (0.0, 0.0, 0.72), samples=12)
             CC.clear_copies(made)
             strip.append(((clip + " " + tag).strip(), f, p))
     fl = bpy.data.objects.get("GFA_FLOOR")
@@ -955,8 +1080,8 @@ def crowd(out_notes):
                   "horde (1x)", "height": None,
          "images": [{"path": out["crowd28"], "label": "1x, 28 m view"}, {"path": out["pack"], "label": "1x: find the 3 bombers"}]},
         {"label": "The horde, 2x nearest", "height": None, "images": [{"path": out["crowd"], "label": "2x", "scale": 2}]},
-        {"label": "RUSH at game size: move@loop across the screen and toward the camera (6 frames each), windup (the swell, "
-                  "the fuse burning down), attack (the detonation) - true pixels shown 3x nearest", "height": None,
+        {"label": "RUSH at game size, TRUE pixels 3x nearest: move@loop across / toward the camera, windup (the fire "
+                  "catches), primed@loop (its throb), attack", "height": None,
          "images": [{"path": p, "label": "%s f%d" % (c, f), "scale": 3} for c, f, p in strip]},
     ]
     layout = {"title": "Kindlejack - horde read, mixed with clinkers (The Unmade, Cinder Wastes)",
@@ -1002,7 +1127,7 @@ def main():
     skin = RIG.skin_rigid(mesh, arm)
     for bone, name, p in bld.sockets():
         RIG.add_socket(arm, bone, name, p)
-    RIG.add_socket(arm, "head", "fx_fuse", tuple(bld.spark))       # extra: the spark VFX (follows the fuse burning down)
+    RIG.add_socket(arm, "tail", "fx_fuse", tuple(bld.spark))       # extra: the spark VFX (follows the fuse burning down)
     clips = make_clips(arm, bld)
     blend = os.path.join(pack, "source", KEY + ".blend")
     C.save_blend(blend)
@@ -1012,18 +1137,22 @@ def main():
         "content_key": KEY,
         "content_row": ROW,
         "verb": "RUSH",
-        "design": "a tall, thin, forward-leaning sheaf of kindling tied by two obsidian collars, a charred splinter crown, "
-                  "a lit fuse with a teal-white spark; two obsidian stilt legs, one stick arm trailing back, one snapped stump",
-        "bones": {"root": "bob, lean, knock-back", "body": "the sheaf (sticks, crown, collars, core, shoulder shards); scale = the swell",
-                  "head": "the fuse + spark (pivot at the fuse's root; scale = the fuse burning down)",
-                  "legs_a": "left leg", "legs_b": "right leg", "tail": "both arms (pivot at the shoulders)"},
-        "clip_map": {"move@loop": "Approach (the sprint)", "windup": "PRIMED: plant, swell, the fuse burns down; "
-                     "time-stretch it to fuse x telegraph_time; ends on the loaded pose",
-                     "primed@loop": "optional: hold the loaded, trembling swell if PRIMED outlasts windup",
+        "design": "a forward-leaning sheaf of kindling tied by two obsidian collars, flaring into a pale ash torch head "
+                  "around a teal Unmade fire, a lit fuse with a big white-teal spark; two obsidian stilt legs, one stick "
+                  "arm trailing back, one snapped stump",
+        "bones": {"root": "bob, lean, knock-back",
+                  "body": "the sheaf (sticks, torch head, collars, core, shoulder shards) and both arms; scale = the swell",
+                  "head": "the torch-head fire (pivot at the neck collar's centre; scale = the fire blazing and throbbing)",
+                  "legs_a": "left leg", "legs_b": "right leg",
+                  "tail": "the fuse + spark (pivot at the fuse's root; scale = the fuse burning down)"},
+        "clip_map": {"move@loop": "Approach (the sprint)", "windup": "PRIMED begins: skid, the fire catches and flares, "
+                     "swell, the fuse burns down; ends on primed@loop's first frame",
+                     "primed@loop": "PRIMED: loop it after windup for the rest of the fuse - the fire blazes about 2 x "
+                                    "and throbs three times a second (the brightest swarm on screen)",
                      "attack": "the detonation when the fuse runs out (play on the despawn; the blast is the engine's VFX "
                                "at fx_core)", "death": "shot down before it blows: stagger, sputtering swell, a small burst",
                      "hit": "flinch", "idle@loop": "bouncing on its toes"},
-        "extra_sockets": {"fx_fuse": "on head: the spark at the fuse tip (moves down as the fuse burns in windup)"},
+        "extra_sockets": {"fx_fuse": "on tail: the spark at the fuse tip (moves down as the fuse burns in windup)"},
         "move_cycle_m": MOVE_CYCLE_M,
         "move_note": "rigid-group sprint: play move@loop at speed / move_cycle_m cycles per second (the Bomber runs at "
                      "1.1 x 4.6 m/s -> about 5.6 cycles/s, 11 strides a second: the frantic RUSH)",
@@ -1040,8 +1169,9 @@ def main():
             rep["tris"], " + ".join("%dpx" % t["px"][0] for t in rep["textures"]), rep["height_m"], rep["height_m"] / 2.2,
             (rep["bounds"]["max"][2] - rep["bounds"]["min"][2]), ", ".join(sorted(rep["sockets"]))),
         "Clips: %s" % ", ".join(c["name"].replace(KEY + "_", "") + " %.2fs" % c["seconds"] for c in RIG.clips_report(arm)),
-        "move_cycle_m %.2f. The fuse is the head bone (scale burns it down); the swell is the body scale; the legs are posed "
-        "in world space and stay planted. Status: %s." % (MOVE_CYCLE_M, SPEC.STATUS_AI_FINAL),
+        "move_cycle_m %.2f. The torch-head fire is the head bone (scale = its blaze and throb), the fuse the tail bone (scale "
+        "burns it down);" % MOVE_CYCLE_M,
+        "the swell is the body scale; the legs are posed in world space and stay planted. Status: %s." % SPEC.STATUS_AI_FINAL,
     ]
     outputs = [C.rel(C.model_path(KIND, KEY)), C.rel(os.path.splitext(C.model_path(KIND, KEY))[0] + ".meta.json"),
                "art/enemies/%s/source/%s.blend" % (KEY, KEY), "art/enemies/%s/textures/%s_basecolor.png" % (KEY, KEY),
@@ -1053,10 +1183,18 @@ def main():
     if not C.flag(argv, "--no-crowd"):
         sheet, crowd2x = crowd(notes[:1])
         outputs += [C.rel(sheet), C.rel(crowd2x)]
+    fix_sheet = os.path.join(reports, "%s_review_fix.png" % KEY)       # written by enemies/kindlejack_fix_sheet.py
+    if os.path.exists(fix_sheet):
+        outputs.append(C.rel(fix_sheet))
     C.write_pack_status(KIND, KEY, outputs,
                         "Built from code by tools/blender/gf_assets/enemies/kindlejack.py (model, paint, GF_Swarm_v1 rig, "
-                        "7 clips, export, validation, review and the horde read mixed with clinkers).", tier=TIER,
-                        extra={"skeleton": SPEC.SWARM_SKELETON})
+                        "7 clips, export, validation, review and the horde read mixed with clinkers). Art review fix "
+                        "(5/10): it fills its collider (footprint 0.65 x 0.67 -> 0.86 x 0.89 m, on a par with a clinker "
+                        "on screen), the crown flares into a pale ash torch head, the spark is a 0.14 m white-teal core (2.5 x the area), "
+                        "the slits between the sticks are banked dark, and primed@loop throbs a teal fire in the torch "
+                        "head (the brightest swarm on screen while primed); before/after in "
+                        "reports/kindlejack_review_fix.png (enemies/kindlejack_fix_sheet.py).", tier=TIER,
+                        extra={"skeleton": SPEC.SWARM_SKELETON, "faction": "unmade", "verb": "RUSH"})
     C.log("DONE", KEY)
 
 
