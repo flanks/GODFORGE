@@ -952,7 +952,7 @@ pub fn stats(room: &RoomDef) -> Stats {
 
 fn stats_line(s: &Stats) -> String {
     format!(
-        "OBST {}  BLOCK {:.1}%  OPEN {:.0}%  SQZ {}  SEAL {:.1}/{:.1}%  UNDR {}  DECOR {}",
+        "OBST {}  BLOCK {:.1}%  OPEN {:.0}%  SQZ {}  SEAL {:.2}/{:.2}%  UNDR {}  DECOR {}",
         s.obstacles,
         s.blocked * 100.0,
         s.open * 100.0,

@@ -191,6 +191,10 @@ fn rot_of(d: Vec2) -> Rot16 {
 
 /// Clear floor kept between features so the horde flows and players can always kite.
 pub const LANE: f32 = 2.8;
+/// Pieces of one composition either touch (a hairline gap no enemy fits into) ...
+const TOUCH: f32 = 0.3;
+/// ... or leave a squeeze: the swarm and elites slip through, heroes weave, bosses cannot.
+const SQUEEZE: f32 = 2.1;
 /// Clear margin inside the arena rim.
 const RIM: f32 = 3.0;
 /// Breathing room between a district slot and the lanes around it.
@@ -511,7 +515,8 @@ impl Builder {
         self.groups
     }
 
-    /// Inside the rim margin, out of the keep-outs and lanes, and a lane away from other groups.
+    /// Inside the rim margin, out of the keep-outs and lanes, a lane away from other groups, and
+    /// either touching or a squeeze apart from its own group (no slivers that trap an elite).
     fn fits(&self, o: &Obstacle, g: u16) -> bool {
         let (c, e) = extent(o);
         if c.x.abs() + e.x > self.half.x - RIM || c.y.abs() + e.y > self.half.y - RIM {
@@ -524,7 +529,10 @@ impl Builder {
         if self.lanes.iter().any(|l| seg_dist(o, l.from, l.to) < l.width * 0.5) {
             return false;
         }
-        self.obstacles.iter().zip(&self.owner).all(|(p, &pg)| pg == g || gap(o, p) >= LANE)
+        self.obstacles.iter().zip(&self.owner).all(|(p, &pg)| {
+            let gap = gap(o, p);
+            if pg == g { gap <= TOUCH || gap >= SQUEEZE } else { gap >= LANE }
+        })
     }
 
     fn mark(&mut self, o: &Obstacle) {
@@ -897,7 +905,7 @@ fn court(b: &mut Builder, f: Frame, cloister: bool) -> Option<Rect> {
     let g = b.group();
     let r = q(b.rl(0.75, 0.95));
     let h = b.biome.column(&mut b.dress);
-    let sp = b.rl(3.9, 4.5);
+    let sp = b.rl(4.1, 4.6);
     let e = r + 0.25;
     let sides = if cloister {
         4
@@ -968,7 +976,8 @@ fn court(b: &mut Builder, f: Frame, cloister: bool) -> Option<Rect> {
         b.decal(Decor::FloorInlay { at: qv(c.p(0.0, -cw * 0.15)), radius: ir, rot, variant: 1, god: 0 });
         if cw >= 5.0 && b.lay.chance(0.5) {
             let sr = 1.1;
-            let at = c.p(b.rl(-cl * 0.3, cl * 0.3), cw - r - sr - 1.0);
+            // A lane clear of the back row: no niche behind it.
+            let at = c.p(b.rl(-cl * 0.3, cl * 0.3), cw - r - sr - LANE);
             let (height, rot, god, variant) = (q(b.rd(3.2, 4.2)), c.rot(0.0, -1.0), b.god(), b.vd(4));
             b.circle(g, at, sr, |at, radius| Decor::Statue { at, radius, height, rot, god, variant });
         }
@@ -1241,8 +1250,8 @@ fn reflecting_pool(b: &mut Builder, f: Frame) -> Option<Rect> {
     });
     // The foot of the pool: two low plinths carrying fire bowls.
     for side in [-1.0f32, 1.0] {
-        let at = c.p(-head * (c.hl - 0.9), side * (pw * 0.5 + 0.2));
         let hs = q(b.rl(0.55, 0.75));
+        let at = c.p(-head * (c.hl - 0.9), side * (pw * 0.5 + hs + 0.9));
         let (height, variant) = (q(b.rd(0.9, 1.3)), b.vd(4));
         if b.block(g, at, Vec2::splat(hs), |at, half| Decor::Wall {
             at,
