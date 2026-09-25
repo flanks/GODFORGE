@@ -1,0 +1,152 @@
+{
+ "kind": "weapon",
+ "key": "wraith_bow",
+ "tier": "two_handed",
+ "tris": 3226,
+ "tris_budget": [
+  2000,
+  4000
+ ],
+ "textures": [
+  {
+   "name": "wraith_bow_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 182069
+  },
+  {
+   "name": "wraith_bow_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 769933
+  }
+ ],
+ "sockets": {
+  "grip_L": {
+   "translation": [
+    -0.0856,
+    -0.0278,
+    -0.332
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.38
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "grip_R": {
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "glow_core": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.63
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  }
+ },
+ "clips": [],
+ "skeleton": null,
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = palm centre of the main hand, -Z = barrel/forward, +Y = up, +X = right; attach as a child of the hand socket / aim pivot with an identity transform.",
+ "bounds_m": {
+  "min": [
+   -0.7337,
+   -0.2199,
+   -0.75
+  ],
+  "max": [
+   0.7214,
+   0.2606,
+   0.0999
+  ]
+ },
+ "size_m": 1.455,
+ "glb": "assets/models/weapons/wraith_bow.glb",
+ "glb_bytes": 1100108,
+ "glb_sha256": "cf7473e7e15cd63e83f3dacbfe4e5ff3d4398862cad6493b05b82003a9ac5c3c",
+ "source_blend": "art/weapons/wraith_bow/source/wraith_bow.blend",
+ "build_script": "art/weapons/wraith_bow/source/wraith_bow_build.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "chassis": {
+  "damage_type": "Void",
+  "style": "Arrow",
+  "fire": "Charge",
+  "tags": [
+   "charge",
+   "pierce",
+   "thessaly"
+  ]
+ },
+ "cant_deg": 72.0,
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 603.9,
+   "p10": 555.1,
+   "p90": 636.8
+  },
+  "coverage": 0.366
+ }
+}

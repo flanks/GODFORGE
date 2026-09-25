@@ -1,0 +1,31 @@
+{
+ "asset": "wraith_bow",
+ "kind": "weapon",
+ "tier": "two_handed",
+ "pipeline": "docs/art/WEAPONS.md (built with tools/blender/gf_assets)",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "stages": {
+  "1_build": {
+   "status": "done",
+   "human_signoff_required": false,
+   "outputs": [
+    "assets/models/weapons/wraith_bow.glb",
+    "assets/models/weapons/wraith_bow.meta.json",
+    "art/weapons/wraith_bow/source/wraith_bow.blend",
+    "art/weapons/wraith_bow/textures/wraith_bow_basecolor.png",
+    "art/weapons/wraith_bow/textures/wraith_bow_emissive.png",
+    "art/weapons/wraith_bow/reports/wraith_bow_review.png",
+    "art/weapons/wraith_bow/reports/wraith_bow_hold.png"
+   ],
+   "notes": "Built from code by art/weapons/wraith_bow/source/wraith_bow_build.py (tools/blender/gf_assets)."
+  },
+  "2_user_approval": {
+   "status": "pending_human",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The user gives the final visual approval (meta.json status ai_final_pending_user_approval until then)."
+  }
+ }
+}

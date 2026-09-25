@@ -1,0 +1,158 @@
+{
+ "export": {
+  "file": "D:\\GODFORGE\\assets\\models\\weapons\\wraith_bow.glb",
+  "key": "wraith_bow",
+  "kind": "weapon",
+  "tier": "two_handed",
+  "extensions_used": [],
+  "tris": 3226,
+  "budget": [
+   2000,
+   4000
+  ],
+  "textures": [
+   {
+    "name": "wraith_bow_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 182069
+   },
+   {
+    "name": "wraith_bow_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 769933
+   }
+  ],
+  "materials": [
+   "M_wraith_bow"
+  ],
+  "nodes": [
+   "glow_core",
+   "grip_L",
+   "grip_R",
+   "muzzle",
+   "wraith_bow_mesh",
+   "wraith_bow"
+  ],
+  "sockets": {
+   "grip_L": {
+    "translation": [
+     -0.0856,
+     -0.0278,
+     -0.332
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "muzzle": {
+    "translation": [
+     0.0,
+     0.0,
+     -0.38
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "grip_R": {
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   },
+   "glow_core": {
+    "translation": [
+     0.0,
+     0.0,
+     -0.63
+    ],
+    "forward": [
+     0,
+     0,
+     -1
+    ],
+    "up": [
+     0,
+     1,
+     0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.7337,
+    -0.2199,
+    -0.75
+   ],
+   "max": [
+    0.7214,
+    0.2606,
+    0.0999
+   ]
+  },
+  "length_m": 1.455,
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 603.9,
+   "p10": 555.1,
+   "p90": 636.8
+  },
+  "coverage": 0.366,
+  "zones": [
+   "wood",
+   "feather",
+   "iron",
+   "wrap",
+   "brass",
+   "void",
+   "glow_eye",
+   "glow_string",
+   "glow_bolt"
+  ],
+  "decals": 52,
+  "basecolor": "art/weapons/wraith_bow/textures/wraith_bow_basecolor.png",
+  "emissive": "art/weapons/wraith_bow/textures/wraith_bow_emissive.png",
+  "emissive_texels": 233592,
+  "seconds": 21.9
+ }
+}

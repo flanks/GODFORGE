@@ -121,7 +121,7 @@ Every chassis in `content/sheets/chassis.csv` today:
 | thundercoil_launcher | two_handed | heavy (storm) | an orb chamber wound with copper coils; a crackling orb sits visibly in the breech |
 | serpent_smg | one_handed | rapid | a long serpent-scaled receiver, a fanged needle muzzle, a coiled drum |
 | godsbane_rifle | two_handed | precise | a very long barrel and sight blade; a god-bone stock |
-| wraith_bow | two_handed | charge | recurved limbs with a void-violet string; `muzzle` = the arrow rest, `grip_R` = the bow grip |
+| **wraith_bow** | two_handed | charge (pierce, void) | **built** (`art/weapons/wraith_bow/`): a winged recurve of pale wraith-wood and dark iron at half draw, canted 72° about the aim so that the feathered limbs face the 55° camera; a violet spectral string, a nocked hex-bolt with a white-hot head, a void eye on the riser. `grip_R` = the right palm on the string's nocking point (the drawing hand), `grip_L` = the left palm on the riser grip, `muzzle` = the arrow rest, `glow_core` = the bolt head |
 | **sunspike_shotgun** | two_handed | spread | **built**: a blunderbuss bell crowned with ten sun-rays |
 | anvil_gauntlets | gauntlet_pair | melee | owned by Brax's agent (`art/weapons/anvil_gauntlets/`) |
 | longstrider_rail | two_handed | charge / precise | a rail twice the hero's arm span; capacitor rings along it |
