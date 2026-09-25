@@ -1,0 +1,169 @@
+{
+ "kind": "weapon",
+ "key": "colossus_cannon",
+ "tier": "two_handed",
+ "tris": 3344,
+ "tris_budget": [
+  2000,
+  4000
+ ],
+ "textures": [
+  {
+   "name": "colossus_cannon_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 52981
+  },
+  {
+   "name": "colossus_cannon_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 803571
+  }
+ ],
+ "sockets": {
+  "muzzle": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.8
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "grip_L": {
+   "translation": [
+    -0.312,
+    0.0,
+    -0.23
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "glow_core": {
+   "translation": [
+    0.0,
+    0.0,
+    -0.23
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "grip_R": {
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "forward": [
+    0,
+    0,
+    -1
+   ],
+   "up": [
+    0,
+    1,
+    0
+   ]
+  },
+  "eject": {
+   "translation": [
+    0.212,
+    0.07,
+    -0.49
+   ],
+   "forward": [
+    0.9186,
+    0.3215,
+    0.2297
+   ],
+   "up": [
+    -0.3119,
+    0.9469,
+    -0.078
+   ]
+  }
+ },
+ "clips": [],
+ "skeleton": null,
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Grip frame: origin = palm centre of the main hand, -Z = barrel/forward, +Y = up, +X = right; attach as a child of the hand socket / aim pivot with an identity transform.",
+ "bounds_m": {
+  "min": [
+   -0.3345,
+   -0.311,
+   -0.803
+  ],
+  "max": [
+   0.254,
+   0.33,
+   0.353
+  ]
+ },
+ "size_m": 1.156,
+ "glb": "assets/models/weapons/colossus_cannon.glb",
+ "glb_bytes": 1030088,
+ "glb_sha256": "fc8b2965b46bae8efe56f995a6055bf5971ec2797794b12115ab3137913588a9",
+ "source_blend": "art/weapons/colossus_cannon/source/colossus_cannon.blend",
+ "build_script": "art/weapons/colossus_cannon/source/colossus_cannon_build.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "chassis": {
+  "damage_type": "Kinetic",
+  "style": "Shell",
+  "fire": "Auto",
+  "tags": [
+   "heavy",
+   "splash",
+   "valdris"
+  ]
+ },
+ "mount": "arm: the right forearm lies along -Y inside the sleeve (elbow ~0.38 m behind the palm); grip_L is the drum's left-flank handle",
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 285.1,
+   "p10": 246.6,
+   "p90": 300.1
+  },
+  "coverage": 0.381
+ }
+}

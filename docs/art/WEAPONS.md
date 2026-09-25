@@ -117,7 +117,7 @@ Every chassis in `content/sheets/chassis.csv` today:
 
 | Chassis | Tier | Family | Brief |
 |---|---|---|---|
-| colossus_cannon | two_handed | heavy | a shoulder-slung siege barrel with a drum breech; shell-burst ring at the muzzle |
+| **colossus_cannon** | two_handed | heavy | **built** (`art/weapons/colossus_cannon/`): **arm-mounted**, after Valdris's concept. A plated sleeve over the right forearm, with the fist on an inner handle (`grip_R`); an octagonal shell-drum breech with top clamps and an under-bracket; a stepped muzzle collar whose shell-burst ring is glowing slots and ports around an ember bore. `grip_L` is a side handle on the drum's left. The hold needs the forearm along -Y inside the sleeve |
 | thundercoil_launcher | two_handed | heavy (storm) | an orb chamber wound with copper coils; a crackling orb sits visibly in the breech |
 | serpent_smg | one_handed | rapid | a long serpent-scaled receiver, a fanged needle muzzle, a coiled drum |
 | godsbane_rifle | two_handed | precise | a very long barrel and sight blade; a god-bone stock |
