@@ -1,0 +1,296 @@
+{
+ "export": {
+  "file": "assets/models/enemies/forge_warden.glb",
+  "key": "forge_warden",
+  "kind": "enemy",
+  "tier": "elite",
+  "extensions_used": [],
+  "tris": 7666,
+  "budget": [
+   4000,
+   8000
+  ],
+  "textures": [
+   {
+    "name": "forge_warden_emissive",
+    "role": "emissive",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 120510
+   },
+   {
+    "name": "forge_warden_basecolor",
+    "role": "base_color",
+    "px": [
+     1024,
+     1024
+    ],
+    "format": "png",
+    "bytes": 1116598
+   }
+  ],
+  "materials": [
+   "M_forge_warden"
+  ],
+  "sockets": {
+   "fx_core": {
+    "translation": [
+     0.0,
+     1.63,
+     -0.05
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "shield": {
+    "translation": [
+     0.6267,
+     1.4651,
+     0.6048
+    ],
+    "forward": [
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "hit_center": {
+    "translation": [
+     -0.0,
+     1.72,
+     -0.0
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     -0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "head_top": {
+    "translation": [
+     -0.0,
+     2.79,
+     -0.02
+    ],
+    "forward": [
+     0.0,
+     0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   },
+   "attack_origin": {
+    "translation": [
+     0.6775,
+     1.3987,
+     0.7189
+    ],
+    "forward": [
+     0.0,
+     -0.0,
+     -1.0
+    ],
+    "up": [
+     0.0,
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "bounds": {
+   "min": [
+    -0.967,
+    0.0022,
+    -0.43
+   ],
+   "max": [
+    1.3039,
+    2.7948,
+    0.8927
+   ]
+  },
+  "height_m": 2.793,
+  "height_vs_hero": 1.269,
+  "joints": [
+   "root",
+   "pelvis",
+   "spine_01",
+   "spine_02",
+   "core",
+   "spine_03",
+   "clavicle_L",
+   "pauldron_L",
+   "upperarm_L",
+   "lowerarm_L",
+   "hand_L",
+   "shield",
+   "clavicle_R",
+   "pauldron_R",
+   "upperarm_R",
+   "lowerarm_R",
+   "hand_R",
+   "spear",
+   "neck",
+   "head",
+   "mask_L",
+   "mask_R",
+   "thigh_L",
+   "shin_L",
+   "foot_L",
+   "toe_L",
+   "thigh_R",
+   "shin_R",
+   "foot_R",
+   "toe_R"
+  ],
+  "clips": [
+   "forge_warden_idle@loop",
+   "forge_warden_move@loop",
+   "forge_warden_windup",
+   "forge_warden_attack",
+   "forge_warden_hit",
+   "forge_warden_death",
+   "forge_warden_cast",
+   "forge_warden_shield_up"
+  ],
+  "errors": [],
+  "warnings": [],
+  "ok": true
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 148.1,
+   "p10": 53.2,
+   "p90": 154.4
+  },
+  "coverage": 0.36,
+  "zones": [
+   "bronze",
+   "bronze_dark",
+   "gold",
+   "porcelain",
+   "void",
+   "glow",
+   "shield"
+  ],
+  "decals": 22,
+  "basecolor": "art/enemies/forge_warden/textures/forge_warden_basecolor.png",
+  "emissive": "art/enemies/forge_warden/textures/forge_warden_emissive.png",
+  "emissive_texels": 66164,
+  "seconds": 32.4
+ },
+ "clips": [
+  {
+   "name": "forge_warden_idle@loop",
+   "frames": [
+    0,
+    60
+   ],
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "forge_warden_move@loop",
+   "frames": [
+    0,
+    24
+   ],
+   "seconds": 0.8,
+   "loop": true
+  },
+  {
+   "name": "forge_warden_windup",
+   "frames": [
+    0,
+    18
+   ],
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "forge_warden_attack",
+   "frames": [
+    0,
+    21
+   ],
+   "seconds": 0.7,
+   "loop": false
+  },
+  {
+   "name": "forge_warden_hit",
+   "frames": [
+    0,
+    10
+   ],
+   "seconds": 0.333,
+   "loop": false
+  },
+  {
+   "name": "forge_warden_death",
+   "frames": [
+    0,
+    66
+   ],
+   "seconds": 2.2,
+   "loop": false
+  },
+  {
+   "name": "forge_warden_cast",
+   "frames": [
+    0,
+    36
+   ],
+   "seconds": 1.2,
+   "loop": false
+  },
+  {
+   "name": "forge_warden_shield_up",
+   "frames": [
+    0,
+    12
+   ],
+   "seconds": 0.4,
+   "loop": false
+  }
+ ],
+ "review": {
+  "turn_front": "art/enemies/forge_warden/work/review/forge_warden_turn_front.png",
+  "turn_34_front": "art/enemies/forge_warden/work/review/forge_warden_turn_34_front.png",
+  "turn_side": "art/enemies/forge_warden/work/review/forge_warden_turn_side.png",
+  "turn_back": "art/enemies/forge_warden/work/review/forge_warden_turn_back.png",
+  "turn_34_back": "art/enemies/forge_warden/work/review/forge_warden_turn_34_back.png",
+  "turn_top": "art/enemies/forge_warden/work/review/forge_warden_turn_top.png",
+  "ingame": "art/enemies/forge_warden/work/review/forge_warden_ingame_22.png",
+  "ingame_sil": "art/enemies/forge_warden/work/review/forge_warden_ingame_22_sil.png",
+  "sheet": "art/enemies/forge_warden/reports/forge_warden_review.png",
+  "clips": "art/enemies/forge_warden/reports/forge_warden_clips.png",
+  "hero_shot": "art/enemies/forge_warden/reports/forge_warden_34.png",
+  "scale": "art/enemies/forge_warden/reports/forge_warden_scale.png"
+ }
+}

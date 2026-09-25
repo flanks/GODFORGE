@@ -1,0 +1,227 @@
+{
+ "kind": "enemy",
+ "key": "forge_warden",
+ "tier": "elite",
+ "tris": 7666,
+ "tris_budget": [
+  4000,
+  8000
+ ],
+ "textures": [
+  {
+   "name": "forge_warden_emissive",
+   "role": "emissive",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 120510
+  },
+  {
+   "name": "forge_warden_basecolor",
+   "role": "base_color",
+   "px": [
+    1024,
+    1024
+   ],
+   "format": "png",
+   "bytes": 1116598
+  }
+ ],
+ "sockets": {
+  "fx_core": {
+   "translation": [
+    0.0,
+    1.63,
+    -0.05
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "shield": {
+   "translation": [
+    0.6267,
+    1.4651,
+    0.6048
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "hit_center": {
+   "translation": [
+    -0.0,
+    1.72,
+    -0.0
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "head_top": {
+   "translation": [
+    -0.0,
+    2.79,
+    -0.02
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  },
+  "attack_origin": {
+   "translation": [
+    0.6775,
+    1.3987,
+    0.7189
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    -1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "clips": [
+  "forge_warden_idle@loop",
+  "forge_warden_move@loop",
+  "forge_warden_windup",
+  "forge_warden_attack",
+  "forge_warden_hit",
+  "forge_warden_death",
+  "forge_warden_cast",
+  "forge_warden_shield_up"
+ ],
+ "skeleton": "GF_ForgeWarden_v1",
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. Creature faces glTF +Z (Blender -Y), ground contact at y = 0; the engine turns it with yaw(angle) * rot_y(PI).",
+ "bounds_m": {
+  "min": [
+   -0.967,
+   0.0022,
+   -0.43
+  ],
+  "max": [
+   1.3039,
+   2.7948,
+   0.8927
+  ]
+ },
+ "size_m": 2.793,
+ "glb": "assets/models/enemies/forge_warden.glb",
+ "glb_bytes": 2023660,
+ "glb_sha256": "5ac6ab4155f9b71cf84866714e1fecade0888903234e776aeb379d598dacf720",
+ "source_blend": "art/enemies/forge_warden/source/forge_warden.blend",
+ "build_script": "tools/blender/gf_assets/enemies/forge_warden.py",
+ "toolkit": "tools/blender/gf_assets (spec v1)",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-25",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": []
+ },
+ "faction": "fallen_godworks",
+ "rig": {
+  "armature": "GF_ForgeWarden_v1",
+  "bones": 30,
+  "core": "GF_Hero_v1 core names and parents (23 bones, docs/ART_PIPELINE.md section 5)",
+  "extra_bones": [
+   "pauldron_L",
+   "pauldron_R",
+   "core",
+   "mask_L",
+   "mask_R",
+   "shield",
+   "spear"
+  ],
+  "skinning": "rigid: every plate on one bone (hollow armour, no deformation)",
+  "rest_pose": "the guard stance (shield up in front, spear upright)",
+  "axes": "bone +Y along the bone, +Z toward the front (Ashen Covenant roll convention)"
+ },
+ "clip_roles": {
+  "forge_warden_idle@loop": "shield-up guard, breathing; plates hover, the heart spins",
+  "forge_warden_move@loop": "walk: heavy planted steps, shield held forward (brief name: walk@loop)",
+  "forge_warden_windup": "the shield rises up and back for the bash (anticipation; the engine adds the telegraph)",
+  "forge_warden_attack": "shield bash: lunge, the rim drives forward and down (brief name: shield_bash)",
+  "forge_warden_hit": "flinch back, the mask rattles",
+  "forge_warden_death": "the binding fails: plates drop inward into a heap, shield topples flat, spear falls, the heart goes out, the mask cracks apart last",
+  "forge_warden_cast": "support pulse: spear slams down, the halo shield is raised overhead face-up (brief name: cast_shield)",
+  "forge_warden_shield_up": "brace: shield up to the eyes, crouched behind it (held on the last frame)"
+ },
+ "clip_aliases": {
+  "walk@loop": "forge_warden_move@loop",
+  "shield_bash": "forge_warden_attack",
+  "cast_shield": "forge_warden_cast"
+ },
+ "clip_seconds": {
+  "forge_warden_idle@loop": 2.0,
+  "forge_warden_move@loop": 0.8,
+  "forge_warden_windup": 0.6,
+  "forge_warden_attack": 0.7,
+  "forge_warden_hit": 0.333,
+  "forge_warden_death": 2.2,
+  "forge_warden_cast": 1.2,
+  "forge_warden_shield_up": 0.4
+ },
+ "move_cycle_m": 1.571,
+ "footprint": {
+  "collider_radius_m": 0.9,
+  "row": "radius 0.75 x scale 1.2",
+  "model_span_m": [
+   2.271,
+   1.323
+  ]
+ },
+ "content_row": {
+  "class": "Elite",
+  "biome": "cinder_wastes",
+  "behavior": "Support(range: 6.0, shield: 60.0, interval: 4.0, keep_distance: 6.0)",
+  "color": "#D9B45A",
+  "shape": "Spire",
+  "scale": 1.2
+ },
+ "paint": {
+  "size": 1024,
+  "texel_density_px_per_m": {
+   "median": 148.1,
+   "p10": 53.2,
+   "p90": 154.4
+  },
+  "coverage": 0.36
+ }
+}

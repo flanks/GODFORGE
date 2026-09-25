@@ -29,6 +29,8 @@ fails to get a device, retry.
 | `gfa_render.py` | bpy | toon preview (engine-like ramp, rim, ink hull), `turnaround`, `silhouette`, `mannequin`, `weapon_hold_matrix`, `ingame` (55° camera, true 1080p pixels), **`review_weapon`**, **`review_enemy`**, `contact_sheet` |
 | `gfa_sheet.py` | PIL (ComfyUI python) | builds the contact sheet PNG from a layout JSON (< 2 MB) |
 | `gfa_rig.py` | bpy | **GF_Swarm_v1** (`build_swarm_rig`, `validate_rig`), `skin_rigid`, `add_socket`, poses (`apply_pose`, `merge`), `cycle_clip` (seamless loops), `keyed_clip`, `swarm_clip_set` (all six clips) |
+| `gfa_shell.py` | bmesh | **hollow armour**: `thick_patch(fn, nu, nv, thickness, keep=...)` builds a closed plate from a surface function and returns the outer skin + rims and the inner skin separately (paint the inside as a void). Surfaces `rev_fn` (revolve an (r, z) profile), `cap_fn` (dome), `grid_fn` (bent plate); keep-masks `jagged_keep` (torn edges), `bite_keep` (a bite out of a rim). Added by `enemies/forge_warden.py` |
+| `gfa_rig_dedicated.py` | bpy | **dedicated rigs** (elites, bosses): `build_armature` from a bone table (GF_Hero_v1 core names in `HERO_CORE`, forward roll convention), `validate_core`, `skin_rigid` for any bone set, world-space posing (`aim_bone`, `two_bone_ik`, `set_matrix`, `rest_frame_now`), `Keys` (pose-to-pose parameter keys with easing), `bake_clip` (solve every frame, then key it; stashed like gfa_rig clips). Added by `enemies/forge_warden.py` |
 | `gfa_export.py` | bpy | **`export_asset(kind, key, tier, root, ...)`**: prepares transforms, exports the GLB (+Y up, no compression, embedded PNGs, NLA tracks as clips), validates, writes `<key>.meta.json`, exits 1 on failure |
 | `gfa_validate.py` | nothing (stdlib) | re-checks any shipped GLB against the contract; CLI; exit 1 on errors |
 
@@ -64,7 +66,12 @@ Start from `examples/swarm_example.py`:
 7. `review_enemy(...)`.
 
 Elites and bosses get a dedicated rig (ENEMIES.md section 6), but they use the same painter, exporter,
-validator and review.
+validator and review. `enemies/forge_warden.py` is the worked elite: `gfa_rig_dedicated.build_armature`
+with the hero core names, rigid skinning, a per-frame `Solver` (FK spine, IK-planted feet, props that
+drive the arms holding them), `Keys` + `bake_clip` for every clip, then `paint_asset`, `export_asset`,
+`review_enemy` and its own clip / scale sheets. Hollow, many-part models can pass
+`paint_asset(..., uv_zone_scale={"void": 0.35}, uv_small_islands=(0.0012, 0.45))` so hidden inner
+skins and thin rims take less of the atlas.
 
 ## Paint recipe reference (`gfa_paint.zone`)
 

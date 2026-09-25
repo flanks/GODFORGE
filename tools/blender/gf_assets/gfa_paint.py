@@ -206,8 +206,12 @@ def mix(a, b, t):
 
 # ---- UVs ------------------------------------------------------------------------------------------
 
-def unwrap(obj, size=1024, margin_px=6, angle_limit=60.0):
-    """Smart-project + equal texel density + pack into one atlas. Returns texel density stats (px/m)."""
+def unwrap(obj, size=1024, margin_px=6, angle_limit=60.0, zone_scale=None, small_islands=None):
+    """Smart-project + equal texel density + pack into one atlas. Returns texel density stats (px/m).
+    Optional (added for hollow armour, where hidden inner skins and hundreds of thin rim strips would eat
+    the atlas): zone_scale {zone: factor} shrinks the UV islands of those zones (e.g. {"void": 0.35});
+    small_islands (area_m2, factor) shrinks islands whose 3D area is below area_m2 (thin rims, rivets).
+    Everything else then gets the space in the final pack."""
     me = obj.data
     while me.uv_layers:
         me.uv_layers.remove(me.uv_layers[0])
@@ -219,11 +223,71 @@ def unwrap(obj, size=1024, margin_px=6, angle_limit=60.0):
                              correct_aspect=True, scale_to_bounds=False)
     bpy.ops.uv.select_all(action="SELECT")
     bpy.ops.uv.average_islands_scale()
+    if zone_scale or small_islands:
+        _scale_islands(obj, zone_scale or {}, small_islands)
     bpy.ops.uv.pack_islands(udim_source="CLOSEST_UDIM", rotate=True, rotate_method="ANY", scale=True,
                             merge_overlap=False, margin_method="FRACTION", margin=margin_px / size,
                             pin=False, shape_method="CONCAVE")
     bpy.ops.object.mode_set(mode="OBJECT")
     return texel_density(obj, size)
+
+
+def _uv_islands(bm, uvl):
+    """UV islands of a bmesh: lists of faces connected through edges whose UVs match on both sides."""
+    bm.faces.ensure_lookup_table()
+    parent = list(range(len(bm.faces)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+    for e in bm.edges:
+        lf = e.link_faces
+        if len(lf) != 2:
+            continue
+        f1, f2 = lf
+        same = True
+        for v in e.verts:
+            l1 = next(lp for lp in f1.loops if lp.vert is v)
+            l2 = next(lp for lp in f2.loops if lp.vert is v)
+            if (l1[uvl].uv - l2[uvl].uv).length > 1e-6:
+                same = False
+                break
+        if same:
+            a, b = find(f1.index), find(f2.index)
+            if a != b:
+                parent[a] = b
+    groups = {}
+    for f in bm.faces:
+        groups.setdefault(find(f.index), []).append(f)
+    return list(groups.values())
+
+
+def _scale_islands(obj, zone_scale, small_islands):
+    """Shrink UV islands in place (edit mode): whole-zone islands by zone_scale, tiny ones by small_islands."""
+    me = obj.data
+    bm = bmesh.from_edit_mesh(me)
+    uvl = bm.loops.layers.uv.active
+    zones = [s.material.name[4:] if s.material and s.material.name.startswith("GFA_") else "" for s in obj.material_slots]
+    n_zone = n_small = 0
+    for isl in _uv_islands(bm, uvl):
+        k = 1.0
+        zs = {zones[f.material_index] for f in isl if f.material_index < len(zones)}
+        if len(zs) == 1 and next(iter(zs)) in zone_scale:
+            k *= zone_scale[next(iter(zs))]
+            n_zone += 1
+        if small_islands and sum(f.calc_area() for f in isl) < small_islands[0]:
+            k *= small_islands[1]
+            n_small += 1
+        if k == 1.0:
+            continue
+        loops = [lp for f in isl for lp in f.loops]
+        c = sum((lp[uvl].uv for lp in loops), Vector((0.0, 0.0))) / len(loops)
+        for lp in loops:
+            lp[uvl].uv = c + (lp[uvl].uv - c) * k
+    bmesh.update_edit_mesh(me)
+    C.log("uv islands shrunk: %d by zone, %d small" % (n_zone, n_small))
 
 
 def texel_density(obj, size):
@@ -659,7 +723,8 @@ def apply_final_material(obj, name, base_png, emis_png, roughness=0.85):
 # ---- one call -----------------------------------------------------------------------------------------
 
 def paint_asset(obj, key, recipes, tex_dir, size=1024, decals=(), ao_distance=0.05, ao_samples=16,
-                edge_min_angle=20.0, margin_px=6, seed=0, uv_angle=60.0, preview_dir=None):
+                edge_min_angle=20.0, margin_px=6, seed=0, uv_angle=60.0, preview_dir=None, uv_zone_scale=None,
+                uv_small_islands=None):
     """Unwrap, bake, paint, write <tex_dir>/<key>_basecolor.png + <key>_emissive.png and assign the final
     material M_<key>. recipes: {zone: zone(...)} for every GFA_<zone> slot on obj. Returns a report."""
     t0 = time.time()
@@ -667,7 +732,7 @@ def paint_asset(obj, key, recipes, tex_dir, size=1024, decals=(), ao_distance=0.
     missing = [z for z in zones_order if z not in recipes]
     if missing:
         raise KeyError("no paint recipe for zones %s" % missing)
-    dens = unwrap(obj, size, margin_px, uv_angle)
+    dens = unwrap(obj, size, margin_px, uv_angle, zone_scale=uv_zone_scale, small_islands=uv_small_islands)
     C.log("unwrapped: %.0f px/m median" % dens["median"])
     mp = bake_maps(obj, size, ao_distance, ao_samples)
     zone_img = mp["zone"][..., 0]

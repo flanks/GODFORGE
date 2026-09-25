@@ -229,6 +229,16 @@ is no runtime variant system.
   (shield bash), hit, death (the armour collapses inward with sparks; the mask cracks last), cast.
 * **Colour:** faded god-bronze `#D4B45A`, cracked white porcelain, dead-ember glow, dark verdigris
   shadows. Budget 4-8k tris, 1024 px.
+* **Built (2026-09-25, `ai_final_pending_user_approval`).** The shipped rig is `GF_ForgeWarden_v1`: 30
+  bones, the 23 hero core bones plus `pauldron_L/R`, `core`, `mask_L/R`, `shield` and `spear`, all
+  rigidly skinned. The shield drives the left arm, and the spear drives the right. Clips: `idle@loop`,
+  `move@loop` (`move_cycle_m` 1.571), `windup`, `attack`, `hit`, `death` (the mask halves split last),
+  `cast` (the halo is raised overhead) and the extra `shield_up`. The brief's `walk@loop`,
+  `shield_bash` and `cast_shield` map to these through meta.json `clip_aliases`. Sockets: `hit_center`,
+  `fx_core`, `head_top`, `shield` and `attack_origin`. It is 2.79 m tall (1.27 ×) with 7.7k tris. Build
+  script: `tools/blender/gf_assets/enemies/forge_warden.py`, which adds `gfa_shell.py` (hollow thick
+  shells) and `gfa_rig_dedicated.py` (dedicated rigs, IK and prop-driven arms, per-frame clip baking).
+  Brief, metrics and review sheets: [art/enemies/forge_warden/README.md](../../art/enemies/forge_warden/README.md).
 
 ### E3 The Slag King → `slag_king` (Boss, Cinder Wastes, Unmade)
 
