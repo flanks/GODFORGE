@@ -6,6 +6,7 @@
 //! string keys to compact ids and validates every cross-reference.
 
 pub mod db;
+pub mod procgen;
 pub mod schema;
 pub mod validate;
 

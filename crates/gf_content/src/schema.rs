@@ -804,6 +804,9 @@ pub enum SpawnZone {
     Edges { margin: f32 },
     /// Around a point.
     Point { at: Vec2, radius: f32 },
+    /// A ring around a random living player, just beyond the screen edge: the horde converges
+    /// from every side on big open fields (survivor-style).
+    Around { min: f32, max: f32 },
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -864,6 +867,26 @@ pub struct RoomDef {
     pub encounter: EncounterDef,
     #[serde(default)]
     pub decor: Vec<Decor>,
+}
+
+impl RoomDef {
+    /// An empty open room (used before a run starts and as a last-resort fallback).
+    pub fn placeholder() -> Self {
+        RoomDef {
+            key: "placeholder".into(),
+            biome: String::new(),
+            kind: RoomKind::Combat,
+            phase: Phase::P0,
+            half_extents: Vec2::new(22.0, 15.0),
+            obstacles: Vec::new(),
+            player_spawn: Vec2::new(0.0, -10.0),
+            anvil: None,
+            exits: vec![Vec2::new(0.0, 14.0)],
+            spawn_zones: vec![SpawnZone::Edges { margin: 1.0 }],
+            encounter: EncounterDef::default(),
+            decor: Vec::new(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

@@ -54,6 +54,20 @@ pub fn spawn_point(zones: &[SpawnZone], half: Vec2, players: &[Vec2], rng: &mut 
                 }
             }
             SpawnZone::Point { at, radius } => at + rng.unit_vec2() * rng.range_f32(0.0, radius),
+            SpawnZone::Around { min, max } => {
+                // Ring just off-screen around a random player (rejection-sampled, no trig).
+                let center = rng.pick(players).copied().unwrap_or(Vec2::ZERO);
+                let mut p = center + Vec2::new(max, 0.0);
+                for _ in 0..8 {
+                    let d = Vec2::new(rng.range_f32(-max, max), rng.range_f32(-max, max));
+                    let l = d.length();
+                    if l >= min && l <= max {
+                        p = center + d;
+                        break;
+                    }
+                }
+                p.clamp(-half + Vec2::splat(1.0), half - Vec2::splat(1.0))
+            }
         };
         let d = players.iter().map(|q| q.distance(p)).fold(f32::INFINITY, f32::min);
         if d >= 8.0 {
