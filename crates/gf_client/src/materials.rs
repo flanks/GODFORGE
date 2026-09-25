@@ -9,7 +9,9 @@
 //!   bands, dark bands lean saturated and cool, a coloured rim picks out silhouettes and a dark
 //!   ink edge closes them. Build one with [`toon`] / [`toon_from_standard`] and a [`ToonStyle`].
 //! * [`FloorMaterial`]: the arena floor, painted procedurally in world space from the biome
-//!   palette (plaza pavers, flagstones, dirt, worn paths, soot, lava cracks).
+//!   palette (plaza pavers, flagstones, dirt, worn paths and roads, soot, lava cracks, inlays,
+//!   laid paving, holes for sunken channels). One per room, one per 32 u chunk on biome maps,
+//!   where the region tint rides on vertex colours.
 //! * [`AbyssMaterial`]: the animated sea far below the platform (magma, deep water, night sky or
 //!   raw chaos, per biome).
 //!
@@ -232,12 +234,18 @@ pub fn toon(color: Color, texture: Option<Handle<Image>>, emissive: LinearRgba, 
 
 // ───────────────────────────── floor ─────────────────────────────
 
-/// Worn-path segments the floor paints (spawn → exits / anvil).
-pub const FLOOR_PATHS: usize = 6;
-/// Fissure segments the floor paints (the room's `Decor::LavaCrack`s).
+/// Roads / worn paths a floor paints (rooms: spawn → exits; maps: the roads crossing the chunk).
+pub const FLOOR_PATHS: usize = 8;
+/// Fissure segments a floor paints (`Decor::LavaCrack`).
 pub const FLOOR_CRACKS: usize = 48;
+/// Circular inlays a floor paints (`Decor::FloorInlay`, map POI clearings).
+pub const FLOOR_INLAYS: usize = 12;
+/// Laid paving areas a floor paints (`Decor::Paving`).
+pub const FLOOR_PAVING: usize = 12;
+/// Holes cut into a floor (channels and pools sink below it).
+pub const FLOOR_HOLES: usize = 8;
 
-/// GPU layout of `FloorParams` in `floor.wesl`.
+/// GPU layout of `FloorParams` in `floor.wesl` (field order matters).
 #[derive(Clone, Copy, Debug, ShaderType, Reflect)]
 pub struct FloorParams {
     /// rgb slab colour (linear), a = slab value contrast.
@@ -248,22 +256,37 @@ pub struct FloorParams {
     pub mortar: Vec4,
     /// rgb crack glow (linear, HDR), a = glow strength.
     pub accent: Vec4,
-    /// rgb inlay metal, a = mosaic ring radius (0 = none).
+    /// rgb inlay metal, a = unused.
     pub gold: Vec4,
     /// rgb cool temperature tint, a = temperature variation.
     pub cool: Vec4,
     /// xy = arena half extents (world x, z), z = slab size, w = fissure heat (1 molten … 0 cold).
     pub shape: Vec4,
-    /// x = paint seed, y = moss / growth, z = vein sparkle, w = worn-path count.
+    /// x = paint seed, y = moss / growth, z = vein sparkle, w = path count.
     pub style: Vec4,
-    /// x = fissure count, yz = key light direction (world xz, toward the light).
+    /// x = fissure count, yz = key light direction (world xz, toward the light), w = unused.
     pub misc: Vec4,
-    /// Worn paths: segments (ax, az, bx, bz) in world xz.
+    /// x = inlay count, y = paving count, z = hole count, w = 1 on biome maps (no rim soot).
+    pub counts: Vec4,
+    /// Paths: segments (ax, az, bx, bz) in world xz.
     pub paths: [Vec4; FLOOR_PATHS],
+    /// Path widths, four per `Vec4` (0 = a narrow worn path).
+    pub paths_w: [Vec4; FLOOR_PATHS / 4],
     /// Fissures: segments (ax, az, bx, bz) in world xz.
     pub cracks: [Vec4; FLOOR_CRACKS],
     /// Fissure widths, four per `Vec4`.
     pub cracks_w: [Vec4; FLOOR_CRACKS / 4],
+    /// Inlays: (x, z, radius, rotation) in world xz.
+    pub inlays: [Vec4; FLOOR_INLAYS],
+    /// Inlay colour (linear) and variant: 0 plaza with a gold mosaic star, 1 rune ring,
+    /// 2 clockface, 3 god sigil, 4 chaos glyph, 5 paved clearing (map POIs).
+    pub inlays_c: [Vec4; FLOOR_INLAYS],
+    /// Paving: (min x, min z, max x, max z) in world xz.
+    pub paving: [Vec4; FLOOR_PAVING],
+    /// Paving variants, four per `Vec4`: 0 flagstones, 1 herringbone, 2 tesserae, 3 broken.
+    pub paving_v: [Vec4; FLOOR_PAVING / 4],
+    /// Holes: (min x, min z, max x, max z) in world xz.
+    pub holes: [Vec4; FLOOR_HOLES],
 }
 
 #[derive(Asset, AsBindGroup, Reflect, Clone, Debug)]
@@ -378,15 +401,27 @@ impl BiomeLook {
         }
     }
 
-    /// Painted-stone colour of the arena floor.
+    /// Painted-stone colour of the arena floor: a near-neutral stone leaning toward the biome's
+    /// ground colour, so the glowing accents and the characters own the saturation.
     pub fn stone(&self) -> Color {
         let neutral = match self.abyss {
-            AbyssKind::Magma => hex("#6E5A4C"),
+            AbyssKind::Magma => hex("#66605C"),
             AbyssKind::Water => hex("#56646A"),
             AbyssKind::Sky => hex("#5C5F78"),
             AbyssKind::Chaos => hex("#5A4C68"),
         };
-        mix(neutral, self.base, 0.35)
+        mix(neutral, self.base, 0.25)
+    }
+
+    /// Bare ground between the stones: dark, low-saturation earth (ash in the Cinder).
+    pub fn dirt(&self) -> Color {
+        let earth = match self.abyss {
+            AbyssKind::Magma => hex("#3A3230"),
+            AbyssKind::Water => hex("#2E3A2C"),
+            AbyssKind::Sky => hex("#34364A"),
+            AbyssKind::Chaos => hex("#322A3C"),
+        };
+        mix(earth, self.base, 0.3)
     }
 
     /// Cliff rock colour (a shade cooler than the floor).
@@ -450,5 +485,20 @@ impl BiomeLook {
             ),
         };
         AbyssParams { deep, mid, glow, mist, shape: Vec4::new(half.x, half.y, style, seed), flow }
+    }
+
+    /// The biome liquid at the surface (rivers, channels, pools, quench troughs): the abyss
+    /// shader with its heat everywhere and no distance fade, at a finer pattern scale.
+    pub fn liquid_params(&self, seed: f32) -> AbyssParams {
+        let mut p = self.abyss_params(Vec2::ZERO, seed + 17.0);
+        p.flow.y *= 2.2;
+        p.flow.z = 1.0e5;
+        p.flow.w = 1.0e6;
+        p.mist.w = 0.0;
+        p.glow.w *= match self.abyss {
+            AbyssKind::Magma => 1.15,
+            _ => 1.0,
+        };
+        p
     }
 }

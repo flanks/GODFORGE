@@ -12,13 +12,12 @@ use crate::input::InputState;
 use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial};
 use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
-use crate::terrain::{self, TerrainStores};
+use crate::world::{self, EnvLights, WorldStores};
 use crate::{ClientConfig, ClientSet};
 use gf_content::schema::{MapLayout, PoiSite};
-use gf_content::{ContentDb, Decor, EnemyShape, RoomDef};
+use gf_content::{ContentDb, EnemyShape};
 use gf_core::aim::AimMode;
 use gf_core::ids::NetId;
-use gf_core::movement::Obstacle;
 use gf_core::rarity::Rarity;
 use gf_core::revive::LifeState;
 use gf_engine::client::{NotShadowCaster, SystemParam};
@@ -33,8 +32,6 @@ const GOLD: &str = "#FFC940";
 const BRONZE: &str = "#7E5E36";
 const IRON: &str = "#3B3633";
 const INK: &str = "#140C08";
-/// Ink outline thickness on room architecture (world units).
-const ENV_INK: f32 = 0.06;
 
 #[derive(Component)]
 pub struct RoomGeometry;
@@ -224,24 +221,6 @@ impl<'a, 'w, 's> Kit<'a, 'w, 's> {
         e.id()
     }
 
-    fn geometry(&mut self, mesh: &Handle<Mesh>, mat: Mat, tf: Transform) {
-        let mut e = self.commands.spawn((RoomGeometry, Mesh3d(mesh.clone()), tf));
-        mat.insert(&mut e);
-    }
-
-    /// Room geometry with an inverted-hull ink outline (`grow` is added to the local scale).
-    fn inked(&mut self, mesh: &Handle<Mesh>, mat: Mat, tf: Transform, grow: Vec3) {
-        self.geometry(mesh, mat, tf);
-        let ink = self.mat(hex(INK), Look::Ink);
-        let mut e = self.commands.spawn((
-            RoomGeometry,
-            Mesh3d(mesh.clone()),
-            Transform { scale: tf.scale + grow, ..tf },
-            NotShadowCaster,
-        ));
-        ink.insert(&mut e);
-    }
-
     /// Soft contact shadow (no shadow maps: cheap and readable at 400 enemies).
     fn shadow(&mut self, parent: Entity, radius: f32, lift: f32) {
         let m = Mat::Std(self.pal.blob_shadow(self.mats, 0.6));
@@ -268,12 +247,13 @@ fn rebuild_room(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     current: Res<CurrentRoom>,
-    mut pal: ResMut<Palette>,
+    pal: Res<Palette>,
     mut stores: Stores,
     mut floors: ResMut<Assets<FloorMaterial>>,
     mut abysses: ResMut<Assets<AbyssMaterial>>,
     mut index: ResMut<SceneIndex>,
     mut ambient: ResMut<GlobalAmbientLight>,
+    mut lights: ResMut<EnvLights>,
     mut keys: Query<&mut DirectionalLight, With<KeyLight>>,
     old: Query<Entity, With<RoomGeometry>>,
 ) {
@@ -305,199 +285,15 @@ fn rebuild_room(
         0 => room.key.bytes().fold(0x811C_9DC5u32, |h, b| (h ^ b as u32).wrapping_mul(0x0100_0193)),
         s => s,
     };
-    let terrain_stores = TerrainStores {
+    // Rooms and biome maps both go through the world builder (env kit, merged chunks).
+    let world_stores = WorldStores {
         meshes: stores.meshes.as_mut(),
+        mats: stores.mats.as_mut(),
         toons: stores.toons.as_mut(),
         floors: floors.as_mut(),
         abysses: abysses.as_mut(),
     };
-    terrain::build(&mut commands, terrain_stores, &pal, room, &look, seed);
-    let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
-    build_room(&mut kit, room, &look);
-}
-
-fn hash01(i: i32, k: u32) -> f32 {
-    let mut h = (i as u32).wrapping_mul(0x9E37_79B9) ^ k.wrapping_mul(0x85EB_CA6B);
-    h ^= h >> 15;
-    h = h.wrapping_mul(0x2C1B_3C6D);
-    h ^= h >> 12;
-    (h & 0xffff) as f32 / 65535.0
-}
-
-fn build_room(kit: &mut Kit, room: &RoomDef, look: &BiomeLook) {
-    let half = room.half_extents;
-    let accent = look.accent;
-
-    // Walls: tall ruined backdrop to the north, medium flanks, a low ledge to the south so the
-    // camera never loses a character behind geometry (§5 readability).
-    let wall = kit.mat(look.masonry(), Look::Matte);
-    // Capstones: the same stone, a lighter course (they catch the key light and cap the ink).
-    let cap = kit.mat(lighten(look.masonry(), 1.35), Look::Matte);
-    let cube = kit.pal.cube.clone();
-    let segment = |kit: &mut Kit, center: Vec2, size: Vec2, h: f32, i: i32| {
-        kit.inked(
-            &cube,
-            wall.clone(),
-            Transform::from_translation(w3(center, h * 0.5)).with_scale(Vec3::new(size.x, h, size.y)),
-            Vec3::splat(ENV_INK * 2.0),
-        );
-        if hash01(i, 9) > 0.55 {
-            kit.inked(
-                &cube,
-                cap.clone(),
-                Transform::from_translation(w3(center, h + 0.08)).with_scale(Vec3::new(
-                    size.x + 0.15,
-                    0.16,
-                    size.y + 0.15,
-                )),
-                Vec3::splat(ENV_INK * 2.0),
-            );
-        }
-    };
-    let step = 3.0;
-    let nx = ((half.x * 2.0 + 2.4) / step).ceil() as i32;
-    for i in 0..nx {
-        let x = -half.x - 1.2 + (i as f32 + 0.5) * step;
-        let h = 1.8 + 1.8 * hash01(i, 1);
-        segment(kit, Vec2::new(x, half.y + 0.7), Vec2::new(step - 0.1, 1.4), h, i);
-        segment(kit, Vec2::new(x, -half.y - 0.6), Vec2::new(step - 0.1, 1.2), 0.35 + 0.25 * hash01(i, 2), i + 500);
-    }
-    let ny = ((half.y * 2.0) / step).ceil() as i32;
-    for j in 0..ny {
-        let y = -half.y + (j as f32 + 0.5) * step;
-        let t = (y + half.y) / (half.y * 2.0);
-        let h = 0.6 + 1.6 * t + 0.6 * hash01(j, 3);
-        segment(kit, Vec2::new(-half.x - 0.7, y), Vec2::new(1.4, step - 0.1), h, j + 1000);
-        segment(kit, Vec2::new(half.x + 0.7, y), Vec2::new(1.4, step - 0.1), h * (0.8 + 0.4 * hash01(j, 4)), j + 2000);
-    }
-
-    // Obstacles (skipping those a Decor::Pillar already dresses).
-    let stone = kit.mat(lighten(look.masonry(), 1.15), Look::Matte);
-    let cylinder = kit.pal.cylinder.clone();
-    let cyl_ink = Vec3::new(ENV_INK, ENV_INK * 2.0, ENV_INK);
-    let dressed = |c: Vec2| room.decor.iter().any(|d| matches!(d, Decor::Pillar { at, .. } if at.distance(c) < 0.5));
-    for o in &room.obstacles {
-        match *o {
-            Obstacle::Circle { center, radius } if !dressed(center) => {
-                kit.inked(
-                    &cylinder,
-                    stone.clone(),
-                    Transform::from_translation(w3(center, 1.1)).with_scale(Vec3::new(radius, 2.2, radius)),
-                    cyl_ink,
-                );
-                kit.inked(
-                    &cylinder,
-                    cap.clone(),
-                    Transform::from_translation(w3(center, 2.3)).with_scale(Vec3::new(
-                        radius * 1.15,
-                        0.25,
-                        radius * 1.15,
-                    )),
-                    cyl_ink,
-                );
-            }
-            Obstacle::Box { center, half } if !dressed(center) => {
-                kit.inked(
-                    &cube,
-                    stone.clone(),
-                    Transform::from_translation(w3(center, 0.7)).with_scale(Vec3::new(half.x * 2.0, 1.4, half.y * 2.0)),
-                    Vec3::splat(ENV_INK * 2.0),
-                );
-                kit.inked(
-                    &cube,
-                    cap.clone(),
-                    Transform::from_translation(w3(center, 1.48)).with_scale(Vec3::new(
-                        half.x * 2.0 + 0.2,
-                        0.16,
-                        half.y * 2.0 + 0.2,
-                    )),
-                    Vec3::splat(ENV_INK * 2.0),
-                );
-            }
-            _ => {}
-        }
-    }
-
-    // Decor.
-    let iron = kit.mat(hex(IRON), Look::Metal);
-    let bronze = kit.mat(hex(BRONZE), Look::Metal);
-    let flame = kit.mat(hdr(mix(accent, Color::WHITE, 0.3), 1.0), Look::Glow);
-    let sphere = kit.pal.sphere.clone();
-    for d in &room.decor {
-        match *d {
-            // Painted into the floor as glowing rifts (see `terrain` / floor.wesl).
-            Decor::LavaCrack { .. } => {}
-            Decor::BrokenAnvil { at, scale } => {
-                kit.geometry(
-                    &cube,
-                    iron.clone(),
-                    Transform {
-                        translation: w3(at, 0.28 * scale),
-                        rotation: Quat::from_rotation_y(0.6) * Quat::from_rotation_z(0.22),
-                        scale: Vec3::new(1.5, 0.55, 0.7) * scale,
-                    },
-                );
-                kit.geometry(
-                    &cube,
-                    iron.clone(),
-                    Transform {
-                        translation: w3(at + Vec2::new(1.1, -0.5) * scale, 0.18 * scale),
-                        rotation: Quat::from_rotation_y(-0.4) * Quat::from_rotation_x(-0.3),
-                        scale: Vec3::new(0.7, 0.4, 0.6) * scale,
-                    },
-                );
-            }
-            Decor::Brazier { at } => {
-                kit.geometry(
-                    &cylinder,
-                    bronze.clone(),
-                    Transform::from_translation(w3(at, 0.45)).with_scale(Vec3::new(0.42, 0.9, 0.42)),
-                );
-                kit.geometry(
-                    &sphere,
-                    flame.clone(),
-                    Transform::from_translation(w3(at, 1.05)).with_scale(Vec3::new(0.3, 0.42, 0.3)),
-                );
-                kit.commands.spawn((
-                    RoomGeometry,
-                    PointLight {
-                        color: mix(accent, Color::WHITE, 0.25),
-                        intensity: look.brazier,
-                        range: 12.0,
-                        ..default()
-                    },
-                    Transform::from_translation(w3(at, 1.6)),
-                ));
-            }
-            Decor::Pillar { at, radius, height } => {
-                kit.inked(
-                    &cylinder,
-                    stone.clone(),
-                    Transform::from_translation(w3(at, height * 0.5)).with_scale(Vec3::new(radius, height, radius)),
-                    cyl_ink,
-                );
-                kit.inked(
-                    &cube,
-                    cap.clone(),
-                    Transform::from_translation(w3(at, height + 0.15)).with_scale(Vec3::new(
-                        radius * 2.3,
-                        0.3,
-                        radius * 2.3,
-                    )),
-                    Vec3::splat(ENV_INK * 2.0),
-                );
-                kit.inked(
-                    &cube,
-                    stone.clone(),
-                    Transform::from_translation(w3(at, 0.15)).with_scale(Vec3::new(radius * 2.3, 0.3, radius * 2.3)),
-                    Vec3::splat(ENV_INK * 2.0),
-                );
-            }
-            // The env kit renders the rest of the procgen vocabulary; until then the obstacles
-            // they dress keep their greybox above.
-            _ => {}
-        }
-    }
+    world::build(&mut commands, world_stores, &pal, &cfg.content, room, &look, seed, &mut lights);
 }
 
 // ───────────────────────────── replicated entities ─────────────────────────────

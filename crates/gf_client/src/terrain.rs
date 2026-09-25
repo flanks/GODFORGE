@@ -9,14 +9,15 @@
 //! Visual only: the outline jitter and the paint come from the replicated room seed, never the
 //! other way round. The playable area is still `RoomDef::half_extents`.
 
-use crate::camera::{KEY_LIGHT_FROM, w3};
+use crate::camera::w3;
 use crate::materials::{
-    ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_PATHS, Floor, FloorMaterial, FloorParams,
-    ToonMaterial, ToonStyle, toon,
+    ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_PATHS, Floor, FloorMaterial, FloorParams, ToonMaterial, ToonStyle,
+    toon,
 };
-use crate::palette::{Palette, hex, mix};
+use crate::palette::Palette;
 use crate::scene::RoomGeometry;
-use gf_content::{Decor, RoomDef};
+use crate::world;
+use gf_content::{ContentDb, Decor, RoomDef};
 use gf_engine::client::{NotShadowCaster, NotShadowReceiver, triangle_mesh};
 use gf_engine::prelude::*;
 
@@ -50,6 +51,7 @@ pub fn build(
     commands: &mut Commands,
     stores: TerrainStores,
     pal: &Palette,
+    db: &ContentDb,
     room: &RoomDef,
     look: &BiomeLook,
     seed: u32,
@@ -83,7 +85,7 @@ pub fn build(
     let cap = stores.meshes.add(triangle_mesh(pos, normals, uvs, idx));
     let floor = stores.floors.add(FloorMaterial {
         base: StandardMaterial { base_color: Color::WHITE, perceptual_roughness: 0.92, reflectance: 0.18, ..default() },
-        extension: Floor { params: floor_params(room, look, seed) },
+        extension: Floor { params: floor_params(db, room, look, seed) },
     });
     commands.spawn((RoomGeometry, Mesh3d(cap), MeshMaterial3d(floor), Transform::default(), NotShadowCaster));
 
@@ -201,51 +203,26 @@ fn cliff_mesh(outline: &[(Vec2, Vec2)], seed: u32) -> Mesh {
     triangle_mesh(pos, nor, uv, idx)
 }
 
-fn lin4(c: Color, a: f32) -> Vec4 {
-    let l = c.to_linear();
-    Vec4::new(l.red, l.green, l.blue, a)
-}
-
-fn floor_params(room: &RoomDef, look: &BiomeLook, seed: u32) -> FloorParams {
-    let stone = look.stone();
-    let dirt = mix(mix(look.base, stone, 0.35), hex("#1A1410"), 0.25);
-    let mortar = mix(look.deep, hex("#050308"), 0.35);
-    let mut paths = [Vec4::ZERO; FLOOR_PATHS];
-    let mut count = 0;
+/// Floor paint of a room: worn paths from the spawn to the exits and the anvil, every decor the
+/// floor paints, and a mosaic plaza at the heart when the layout has none of its own.
+fn floor_params(db: &ContentDb, room: &RoomDef, look: &BiomeLook, seed: u32) -> FloorParams {
+    let mut p = world::floor_base(look, seed);
+    p.shape.x = room.half_extents.x;
+    p.shape.y = room.half_extents.y;
     let from = w3(room.player_spawn, 0.0);
-    let targets = room.exits.iter().copied().chain(room.anvil);
-    for to in targets.take(FLOOR_PATHS) {
+    let mut count = 0;
+    for to in room.exits.iter().copied().chain(room.anvil).take(FLOOR_PATHS) {
         let to = w3(to, 0.0);
-        paths[count] = Vec4::new(from.x, from.z, to.x, to.z);
+        p.paths[count] = Vec4::new(from.x, from.z, to.x, to.z);
         count += 1;
     }
-    let mut cracks = [Vec4::ZERO; FLOOR_CRACKS];
-    let mut widths = [0.0f32; FLOOR_CRACKS];
-    let mut n_cracks = 0;
-    for d in &room.decor {
-        if let Decor::LavaCrack { from, to, width } = *d
-            && n_cracks < FLOOR_CRACKS
-        {
-            let (a, b) = (w3(from, 0.0), w3(to, 0.0));
-            cracks[n_cracks] = Vec4::new(a.x, a.z, b.x, b.z);
-            widths[n_cracks] = width;
-            n_cracks += 1;
-        }
+    p.style.w = count as f32;
+    let heart = room.decor.iter().any(|d| matches!(d, Decor::FloorInlay { variant: 0, .. }));
+    if !heart {
+        p.inlays[0] = Vec4::new(0.0, 0.0, 13.5, 0.0);
+        p.inlays_c[0] = Vec4::new(0.0, 0.0, 0.0, 0.0);
+        p.counts.x = 1.0;
     }
-    let cracks_w = std::array::from_fn(|i| Vec4::from_slice(&widths[i * 4..i * 4 + 4]));
-    let light = Vec2::new(KEY_LIGHT_FROM.x, KEY_LIGHT_FROM.z).normalize();
-    FloorParams {
-        stone: lin4(stone, 0.35),
-        dirt: lin4(dirt, 0.52),
-        mortar: lin4(mortar, 0.8),
-        accent: lin4(look.accent, if look.cracks >= 1.0 { 3.0 } else { 1.0 }),
-        gold: lin4(hex("#C9A24E"), 6.0),
-        cool: lin4(mix(look.ambient, hex("#4A5CB0"), 0.5), 0.4),
-        shape: Vec4::new(room.half_extents.x, room.half_extents.y, 1.6, look.cracks),
-        style: Vec4::new((seed % 1000) as f32, look.moss, look.veins, count as f32),
-        misc: Vec4::new(n_cracks as f32, light.x, light.y, 0.0),
-        paths,
-        cracks,
-        cracks_w,
-    }
+    world::paint_decor(&mut p, db, &room.decor, None);
+    p
 }

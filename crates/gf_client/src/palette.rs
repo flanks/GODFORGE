@@ -96,6 +96,9 @@ pub struct Palette {
     pub blob_texture: Handle<Image>,
     /// Hand-painted block face (ink border, bevel light, brushwork) for architecture primitives.
     pub block_texture: Handle<Image>,
+    /// The env kit's stone atlas: a painted block face on the left half (u < 0.5), borderless
+    /// brushed stone on the right half (lathes, bevels, cloth).
+    pub env_texture: Handle<Image>,
     pub players: [Color; 4],
     pub danger: Color,
     sectors: HashMap<u8, Handle<Mesh>>,
@@ -359,6 +362,7 @@ fn setup(
         rock_texture: images.add(rgba_image(ROCK_SIZE, ROCK_SIZE, rock_pixels(ROCK_SIZE), true)),
         blob_texture: images.add(rgba_image(BLOB_SIZE, BLOB_SIZE, blob_pixels(BLOB_SIZE), false)),
         block_texture: images.add(rgba_image(BLOCK_SIZE, BLOCK_SIZE, block_pixels(BLOCK_SIZE), false)),
+        env_texture: images.add(rgba_image(BLOCK_SIZE * 2, BLOCK_SIZE, env_pixels(BLOCK_SIZE), false)),
         players: [
             hex(&game.player_colors[0]),
             hex(&game.player_colors[1]),
@@ -468,6 +472,36 @@ fn block_pixels(size: u32) -> Vec<u8> {
             // Ink border.
             let ink = 1.0 - ((edge - 0.012) / 0.016).clamp(0.0, 1.0);
             lum *= 1.0 - 0.85 * ink;
+            let to8 = |f: f32| (f.clamp(0.0, 1.0) * 255.0) as u8;
+            out.extend_from_slice(&[to8(lum), to8(lum * 0.97), to8(lum * 0.93), 255]);
+        }
+    }
+    out
+}
+
+/// The env kit's stone atlas, `2 × size` wide: the painted block face on the left, and on the
+/// right borderless stone with vertical brush drags and a few chisel marks (lathes and bevels map
+/// it, so turned and bevelled stone reads painted without a border on every facet).
+fn env_pixels(size: u32) -> Vec<u8> {
+    let block = block_pixels(size);
+    let mut out = Vec::with_capacity((size * size * 8) as usize);
+    for py in 0..size {
+        let row = (py * size * 4) as usize;
+        out.extend_from_slice(&block[row..row + (size * 4) as usize]);
+        for px in 0..size {
+            let u = (px as f32 + 0.5) / size as f32;
+            let v = (py as f32 + 0.5) / size as f32;
+            let n = 0.5 * vnoise(u * 5.0, v * 5.0, 5)
+                + 0.3 * vnoise(u * 13.0 + 2.0, v * 13.0, 13)
+                + 0.2 * vnoise(u * 29.0, v * 29.0, 29);
+            // Vertical drags of a loaded brush.
+            let drag = vnoise(u * 16.0, v * 2.0 + 5.0, 16);
+            let mut lum = 0.8 + 0.24 * (n - 0.5) + 0.1 * (drag - 0.5);
+            // Sparse chisel nicks.
+            let nick = vnoise(u * 21.0 + 4.0, v * 21.0 + 9.0, 21);
+            if nick > 0.8 {
+                lum *= 0.82;
+            }
             let to8 = |f: f32| (f.clamp(0.0, 1.0) * 255.0) as u8;
             out.extend_from_slice(&[to8(lum), to8(lum * 0.97), to8(lum * 0.93), 255]);
         }
