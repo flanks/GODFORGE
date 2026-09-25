@@ -1,0 +1,122 @@
+# GODFORGE CI (§14 Build & pipeline, §20.7 test rigs).
+#
+#   check      fmt · clippy (deny warnings) · unit/integration tests · content import/validation
+#   sim-gates  release bots over the real netcode: slice run, attack-mode parity, lossy 4P EA run,
+#              chaos stress (400 enemies) — each fails on crash, stall or a blown 60 Hz tick budget
+#   client     windowed smoke test under Xvfb + Mesa lavapipe with screenshots as artifacts
+#   builds     release binaries for Linux (Steam Deck), Windows and macOS (push to main / nightly)
+#   nightly    longer bot soak across every EA character
+
+name: CI
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "23 3 * * *"
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain (pinned by rust-toolchain.toml)
+        run: rustup show
+      - name: System packages
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libudev-dev libwayland-dev libxkbcommon-dev
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+      - name: Spreadsheets and generated data in sync
+        run: cargo run -p gf_tools -- import --check
+      - name: Content validation (strict, incl. EA scope floors)
+        run: cargo run -p gf_tools -- validate --strict
+
+  sim-gates:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libudev-dev libwayland-dev libxkbcommon-dev
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p gf_game
+      - name: Slice run (2 bots)
+        run: ./target/release/godforge --bot-run --bots 2 --seed 7
+      - name: Attack-mode parity — AUTO and MANUAL both finish the same seed (acceptance #8)
+        run: |
+          ./target/release/godforge --bot-run --aim auto --seed 7
+          ./target/release/godforge --bot-run --aim manual --seed 7
+      - name: 4-player EA run over a lossy 100 ms link (real-time, 5 min, 20 Hz remote snapshots)
+        run: ./target/release/godforge --bot-run --bots 4 --phase ea --seed 11 --rtt 100 --loss 0.02 --minutes 5
+      - name: Chaos stress — 4 players, 400 enemies
+        run: ./target/release/godforge --stress 400 --bots 4 --minutes 2
+
+  client:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libudev-dev libwayland-dev libxkbcommon-dev xvfb mesa-vulkan-drivers
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p gf_game
+      - name: Windowed smoke test (software Vulkan)
+        env:
+          WGPU_BACKEND: vulkan
+          VK_ICD_FILENAMES: /usr/share/vulkan/icd.d/lvp_icd.x86_64.json
+        run: |
+          mkdir -p shots
+          xvfb-run -a -s "-screen 0 1280x720x24" ./target/release/godforge --autoplay --bots 3 --no-vsync \
+            --window 1280x720 --screenshot shots/smoke.png --screenshot-after 8 --shots 3 --shot-interval 8
+          ls -la shots
+      - uses: actions/upload-artifact@v4
+        with:
+          name: client-smoke-screenshots
+          path: shots/
+
+  builds:
+    if: github.event_name != 'pull_request'
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libudev-dev libwayland-dev libxkbcommon-dev
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p gf_game
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godforge-${{ matrix.os }}
+          path: |
+            target/release/godforge
+            target/release/godforge.exe
+            assets/content/
+
+  nightly:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: sim-gates
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        character: [valdris, selene, kael, thessaly, brax, ossian, mirren, epoch]
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libudev-dev libwayland-dev libxkbcommon-dev
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release -p gf_game
+      - name: Full EA run, party of four ${{ matrix.character }} (duplicate picks are allowed)
+        run: ./target/release/godforge --bot-run --bots 4 --phase ea --character ${{ matrix.character }} --seed ${{ github.run_number }}
