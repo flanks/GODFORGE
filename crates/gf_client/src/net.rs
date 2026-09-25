@@ -234,7 +234,7 @@ fn poll_link(
                 link.fresh_events.extend(w.events.iter().copied());
                 let new_room = room.sync(&w.run, &cfg.content);
                 if new_room {
-                    pred.arena = Arc::new(Arena::new(room.def.half_extents, room.def.obstacles.clone(), Vec::new()));
+                    pred.arena = Arc::new(room.def.arena());
                 }
                 if let Some(slot) = link.slot {
                     reconcile(&mut pred, &w, slot, &cfg, new_room);

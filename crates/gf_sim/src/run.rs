@@ -9,7 +9,6 @@ use gf_content::ContentDb;
 use gf_content::procgen;
 use gf_content::schema::{RoomKind, RunStep};
 use gf_core::ids::{BiomeId, EnemyId, RoomId};
-use gf_core::movement::Arena;
 use gf_core::rarity::Rarity;
 use gf_core::rng::GfRng;
 use gf_engine::prelude::*;
@@ -127,7 +126,7 @@ pub fn load_room(world: &mut World, room_id: RoomId, seed: u32) {
     for e in scoped {
         world.despawn(e);
     }
-    let arena = Arc::new(Arena::new(room.half_extents, room.obstacles.clone(), Vec::new()));
+    let arena = Arc::new(room.arena());
     world.resource_mut::<Grid>().0.reset(room.half_extents, 2.0);
     world.insert_resource(ArenaRes(arena.clone()));
 

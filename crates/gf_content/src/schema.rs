@@ -8,7 +8,7 @@ use gf_core::aim::AimModeParams;
 use gf_core::damage::{DamageType, Plating, Resistances};
 use gf_core::forge::{ForgeRules, Slot};
 use gf_core::modifier::Modifier;
-use gf_core::movement::{MoveTuning, Obstacle};
+use gf_core::movement::{Arena, MoveTuning, Obstacle};
 use gf_core::overdrive::OverdriveTuning;
 use gf_core::poi::PoiKind;
 use gf_core::rarity::{Rarity, RarityTable};
@@ -1849,6 +1849,13 @@ impl RoomDef {
             expedition: None,
             map: None,
         }
+    }
+
+    /// The collision world every peer (host, client prediction, bots, validation) derives from
+    /// this layout: its obstacles, plus a biome map's pits (void and liquid tiles).
+    pub fn arena(&self) -> Arena {
+        let pits = self.map.as_ref().map_or_else(Vec::new, |m| m.pits.clone());
+        Arena::new(self.half_extents, self.obstacles.clone(), pits)
     }
 }
 

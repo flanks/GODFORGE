@@ -85,11 +85,6 @@ struct MapEntry {
     navs: Vec<(u32, Arc<NavGrid>)>,
 }
 
-/// The collision world every peer derives from a layout.
-// Phase 2 swaps this for `RoomDef::arena()`, which adds a biome map's pits.
-fn room_arena(def: &RoomDef) -> Arena {
-    Arena::new(def.half_extents, def.obstacles.clone(), Vec::new())
-}
 
 /// The shared layout, arena and nav grid (for `clearance`) of `room`, building what is missing.
 fn shared_room(db: &ContentDb, room: RoomKey, clearance: f32) -> (Arc<RoomDef>, Arc<Arena>, Arc<NavGrid>) {
@@ -100,7 +95,7 @@ fn shared_room(db: &ContentDb, room: RoomKey, clearance: f32) -> (Arc<RoomDef>, 
         Some(entry) if entry.key == key => entry,
         _ => {
             let def = Arc::new(procgen::resolve_room(db, room.1, room.2));
-            let arena = Arc::new(room_arena(&def));
+            let arena = Arc::new(def.arena());
             MapEntry { key, def, arena, navs: Vec::new() }
         }
     };
