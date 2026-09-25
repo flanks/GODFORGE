@@ -1,0 +1,58 @@
+{
+ "asset": "valdris",
+ "references": [
+  {
+   "path": "art/characters/valdris/references/VALDRIS_front_approved.jpg",
+   "bytes": 307583,
+   "sha256": "55d018f3d0a857318342cecd395eb3c4f3016d92255c632a116d41bc75292dfd",
+   "role": "approved hero front (stage 0, approved by the user): cannon on his LEFT arm, anvil chest plate",
+   "in_git": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-25"
+  },
+  {
+   "path": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+   "bytes": 350884,
+   "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+   "role": "approved turnaround sheet (user-supplied): front A-pose / side / back, colour script, lighting note; cannon on his RIGHT arm, no anvil plate",
+   "in_git": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-25"
+  },
+  {
+   "path": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+   "bytes": 1018755,
+   "sha256": "62fc6eed9461f8da33b3c2e78667ce4c04d6e82553dd14e70776def21106146d",
+   "role": "derived stage-1 TRELLIS.2 input: VALDRIS_front_approved.jpg mirrored horizontally (PIL 12.3.0 ImageOps.mirror, lossless PNG) so the cannon is on his RIGHT arm and the anvil plate stays (status.json decisions[cannon_side_and_anvil_plate]); not separately approved",
+   "in_git": true,
+   "derived_from": "art/characters/valdris/references/VALDRIS_front_approved.jpg",
+   "verified": "mirroring it again reproduces the decoded pixels of VALDRIS_front_approved.jpg exactly (checked 2026-09-25)"
+  },
+  {
+   "path": "art/characters/valdris/references/valdris_concept_front_mirrored_mask.png",
+   "bytes": 70931,
+   "sha256": "2115aad9c78abdccbdcec658f5dd53637d77d53826994ade5adb552ac7e1fc7c",
+   "role": "derived: the TRELLIS graph's own birefnet figure mask of valdris_concept_front_mirrored.png (run_trellis.py --mask-only, verbatim copy of work/maskcheck_raw/valdris_maskcheck_mask.png); > 127 = figure. Used by palette_extract.py and readability_sheet.py, because the concept's background is a gradient",
+   "in_git": true,
+   "derived_from": "art/characters/valdris/references/valdris_concept_front_mirrored.png"
+  },
+  {
+   "path": "docs/media/playable_characters/VALDRIS.jpg",
+   "bytes": 307583,
+   "sha256": "55d018f3d0a857318342cecd395eb3c4f3016d92255c632a116d41bc75292dfd",
+   "role": "the user's original of the approved hero front, outside the art tree",
+   "in_git": true,
+   "note": "committed by the user in 1ef48b9; byte-identical to references/VALDRIS_front_approved.jpg"
+  },
+  {
+   "path": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+   "bytes": 350884,
+   "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+   "role": "the user's original of the turnaround sheet, outside the art tree",
+   "in_git": true,
+   "note": "committed by the user in 1ef48b9; byte-identical to references/VALDRIS_sheet_turnaround.jpg"
+  }
+ ],
+ "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The 'files' list below is written by tools/comfy/art_manifest.py (raw output: local-only unless in_git, and lfs: true when git stores it through Git LFS).",
+ "files": []
+}

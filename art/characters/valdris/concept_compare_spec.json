@@ -1,0 +1,374 @@
+{
+ "about": "Input for tools/comfy/concept_compare.py: the two approved Valdris concepts side by side, with numbered markers for every inconsistency (legend = reports/stage0_sheet_analysis.md). Marker coordinates are pixels of the source image before crop/mirror.",
+ "title": "VALDRIS  -  where the two approved concepts disagree",
+ "subtitle": "Top: the images as supplied. Bottom: the resolved reference set (cannon on his RIGHT arm, anvil chest plate kept). Orange frame = conflicts with the resolution as drawn, green = consistent. Details and numbers: reports/stage0_sheet_analysis.md",
+ "output": "art/characters/valdris/reports/stage0_sheet_compare.png",
+ "rows": [
+  {
+   "label": "As supplied",
+   "height": 500,
+   "panels": [
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      0,
+      160,
+      470,
+      650
+     ],
+     "status": "ok",
+     "caption": "Sheet: front (A-pose). Cannon on his RIGHT arm.",
+     "markers": [
+      [
+       45,
+       420,
+       1
+      ],
+      [
+       235,
+       300,
+       2
+      ],
+      [
+       196,
+       206,
+       3
+      ],
+      [
+       150,
+       222,
+       4
+      ],
+      [
+       120,
+       330,
+       5
+      ],
+      [
+       428,
+       395,
+       6
+      ],
+      [
+       240,
+       425,
+       7
+      ],
+      [
+       262,
+       262,
+       8
+      ],
+      [
+       238,
+       178,
+       16
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      450,
+      160,
+      720,
+      650
+     ],
+     "status": "conflict",
+     "caption": "Sheet: side. Faces left, so the near arm is his LEFT: the cannon is on the wrong arm.",
+     "markers": [
+      [
+       545,
+       445,
+       13
+      ],
+      [
+       545,
+       185,
+       3
+      ],
+      [
+       577,
+       610,
+       11
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      700,
+      160,
+      1168,
+      650
+     ],
+     "status": "ok",
+     "caption": "Sheet: back. Cannon on his RIGHT arm; the only view of the cape emblem.",
+     "markers": [
+      [
+       1085,
+       430,
+       1
+      ],
+      [
+       885,
+       300,
+       10
+      ],
+      [
+       742,
+       392,
+       6
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_front_approved.jpg",
+     "crop": [
+      0,
+      150,
+      784,
+      1030
+     ],
+     "status": "conflict",
+     "caption": "Hero front (VALDRIS.jpg). Cannon on his LEFT arm; anvil chest plate.",
+     "markers": [
+      [
+       758,
+       372,
+       1
+      ],
+      [
+       400,
+       440,
+       2
+      ],
+      [
+       400,
+       198,
+       3
+      ],
+      [
+       553,
+       232,
+       4
+      ],
+      [
+       598,
+       296,
+       5
+      ],
+      [
+       48,
+       372,
+       6
+      ],
+      [
+       400,
+       640,
+       7
+      ],
+      [
+       400,
+       305,
+       8
+      ],
+      [
+       262,
+       372,
+       14
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Resolved reference set (what stage 1 and stage 2 build from)",
+   "height": 500,
+   "panels": [
+    {
+     "image": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+     "crop": [
+      0,
+      150,
+      784,
+      1030
+     ],
+     "status": "ok",
+     "caption": "TRELLIS input: hero front mirrored. Cannon RIGHT, fist LEFT, anvil kept; its horn now points to his left.",
+     "markers": [
+      [
+       25,
+       372,
+       1
+      ],
+      [
+       521,
+       372,
+       14
+      ],
+      [
+       400,
+       440,
+       2
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      450,
+      160,
+      720,
+      650
+     ],
+     "mirror": true,
+     "status": "ok",
+     "caption": "Sheet side, mirrored = his RIGHT profile (cannon on the near arm).",
+     "markers": [
+      [
+       545,
+       445,
+       13
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      700,
+      160,
+      1168,
+      650
+     ],
+     "status": "ok",
+     "caption": "Sheet back, unchanged: cape, collar, emblem.",
+     "markers": [
+      [
+       885,
+       300,
+       10
+      ]
+     ]
+    },
+    {
+     "image": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+     "crop": [
+      0,
+      160,
+      470,
+      650
+     ],
+     "status": "ok",
+     "caption": "Sheet front, unchanged: A-pose, proportions check (its chest and head are superseded, 2 and 3).",
+     "markers": []
+    }
+   ]
+  }
+ ],
+ "legend_columns": 2,
+ "legend": [
+  {
+   "n": 1,
+   "title": "Weapon arm",
+   "status": "conflict",
+   "text": "Sheet front and back: cannon on his RIGHT arm. Hero front: LEFT. Resolution (orchestrator default; the user may override): RIGHT. The TRELLIS input is the hero front mirrored; the fist is his LEFT hand."
+  },
+  {
+   "n": 2,
+   "title": "Chest: anvil plate",
+   "status": "conflict",
+   "text": "Hero: a big protruding anvil (flat top face, horn, waisted body, two feet) over the chest. Sheet: a flat chest plate whose outline only hints at an anvil. Resolution: KEEP the anvil, his Anvil-Born identity and the centre mark of his silhouette."
+  },
+  {
+   "n": 3,
+   "title": "Head size and height",
+   "status": "conflict",
+   "text": "Hero: about 11 heads tall, the crown level with the pauldron tops (sunk between them). Sheet: about 8.3 heads tall, the head half a head above the pauldrons. Resolution: the hero front (it is the TRELLIS input). Flagged for the user."
+  },
+  {
+   "n": 4,
+   "title": "Pauldrons",
+   "status": "conflict",
+   "text": "Hero: huge boxy blocks with upright back plates and glowing slots. Sheet: smaller layered plates with gold rims. Same span (0.52-0.53 of his height). Resolution: hero shape; the sheet for their back and side."
+  },
+  {
+   "n": 5,
+   "title": "Cannon build",
+   "status": "conflict",
+   "text": "Hero: breech housing with top clamps and an under-bracket, gold bands, a flared muzzle ring, a glowing bore. Sheet: a segmented cylinder, about 40 % thicker in its side view. Resolution: hero design and thickness; the weapon sheet (prompt ready) settles top, underside and mount."
+  },
+  {
+   "n": 6,
+   "title": "Off hand",
+   "status": "info",
+   "text": "Hero: closed fist. Sheet: relaxed open hand. Same plated gauntlet with gold cuffs, so a pose difference only: a normal five-finger gauntlet, fist as the default gameplay pose."
+  },
+  {
+   "n": 7,
+   "title": "Front skirt",
+   "status": "conflict",
+   "text": "Hero: a gold-trimmed armoured centre plate (faulds) with side tassets, red cloth behind. Sheet: a red cloth tabard on a belt with a square gold buckle. Resolution: hero plate; the red cloth behind it is cape material."
+  },
+  {
+   "n": 8,
+   "title": "Beard",
+   "status": "conflict",
+   "text": "Hero: iron-grey, five braids ending in gold rings and steel caps. Sheet: brown-grey and wavy, braided side locks with rings. Resolution: hero braids and caps, iron-grey."
+  },
+  {
+   "n": 9,
+   "title": "Eyes",
+   "status": "info",
+   "text": "Hero amber, sheet red-orange; about 8 px on either concept and invisible at game scale. Resolution: ember glow (the seams' hot tone)."
+  },
+  {
+   "n": 10,
+   "title": "Cape back, collar, emblem",
+   "status": "info",
+   "text": "Only the sheet shows the back: a high red collar, a gold emblem (a vertical blade with branching arms), tatters and holes, hem at mid-shin. Resolution: the sheet; an emblem detail sheet is optional (prompt ready)."
+  },
+  {
+   "n": 11,
+   "title": "Boots",
+   "status": "info",
+   "text": "Sheet: a round gold disc on the outer ankle. Hero: blocky gold-trimmed sabatons, no disc. Resolution: hero sabatons; the disc is optional detail."
+  },
+  {
+   "n": 12,
+   "title": "Pose",
+   "status": "info",
+   "text": "Sheet: A-pose, labelled the neutral pose for the 3D blockout. Hero: arms level, wider stance. Resolution: TRELLIS uses the hero pose (arms clear of the body); the rig binds in its own rest pose."
+  },
+  {
+   "n": 13,
+   "title": "The side view is mirrored",
+   "status": "conflict",
+   "text": "He faces image-left, so we see his LEFT side, yet the near arm carries the cannon: the side view contradicts the sheet's own front and back. Read mirrored, it is his RIGHT profile and matches the resolution."
+  },
+  {
+   "n": 14,
+   "title": "What mirroring flips",
+   "status": "info",
+   "text": "Mirroring the hero front moves the anvil horn to his LEFT (toward the fist) and flips the cape tatters, the scalp scar and the light direction. None of these is a design rule; the horn side is recorded as his left."
+  },
+  {
+   "n": 15,
+   "title": "Colours agree",
+   "status": "ok",
+   "text": "Same filter on both images: plate dE 2, cape dE 3, seams dE 4, skin dE 6, beard dE 7, gold dE 11 (the sheet's gold is in more shadow). The sheet's chips do not match their own labels (Ember Amber painted #B1311B vs #FF6B1A): palette.json keeps both."
+  },
+  {
+   "n": 16,
+   "title": "Scalp scar",
+   "status": "info",
+   "text": "Sheet: a mark on the top of the scalp. Hero: cracked, faintly orange scar lines over the forehead and scalp. Resolution: hero, as texture (it may glow with Reforged Flesh)."
+  },
+  {
+   "n": 17,
+   "title": "Lighting",
+   "status": "info",
+   "text": "The sheet's note asks for a forge key light from below-left and a cool steel rim from above-right; both paintings are lit from the front and above. Resolution: art direction for the shader and colour script, not geometry."
+  }
+ ]
+}

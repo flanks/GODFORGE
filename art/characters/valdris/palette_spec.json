@@ -1,0 +1,115 @@
+{
+ "about": "Input for tools/comfy/palette_extract.py: where each material is sampled. Boxes are [x0, y0, x1, y1] in image pixels (origin top-left, x1/y1 exclusive); hue in degrees, sat/val in 0-1 (HSV). The concept is the MIRRORED hero front (784x1168, cannon on his right arm, the resolved design); its background is a radial gradient, so the birefnet figure mask (mask) replaces the flat-background test. 'sheet' is the approved turnaround sheet (1168x784): the cape emblem is sampled there, its colour-script chips are the anchors, and the cross-checks measure the same materials on it. tones = CIELAB L* percentiles reported as shadow/base/highlight (emissive: rim/hot/core). Edit a box, re-run the tool, look at reports/stage0_palette_samples.png.",
+ "character": "valdris",
+ "concept": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+ "mask": "art/characters/valdris/references/valdris_concept_front_mirrored_mask.png",
+ "sources": {
+  "sheet": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+ },
+ "content_color": "#C8A25A",
+ "title": "VALDRIS",
+ "subtitle": "The Anvil-Born  -  colour callouts",
+ "title_rgb": "#FFC24B",
+ "header_note": "Measured from the approved hero front, mirrored so the cannon is on his right arm (references/valdris_concept_front_mirrored.png), and from the approved turnaround sheet. Derived data, not new design.",
+ "value_note": "Valdris is one DARK block (gunmetal plate, cannon, anvil, beard: L* 10-20) with two lighter accents: the gold trim (MID-LIGHT) and the war-red cape (DARK-MID, a hue, not a value). The EMISSIVE seams and the muzzle sit above everything. At game scale he reads by silhouette + gold + glow, so the toon ramp must lift the plate's lit faces (highlight tone) and keep the seams unlit.",
+ "outputs": {
+  "palette": "art/characters/valdris/palette.json",
+  "color_script": "art/characters/valdris/color_script.png",
+  "overlay": "art/characters/valdris/reports/stage0_palette_samples.png"
+ },
+ "swatches": [
+  {
+   "key": "gunmetal_plate", "label": "Gunmetal plate",
+   "note": "the whole armour shell: dark, cracked, faceted; lit faces lift to the highlight tone",
+   "boxes": [[255, 560, 330, 690], [475, 560, 550, 690], [240, 770, 320, 880], [480, 770, 560, 880], [370, 560, 430, 700], [195, 215, 275, 245], [525, 215, 610, 245], [215, 930, 320, 1000]],
+   "sat": [0.0, 0.42], "val": [0.0, 0.80]
+  },
+  {
+   "key": "anvil_iron", "label": "Anvil chest plate",
+   "note": "the anvil: same dark iron, flatter and greyer; its flat top face is the lightest plate",
+   "boxes": [[300, 375, 500, 395], [330, 400, 470, 470], [320, 480, 480, 520]],
+   "sat": [0.0, 0.35], "val": [0.0, 0.85]
+  },
+  {
+   "key": "cannon_steel", "label": "Siege-cannon steel",
+   "note": "barrel and breech between the gold bands; same family as the plate",
+   "boxes": [[160, 300, 240, 440], [95, 300, 122, 445]],
+   "sat": [0.0, 0.42], "val": [0.0, 0.80]
+  },
+  {
+   "key": "forge_gold", "label": "Forge-gold trim",
+   "note": "plate edges, cannon rings, fist cuffs, braid rings: the mid-light accent that outlines every plate",
+   "boxes": [[125, 290, 150, 455], [612, 325, 640, 415], [680, 330, 697, 410], [60, 300, 80, 445], [235, 540, 255, 660], [545, 540, 565, 660]],
+   "hue": [28, 55], "sat": [0.40, 1.0], "val": [0.30, 1.0]
+  },
+  {
+   "key": "ember_seams", "label": "Glowing seams", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [10, 50, 97],
+   "note": "cracks between plates, anvil flanks, knees; unlit in the shader, bloom does the rest",
+   "boxes": [[230, 540, 340, 900], [460, 540, 570, 900], [300, 410, 500, 480], [190, 255, 620, 285], [340, 500, 460, 560]],
+   "hue": [5, 33], "sat": [0.55, 1.0], "val": [0.70, 1.0]
+  },
+  {
+   "key": "muzzle_glow", "label": "Cannon muzzle", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [10, 50, 97],
+   "note": "the hottest point on him and his aim read; Siege Stance and firing push it to white",
+   "boxes": [[8, 335, 45, 410]],
+   "hue": [0, 60], "sat": [0.20, 1.0], "val": [0.55, 1.0]
+  },
+  {
+   "key": "war_red", "label": "War-red cape",
+   "note": "the one cloth mass and the one saturated hue; tattered hem, gold emblem on the back",
+   "boxes": [[120, 560, 200, 820], [610, 560, 690, 820], [345, 720, 455, 850]],
+   "hue": [335, 25], "sat": [0.35, 1.0], "val": [0.08, 0.75]
+  },
+  {
+   "key": "skin", "label": "Skin",
+   "note": "weathered, scarred scalp and face; tiny at game scale",
+   "boxes": [[368, 212, 432, 250]],
+   "hue": [5, 35], "sat": [0.15, 0.75], "val": [0.20, 0.95], "drop_hot": true
+  },
+  {
+   "key": "beard", "label": "Braided beard",
+   "note": "iron-grey braids; merges into one dark mass above the anvil at game scale",
+   "boxes": [[350, 262, 450, 335]],
+   "sat": [0.0, 0.30], "val": [0.0, 0.65]
+  },
+  {
+   "key": "emblem_gold", "label": "Cape emblem", "source": "sheet",
+   "note": "the gold sigil on the back of the cape (turnaround sheet, back view)",
+   "boxes": [[855, 245, 915, 390]],
+   "hue": [28, 58], "sat": [0.35, 1.0], "val": [0.35, 1.0]
+  }
+ ],
+ "anchors": [
+  {"label": "Gunmetal Black", "hex": "#2A242E", "source": "sheet", "box": [971, 49, 987, 62], "swatch": "gunmetal_plate"},
+  {"label": "Forge Gold", "hex": "#FFC24B", "source": "sheet", "box": [971, 77, 987, 92], "swatch": "forge_gold"},
+  {"label": "Ember Amber", "hex": "#FF6B1A", "source": "sheet", "box": [971, 107, 987, 122], "swatch": "ember_seams"},
+  {"label": "Deep War Red", "hex": "#7A1F1F", "source": "sheet", "box": [971, 136, 987, 152], "swatch": "war_red"},
+  {"label": "Glowing seams white-hot", "source": "sheet", "box": [970, 183, 989, 186], "swatch": "ember_seams",
+   "note": "a line sample, not a chip: the sheet names no hex for it"}
+ ],
+ "cross_checks": [
+  {"swatch": "gunmetal_plate", "label": "plate, sheet front legs", "source": "sheet", "boxes": [[160, 480, 225, 560], [275, 480, 340, 560]]},
+  {"swatch": "forge_gold", "label": "gold, sheet side cannon", "source": "sheet", "boxes": [[505, 300, 625, 420]]},
+  {"swatch": "ember_seams", "label": "seams, sheet front torso", "source": "sheet", "boxes": [[185, 270, 300, 330], [140, 470, 330, 600]]},
+  {"swatch": "war_red", "label": "cape, sheet back", "source": "sheet", "boxes": [[790, 300, 860, 520], [920, 300, 990, 520]]},
+  {"swatch": "skin", "label": "skin, sheet front face", "source": "sheet", "boxes": [[213, 190, 250, 222]]},
+  {"swatch": "beard", "label": "beard, sheet front", "source": "sheet", "boxes": [[208, 228, 258, 285]]}
+ ],
+ "checks": {
+  "pairs": [
+   ["gunmetal_plate", "cannon_steel", "one steel material for armour and cannon"],
+   ["gunmetal_plate", "anvil_iron", "the anvil is the same iron, a touch lighter"],
+   ["forge_gold", "emblem_gold", "one gold for trim and emblem"]
+  ],
+  "content_vs": "forge_gold",
+  "content_vs_tone": "highlight",
+  "content_note": "the kit colour is his lit gold trim",
+  "probe": ["gunmetal_plate", "forge_gold", "war_red", "ember_seams"],
+  "probe_labels": {"gunmetal_plate": "plate", "forge_gold": "gold", "war_red": "cape", "ember_seams": "seams"},
+  "emissive_vs_biome": "ember_seams",
+  "bg_probe": "gunmetal_plate",
+  "bg_note": "the plate sits on the near-black background by value; gold trim, seams and the outline carry the silhouette"
+ }
+}

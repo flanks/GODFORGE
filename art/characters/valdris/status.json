@@ -1,0 +1,342 @@
+{
+ "asset": "valdris",
+ "name": "Valdris, The Anvil-Born",
+ "pipeline": "docs/ART_PIPELINE.md",
+ "updated": "2026-09-25",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "decisions": [
+  {
+   "id": "cannon_side_and_anvil_plate",
+   "state": "orchestrator_default",
+   "decided_on": "2026-09-25",
+   "by": "workflow orchestrator default; the user may override",
+   "decision": "The cannon is on his RIGHT arm and the anvil chest plate is KEPT.",
+   "why": "The two approved concepts disagree: the turnaround sheet (labelled 'neutral standing pose for 3D blockout') has the cannon on his right arm and no anvil plate; the hero front VALDRIS.jpg has the cannon on his left arm and a big anvil chest plate. The turnaround is the labelled blockout reference (weapon arm = right, matching weapon_socket_R); the anvil plate is the 'Anvil-Born' identity.",
+   "consequence": "The stage-1 TRELLIS.2 input is a horizontally mirrored copy of VALDRIS.jpg: art/characters/valdris/references/valdris_concept_front_mirrored.png (PIL ImageOps.mirror, lossless PNG, sha256 62fc6eed9461f8da33b3c2e78667ce4c04d6e82553dd14e70776def21106146d).",
+   "mirror_also_flips": [
+    "the clenched fist moves to his LEFT hand (the turnaround's weapon-less left hand is open; the clenched fist of VALDRIS.jpg is kept)",
+    "the anvil plate's horn (pointed end) points to his LEFT, the square heel to his right",
+    "the glowing forehead scars and any face asymmetry swap sides",
+    "the cape's tatter pattern, the pauldron glow slits and the small cannon glyphs (ornament, not text) are mirrored",
+    "the concept's baked lighting is mirrored: the muzzle glow now lights his right side (the turnaround's lighting note, forge key from below-left and cool rim from above-right, is unaffected)"
+   ],
+   "override": "If the user wants the cannon on the left, re-run stage 1 from references/VALDRIS_front_approved.jpg un-mirrored (run_trellis.py records the input sha256 in every provenance JSON).",
+   "sheet_analysis": "art/characters/valdris/reports/stage0_sheet_analysis.md (items 1, 2, 13, 14)"
+  },
+  {
+   "id": "sheet_side_view_mirrored",
+   "state": "pack_reading",
+   "decided_on": "2026-09-25",
+   "by": "stage-0 sheet analysis (follows from cannon_side_and_anvil_plate)",
+   "decision": "The turnaround sheet's side view is read MIRRORED, as his right profile.",
+   "why": "In the side view he faces image-left, so the viewer sees his LEFT side, yet the near arm carries the cannon: as drawn it puts the cannon on his left arm, against the sheet's own front and back views. Mirrored, it is his right profile and matches the resolution.",
+   "consequence": "Stage 1/2 use the side view mirrored for depth, the head's hunch, the cape's fall and the boot length (the resolved reference set in reports/stage0_sheet_compare.png)."
+  },
+  {
+   "id": "head_size",
+   "state": "pack_default",
+   "decided_on": "2026-09-25",
+   "by": "stage-0 pack default; the user decides",
+   "decision": "Follow the hero front: a small head (about 11 heads tall) sunk between the pauldrons, the crown level with the pauldron tops.",
+   "why": "The sheet draws a larger head (about 8.3 heads tall) standing half a head above the pauldrons; everything else agrees within a few percent. The hero front is the TRELLIS input and its flat top line reads as 'walking siege engine'.",
+   "alternative": "The sheet's larger head: re-proportion in stage 2 (the blockout is sculpt reference only).",
+   "sheet_analysis": "art/characters/valdris/reports/stage0_sheet_analysis.md (item 3); brief.md section 7.2 Q1"
+  }
+ ],
+ "stages": {
+  "0_concept_reference": {
+   "status": "done",
+   "human_signoff_required": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-25",
+   "outputs": [
+    "art/characters/valdris/references/VALDRIS_front_approved.jpg",
+    "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+    "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+    "art/characters/valdris/references/valdris_concept_front_mirrored_mask.png",
+    "art/characters/valdris/brief.md",
+    "art/characters/valdris/turnaround_prompts.md",
+    "art/characters/valdris/palette_spec.json",
+    "art/characters/valdris/palette.json",
+    "art/characters/valdris/color_script.png",
+    "art/characters/valdris/concept_compare_spec.json",
+    "art/characters/valdris/reports/stage0_sheet_analysis.md",
+    "art/characters/valdris/reports/stage0_sheet_compare.png",
+    "art/characters/valdris/reports/stage0_palette_samples.png",
+    "art/characters/valdris/reports/stage0_readability.png"
+   ],
+   "notes": "Done 2026-09-25 with the user's two supplied concepts (approval relayed by the workflow coordinator): the turnaround sheet 'VALDRIS THE ANVIL-BORN' (front A-pose, side, back, colour script with four declared swatches plus white-hot seams, lighting note) and the hero front VALDRIS.jpg. They disagree in 17 places (reports/stage0_sheet_analysis.md); the pack resolves them as cannon on his RIGHT arm and anvil chest plate kept (decisions[cannon_side_and_anvil_plate]), reads the sheet's side view mirrored (decisions[sheet_side_view_mirrored]) and follows the hero front's head size until the user decides (decisions[head_size]). Front, side, back and colour script are done. Optional and not blocking stage 1 or 2, prompts ready in turnaround_prompts.md: 3/4 view, expression sheet, siege-cannon weapon sheet (the most useful before the stage-2 cannon), Mountainfall anvil-avatar concept with the kit's glow states, cape emblem detail.",
+   "items": {
+    "front": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS.jpg",
+     "sha256": "55d018f3d0a857318342cecd395eb3c4f3016d92255c632a116d41bc75292dfd",
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_front_approved.jpg"
+     ],
+     "notes": "The user's hero front (784x1168 JPEG on a near-black radial-gradient ground): arms out level, cracked gunmetal plate armour with gold trim and glowing seams, huge boxy pauldrons level with the crown, an anvil-shaped chest plate, bald scarred head, iron-grey beard of five braids with gold rings and steel caps, tattered deep-red cape, a plated fist on his right arm and the siege cannon on his LEFT arm. The resolved front is its lossless mirror, references/valdris_concept_front_mirrored.png (cannon on his RIGHT, anvil horn pointing to his left), which is the stage-1 input and the design authority for the front (decisions[cannon_side_and_anvil_plate]).",
+     "resolved_as": "art/characters/valdris/references/valdris_concept_front_mirrored.png"
+    },
+    "front_apose": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+     "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+     ],
+     "view": "left panel: front, A-pose, labelled 'neutral standing pose for 3D blockout'. Cannon on his RIGHT arm (image left), an open armoured gauntlet on his left, a segmented chest plate without the anvil, a red tabard at the waist, the cape attached at the shoulders",
+     "notes": "Approved: the user-supplied turnaround sheet, copied verbatim; the user's approval was relayed by the workflow coordinator on 2026-09-25."
+    },
+    "side": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+     "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+     ],
+     "view": "middle panel: side profile. He faces image-left, so the viewer sees his LEFT side, but the near arm carries the cannon: as drawn the cannon is on his left arm, against the sheet's own front and back. Read MIRRORED (decisions[sheet_side_view_mirrored]) it is his RIGHT profile and settles the depth: a deep torso under the pauldron stack with the head hunched forward, the cannon arm hanging with the bore at hip height, the cape hanging clear of the legs behind him to the calves, long sabatons with a gold ankle disc",
+     "notes": "Approved: the user-supplied turnaround sheet, copied verbatim; the user's approval was relayed by the workflow coordinator on 2026-09-25."
+    },
+    "three_quarter": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "notes": "Optional. Not supplied; the front, the mirrored side and the back cover what stage 2 needs. The prompt turns his cannon side toward the viewer.",
+     "prompt": "art/characters/valdris/turnaround_prompts.md#1-front-three-quarter-view"
+    },
+    "back": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+     "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+     ],
+     "view": "right panel: back view. Settles the back: the deep-red cape hangs from the neck between the pauldrons and covers the whole back to the calves, tattered and holed, with a gold forge sigil (a vertical blade shape with branching arms) at the centre; the cannon on his right (image right)",
+     "notes": "Approved: the user-supplied turnaround sheet, copied verbatim; the user's approval was relayed by the workflow coordinator on 2026-09-25."
+    },
+    "expression": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "notes": "Optional. Not supplied. The hero front shows a stern face with glowing amber eyes; the face is about 7 px at game scale, so expressions matter for portraits and the codex only.",
+     "prompt": "art/characters/valdris/turnaround_prompts.md#2-expression-sheet"
+    },
+    "weapon_cannon": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "notes": "Optional, but the most useful missing sheet: the hero front shows the cannon's front and outer side (breech housing with top clamps and under-bracket, three gold bands, side port, flared muzzle, glowing bore); its top (what the game camera sees), underside, breech end and elbow mount are not drawn. Without it, stage 2 builds those from the hero front and the sheet's side/back and records them.",
+     "prompt": "art/characters/valdris/turnaround_prompts.md#3-siege-cannon-weapon-sheet"
+    },
+    "colour_swatches": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+     "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+     ],
+     "swatches": [
+      {
+       "hex": "#2A242E",
+       "role": "Gunmetal Black (armour plates)",
+       "painted_chip": "#1A1A1A"
+      },
+      {
+       "hex": "#FFC24B",
+       "role": "Forge Gold (trim, rings, emblem)",
+       "painted_chip": "#DAA537"
+      },
+      {
+       "hex": "#FF6B1A",
+       "role": "Ember Amber (seams, muzzle, eyes)",
+       "painted_chip": "#B1311B"
+      },
+      {
+       "hex": "#7A1F1F",
+       "role": "Deep War Red (cape, tabard)",
+       "painted_chip": "#6C0E08"
+      }
+     ],
+     "lighting": "glowing seams white-hot; forge key light from below-left, cool steel rim from above-right",
+     "notes": "The sheet's COLOR SCRIPT panel, with the hex values as printed on the sheet (the authority for the NPR base colours). painted_chip = the median of the chip the sheet actually painted next to each label (palette.json anchors); the white-hot seam line is painted #FFF5CE."
+    },
+    "color_script": {
+     "status": "done",
+     "human_signoff_required": true,
+     "outputs": [
+      "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg"
+     ],
+     "notes": "Approved as part of the user's turnaround sheet. The declared hexes are the authority for the NPR base colours; the painted chips next to them differ (e.g. Ember Amber is painted #B1311B), recorded in palette.json anchors and brief.md section 4. The kit's glow states (Reforged Flesh, Siege Stance, Mountainfall) are part of the optional Mountainfall concept sheet.",
+     "approved_by": "user",
+     "approved_on": "2026-09-25",
+     "source": "docs/media/playable_characters/VALDRIS THE ANVIL-BORN.jpg",
+     "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+     "view": "top right: the sheet's 'COLOR SCRIPT' panel (Gunmetal Black #2A242E, Forge Gold #FFC24B, Ember Amber #FF6B1A, Deep War Red #7A1F1F, glowing seams white-hot) and its lighting note (forge key light from below-left, cool steel rim from above-right)"
+    },
+    "palette": {
+     "status": "stand_in",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/valdris/palette.json",
+      "art/characters/valdris/color_script.png",
+      "art/characters/valdris/reports/stage0_palette_samples.png"
+     ],
+     "notes": "Automated measurement (10 swatches, shadow/base/highlight; birefnet mask because the concept's background is a gradient) on the resolved front, plus the cape emblem on the sheet. Records the sheet's declared colour script vs its painted chips vs the measured materials (anchors) and the same materials measured on both concepts (cross_checks: dE 2-11, one palette). A STAND-IN for a painted colour script with lighting and kit states; the declared hexes (item color_script) win for the base colours.",
+     "stand_in": true,
+     "tool": "tools/comfy/palette_extract.py art/characters/valdris/palette_spec.json"
+    },
+    "brief": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/valdris/brief.md"
+     ],
+     "notes": "Built from the content rows (characters.csv, kits.ron, chassis.csv, enemies.csv, game.ron), both approved concepts, measurements on the resolved front (mask) and the readability sheet. Sections: kit, silhouette pillars, proportions at 2.3 m, materials (declared vs measured), readability incl. a 400-enemy horde, toon-shader rules, how Siege Stance / Mountainfall / Reforged Flesh / Bulwark Slam should read and open questions (section 7), notes for stages 1-4 incl. the unique clip set (section 8)."
+    },
+    "readability_check": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/valdris/reports/stage0_readability.png"
+     ],
+     "notes": "2D approximation: the resolved front at 65/86 px, on the biome grounds, in a client frame, and inside 400 non-overlapping swarm enemies per biome (enemies.csv colours and sizes) as colour, value and with the P1 ring. Findings in brief.md section 5. The real check through the 55-degree camera is the stage-1 in-game render.",
+     "tool": "tools/comfy/readability_sheet.py valdris art/characters/valdris/references/valdris_concept_front_mirrored.png --height-m 2.3 --radius-m 0.55 --mask art/characters/valdris/references/valdris_concept_front_mirrored_mask.png --horde 400 --ring"
+    },
+    "mountainfall_avatar": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/valdris/turnaround_prompts.md#4-mountainfall-anvil-avatar-concept-with-the-kits-glow-states",
+     "notes": "Optional; needed for the ultimate's look (stage 4/VFX and a material state), not for the stage-2 base mesh. Also draws the kit's glow states (Reforged Flesh armour empty/full/break, Siege Stance, firing). Proposal in brief.md section 7.1."
+    },
+    "cape_emblem": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/valdris/turnaround_prompts.md#5-back-of-cape-emblem-detail",
+     "notes": "Optional. The sheet's back view shows the emblem small (a downward blade with a cross-bar, a diamond and two pairs of up-swept branches); a flat detail helps the texture pass. It is a texture, not geometry."
+    },
+    "turnaround_prompts": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/valdris/turnaround_prompts.md"
+     ],
+     "notes": "Prompts for the five missing sheets (3/4, expression, siege-cannon weapon, Mountainfall concept with glow states, cape emblem), each attaching the resolved front and the sheet, plus the acceptance checklist."
+    },
+    "sheet_analysis": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/valdris/reports/stage0_sheet_analysis.md",
+      "art/characters/valdris/reports/stage0_sheet_compare.png"
+     ],
+     "tool": "tools/comfy/concept_compare.py art/characters/valdris/concept_compare_spec.json",
+     "notes": "Every inconsistency between the two concepts (17 items) with the resolution used, what mirroring flips, colour agreement and the proportion comparison."
+    }
+   }
+  },
+  "1_blockout": {
+   "status": "in_progress",
+   "stand_in": false,
+   "sculpt_reference_only": true,
+   "shipped": false,
+   "human_signoff_required": false,
+   "outputs": [
+    "art/characters/valdris/reports/blockout/input_maskcheck.png"
+   ],
+   "tools": [
+    "tools/comfy/run_trellis.py",
+    "tools/comfy/trellis2_character_api.json",
+    "tools/comfy/maskcheck_sheet.py",
+    "tools/blender/gf_hero/render_blockout.py",
+    "tools/comfy/render_blockout_parts.py",
+    "tools/comfy/blockout_sheets.py",
+    "tools/comfy/art_manifest.py"
+   ],
+   "notes": "SCULPT REFERENCE ONLY. TRELLIS.2 (Pixal3D pruned) on the mirrored hero front; birefnet cut-out verified; seeds 101/202/303 running."
+  },
+  "2_production_mesh": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Per the user's 2026-09-25 decision there is no human artist: AI builds the production retopo (~15-25k tris) and the hand-painted NPR textures; the user gives the final visual approval, which is this stage's human gate."
+  },
+  "3_rig": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The GF_Hero_v1 master skeleton; the cannon rigid on the right forearm/hand with weapon_socket_R at the bore; cape and beard braids on x_ leaf chains."
+  },
+  "4_animation": {
+   "status": "not_started",
+   "human_signoff_required": false,
+   "outputs": [],
+   "notes": "The shared clip set on GF_Hero_v1 plus Valdris's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only."
+  },
+  "5_export_validate": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Headless Blender CI writes assets/models/characters/valdris.glb, uncompressed (bevy_gltf 0.20 supports no Draco, meshopt or quantisation). The user applies the final visual approval."
+  }
+ },
+ "human_gates": [
+  {
+   "gate": "stage 0: approve the hero front and the turnaround sheet (front A-pose, side, back, colour script)",
+   "state": "done",
+   "approved_by": "user",
+   "approved_on": "2026-09-25",
+   "via": "references/VALDRIS_front_approved.jpg, references/VALDRIS_sheet_turnaround.jpg"
+  },
+  {
+   "gate": "confirm or override the orchestrator default: cannon on the RIGHT arm, anvil chest plate kept (decisions[cannon_side_and_anvil_plate])",
+   "state": "pending_human"
+  },
+  {
+   "gate": "confirm or override the pack default for the head size: the hero front's small head sunk between the pauldrons (decisions[head_size])",
+   "state": "pending_human"
+  },
+  {
+   "gate": "stage 0 (optional): 3/4 view, expression sheet, siege-cannon weapon sheet, Mountainfall anvil-avatar concept (with the kit's glow states), cape emblem detail (prompts in turnaround_prompts.md)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "stage 2: final visual approval of the AI-built production mesh and NPR textures",
+   "state": "not_started"
+  },
+  {
+   "gate": "stage 3: weight-paint sign-off",
+   "state": "not_started"
+  },
+  {
+   "gate": "stage 5: final Hades-II bar",
+   "state": "not_started"
+  }
+ ]
+}

@@ -1,0 +1,590 @@
+{
+ "character": "valdris",
+ "generated_by": "tools/comfy/palette_extract.py",
+ "spec": "art/characters/valdris/palette_spec.json",
+ "source": {
+  "path": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+  "sha256": "62fc6eed9461f8da33b3c2e78667ce4c04d6e82553dd14e70776def21106146d",
+  "size": [
+   784,
+   1168
+  ]
+ },
+ "generated": "2026-09-25",
+ "kind": "measured from approved art (stage 0 derived data, not a new design)",
+ "method": "per swatch: pixels in the sample boxes passing the HSV filter, background removed by the figure mask; tones = median colour of the pixels within +-5 percentile of the named CIELAB L* percentile",
+ "sheet_background": "#0C0C0C",
+ "content_color": "#C8A25A",
+ "swatches": [
+  {
+   "n": 1,
+   "key": "gunmetal_plate",
+   "label": "Gunmetal plate",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1E1A17",
+    "base": "#312C27",
+    "highlight": "#6F6862"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    18.4,
+    1.2,
+    4.1
+   ],
+   "pixels_sampled": 32567,
+   "note": "the whole armour shell: dark, cracked, faceted; lit faces lift to the highlight tone",
+   "silhouette_share": 0.1012
+  },
+  {
+   "n": 2,
+   "key": "anvil_iron",
+   "label": "Anvil chest plate",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1F1C1A",
+    "base": "#2A2624",
+    "highlight": "#746C68"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    15.5,
+    1.4,
+    2.0
+   ],
+   "pixels_sampled": 13738,
+   "note": "the anvil: same dark iron, flatter and greyer; its flat top face is the lightest plate",
+   "silhouette_share": 0.0574
+  },
+  {
+   "n": 3,
+   "key": "cannon_steel",
+   "label": "Siege-cannon steel",
+   "emissive": false,
+   "tones": {
+    "shadow": "#201C18",
+    "base": "#47403A",
+    "highlight": "#928579"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    27.6,
+    1.8,
+    4.8
+   ],
+   "pixels_sampled": 4366,
+   "note": "barrel and breech between the gold bands; same family as the plate",
+   "silhouette_share": 0.1003
+  },
+  {
+   "n": 4,
+   "key": "forge_gold",
+   "label": "Forge-gold trim",
+   "emissive": false,
+   "tones": {
+    "shadow": "#583F23",
+    "base": "#7C5931",
+    "highlight": "#CF9F66"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    40.7,
+    9.6,
+    28.5
+   ],
+   "pixels_sampled": 1441,
+   "note": "plate edges, cannon rings, fist cuffs, braid rings: the mid-light accent that outlines every plate",
+   "silhouette_share": 0.0318
+  },
+  {
+   "n": 5,
+   "key": "ember_seams",
+   "label": "Glowing seams",
+   "emissive": true,
+   "tones": {
+    "rim": "#BB6A26",
+    "hot": "#C78549",
+    "core": "#F8AA5D"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 10,
+    "hot": 50,
+    "core": 97
+   },
+   "base_lab": [
+    61.1,
+    19.5,
+    42.1
+   ],
+   "pixels_sampled": 607,
+   "note": "cracks between plates, anvil flanks, knees; unlit in the shader, bloom does the rest",
+   "silhouette_share": 0.0045
+  },
+  {
+   "n": 6,
+   "key": "muzzle_glow",
+   "label": "Cannon muzzle",
+   "emissive": true,
+   "tones": {
+    "rim": "#A54011",
+    "hot": "#E8741C",
+    "core": "#FFF097"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 10,
+    "hot": 50,
+    "core": 97
+   },
+   "base_lab": [
+    61.4,
+    40.1,
+    63.1
+   ],
+   "pixels_sampled": 1829,
+   "note": "the hottest point on him and his aim read; Siege Stance and firing push it to white",
+   "silhouette_share": 0.0086
+  },
+  {
+   "n": 7,
+   "key": "war_red",
+   "label": "War-red cape",
+   "emissive": false,
+   "tones": {
+    "shadow": "#250D0C",
+    "base": "#401B19",
+    "highlight": "#5D2B28"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    15.2,
+    17.8,
+    9.9
+   ],
+   "pixels_sampled": 23228,
+   "note": "the one cloth mass and the one saturated hue; tattered hem, gold emblem on the back",
+   "silhouette_share": 0.1104
+  },
+  {
+   "n": 8,
+   "key": "skin",
+   "label": "Skin",
+   "emissive": false,
+   "tones": {
+    "shadow": "#493126",
+    "base": "#7C5A4A",
+    "highlight": "#C69D88"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    41.4,
+    11.7,
+    14.7
+   ],
+   "pixels_sampled": 1659,
+   "note": "weathered, scarred scalp and face; tiny at game scale",
+   "silhouette_share": 0.0623
+  },
+  {
+   "n": 9,
+   "key": "beard",
+   "label": "Braided beard",
+   "emissive": false,
+   "tones": {
+    "shadow": "#2C2722",
+    "base": "#48413C",
+    "highlight": "#79716A"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    28.1,
+    2.0,
+    4.1
+   ],
+   "pixels_sampled": 4082,
+   "note": "iron-grey braids; merges into one dark mass above the anvil at game scale",
+   "silhouette_share": 0.0891
+  },
+  {
+   "n": 10,
+   "key": "emblem_gold",
+   "label": "Cape emblem",
+   "emissive": false,
+   "tones": {
+    "shadow": "#7B5020",
+    "base": "#A57741",
+    "highlight": "#D5A76F"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    53.6,
+    12.0,
+    36.4
+   ],
+   "pixels_sampled": 1308,
+   "note": "the gold sigil on the back of the cape (turnaround sheet, back view)",
+   "source": "sheet",
+   "silhouette_share": 0.0186
+  }
+ ],
+ "ink_and_deep_shadow_share": 0.4156,
+ "checks": {
+  "notes": "dE = CIELAB dE76 between base tones; dL = difference in L* (value), the part a toon ramp and a small screen keep.",
+  "dE_gunmetal_plate_vs_cannon_steel": 9.2,
+  "dE_gunmetal_plate_vs_anvil_iron": 3.6,
+  "dE_forge_gold_vs_emblem_gold": 15.3,
+  "dE_content_color_vs_forge_gold": 8.1,
+  "dL_vs_sheet_background": {
+   "gunmetal_plate": 15.1,
+   "anvil_iron": 12.2,
+   "cannon_steel": 24.3,
+   "forge_gold": 37.4,
+   "ember_seams": 57.8,
+   "muzzle_glow": 58.1,
+   "war_red": 11.9,
+   "skin": 38.1,
+   "beard": 24.8,
+   "emblem_gold": 50.3
+  },
+  "biomes": [
+   {
+    "biome": "cinder_wastes",
+    "name": "Cinder Wastes",
+    "ground": "#2B1B15",
+    "accent": "#FF8A2A",
+    "dL_vs_ground": {
+     "gunmetal_plate": 6.8,
+     "forge_gold": 29.1,
+     "war_red": 3.6,
+     "ember_seams": 49.5
+    },
+    "dE_ember_seams_vs_biome_accent": 31.7
+   },
+   {
+    "biome": "verdant_ruin",
+    "name": "Verdant Ruin",
+    "ground": "#1C2A21",
+    "accent": "#5CF2B0",
+    "dL_vs_ground": {
+     "gunmetal_plate": 2.8,
+     "forge_gold": 25.1,
+     "war_red": -0.4,
+     "ember_seams": 45.5
+    },
+    "dE_ember_seams_vs_biome_accent": 81.5
+   },
+   {
+    "biome": "hollow_spire",
+    "name": "The Hollow Spire",
+    "ground": "#1B1D36",
+    "accent": "#A9C8FF",
+    "dL_vs_ground": {
+     "gunmetal_plate": 6.6,
+     "forge_gold": 28.9,
+     "war_red": 3.4,
+     "ember_seams": 49.3
+    },
+    "dE_ember_seams_vs_biome_accent": 76.8
+   },
+   {
+    "biome": "the_unmaking",
+    "name": "The Unmaking",
+    "ground": "#140B1F",
+    "accent": "#E24BFF",
+    "dL_vs_ground": {
+     "gunmetal_plate": 14.0,
+     "forge_gold": 36.3,
+     "war_red": 10.8,
+     "ember_seams": 56.7
+    },
+    "dE_ember_seams_vs_biome_accent": 119.7
+   }
+  ],
+  "biomes_note": "ground = the biome's albedo tint from biomes.ron (unlit); the lit floor in game is lighter. Treat these as worst-case value contrast, not a render."
+ },
+ "mask": {
+  "path": "art/characters/valdris/references/valdris_concept_front_mirrored_mask.png",
+  "sha256": "2115aad9c78abdccbdcec658f5dd53637d77d53826994ade5adb552ac7e1fc7c",
+  "use": "figure mask for the silhouette shares; every concept sample is limited to it"
+ },
+ "sources": {
+  "sheet": {
+   "path": "art/characters/valdris/references/VALDRIS_sheet_turnaround.jpg",
+   "sha256": "d27bf5f34e8b765cc5cef215bdb0b2aeaccfa85e4dca00e51a11b582adb37c17",
+   "size": [
+    1168,
+    784
+   ]
+  }
+ },
+ "anchors": [
+  {
+   "label": "Gunmetal Black",
+   "declared": "#2A242E",
+   "painted_chip": "#1A1A1A",
+   "painted_Lstar": 9.3,
+   "dE_declared_vs_painted": 9.7,
+   "declared_Lstar": 15.2,
+   "swatch": "gunmetal_plate",
+   "measured_base": "#312C27",
+   "dE_declared_vs_measured_base": 10.9,
+   "nearest_measured_tone": {
+    "name": "shadow",
+    "hex": "#1E1A17",
+    "dE": 10.8
+   }
+  },
+  {
+   "label": "Forge Gold",
+   "declared": "#FFC24B",
+   "painted_chip": "#DAA537",
+   "painted_Lstar": 70.9,
+   "dE_declared_vs_painted": 12.0,
+   "declared_Lstar": 82.0,
+   "swatch": "forge_gold",
+   "measured_base": "#7C5931",
+   "dE_declared_vs_measured_base": 55.6,
+   "nearest_measured_tone": {
+    "name": "highlight",
+    "hex": "#CF9F66",
+    "dE": 32.0
+   }
+  },
+  {
+   "label": "Ember Amber",
+   "declared": "#FF6B1A",
+   "painted_chip": "#B1311B",
+   "painted_Lstar": 40.6,
+   "dE_declared_vs_painted": 33.0,
+   "declared_Lstar": 63.2,
+   "swatch": "ember_seams",
+   "measured_base": "#C78549",
+   "dE_declared_vs_measured_base": 41.6,
+   "nearest_measured_tone": {
+    "name": "rim",
+    "hex": "#BB6A26",
+    "dE": 32.5
+   }
+  },
+  {
+   "label": "Deep War Red",
+   "declared": "#7A1F1F",
+   "painted_chip": "#6C0E08",
+   "painted_Lstar": 22.0,
+   "dE_declared_vs_painted": 8.2,
+   "declared_Lstar": 27.3,
+   "swatch": "war_red",
+   "measured_base": "#401B19",
+   "dE_declared_vs_measured_base": 28.0,
+   "nearest_measured_tone": {
+    "name": "highlight",
+    "hex": "#5D2B28",
+    "dE": 20.0
+   }
+  },
+  {
+   "label": "Glowing seams white-hot",
+   "declared": null,
+   "painted_chip": "#FFF5CE",
+   "painted_Lstar": 96.4,
+   "swatch": "ember_seams",
+   "measured_base": "#C78549",
+   "dE_painted_vs_measured_base": 47.2,
+   "nearest_measured_tone": {
+    "name": "core",
+    "hex": "#F8AA5D",
+    "dE": 44.0
+   },
+   "note": "a line sample, not a chip: the sheet names no hex for it"
+  }
+ ],
+ "cross_checks": [
+  {
+   "swatch": "gunmetal_plate",
+   "label": "plate, sheet front legs",
+   "source": "sheet",
+   "boxes": [
+    [
+     160,
+     480,
+     225,
+     560
+    ],
+    [
+     275,
+     480,
+     340,
+     560
+    ]
+   ],
+   "pixels_sampled": 2495,
+   "tones": {
+    "shadow": "#25201A",
+    "base": "#302D2B",
+    "highlight": "#6D5D50"
+   },
+   "base_name": "base",
+   "concept_base": "#312C27",
+   "dE_base": 2.4,
+   "dL_base": 0.3
+  },
+  {
+   "swatch": "forge_gold",
+   "label": "gold, sheet side cannon",
+   "source": "sheet",
+   "boxes": [
+    [
+     505,
+     300,
+     625,
+     420
+    ]
+   ],
+   "pixels_sampled": 799,
+   "tones": {
+    "shadow": "#523F29",
+    "base": "#685035",
+    "highlight": "#B18B5E"
+   },
+   "base_name": "base",
+   "concept_base": "#7C5931",
+   "dE_base": 10.6,
+   "dL_base": -4.8
+  },
+  {
+   "swatch": "ember_seams",
+   "label": "seams, sheet front torso",
+   "source": "sheet",
+   "boxes": [
+    [
+     185,
+     270,
+     300,
+     330
+    ],
+    [
+     140,
+     470,
+     330,
+     600
+    ]
+   ],
+   "pixels_sampled": 101,
+   "tones": {
+    "rim": "#B96A34",
+    "hot": "#CC8346",
+    "core": "#FCAE66"
+   },
+   "base_name": "hot",
+   "concept_base": "#C78549",
+   "dE_base": 3.5,
+   "dL_base": 0.1
+  },
+  {
+   "swatch": "war_red",
+   "label": "cape, sheet back",
+   "source": "sheet",
+   "boxes": [
+    [
+     790,
+     300,
+     860,
+     520
+    ],
+    [
+     920,
+     300,
+     990,
+     520
+    ]
+   ],
+   "pixels_sampled": 20396,
+   "tones": {
+    "shadow": "#280E0A",
+    "base": "#421A15",
+    "highlight": "#582923"
+   },
+   "base_name": "base",
+   "concept_base": "#401B19",
+   "dE_base": 3.1,
+   "dL_base": 0.0
+  },
+  {
+   "swatch": "skin",
+   "label": "skin, sheet front face",
+   "source": "sheet",
+   "boxes": [
+    [
+     213,
+     190,
+     250,
+     222
+    ]
+   ],
+   "pixels_sampled": 784,
+   "tones": {
+    "shadow": "#4C3224",
+    "base": "#7E5840",
+    "highlight": "#C5957A"
+   },
+   "base_name": "base",
+   "concept_base": "#7C5A4A",
+   "dE_base": 5.6,
+   "dL_base": -0.6
+  },
+  {
+   "swatch": "beard",
+   "label": "beard, sheet front",
+   "source": "sheet",
+   "boxes": [
+    [
+     208,
+     228,
+     258,
+     285
+    ]
+   ],
+   "pixels_sampled": 436,
+   "tones": {
+    "shadow": "#413933",
+    "base": "#595149",
+    "highlight": "#86766B"
+   },
+   "base_name": "base",
+   "concept_base": "#48413C",
+   "dE_base": 7.1,
+   "dL_base": 6.9
+  }
+ ]
+}

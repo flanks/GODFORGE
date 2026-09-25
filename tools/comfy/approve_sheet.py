@@ -3,13 +3,15 @@
   python tools/comfy/approve_sheet.py <key> <item> <sheet.png> --by "<who approved>" [--on YYYY-MM-DD]
 
   <item>: front | side | three_quarter | back | expression | weapon_gauntlet | color_script
+          (also: weapon_cannon | mountainfall_avatar | cape_emblem, the extra sheets of Valdris's pack)
 
 Run this ONLY after a person has looked at the sheet and approved it; --by names that person.
 It never decides anything itself. It:
-  1. copies the sheet to art/characters/<key>/references/<KEY>_<item>_approved.png (refuses > 20 MB:
-     no Git LFS in this repo);
+  1. copies the sheet to art/characters/<key>/references/<KEY>_<item>_approved.png (a .jpg/.jpeg/.webp
+     sheet keeps its own extension; refuses > 20 MB);
   2. sets stages.0_concept_reference.items.<item> in status.json to done with approved_by / approved_on /
-     sha256 / outputs, and the stage itself to done once every sheet item is done;
+     sha256 / outputs, and the stage itself to done once every sheet item is done (or, for a pack that
+     marks optional sheets with "optional": true, once every non-optional sheet item it lists is done);
   3. adds or replaces the sheet's entry under "references" in manifest.json.
 It does not commit. Pure standard library; key order in the JSON files is preserved.
 """
@@ -24,6 +26,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 SHEETS = ("front", "side", "three_quarter", "back", "expression", "weapon_gauntlet", "color_script")
+EXTRA_SHEETS = ("weapon_cannon", "mountainfall_avatar", "cape_emblem")
+IMAGE_EXT = (".png", ".jpg", ".jpeg", ".webp")
 STAGE = "0_concept_reference"
 LIMIT = 20_000_000
 
@@ -42,7 +46,7 @@ def save(path, data):
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("key")
-    ap.add_argument("item", choices=SHEETS)
+    ap.add_argument("item", choices=SHEETS + EXTRA_SHEETS)
     ap.add_argument("sheet")
     ap.add_argument("--by", required=True, help="the person who approved the sheet")
     ap.add_argument("--on", default=datetime.date.today().isoformat())
@@ -53,7 +57,8 @@ def main(argv):
     size = os.path.getsize(src)
     if size > LIMIT:
         raise SystemExit("%s is %d bytes: over the 20 MB commit limit; export a smaller PNG" % (src, size))
-    dst = os.path.join(base, "references", "%s_%s_approved.png" % (a.key.upper(), a.item))
+    ext = os.path.splitext(src)[1].lower()
+    dst = os.path.join(base, "references", "%s_%s_approved%s" % (a.key.upper(), a.item, ext if ext in IMAGE_EXT else ".png"))
     if os.path.abspath(dst) != src:
         shutil.copyfile(src, dst)
     digest = hashlib.sha256(open(dst, "rb").read()).hexdigest()
@@ -65,7 +70,10 @@ def main(argv):
     item = stage.setdefault("items", {}).setdefault(a.item, {})
     item.update({"status": "done", "human_signoff_required": True, "approved_by": a.by, "approved_on": a.on,
                  "sha256": digest, "outputs": [rel], "notes": "Approved by %s on %s." % (a.by, a.on)})
-    if all(stage["items"].get(s, {}).get("status") == "done" for s in SHEETS):
+    listed = [s for s in SHEETS + EXTRA_SHEETS if s in stage["items"]]
+    if all(stage["items"].get(s, {}).get("status") == "done" for s in SHEETS) or (
+            any(stage["items"][s].get("optional") for s in listed)
+            and all(stage["items"][s].get("status") == "done" for s in listed if not stage["items"][s].get("optional"))):
         stage["status"] = "done"
     if rel not in stage.setdefault("outputs", []):
         stage["outputs"].append(rel)
