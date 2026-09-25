@@ -54,5 +54,74 @@
   }
  ],
  "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The 'files' list below is written by tools/comfy/art_manifest.py (raw output: local-only unless in_git, and lfs: true when git stores it through Git LFS).",
- "files": []
+ "files": [
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s101.glb",
+   "bytes": 84165560,
+   "sha256": "64acfff8baf6d701e2e24dd378372f5cd54e05626241f2675ba77f2207656f60",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s101_cond.png",
+   "bytes": 1400252,
+   "sha256": "6488bb5762bf44c85a325df8328d697685fb8b0a25dce83f0f49aa507bea59c0",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s101_mask.png",
+   "bytes": 97546,
+   "sha256": "360146553ea20c4fd082282979a4c1d84c97913cbfbc00aa43532931d208af72",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s202.glb",
+   "bytes": 80625416,
+   "sha256": "98900f1c42f6b202296f85d0f35f9e2c4d593c22cd64c4eb34849e010c960792",
+   "in_git": true,
+   "lfs": true,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s202_cond.png",
+   "bytes": 1400252,
+   "sha256": "6488bb5762bf44c85a325df8328d697685fb8b0a25dce83f0f49aa507bea59c0",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s202_mask.png",
+   "bytes": 97546,
+   "sha256": "360146553ea20c4fd082282979a4c1d84c97913cbfbc00aa43532931d208af72",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s303.glb",
+   "bytes": 77866500,
+   "sha256": "3e43aca4a16cbc3d1f28103fa5b4113d154620c9604fb42548dd764c00190ffa",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s303_cond.png",
+   "bytes": 1400252,
+   "sha256": "6488bb5762bf44c85a325df8328d697685fb8b0a25dce83f0f49aa507bea59c0",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/valdris/source/valdris_trellis2_s303_mask.png",
+   "bytes": 97546,
+   "sha256": "360146553ea20c4fd082282979a4c1d84c97913cbfbc00aa43532931d208af72",
+   "in_git": false,
+   "provenance": "art/characters/valdris/source/valdris_trellis2_s303.json"
+  }
+ ],
+ "updated": "2026-09-25T18:18:47",
+ "policy": "files listed with in_git=false stay local (art/.gitignore); verify a copy by sha256",
+ "selected_sculpt_reference": "art/characters/valdris/source/valdris_trellis2_s202.glb",
+ "note": "Stage-1 TRELLIS.2 blockouts are SCULPT REFERENCES ONLY (never shipped). Picked seed s202 (committed through Git LFS); s101/s303 and the ComfyUI previews stay local. See reports/blockout_report.md."
 }

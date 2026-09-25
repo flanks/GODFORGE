@@ -2,10 +2,12 @@
 
   python tools/comfy/art_manifest.py <key> [--selected <file>] [--note "..."]
 
-Raw generator output (TRELLIS GLBs, ComfyUI previews) and heavy .blend files never enter git
-(art/.gitignore; no Git LFS, nothing > 20 MB committed). The manifest is the committed record that
-lets anyone verify a local copy: it lists every file under source/ (plus any *.blend under work/),
-whether git ignores it, its size and sha256, and the provenance JSON that produced it.
+Raw generator output (TRELLIS GLBs, ComfyUI previews) and heavy .blend files stay local
+(art/.gitignore) unless a hero's pack re-includes one on purpose (e.g. the selected seed's GLB,
+committed through Git LFS). The manifest is the committed record that lets anyone verify a local
+copy: it lists every file under source/ (plus any *.blend under work/), whether git ignores it
+(in_git), whether .gitattributes routes it through Git LFS (lfs: true), its size and sha256, and
+the provenance JSON that produced it.
 Existing per-file notes and top-level keys other than "files" are preserved.
 Pure standard library.
 """
@@ -43,6 +45,16 @@ def ignored(paths):
     return set(p for p in r.stdout.decode("utf-8").split("\0") if p)
 
 
+def lfs(paths):
+    """The subset of paths that .gitattributes sends through Git LFS (filter=lfs)."""
+    if not paths:
+        return set()
+    r = subprocess.run(["git", "check-attr", "-z", "--stdin", "filter"], cwd=ROOT, input="\0".join(paths).encode("utf-8"),
+                       capture_output=True)
+    f = r.stdout.decode("utf-8").split("\0")
+    return {f[i] for i in range(0, len(f) - 2, 3) if f[i + 2] == "lfs"}
+
+
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("key")
@@ -63,9 +75,12 @@ def main(argv):
                     found.append(os.path.join(dirpath, n))
     rels = [rel(p) for p in found]
     ign = ignored(rels)
+    in_lfs = lfs([r for r in rels if r not in ign])
     files = []
     for p, r in zip(found, rels):
         entry = {"path": r, "bytes": os.path.getsize(p), "sha256": sha256(p), "in_git": r not in ign}
+        if r in in_lfs:
+            entry["lfs"] = True
         stem = os.path.splitext(os.path.basename(p))[0]
         for suffix in ("_cond", "_mask"):
             if stem.endswith(suffix):
@@ -76,7 +91,7 @@ def main(argv):
         if r in old_notes:
             entry["note"] = old_notes[r]
         files.append(entry)
-        if entry["in_git"] and entry["bytes"] > 20_000_000:
+        if entry["in_git"] and entry["bytes"] > 20_000_000 and not entry.get("lfs"):
             print("[manifest] WARNING %s is %d bytes and NOT ignored by git" % (r, entry["bytes"]), file=sys.stderr)
 
     manifest = dict(old)

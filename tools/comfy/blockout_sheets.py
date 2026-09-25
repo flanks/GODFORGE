@@ -16,6 +16,13 @@ metrics JSON per seed). Needs PIL + numpy, so run it with ComfyUI's standalone p
   blockout_compare.png    the concept next to every stem's front / 3-4 / clay views
   blockout_selected.png   with --selected <stem>: the picked seed beside the concept, 2 rows
 Every PNG is kept under 2 MB (downscaled until it fits).
+
+--views <art/characters/<key>/blockout_views.json> (optional; without it the sheets are Brax's):
+takes the hero name, the height, the concept crop / label, the close-up rows (one per part: its
+lit views, then its clay views, as rendered by tools/comfy/render_blockout_parts.py) and the tiles
+of blockout_selected.png from that spec. "closeup_groups": [[part, ...], [part, ...]] splits the
+close-ups over <stem>_closeups.png, <stem>_closeups2.png, ... (the diagnostics row goes on the
+last one), so many parts stay legible under the 2 MB cap.
 """
 import json
 import os
@@ -130,20 +137,40 @@ def ingame(render_dir, stem, out_dir):
     save_small(sheet, os.path.join(out_dir, "%s_ingame.png" % stem))
 
 
+# Brax's layout, the default when no --views spec is given
+BRAX_CLOSEUPS = (("head", ("front", "34L", "side")), ("gauntletR", ("front", "34", "top")),
+                 ("gauntletL", ("front", "34")), ("legs", ("front", "34L", "back")))
+BRAX_SELECTED = (("tex_front", "lit front"), ("tex_front34L", "lit 3/4"), ("tex_back34R", "lit back 3/4"),
+                 ("clay_front34L", "clay 3/4"), ("close_head_34L", "head 3/4"), ("close_gauntletR_34", "right gauntlet 3/4"),
+                 ("closeclay_gauntletR_top", "gauntlet clay, top"), ("close_legs_34L", "skirt + legs 3/4"))
+
+
+def pop_opt(argv, name):
+    if name in argv:
+        i = argv.index(name)
+        return argv[i + 1], argv[:i] + argv[i + 2:]
+    return None, argv
+
+
 def main(argv):
     if len(argv) < 5:
         print(__doc__)
         return 2
-    selected = None
-    if "--selected" in argv:
-        i = argv.index("--selected")
-        selected = argv[i + 1]
-        argv = argv[:i] + argv[i + 2:]
+    selected, argv = pop_opt(argv, "--selected")
+    views_path, argv = pop_opt(argv, "--views")
+    spec = json.load(open(views_path, encoding="utf-8")) if views_path else {}
+    name = spec.get("name", "Brax")
+    closeups = [(p, tuple(v["name"] for v in d["views"])) for p, d in spec["parts"].items()] if spec else BRAX_CLOSEUPS
+    part_label = {p: d.get("label", p) for p, d in spec.get("parts", {}).items()}
+    selected_tiles = [tuple(t) for t in spec["selected_tiles"]] if spec.get("selected_tiles") else BRAX_SELECTED
+    concept_label = spec.get("concept_label", "approved concept")
+    height = "%g" % spec.get("height_m", 2.2)
+    groups = spec.get("closeup_groups") or [[p for p, _ in closeups]]
     render_root, out_dir, concept, concept_mask = argv[:4]
     stems = argv[4:]
     os.makedirs(out_dir, exist_ok=True)
     views = ["front", "front34L", "sideL", "back", "back34R", "sideR"]
-    concept_img = Image.open(concept).convert("RGB").crop((150, 0, 1386, 1024))
+    concept_img = Image.open(concept).convert("RGB").crop(tuple(spec.get("concept_crop", (150, 0, 1386, 1024))))
     compare = []
     for stem in stems:
         rd = os.path.join(render_root, stem)
@@ -151,22 +178,28 @@ def main(argv):
         clay = [(load(os.path.join(rd, "%s_clay_%s.png" % (stem, v))), "clay " + v) for v in views]
         albedo = [(load(os.path.join(rd, "%s_albedo_%s.png" % (stem, v))), "unlit albedo " + v) for v in ("front", "front34L", "back")]
         save_small(grid([t for t in tex + clay + albedo if t[0] is not None], 6, 440,
-                        "%s  turnaround (common ortho scale, hero normalised to 2.2 m): lit / clay / unlit albedo" % stem),
+                        "%s  turnaround (common ortho scale, hero normalised to %s m): lit / clay / unlit albedo" % (stem, height)),
                    os.path.join(out_dir, "%s_turnaround.png" % stem))
-        close = []
-        for part, vs in (("head", ("front", "34L", "side")), ("gauntletR", ("front", "34", "top")),
-                         ("gauntletL", ("front", "34")), ("legs", ("front", "34L", "back"))):
-            row = []
-            for tag in ("close", "closeclay"):
-                for v in vs:
-                    row.append((load(os.path.join(rd, "%s_%s_%s_%s.png" % (stem, tag, part, v))),
-                                "%s %s %s" % ("lit" if tag == "close" else "clay", part, v)))
-            close += row + [(None, "")] * (6 - len(row))
-        close += [(load(os.path.join(rd, "%s_diag_%s.png" % (stem, v))), t) for v, t in (
-            ("front", "components front"), ("back", "components back"), ("sectionFront", "section at mid-depth"),
-            ("sectionSide", "section at mid-width"))]
-        save_small(grid(close, 6, 400, "%s  close-ups; last row: components (grey main, red/blue/green next, yellow tiny) and sections" % stem),
-                   os.path.join(out_dir, "%s_closeups.png" % stem))
+        views_of = dict(closeups)
+        for gi, group in enumerate(groups):
+            close = []
+            for part in group:
+                row = []
+                for tag in ("close", "closeclay"):
+                    for v in views_of[part]:
+                        row.append((load(os.path.join(rd, "%s_%s_%s_%s.png" % (stem, tag, part, v))),
+                                    "%s %s %s" % ("lit" if tag == "close" else "clay", part_label.get(part, part), v)))
+                close += row + [(None, "")] * (-len(row) % 6)
+            last = gi == len(groups) - 1
+            if last:
+                close += [(load(os.path.join(rd, "%s_diag_%s.png" % (stem, v))), t) for v, t in (
+                    ("front", "components front"), ("back", "components back"), ("sectionFront", "section at mid-depth"),
+                    ("sectionSide", "section at mid-width"))]
+            title = "%s  close-ups%s" % (stem, " (%d/%d)" % (gi + 1, len(groups)) if len(groups) > 1 else "")
+            if last:
+                title += "; last row: components (grey main, red/blue/green next, yellow tiny) and sections"
+            save_small(grid(close, 6, 400, title),
+                       os.path.join(out_dir, "%s_closeups%s.png" % (stem, str(gi + 1) if gi else "")))
         ingame(rd, stem, out_dir)
         sil = silhouette(rd, stem, concept_mask, out_dir)
         mpath = os.path.join(rd, "%s_metrics.json" % stem)
@@ -177,25 +210,22 @@ def main(argv):
                 json.dump(metrics, f, indent=1)
                 f.write("\n")
         seed = stem.rsplit("_", 1)[-1]
-        compare.append((concept_img, "approved concept"))
+        compare.append((concept_img, concept_label))
         for kind, v in (("tex", "front"), ("tex", "front34L"), ("tex", "back"), ("clay", "front34L"), ("albedo", "front")):
             compare.append((load(os.path.join(rd, "%s_%s_%s.png" % (stem, kind, v))),
                             "%s %s %s" % (seed, {"tex": "lit", "clay": "clay", "albedo": "albedo"}[kind], v)))
-    save_small(grid(compare, 6, 400, "Brax stage-1 blockout: concept vs TRELLIS.2 seeds, one row per seed (SCULPT REFERENCE ONLY)"),
+    save_small(grid(compare, 6, 400, "%s stage-1 blockout: concept vs TRELLIS.2 seeds, one row per seed (SCULPT REFERENCE ONLY)" % name),
                os.path.join(out_dir, "blockout_compare.png"))
     if selected:
         rd = os.path.join(render_root, selected)
         game = load(os.path.join(rd, "%s_ingame_22_tex.png" % selected))
         if game is not None:
             game = game.crop((48, 64, 208, 192)).resize((500, 400), Image.NEAREST)
-        tiles = [(concept_img, "approved concept (front)")]
-        tiles += [(load(os.path.join(rd, "%s_%s.png" % (selected, n))), t) for n, t in (
-            ("tex_front", "lit front"), ("tex_front34L", "lit 3/4"), ("tex_back34R", "lit back 3/4"),
-            ("clay_front34L", "clay 3/4"), ("close_head_34L", "head 3/4"), ("close_gauntletR_34", "right gauntlet 3/4"),
-            ("closeclay_gauntletR_top", "gauntlet clay, top"), ("close_legs_34L", "skirt + legs 3/4"))]
+        tiles = [(concept_img, concept_label if spec else "approved concept (front)")]
+        tiles += [(load(os.path.join(rd, "%s_%s.png" % (selected, n))), t) for n, t in selected_tiles]
         tiles.append((game, "in-game 55 deg, 22 m, 3x pixels"))
-        save_small(grid(tiles, 5, 440, "Brax stage-1 blockout: picked seed %s vs concept - SCULPT REFERENCE ONLY, never shipped"
-                        % selected.rsplit("_", 1)[-1]), os.path.join(out_dir, "blockout_selected.png"))
+        save_small(grid(tiles, 5, 440, "%s stage-1 blockout: picked seed %s vs concept - SCULPT REFERENCE ONLY, never shipped"
+                        % (name, selected.rsplit("_", 1)[-1])), os.path.join(out_dir, "blockout_selected.png"))
     return 0
 
 

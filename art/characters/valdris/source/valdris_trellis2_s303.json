@@ -1,0 +1,76 @@
+{
+ "asset": "valdris",
+ "stage": "1-blockout",
+ "use": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/",
+ "tool": "tools/comfy/run_trellis.py",
+ "model": "TRELLIS.2 (trellis_2_int8_convrot, trellis_2 shape/texture VAEs bf16), DINOv3-L conditioning, birefnet background removal; Pixal3D branch pruned (licence not cleared)",
+ "licence": "TRELLIS.2 code + weights MIT, run locally. The graph's DINOv3-L conditioning encoder is under Meta's DINOv3 licence (not MIT, not yet read for GODFORGE: pending_human gate in status.json); BiRefNet MIT per its repository. Pixal3D pruned.",
+ "comfyui": {
+  "url": "http://127.0.0.1:8188",
+  "version": "0.37.0",
+  "prompt_id": "fd571fb4-f49a-41bd-9f42-d7805f0b1307",
+  "output": "3d/GF_valdris_s303_00001.glb",
+  "attempts": 1
+ },
+ "input_image": {
+  "path": "art/characters/valdris/references/valdris_concept_front_mirrored.png",
+  "sha256": "62fc6eed9461f8da33b3c2e78667ce4c04d6e82553dd14e70776def21106146d",
+  "uploaded_as": "valdris_concept_front_mirrored.png"
+ },
+ "graph": {
+  "template": "tools/comfy/trellis2_character_api.json",
+  "template_sha256": "8471ef6d3b29a4c702aa95a6ad3781a562d6219d8b4e9075ec31f42504bb133c",
+  "submitted_sha256": "89f9895af691a72b24285c69549b3319d78d6d51f6f52d1f5ec7cc598a0ce674",
+  "patched_inputs": {
+   "122.image": "valdris_concept_front_mirrored.png",
+   "316.value": true,
+   "pruned_pixal3d_nodes": [
+    "319",
+    "298",
+    "242",
+    "56",
+    "55"
+   ],
+   "248.switch": true,
+   "312.background": "#808080",
+   "322.filename_prefix": "3d/GF_valdris_s303",
+   "3.seed": 306,
+   "18.seed": 321,
+   "23.seed": 326,
+   "12.seed": 315,
+   "186.target_face_count": 700000,
+   "288.value": 4096,
+   "224.resolution": 2048
+  }
+ },
+ "seed": 303,
+ "node_seeds": {
+  "3": 306,
+  "18": 321,
+  "23": 326,
+  "12": 315
+ },
+ "settings": {
+  "target_faces": 700000,
+  "texture_px": 4096,
+  "background": "#808080",
+  "mask_source": "birefnet"
+ },
+ "timings": {
+  "execution_start_ms": 1790350200284,
+  "execution_end_ms": 1790352830590,
+  "execution_seconds": 2630.3,
+  "wall_seconds": 2634.4,
+  "generated": "2026-09-25T18:13:54"
+ },
+ "high_poly_info": "Vertices:   18,793,647 (18.79M); Faces:      38,327,522 (38.33M); Attributes: none",
+ "output": {
+  "path": "art/characters/valdris/source/valdris_trellis2_s303.glb",
+  "bytes": 77866500,
+  "sha256": "3e43aca4a16cbc3d1f28103fa5b4113d154620c9604fb42548dd764c00190ffa"
+ },
+ "previews": {
+  "cond": "art/characters/valdris/source/valdris_trellis2_s303_cond.png",
+  "mask": "art/characters/valdris/source/valdris_trellis2_s303_mask.png"
+ }
+}

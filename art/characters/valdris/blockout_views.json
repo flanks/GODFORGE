@@ -1,0 +1,99 @@
+{
+ "asset": "valdris",
+ "name": "Valdris",
+ "use": "Stage-1 review views for tools/comfy/render_blockout_parts.py (Blender close-ups + region metrics) and tools/comfy/blockout_sheets.py --views (sheet rows). SCULPT REFERENCE review only.",
+ "coords": "Hero normalised as in tools/blender/gf_hero/render_blockout.py: feet on z=0, bbox centred in x/y, facing Blender -Y, his right = -X. Boxes are fractions of the bbox: x and y relative to the centre in units of span / depth (-0.5..0.5), z from the feet in units of height (0..1). Views: az 0 = front, 90 = his left side, 180 = back, 270 = his right side; el = elevation in degrees; dir = explicit camera direction. clip = core renders only what lies behind the nearest point of the part's core box; section_x / section_z cut the mesh at that fraction (camera looking at the cut face). Top-down views use dir [0, -0.02, 1] so the front is at the bottom of the image and his right on the left.",
+ "height_m": 2.3,
+ "concept_crop": [-40, 170, 824, 1034],
+ "concept_label": "approved concept, mirrored (= TRELLIS input)",
+ "closeup_groups": [["head", "cannon", "fist"], ["overview", "pauldrons", "cape", "legs"]],
+ "parts": {
+  "overview": {
+   "label": "whole",
+   "box": {"x": [-0.5, 0.5], "z": [0.0, 1.0]},
+   "views": [
+    {"name": "top", "dir": [0.0, -0.02, 1.0]},
+    {"name": "game55", "az": 0, "el": 55},
+    {"name": "game55_34", "az": 35, "el": 55}
+   ]
+  },
+  "head": {
+   "label": "head + beard",
+   "box": {"x": [-0.10, 0.10], "z": [0.76, 1.0]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34L", "az": 35, "el": 8},
+    {"name": "side", "az": 90, "el": 5, "clip": "core", "core": {"x": [-0.06, 0.06], "z": [0.80, 1.0]}}
+   ]
+  },
+  "cannon": {
+   "label": "cannon (his right arm)",
+   "box": {"x": [-0.5, -0.20], "z": [0.55, 0.95]},
+   "views": [
+    {"name": "34", "az": -40, "el": 12},
+    {"name": "muzzle", "az": -90, "el": 5},
+    {"name": "top", "dir": [0.0, -0.25, 1.0]}
+   ]
+  },
+  "fist": {
+   "label": "fist (his left arm)",
+   "box": {"x": [0.20, 0.5], "z": [0.55, 0.95]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34", "az": 40, "el": 12},
+    {"name": "end", "az": 90, "el": 5}
+   ]
+  },
+  "pauldrons": {
+   "label": "pauldrons + anvil plate",
+   "box": {"x": [-0.36, 0.36], "z": [0.55, 1.0]},
+   "views": [
+    {"name": "front", "az": 0, "el": 20},
+    {"name": "34L", "az": 35, "el": 25},
+    {"name": "back", "az": 180, "el": 25}
+   ]
+  },
+  "cape": {
+   "label": "cape",
+   "box": {"x": [-0.40, 0.40], "z": [0.0, 0.95]},
+   "views": [
+    {"name": "back", "az": 180, "el": 5},
+    {"name": "back34L", "az": 135, "el": 5},
+    {"name": "sideR", "az": 270, "el": 5}
+   ]
+  },
+  "legs": {
+   "label": "legs + cape hem",
+   "box": {"x": [-0.30, 0.30], "z": [0.0, 0.50]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34L", "az": 35, "el": 8},
+    {"name": "back", "az": 180, "el": 8},
+    {"name": "cutKnee", "dir": [0.0, -0.02, 1.0], "section_z": 0.30},
+    {"name": "cutThighL", "az": 90, "el": 0, "section_x": 0.10},
+    {"name": "cutThighR", "az": 270, "el": 0, "section_x": -0.10}
+   ]
+  }
+ },
+ "regions": [
+  {"name": "cannon arm R", "x": [-0.5, -0.22], "z": [0.45, 1.0]},
+  {"name": "fist arm L", "x": [0.22, 0.5], "z": [0.45, 1.0]},
+  {"name": "head/beard", "x": [-0.09, 0.09], "z": [0.78, 1.0]},
+  {"name": "pauldrons", "x": [-0.36, 0.36], "z": [0.80, 1.0]},
+  {"name": "torso/anvil", "x": [-0.22, 0.22], "z": [0.55, 0.80]},
+  {"name": "waist/cape", "x": [-0.5, 0.5], "z": [0.30, 0.55]},
+  {"name": "legs/cape hem", "x": [-0.5, 0.5], "z": [0.08, 0.30]},
+  {"name": "feet", "x": [-0.5, 0.5], "z": [0.0, 0.08]},
+  {"name": "other", "x": [-0.5, 0.5], "z": [0.0, 1.0]}
+ ],
+ "selected_tiles": [
+  ["tex_front", "lit front"],
+  ["tex_front34L", "lit 3/4"],
+  ["tex_back34R", "lit back 3/4 (cape)"],
+  ["clay_front34L", "clay 3/4"],
+  ["close_head_34L", "head + beard 3/4"],
+  ["close_cannon_34", "cannon 3/4 (his right)"],
+  ["closeclay_pauldrons_34L", "clay pauldrons + anvil"],
+  ["closeclay_legs_cutKnee", "clay cut at knee: legs vs cape"]
+ ]
+}

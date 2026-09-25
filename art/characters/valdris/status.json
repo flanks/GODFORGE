@@ -258,13 +258,26 @@
    }
   },
   "1_blockout": {
-   "status": "in_progress",
+   "status": "done",
    "stand_in": false,
    "sculpt_reference_only": true,
    "shipped": false,
    "human_signoff_required": false,
+   "selected": "art/characters/valdris/source/valdris_trellis2_s202.glb",
+   "selected_sha256": "98900f1c42f6b202296f85d0f35f9e2c4d593c22cd64c4eb34849e010c960792",
+   "selected_in_git": "Git LFS (re-included by art/characters/valdris/.gitignore); s101/s303 and the ComfyUI previews stay local (manifest.json)",
+   "height_m": 2.3,
+   "input": "art/characters/valdris/references/valdris_concept_front_mirrored.png (the hero front mirrored: cannon on his RIGHT arm, anvil plate kept; decisions[cannon_side_and_anvil_plate])",
    "outputs": [
-    "art/characters/valdris/reports/blockout/input_maskcheck.png"
+    "art/characters/valdris/reports/blockout_report.md",
+    "art/characters/valdris/reports/blockout/blockout_selected.png",
+    "art/characters/valdris/reports/blockout/blockout_compare.png",
+    "art/characters/valdris/reports/blockout/input_maskcheck.png",
+    "art/characters/valdris/reports/blockout/valdris_trellis2_s{101,202,303}_{turnaround,closeups,closeups2,ingame,silhouette}.png",
+    "art/characters/valdris/blockout_views.json",
+    "art/characters/valdris/source/valdris_trellis2_s{101,202,303}.json",
+    "art/characters/valdris/source/valdris_trellis2_s202.glb (Git LFS)",
+    "art/characters/valdris/source/valdris_trellis2_s{101,303}.glb (local only, gitignored; sha256 in manifest.json)"
    ],
    "tools": [
     "tools/comfy/run_trellis.py",
@@ -275,7 +288,7 @@
     "tools/comfy/blockout_sheets.py",
     "tools/comfy/art_manifest.py"
    ],
-   "notes": "SCULPT REFERENCE ONLY. TRELLIS.2 (Pixal3D pruned) on the mirrored hero front; birefnet cut-out verified; seeds 101/202/303 running."
+   "notes": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. TRELLIS.2 (Pixal3D pruned) on the mirrored hero front; birefnet cut-out verified against a colour key over a fitted background (pauldrons, fist, cannon, cape tatters and boots kept); 3 seeds (101/202/303) at the user's character settings (700k faces, 4096 px), 40-44 min each on the shared GPU. s202 picked: the only seed with the anvil plate mounted on the chest (s101 floats it as a separate shell, s303 half-detaches it), by far the cleanest surface (one main shell, largest hole 1.1 cm vs 0.24-0.26 m openings in s101/s303), a solid cape with the tatters at the hem, separated from the legs, and span/height 0.935 (concept 0.937). Cannon on his right arm in all seeds. Known defects (reports/blockout_report.md section 6): both arms reach ~45 degrees forward in all seeds (TRELLIS read the 3/4-drawn bore and fist as facing the viewer; a pose, not a shape problem), soft face (use the concept and s303's head), no seam/muzzle emissive, fused thick cape, baked lighting. The seed pick is an engineering judgement; the user's visual approval comes at stage 2."
   },
   "2_production_mesh": {
    "status": "not_started",

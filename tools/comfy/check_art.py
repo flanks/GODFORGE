@@ -4,7 +4,9 @@
 
 Errors (exit 1):
   * a file tracked by git, or an untracked file under art/ or assets/models/ that git would add,
-    is larger than 20 MB (no Git LFS in this repo; raw output stays local, see art/.gitignore);
+    is larger than 20 MB, unless .gitattributes routes it through Git LFS (filter=lfs: git then
+    stores a small pointer; e.g. a hero's selected raw TRELLIS GLB). Other raw output stays local,
+    see art/.gitignore;
   * art/characters/<key>/status.json breaks the pipeline's status rules (docs/ART_PIPELINE.md):
       - every stage/item status is one of not_started | in_progress | done | stand_in | pending_human | blocked;
       - status stand_in  =>  stand_in: true;  stand_in: true  =>  never final, never plain done;
@@ -41,14 +43,27 @@ def git(*args):
     return [p for p in r.stdout.decode("utf-8").split("\0") if p]
 
 
+def lfs_paths(paths):
+    """The subset of paths that .gitattributes sends through Git LFS (filter=lfs)."""
+    if not paths:
+        return set()
+    r = subprocess.run(["git", "check-attr", "-z", "--stdin", "filter"], cwd=ROOT, capture_output=True,
+                       input="\0".join(paths).encode("utf-8"))
+    f = r.stdout.decode("utf-8").split("\0")
+    return {f[i] for i in range(0, len(f) - 2, 3) if f[i + 2] == "lfs"}
+
+
 def check_sizes():
     tracked = git("ls-files", "-z")
     addable = git("ls-files", "-z", "--others", "--exclude-standard", "--", "art", "assets/models")
-    for rel in tracked + addable:
-        p = os.path.join(ROOT, rel)
-        if os.path.isfile(p) and os.path.getsize(p) > LIMIT:
-            kind = "tracked" if rel in tracked else "untracked and NOT ignored"
-            errors.append("%s is %d bytes (> 20 MB, %s)" % (rel, os.path.getsize(p), kind))
+    big = [rel for rel in tracked + addable
+           if os.path.isfile(os.path.join(ROOT, rel)) and os.path.getsize(os.path.join(ROOT, rel)) > LIMIT]
+    lfs = lfs_paths(big)
+    for rel in big:
+        if rel in lfs:
+            continue            # git stores an LFS pointer, not the bytes
+        kind = "tracked" if rel in tracked else "untracked and NOT ignored"
+        errors.append("%s is %d bytes (> 20 MB, %s, not in Git LFS)" % (rel, os.path.getsize(os.path.join(ROOT, rel)), kind))
     return set(tracked)
 
 
