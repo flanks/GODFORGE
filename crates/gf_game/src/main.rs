@@ -258,7 +258,17 @@ fn print_report(r: &RunReport, gate: Gate) -> bool {
     );
     println!("snapshot       max {} bytes", r.max_snapshot_bytes);
     for room in &r.rooms {
-        println!("  room {:<28} {:>6.1}s {:>5} kills", room.room, room.seconds, room.kills);
+        let stage = room.stage.map_or(String::new(), |s| {
+            format!(
+                " · seals {}/{} · warlord {} · {} objectives{}",
+                s.seals,
+                s.required,
+                if s.warlord { "done" } else { "alive" },
+                s.objectives,
+                if s.forced { " · gate forced (Unworthy)" } else { "" }
+            )
+        });
+        println!("  room {:<28} {:>6.1}s {:>5} kills{stage}", room.room, room.seconds, room.kills);
     }
     for b in &r.bots {
         println!(

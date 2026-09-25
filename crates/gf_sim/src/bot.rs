@@ -983,6 +983,31 @@ pub struct RoomTiming {
     pub room: String,
     pub seconds: f32,
     pub kills: u32,
+    /// Biome maps only: the objective state when the party left the map.
+    pub stage: Option<StageSummary>,
+}
+
+/// How a biome map ended (the phase-2 proof reads it from the bot-run report).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct StageSummary {
+    pub seals: u8,
+    pub required: u8,
+    pub warlord: bool,
+    pub objectives: u8,
+    /// The gate was forced open (Unworthy).
+    pub forced: bool,
+}
+
+impl StageSummary {
+    fn of(ex: &crate::resources::Expedition) -> Option<Self> {
+        ex.active.then_some(Self {
+            seals: ex.seals,
+            required: ex.required,
+            warlord: ex.warlord_done,
+            objectives: ex.objectives,
+            forced: ex.forced,
+        })
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -1085,6 +1110,8 @@ pub fn run_headless(
     let trace = std::env::var_os("GODFORGE_TRACE").is_some();
     let mut rooms: Vec<RoomTiming> = Vec::new();
     let mut room_start = (0u32, 0.0f32, 0u32, String::new());
+    // The current room's objective state as of the last tick (biome maps only).
+    let mut stage: Option<StageSummary> = None;
     // Objective progress on a biome map, and the sim time it last changed.
     let mut progress: (Option<(u32, u8, u8, u8, bool)>, f32) = (None, 0.0);
     let mut stalled = false;
@@ -1126,13 +1153,18 @@ pub fn run_headless(
                         room: room_start.3.clone(),
                         seconds: time - room_start.1,
                         kills: run.kills - room_start.2,
+                        stage: stage.take(),
                     });
                 }
                 let key = world.resource::<crate::resources::RoomLayout>().0.key.clone();
                 room_start = (run.room_serial, time, run.kills, key);
             }
+            stage = StageSummary::of(world.resource::<crate::resources::Expedition>());
             let now = stage_progress(world);
             if now != progress.0 {
+                if trace {
+                    eprintln!("    [{time:>5.1}s] objective progress (room, objectives, seals, gate, warlord) {now:?}");
+                }
                 progress = (now, time);
             } else if now.is_some() && time - progress.1 >= STALL_MINUTES * 60.0 && !run.is_over() {
                 stalled = true;
@@ -1298,6 +1330,7 @@ pub fn run_headless(
             room: room_start.3.clone(),
             seconds: time - room_start.1,
             kills: run.kills - room_start.2,
+            stage,
         });
     }
     let s = &server.stats;
