@@ -476,9 +476,14 @@ fn sync_entities(
     let me = link.slot;
     let ally_alpha = cfg.content.game.vfx.ally_effect_alpha;
     let mut effects = 0;
-    // A room change clears the field: nothing left behind plays a death.
+    // A room change clears the field: nothing left behind plays a death, and the dead go with it.
     let same_room = *last_room == room.generation;
     *last_room = room.generation;
+    if !same_room {
+        for e in index.corpses.drain(..) {
+            commands.entity(e).despawn();
+        }
+    }
     let mut fresh = std::mem::take(&mut index.fresh);
     let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
     for e in &world.entities {
@@ -665,7 +670,9 @@ fn tick_corpses(
         if c.hold.is_infinite() && c.age > CORPSE_MAX {
             c.hold = c.age;
         }
-        let sink = (c.age - c.hold) / CORPSE_SINK;
+        // A monument goes under slowly; a swarm's ash is gone in a blink.
+        let sink_time = if c.swarm { CORPSE_SINK } else { CORPSE_SINK + c.depth * 0.18 };
+        let sink = (c.age - c.hold) / sink_time;
         if sink > 0.0
             && c.swarm
             && let Some(s) = c.shadow.take()
@@ -678,7 +685,7 @@ fn tick_corpses(
             return false;
         }
         if sink > 0.0 {
-            tf.translation.y -= c.depth * dt / CORPSE_SINK;
+            tf.translation.y -= c.depth * dt / sink_time;
         }
         true
     });

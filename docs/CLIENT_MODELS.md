@@ -7,8 +7,8 @@ weapons and enemies on screen. The simulation never sees any of this: a missing 
 | File | What |
 |---|---|
 | `crates/gf_client/src/models.rs` | asset lookup by key, sidecar parsing, loading, one animation graph per asset, toon skins, weapon attach |
-| `crates/gf_client/src/anim.rs` | the `Animator` (base + upper layer) and the hero state machine (`HeroAnim`) |
-| `crates/gf_client/src/scene.rs` | the rigs: spawns the model under the greybox rig, hides the greybox once it is ready |
+| `crates/gf_client/src/anim.rs` | the `Animator` (base + upper layer), the hero state machine (`HeroAnim`) and the enemy one (`EnemyAnim`) |
+| `crates/gf_client/src/scene.rs` | the rigs and proxies: spawns the model under the greybox, hides the greybox once it is ready, corpses |
 | `crates/gf_engine/src/client.rs` | `find_asset_dir` / `asset_plugin`: where the asset server reads from |
 
 ## 1. Where assets load from
@@ -34,7 +34,10 @@ A packaged build ships `godforge.exe` beside `assets/` (`assets/content`, `asset
   without a file (or a failed load) from one still loading. Until then the caller keeps its greybox.
 * `--greybox` (or `GODFORGE_GREYBOX=1`) turns every model off: the QA view of the greybox look.
 * The sidecar gives the clip info the GLB cannot: loop, layer (`full` / `upper`), design speed, events (frame and
-  time), the gauntlet fist / open swap frames, the default weapon, a weapon's variant node names.
+  time), the gauntlet fist / open swap frames, the default weapon, a weapon's variant node names; for enemies the
+  `variant_set`, `move_cycle_m` (one number, or per loop), `events_s` / `clip_events_s`, `bounds_m` and the sockets.
+* `Models::looks(kind, key, server)` answers a key's looks (its `variant_set`, the files that exist; `[key]` for a
+  key with one look) and starts loading all of them.
 
 ## 3. Materials: toon skins
 
@@ -48,7 +51,10 @@ the rim, the ink edge and the brush noise are added). The toon materials are cac
 | `Hero(slot)` | the hero style with a rim in the player's colour, narrower than the greybox's (a sculpted body has far more silhouette), a painted ink edge (a skinned mesh cannot take the greybox's inverted hull) |
 | `Ghost(slot)` | downed (the Soul-Tether wraith): translucent, glowing in the player's colour; the weapon wears it too |
 | `Gear(slot)` | the hero's weapon: a quieter rim in the player's colour |
-| `Foe` | enemies: the warm red rim |
+| `Foe { tint, hot }` | enemies: the warm red rim. `tint` is the engine's body language over the painted material: `Flash` (a swarm hit: white-hot), `SoftFlash` (an elite or boss hit: a warm lift), `Warn` (the wind-up blink, red), `Frozen`, `Stunned`, `Status(bit)`; `hot` is the Slag King's Final Pour (every glow whiter) |
+
+An enemy asset has one material, so a horde of one look wears at most a dozen cached handles and keeps batching
+while it flashes.
 
 ## 4. Heroes
 
@@ -109,10 +115,72 @@ Full-body one-shots hand the body back to locomotion when the hero moves on afte
 roots a cast), so a long clip never slides. Unused for now: `knockdown` / `get_up` (the snapshot carries no
 player stun), `heat_vent` (Brax's Heat Gauge is not replicated).
 
-## 7. QA
+## 7. Enemies
+
+**Spawn.** `scene::sync_enemy_models` preloads the run biome's roster (every look of every enemy key of the
+biome) when the biome changes, so a horde surge never waits on a file. Each enemy proxy (`scene::Visual`) picks
+its look once: `variant_set[hash(NetId) % n]` (clinker ×4, cinderling ×3). The model spawns under the proxy
+at unit scale (the art is authored at game size; `bounds_m` only rescales a model whose footprint is outside
+0.7-5 × the collider's diameter, none today), turned by π (creatures face +Z), with its origin on the ground
+under a hovering greybox (the emberwisp's hover is in its clips). Once its materials and first pose are in, the
+greybox body, ink hull, eyes and accents hide; the elite / boss ring and the contact shadow stay. Hits spark at
+the model's `hit_center`.
+
+**The proxy** eases its facing toward the replicated one (16/s swarm, 9/s elite, 4/s boss) or toward an
+attack's direction (`Visual::face_override`); a model drops the greybox's wind-up throb and bob and keeps a
+third of its hit squash. A horde spawn (`EntityFlags::EMERGING`) rises out of the ground over `emerge_time`.
+
+**Corpses.** A proxy that leaves the snapshot within 1 s of its `GameEvent::Kill` stays as a `scene::Corpse`: its
+model plays `death` (held), then the proxy sinks and despawns (swarm 0.3 s after the clip, elite 1.6 s, boss 4 s;
+a swarm's contact shadow goes with it). A Bomber that leaves while `PRIMED` (the fuse ran out, no kill) plays its
+`attack`, the detonation. A room change takes the corpses with it.
+
+**The state machine** (`EnemyAnim`, on the model; reads the proxy, the flags, this frame's fresh entities and
+`GameEvent`s):
+
+| Sim state | Clip |
+|---|---|
+| rendered ground speed ≥ 0.45 m/s (off below 0.2) | `move@loop` at `speed / move_cycle_m` cycles per second, else `idle@loop` (0.92-1.08×, each enemy starts its loops at its own offset) |
+| Charger `WINDUP` / `CHARGING` | `windup` stretched to the telegraph's wind-up and held; `attack` launches the charge, then `charge@loop` while it lasts |
+| Caster `WINDUP` | `windup`, `channel@loop`, then `attack` timed so its `beam_fire` key lands on the beam's resolve |
+| Bomber `PRIMED` | `windup` (in half the fuse), then `primed@loop`; the corpse plays `attack` |
+| Lobber: its circle telegraph appears (matched by size and range) | `windup` in the first ~45 % of the telegraph, then `attack`: the glob flies for the rest |
+| Support | `cast` every `interval`, synced to its own `SHIELDED` rising |
+| Chaser / Swarmer / Support touching a hero | `attack` (the bite, the shield bash after a quick `windup`), every 0.8-1.5 s |
+| `GameEvent::Hit` | `hit` (swarm at most every 0.45 s, elite 1.1 s, a boss only on a crit every 7 s and only when idle) |
+| `GameEvent::PlatesShattered` (anvil brute) | `plates_break` once the wind-up or charge is over |
+| an enemy whose model is up within 0.35 s of its appearing (a summoned add, a horde spawn, a pack) | `spawn` first, when the model has it (the cinderlings pop from their ember) |
+| `EntityFlags::FROZEN` (the time stop) | the pose holds |
+
+**Bosses** (`Brain::Boss`, the `bosses.ron` script). The phase follows the HP fraction the way the sim computes
+it (`GameEvent::BossPhase` is lossy); entering phase 2 plays `phase2`, phase 3 `phase3` (the Slag King), locked
+until the burst. From phase 2 on every clip resolves to `<clip>_p2` when the model has it. Attacks are read from
+what this frame's snapshot brings, since the sim does not name them:
+
+* a telegraph whose shape and size match one of the script's attacks (`Strike` → `strike_<shape>`,
+  `SlamTrail` → `slam_trail`, `Pools` → `pools`), heroes' gold telegraphs excluded;
+* five or more fresh enemy shots around the boss → `radial` (started at its `release` key);
+* two or more fresh adds around it → `summon` (started at its first `spawn` key).
+
+The clip's impact key is stretched onto the telegraph's wind-up (0.6-1.8×; pools fling at 60 % of it), a cone or
+a line faces its direction, the rest face the nearest hero; a boss squares up to its target between attacks. A
+new attack may cut the previous one after its impact. The Slag King's `crown_spin` joint turns 75°/s in Slagfall,
+150°/s in the Final Pour (twice that during `radial`), after the animation; the Final Pour wears `hot`. The
+anvil brute's plate joints are set after the animation too: intact, cracked in `crack_order` as the estimated
+wear (Hit amounts × 1.5 Kinetic, × 0.5 else) passes `crack_at`, stripped once `PLATED` is gone.
+
+**LOD.** An off-screen swarm enemy (12 % margin) detaches its `AnimationGraphHandle`: Bevy then neither
+advances nor evaluates its skeleton (elites and bosses always animate). `GODFORGE_ENEMY_LOD=0` turns it off to
+measure it.
+
+## 8. QA
 
 ```sh
-godforge --autoplay --bots 3 --phase ea --character brax --anim-log   # the clip-state log: every base change, every upper clip
+godforge --autoplay --bots 3 --phase ea --character brax --anim-log   # the clip-state log: every base change, every upper clip, and every elite, boss, lob and fuse
 godforge --phase ea --character valdris --anim-gallery 0              # the local hero plays every clip, 2.5 s each (one-shots held on their key frame), facing the camera
+godforge --phase ea --enemy-gallery 0                                 # every enemy look of the biome in a row 3 m below the hero, all playing the same clip (the log names each one's sim position)
 godforge --greybox                                                    # no models
+godforge --autoplay --bots 3 --start-at warlord --anim-log            # The Bellows; --room cinder_throne --seed 3 for the Slag King
 ```
+
+`GF_CAM_AT="x,y"` pins the camera (the enemy gallery), `GODFORGE_ENEMY_LOD=0` turns the animation LOD off.

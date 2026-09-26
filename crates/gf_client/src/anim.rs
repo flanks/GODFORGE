@@ -1119,6 +1119,8 @@ struct Plates {
     plate_hp: f32,
     /// `plates_break` plays until then (the plates stay cracked for its fling).
     breaking: f32,
+    /// Shattered, the fling waits for the wind-up or charge to end.
+    pending: bool,
     /// (intact, cracked) joints per plate, found on first use.
     nodes: Option<Vec<(Option<Entity>, Option<Entity>)>>,
 }
@@ -1147,6 +1149,8 @@ pub struct EnemyAnim {
     next_contact: f32,
     next_cast: f32,
     flags: EntityFlags,
+    /// `flags` holds a real frame (edges count from the second frame on).
+    seen: bool,
     dying: bool,
     frozen: bool,
     /// Off screen: the animation graph is detached (no evaluation at all).
@@ -1198,6 +1202,7 @@ impl EnemyAnim {
             next_contact: 0.0,
             next_cast: f32::INFINITY,
             flags: EntityFlags::empty(),
+            seen: false,
             dying: false,
             frozen: false,
             culled: false,
@@ -1209,6 +1214,7 @@ impl EnemyAnim {
                 wear: 0.0,
                 plate_hp: p.plate_hp.max(1.0),
                 breaking: 0.0,
+                pending: false,
                 nodes: None,
             }),
             logged: String::new(),
@@ -1217,6 +1223,12 @@ impl EnemyAnim {
 
     fn boss(&self) -> bool {
         matches!(self.brain, Brain::Boss { .. })
+    }
+
+    /// Logged by `--anim-log`: every elite and boss, and the swarms with a behaviour of their
+    /// own (lobs, fuses); not the horde's bites.
+    fn loud(&self) -> bool {
+        self.tier != EnemyClass::Swarm || matches!(self.brain, Brain::Lobber { .. } | Brain::Bomber { .. })
     }
 
     /// The clip for `base` in the current phase: `<base>_p2` from the second phase on when the
@@ -1313,6 +1325,11 @@ fn boss_attack(ea: &EnemyAnim, cues: &[Cue]) -> Option<(String, Cue)> {
     })
 }
 
+/// The enemy animation LOD (off-screen swarms detach their graph). `GODFORGE_ENEMY_LOD=0` turns it
+/// off, to measure what it saves.
+#[derive(Resource)]
+pub struct EnemyLod(pub bool);
+
 /// Sim angle from `a` to `b`.
 fn angle_to(a: Vec2, b: Vec2) -> f32 {
     let d = b - a;
@@ -1331,6 +1348,7 @@ fn drive_enemies(
     link: Res<Link>,
     index: Res<SceneIndex>,
     log: Res<AnimLog>,
+    lod: Res<EnemyLod>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     mut enemies: Query<(&mut EnemyAnim, &ModelParts)>,
     mut visuals: Query<&mut Visual>,
@@ -1491,7 +1509,7 @@ fn drive_enemies(
                 ea.act = None;
                 match ea.resolve(an, corpse.clip) {
                     Some(clip) => {
-                        if log.0 && ea.tier != EnemyClass::Swarm {
+                        if log.0 && ea.loud() {
                             info!("anim E{} {}: {} -> {clip} (corpse)", ea.id.0, ea.name, an.base_name());
                             ea.logged = clip.clone();
                         }
@@ -1512,7 +1530,7 @@ fn drive_enemies(
 
         // ── LOD: an off-screen swarm stops evaluating its skeleton ──
         let swarm = ea.tier == EnemyClass::Swarm;
-        attach(ea, !swarm || on_screen(w3(v.shown, 0.5), 0.12));
+        attach(ea, !lod.0 || !swarm || on_screen(w3(v.shown, 0.5), 0.12));
 
         // ── ground speed (from the rendered motion) ──
         let raw = ea.last_pos.map_or(0.0, |l| l.distance(v.shown) / dt);
@@ -1530,7 +1548,9 @@ fn drive_enemies(
                 ap.resume_all();
             }
         }
-        let (prev, flags) = (ea.flags, v.flags);
+        // The first frame only learns the flags (no edges from an empty start).
+        let (prev, flags) = (if ea.seen { ea.flags } else { v.flags }, v.flags);
+        ea.seen = true;
         ea.flags = flags;
         if frozen {
             continue;
@@ -1601,8 +1621,21 @@ fn drive_enemies(
             ea.crown = (ea.crown + rate * boost * dt).rem_euclid(TAU);
         }
 
-        // ── plates (the anvil brute): wear cracks them in order, the shatter flings them ──
-        let shatter = ea.plates.is_some() && shattered.contains(&v.id);
+        // ── plates (the anvil brute): wear cracks them in order, the shatter flings them (after
+        // a wind-up or a charge: the charge's read comes first) ──
+        let busy = flags.intersects(EntityFlags::WINDUP | EntityFlags::CHARGING);
+        let mut shatter = false;
+        if let Some(pl) = &mut ea.plates {
+            if shattered.contains(&v.id) {
+                pl.pending = true;
+                pl.state = [1; 5];
+                pl.breaking = f32::INFINITY;
+            }
+            if pl.pending && !busy && ea.act.as_ref().is_none_or(|(a, s)| now - s >= a.locked) {
+                pl.pending = false;
+                shatter = true;
+            }
+        }
         if let Some(pl) = &mut ea.plates {
             if let Some(&(amount, element, _)) = hits.get(&v.id)
                 && flags.contains(EntityFlags::PLATED)
@@ -1746,7 +1779,8 @@ fn drive_enemies(
                     ea.next_cast = now + interval * (0.3 + ea.seed);
                 }
                 // Its own shield rising marks the pulse; between those it keeps the sim's rhythm.
-                let pulse = rose(EntityFlags::SHIELDED) || now >= ea.next_cast;
+                let pulse =
+                    now >= ea.next_cast || (rose(EntityFlags::SHIELDED) && now >= ea.next_cast - interval * 0.5);
                 if pulse {
                     ea.next_cast = now + interval;
                     if ea.free(now)
@@ -1878,7 +1912,7 @@ fn drive_enemies(
             let seek = clip_len(an, &clip) * ea.seed;
             an.set_base_at(ap, &clip, rate, fade, false, seek);
         }
-        if log.0 && ea.tier != EnemyClass::Swarm && ea.logged != an.base_name() {
+        if log.0 && ea.loud() && ea.logged != an.base_name() {
             info!(
                 "anim E{} {}: {} -> {} (speed {:.1} m/s, phase {})",
                 ea.id.0,
@@ -2051,6 +2085,7 @@ pub fn build(app: &mut App) {
     let heroes = flag("--anim-gallery", "GODFORGE_ANIM_GALLERY");
     let enemies = flag("--enemy-gallery", "GODFORGE_ENEMY_GALLERY");
     app.insert_resource(AnimLog(flag("--anim-log", "GODFORGE_ANIM_LOG")))
+        .insert_resource(EnemyLod(!std::env::var("GODFORGE_ENEMY_LOD").is_ok_and(|v| v == "0")))
         .insert_resource(AnimGallery(heroes.then(|| gallery_start("--anim-gallery", "GODFORGE_ANIM_GALLERY"))))
         .insert_resource(EnemyGallery {
             start: enemies.then(|| gallery_start("--enemy-gallery", "GODFORGE_ENEMY_GALLERY")),
