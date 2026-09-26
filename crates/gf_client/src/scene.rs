@@ -7,9 +7,11 @@
 //!   everything else eases toward its latest authoritative position.
 //! * The local player renders at its predicted position (see `net::Prediction`).
 
+use crate::anim::HeroAnim;
 use crate::camera::{KeyLight, w3};
 use crate::input::InputState;
 use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial, XRayMaterial, xray};
+use crate::models::{self, HeroGear, ModelKind, ModelParts, Models, Skin};
 use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{
     Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, poi_kind_color, rarity_color, yaw,
@@ -30,6 +32,9 @@ use std::collections::HashMap;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_4};
 
 const PROJECTILE_HEIGHT: f32 = 0.9;
+/// How far (m) a glTF hero's x-ray proxies slide toward the lens: past a fist or a cannon thrust at
+/// the camera, yet close enough that a boss or a pillar right in front still hides them.
+const XRAY_TOWARD_LENS: f32 = 1.25;
 /// Hit flash length and the shortest time between two flashes of one body.
 const FLASH_TIME: f32 = 0.07;
 const FLASH_COOLDOWN: f32 = 0.2;
@@ -146,6 +151,26 @@ pub struct PlayerRig {
     body_mat: Handle<ToonMaterial>,
     ghost_mat: Handle<ToonMaterial>,
     downed: bool,
+    /// Greybox body pieces (capsule, head, ink hulls, belt), hidden once the glTF hero shows.
+    greybox: [Entity; 5],
+    /// The greybox gun on the aim pivot, kept while the equipped chassis has no model.
+    gun: [Entity; 2],
+    /// The x-ray silhouette proxies (capsule, head).
+    xray: [Entity; 2],
+    /// The glTF hero (`models::spawn_model`), once its asset is in.
+    model: Option<Entity>,
+    model_shown: bool,
+    /// This hero has no model (or `--greybox`): the greybox stays.
+    no_model: bool,
+}
+
+/// The model store and the glTF hero parts `sync_players` drives.
+#[derive(SystemParam)]
+pub struct HeroModels<'w, 's> {
+    server: Res<'w, AssetServer>,
+    models: ResMut<'w, Models>,
+    gears: Query<'w, 's, &'static mut HeroGear>,
+    ready: Query<'w, 's, (), With<ModelParts>>,
 }
 
 #[derive(Component)]
@@ -1508,7 +1533,7 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XR
     let (Some(body_mat), Some(ghost_mat)) = (body_mat.toon(), ghost_mat.toon()) else {
         unreachable!("hero and ghost looks are toon materials")
     };
-    kit.child(root, &sphere, head, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62)));
+    let head = kit.child(root, &sphere, head, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62)));
     let ink = kit.mat(hex(INK), Look::Ink);
     let o1 = kit.child(
         root,
@@ -1522,22 +1547,27 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XR
     kit.commands.entity(o2).insert(NotShadowCaster);
     // The x-ray silhouette: the hero in their colour wherever a foe or a monument hides them
     // (raised a hair so the floor never counts as hiding the feet).
-    for (mesh, tf) in [
+    let xray = [
         (&capsule, Transform::from_xyz(0.0, 0.93, 0.0).with_scale(Vec3::new(r * 2.0 + 0.04, 0.84, r * 2.0 + 0.04))),
         (&sphere, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62 + 0.02))),
-    ] {
-        kit.commands.spawn((
-            Mesh3d(mesh.clone()),
-            MeshMaterial3d(xray_mat.clone()),
-            tf,
-            NotShadowCaster,
-            ChildOf(root),
-        ));
-    }
-    kit.child(root, &torus, gold, Transform::from_xyz(0.0, 0.95, 0.0).with_scale(Vec3::new(r * 1.1, 1.6, r * 1.1)));
+    ]
+    .map(|(mesh, tf)| {
+        kit.commands
+            .spawn((Mesh3d(mesh.clone()), MeshMaterial3d(xray_mat.clone()), tf, NotShadowCaster, ChildOf(root)))
+            .id()
+    });
+    let belt =
+        kit.child(root, &torus, gold, Transform::from_xyz(0.0, 0.95, 0.0).with_scale(Vec3::new(r * 1.1, 1.6, r * 1.1)));
     let pivot = kit.commands.spawn((Transform::from_xyz(0.0, 1.05, 0.0), Visibility::default(), ChildOf(root))).id();
-    kit.child(pivot, &cube, brass, Transform::from_xyz(r * 0.75, 0.0, -0.55).with_scale(Vec3::new(0.15, 0.15, 0.95)));
-    kit.child(pivot, &sphere, muzzle, Transform::from_xyz(r * 0.75, 0.0, -1.05).with_scale(Vec3::splat(0.09)));
+    let gun = [
+        kit.child(
+            pivot,
+            &cube,
+            brass,
+            Transform::from_xyz(r * 0.75, 0.0, -0.55).with_scale(Vec3::new(0.15, 0.15, 0.95)),
+        ),
+        kit.child(pivot, &sphere, muzzle, Transform::from_xyz(r * 0.75, 0.0, -1.05).with_scale(Vec3::splat(0.09))),
+    ];
     let shield = kit.hidden_child(
         root,
         &sphere,
@@ -1569,8 +1599,78 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XR
         body_mat,
         ghost_mat,
         downed: false,
+        greybox: [body, head, o1, o2, belt],
+        gun,
+        xray,
+        model: None,
+        model_shown: false,
+        no_model: false,
     });
     root
+}
+
+/// Swap the greybox for the authored hero once its model is in (docs/art/GF_HERO_SKELETON.md):
+/// request it, spawn it under the rig, hide the greybox body when it is ready, and tell its gear
+/// which chassis to hold. A hero without a model (or `--greybox`) keeps the greybox.
+fn sync_hero_model(
+    commands: &mut Commands,
+    db: &ContentDb,
+    root: Entity,
+    rig: &mut PlayerRig,
+    p: &PlayerView,
+    hm: &mut HeroModels,
+    parts: &mut Query<(&mut Transform, &mut Visibility), Without<PlayerRig>>,
+) {
+    let show = |parts: &mut Query<(&mut Transform, &mut Visibility), Without<PlayerRig>>, e: Entity, on: bool| {
+        if let Ok((_, mut v)) = parts.get_mut(e) {
+            let want = if on { Visibility::Inherited } else { Visibility::Hidden };
+            if *v != want {
+                *v = want;
+            }
+        }
+    };
+    if rig.model.is_none() && !rig.no_model {
+        match db.characters.try_get(p.character).map(|c| c.key.clone()) {
+            Some(key) => match hm.models.get(ModelKind::Character, &key, &hm.server) {
+                Some(model) => {
+                    let e = models::spawn_model(commands, root, &model, Skin::Hero(p.slot), Transform::default());
+                    commands.entity(e).insert((HeroAnim::new(p.slot, &key), HeroGear { slot: p.slot, ..default() }));
+                    rig.model = Some(e);
+                }
+                None => rig.no_model = hm.models.missing(ModelKind::Character, &key),
+            },
+            None => rig.no_model = true,
+        }
+    }
+    let Some(model) = rig.model else { return };
+    if !rig.model_shown && hm.ready.contains(model) {
+        rig.model_shown = true;
+        for e in rig.greybox {
+            show(parts, e, false);
+        }
+        // The x-ray proxies sit inside the hero, so the hero's own mesh would count as hiding
+        // them. Slid toward the lens (the camera is orthographic: same place and size on screen)
+        // they are only hidden by what stands well in front of the hero: a monument, a boss.
+        let cam = &db.game.camera;
+        let (pitch, yaw) = (cam.pitch_deg.to_radians(), cam.yaw_deg.to_radians());
+        let toward = Vec3::new(yaw.sin() * pitch.cos(), pitch.sin(), yaw.cos() * pitch.cos());
+        for e in rig.xray {
+            if let Ok((mut tf, _)) = parts.get_mut(e) {
+                tf.translation += toward * XRAY_TOWARD_LENS;
+            }
+        }
+    }
+    let mut greybox_gun = !rig.model_shown;
+    if let Ok(mut gear) = hm.gears.get_mut(model) {
+        let want = db.chassis.try_get(p.weapon.chassis.0).map(|c| c.key.clone());
+        if gear.want != want {
+            gear.want = want;
+        }
+        greybox_gun |= gear.greybox_gun;
+    }
+    for e in rig.gun {
+        show(parts, e, greybox_gun);
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1585,6 +1685,7 @@ fn sync_players(
     mut stores: Stores,
     mut index: ResMut<SceneIndex>,
     xrays: Res<XRayMats>,
+    mut hm: HeroModels,
     mut rigs: Query<(&mut PlayerRig, &mut Transform, &mut Visibility)>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<PlayerRig>>,
     mut bodies: Query<&mut MeshMaterial3d<ToonMaterial>>,
@@ -1627,6 +1728,7 @@ fn sync_players(
         tf.scale = Vec3::splat(p.scale.max(0.2));
         let reforging = matches!(p.life, LifeState::Reforging { .. });
         *vis = if reforging { Visibility::Hidden } else { Visibility::Inherited };
+        sync_hero_model(&mut commands, &cfg.content, ent, &mut rig, p, &mut hm, &mut parts);
         // Aim: the local MANUAL player sees their own stick/mouse with zero latency.
         let aim = if is_me && input.aim_mode == AimMode::Manual { input.aim_dir } else { u16_to_dir(p.aim) };
         let angle = aim.y.atan2(aim.x);
