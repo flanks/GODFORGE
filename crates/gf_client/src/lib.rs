@@ -7,6 +7,7 @@
 
 pub mod camera;
 pub mod envkit;
+pub mod fx;
 pub mod hud;
 pub mod input;
 pub mod materials;
@@ -105,6 +106,7 @@ impl Plugin for ClientPlugin {
         scene::build(app);
         world::build_plugin(app);
         vfx::build(app);
+        fx::build(app);
         hud::build(app);
         offscreen::build(app);
         ui::build(app);

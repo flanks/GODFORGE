@@ -1,9 +1,14 @@
-//! Transient effects driven by cosmetic events: sparks, death bursts, explosion rings, chain
-//! arcs, synergy detonations, pings and damage numbers. Everything is budgeted by the readability
-//! tiers in `game.ron` (§5: every effect must stay readable at 4-player peak chaos) — as the
-//! screen fills, particle counts drop and finally only silhouettes remain.
+//! Transient effects driven by cosmetic events: hit marks, kill bursts and motes, layered
+//! explosions, chain bolts, synergy detonations, team moments, pings and damage numbers.
+//!
+//! The effects themselves are drawn by the batched VFX engine in [`crate::fx`] (painted flipbooks,
+//! ribbons, smears, decals, light flashes); this module routes `GameEvent`s to its recipes, picks
+//! the readability tier from the live load (`game.ron vfx`, VFX_STYLE §20: every effect must stay
+//! readable at 4-player peak chaos) and owns the damage numbers.
 
 use crate::camera::{MainCamera, w3};
+use crate::fx::api::{self, F, burst_seq, faction_ramp};
+use crate::fx::{self, Fx, FxStore, Glyph, Hit, HitKind, Owner, Play, Ramp};
 use crate::input::Settings;
 use crate::net::Link;
 use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix};
@@ -14,10 +19,10 @@ use gf_core::damage::DamageType;
 use gf_core::ids::NetId;
 use gf_engine::client::{font_px, world_to_screen};
 use gf_engine::prelude::*;
-use gf_net::GameEvent;
 use gf_net::quant::QPos;
+use gf_net::{EntityKind, GameEvent};
 use std::collections::HashMap;
-use std::f32::consts::{FRAC_PI_2, TAU};
+use std::f32::consts::FRAC_PI_2;
 
 /// A short-lived additive mote.
 #[derive(Component)]
@@ -79,59 +84,59 @@ pub fn build(app: &mut App) {
     );
 }
 
-fn choose_tier(cfg: Res<ClientConfig>, index: Res<SceneIndex>, mut state: ResMut<VfxState>) {
+/// The readability tier from the live effect load (VFX_STYLE §20.1): replicated projectiles,
+/// hazards and telegraphs, legacy particle entities, and the batched fx store (ribbons and arcs
+/// count as effects, particles at a quarter). It steps up at once and back down only after the
+/// load has stayed 15 % under the threshold for half a second, so it never flickers.
+fn choose_tier(
+    time: Res<Time>,
+    cfg: Res<ClientConfig>,
+    index: Res<SceneIndex>,
+    mut state: ResMut<VfxState>,
+    mut store: ResMut<FxStore>,
+    mut calm: Local<f32>,
+) {
     let b = &cfg.content.game.vfx;
-    let load = index.effect_count + state.particles;
-    state.tier = if load >= b.silhouette_at {
+    let load = index.effect_count + state.particles + store.load();
+    let wanted = if load >= b.silhouette_at {
         VfxTier::Silhouette
     } else if load >= b.reduced_at {
         VfxTier::Reduced
     } else {
         VfxTier::Full
     };
+    let below = |at: u32| (load as f32) < at as f32 * 0.85;
+    let can_drop = match state.tier {
+        VfxTier::Silhouette => below(b.silhouette_at),
+        VfxTier::Reduced => below(b.reduced_at),
+        VfxTier::Full => true,
+    };
+    if (wanted as u8) >= (state.tier as u8) {
+        state.tier = wanted;
+        *calm = 0.0;
+    } else if can_drop {
+        *calm += time.delta_secs();
+        if *calm >= 0.5 {
+            state.tier = wanted;
+            *calm = 0.0;
+        }
+    } else {
+        *calm = 0.0;
+    }
+    store.tier = state.tier;
+    store.caps = b.particles;
+    store.ally_alpha = b.ally_effect_alpha;
 }
 
-struct Fx<'a, 'w, 's> {
+/// The last legacy mesh effects: the ping marker (a player-colour ownership mark: the fx ramps
+/// carry no player colours) and its ring.
+struct Legacy<'a, 'w, 's> {
     commands: &'a mut Commands<'w, 's>,
     pal: &'a mut Palette,
     mats: &'a mut Assets<StandardMaterial>,
-    budget: u32,
-    alive: u32,
-    rng: u32,
 }
 
-impl Fx<'_, '_, '_> {
-    fn rand(&mut self) -> f32 {
-        self.rng ^= self.rng << 13;
-        self.rng ^= self.rng >> 17;
-        self.rng ^= self.rng << 5;
-        (self.rng & 0xffff) as f32 / 65535.0
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    fn burst(&mut self, at: Vec3, color: Color, count: u32, speed: f32, size: f32, life: f32, gravity: f32) {
-        let mat = self.pal.mat(self.mats, hdr(color, 2.5), Look::Additive);
-        let mesh = self.pal.low_sphere.clone();
-        for _ in 0..count {
-            if self.alive >= self.budget {
-                return;
-            }
-            self.alive += 1;
-            let a = self.rand() * TAU;
-            let up = 0.3 + self.rand() * 0.9;
-            let s = speed * (0.4 + self.rand() * 0.8);
-            let vel = Vec3::new(a.cos() * s, up * s * 0.8, a.sin() * s);
-            let sz = size * (0.6 + self.rand() * 0.8);
-            let l = life * (0.6 + self.rand() * 0.6);
-            self.commands.spawn((
-                Particle { vel, life: l, max: l, size: Vec3::splat(sz), gravity, drag: 2.5 },
-                Mesh3d(mesh.clone()),
-                MeshMaterial3d(mat.clone()),
-                Transform::from_translation(at).with_scale(Vec3::splat(sz)),
-            ));
-        }
-    }
-
+impl Legacy<'_, '_, '_> {
     fn shockwave(&mut self, at: Vec2, color: Color, from: f32, to: f32, life: f32) {
         let mat = self.pal.mat(self.mats, hdr(color, 2.5).with_alpha(0.8), Look::Decal);
         let ring = self.pal.ring.clone();
@@ -141,56 +146,6 @@ impl Fx<'_, '_, '_> {
             MeshMaterial3d(mat),
             Transform { translation: w3(at, 0.06), rotation: flat(FRAC_PI_2), scale: Vec3::splat(from.max(0.01)) },
         ));
-    }
-
-    fn flash(&mut self, at: Vec3, color: Color, radius: f32, life: f32) {
-        let mat = self.pal.mat(self.mats, hdr(color, 2.0), Look::Additive);
-        let mesh = self.pal.sphere.clone();
-        let scale = Vec3::splat(radius);
-        self.commands.spawn((
-            Fade { life, max: life, base_scale: scale, shrink_xz: false },
-            Mesh3d(mesh),
-            MeshMaterial3d(mat),
-            Transform::from_translation(at).with_scale(scale),
-        ));
-    }
-
-    fn pillar(&mut self, at: Vec2, color: Color, height: f32, life: f32) {
-        let mat = self.pal.mat(self.mats, hdr(color, 2.2).with_alpha(0.5), Look::Decal);
-        let mesh = self.pal.cylinder.clone();
-        let scale = Vec3::new(0.8, height, 0.8);
-        self.commands.spawn((
-            Fade { life, max: life, base_scale: scale, shrink_xz: true },
-            Mesh3d(mesh),
-            MeshMaterial3d(mat),
-            Transform::from_translation(w3(at, height * 0.5)).with_scale(scale),
-        ));
-    }
-
-    fn arc(&mut self, from: Vec2, to: Vec2, color: Color) {
-        let mat = self.pal.mat(self.mats, hdr(color, 3.5), Look::Additive);
-        let mesh = self.pal.cube.clone();
-        let segments = 4;
-        let mut prev = w3(from, 0.9);
-        let perp = (to - from).perp().normalize_or_zero();
-        for i in 1..=segments {
-            let t = i as f32 / segments as f32;
-            let jitter = if i == segments { 0.0 } else { (self.rand() - 0.5) * 0.9 };
-            let p = w3(from.lerp(to, t) + perp * jitter, 0.9 + (self.rand() - 0.5) * 0.3);
-            let mid = (prev + p) * 0.5;
-            let len = prev.distance(p);
-            if len > 1e-3 {
-                let rot = Quat::from_rotation_arc(Vec3::Z, (p - prev) / len);
-                let scale = Vec3::new(0.06, 0.06, len);
-                self.commands.spawn((
-                    Fade { life: 0.14, max: 0.14, base_scale: scale, shrink_xz: true },
-                    Mesh3d(mesh.clone()),
-                    MeshMaterial3d(mat.clone()),
-                    Transform { translation: mid, rotation: rot, scale },
-                ));
-            }
-            prev = p;
-        }
     }
 
     fn ping(&mut self, at: Vec2, color: Color) {
@@ -216,6 +171,21 @@ fn pos3(q: QPos, h: f32) -> Vec3 {
     w3(q.to_vec2(), h)
 }
 
+/// The ramp of a god's boon pillar and sigil (VFX_STYLE §19).
+fn god_look(key: &str) -> (Ramp, Glyph) {
+    match key {
+        "pyra" => (Ramp::Flame, Glyph::GodPyra),
+        "zephyros" => (Ramp::Storm, Glyph::GodZephyros),
+        "nyctia" => (Ramp::Void, Glyph::GodNyctia),
+        "aeon" => (Ramp::Time, Glyph::GodAeon),
+        "gaiaa" => (Ramp::Kinetic, Glyph::GodGaiaa),
+        "morwenn" => (Ramp::Plague, Glyph::GodMorwenn),
+        "seraphel" => (Ramp::Radiant, Glyph::GodSeraphel),
+        "umbra_rex" => (Ramp::Void, Glyph::GodUmbraRex),
+        _ => (Ramp::ZoneGold, Glyph::SunWheel),
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn spawn_from_events(
     mut commands: Commands,
@@ -229,35 +199,44 @@ fn spawn_from_events(
     mut mats: ResMut<Assets<StandardMaterial>>,
     mut state: ResMut<VfxState>,
     mut numbers: Query<&mut DamageNumber>,
+    mut fx: Fx,
+    mut last_star: Local<HashMap<NetId, f32>>,
 ) {
     if link.fresh_events.is_empty() {
         return;
     }
     let Some(world) = link.latest.clone() else { return };
-    let b = &cfg.content.game.vfx;
-    let tier = state.tier;
-    let budget = b.particles[tier as usize];
     let me = link.slot;
-    let scale_count = |n: u32| match tier {
-        VfxTier::Full => n,
-        VfxTier::Reduced => n.div_ceil(2),
-        VfxTier::Silhouette => n / 4,
-    };
-    let seed = (time.elapsed_secs() * 1000.0) as u32 | 1;
-    let mut fx =
-        Fx { commands: &mut commands, pal: &mut pal, mats: &mut mats, budget, alive: state.particles, rng: seed };
-    let visual_pos =
-        |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok()).map(|v| (v.shown, v.radius, v.color));
+    let now = time.elapsed_secs();
+    let mut legacy = Legacy { commands: &mut commands, pal: &mut pal, mats: &mut mats };
+    let visual_of = |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok().map(|v| (e, v)));
+    let visual_pos = |id: NetId| visual_of(id).map(|(_, v)| (v.shown, v.radius, v.color));
     let player_pos = |slot: u8| world.players.iter().find(|p| p.slot == slot).map(|p| p.mover.pos);
+    let player_entity = |slot: u8| index.players.get(slot as usize).copied().flatten();
     let mut new_numbers: Vec<(NetId, Vec3, u32, Color, f32)> = Vec::new();
+    if last_star.len() > 512 {
+        last_star.retain(|_, t| now - *t < 0.5);
+    }
     for ev in &link.fresh_events {
         match *ev {
             GameEvent::Hit { target, amount, crit, precision, element, source } => {
                 let Some((p, r, _)) = visual_pos(target) else { continue };
                 let mine = me.is_some() && Some(source % 4) == me && source < 12;
-                if mine || tier == VfxTier::Full {
-                    let n = scale_count(if crit { 4 } else { 2 });
-                    fx.burst(w3(p, 0.8), element_color(element), n, 4.0, 0.06, 0.25, 6.0);
+                let owner = Owner::of_source(source, me);
+                let ramp = if owner == Owner::Enemy { Ramp::EnemyShot } else { Ramp::of(element) };
+                // Several hits on one target inside 0.08 s share one star (VFX_STYLE §10.1).
+                let recent = last_star.get(&target).is_some_and(|t| now - *t < 0.08);
+                if !recent || crit || precision {
+                    last_star.insert(target, now);
+                    let from = if source < 12 { player_pos(source % 4) } else { None };
+                    let dir = from.map_or(Vec3::ZERO, |f| (w3(p, 0.0) - w3(f, 0.0)).normalize_or_zero());
+                    let kind = match (owner, crit, precision) {
+                        (Owner::Mine, _, true) => HitKind::Precision,
+                        (Owner::Mine, true, _) => HitKind::Crit,
+                        _ => HitKind::Plain,
+                    };
+                    let size = if crit { 0.5 } else { 0.32 + r * 0.12 };
+                    fx.impact(Hit::new(w3(p, 0.7 + r * 0.5), ramp, size, owner).kind(kind).dir(dir).body(r));
                 }
                 if settings.damage_numbers && mine && amount > 0 {
                     let color = if precision {
@@ -273,127 +252,168 @@ fn spawn_from_events(
                     new_numbers.push((target, w3(p, 1.4 + r), amount as u32, color, px));
                 }
             }
-            GameEvent::Kill { pos, elite, .. } => {
-                let c = if elite { hex("#FFC940") } else { hex("#FF9A3C") };
-                fx.burst(
-                    pos3(pos, 0.6),
-                    c,
-                    scale_count(if elite { 22 } else { 8 }),
-                    if elite { 7.0 } else { 5.0 },
-                    0.09,
-                    0.5,
-                    9.0,
-                );
+            GameEvent::Kill { target, pos, elite, source } => {
+                let owner = Owner::of_source(source, me);
+                let seen = visual_of(target);
+                let r = seen.map_or(0.5, |(_, v)| v.radius);
+                let ramp = seen
+                    .and_then(|(_, v)| match v.kind {
+                        EntityKind::Enemy { def } => cfg.content.enemies.try_get(def).map(|d| faction_ramp(&d.key)),
+                        _ => None,
+                    })
+                    .unwrap_or(Ramp::Unmade);
+                let scale = if elite { 2.0 } else { 1.0 };
+                fx.death(ramp, pos3(pos, 0.0), r * scale, owner);
                 if elite {
-                    fx.shockwave(pos.to_vec2(), c, 0.5, 3.5, 0.45);
+                    // The second beat, 6 frames later.
+                    fx.sprite(burst_seq(ramp), pos3(pos, 0.9)).radius(r * 1.6).delay(6.0 * F).owner(owner).emit();
+                }
+                // Kill motes fly to the killer (VFX_STYLE §12.2).
+                if source < 12
+                    && let Some(killer) = player_entity(source % 4)
+                {
+                    let n = match (owner, elite) {
+                        (_, true) => 6,
+                        (Owner::Mine, false) => 3,
+                        _ => 1,
+                    };
+                    fx.motes(pos3(pos, 0.6), killer, n, Ramp::Radiant, owner);
                 }
             }
             GameEvent::Explosion { pos, radius_q, element } => {
-                let r = radius_q as f32 / 32.0;
-                let c = element_color(element);
-                fx.shockwave(pos.to_vec2(), c, r * 0.3, r, 0.3);
-                if tier != VfxTier::Silhouette {
-                    fx.flash(pos3(pos, 0.5), c, r * 0.55, 0.16);
-                }
-                fx.burst(pos3(pos, 0.5), c, scale_count(10), 7.0, 0.08, 0.45, 8.0);
+                // No source rides on the event: explosions read as your own.
+                fx.burst(Ramp::of(element), pos3(pos, 0.0), radius_q as f32 / 32.0, Owner::Mine);
             }
-            GameEvent::Arc { from, to, element } => fx.arc(from.to_vec2(), to.to_vec2(), element_color(element)),
-            GameEvent::Synergy { synergy, pos, .. } => {
-                let (a, b2) = cfg
+            GameEvent::Arc { from, to, element } => {
+                let ramp = Ramp::of(element);
+                let (a, b) = (pos3(from, 1.0), pos3(to, 1.0));
+                fx.bolt(a, b, ramp, 0.55, 8.0 * F, Owner::Mine);
+                fx.sprite(api::hit_star(ramp), b).radius(0.4).ramp(ramp).play(Play::Life).life(6.0 * F).emit();
+                fx.light(b, ramp.light(), 40_000.0, 4.0, 0.12, Owner::Mine);
+            }
+            GameEvent::Synergy { synergy, pos, a, b } => {
+                let (ea, eb) = cfg
                     .content
                     .synergies
                     .try_get(synergy)
                     .map_or((DamageType::Radiant, DamageType::Flame), |s| (s.a, s.b));
-                fx.shockwave(pos.to_vec2(), element_color(a), 0.5, 5.0, 0.55);
-                fx.shockwave(pos.to_vec2(), element_color(b2), 0.2, 3.6, 0.45);
-                fx.flash(pos3(pos, 0.8), mix(element_color(a), element_color(b2), 0.5), 1.4, 0.22);
-                fx.burst(pos3(pos, 0.8), element_color(b2), scale_count(18), 9.0, 0.1, 0.6, 6.0);
+                let owner = if Some(a) == me || Some(b) == me { Owner::Mine } else { Owner::Ally };
+                let at = pos3(pos, 0.0);
+                // The trigger beat: both elements' rings wind in and snap into a white frame.
+                fx.ring(at, 4.2, 0.6, 10.0 * F, fx::strip::ACCENT_RING, Ramp::of(ea), owner);
+                fx.ring(at, 3.6, 0.4, 8.0 * F, fx::strip::ACCENT_RING, Ramp::of(eb), owner);
+                fx.burst(Ramp::of(eb), at, 3.0, owner);
+                fx.sprite(burst_seq(Ramp::of(ea)), at + Vec3::Y * 0.3).radius(2.4).delay(4.0 * F).owner(owner).emit();
+                fx.ring(at, 0.5, 3.2, 20.0 * F, fx::strip::ACCENT_RING, Ramp::ZoneGold, owner);
             }
             GameEvent::Ability { slot, pos, .. } => {
-                let c = fx.pal.player(slot);
-                fx.shockwave(pos.to_vec2(), c, 0.4, 2.8, 0.35);
+                let owner = Owner::of_slot(slot, me);
+                fx.ring(pos3(pos, 0.0), 0.4, 2.8, 20.0 * F, fx::strip::SHOCK_FRONT, Ramp::ZoneGold, owner);
+                fx.smoke(pos3(pos, 0.2), 4, 0.6, Ramp::Dust, owner);
             }
-            GameEvent::Overdrive { .. } => {
+            GameEvent::Overdrive { slot } => {
                 for p in &world.players {
-                    fx.shockwave(p.mover.pos, hex("#FFC940"), 0.5, 9.0, 0.8);
-                    fx.pillar(p.mover.pos, hex("#FFC940"), 7.0, 0.7);
+                    let owner = Owner::of_slot(p.slot, me);
+                    let at = w3(p.mover.pos, 0.0);
+                    fx.pillar(at, 7.0, 1.1, Ramp::ZoneGold, 0.9, Owner::World);
+                    if p.slot == slot {
+                        fx.ring(at, 0.5, 12.0, 0.8, fx::strip::SHOCK_FRONT, Ramp::ZoneGold, owner);
+                        fx.dust_wall(at, 0.5, 9.0, 0.5, 0.7, Ramp::ZoneGold, owner);
+                    }
                 }
             }
             GameEvent::Downed { slot } => {
                 if let Some(p) = player_pos(slot) {
-                    fx.burst(w3(p, 1.0), Color::srgb(0.6, 0.6, 0.7), 14, 4.0, 0.1, 0.8, 2.0);
-                    fx.shockwave(p, fx.pal.player(slot), 0.3, 2.5, 0.6);
+                    let owner = Owner::of_slot(slot, me);
+                    fx.smoke(w3(p, 0.5), 6, 0.8, Ramp::Mono, owner);
+                    fx.ring(w3(p, 0.0), 0.3, 2.5, 0.6, fx::strip::SHOCK_FRONT, Ramp::Dust, owner);
                 }
             }
             GameEvent::Revived { slot, .. } => {
                 if let Some(p) = player_pos(slot) {
-                    fx.pillar(p, hex("#FFE9A8"), 8.0, 0.9);
-                    fx.burst(w3(p, 1.0), hex("#FFC940"), 20, 6.0, 0.1, 0.7, 4.0);
+                    let owner = Owner::of_slot(slot, me);
+                    fx.pillar(w3(p, 0.0), 8.0, 1.0, Ramp::Heal, 0.9, Owner::World);
+                    fx.burst(Ramp::Radiant, w3(p, 0.0), 1.4, owner);
+                    fx.ring(w3(p, 0.0), 0.4, 3.0, 0.5, fx::strip::HEX_BAND, Ramp::Heal, owner);
                 }
             }
             GameEvent::ArmorBreak { slot } => {
                 if let Some(p) = player_pos(slot) {
-                    fx.burst(w3(p, 1.1), Color::srgb(0.75, 0.75, 0.8), 16, 6.0, 0.1, 0.5, 12.0);
+                    let owner = Owner::of_slot(slot, me);
+                    fx.shards(w3(p, 1.1), 10, 6.5, Ramp::Kinetic, 0.26, owner);
+                    fx.ring(w3(p, 0.0), 0.5, 5.0, 0.45, fx::strip::SHOCK_FRONT, Ramp::ZoneGold, owner);
+                    fx.dust_wall(w3(p, 0.0), 0.5, 5.0, 0.5, 0.5, Ramp::ZoneGold, owner);
                 }
             }
             GameEvent::PlatesShattered { target } => {
                 if let Some((p, r, _)) = visual_pos(target) {
-                    fx.burst(w3(p, 1.0 + r), Color::srgb(0.8, 0.78, 0.72), 18, 7.0, 0.12, 0.6, 14.0);
-                    fx.shockwave(p, Color::srgb(0.9, 0.9, 1.0), r, r + 2.0, 0.3);
+                    fx.shards(w3(p, 1.0 + r * 0.5), 11, 7.5, Ramp::GodworksGold, 0.3 + r * 0.1, Owner::Mine);
+                    fx.smoke(w3(p, 0.3), 5, 0.6 + r * 0.3, Ramp::Dust, Owner::Mine);
+                    fx.impact_frame(w3(p, 1.0 + r * 0.5), r + 0.6, r, Owner::Mine);
+                    fx.ring(w3(p, 0.0), r, r + 2.0, 0.3, fx::strip::SHOCK_FRONT, Ramp::Mono, Owner::Mine);
                 }
             }
             GameEvent::Pickup { slot, kind } => {
                 if Some(slot) == me
                     && let Some(p) = player_pos(slot)
                 {
-                    let c = match kind {
-                        gf_net::PickupKind::Part { rarity } => crate::palette::rarity_color(rarity),
-                        gf_net::PickupKind::Shards(_) => hex("#8FF7FF"),
-                        gf_net::PickupKind::Health => hex("#FF4D6D"),
+                    let ramp = match kind {
+                        gf_net::PickupKind::Part { .. } => Ramp::ZoneGold,
+                        gf_net::PickupKind::Shards(_) => Ramp::Storm,
+                        gf_net::PickupKind::Health => Ramp::Heal,
                     };
-                    fx.burst(w3(p, 1.0), c, 8, 3.0, 0.07, 0.4, -2.0);
+                    fx.sprite(fx::seq::GLINT.nth(0), w3(p, 1.0)).radius(0.5).ramp(ramp).life(10.0 * F).emit();
+                    fx.ring(w3(p, 0.0), 0.2, 1.1, 12.0 * F, fx::strip::ACCENT_RING, ramp, Owner::Mine);
                 }
             }
             GameEvent::Ping { slot, pos, .. } => {
-                let c = fx.pal.player(slot);
-                fx.ping(pos.to_vec2(), c);
+                let c = legacy.pal.player(slot);
+                legacy.ping(pos.to_vec2(), c);
             }
             GameEvent::BossPhase { boss, .. } => {
                 if let Some((p, r, _)) = visual_pos(boss) {
-                    let danger = fx.pal.danger;
-                    fx.shockwave(p, danger, r, r + 10.0, 0.9);
-                    fx.flash(w3(p, 1.5), Color::WHITE, r * 1.5, 0.25);
+                    // A faction burst from the boss's core; never red-white (a phase change deals no
+                    // damage).
+                    fx.burst(Ramp::Unmade, w3(p, 0.0), r + 1.5, Owner::World);
+                    fx.ring(w3(p, 0.0), r, r + 10.0, 0.9, fx::strip::SHOCK_FRONT, Ramp::Mono, Owner::World);
+                    fx.impact_frame(w3(p, 1.5), r * 1.2, r, Owner::World);
                 }
             }
             GameEvent::AnvilLit | GameEvent::AnvilHot => {
                 if let Some(a) = world.private.anvil
                     && let Some((p, _, _)) = visual_pos(a.id)
                 {
-                    fx.pillar(p, hex("#FFB82E"), 9.0, 1.2);
-                    fx.shockwave(p, hex("#FFC940"), 1.0, 6.0, 0.7);
+                    let at = w3(p, 0.0);
+                    fx.pillar(at, 9.0, 1.3, Ramp::Flame, 1.2, Owner::World);
+                    fx.ring(at, 1.0, 6.0, 0.7, fx::strip::SHOCK_FRONT, Ramp::ZoneGold, Owner::World);
+                    fx.sprite(fx::seq::SPARKFX_SHOWER, at + Vec3::Y * 1.0)
+                        .size(3.0)
+                        .ramp(Ramp::Flame)
+                        .owner(Owner::World)
+                        .emit();
+                    fx.light(at + Vec3::Y * 1.5, Ramp::Flame.light(), 400_000.0, 9.0, 1.0, Owner::World);
                 }
             }
             GameEvent::Forged { slot, .. } | GameEvent::RecipeDiscovered { slot, .. } => {
                 if let Some(p) = player_pos(slot) {
-                    fx.burst(w3(p, 1.2), hex("#FFB82E"), 16, 5.0, 0.08, 0.6, 3.0);
+                    let owner = Owner::of_slot(slot, me);
+                    fx.impact_frame(w3(p, 1.2), 0.8, 0.5, owner);
+                    fx.sprite(fx::seq::SPARKFX_SHOWER, w3(p, 1.2)).size(2.4).ramp(Ramp::Flame).owner(owner).emit();
+                    fx.embers(w3(p, 0.5), 8, 0.6, owner);
                 }
             }
             GameEvent::BoonTaken { slot, boon } => {
                 if let Some(p) = player_pos(slot) {
-                    let c = cfg
-                        .content
-                        .boons
-                        .try_get(boon)
-                        .and_then(|b| b.gods.first())
-                        .and_then(|g| cfg.content.gods.by_key(g))
-                        .map_or(hex("#FFC940"), |g| crate::palette::hex(&g.color));
-                    fx.pillar(p, c, 6.0, 0.6);
+                    let god = cfg.content.boons.try_get(boon).and_then(|b| b.gods.first()).cloned().unwrap_or_default();
+                    let (ramp, glyph) = god_look(&god);
+                    let owner = Owner::of_slot(slot, me);
+                    fx.pillar(w3(p, 0.0), 6.0, 0.9, ramp, 0.8, Owner::World);
+                    fx.decal_seq(glyph.seq(), w3(p, 0.0), 1.1, 0.0, ramp, 1.2, owner);
                 }
             }
             _ => {}
         }
     }
-    state.particles = fx.alive;
     // Damage numbers: aggregate rapid hits on one target into a single rising number.
     for (target, at, amount, color, px) in new_numbers {
         if let Some(&e) = state.recent.get(&target)
