@@ -208,6 +208,9 @@ pub struct FxStore {
     pub(crate) free_ribbons: Vec<u32>,
     pub(crate) arcs: Vec<Arc>,
     pub(crate) flashes: Vec<light::Flash>,
+    /// Drawn for one frame, then dropped (`SpriteBuilder::now`, `Fx::arc_now`).
+    pub(crate) instant: Vec<Particle>,
+    pub(crate) instant_arcs: Vec<Arc>,
     /// The readability tier (set from `VfxState` every frame).
     pub tier: VfxTier,
     /// Particle cap per tier (`game.ron vfx.particles`).
@@ -241,6 +244,8 @@ impl Default for FxStore {
             free_ribbons: Vec::new(),
             arcs: Vec::with_capacity(64),
             flashes: Vec::with_capacity(32),
+            instant: Vec::with_capacity(64),
+            instant_arcs: Vec::with_capacity(16),
             tier: VfxTier::Full,
             caps: [1600, 700, 200],
             ally_alpha: 0.55,
@@ -387,6 +392,8 @@ impl FxStore {
         self.decals.clear();
         self.arcs.clear();
         self.flashes.clear();
+        self.instant.clear();
+        self.instant_arcs.clear();
         for (i, slot) in self.ribbons.iter_mut().enumerate() {
             if slot.ribbon.take().is_some() {
                 self.free_ribbons.push(i as u32);
@@ -534,6 +541,12 @@ fn draw(
         d.emit(layers.buf(d.seq.sheet, d.layer), &cam);
     }
     for a in &store.arcs {
+        a.emit(layers.buf(a.strip.sheet, a.layer), &cam);
+    }
+    for p in store.instant.drain(..) {
+        p.emit(layers.buf(p.seq.sheet, p.layer), &cam);
+    }
+    for a in store.instant_arcs.drain(..) {
         a.emit(layers.buf(a.strip.sheet, a.layer), &cam);
     }
     let now = store.time;

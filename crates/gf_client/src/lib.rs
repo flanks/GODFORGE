@@ -6,6 +6,7 @@
 //! transport, so single-player and co-op share every code path (§20.3).
 
 pub mod anim;
+pub mod arms;
 pub mod camera;
 pub mod envkit;
 pub mod fx;
@@ -111,6 +112,7 @@ impl Plugin for ClientPlugin {
         world::build_plugin(app);
         vfx::build(app);
         fx::build(app);
+        arms::build(app);
         hud::build(app);
         offscreen::build(app);
         ui::build(app);

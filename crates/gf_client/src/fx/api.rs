@@ -261,8 +261,38 @@ impl<'a> SpriteBuilder<'a> {
 
     /// Spawn it (returns false when the budget skipped it).
     pub fn emit(self) -> bool {
+        self.finish(false)
+    }
+
+    /// Draw it for this frame only (immediate mode: charge cores and rings, beam accents, orbit
+    /// smears; the caller re-issues it every frame it should show). Frame and alpha are read at
+    /// age 0: pick the frame with [`Play::Frame`].
+    pub fn now(self) -> bool {
+        self.finish(true)
+    }
+
+    fn finish(self, instant: bool) -> bool {
         let SpriteBuilder { store, mut p, owner, class, ink } = self;
         let Some(g) = store.grant(owner, class) else { return false };
+        if instant {
+            p.alpha =
+                Curve { a: p.alpha.a * g.alpha, b: p.alpha.b * g.alpha, c: p.alpha.c * g.alpha, mid: p.alpha.mid };
+            p.cap = p.cap.min(g.cap);
+            p.size *= g.size;
+            p.world = p.pos;
+            p.age = p.age.max(0.0);
+            if let Some((scale, rot)) = ink {
+                let mut back = p;
+                back.size *= scale;
+                back.rot += rot;
+                back.value = value::INK;
+                back.alpha = Curve { a: p.alpha.a * 0.95, b: p.alpha.b * 0.95, c: p.alpha.c * 0.95, mid: p.alpha.mid };
+                back.layer = p.layer.behind();
+                store.instant.push(back);
+            }
+            store.instant.push(p);
+            return true;
+        }
         p.alpha = Curve { a: p.alpha.a * g.alpha, b: p.alpha.b * g.alpha, c: p.alpha.c * g.alpha, mid: p.alpha.mid };
         p.cap = p.cap.min(g.cap);
         p.size *= g.size;
@@ -647,6 +677,17 @@ impl Fx<'_> {
         a.life *= g.life;
         a.world = a.center;
         self.store.push_arc(a);
+        true
+    }
+
+    /// Any arc strip for this frame only (immediate mode: orbit smears, sliding halo arcs); the
+    /// caller re-issues it every frame, reading it at its current `age`.
+    pub fn arc_now(&mut self, mut a: Arc, owner: Owner, class: Class) -> bool {
+        let Some(g) = self.store.grant(owner, class) else { return false };
+        a.alpha = Curve { a: a.alpha.a * g.alpha, b: a.alpha.b * g.alpha, c: a.alpha.c * g.alpha, mid: a.alpha.mid };
+        a.cap = a.cap.min(g.cap);
+        a.world = a.center;
+        self.store.instant_arcs.push(a);
         true
     }
 

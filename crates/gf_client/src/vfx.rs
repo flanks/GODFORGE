@@ -7,18 +7,17 @@
 //! readable at 4-player peak chaos) and owns the damage numbers.
 
 use crate::camera::{MainCamera, w3};
-use crate::fx::api::{self, F, burst_seq, faction_ramp};
-use crate::fx::{self, Fx, FxStore, Glyph, Hit, HitKind, Mote, Owner, Play, Ramp};
+use crate::fx::api::{F, burst_seq, faction_ramp};
+use crate::fx::{self, Fx, FxStore, Glyph, Mote, Owner, Ramp};
 use crate::input::Settings;
-use crate::models::HeroGear;
 use crate::net::Link;
 use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix};
-use crate::scene::{PlayerRig, SceneIndex, Visual};
+use crate::scene::{SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
 use gf_content::VfxTier;
 use gf_core::damage::DamageType;
 use gf_core::ids::NetId;
-use gf_engine::client::{NotShadowCaster, font_px, world_to_screen};
+use gf_engine::client::{font_px, world_to_screen};
 use gf_engine::prelude::*;
 use gf_net::quant::QPos;
 use gf_net::{EntityKind, GameEvent};
@@ -82,7 +81,6 @@ pub fn build(app: &mut App) {
         (
             choose_tier,
             spawn_from_events,
-            muzzle_flashes,
             status_motes,
             update_particles,
             update_shockwaves,
@@ -92,47 +90,6 @@ pub fn build(app: &mut App) {
             .chain()
             .in_set(ClientSet::Presentation),
     );
-}
-
-/// A short flash where each shot leaves the weapon: the glTF weapon's `muzzle` node, else the
-/// greybox gun's muzzle on the aim pivot.
-fn muzzle_flashes(
-    mut commands: Commands,
-    link: Res<Link>,
-    index: Res<SceneIndex>,
-    rigs: Query<&PlayerRig>,
-    gears: Query<&HeroGear>,
-    muzzles: Query<&GlobalTransform>,
-    mut pal: ResMut<Palette>,
-    mut mats: ResMut<Assets<StandardMaterial>>,
-) {
-    let Some(world) = link.latest.as_deref() else { return };
-    for ev in &link.fresh_events {
-        let GameEvent::Shot { slot, dir, element } = *ev else { continue };
-        let Some(rig) = index.players.get(slot as usize).copied().flatten().and_then(|e| rigs.get(e).ok()) else {
-            continue;
-        };
-        let muzzle = rig
-            .model()
-            .and_then(|m| gears.get(m).ok())
-            .and_then(|g| g.muzzle.filter(|_| !g.greybox_gun))
-            .and_then(|m| muzzles.get(m).ok())
-            .map(|g| g.translation());
-        let at = muzzle.unwrap_or_else(|| {
-            let d = gf_net::quant::u16_to_dir(dir);
-            let height = world.players.iter().find(|p| p.slot == slot).map_or(0.0, |p| p.height);
-            w3(rig.shown + d * 1.05, 1.05 + height)
-        });
-        let mat = pal.mat(&mut mats, hdr(mix(element_color(element), Color::WHITE, 0.35), 2.2), Look::Additive);
-        let scale = Vec3::splat(0.2);
-        commands.spawn((
-            Fade { life: 0.07, max: 0.07, base_scale: scale, shrink_xz: false },
-            Mesh3d(pal.low_sphere.clone()),
-            MeshMaterial3d(mat),
-            Transform::from_translation(at).with_scale(scale),
-            NotShadowCaster,
-        ));
-    }
 }
 
 /// A big body's statuses show as motes around its hit centre, since its paint stays its own (the
@@ -301,7 +258,6 @@ fn god_look(key: &str) -> (Ramp, Glyph) {
 #[allow(clippy::too_many_arguments)]
 fn spawn_from_events(
     mut commands: Commands,
-    time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     settings: Res<Settings>,
@@ -312,47 +268,24 @@ fn spawn_from_events(
     mut state: ResMut<VfxState>,
     mut numbers: Query<&mut DamageNumber>,
     mut fx: Fx,
-    mut last_star: Local<HashMap<NetId, f32>>,
 ) {
     if link.fresh_events.is_empty() {
         return;
     }
     let Some(world) = link.latest.clone() else { return };
     let me = link.slot;
-    let now = time.elapsed_secs();
     let mut legacy = Legacy { commands: &mut commands, pal: &mut pal, mats: &mut mats };
     let visual_of = |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok().map(|v| (e, v)));
     let visual_pos = |id: NetId| visual_of(id).map(|(_, v)| (v.shown, v.radius, v.color));
-    // Where a hit lands on a body: the model's `hit_center`, else the greybox body's middle.
-    let hit_at = |id: NetId| visual_of(id).map(|(_, v)| w3(v.shown, v.hit_height));
     let player_pos = |slot: u8| world.players.iter().find(|p| p.slot == slot).map(|p| p.mover.pos);
     let player_entity = |slot: u8| index.players.get(slot as usize).copied().flatten();
     let mut new_numbers: Vec<(NetId, Vec3, u32, Color, f32)> = Vec::new();
-    if last_star.len() > 512 {
-        last_star.retain(|_, t| now - *t < 0.5);
-    }
     for ev in &link.fresh_events {
         match *ev {
             GameEvent::Hit { target, amount, crit, precision, element, source } => {
                 let Some((p, r, _)) = visual_pos(target) else { continue };
                 let mine = me.is_some() && Some(source % 4) == me && source < 12;
-                let owner = Owner::of_source(source, me);
-                let ramp = if owner == Owner::Enemy { Ramp::EnemyShot } else { Ramp::of(element) };
-                // Several hits on one target inside 0.08 s share one star (VFX_STYLE §10.1).
-                let recent = last_star.get(&target).is_some_and(|t| now - *t < 0.08);
-                if !recent || crit || precision {
-                    last_star.insert(target, now);
-                    let from = if source < 12 { player_pos(source % 4) } else { None };
-                    let dir = from.map_or(Vec3::ZERO, |f| (w3(p, 0.0) - w3(f, 0.0)).normalize_or_zero());
-                    let kind = match (owner, crit, precision) {
-                        (Owner::Mine, _, true) => HitKind::Precision,
-                        (Owner::Mine, true, _) => HitKind::Crit,
-                        _ => HitKind::Plain,
-                    };
-                    let size = if crit { 0.5 } else { 0.32 + r * 0.12 };
-                    let at = hit_at(target).unwrap_or(w3(p, 0.7 + r * 0.5));
-                    fx.impact(Hit::new(at, ramp, size, owner).kind(kind).dir(dir).body(r));
-                }
+                // The hit punctuation is the weapon's (`arms::recipes::contact`).
                 if settings.damage_numbers && mine && amount > 0 {
                     let color = if precision {
                         hex("#7FF6FF")
@@ -394,17 +327,6 @@ fn spawn_from_events(
                     };
                     fx.motes(pos3(pos, 0.6), killer, n, Ramp::Radiant, owner);
                 }
-            }
-            GameEvent::Explosion { pos, radius_q, element } => {
-                // No source rides on the event: explosions read as your own.
-                fx.burst(Ramp::of(element), pos3(pos, 0.0), radius_q as f32 / 32.0, Owner::Mine);
-            }
-            GameEvent::Arc { from, to, element } => {
-                let ramp = Ramp::of(element);
-                let (a, b) = (pos3(from, 1.0), pos3(to, 1.0));
-                fx.bolt(a, b, ramp, 0.55, 8.0 * F, Owner::Mine);
-                fx.sprite(api::hit_star(ramp), b).radius(0.4).ramp(ramp).play(Play::Life).life(6.0 * F).emit();
-                fx.light(b, ramp.light(), 40_000.0, 4.0, 0.12, Owner::Mine);
             }
             GameEvent::Synergy { synergy, pos, a, b } => {
                 let (ea, eb) = cfg
