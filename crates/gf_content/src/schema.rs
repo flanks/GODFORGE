@@ -1508,12 +1508,24 @@ pub enum Decor {
     /// stone lip, axis-aligned `at ± half`, rounded corners.
     Pool { at: Vec2, half: Vec2 },
     /// Visual: laid floor area, axis-aligned `at ± half`. `variant`: 0 flagstones, 1 herringbone,
-    /// 2 mosaic tesserae, 3 broken paving.
+    /// 2 mosaic tesserae, 3 broken paving (an island of at most 5 u half is painted as a frayed
+    /// oval, its courses turned by its own angle).
     Paving {
         at: Vec2,
         half: Vec2,
         #[serde(default)]
         variant: u8,
+    },
+    /// Visual (biome maps): a floor-story mark painted into the open ground, never a mesh: an
+    /// fbm-warped oval of `half` (along `rot`, across it), e.g. an old fire's burn scar, a cooled
+    /// slag spill or a soot fan (OPEN_WORLD.md §3.6.7).
+    FloorMark {
+        at: Vec2,
+        half: Vec2,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        kind: FloorMarkKind,
     },
     /// Visual: circular floor decal of `radius`, rotated `rot`. `variant`: 0 plaza mosaic star (gold),
     /// 1 rune ring, 2 clockface / orrery, 3 god sigil (uses `god`), 4 chaos glyph.
@@ -1597,6 +1609,31 @@ pub enum Decor {
     },
 }
 
+/// What a [`Decor::FloorMark`] shows (painted by the floor shader; the index is its paint slot).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum FloorMarkKind {
+    /// An old fire: a charred heart, a ring of pale ash, soot streaks and a few embers.
+    #[default]
+    Burn,
+    /// A cooled slag spill: glossy black plates, pale seams, a crust ridge at its edge.
+    Slag,
+    /// An ash drift, rippled across the wind (`rot`).
+    Ash,
+    /// A collapsed floor: a sunken heart, a crack web and scattered masonry chips.
+    Collapse,
+    /// Rust stains and two drag ruts along `rot`.
+    Rust,
+    /// A soot fan sprayed along `rot` from its back end (below a chimney or a wall).
+    Soot,
+}
+
+impl FloorMarkKind {
+    /// Paint slot index (0..=5), in declaration order.
+    pub fn index(self) -> u8 {
+        self as u8
+    }
+}
+
 /// Where a [`Decor::Scenery`] piece frames the map.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum SceneryKind {
@@ -1667,6 +1704,7 @@ impl Decor {
             | Decor::FallenWeapon { at, .. }
             | Decor::Pool { at, .. }
             | Decor::Paving { at, .. }
+            | Decor::FloorMark { at, .. }
             | Decor::FloorInlay { at, .. }
             | Decor::Overgrowth { at, .. }
             | Decor::Rubble { at, .. }
@@ -1966,6 +2004,10 @@ pub struct RegionTheme {
     /// How the region's open ground is painted (presentation only: generation never reads it).
     #[serde(default)]
     pub ground: GroundRecipe,
+    /// Floor-story marks painted over the region's open ground (pick weights; none when empty):
+    /// what happened there, told in paint instead of meshes (§3.6.7).
+    #[serde(default)]
+    pub marks: Vec<(FloorMarkKind, f32)>,
 }
 
 impl RegionTheme {
@@ -1996,6 +2038,8 @@ pub struct GroundRecipe {
     pub paving: f32,
     /// Ash drifts with wind ripples (0..=1).
     pub ash: f32,
+    /// Black glassy slag sheets with pale seams over the bare ground (0..=1).
+    pub glass: f32,
 }
 
 /// The coastline: void tiles eaten in from the map rectangle (tile units).
@@ -2094,6 +2138,11 @@ pub struct ComposeDef {
     pub heat_reach: f32,
     /// Every land lattice point (11 × 7 u) has a warm source inside this box (u), centred on it.
     pub light_box: (f32, f32),
+    /// Floor-story marks stand on a jittered lattice of this step (u) over each region's open
+    /// ground (0 = none).
+    pub mark_spacing: f32,
+    /// A mark's half length along its facing (u); across it is 55–100 % of that.
+    pub mark_size: (f32, f32),
 }
 
 impl Default for ComposeDef {
@@ -2117,6 +2166,8 @@ impl Default for ComposeDef {
             vignette_spacing: 18.0,
             heat_reach: 9.0,
             light_box: (30.0, 18.0),
+            mark_spacing: 16.5,
+            mark_size: (2.2, 5.5),
         }
     }
 }

@@ -343,7 +343,8 @@ pub fn build(
                 },
                 extension: Floor { params },
             });
-            // Second UV set: (liquid heat, 0) per vertex, for the hot banks.
+            // Second UV set: (liquid heat, glassy slag) per vertex, for the hot banks and the
+            // slag sheets.
             let mesh = stores.meshes.add(buf.into_mesh().with_inserted_attribute(Mesh::ATTRIBUTE_UV_1, heat));
             commands.spawn((
                 RoomGeometry,
@@ -796,21 +797,22 @@ fn land_field(map: &MapLayout, mask: &[Ground]) -> Field {
 const TINT_NEUTRAL: f32 = 0.2158;
 
 /// Region look per tile: the tint as a vertex-colour multiplier (`#808080` = 1: hue *and* value,
-/// so black slag and pale ash read apart) and the theme's ground recipe (paving offset, ash).
-fn tile_looks(map: &MapLayout, room: &RoomDef) -> Vec<(Vec3, Vec2)> {
+/// so black slag and pale ash read apart) and the theme's ground recipe (paving offset, ash,
+/// glassy slag).
+fn tile_looks(map: &MapLayout, room: &RoomDef) -> Vec<(Vec3, Vec3)> {
     let themes = room.expedition.as_ref().map(|x| &x.themes);
-    let looks: Vec<(Vec3, Vec2)> = map
+    let looks: Vec<(Vec3, Vec3)> = map
         .regions
         .iter()
         .map(|r| {
             let theme = themes.and_then(|t| t.get(r.theme as usize));
             let l = hex(theme.map_or("#808080", |t| t.tint.as_str())).to_linear();
             let v = Vec3::new(l.red, l.green, l.blue) / TINT_NEUTRAL;
-            let recipe = theme.map_or(Vec2::ZERO, |t| Vec2::new(t.ground.paving, t.ground.ash));
+            let recipe = theme.map_or(Vec3::ZERO, |t| Vec3::new(t.ground.paving, t.ground.ash, t.ground.glass));
             (v.clamp(Vec3::splat(0.3), Vec3::splat(1.6)), recipe)
         })
         .collect();
-    map.tiles.region.iter().map(|&r| looks.get(r as usize).copied().unwrap_or((Vec3::ONE, Vec2::ZERO))).collect()
+    map.tiles.region.iter().map(|&r| looks.get(r as usize).copied().unwrap_or((Vec3::ONE, Vec3::ZERO))).collect()
 }
 
 /// One map chunk's floor: its mesh, its sim rect and each vertex's liquid heat (second UV set).
@@ -822,8 +824,9 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, ro
     let field = land_field(map, &mask);
     let looks = tile_looks(map, room);
     let t = &map.tiles;
-    // Bilinear over tile centres: (vertex colour, ground recipe as the first UV set).
-    let look_at = |p: Vec2| -> ([f32; 4], [f32; 2]) {
+    // Bilinear over tile centres: (vertex colour, ground recipe: paving and ash as the first UV
+    // set, glass as the second set's y).
+    let look_at = |p: Vec2| -> ([f32; 4], Vec3) {
         let q = (p - t.origin) / t.size - Vec2::splat(0.5);
         let (x0, y0) = (q.x.floor(), q.y.floor());
         let (fx, fy) = (q.x - x0, q.y - y0);
@@ -831,11 +834,11 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, ro
             let (x, y) = ((x as i32).clamp(0, t.w as i32 - 1), (y as i32).clamp(0, t.h as i32 - 1));
             looks[t.index(x as u16, y as u16)]
         };
-        let lerp = |a: (Vec3, Vec2), b: (Vec3, Vec2), k: f32| (a.0.lerp(b.0, k), a.1.lerp(b.1, k));
+        let lerp = |a: (Vec3, Vec3), b: (Vec3, Vec3), k: f32| (a.0.lerp(b.0, k), a.1.lerp(b.1, k));
         let a = lerp(at(x0, y0), at(x0 + 1.0, y0), fx);
         let b = lerp(at(x0, y0 + 1.0), at(x0 + 1.0, y0 + 1.0), fx);
         let (v, r) = lerp(a, b, fy);
-        ([v.x, v.y, v.z, 1.0], [r.x, r.y])
+        ([v.x, v.y, v.z, 1.0], r)
     };
     let pit_at = |p: Vec2| -> Ground {
         match t.tile_of(p) {
@@ -958,8 +961,8 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, ro
                     let (mut col, recipe) = look_at(*p);
                     // Alpha: how far inland (0 on the shore, 1 from 3 u in).
                     col[3] = (-f / 3.0).clamp(0.0, 1.0);
-                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, recipe, col));
-                    heat.push([heat_at(*p), 0.0]);
+                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, [recipe.x, recipe.y], col));
+                    heat.push([heat_at(*p), recipe.z]);
                 }
                 idx[k] = s.1;
             }
@@ -1218,8 +1221,19 @@ pub fn paint_decor(p: &mut FloorParams, db: &ContentDb, decor: &[Decor], area: O
             Decor::Paving { at, half, variant } if np < FLOOR_PAVING && touches(at - half, at + half) => {
                 let (lo, hi) = (w3(at - half, 0.0), w3(at + half, 0.0));
                 p.paving[np] = Vec4::new(lo.x, hi.z, hi.x, lo.z);
-                set4(&mut p.paving_v, np, variant as f32);
+                set4(&mut p.paving_v, np, variant.min(3) as f32);
                 np += 1;
+            }
+            // A floor-story mark shares the paving slots: (centre x, centre z, half along, half
+            // across), variant 4 + its kind, the facing in the fraction (Rot16 / 32).
+            Decor::FloorMark { at, half, rot, kind } if np < FLOOR_PAVING => {
+                let r = Vec2::splat(half.max_element() * 1.3);
+                if touches(at - r, at + r) {
+                    let a = w3(at, 0.0);
+                    p.paving[np] = Vec4::new(a.x, a.z, half.x, half.y);
+                    set4(&mut p.paving_v, np, (4 + kind.index()) as f32 + f32::from(rot % 16) / 32.0);
+                    np += 1;
+                }
             }
             Decor::Channel { from, to, width } if nh < FLOOR_HOLES => {
                 let (lo, hi) = (from.min(to) - Vec2::splat(width * 0.5), from.max(to) + Vec2::splat(width * 0.5));
@@ -1262,11 +1276,14 @@ fn map_floor_params(
     // The ground is the bottom of the value ladder on a map (characters > telegraphs > POIs >
     // props > ground > abyss): darker stone and earth, low paving contrast, hand-sized slabs.
     // Open country is bare ground with old paving in patches; roads and clearings are paved.
-    p.stone = lin4(lighten(look.stone(), 0.7), 0.2);
+    p.stone = lin4(lighten(look.stone(), 0.85), 0.2);
     // The bare ground carries the open country's painted detail (ash drifts, scree, cracked
-    // earth), so it sits a step above the stones' mortar instead of reading as a hole.
-    p.dirt = lin4(lighten(look.dirt(), 0.95), 0.14);
-    p.shape.z = 1.05;
+    // earth, the floor-story marks), so it sits well above the stones' mortar, near the old
+    // paving's value: the field reads as ground at about a quarter of the value range, never
+    // as a hole (the characters, telegraphs and pools stay on top).
+    p.dirt = lin4(lighten(look.dirt(), 1.5), 0.14);
+    // Big old slabs: at enemy scale the joints read as ground texture, not as a grid.
+    p.shape.z = 1.45;
     // Fissures glow, but under the characters and under the orange of the swarm (§3.6.7).
     if look.cracks >= 1.0 {
         p.accent.w = 1.0;

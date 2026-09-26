@@ -401,6 +401,14 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::Bridge { .. } => ("BRIDGE", hex("#D8C8A8")),
         Decor::Pool { .. } => ("POOL", hex("#4A9AC8")),
         Decor::Paving { .. } => ("PAVING", p.ground.scale(3.2).mix(WHITE, 0.15)),
+        Decor::FloorMark { kind, .. } => match kind {
+            FloorMarkKind::Burn => ("MARK BURN SCAR", hex("#2A1C18")),
+            FloorMarkKind::Slag => ("MARK SLAG SPILL", hex("#15141C")),
+            FloorMarkKind::Ash => ("MARK ASH DRIFT", hex("#B4AEA6")),
+            FloorMarkKind::Collapse => ("MARK COLLAPSE", hex("#5A4E46")),
+            FloorMarkKind::Rust => ("MARK RUST DRAG", hex("#8A4A2A")),
+            FloorMarkKind::Soot => ("MARK SOOT FAN", hex("#201A1A")),
+        },
         Decor::FloorInlay { .. } => ("FLOOR INLAY", hex("#E8C060")),
         Decor::Overgrowth { .. } => ("OVERGROWTH", p.cover),
         Decor::Roots { .. } => ("ROOTS", hex("#5A6A2E")),
@@ -421,7 +429,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
 /// Draw order: floor-level decals first, then solids, then props and markers.
 fn layer(d: &Decor) -> u8 {
     match d {
-        Decor::Scenery { .. } | Decor::Paving { .. } => 0,
+        Decor::Scenery { .. } | Decor::Paving { .. } | Decor::FloorMark { .. } => 0,
         Decor::Overgrowth { .. } | Decor::Pool { .. } | Decor::FloorInlay { .. } => 1,
         Decor::LavaCrack { .. } | Decor::Roots { .. } | Decor::Channel { .. } => 2,
         Decor::Bridge { .. } => 3,
@@ -449,6 +457,16 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
                 segment(cv, v, Vec2::new(at.x - half.x, y), Vec2::new(at.x + half.x, y), 0.03, ink, 0.18);
                 y += step;
             }
+        }
+        Decor::FloorMark { at, half, rot, .. } => {
+            // A painted oval turned to its facing (no joints: it is paint, not paving).
+            let u = rot16_dir(rot);
+            let r = half.max_element();
+            fill(cv, v, at - Vec2::splat(r), at + Vec2::splat(r), col, 0.5, |q| {
+                let d = q - at;
+                let l = Vec2::new(d.dot(u), d.dot(u.perp())) / half;
+                (l.length() - 1.0) * half.min_element()
+            });
         }
         Decor::Overgrowth { at, radius, .. } => {
             circle(cv, v, at, radius, col, 0.22);

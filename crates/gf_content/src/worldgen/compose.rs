@@ -29,8 +29,8 @@ use super::barriers::road_dir;
 use super::tiles::{self, land_box};
 use super::{Gen, HUB_R, LANDING_R};
 use crate::procgen::{
-    Biome, Builder, CELL, Frame, ISLAND_APART, PAD, Rect, TileMask, anchor, arch, boulder, bounds, extent, field,
-    monument, monument_at, point_seg, q, qv, rot_of, satellite, stamp,
+    Biome, Builder, CELL, Frame, ISLAND_APART, PAD, Rect, TileMask, anchor, arch, boulder, bounds, extent, monument,
+    monument_at, point_seg, q, qv, rot_of, satellite, stamp,
 };
 use crate::schema::*;
 use gf_core::movement::Obstacle;
@@ -149,6 +149,9 @@ pub(crate) fn build(g: &mut Gen) -> Built {
     light_gaps(g, &mut b, &x, &mut plan);
     g.trace(|| format!("braziers: {before} before the light gaps, {} after", fires(&b)));
     road_paving(g, &mut b);
+    for r in 0..g.regions.len() {
+        floor_marks(g, &mut b, &x, r, &plan);
+    }
     districts.extend(g.pois.iter().map(|p| District {
         kind: DistrictKind::Plaza,
         min: qv(p.site.at - Vec2::splat(p.plaza)),
@@ -992,12 +995,23 @@ fn region(
     for slot in fields {
         let flip = b.lay.chance(0.5);
         let f = Frame::of(slot.rect, slot.back, Vec2::ZERO, flip);
-        field(b, f);
         if b.lay.chance(1.0 - bare) {
             let c0 = b.covered;
+            let n0 = b.obstacles.len();
             let ok = budget > 0.0 && anchor(b, f, x, budget);
             if ok {
                 budget -= (b.covered - c0) as f32 * CELL * CELL;
+                // The anchor stands on what is left of an old paving: a broken island around its
+                // foot (§3.6.7), never a lone rug in the open (the open field gets floor marks).
+                if let Some(o) = b.obstacles.get(n0) {
+                    let (c, e) = extent(o);
+                    let d = rot16_dir(b.vd(16));
+                    let at = qv(c + d * (e.max_element() * 0.6 + b.rd(0.5, 1.5)));
+                    let half = qv(Vec2::new(b.rd(2.8, 4.2), b.rd(2.2, 3.4)));
+                    if g.tiles.kind_at(at) == TileKind::Ground && b.island_ok(at, ISLAND_APART) {
+                        b.decal(Decor::Paving { at, half, variant: 3 });
+                    }
+                }
             }
             g.trace(|| {
                 format!(
@@ -1153,10 +1167,11 @@ fn story(b: &mut Builder, at: Vec2, theme: &str) -> bool {
             if !b.circle(g, at, r, |at, radius| Decor::Pillar { at, radius, height }) {
                 return false;
             }
-            // Chains run from the anchor post to two stakes.
+            // Chains run from the anchor post to two stakes (colliding: laid on the lay stream,
+            // so the dressing never moves them).
             for k in 0..2u32 {
-                let d = rot16_dir(b.vd(16));
-                let stake = qv(at + d * b.rd(3.0, 4.2));
+                let d = rot16_dir(b.lay.range_u32(0, 16) as u8);
+                let stake = qv(at + d * b.rl(3.0, 4.2));
                 let sr = 0.3;
                 let sh = q(b.rd(1.1, 1.5));
                 if b.circle(g, stake, sr, |at, radius| Decor::Pillar { at, radius, height: sh }) {
@@ -1985,6 +2000,116 @@ fn road_paving(g: &Gen, b: &mut Builder) {
             }
             side = -side;
             s += b.rd(40.0, 60.0);
+        }
+    }
+}
+
+/// Region `r`'s floor-story marks (§3.6.7), on the dress stream `2500 + r`: big painted shapes
+/// (burn scars, slag spills, ash drifts, collapsed floors, rust drags, soot fans) on a jittered
+/// lattice of `compose.mark_spacing` over its open ground, off the roads, clearings, hubs, the
+/// Landing and the compositions' floors. The theme's `marks` pool picks each kind; a soot fan
+/// only stands against a solid (it sprays away from it), a rust drag leads toward the nearest
+/// way, and the ash drifts all lie across the map's one wind.
+fn floor_marks(g: &Gen, b: &mut Builder, x: &ComposeDef, r: usize, plan: &Plan) {
+    let Some(theme) = g.x.themes.get(g.regions[r].theme as usize) else { return };
+    let step = x.mark_spacing;
+    if theme.marks.is_empty() || step < 6.0 || g.regions[r].area == 0 {
+        return;
+    }
+    let wind = g.root.fork(2599).range_u32(0, 16) as u8;
+    b.dress = g.root.fork(2500 + r as u64);
+    let t = &g.tiles;
+    let (lo, hi) = g.regions[r].bounds(&t);
+    let (size_lo, size_hi) = (x.mark_size.0.min(x.mark_size.1).max(1.0), x.mark_size.1.max(x.mark_size.0).max(1.0));
+    let lanes = g.lanes();
+    let weights: Vec<f32> = theme.marks.iter().map(|(_, w)| *w).collect();
+    let comps: Vec<Rect> = plan.comps.iter().filter(|c| c.0 == r).map(|c| c.1).collect();
+    let (nx, ny) = (((hi.x - lo.x) / step).ceil() as i32, ((hi.y - lo.y) / step).ceil() as i32);
+    let mut placed: Vec<Vec2> = b
+        .decor
+        .iter()
+        .filter_map(|d| match *d {
+            Decor::FloorMark { at, .. } => Some(at),
+            _ => None,
+        })
+        .collect();
+    for j in 0..ny {
+        for i in 0..nx {
+            let jitter = Vec2::new(b.rd(-0.3, 0.3), b.rd(-0.3, 0.3));
+            let at = qv(lo + (Vec2::new(i as f32, j as f32) + Vec2::splat(0.5) + jitter) * step);
+            let Some(p) = b.dress.weighted_index(&weights) else { return };
+            let mut kind = theme.marks[p].0;
+            let along = b.rd(size_lo, size_hi);
+            let spin = b.vd(16);
+            let ti = tiles::tile_at(t, at);
+            if t.kind[ti] != TileKind::Ground || t.region[ti] as usize != r {
+                continue;
+            }
+            let reach = along * 0.8;
+            let clear = lanes.iter().all(|l| point_seg(at, l.from, l.to) >= l.width * 0.5 + reach * 0.6 + 0.5)
+                && g.pois.iter().all(|poi| at.distance(poi.site.at) >= poi.plaza + reach + 1.0)
+                && at.distance(g.landing) >= LANDING_R + reach + 2.0
+                && g.regions.iter().filter(|rg| rg.landmark.is_some()).all(|rg| at.distance(rg.site) >= HUB_R + reach)
+                && comps.iter().all(|c| !c.contains(at, reach * 0.5))
+                && placed.iter().all(|m| m.distance(at) >= step * 0.7);
+            if !clear {
+                continue;
+            }
+            let mut at = at;
+            let rot = match kind {
+                FloorMarkKind::Soot => {
+                    // Against the nearest solid within 8 u, spraying away from it.
+                    let near = b
+                        .obstacles
+                        .iter()
+                        .map(|o| {
+                            let (c, e) = extent(o);
+                            (c, e.max_element(), c.distance(at))
+                        })
+                        .filter(|(_, e, d)| *d < 8.0 + e)
+                        .min_by(|a, z| a.2.total_cmp(&z.2));
+                    match near {
+                        Some((c, e, _)) => {
+                            let d = (at - c).normalize_or(Vec2::NEG_Y);
+                            at = qv(c + d * (e + along * 0.9));
+                            rot_of(d)
+                        }
+                        None => {
+                            kind = FloorMarkKind::Burn;
+                            spin
+                        }
+                    }
+                }
+                FloorMarkKind::Rust => {
+                    // The ruts lead toward the nearest way.
+                    let q = lanes
+                        .iter()
+                        .map(|l| {
+                            let ab = l.to - l.from;
+                            let s = ((at - l.from).dot(ab) / ab.length_squared().max(1e-6)).clamp(0.0, 1.0);
+                            l.from + ab * s
+                        })
+                        .min_by(|a, z| a.distance_squared(at).total_cmp(&z.distance_squared(at)));
+                    q.map_or(spin, |q| rot_of(q - at))
+                }
+                FloorMarkKind::Ash => wind.wrapping_add(spin % 3).wrapping_sub(1) % 16,
+                _ => spin,
+            };
+            let ratio = match kind {
+                FloorMarkKind::Burn => b.rd(0.85, 1.0),
+                FloorMarkKind::Collapse => b.rd(0.75, 1.0),
+                FloorMarkKind::Slag => b.rd(0.6, 0.9),
+                FloorMarkKind::Soot => b.rd(0.55, 0.8),
+                FloorMarkKind::Ash => b.rd(0.45, 0.7),
+                FloorMarkKind::Rust => b.rd(0.4, 0.6),
+            };
+            let along = if kind == FloorMarkKind::Burn { along.min(size_hi * 0.75) } else { along };
+            let half = qv(Vec2::new(along, along * ratio).max(Vec2::splat(1.0)));
+            if t.kind_at(at) != TileKind::Ground {
+                continue;
+            }
+            placed.push(at);
+            b.decal(Decor::FloorMark { at, half, rot, kind });
         }
     }
 }

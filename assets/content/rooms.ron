@@ -1180,7 +1180,10 @@
             // Camps draw their pack from `camp_pool` (one enemy kind per camp, 6–12 strong; bombers
             // stay out of camps, a dozen sleeping kindlejacks is a wipe, not a fight).
             // `tint` multiplies the ground (#808080 = unchanged: hue *and* value), `ground` paints
-            // it (paving offset, ash drifts), and the regions of one theme take `names` in turn.
+            // it (paving offset: how much old paving survives in the open country, ash drifts,
+            // glassy slag sheets), `marks` picks the floor-story marks painted over its open
+            // ground (burn scars, slag spills, ash drifts, collapses, rust drags, soot fans), and
+            // the regions of one theme take `names` in turn.
             themes: [
                 (
                     key: "slag_flats",
@@ -1197,7 +1200,8 @@
                     tint: "#737173",
                     map_color: "#3C2A24",
                     names: ["The Slag Flats", "The Glass Wastes", "Clinker Plain", "The Cooling Fields"],
-                    ground: (paving: -0.2, ash: 0.2),
+                    ground: (paving: -0.35, ash: 0.2, glass: 0.85),
+                    marks: [(Slag, 1.0), (Burn, 0.8), (Ash, 0.5), (Collapse, 0.3)],
                     camp_pool: [(key: "cinderling", weight: 1.0), (key: "emberwisp", weight: 0.6), (key: "slagspitter", weight: 0.3)],
                 ),
                 (
@@ -1214,7 +1218,8 @@
                     tint: "#7A7777",
                     map_color: "#4A403C",
                     names: ["Foundry Ruins", "The Dead Furnaces", "Bellows Hall", "The Cold Smelteries", "Ingot Row"],
-                    ground: (paving: 0.25, ash: 0.25),
+                    ground: (paving: 0.12, ash: 0.2),
+                    marks: [(Soot, 1.2), (Collapse, 1.0), (Burn, 0.8), (Rust, 0.3)],
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "cinderling", weight: 0.7), (key: "slagspitter", weight: 0.4)],
                 ),
                 (
@@ -1231,7 +1236,8 @@
                     tint: "#8B867D",
                     map_color: "#6E6252",
                     names: ["Colonnade of Oaths", "The Oathbound Walk", "Hall of Vows", "The Pledge Stones", "Court of the Sworn"],
-                    ground: (paving: 0.4, ash: 0.15),
+                    ground: (paving: 0.25, ash: 0.1),
+                    marks: [(Collapse, 1.2), (Burn, 0.7), (Ash, 0.4)],
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "cinderling", weight: 0.6), (key: "emberwisp", weight: 0.4)],
                 ),
                 (
@@ -1249,7 +1255,8 @@
                     tint: "#8E8C8B",
                     map_color: "#66625E",
                     names: ["Cinder Dunes", "The Ash Sea", "Grey Drifts", "The Smoke Barrows"],
-                    ground: (paving: -0.35, ash: 0.9),
+                    ground: (paving: -0.4, ash: 0.9),
+                    marks: [(Ash, 1.4), (Burn, 0.6), (Slag, 0.3)],
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "clinker", weight: 0.8), (key: "emberwisp", weight: 0.5)],
                 ),
                 (
@@ -1266,7 +1273,8 @@
                     tint: "#8B796E",
                     map_color: "#6A3826",
                     names: ["The Chainyard", "Rust Gallows", "The Anchor Pits", "The Shackle Rows"],
-                    ground: (paving: -0.05, ash: 0.2),
+                    ground: (paving: 0.05, ash: 0.15),
+                    marks: [(Rust, 1.4), (Burn, 0.7), (Collapse, 0.5), (Soot, 0.3)],
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "slagspitter", weight: 0.5), (key: "cinderling", weight: 0.5)],
                 ),
             ],

@@ -1087,7 +1087,7 @@ pub fn decor(env: &mut Env, ctx: &Ctx, d: &Decor) {
     let c = ctx.colors;
     match *d {
         // Painted into the floor as glowing rifts (floor.wesl).
-        Decor::LavaCrack { .. } | Decor::Paving { .. } | Decor::FloorInlay { .. } => {}
+        Decor::LavaCrack { .. } | Decor::Paving { .. } | Decor::FloorMark { .. } | Decor::FloorInlay { .. } => {}
         Decor::BrokenAnvil { at, scale } => broken_anvil(env, ctx, at, scale),
         Decor::Brazier { at } => brazier(env, ctx, at),
         Decor::Pillar { at, radius, height } => {
