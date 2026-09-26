@@ -39,7 +39,10 @@
 //! | [`overdrive_hex`] | [`MoltenFill`] |
 //! | [`pin`] | `UiTransform.rotation` of [`PinParts::frame`] aims the nub |
 //! | [`prompt_plate`] | – |
+//! | [`ally_tag`] | [`AllyTagParts`] (the bar's [`KitBar`], the capsule's display) |
 //! | [`minimap_frame`] (phase-3 hook, hidden) | [`MinimapFrame`] (`content`, `icons`) |
+//! | [`toast`] (one row of the toast rail) | – (the HUD pools three and tweens them) |
+//! | icons inside text: [`UiKit::inline_icon`] as a child of the `Text` | – |
 //!
 //! Icon keys for content live in [`ik`] (`ik::part(key)`, `ik::element(e)`, `ik::poi(kind)`…).
 //!
@@ -2226,6 +2229,64 @@ pub fn pin(p: &mut ChildSpawnerCommands, kit: &UiKit, ring: PinRing, glyph: &str
     root
 }
 
+/// Parts of an ally tag.
+#[derive(Component, Clone, Copy, Debug)]
+pub struct AllyTagParts {
+    /// The HP bar: write its [`KitBar`].
+    pub bar: Entity,
+    /// The name capsule: show it under 60 % HP or when downed (`Node.display`).
+    pub capsule: Entity,
+}
+
+/// An ally's world tag (§6.11): the name capsule (a player pip and the name in `Body` Bold 14),
+/// a 46×6 rimless HP bar and the player-colour chevron under it. The capsule starts hidden.
+pub fn ally_tag(p: &mut ChildSpawnerCommands, kit: &UiKit, name: &str, color: Color) -> Entity {
+    let mut parts = AllyTagParts { bar: Entity::PLACEHOLDER, capsule: Entity::PLACEHOLDER };
+    let root = p
+        .spawn((
+            Node {
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                row_gap: px(3.0),
+                ..default()
+            },
+            Pickable::IGNORE,
+        ))
+        .with_children(|c| {
+            parts.capsule = c
+                .spawn((
+                    Node {
+                        height: px(19.0),
+                        padding: UiRect::horizontal(px(7.0)),
+                        column_gap: px(5.0),
+                        align_items: AlignItems::Center,
+                        border_radius: BorderRadius::all(px(9.5)),
+                        display: Display::None,
+                        ..default()
+                    },
+                    BackgroundColor(hx(0x0C0806).with_alpha(0.72)),
+                    Pickable::IGNORE,
+                ))
+                .with_children(|cap| {
+                    cap.spawn((
+                        Node { width: px(7.0), height: px(7.0), border_radius: BorderRadius::MAX, ..default() },
+                        BackgroundColor(color),
+                    ));
+                    cap.spawn(kit.text_flat(Ty::Strong, 14.0, name, tok::PARCH));
+                })
+                .id();
+            parts.bar = bar(c, kit, BarSpec { edge: false, ..BarSpec::new(46.0, 6.0, BarFill::Hp).no_rim() });
+            c.spawn((
+                Node { width: px(8.0), height: px(5.0), ..default() },
+                kit.tex_tinted("markers/ally_chevron@2x.png", color),
+                Pickable::IGNORE,
+            ));
+        })
+        .id();
+    p.commands_mut().entity(root).insert(parts);
+    root
+}
+
 /// A world prompt plate (§6.11): quiet plate 44 tall with a tail, the key, the verb in
 /// `LabelS` 16 `gold_lt` and the subject in `BodyS` 14 dim.
 pub fn prompt_plate(p: &mut ChildSpawnerCommands, kit: &UiKit, key: Key, verb: &str, subject: &str) -> Entity {
@@ -2288,6 +2349,50 @@ pub fn set_disabled(commands: &mut Commands, button: Entity, disabled: bool) {
     } else {
         commands.entity(button).remove::<InteractionDisabled>();
     }
+}
+
+// ───────────────────────────── toasts ─────────────────────────────
+
+/// One toast row (§6.5): an ink smear fading right, a gilt accent bar, a 20 px icon and rich
+/// text in `Body` 17 (names bold in their reserved colours, the rest `parch_dim`). The HUD lane
+/// owns the pool of three and the motion; this is the row.
+pub fn toast(p: &mut ChildSpawnerCommands, kit: &UiKit, icon_key: &str, spans: &[(Ty, &str, Color)]) -> Entity {
+    p.spawn((
+        Node { width: px(440.0), height: px(30.0), align_items: AlignItems::Center, flex_shrink: 0.0, ..default() },
+        BackgroundGradient(vec![
+            LinearGradient::to_right(vec![
+                ColorStop::percent(tok::POOL.with_alpha(0.62), 0.0),
+                ColorStop::percent(tok::POOL.with_alpha(0.45), 55.0),
+                ColorStop::percent(tok::POOL.with_alpha(0.0), 100.0),
+            ])
+            .into(),
+        ]),
+        UiTransform::default(),
+        Pickable::IGNORE,
+    ))
+    .with_children(|c| {
+        c.spawn((
+            abs(16.0, 4.0, 2.0, 22.0),
+            BackgroundGradient(vec![
+                LinearGradient::to_bottom(vec![
+                    ColorStop::auto(tok::GOLD_HI),
+                    ColorStop::auto(tok::GOLD_MD),
+                    ColorStop::auto(tok::GOLD_DK),
+                ])
+                .into(),
+            ]),
+            Pickable::IGNORE,
+        ));
+        c.spawn((abs(34.0, 5.0, 20.0, 20.0), icon_bundle(icon_key, 20.0, Color::WHITE)));
+        c.spawn((
+            Node { position_type: PositionType::Absolute, left: px(62.0), top: px(4.0), ..default() },
+            Pickable::IGNORE,
+        ))
+        .with_children(|t| {
+            rich(t, kit, 17.0, spans, None, Justify::Left);
+        });
+    })
+    .id()
 }
 
 // ───────────────────────────── wayfinder hook ─────────────────────────────

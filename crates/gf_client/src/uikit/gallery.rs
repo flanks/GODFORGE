@@ -637,6 +637,16 @@ fn spawn_kit_board(
             pin_rot(c, s, 2.4);
             let d = pin(c, kit, PinRing::Tint(tok::DANGER), "states/downed", Color::WHITE);
             pin_rot(c, d, 0.9);
+            let tag = ally_tag(c, kit, "Bot 3 · Kael", players[2]);
+            c.commands_mut().queue(move |w: &mut World| {
+                let Some(parts) = w.get::<AllyTagParts>(tag).copied() else { return };
+                if let Some(mut n) = w.get_mut::<Node>(parts.capsule) {
+                    n.display = Display::Flex;
+                }
+                if let Some(mut b) = w.get_mut::<KitBar>(parts.bar) {
+                    b.value = 0.46;
+                }
+            });
             c.commands_mut()
                 .entity(d)
                 .insert((glow(tok::DANGER.with_alpha(0.6), 10.0, 1.0), Pulse::shadow(1.25, 0.25, 0.8)));
@@ -819,6 +829,7 @@ fn animate_board(
 
 /// The icon board: every master at 32 px on slot recesses, grouped, then a size ladder.
 fn spawn_icon_board(mut commands: Commands, kit: Res<UiKit>) {
+    use gf_core::damage::DamageType;
     let kit = &*kit;
     board_root(&mut commands, |b| {
         at(b, 0.0, 0.0, row(26.0), |c| {
@@ -893,6 +904,58 @@ fn spawn_icon_board(mut commands: Commands, kit: Res<UiKit>) {
                 }
             },
         );
+        // Inline icons in running text and the toast rows.
+        heading(b, kit, 0.0, 690.0, "IN TEXT · TOAST ROWS");
+        at(b, 0.0, 716.0, column(6.0), |c| {
+            toast(
+                c,
+                kit,
+                "currency/seal",
+                &[(Ty::Strong, "Seal claimed", tok::PARCH), (Ty::Body, " · Lair of Ingot Row", tok::PARCH_DIM)],
+            );
+            toast(
+                c,
+                kit,
+                "boons/zephyros_tailwind",
+                &[
+                    (Ty::Strong, "Bot 2", crate::theme::hx(0x3FD8FF)),
+                    (Ty::Body, " took ", tok::PARCH_DIM),
+                    (Ty::Strong, "Tailwind", crate::palette::rarity_color(Rarity::Rare)),
+                ],
+            );
+            toast(
+                c,
+                kit,
+                "ui/equip",
+                &[
+                    (Ty::Body, "Equipped ", tok::PARCH_DIM),
+                    (Ty::Strong, "Ricochet", crate::palette::rarity_color(Rarity::Epic)),
+                    (Ty::Body, " · Mechanism", tok::PARCH_DIM),
+                ],
+            );
+        });
+        at(b, 520.0, 722.0, column(10.0), |c| {
+            let (font, spacing, line) = kit.fonts.style(Ty::Body, 18.0);
+            c.spawn((Text::new("Tap the vein for "), font, spacing, line, TextColor(tok::PARCH))).with_children(|t| {
+                t.spawn(kit.inline_icon("currency/godshard", 20.0, Color::WHITE));
+                t.spawn(kit.span(Ty::Strong, 18.0, " 12", tok::ICHOR));
+                t.spawn(kit.span(Ty::Body, 18.0, " shards for all · hold ", tok::PARCH));
+                t.spawn(kit.inline_icon("input/pad_west", 24.0, Color::WHITE));
+                t.spawn(kit.span(Ty::Body, 18.0, " on a pad · costs ", tok::PARCH));
+                t.spawn(kit.inline_icon("currency/ember", 20.0, Color::WHITE));
+                t.spawn(kit.span(Ty::Strong, 18.0, " 6", tok::ICHOR));
+            });
+            let (font, spacing, line) = kit.fonts.style(Ty::BodyS, 16.0);
+            c.spawn((Text::new("Hits "), font, spacing, line, TextColor(tok::PARCH_DIM))).with_children(|t| {
+                t.spawn(kit.inline_icon("status/shock", 16.0, Color::WHITE));
+                t.spawn(kit.span(Ty::Strong, 16.0, " Shock", crate::palette::element_color(DamageType::Storm)));
+                t.spawn(kit.span(Ty::BodyS, 16.0, " the target · ", tok::PARCH_DIM));
+                t.spawn(kit.inline_icon("ui/delta_up", 16.0, tok::ICHOR));
+                t.spawn(kit.span(Ty::Strong, 16.0, "24%", tok::ICHOR));
+                t.spawn(kit.span(Ty::BodyS, 16.0, " DPS", tok::PARCH_DIM));
+            });
+        });
+
         // Size ladder: the same icons at 64, 48, 32 and 24 (checks the level pick).
         heading(b, kit, 0.0, 858.0, "SIZE LADDER · 64 · 48 · 32 · 24");
         let ladder = [

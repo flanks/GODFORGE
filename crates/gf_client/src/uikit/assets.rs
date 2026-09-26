@@ -9,8 +9,8 @@
 //! code can clone them freely (`Res<UiKit>` is read-only). The PNG is decoded the first time an
 //! `ImageNode` or `InlineImage` using one of its handles appears ([`materialize`]); unused art
 //! costs neither decode time nor GPU memory. Icons get three levels, 128/64/32, built with a
-//! premultiplied 2Ã—2 box filter in linear light (Bevy UI has no mipmaps, Â§9.2); [`UiIcon`] picks
-//! the level from the logical size Ã— UiScale and re-picks when the scale changes.
+//! premultiplied 2×2 box filter in linear light (Bevy UI has no mipmaps, §9.2); [`UiIcon`] picks
+//! the level from the logical size × UiScale and re-picks when the scale changes.
 
 use crate::theme::UiFonts;
 use gf_engine::client::{decode_png_rgba, ui_image};
@@ -20,7 +20,7 @@ use std::collections::{HashMap, HashSet};
 /// How a kit texture maps onto its node (from the manifest).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum KitMode {
-    /// 9-slice, corners at `max_corner_scale: 0.5` (the @2x rule, Â§8.2).
+    /// 9-slice, corners at `max_corner_scale: 0.5` (the @2x rule, §8.2).
     NineSlice,
     /// Left/right caps with a stretched middle.
     ThreeSliceH,
@@ -84,12 +84,18 @@ impl KitEntry {
     }
 }
 
-/// Icon level sizes in px (Â§9.2).
+/// Icon level sizes in px (§9.2).
 pub const ICON_LEVELS: [u32; 3] = [32, 64, 128];
+
+/// Exact sizes for icons inside running text (`InlineImage` boxes take the image's pixel size as
+/// logical px, §11.7).
+pub const ICON_INLINE: [u32; 3] = [16, 20, 24];
 
 struct IconEntry {
     /// Handles for the 32, 64 and 128 px levels.
     levels: [Handle<Image>; 3],
+    /// Handles for the 16, 20 and 24 px inline sizes.
+    inline: [Handle<Image>; 3],
     category: &'static str,
 }
 
@@ -107,7 +113,7 @@ pub struct UiKit {
 #[derive(Clone, Copy)]
 enum Source {
     Kit(&'static KitEntry),
-    /// Index into [`ICONS`]; decoding one level decodes all three.
+    /// Index into [`ICONS`]; decoding one level decodes every level and inline size.
     Icon(usize),
 }
 
@@ -115,7 +121,7 @@ enum Source {
 #[derive(Resource, Default)]
 pub struct UiDecode {
     pending: HashMap<AssetId<Image>, Source>,
-    icon_handles: HashMap<usize, [Handle<Image>; 3]>,
+    icon_handles: HashMap<usize, [Handle<Image>; 6]>,
     /// Handles the next [`materialize`] must decode even if no node shows them yet (material
     /// textures).
     forced: Vec<AssetId<Image>>,
@@ -130,7 +136,7 @@ impl UiDecode {
     }
 }
 
-/// Group fallbacks for a missing icon key (Â§9.2): the generic glyph of its group.
+/// Group fallbacks for a missing icon key (§9.2): the generic glyph of its group.
 fn fallback_icon(key: &str) -> &'static str {
     match key.split('/').next().unwrap_or("") {
         "parts" => "slots/core",
@@ -206,6 +212,19 @@ impl UiKit {
         let level = ICON_LEVELS.iter().position(|&l| l as f32 >= physical_px - 0.5).unwrap_or(ICON_LEVELS.len() - 1);
         entry.levels[level].clone()
     }
+
+    /// An icon for running text (§11.7), as a child of a `Text` next to its `TextSpan`s: the
+    /// nearest inline size (16, 20 or 24 logical px) to `px`, tinted by `tint`.
+    pub fn inline_icon(&self, key: &str, px: f32, tint: Color) -> InlineImage {
+        let entry = self.icons.get(key).or_else(|| self.icons.get(fallback_icon(key)));
+        let Some(entry) = entry else { return InlineImage::default() };
+        let i = ICON_INLINE
+            .iter()
+            .enumerate()
+            .min_by(|a, b| (*a.1 as f32 - px).abs().total_cmp(&(*b.1 as f32 - px).abs()))
+            .map_or(1, |(i, _)| i);
+        InlineImage { image: entry.inline[i].clone(), color: tint }
+    }
 }
 
 /// An icon by key at a logical size. The image level follows UiScale; tint through the node's
@@ -238,11 +257,22 @@ pub fn install(app: &mut App, fonts: UiFonts) {
     let mut icon_keys = Vec::with_capacity(ICONS.len());
     for (i, (key, category, _)) in ICONS.iter().enumerate() {
         let levels = [images.reserve_handle(), images.reserve_handle(), images.reserve_handle()];
-        for h in &levels {
+        let inline = [images.reserve_handle(), images.reserve_handle(), images.reserve_handle()];
+        for h in levels.iter().chain(&inline) {
             decode.pending.insert(h.id(), Source::Icon(i));
         }
-        decode.icon_handles.insert(i, levels.clone());
-        icons.insert(*key, IconEntry { levels, category });
+        decode.icon_handles.insert(
+            i,
+            [
+                levels[0].clone(),
+                levels[1].clone(),
+                levels[2].clone(),
+                inline[0].clone(),
+                inline[1].clone(),
+                inline[2].clone(),
+            ],
+        );
+        icons.insert(*key, IconEntry { levels, inline, category });
         icon_keys.push(*key);
     }
     world.insert_resource(UiKit { fonts, tex, icons, icon_keys });
@@ -315,7 +345,7 @@ fn warn_bad(decode: &mut UiDecode, what: &str) {
     }
 }
 
-/// sRGB byte â†’ linear light.
+/// sRGB byte → linear light.
 fn lin_lut() -> &'static [f32; 256] {
     use std::sync::OnceLock;
     static LUT: OnceLock<[f32; 256]> = OnceLock::new();
@@ -335,7 +365,7 @@ fn to_srgb_byte(l: f32) -> u8 {
     (c * 255.0 + 0.5) as u8
 }
 
-/// Halve an RGBA8 image with a premultiplied 2Ã—2 box filter in linear light. Fully transparent
+/// Halve an RGBA8 image with a premultiplied 2×2 box filter in linear light. Fully transparent
 /// output keeps the ink colour the masters use under their alpha, so edges fringe to ink.
 fn halve(w: u32, h: u32, src: &[u8]) -> (u32, u32, Vec<u8>) {
     let lut = lin_lut();
@@ -368,8 +398,48 @@ fn halve(w: u32, h: u32, src: &[u8]) -> (u32, u32, Vec<u8>) {
     (ow, oh, out)
 }
 
-/// The 32 / 64 / 128 levels of an icon master (any source size is halved down to them).
-fn icon_levels(w: u32, h: u32, px: Vec<u8>) -> [Image; 3] {
+/// Resample an RGBA8 image to (ow, oh) by exact area coverage, premultiplied, in linear light
+/// (the inline sizes 16 / 20 / 24 are not powers of two).
+fn resample(w: u32, h: u32, src: &[u8], ow: u32, oh: u32) -> Vec<u8> {
+    let lut = lin_lut();
+    let (sx, sy) = (w as f32 / ow as f32, h as f32 / oh as f32);
+    let mut out = vec![0u8; (ow * oh * 4) as usize];
+    for y in 0..oh {
+        let (y0, y1) = (y as f32 * sy, (y + 1) as f32 * sy);
+        for x in 0..ow {
+            let (x0, x1) = (x as f32 * sx, (x + 1) as f32 * sx);
+            let mut acc = [0.0f32; 4];
+            let mut area = 0.0;
+            for iy in y0.floor() as u32..(y1.ceil() as u32).min(h) {
+                let wy = ((iy + 1) as f32).min(y1) - (iy as f32).max(y0);
+                for ix in x0.floor() as u32..(x1.ceil() as u32).min(w) {
+                    let wx = ((ix + 1) as f32).min(x1) - (ix as f32).max(x0);
+                    let k = wx * wy;
+                    let i = ((iy * w + ix) * 4) as usize;
+                    let a = src[i + 3] as f32 / 255.0;
+                    acc[0] += lut[src[i] as usize] * a * k;
+                    acc[1] += lut[src[i + 1] as usize] * a * k;
+                    acc[2] += lut[src[i + 2] as usize] * a * k;
+                    acc[3] += a * k;
+                    area += k;
+                }
+            }
+            let o = ((y * ow + x) * 4) as usize;
+            if acc[3] > 1e-5 {
+                out[o] = to_srgb_byte(acc[0] / acc[3]);
+                out[o + 1] = to_srgb_byte(acc[1] / acc[3]);
+                out[o + 2] = to_srgb_byte(acc[2] / acc[3]);
+            } else {
+                out[o..o + 3].copy_from_slice(&[10, 7, 6]);
+            }
+            out[o + 3] = (acc[3] / area.max(1e-5) * 255.0 + 0.5) as u8;
+        }
+    }
+    out
+}
+
+/// The 32 / 64 / 128 levels and the 16 / 20 / 24 inline sizes of an icon master.
+fn icon_levels(w: u32, h: u32, px: Vec<u8>) -> [Image; 6] {
     let mut level = (w, h, px);
     while level.0 > ICON_LEVELS[2] {
         level = halve(level.0, level.1, &level.2);
@@ -377,5 +447,14 @@ fn icon_levels(w: u32, h: u32, px: Vec<u8>) -> [Image; 3] {
     let l128 = level.clone();
     let l64 = halve(l128.0, l128.1, &l128.2);
     let l32 = halve(l64.0, l64.1, &l64.2);
-    [ui_image(l32.0, l32.1, l32.2), ui_image(l64.0, l64.1, l64.2), ui_image(l128.0, l128.1, l128.2)]
+    let inline = ICON_INLINE.map(|s| resample(l64.0, l64.1, &l64.2, s, s));
+    let [i16, i20, i24] = inline;
+    [
+        ui_image(l32.0, l32.1, l32.2),
+        ui_image(l64.0, l64.1, l64.2),
+        ui_image(l128.0, l128.1, l128.2),
+        ui_image(16, 16, i16),
+        ui_image(20, 20, i20),
+        ui_image(24, 24, i24),
+    ]
 }
