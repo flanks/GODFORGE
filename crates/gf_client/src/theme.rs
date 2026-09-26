@@ -262,13 +262,15 @@ impl UiFonts {
     pub fn font_px(&self, ty: Ty, px: f32) -> TextFont {
         let (face, weight, _, _, tabular) = ty.spec();
         let fallback = if face == Face::Cinzel { &self.dejavu_serif } else { &self.dejavu_sans };
-        let font_features = if tabular {
-            FontFeatures::builder()
+        // Alegreya's Regular, Medium and Italic default to oldstyle figures (a 0 reads as an o);
+        // the HUD wants lining figures everywhere, and tabular ones on live numbers.
+        let font_features = match (face, tabular) {
+            (_, true) => FontFeatures::builder()
                 .enable(FontFeatureTag::TABULAR_FIGURES)
                 .enable(FontFeatureTag::LINING_FIGURES)
-                .build()
-        } else {
-            FontFeatures::default()
+                .build(),
+            (Face::Cinzel, false) => FontFeatures::default(),
+            (_, false) => FontFeatures::builder().enable(FontFeatureTag::LINING_FIGURES).build(),
         };
         TextFont {
             font: FontSource::List(vec![

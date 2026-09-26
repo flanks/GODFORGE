@@ -39,6 +39,9 @@
 //! | [`overdrive_hex`] | [`MoltenFill`] |
 //! | [`pin`] | `UiTransform.rotation` of [`PinParts::frame`] aims the nub |
 //! | [`prompt_plate`] | – |
+//! | [`minimap_frame`] (phase-3 hook, hidden) | [`MinimapFrame`] (`content`, `icons`) |
+//!
+//! Icon keys for content live in [`ik`] (`ik::part(key)`, `ik::element(e)`, `ik::poi(kind)`…).
 //!
 //! Motion helpers for anything else: [`Tween`], [`Pulse`], [`pop`].
 //!
@@ -2055,12 +2058,19 @@ pub fn niche_card(
         ))
         .with_children(|c| {
             c.spawn((fill(), kit.tex_tinted("frames/niche_body@2x.png", body_tint), Pickable::IGNORE));
-            c.spawn((fill(), kit.tex_tinted("frames/niche_glow@2x.png", god1.with_alpha(0.24)), Pickable::IGNORE));
+            c.spawn((
+                fill(),
+                kit.tex_tinted(
+                    "frames/niche_glow@2x.png",
+                    crate::palette::mix(god1, hx(0x8C8272), 0.35).with_alpha(0.2),
+                ),
+                Pickable::IGNORE,
+            ));
             // The god sigil as a 6 % watermark in the lower half.
             if let Some((key, _)) = spec.gods.first() {
                 c.spawn((
                     centered_at(150.0, 318.0, 186.0, 186.0),
-                    icon_bundle(&format!("gods/{key}"), 186.0, god1.with_alpha(0.07)),
+                    icon_bundle(&format!("gods/{key}"), 186.0, god1.with_alpha(0.055)),
                 ));
             }
             match god2 {
@@ -2108,7 +2118,7 @@ pub fn niche_card(
             medallion_e = c
                 .spawn((
                     Node { border_radius: BorderRadius::MAX, ..centered_at(150.0, 56.0, 100.0, 100.0) },
-                    glow(god1.with_alpha(0.3), 14.0, 1.0),
+                    glow(god1.with_alpha(0.22), 12.0, 1.0),
                     Pickable::IGNORE,
                 ))
                 .with_children(|m| {
@@ -2277,5 +2287,154 @@ pub fn set_disabled(commands: &mut Commands, button: Entity, disabled: bool) {
         commands.entity(button).insert(InteractionDisabled);
     } else {
         commands.entity(button).remove::<InteractionDisabled>();
+    }
+}
+
+// ───────────────────────────── wayfinder hook ─────────────────────────────
+
+/// The minimap frame (§6.6, OPEN_WORLD phase 3 hook). Spawned hidden (`Display::None`).
+#[derive(Component, Clone, Copy, Debug)]
+pub struct MinimapFrame {
+    /// Clipped content (inset 3): phase 3 writes its map `ImageNode` here.
+    pub content: Entity,
+    /// Absolute pins over the map (players, POIs, the gate).
+    pub icons: Entity,
+}
+
+/// Marks the minimap's clipped content node.
+#[derive(Component, Clone, Copy, Debug, Default)]
+pub struct MinimapContent;
+
+/// Marks the minimap's pin layer.
+#[derive(Component, Clone, Copy, Debug, Default)]
+pub struct MinimapIcons;
+
+/// The 280×176 minimap frame with its gilt rim, horns and north gem baked (`frames/minimap_frame`),
+/// a clipped `MinimapContent` node and a `MinimapIcons` layer. It starts hidden; phase 3 sets
+/// `Display::Flex` on the returned root once it has a map to show. Place it with `node`
+/// (`left`/`top`, e.g. the frame at (1616, 24) means the texture at (1613, 21)).
+pub fn minimap_frame(p: &mut ChildSpawnerCommands, kit: &UiKit, node: Node) -> Entity {
+    let mut content = Entity::PLACEHOLDER;
+    let mut icons = Entity::PLACEHOLDER;
+    let root = p
+        .spawn((
+            Node { width: px(286.0), height: px(182.0), display: Display::None, ..node },
+            drop_shadow(0.6, 4.0, 12.0),
+            Pickable::IGNORE,
+        ))
+        .with_children(|c| {
+            content = c
+                .spawn((
+                    Node { overflow: Overflow::clip(), border_radius: BorderRadius::all(px(8.0)), ..inset(6.0) },
+                    BackgroundColor(hx(0x140E0A)),
+                    MinimapContent,
+                    Pickable::IGNORE,
+                ))
+                .id();
+            icons = c.spawn((inset(6.0), MinimapIcons, Pickable::IGNORE)).id();
+            c.spawn((fill(), kit.tex("frames/minimap_frame@2x.png"), ZIndex(2), Pickable::IGNORE));
+        })
+        .id();
+    p.commands_mut().entity(root).insert(MinimapFrame { content, icons });
+    root
+}
+
+// ───────────────────────────── icon keys ─────────────────────────────
+
+/// Typed icon keys (§9.2): map content to `<group>/<name>` keys of `assets/ui/icons/icons.json`.
+/// A key with no master falls back to its group's generic glyph at runtime.
+pub mod ik {
+    use gf_core::aim::{AimMode, TargetBias};
+    use gf_core::damage::DamageType;
+    use gf_core::poi::PoiKind;
+    use gf_core::rarity::Rarity;
+    use gf_core::status::StatusKind;
+
+    /// A weapon part by its `parts.ron` key.
+    pub fn part(key: &str) -> String {
+        format!("parts/{key}")
+    }
+
+    /// A boon by its `boons.ron` key.
+    pub fn boon(key: &str) -> String {
+        format!("boons/{key}")
+    }
+
+    /// A chassis by its `chassis.ron` key.
+    pub fn chassis(key: &str) -> String {
+        format!("chassis/{key}")
+    }
+
+    /// A god sigil by its `gods.ron` key.
+    pub fn god(key: &str) -> String {
+        format!("gods/{key}")
+    }
+
+    /// A character's bust crest by its `characters.ron` key.
+    pub fn portrait(character: &str) -> String {
+        format!("portraits/{character}")
+    }
+
+    /// A kit ability: `slot` is `q`, `e`, `r` or `passive`.
+    pub fn kit(character: &str, slot: &str) -> String {
+        format!("kits/{character}_{slot}")
+    }
+
+    pub fn element(e: DamageType) -> &'static str {
+        match e {
+            DamageType::Kinetic => "elements/kinetic",
+            DamageType::Flame => "elements/flame",
+            DamageType::Storm => "elements/storm",
+            DamageType::Void => "elements/void",
+            DamageType::Plague => "elements/plague",
+            DamageType::Radiant => "elements/radiant",
+        }
+    }
+
+    pub fn status(s: StatusKind) -> String {
+        format!("status/{}", s.name().to_lowercase())
+    }
+
+    pub fn poi(kind: PoiKind) -> String {
+        format!("poi/{}", kind.name().to_lowercase())
+    }
+
+    /// The empty-slot ghost glyph of a weapon part slot.
+    pub fn slot_ghost(slot: gf_core::forge::Slot) -> &'static str {
+        use gf_core::forge::Slot;
+        match slot {
+            Slot::Core => "slots/core",
+            Slot::Mechanism => "slots/mechanism",
+            Slot::Relic => "slots/relic",
+            Slot::Sigil => "slots/sigil",
+        }
+    }
+
+    /// The cut rarity gem (the only icons with baked colour).
+    pub fn rarity_gem(r: Rarity) -> &'static str {
+        match r {
+            Rarity::Common => "rarity/gem_common",
+            Rarity::Rare => "rarity/gem_rare",
+            Rarity::Epic => "rarity/gem_epic",
+            Rarity::Godforged => "rarity/gem_godforged",
+        }
+    }
+
+    pub fn aim(mode: AimMode) -> &'static str {
+        match mode {
+            AimMode::Auto => "aim/auto",
+            AimMode::Assisted => "aim/assisted",
+            AimMode::Manual => "aim/manual",
+        }
+    }
+
+    pub fn bias(bias: TargetBias) -> &'static str {
+        match bias {
+            TargetBias::Balanced => "aim/bias_balanced",
+            TargetBias::Nearest => "aim/bias_nearest",
+            TargetBias::Strongest => "aim/bias_strongest",
+            TargetBias::LowestHp => "aim/bias_lowest_hp",
+            TargetBias::Pinned => "aim/bias_pinned",
+        }
     }
 }

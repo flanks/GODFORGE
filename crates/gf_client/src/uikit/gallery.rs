@@ -1398,6 +1398,50 @@ fn spawn_cards_board(mut commands: Commands, kit: Res<UiKit>, cfg: Res<ClientCon
             let _ = seraphel;
         });
 
+        // ── the minimap hook (phase 3 fills it; shown here with a stand-in map) ──
+        at(b, rx + (rw - 286.0) / 2.0, 800.0, Node::default(), |c| {
+            let frame = minimap_frame(c, kit, Node::default());
+            let dots: Vec<(f32, f32, Color)> = vec![
+                (120.0, 80.0, players[0]),
+                (140.0, 92.0, players[1]),
+                (98.0, 70.0, players[2]),
+                (150.0, 60.0, players[3]),
+            ];
+            c.commands_mut().queue(move |w: &mut World| {
+                let Some(parts) = w.get::<MinimapFrame>(frame).copied() else { return };
+                if let Some(mut n) = w.get_mut::<Node>(frame) {
+                    n.display = Display::Flex;
+                }
+                // A sepia stand-in for the phase-3 map texture.
+                w.entity_mut(parts.content).insert(BackgroundGradient(vec![
+                    RadialGradient::new(
+                        UiPosition::CENTER.at_percent(-10.0, 5.0),
+                        RadialGradientShape::FarthestCorner,
+                        vec![
+                            ColorStop::percent(hx(0x967650), 0.0),
+                            ColorStop::percent(hx(0x463424), 38.0),
+                            ColorStop::percent(hx(0x140E0A), 100.0),
+                        ],
+                    )
+                    .into(),
+                ]));
+                for (x, y, color) in dots {
+                    let dot = w
+                        .spawn((
+                            Node {
+                                border_radius: BorderRadius::MAX,
+                                border: UiRect::all(px(1.0)),
+                                ..centered_at(x, y, 8.0, 8.0)
+                            },
+                            BackgroundColor(color),
+                            BorderColor::all(tok::INK),
+                        ))
+                        .id();
+                    w.entity_mut(parts.icons).add_child(dot);
+                }
+            });
+        });
+
         // ── a Forge strip ──
         at(b, 0.0, 700.0, Node::default(), |c| {
             gilt_panel(
