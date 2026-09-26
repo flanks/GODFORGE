@@ -17,9 +17,13 @@ pub mod offscreen;
 pub mod palette;
 pub mod scene;
 pub mod terrain;
+pub mod theme;
 pub mod ui;
+pub mod uikit;
 pub mod vfx;
 pub mod world;
+
+pub use theme::UiFonts;
 
 use gf_content::ContentDb;
 use gf_core::aim::AimMode;
@@ -62,19 +66,16 @@ pub struct ClientConfig {
     pub shadows: bool,
     /// Log FPS / frame times and the replicated enemy count once a second (`--fps`).
     pub fps: bool,
+    /// QA: force a UI board or panel open for screenshots (`--ui-shot kit|icons|…`).
+    pub ui_shot: Option<String>,
+    /// QA: hide every root UI node (`--hud-off`, clean plates).
+    pub hud_off: bool,
+    /// Player HUD scale 0.85–1.15 (`--hud-scale`), multiplied into UiScale.
+    pub hud_scale: f32,
 }
 
 /// Wires every client system.
 pub struct ClientPlugin(pub ClientConfig);
-
-/// Heading face (body text uses the replaced default font).
-#[derive(Resource, Clone)]
-pub struct UiFonts {
-    pub display: Handle<Font>,
-}
-
-const BODY_FONT: &[u8] = include_bytes!("../../../assets/fonts/DejaVuSans.ttf");
-const DISPLAY_FONT: &[u8] = include_bytes!("../../../assets/fonts/DejaVuSerif-Bold.ttf");
 
 /// Frame phases, ordered.
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
@@ -88,8 +89,8 @@ pub enum ClientSet {
 impl Plugin for ClientPlugin {
     fn build(&self, app: &mut App) {
         let cfg = self.0.clone();
-        let display = gf_engine::client::install_fonts(app, BODY_FONT, DISPLAY_FONT);
-        app.insert_resource(UiFonts { display })
+        let fonts = theme::install_fonts(app);
+        app.insert_resource(fonts.clone())
             .insert_resource(cfg.clone())
             .insert_resource(Time::<Fixed>::from_hz(gf_core::SIM_HZ as f64))
             .insert_resource(ClearColor(Color::srgb(0.03, 0.02, 0.018)))
@@ -112,6 +113,8 @@ impl Plugin for ClientPlugin {
         hud::build(app);
         offscreen::build(app);
         ui::build(app);
+        theme::build(app);
+        uikit::build(app, fonts);
         if cfg.fps {
             app.register_diagnostic(Diagnostic::new(ENEMIES).with_max_history_length(1).with_smoothing_factor(0.0))
                 .add_systems(Update, measure_horde.after(ClientSet::Net));

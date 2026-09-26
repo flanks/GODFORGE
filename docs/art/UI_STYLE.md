@@ -101,7 +101,7 @@ them.
 
 ## 3. Tokens
 
-These are defined once in `ui_theme.rs` as `const Color` (§11.1). Hex values are sRGB.
+These are defined once in `theme.rs` (`theme::tok`) as `const Color` (§11.1). Hex values are sRGB.
 
 ### 3.1 Surfaces and metal
 
@@ -212,7 +212,7 @@ These are read from content and code; they are never re-typed.
 ### 4.2 The type ramp (a closed list)
 
 Every (face, weight, size) pair builds its own glyph atlas, so the set is fixed in
-`ui_theme::Ty`. Adding a style means editing that enum and this table.
+`theme::Ty`. Adding a style means editing that enum and this table.
 
 | `Ty` | Face | Weight | Size | Tracking | Use |
 |---|---|---|---|---|---|
@@ -1053,11 +1053,13 @@ ImageNode {
 
 - **Masters:** `assets/ui/icons/<group>/<name>.png`, 128×128, RGBA8, transparent background. One
   file per icon, deterministic output from `tools/ui_art/gen_icons.py`.
-- **The generated table:** the generator also writes `crates/gf_client/src/icon_table.rs`, a
-  generated file owned by lane I:
+- **The generated table:** `crates/gf_client/build.rs` reads `icons.json` (and the texture kit's
+  `ui_kit.json`) at build time and writes the `include_bytes!` table into `OUT_DIR`, so new icons
+  land by re-running the generator. The originally planned checked-in form was
+  `crates/gf_client/src/icon_table.rs`:
   `pub const ICONS: &[(&str, &[u8])] = &[("poi/anvil", include_bytes!("../../../assets/ui/icons/poi/anvil.png")), …];`
-  The keys are `<group>/<name>`, sorted. `icons.rs` (lane K) `include!`s it, so the game runs from
-  any cwd.
+  The keys are `<group>/<name>`, sorted. `uikit/assets.rs` (lane K) `include!`s it, so the game
+  runs from any cwd.
 - **Runtime:**
   - K decodes each PNG at startup (`Image::from_buffer`) and builds **three levels (128, 64, 32)**
     with a premultiplied 2×2 box filter, so small icons don't alias. Bevy UI has no mipmaps.
@@ -1164,10 +1166,11 @@ These were checked against `bevy_ui`, `bevy_text` and `bevy_ui_render` 0.20.0-rc
 
 | File | Owner | Contents |
 |---|---|---|
-| `gf_client/src/ui_theme.rs` (new) | K | `tok::*` colours (§3), `Ty` and `ty(Ty) -> (TextFont, LetterSpacing)` (§4.2), `UiFontHandles`, texture handles `UiTex`, sizes and constants (M = 24, region rects) |
-| `gf_client/src/ui_kit.rs` (new) | K | Spawn helpers: `quiet_plate`, `gilt_panel(corner, crest)`, `gilt_card(rarity)`, `niche_card(..)`, `ember_knot(width)`, `sun_crest`, `horn_corners`, `slot(shape, size) -> SlotParts { fill, icon, sweep, rim }`, `medallion(kind, size)`, `rarity_gem(rarity, r)`, `keycap(label)`, `pad_stud(pos)`, `button(kind, label, sub)`, `bar(style, w, h) -> BarParts`, `delta_chip(pct)`, `rich_text(spans)`, `outlined_text`; the `HudRects` resource |
-| `gf_client/src/ui_fx.rs` (new) + `shaders/ui_molten.wesl` | K | `Ghost`, `Tween`, `Pulse`, `Pop`, `Sweep` components and systems; `MoltenMaterial: UiMaterial`; the `UiScale` system; reduced motion |
-| `gf_client/src/icons.rs` (new) + `icon_table.rs` (generated) | K / I | `IconId`, the level builder, `icon(id, px) -> ImageNode` |
+| `gf_client/src/theme.rs` | K | `tok::*` colours (§3), `Ty` and `UiFonts::{font, font_px, style}` (§4.2), `UiFonts`, `player_color`, `god_colors`, the `UiScale` system and `HudScale`, `region::*` rects, `z::*` layers, the `HudRects` resource |
+| `gf_client/src/uikit.rs` | K | Spawn helpers (the table in its module docs lists each with its state component): `quiet_plate`, `gilt_panel(PanelStyle)`, `gilt_card(rarity)`, `niche_card(NicheSpec)`, `tooltip`, `dashed_plate`, `corner_pool`, `halo`, `scrim`, `ember_knot(width, Gem)`, `sun_crest`, `horn_corners`, `slot(SlotSpec) -> SlotParts`, `medallion(MedallionSpec)`, `hearth_medallion`, `ring_meter`, `overdrive_hex`, `rarity_gem(rarity, r)`, `element_cabochon`, `keycap(label)`, `key_chip(Key)`, `button(kind, label, w, h, trailing)`, `chip`, `pill`, `ribbon`, `pchip`, `delta_chip(pct)`, `bar(BarSpec) -> BarParts`, `notches`, `plates`, `dash_pips`, `pin`, `prompt_plate`, `rich`, `outlined_text`, `gradient_text`, `icon`, `damage_text` |
+| `gf_client/src/uikit/fx.rs` + `shaders/ui_molten.wesl` | K | `KitBar` (ghost), `SlotState` (sweep, flash, pop, burst), `KitRing`, `MoltenFill` + `MoltenMaterial: UiMaterial`, `KitPlates`, `KitPips`, `KitCard`, `KitHover`, `KitButton`, `Tween`, `Pulse`, `pop`; reduced motion |
+| `gf_client/src/uikit/assets.rs` + `build.rs` (generated table) | K / T / I | `UiKit` (fonts, `tex(path)`, `icon_handle(key, px)`), `UiIcon { key, px }`, the lazy decode and the 128/64/32 icon levels |
+| `gf_client/src/uikit/gallery.rs` | K | `--ui-shot kit`, `icons` and `cards`; `--hud-off` |
 | `hud.rs`, `offscreen.rs`, damage-number styling in `vfx.rs` | H | §6 |
 | `ui.rs` (+ a small read in `camera.rs`) | P | §7, `PanelFraming` |
 | `lib.rs`, `input.rs` (Settings: `debug_strip`, `reduced_motion`, `hud_scale`; F10) | K | `mod` lines and plugin calls only |
@@ -1200,7 +1203,7 @@ Legibility: `TextShadow { offset: Vec2::new(0., 2.), color: ink.with_alpha(0.9) 
 text outline in `bevy_ui` 0.20. The mockups' 1 px ink stroke becomes this shadow, plus the pool or
 plate behind the text. The single-instance display texts (callout, region banner, boss name,
 VICTORY) also get a real outline: four copies of the text in `ink` at 0.9, offset ±1 px on x and y,
-as siblings behind it (`ui_kit::outlined_text`). Never do this for pooled texts such as damage
+as siblings behind it (`uikit::outlined_text`). Never do this for pooled texts such as damage
 numbers or labels.
 
 ### 11.3 Plates, gradients and shadows
@@ -1309,7 +1312,8 @@ table.
 
 - `--ui-shot forge|boon|end|help|kit` (lane P, with `kit` from K) forces a panel open with sample
   data (from the current content) for screenshots. `kit` shows a board of every widget and state
-  from `ui_kit`, the in-engine twin of `ui_visual_language_1920.png`. QA only; it is never reachable
+  from `uikit`, the in-engine twin of `ui_visual_language_1920.png` (`icons` shows every icon
+  master, `cards` the premium pieces assembled from kit widgets). QA only; it is never reachable
   in normal play.
 - `--hud-off` (K) hides every UI root node, for clean plates.
 - **Acceptance** for each lane:
@@ -1328,7 +1332,7 @@ commits only its own paths.
 
 ### K: the Rust UI kit, theme and fonts (foundation)
 
-- **Files:** `ui_theme.rs`, `ui_kit.rs`, `ui_fx.rs`, `shaders/ui_molten.wesl`, `icons.rs`, plus the
+- **Files:** `theme.rs`, `uikit.rs`, `uikit/{assets,fx,gallery}.rs`, `build.rs`, `shaders/ui_molten.wesl`, plus the
   `mod` and plugin lines in `lib.rs`, the Settings fields and F10 in `input.rs`, add-only functions
   in `gf_engine/src/client.rs`, and the CLI flags in `gf_game`.
 - **Delivers:**
@@ -1336,7 +1340,7 @@ commits only its own paths.
   - all seven fonts embedded, the default font set to Alegreya Medium, and the `FontSource::List`
     stacks;
   - the UiScale system (§5.1);
-  - every `ui_kit` widget (§8.1) with its states (idle, hover, pressed, disabled, selected, focus)
+  - every `uikit` widget (§8.1) with its states (idle, hover, pressed, disabled, selected, focus)
     driven from `Hovered` and `InteractionDisabled`;
   - the slice rule (§8.2), `Tween`, `Pulse` and `Ghost`, `MoltenMaterial`, and the icon levels;
   - `HudRects` (the type; H fills it);
@@ -1407,7 +1411,7 @@ commits only its own paths.
    quality allowed, so the files that K embeds with `include_bytes!` exist.
 2. **K** lands the theme, fonts and kit (with solid-colour fallbacks until the textures land), then
    switches to the textures and icons.
-3. **H and P** start on K's API. They may stub against `ui_kit` signatures agreed in this page.
+3. **H and P** start on K's API (`gf_client::uikit`, `gf_client::theme`).
 4. The final polish pass runs after the T and I second passes. Re-capture `docs/media/*.jpg`.
 
 ---

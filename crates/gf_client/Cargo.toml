@@ -19,5 +19,9 @@ glam = { workspace = true }
 # Art sidecars (assets/models/**/*.meta.json).
 serde_json = { workspace = true }
 
+[build-dependencies]
+# build.rs reads the UI art manifests (assets/ui/ui_kit.json, assets/ui/icons/icons.json).
+serde_json = "1"
+
 [lints]
 workspace = true

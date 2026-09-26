@@ -35,6 +35,10 @@ pub struct InputState {
     pub cursor_ground: Option<Vec2>,
     /// UI panel has focus: gameplay mouse buttons are ignored.
     pub ui_captures: bool,
+    /// A panel opened from the pad owns the D-pad and South/West (UI_STYLE §7.6): dash on South,
+    /// interact on West, aim mode and bias on the D-pad are suppressed until it closes. The panel
+    /// code sets and clears it.
+    pub panel_pad_capture: bool,
     /// Touch sticks (origin, current) for the on-screen overlay.
     pub touch_move: Option<(Vec2, Vec2)>,
     pub touch_aim: Option<(Vec2, Vec2)>,
@@ -70,6 +74,10 @@ pub struct Settings {
     pub damage_numbers: bool,
     pub screen_shake: f32,
     pub help: bool,
+    /// The one-line net / FPS debug strip (F10, or `--fps`), UI_STYLE §6.14.
+    pub debug_strip: bool,
+    /// Reduced motion: the UI kit drops pulses, pops, sheens and shakes and keeps fades (§10).
+    pub reduced_motion: bool,
 }
 
 pub fn build(app: &mut App) {
@@ -87,11 +95,18 @@ pub fn build(app: &mut App) {
         device: Device::KeyboardMouse,
         cursor_ground: None,
         ui_captures: false,
+        panel_pad_capture: false,
         touch_move: None,
         touch_aim: None,
     })
     .insert_resource(Autopilot(cfg.autoplay.then(|| BotBrain::new(0, cfg.aim_mode, 0xB0B))))
-    .insert_resource(Settings { damage_numbers: cfg.damage_numbers, screen_shake: cfg.screen_shake, help: false })
+    .insert_resource(Settings {
+        damage_numbers: cfg.damage_numbers,
+        screen_shake: cfg.screen_shake,
+        help: false,
+        debug_strip: cfg.fps,
+        reduced_motion: false,
+    })
     .add_systems(Update, (read_keyboard_mouse, read_gamepad, read_touch, autopilot).chain().in_set(ClientSet::Input));
 }
 
@@ -135,6 +150,9 @@ fn read_keyboard_mouse(
     }
     if keys.just_pressed(KeyCode::KeyH) {
         settings.help = !settings.help;
+    }
+    if keys.just_pressed(KeyCode::F10) {
+        settings.debug_strip = !settings.debug_strip;
     }
     if auto.0.is_some() {
         return;
@@ -226,8 +244,9 @@ fn read_gamepad(gamepads: Query<&Gamepad>, auto: Res<Autopilot>, mut input: ResM
         input.aim_dir = input.move_dir.normalize();
     }
     input.fire = pad.get(GamepadButton::RightTrigger2).unwrap_or(0.0) > 0.35;
+    let captured = input.panel_pad_capture;
     let presses = &mut input.presses;
-    if pad.just_pressed(GamepadButton::RightTrigger) || pad.just_pressed(GamepadButton::South) {
+    if pad.just_pressed(GamepadButton::RightTrigger) || (!captured && pad.just_pressed(GamepadButton::South)) {
         InputState::press(&mut presses.dash);
     }
     if pad.just_pressed(GamepadButton::LeftTrigger) {
@@ -239,7 +258,7 @@ fn read_gamepad(gamepads: Query<&Gamepad>, auto: Res<Autopilot>, mut input: ResM
     if pad.just_pressed(GamepadButton::North) {
         InputState::press(&mut presses.ult);
     }
-    if pad.just_pressed(GamepadButton::West) {
+    if !captured && pad.just_pressed(GamepadButton::West) {
         InputState::press(&mut presses.interact);
     }
     if pad.just_pressed(GamepadButton::East) {
@@ -248,10 +267,10 @@ fn read_gamepad(gamepads: Query<&Gamepad>, auto: Res<Autopilot>, mut input: ResM
     if pad.just_pressed(GamepadButton::RightThumb) {
         InputState::press(&mut presses.ping);
     }
-    if pad.just_pressed(GamepadButton::DPadUp) {
+    if !captured && pad.just_pressed(GamepadButton::DPadUp) {
         input.aim_mode = input.aim_mode.next();
     }
-    if pad.just_pressed(GamepadButton::DPadRight) {
+    if !captured && pad.just_pressed(GamepadButton::DPadRight) {
         input.bias = input.bias.next();
     }
 }

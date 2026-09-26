@@ -47,6 +47,9 @@ CLIENT OPTIONS
   --window <W>x<H>  --no-vsync  --no-damage-numbers  --no-shake  --no-shadows
   --fps                        log FPS, mean/worst frame time and enemy count once a second
   --horde <n>                  QA: hold n enemies on the field (look and frame time at peak horde)
+  --ui-shot kit|icons          QA: open a UI board for screenshots (the widget kit, every icon)
+  --hud-off                    QA: hide every UI node (clean plates for mockups)
+  --hud-scale <0.85-1.15>      HUD size multiplier (default 1)
 
 HEADLESS OPTIONS
   --bots <n>  --rtt <ms>  --loss <0..1>
@@ -221,6 +224,9 @@ fn main() {
         screen_shake: if args.flag("--no-shake") { 0.0 } else { 1.0 },
         shadows: !args.flag("--no-shadows"),
         fps: args.flag("--fps"),
+        ui_shot: args.value("--ui-shot").map(str::to_string),
+        hud_off: args.flag("--hud-off"),
+        hud_scale: args.parse("--hud-scale").unwrap_or(1.0f32).clamp(0.85, 1.15),
     };
     App::new()
         .add_plugins(gf_engine::client::default_plugins(

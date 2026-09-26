@@ -165,8 +165,13 @@ as the fallback. The colour and readability rules are final:
   Glow, decal, additive and ink looks stay `StandardMaterial`. `palette` caches every material per
   (colour, look), so a 400-enemy horde shares a handful of handles and batches. The room seed may
   vary the paint; it never feeds the simulation.
-* Type: DejaVu Serif Bold for headings and DejaVu Sans for body (bundled, redistributable; `assets/fonts`).
-  The body face replaces Bevy's ASCII-only default font, so every glyph the UI uses renders.
+* Type: Cinzel (variable, SIL OFL) for display capitals, titles, names and big numerals; Alegreya
+  Sans Regular / Medium / Bold / Italic (SIL OFL) for body text and small numerals, with tabular
+  lining figures on live numbers. DejaVu Sans / Serif Bold stay bundled only as the per-glyph
+  fallback at the end of every `FontSource::List` stack. All faces are embedded with
+  `include_bytes!` (`assets/fonts`), and Alegreya Sans Medium replaces Bevy's default font. The
+  colour tokens and the closed type ramp live in `gf_client::theme`; the widgets, their motion and
+  the embedded UI art in `gf_client::uikit` (spec: `docs/art/UI_STYLE.md`).
 
 ## 8. Performance and LOD budgets
 

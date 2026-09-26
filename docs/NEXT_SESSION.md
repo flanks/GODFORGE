@@ -164,7 +164,8 @@ To do:
   - Layered explosions (flash, ring, sparks, smoke).
 * **UI:**
   - Gold-framed gradient panels (`BackgroundGradient`, `BoxShadow`) and better bars and boon cards.
-  - A classical display font (e.g. Cinzel, OFL) if you can download it. DejaVu is bundled now.
+  - Done in the UI pass: Cinzel and Alegreya Sans are embedded, and `gf_client::uikit` is the
+    widget kit (`docs/art/UI_STYLE.md`).
 * **Docs:** update `docs/ARCHITECTURE.md` (procgen, materials) and re-capture `docs/media/*.jpg`.
 
 ## 4. Bevy 0.20 notes that cost time to find
@@ -179,6 +180,23 @@ To do:
   - `Node` has `display` for show/hide.
 * **Fonts:** `TextFont.font` is a `FontSource`. Replacing `AssetId::<Font>::default()` swaps the
   default font (done in `gf_engine::client::install_fonts`).
+  - Each `Font` asset is also registered under its own alias family, so `FontSource::Handle`
+    selects exactly that face. `TextFont.weight` drives a variable font's `wght` (Cinzel).
+  - `FontSource::List` becomes parley's family list, which falls back per glyph cluster: the kit's
+    stacks end in DejaVu, so a stray symbol still renders.
+* **UI kit gotchas** (all handled in `gf_client::uikit`):
+  - `ImageNode.visual_box` defaults to `ContentBox`: a 9-sliced frame on a padded node draws
+    inside the padding. Kit textures use `VisualBox::BorderBox`.
+  - The slicer works in logical px (`compute_texture_slices`), so @2x textures need
+    `max_corner_scale: 0.5`. Slice insets come from `assets/ui/ui_kit.json`.
+  - Clipping is rectangular with rounded corners only. Cooldown sweeps inside chamfered slots sit
+    on a child with `border_radius = 1.71 × chamfer`; shaped fills use a clip-reveal (a clipping
+    parent holding a full-size image).
+  - Conic gradients start at 12 o'clock and run clockwise. `BorderGradient` accepts them too,
+    which gives ring meters with a clear centre and no shader.
+  - `UiMaterial` shaders import `bevy_ui_render::ui_vertex_output::UiVertexOutput`; the material
+    binds at `@group(1)`. WGSL reserved words such as `active` fail at runtime, not at build.
+  - QA boards: `--ui-shot kit|icons|cards`; `--hud-off` hides every UI root for clean plates.
 * **Lights:** `DirectionalLight.shadow_maps_enabled` (not `shadows_enabled`), `bevy::light::{NotShadowCaster, CascadeShadowConfigBuilder}`.
 * **Pick one aim abstraction.** Never branch weapon code per aim mode. Content is data (CSV →
   `gf-content import` → RON). No stats in code.
