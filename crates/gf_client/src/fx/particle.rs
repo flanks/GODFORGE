@@ -111,7 +111,8 @@ pub struct Particle {
     pub cap: f32,
     /// Ramp value override (< 0 = the painted value): ink backings use `value::INK`.
     pub value: f32,
-    /// Cooling: aged texels drop a value band.
+    /// Cooling: by the end of its life a texel's value drops by `cool × (1.2 − B)` (low-B texels,
+    /// the rims and cracks, cool first: smoke rims fade from light to deep, scorch cracks go dark).
     pub cool: f32,
     /// Erosion starts at normalized age `x` and reaches `y` at death.
     pub erode: Vec2,
@@ -298,7 +299,7 @@ impl Particle {
         let erode =
             if k > self.erode.x { (k - self.erode.x) / (1.0 - self.erode.x).max(1e-4) * self.erode.y } else { 0.0 };
         let tint = [alpha, self.gain, self.cap, self.ramp.v()];
-        let fx = [erode, self.value, self.cool, self.soft];
+        let fx = [erode, self.value, self.cool * k, self.soft];
         let uv = [[r.x, r.y], [r.z, r.y], [r.z, r.w], [r.x, r.w]];
         buf.quad([center + corners[0], center + corners[1], center + corners[2], center + corners[3]], uv, tint, fx);
     }

@@ -47,6 +47,10 @@ CLIENT OPTIONS
   --window <W>x<H>  --no-vsync  --no-damage-numbers  --no-shake  --no-shadows
   --fps                        log FPS, mean/worst frame time and enemy count once a second
   --horde <n>                  QA: hold n enemies on the field (look and frame time at peak horde)
+  --vfx-gallery                QA: every VFX primitive and recipe in a labelled grid, re-fired every
+                               2.4 s (env GF_VFX_FREEZE=<s>, GF_VFX_ZOOM=<view height>, GF_VFX_CELL=<i>)
+  --vfx-bench [scale]          QA: hold 2000 particles, 200 trails and 50 smears (x scale) and log
+                               their CPU build time and GPU pass times once a second
 
 HEADLESS OPTIONS
   --bots <n>  --rtt <ms>  --loss <0..1>

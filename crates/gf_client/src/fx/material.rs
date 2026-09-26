@@ -6,7 +6,9 @@
 
 use gf_engine::bevy::mesh::{MeshVertexAttribute, MeshVertexBufferLayoutRef, VertexFormat};
 use gf_engine::bevy::pbr::{MaterialPipeline, MaterialPipelineKey};
-use gf_engine::bevy::render::render_resource::{AsBindGroup, RenderPipelineDescriptor, SpecializedMeshPipelineError};
+use gf_engine::bevy::render::render_resource::{
+    AsBindGroup, RenderPipelineDescriptor, ShaderType, SpecializedMeshPipelineError,
+};
 use gf_engine::bevy::shader::ShaderRef;
 use gf_engine::prelude::*;
 
@@ -22,11 +24,25 @@ pub const INK_ALPHA: f32 = 0.9;
 pub const HOT_FROM: f32 = 0.80;
 pub const HOT_TO: f32 = 0.90;
 
+/// Heroes an effect must never hide (VFX_STYLE §20.3): up to four torso points.
+pub const REVEAL_SLOTS: usize = 4;
+
+/// GPU layout of `FxParams` in `fx.wesl` (field order matters).
+#[derive(Clone, Copy, Debug, Default, PartialEq, ShaderType, Reflect)]
+pub struct FxParams {
+    /// x = streak-noise strength, y = ink alpha, z / w = hot → additive band.
+    pub look: Vec4,
+    /// xyz = the camera's forward, w = the reveal radius around a hero (metres, screen plane).
+    pub view: Vec4,
+    /// Hero torso points (xyz), w = 1 when the slot is live. Effect layers drawn in front of a
+    /// hero thin out over them, so a burst never hides a character.
+    pub heroes: [Vec4; REVEAL_SLOTS],
+}
+
 #[derive(Asset, AsBindGroup, Reflect, Clone, Debug)]
 pub struct FxMaterial {
-    /// x = streak-noise strength, y = ink alpha, z / w = hot → additive band.
     #[uniform(0)]
-    pub look: Vec4,
+    pub params: FxParams,
     #[texture(1)]
     #[sampler(2)]
     pub atlas: Handle<Image>,
@@ -43,9 +59,23 @@ pub struct FxMaterial {
 
 impl FxMaterial {
     pub fn new(atlas: Handle<Image>, ramp: Handle<Image>, noise: Handle<Image>, streak: f32, bias: f32) -> Self {
-        FxMaterial { look: Vec4::new(streak, INK_ALPHA, HOT_FROM, HOT_TO), atlas, ramp, noise, bias }
+        FxMaterial {
+            params: FxParams {
+                look: Vec4::new(streak, INK_ALPHA, HOT_FROM, HOT_TO),
+                view: Vec4::new(0.0, -0.82, -0.57, REVEAL_RADIUS),
+                heroes: [Vec4::ZERO; REVEAL_SLOTS],
+            },
+            atlas,
+            ramp,
+            noise,
+            bias,
+        }
     }
 }
+
+/// Screen-plane radius (metres) around a hero's torso inside which effects in front of them thin
+/// out.
+pub const REVEAL_RADIUS: f32 = 0.95;
 
 impl Material for FxMaterial {
     fn vertex_shader() -> ShaderRef {

@@ -197,6 +197,7 @@ fn run_gallery(
     mut fx: Fx,
     link: Res<Link>,
     index: Res<SceneIndex>,
+    globals: Query<&GlobalTransform>,
 ) {
     let dt = time.delta_secs();
     // Wait for the world and the camera to settle, then hold the grid still where the view is.
@@ -223,6 +224,10 @@ fn run_gallery(
             s.particles, s.ribbons, s.arcs, s.decals, s.draws, s.vertices, s.build_ms
         );
         fire_all(&mut fx, center, me);
+        // A burst right on the local hero: effects thin out over characters (the hero reveal).
+        if let Some(p) = me.and_then(|e| globals.get(e).ok()) {
+            fx.burst(Ramp::Kinetic, p.translation(), 1.5, Owner::Mine);
+        }
     }
     if !gallery.shots {
         gallery.shots = true;

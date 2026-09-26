@@ -7,7 +7,7 @@
 
 use super::Layer;
 use super::library::{Sheet, Strip};
-use super::material::{ATTRIBUTE_FX, FxMaterial};
+use super::material::{ATTRIBUTE_FX, FxMaterial, REVEAL_RADIUS, REVEAL_SLOTS};
 use super::textures::FxTextures;
 use gf_engine::bevy::asset::RenderAssetUsages;
 use gf_engine::bevy::camera::visibility::NoFrustumCulling;
@@ -149,6 +149,7 @@ pub struct Slot {
     pub buf: LayerBuf,
     entity: Option<Entity>,
     mesh: Handle<Mesh>,
+    material: Handle<FxMaterial>,
     visible: bool,
 }
 
@@ -162,7 +163,13 @@ impl Default for Layers {
     fn default() -> Self {
         Layers {
             slots: (0..Sheet::COUNT * Layer::COUNT)
-                .map(|_| Slot { buf: LayerBuf::default(), entity: None, mesh: Handle::default(), visible: false })
+                .map(|_| Slot {
+                    buf: LayerBuf::default(),
+                    entity: None,
+                    mesh: Handle::default(),
+                    material: Handle::default(),
+                    visible: false,
+                })
                 .collect(),
         }
     }
@@ -181,6 +188,28 @@ impl Layers {
     pub fn clear(&mut self) {
         for s in &mut self.slots {
             s.buf.clear();
+        }
+    }
+}
+
+/// Keep every layer material's view and hero points current (only rewritten when they change).
+pub(super) fn update_reveal(
+    layers: &Layers,
+    materials: &mut Assets<FxMaterial>,
+    cam: &CamBasis,
+    heroes: &[Vec4; REVEAL_SLOTS],
+) {
+    let view = cam.fwd.extend(REVEAL_RADIUS);
+    for slot in &layers.slots {
+        if slot.entity.is_none() {
+            continue;
+        }
+        let stale = materials
+            .get(&slot.material)
+            .is_some_and(|m| m.params.heroes != *heroes || (m.params.view - view).length_squared() > 1e-6);
+        if stale && let Some(mut m) = materials.get_mut(&slot.material) {
+            m.params.heroes = *heroes;
+            m.params.view = view;
         }
     }
 }
@@ -218,6 +247,7 @@ pub(super) fn upload(
                 streak_of(sheet),
                 layer.bias() + sheet as usize as f32 * 0.5,
             ));
+            slot.material = material.clone();
             slot.mesh = meshes.add(empty_mesh());
             slot.entity = Some(
                 commands

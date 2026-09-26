@@ -404,7 +404,10 @@ pub fn build(app: &mut App) {
         .init_resource::<Layers>()
         .init_resource::<body::FxBodies>()
         .add_systems(Startup, (textures::load, light::spawn_pool, body::load))
-        .add_systems(Update, (lift_telegraphs, body::update.in_set(crate::ClientSet::Presentation)))
+        .add_systems(
+            Update,
+            (lift_telegraphs, clear_on_room_change, body::update.in_set(crate::ClientSet::Presentation)),
+        )
         .add_systems(
             PostUpdate,
             (attach::start_trails, step, draw)
@@ -505,6 +508,8 @@ fn draw(
     mut visibility: mesh::LayerVisibility,
     mut lights: light::LightPool,
     mut sprites: Query<(&GlobalTransform, &mut attach::FxSprite)>,
+    index: Res<crate::scene::SceneIndex>,
+    globals: Query<&GlobalTransform>,
     mut scratch: Local<(Vec<(u32, f32, u32)>, Vec<Vec3>)>,
 ) {
     let Some(textures) = textures else { return };
@@ -542,10 +547,26 @@ fn draw(
     let (draws, verts) =
         mesh::upload(&mut commands, &mut layers, &textures, &mut meshes, &mut materials, &mut visibility, &cam);
     light::assign(&store.flashes, &mut lights);
+    // Heroes an effect must never hide: the four player rigs' torsos.
+    let mut heroes = [Vec4::ZERO; material::REVEAL_SLOTS];
+    for (slot, e) in index.players.iter().enumerate().take(material::REVEAL_SLOTS) {
+        if let Some(g) = e.and_then(|e| globals.get(e).ok()) {
+            heroes[slot] = (g.translation() + Vec3::Y * 1.0).extend(1.0);
+        }
+    }
+    mesh::update_reveal(&layers, &mut materials, &cam, &heroes);
     store.stats.draws = draws;
     store.stats.vertices = verts;
     store.stats.lights = store.flashes.len().min(light::POOL) as u32;
     store.stats.build_ms += started.elapsed().as_secs_f32() * 1000.0;
+}
+
+/// A new room or a new session starts with a clean slate (no stains or trails from the last one).
+fn clear_on_room_change(room: Res<crate::net::CurrentRoom>, mut store: ResMut<FxStore>, mut seen: Local<u32>) {
+    if room.generation != *seen {
+        *seen = room.generation;
+        store.clear();
+    }
 }
 
 /// Enemy telegraphs must composite over every VFX layer (VFX_STYLE §15.1, §21.3). The scene
