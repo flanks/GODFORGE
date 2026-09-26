@@ -680,10 +680,16 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     }
     color = mix(color, color * 0.45, foot * 0.8);
 
-    // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland,
-    // so the ground darkens toward cliffs and banks.
-    @if(VERTEX_COLORS)
-    color = color * in.color.rgb * mix(0.5, 1.0, smoothstep(0.0, 0.85, in.color.a));
+    // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland
+    // (+ 2 beside a liquid), so the ground darkens toward cliffs and glows toward hot banks.
+    var bank_heat = 0.0;
+    @if(VERTEX_COLORS) {
+        let beside_liquid = in.color.a > 1.5;
+        let inland = select(in.color.a, in.color.a - 2.0, beside_liquid);
+        let shade = select(mix(0.5, 1.0, smoothstep(0.0, 0.85, inland)), 1.0, beside_liquid);
+        color = color * in.color.rgb * shade;
+        bank_heat = select(0.0, 1.0 - smoothstep(0.0, 0.9, inland), beside_liquid);
+    }
 
     // ── fissures ──
     let heat = fp.shape.w;
@@ -698,6 +704,8 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     glow += vec3(1.0, 0.85, 0.55) * fp.accent.a * 0.5 * heat * (1.0 - smoothstep(0.0, 0.14, rift)) * flow;
     // Heat halo: warms the stone around it (lit by the rift).
     color += fp.accent.rgb * (0.02 + select(0.13, 0.07, map_mode) * heat) * halo * (1.0 - core);
+    // Hot banks: the stone beside a molten river is lit from below by it.
+    glow += fp.accent.rgb * bank_heat * bank_heat * 0.1 * heat * (0.8 + 0.2 * sin(t * 1.1 + w.x * 0.3));
 
     // ── veins (Spire starlit marble, Unmaking seams) ──
     let vein_f = fbm(w * 0.45 + seed * 1.9);

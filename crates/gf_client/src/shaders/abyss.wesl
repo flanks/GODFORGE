@@ -115,7 +115,7 @@ fn band(v: f32, steps: f32) -> f32 {
     return (floor(s) + smoothstep(0.3, 0.7, fract(s))) / steps;
 }
 
-fn magma(w: vec2<f32>, d: f32, t: f32, near: f32) -> vec3<f32> {
+fn magma(w: vec2<f32>, d: f32, t: f32, near: f32, bank: f32) -> vec3<f32> {
     let sc = ab.flow.y;
     let q = w * sc + ab.shape.w * 0.37;
     // Domain warp: the whole sea creeps and folds.
@@ -123,7 +123,8 @@ fn magma(w: vec2<f32>, d: f32, t: f32, near: f32) -> vec3<f32> {
     let p = q + (warp - 0.5) * 2.4;
     // Liquid channels between cooled crust islands; the lava licks right up to the cliff feet.
     let m = fbm(p * 0.55 + vec2(t * 0.01, 0.0));
-    let level = 0.36 + 0.06 * near + 0.22 * exp(-d / 0.6);
+    // `mid.a` raises the molten share (surface rivers); banks run hotter still.
+    let level = 0.36 + 0.06 * near + 0.22 * exp(-d / 0.6) + ab.mid.a + 0.2 * bank;
     let liquid = 1.0 - smoothstep(level - 0.015, level + 0.015, m);
     // The hottest line is where the crust meets the liquid.
     let rim = 1.0 - smoothstep(0.0, 0.028, abs(m - level - 0.02));
@@ -143,6 +144,8 @@ fn magma(w: vec2<f32>, d: f32, t: f32, near: f32) -> vec3<f32> {
     var col = mix(crust, lava, liquid);
     col += ab.glow.rgb * ab.glow.a * crack * (1.0 - liquid) * (0.06 + 0.22 * (1.0 - interior)) * pulse * heat;
     col += mix(ab.glow.rgb, vec3(1.0, 0.72, 0.3), 0.3) * ab.glow.a * rim * 0.65 * pulse * heat;
+    // The bank band: where the liquid licks the stone it runs white-hot.
+    col += mix(ab.glow.rgb, vec3(1.0, 0.8, 0.45), 0.35) * ab.glow.a * bank * bank * 0.55 * pulse;
     // Smoke hanging over the sea: it reads as far below.
     let smoke = fbm(vec2(w.x * 0.08 + t * 0.02, w.y * 0.12 - t * 0.015));
     col = mix(col, ab.mid.rgb * 0.8, smoothstep(0.35, 0.75, smoke) * 0.45);
@@ -239,7 +242,12 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     } else if style == 3 {
         col = chaos(w, d, t, near);
     } else {
-        col = magma(w, d, t, near);
+        // Surface liquids carry bank heat on their vertex colours (red channel).
+        var bank = 0.0;
+        @if(VERTEX_COLORS) {
+            bank = in.color.r;
+        }
+        col = magma(w, d, t, near, bank);
     }
 
     // Haze bank at the cliffs: brushy, drifting.

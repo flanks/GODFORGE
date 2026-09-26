@@ -23,7 +23,7 @@ use crate::materials::{
     ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_FOOTINGS, FLOOR_HOLES, FLOOR_INLAYS, FLOOR_PATHS,
     FLOOR_PAVING, Floor, FloorMaterial, FloorParams, ToonMaterial, ToonStyle, toon, toon_from_standard,
 };
-use crate::palette::{Palette, hex, lighten, mix};
+use crate::palette::{Palette, hdr, hex, lighten, mix};
 use crate::scene::RoomGeometry;
 use crate::terrain;
 use gf_content::schema::{Decor, MapLayout, TileKind};
@@ -354,7 +354,9 @@ pub fn build(
         // the hazards at floor level read first.
         let inner = (half - Vec2::splat(10.0)).max(Vec2::ONE);
         let mut params = look.abyss_params(inner, (seed % 997) as f32);
-        params.glow.w *= 0.55;
+        // The bottom of the value ladder: the sea glows far below, dimmer than the ground.
+        params.glow.w *= 0.3;
+        params.mist.w *= 0.6;
         let abyss = stores.abysses.add(AbyssMaterial {
             base: StandardMaterial { base_color: Color::WHITE, unlit: true, fog_enabled: false, ..default() },
             extension: Abyss { params },
@@ -797,6 +799,24 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
             None => Ground::Void,
         }
     };
+    // Land within a tile of a liquid: its floor glows with the heat (a hot bank, not a cold lip).
+    let mut hot = vec![false; mask.len()];
+    for y in 0..t.h as i32 {
+        for x in 0..t.w as i32 {
+            if mask[t.index(x as u16, y as u16)] != Ground::Liquid {
+                continue;
+            }
+            for dy in -1..=1 {
+                for dx in -1..=1 {
+                    let (nx, ny) = (x + dx, y + dy);
+                    if nx >= 0 && ny >= 0 && nx < t.w as i32 && ny < t.h as i32 {
+                        hot[t.index(nx as u16, ny as u16)] = true;
+                    }
+                }
+            }
+        }
+    }
+    let hot_at = |p: Vec2| t.tile_of(p).is_some_and(|(x, y)| hot[t.index(x, y)]);
 
     let t_field = t0.elapsed().as_secs_f64() * 1000.0;
     // ── floor (marching squares) and shore contour ──
@@ -887,7 +907,8 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                     // Alpha carries how far inland the vertex is (0 on the shore, 1 from 3 u in):
                     // the floor darkens toward cliffs and banks.
                     let (mut col, recipe) = look_at(*p);
-                    col[3] = (-f / 3.0).clamp(0.0, 1.0);
+                    // Alpha: how far inland (0 on the shore, 1 from 3 u in); + 2 beside a liquid.
+                    col[3] = (-f / 3.0).clamp(0.0, 1.0) + if hot_at(*p) { 2.0 } else { 0.0 };
                     *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, recipe, col));
                 }
                 idx[k] = s.1;
@@ -946,10 +967,27 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                 buf.quad(base, base + 1, base + 2, base + 3);
             }
         }
-        // Crumbling edges: now and then a loose stone on the lip, half over the drop.
+        if !liquid {
+            // Rim light: the heat of the abyss catches the lip, a thin glowing ribbon hanging just
+            // past the edge, so every shore reads as a lit edge, not a straight cut into black.
+            let heat = 0.55 + 0.45 * h01((ka as u32) ^ 0x51A, 0xED70);
+            let glow = lin(hdr(c.molten, 0.16 * heat));
+            let (oa, ob) = (Vec3::new(ga.x, 0.0, -ga.y), Vec3::new(gb.x, 0.0, -gb.y));
+            let (a3, b3) = (Vec3::new(pa.x, -0.05, -pa.y), Vec3::new(pb.x, -0.05, -pb.y));
+            let buf = env.buf(Key::Glow);
+            let base = buf.pos.len() as u32;
+            for v in [a3 + oa * 0.12, b3 + ob * 0.12, b3 + ob * 0.42, a3 + oa * 0.42] {
+                buf.vert(v, Vec3::Y, [0.0, 0.0], glow);
+            }
+            buf.quad(base, base + 1, base + 2, base + 3);
+            buf.quad(base, base + 3, base + 2, base + 1);
+        }
+        // Crumbling edges: loose stones on the lip, half over the drop; more of them on the north
+        // shores, where the camera never sees a cliff face and the stones are the edge.
         let pick = h01((ka as u32) ^ (ka >> 32) as u32, 0xED6E);
-        if !liquid && pick < 0.09 {
-            let rr = 0.22 + 0.4 * h01(ka as u32, 0xED6F);
+        let north = out.y > 0.5;
+        if !liquid && pick < if north { 0.5 } else { 0.22 } {
+            let rr = if north { 0.3 + 0.5 * h01(ka as u32, 0xED6F) } else { 0.22 + 0.4 * h01(ka as u32, 0xED6F) };
             let at = mid - out * (rr * 0.4);
             env.rock(
                 Vec3::new(at.x, rr * 0.15, -at.y),
@@ -981,7 +1019,34 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                 t.origin + Vec2::new(x as f32 + 1.0, y as f32 + 1.0) * t.size + Vec2::new(reach(1, 0), reach(0, 1));
             env.at((lo + hi) * 0.5);
             let q = |x: f32, y: f32| Vec3::new(x, LIQUID_Y, -y);
-            env.sheet([q(lo.x, lo.y), q(hi.x, lo.y), q(hi.x, hi.y), q(lo.x, hi.y)], [[1.0; 4]; 4], Key::Liquid);
+            // Red channel: bank heat at each corner (1 where a land tile meets it), which the
+            // liquid shader turns into a hot band along the banks.
+            let bank = |cx: i32, cy: i32| {
+                let land = [(cx - 1, cy - 1), (cx, cy - 1), (cx - 1, cy), (cx, cy)].iter().any(|&(tx, ty)| {
+                    tx >= 0
+                        && ty >= 0
+                        && tx < t.w as i32
+                        && ty < t.h as i32
+                        && mask[t.index(tx as u16, ty as u16)] == Ground::Land
+                });
+                if land { [1.0, 1.0, 1.0, 1.0] } else { [0.0, 1.0, 1.0, 1.0] }
+            };
+            env.sheet(
+                [q(lo.x, lo.y), q(hi.x, lo.y), q(hi.x, hi.y), q(lo.x, hi.y)],
+                [bank(x, y), bank(x + 1, y), bank(x + 1, y + 1), bank(x, y + 1)],
+                Key::Liquid,
+            );
+            // Rivers light their banks: a low molten light every few tiles (the pool picks the
+            // ones near the camera).
+            if h01((x as u32).wrapping_mul(0x9E37_79B9) ^ (y as u32), 0x71C3) < 0.3 {
+                let c3 = t.center(x as u16, y as u16);
+                env.flames.push(Flame {
+                    at: Vec3::new(c3.x, LIQUID_Y + 0.9, -c3.y),
+                    color: c.molten,
+                    power: 0.45,
+                    range: 7.5,
+                });
+            }
         }
     }
     for y in 0..t.h as i32 {

@@ -97,7 +97,7 @@ fn clear_of_hud(p: Vec2, size: Vec2) -> Vec2 {
         (0.0, 0.0, 440.0, 176.0),
         (size.x - 300.0, 0.0, size.x, 146.0),
         (cx - 300.0, 0.0, cx + 300.0, 96.0),
-        (cx - 300.0, size.y - 124.0, cx + 300.0, size.y),
+        (cx - 370.0, size.y - 124.0, cx + 370.0, size.y),
         (0.0, size.y - 100.0, 400.0, size.y),
         (size.x - 320.0, size.y - 70.0, size.x, size.y),
     ];

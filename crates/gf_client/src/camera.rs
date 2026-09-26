@@ -94,6 +94,7 @@ fn follow(
     settings: Res<Settings>,
     mut shake: ResMut<Shake>,
     mut cams: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
+    mut pinned: Local<Option<Option<Vec2>>>,
 ) {
     let Ok((mut tf, mut projection)) = cams.single_mut() else { return };
     let dt = time.delta_secs();
@@ -125,6 +126,15 @@ fn follow(
     let half_view = Vec2::new(view_h * 0.5 * 16.0 / 9.0, view_h * 0.5);
     let limit = (room.def.half_extents + Vec2::splat(2.0) - half_view * Vec2::new(0.62, 0.36)).max(Vec2::ZERO);
     focus = focus.clamp(-limit, limit);
+    // QA: GF_CAM_AT="x,y" pins the view to a sim point (coast and set-piece captures).
+    if let Some(at) = *pinned.get_or_insert_with(|| {
+        std::env::var("GF_CAM_AT").ok().and_then(|v| {
+            let (x, y) = v.split_once(',')?;
+            Some(Vec2::new(x.trim().parse().ok()?, y.trim().parse().ok()?))
+        })
+    }) {
+        focus = at;
+    }
     if !shake.seeded {
         shake.focus = focus;
         shake.seeded = true;

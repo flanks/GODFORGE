@@ -2866,6 +2866,28 @@ pub fn bridge(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, width: f32, deep:
     }
     // Under-structure: a beam under the deck, and over a chasm two piers dropping into it.
     env.block(w3(mid, -0.62), rot, Vec3::new(hw - 0.3, 0.3, len * 0.5 - 0.2), 0.04, stone);
+    // The deck's thickness shows: an inked fascia down each side, so the span reads as a slab
+    // standing over the pit, not a carpet on it.
+    for side in [-1.0f32, 1.0] {
+        let edge = mid + n * (side * (hw + 0.02));
+        env.block(w3(edge, -0.42), rot, Vec3::new(0.16, 0.5, len * 0.5 - 0.05), 0.03, trim);
+        // Corbels under the fascia.
+        let corbels = (len / 2.2).ceil() as u32;
+        for k in 0..=corbels {
+            let s = -len * 0.5 + 0.4 + (len - 0.8) * k as f32 / corbels.max(1) as f32;
+            env.block(w3(edge + d * s, -1.0), rot, Vec3::new(0.2, 0.2, 0.22), 0.02, stone);
+        }
+    }
+    // A painted shadow on the pit below, thrown away from the key light.
+    let shade = [0.02, 0.012, 0.01, 1.0];
+    let off = Vec2::new(0.45, 0.35);
+    let q = |s: f32, x: f32| {
+        let p = mid + d * s + n * x + off;
+        Vec3::new(p.x, crate::world::LIQUID_Y + 0.03, -p.y)
+    };
+    let (hl, hx) = (len * 0.5 - 0.3, hw + 0.35);
+    env.sheet([q(-hl, -hx), q(hl, -hx), q(hl, hx), q(-hl, hx)], [shade; 4], Key::Stone);
+    env.sheet([q(-hl, -hx), q(-hl, hx), q(hl, hx), q(hl, -hx)], [shade; 4], Key::Stone);
     if deep > 0.0 {
         for s in [-0.28f32, 0.28] {
             let at = mid + d * (s * len);
@@ -2878,11 +2900,11 @@ pub fn bridge(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, width: f32, deep:
             );
         }
     }
-    // Balustrades: a rail on posts, taller end posts with a finial.
+    // Balustrades: a solid parapet with a coping rail, taller end posts with a finial.
     for side in [-1.0f32, 1.0] {
         let rail = mid + n * (side * (hw - 0.18));
-        env.block(w3(rail, 0.1), rot, Vec3::new(0.2, 0.2, len * 0.5), 0.0, trim);
-        env.block(w3(rail, 0.62), rot, Vec3::new(0.15, 0.07, len * 0.5 - 0.1), 0.0, trim);
+        env.block(w3(rail, 0.22), rot, Vec3::new(0.2, 0.32, len * 0.5), 0.02, trim);
+        env.block(w3(rail, 0.62), rot, Vec3::new(0.24, 0.07, len * 0.5 - 0.1), 0.0, trim);
         let posts = (len / 1.9).ceil() as u32;
         for k in 0..=posts {
             let s = -len * 0.5 + 0.2 + (len - 0.4) * k as f32 / posts as f32;

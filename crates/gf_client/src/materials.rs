@@ -499,6 +499,10 @@ impl BiomeLook {
         p.flow.z = 1.0e5;
         p.flow.w = 1.0e6;
         p.mist.w = 0.0;
+        // Rivers and channels read as molten, not as black crust with a few blobs.
+        if self.abyss == AbyssKind::Magma {
+            p.mid.w = 0.12;
+        }
         p.glow.w *= match self.abyss {
             AbyssKind::Magma => 1.15,
             _ => 1.0,
