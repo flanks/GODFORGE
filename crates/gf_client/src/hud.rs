@@ -60,7 +60,6 @@ enum Label {
     Boss,
     Weapon,
     Slot(u8),
-    Traits,
     Aim,
     Stats,
     Net,
@@ -73,8 +72,16 @@ enum Label {
 #[derive(Component)]
 struct PartyRow(u8);
 
+/// The top-right party panel.
+#[derive(Component)]
+struct PartyPanel;
+
 #[derive(Component)]
 struct ToastList;
+
+/// The bottom arsenal strip (fades while enemies are behind it).
+#[derive(Component)]
+struct ArsenalStrip;
 
 #[derive(Component)]
 struct Toast {
@@ -102,7 +109,8 @@ const BAR_POOL: usize = 16;
 pub fn build(app: &mut App) {
     app.add_systems(Startup, spawn_hud).add_systems(
         Update,
-        (update_labels, update_bars, update_party, toasts, world_labels, touch_overlay).in_set(ClientSet::Presentation),
+        (update_labels, update_bars, update_party, toasts, world_labels, touch_overlay, fade_arsenal)
+            .in_set(ClientSet::Presentation),
     );
 }
 
@@ -219,28 +227,35 @@ fn spawn_hud(mut commands: Commands, fonts: Res<UiFonts>) {
                 p.spawn((Label::Boss, text_in("", 22.0, hex("#FFD27A"), &display), TextShadow::default()));
                 bar(p, Bar::Boss, 520.0, 14.0, hex("#C0262B"));
             });
-            c.spawn((
-                ToastList,
-                Node {
-                    flex_direction: FlexDirection::Column,
-                    align_items: AlignItems::Center,
-                    row_gap: Val::Px(2.0),
-                    ..default()
-                },
-            ));
         });
-
-    // Top-right: party frames + net.
-    commands
-        .spawn(panel(Node {
+    // Left rail under the vitals: event toasts (off the top-centre action).
+    commands.spawn((
+        ToastList,
+        Node {
             position_type: PositionType::Absolute,
-            right: Val::Px(14.0),
-            top: Val::Px(14.0),
+            left: Val::Px(18.0),
+            top: Val::Px(186.0),
             flex_direction: FlexDirection::Column,
-            row_gap: Val::Px(5.0),
-            min_width: Val::Px(200.0),
+            align_items: AlignItems::FlexStart,
+            row_gap: Val::Px(2.0),
             ..default()
-        }))
+        },
+    ));
+
+    // Top-right: party frames + net (hidden when there is neither).
+    commands
+        .spawn((
+            PartyPanel,
+            panel(Node {
+                position_type: PositionType::Absolute,
+                right: Val::Px(14.0),
+                top: Val::Px(14.0),
+                flex_direction: FlexDirection::Column,
+                row_gap: Val::Px(5.0),
+                min_width: Val::Px(200.0),
+                ..default()
+            }),
+        ))
         .with_children(|p| {
             for i in 0..3u8 {
                 p.spawn((
@@ -273,30 +288,32 @@ fn spawn_hud(mut commands: Commands, fonts: Res<UiFonts>) {
         })
         .with_children(|c| {
             c.spawn((Label::Prompt, text_in("", 21.0, hex("#FFE3A3"), &display), TextShadow::default()));
-            c.spawn(panel(Node {
-                flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Center,
-                row_gap: Val::Px(4.0),
-                ..default()
-            }))
+            // The arsenal: one slim strip hugging the bottom edge (enemies pour in from the south
+            // under the north-facing camera); it fades while a fight runs behind it.
+            c.spawn((
+                ArsenalStrip,
+                panel(Node {
+                    flex_direction: FlexDirection::Row,
+                    align_items: AlignItems::Center,
+                    column_gap: Val::Px(14.0),
+                    padding: UiRect::axes(Val::Px(10.0), Val::Px(4.0)),
+                    ..default()
+                }),
+            ))
             .with_children(|p| {
-                p.spawn((Label::Weapon, text_in("", 17.0, PARCHMENT, &display)));
-                p.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(10.0), ..default() })
-                    .with_children(|row| {
-                        for s in 0..4u8 {
-                            row.spawn(Node {
-                                flex_direction: FlexDirection::Column,
-                                align_items: AlignItems::Center,
-                                min_width: Val::Px(118.0),
-                                ..default()
-                            })
-                            .with_children(|chip| {
-                                chip.spawn(text(Slot::ALL[s as usize].name().to_uppercase(), 10.0, DIM));
-                                chip.spawn((Label::Slot(s), text("", 14.0, DIM)));
-                            });
-                        }
+                p.spawn((Label::Weapon, text_in("", 15.0, PARCHMENT, &display)));
+                for s in 0..4u8 {
+                    p.spawn(Node {
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        min_width: Val::Px(92.0),
+                        ..default()
+                    })
+                    .with_children(|chip| {
+                        chip.spawn(text(Slot::ALL[s as usize].name().to_uppercase(), 9.0, DIM));
+                        chip.spawn((Label::Slot(s), text("", 12.0, DIM)));
                     });
-                p.spawn((Label::Traits, text("", 12.0, DIM)));
+                }
             });
         });
 
@@ -518,7 +535,27 @@ fn update_labels(
                 };
                 let chaos =
                     if w.run.chaos_tier > 0 { format!(" · Chaos {}", w.run.chaos_tier) } else { String::new() };
-                format!("{biome}{kind} — room {}/{}{chaos}", w.run.step as u32 + 1, w.run.steps)
+                match &w.run.stage {
+                    // A biome map: the stage line (Seals, the Warlord, the clock, the threat).
+                    Some(st) => {
+                        let warlord = if st.warlord { "Warlord slain" } else { "Warlord lives" };
+                        let gate = match st.gate {
+                            GateView::Sealed => String::new(),
+                            GateView::Open => " · GATE OPEN".into(),
+                            GateView::Gathering { left_ds } => format!(" · Gathering {:.0}s", left_ds as f32 / 10.0),
+                        };
+                        let t = st.time as u32;
+                        format!(
+                            "{biome} · Seals {}/{} · {warlord} · {:02}:{:02} · Threat {}{gate}{chaos}",
+                            st.seals,
+                            st.required,
+                            t / 60,
+                            t % 60,
+                            st.threat_level() + 1
+                        )
+                    }
+                    None => format!("{biome}{kind} — room {}/{}{chaos}", w.run.step as u32 + 1, w.run.steps),
+                }
             }
             (Label::Boss, Some(w), _) => w.run.boss.map_or(String::new(), |b| {
                 let def = db.enemies.try_get(b.enemy);
@@ -547,10 +584,6 @@ fn update_labels(
                         "—".into()
                     }
                 }
-            }
-            (Label::Traits, _, Some(p)) => {
-                let prof = gf_sim::bot::weapon_for(db, p);
-                gf_core::weapon::describe(&prof).into_iter().skip(1).collect::<Vec<_>>().join(" · ")
             }
             (Label::Aim, _, Some(p)) => {
                 let params = db.aim_params(input.aim_mode);
@@ -582,7 +615,7 @@ fn update_labels(
                 let secs = w.run.time as u32 % 60;
                 format!("Godshards {shards} · Ember {} · Kills {kills} · {mins}:{secs:02}", w.run.ember)
             }
-            (Label::Net, _, _) => format!(
+            (Label::Net, _, _) if cfg.fps || settings.help => format!(
                 "{} · {:.1} KB/s · corrections {}",
                 link.host_label,
                 link.bytes_per_sec / 1024.0,
@@ -703,7 +736,11 @@ fn update_bars(
                     w.run.overdrive_meter
                 }
             }
-            Bar::Encounter => w.run.encounter_left,
+            // On a map the banner bar tracks the Seals toward the gate.
+            Bar::Encounter => match &w.run.stage {
+                Some(st) => st.seals as f32 / st.required.max(1) as f32,
+                None => w.run.encounter_left,
+            },
             Bar::Boss => w.run.boss?.hp_frac,
             Bar::Party(i) => {
                 let p = others.get(i as usize)?;
@@ -727,14 +764,24 @@ fn update_bars(
     }
 }
 
+#[allow(clippy::type_complexity)]
 fn update_party(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
-    mut rows: Query<(&PartyRow, &mut Node)>,
+    settings: Res<Settings>,
+    mut rows: Query<(&PartyRow, &mut Node), Without<PartyPanel>>,
+    mut panels: Query<&mut Node, (With<PartyPanel>, Without<PartyRow>)>,
     mut labels: Query<(&Label, &mut Text)>,
 ) {
     let others: Vec<&PlayerView> =
         link.latest.as_deref().map_or(Vec::new(), |w| w.players.iter().filter(|p| Some(p.slot) != link.slot).collect());
+    let show_panel = !others.is_empty() || cfg.fps || settings.help;
+    for mut n in &mut panels {
+        let d = if show_panel { Display::Flex } else { Display::None };
+        if n.display != d {
+            n.display = d;
+        }
+    }
     for (PartyRow(i), mut node) in &mut rows {
         let d = if (*i as usize) < others.len() { Display::Flex } else { Display::None };
         if node.display != d {
@@ -844,14 +891,14 @@ fn toasts(
             text.0 = format!("{s} ×{}", t.count);
             continue;
         }
-        if count >= 5 {
+        if count >= 2 {
             continue;
         }
         count += 1;
         let label = if n > 1 { format!("{s} ×{n}") } else { s.clone() };
         commands.spawn((
             Toast { life: 2.8, key: s, count: n },
-            text_in(label, 18.0, color, &fonts.display),
+            text_in(label, 16.0, color, &fonts.display),
             TextShadow::default(),
             ChildOf(parent),
         ));
@@ -881,19 +928,21 @@ fn world_labels(
             texts.push((w3(e.pos.to_vec2(), 4.3), door_label(db, reward), hex("#FFE3A3"), 15.0));
         }
     }
-    // Allies: name tags above heads.
+    // Allies: a slot tag above heads, the name only when they need help (hurt or down).
     for p in &world.players {
         if Some(p.slot) == link.slot {
             continue;
         }
         let pos = index.players[p.slot as usize].and_then(|e| rigs.get(e).ok()).map_or(p.mover.pos, |r| r.shown);
-        texts.push((
-            w3(pos, 2.6),
-            format!("P{} {}", p.slot + 1, player_name(&link, p.slot)),
-            crate::palette::hex(&db.game.player_colors[p.slot as usize % 4]),
-            13.0,
-        ));
-        hp_bars.push((w3(pos, 2.35), p.hp / p.max_hp.max(1.0)));
+        let frac = p.hp / p.max_hp.max(1.0);
+        let needs_help = frac < 0.6 || !p.life.is_alive();
+        let tag = if needs_help {
+            format!("P{} {}", p.slot + 1, player_name(&link, p.slot))
+        } else {
+            format!("P{}", p.slot + 1)
+        };
+        texts.push((w3(pos, 2.6), tag, crate::palette::hex(&db.game.player_colors[p.slot as usize % 4]), 12.0));
+        hp_bars.push((w3(pos, 2.35), frac));
     }
     // Elites and bosses: HP bars.
     for e in &world.entities {
@@ -904,9 +953,26 @@ fn world_labels(
             hp_bars.push((w3(v.shown, v.lift + v.radius * 3.2 + 0.4), v.hp));
         }
     }
-    let mut ti = texts.into_iter();
+    // Project, then stack labels that would overprint (grouped allies) upward.
+    let mut shown: Vec<(Vec2, String, Color, f32)> = Vec::new();
+    for (at, s, c, px) in texts {
+        let Some(mut p) = world_to_screen(camera, cam_tf, at) else { continue };
+        let half_w = s.chars().count() as f32 * px * 0.27;
+        for _ in 0..4 {
+            let clash = shown.iter().any(|(q, qs, _, qpx)| {
+                (q.y - p.y).abs() < qpx.max(px) + 2.0
+                    && (q.x - p.x).abs() < half_w + qs.chars().count() as f32 * qpx * 0.27 + 4.0
+            });
+            if !clash {
+                break;
+            }
+            p.y -= px + 3.0;
+        }
+        shown.push((p, s, c, px));
+    }
+    let mut ti = shown.into_iter();
     for (_, mut node, mut t, mut color, mut font) in &mut labels {
-        match ti.next().and_then(|(at, s, c, px)| world_to_screen(camera, cam_tf, at).map(|p| (p, s, c, px))) {
+        match ti.next() {
             Some((p, s, c, px)) => {
                 node.display = Display::Flex;
                 node.left = Val::Px(p.x - s.chars().count() as f32 * px * 0.27);
@@ -934,6 +1000,65 @@ fn world_labels(
                 }
             }
             None => node.display = Display::None,
+        }
+    }
+}
+
+/// Fade the arsenal strip while enemies (or allies) stand behind it on screen.
+#[allow(clippy::type_complexity)]
+fn fade_arsenal(
+    link: Res<Link>,
+    index: Res<SceneIndex>,
+    cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    visuals: Query<&Visual>,
+    rigs: Query<&crate::scene::PlayerRig>,
+    mut strip: Query<
+        (&ComputedNode, &UiGlobalTransform, &mut BackgroundColor, &mut BorderColor, &Children),
+        With<ArsenalStrip>,
+    >,
+    children_q: Query<&Children>,
+    mut texts: Query<&mut TextColor>,
+) {
+    let Ok((camera, cam_tf)) = cameras.single() else { return };
+    let Ok((node, gt, mut bg, mut border, kids)) = strip.single_mut() else { return };
+    let scale = node.inverse_scale_factor();
+    let centre = gt.translation * scale;
+    let half = node.size() * scale * 0.5 + Vec2::splat(12.0);
+    let inside = |p: Vec2| (p - centre).abs().cmple(half).all();
+    let me = link.slot;
+    let mut busy = false;
+    for v in &visuals {
+        if matches!(v.kind, EntityKind::Enemy { .. })
+            && let Some(p) = world_to_screen(camera, cam_tf, w3(v.shown, 0.8))
+            && inside(p)
+        {
+            busy = true;
+            break;
+        }
+    }
+    if !busy && let Some(world) = link.latest.as_deref() {
+        busy = world.players.iter().filter(|p| Some(p.slot) != me).any(|p| {
+            let pos = index.players[p.slot as usize].and_then(|e| rigs.get(e).ok()).map_or(p.mover.pos, |r| r.shown);
+            world_to_screen(camera, cam_tf, w3(pos, 0.9)).is_some_and(inside)
+        });
+    }
+    let a = if busy { 0.28 } else { 1.0 };
+    let target = INK.with_alpha(INK.alpha() * a);
+    if bg.0 != target {
+        bg.0 = target;
+        *border = BorderColor::all(EDGE.with_alpha(EDGE.alpha() * a));
+    }
+    // Every frame: `update_labels` recolours the slot and weapon labels.
+    let text_alpha = if busy { 0.4 } else { 1.0 };
+    let mut stack: Vec<Entity> = kids.iter().collect();
+    while let Some(e) = stack.pop() {
+        if let Ok(mut tc) = texts.get_mut(e)
+            && tc.0.alpha() != text_alpha
+        {
+            tc.0 = tc.0.with_alpha(text_alpha);
+        }
+        if let Ok(c) = children_q.get(e) {
+            stack.extend(c.iter());
         }
     }
 }
