@@ -103,6 +103,7 @@ fn cut(
         band.extend(inner);
         band.sort_unstable();
     }
+    let band = chamfer(t, &band, a, b);
     let pit = if kind == BarrierKind::Chasm { TileKind::Void } else { TileKind::Liquid };
     let mut changed: Vec<(usize, TileKind)> = Vec::new();
     for i in band {
@@ -139,6 +140,48 @@ fn cut(
         g.tiles.kind[i] = pit;
     }
     true
+}
+
+/// Chamfer a band's staircase: a land tile of the pair's two regions with at least five of its
+/// eight neighbours in the band joins it (the inner corner of every step), and a band tile with
+/// at most two band neighbours leaves it (spurs), so a river or chasm runs in 45° reaches instead
+/// of tile-sized L shapes. Integer counts only; the result is sorted.
+fn chamfer(t: &TileGrid, band: &[usize], a: usize, b: usize) -> Vec<usize> {
+    let n = t.kind.len();
+    let (w, h) = (t.w as i32, t.h as i32);
+    let mut inb = vec![false; n];
+    for &i in band {
+        inb[i] = true;
+    }
+    let count = |inb: &[bool], i: usize| {
+        let (x, y) = ((i % w as usize) as i32, (i / w as usize) as i32);
+        let mut c = 0;
+        for dy in -1..=1 {
+            for dx in -1..=1 {
+                let (nx, ny) = (x + dx, y + dy);
+                if (dx, dy) != (0, 0) && nx >= 0 && ny >= 0 && nx < w && ny < h && inb[(ny * w + nx) as usize] {
+                    c += 1;
+                }
+            }
+        }
+        c
+    };
+    let add: Vec<usize> = (0..n)
+        .filter(|&i| {
+            !inb[i]
+                && t.kind[i].is_land()
+                && (t.region[i] as usize == a || t.region[i] as usize == b)
+                && count(&inb, i) >= 5
+        })
+        .collect();
+    let drop: Vec<usize> = band.iter().copied().filter(|&i| count(&inb, i) <= 2).collect();
+    for i in add {
+        inb[i] = true;
+    }
+    for i in drop {
+        inb[i] = false;
+    }
+    (0..n).filter(|&i| inb[i]).collect()
 }
 
 /// One pass per bridged crossing (a connected run of `Bridge` tiles) with its deck from bank to

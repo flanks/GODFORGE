@@ -398,6 +398,6 @@ mod tests {
         let layout = map.map.as_ref().expect("a biome map");
         assert_eq!(layout.hash, layout_hash(&map.obstacles, &layout.pits, &layout.pois, map.player_spawn, layout.gate));
         assert_eq!(generate(&db, &t, 7).map.as_ref().map(|m| m.hash), Some(layout.hash), "not deterministic");
-        assert_eq!(layout.hash, 0x3bdc_0fe3_08bc_c334, "golden hash moved: {:#018x}", layout.hash);
+        assert_eq!(layout.hash, 0xca35_2138_2f4a_6edd, "golden hash moved: {:#018x}", layout.hash);
     }
 }
