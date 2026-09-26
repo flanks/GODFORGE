@@ -24,6 +24,7 @@ use gf_engine::client::{
 use gf_engine::prelude::*;
 
 pub type ToonMaterial = ExtendedMaterial<StandardMaterial, Toon>;
+pub type XRayMaterial = ExtendedMaterial<StandardMaterial, XRay>;
 pub type FloorMaterial = ExtendedMaterial<StandardMaterial, Floor>;
 pub type AbyssMaterial = ExtendedMaterial<StandardMaterial, Abyss>;
 
@@ -38,6 +39,7 @@ pub fn build(app: &mut App) {
         MaterialPlugin::<ToonMaterial>::default(),
         MaterialPlugin::<FloorMaterial>::default(),
         MaterialPlugin::<AbyssMaterial>::default(),
+        MaterialPlugin::<XRayMaterial>::default(),
     ));
 }
 
@@ -230,6 +232,47 @@ pub fn toon(color: Color, texture: Option<Handle<Image>>, emissive: LinearRgba, 
         ..default()
     };
     toon_from_standard(base, style)
+}
+
+// ───────────────────────────── x-ray ─────────────────────────────
+
+/// A silhouette drawn only where something stands in front of it (the depth test inverted, no
+/// depth write): a hero seen through the boss, the elite or the monument that hides them.
+#[derive(Asset, AsBindGroup, Reflect, Clone, Debug, Default)]
+pub struct XRay {
+    /// Unused (an extension carries at least one binding).
+    #[uniform(100)]
+    pub unused: Vec4,
+}
+
+impl MaterialExtension for XRay {
+    fn specialize(
+        _pipeline: &gf_engine::bevy::pbr::MaterialExtensionPipeline,
+        descriptor: &mut gf_engine::bevy::render::render_resource::RenderPipelineDescriptor,
+        _layout: &gf_engine::bevy::mesh::MeshVertexBufferLayoutRef,
+        _key: gf_engine::bevy::pbr::MaterialExtensionKey<Self>,
+    ) -> Result<(), gf_engine::bevy::render::render_resource::SpecializedMeshPipelineError> {
+        if let Some(ds) = descriptor.depth_stencil.as_mut() {
+            // Reverse-Z: a fragment behind what is already drawn has the *smaller* depth.
+            ds.depth_compare = Some(gf_engine::bevy::render::render_resource::CompareFunction::Less);
+            ds.depth_write_enabled = Some(false);
+        }
+        Ok(())
+    }
+}
+
+/// A flat, translucent x-ray silhouette in `color`.
+pub fn xray(color: Color) -> XRayMaterial {
+    ExtendedMaterial {
+        base: StandardMaterial {
+            base_color: color,
+            unlit: true,
+            alpha_mode: AlphaMode::Blend,
+            fog_enabled: false,
+            ..default()
+        },
+        extension: XRay::default(),
+    }
 }
 
 // ───────────────────────────── floor ─────────────────────────────

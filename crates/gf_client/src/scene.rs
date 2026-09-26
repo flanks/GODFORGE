@@ -9,7 +9,7 @@
 
 use crate::camera::{KeyLight, w3};
 use crate::input::InputState;
-use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial};
+use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial, XRayMaterial, xray};
 use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{
     Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, poi_kind_color, rarity_color, yaw,
@@ -184,8 +184,18 @@ impl SceneIndex {
     }
 }
 
+/// Each slot's x-ray silhouette material (heroes seen through whatever hides them).
+#[derive(Resource)]
+struct XRayMats([Handle<XRayMaterial>; 4]);
+
+fn setup_xray(mut commands: Commands, pal: Res<Palette>, mut xrays: ResMut<Assets<XRayMaterial>>) {
+    let m = |slot: u8, xrays: &mut Assets<XRayMaterial>| xrays.add(xray(pal.player(slot).with_alpha(0.55)));
+    let mats = [m(0, &mut xrays), m(1, &mut xrays), m(2, &mut xrays), m(3, &mut xrays)];
+    commands.insert_resource(XRayMats(mats));
+}
+
 pub fn build(app: &mut App) {
-    app.init_resource::<SceneIndex>().add_systems(Startup, spawn_markers).add_systems(
+    app.init_resource::<SceneIndex>().add_systems(Startup, (spawn_markers, setup_xray)).add_systems(
         Update,
         (
             rebuild_room,
@@ -1426,7 +1436,7 @@ fn animate_anvils(
 
 // ───────────────────────────── players ─────────────────────────────
 
-fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView) -> Entity {
+fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XRayMaterial>) -> Entity {
     let color = db.characters.try_get(p.character).map_or(Color::srgb(0.8, 0.8, 0.8), |c| hex(&c.color));
     let pc = kit.pal.player(p.slot);
     let r = p.radius.max(0.3);
@@ -1480,6 +1490,20 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView) -> Entity {
         kit.child(root, &sphere, ink, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62 + 0.06)));
     kit.commands.entity(o1).insert(NotShadowCaster);
     kit.commands.entity(o2).insert(NotShadowCaster);
+    // The x-ray silhouette: the hero in their colour wherever a foe or a monument hides them
+    // (raised a hair so the floor never counts as hiding the feet).
+    for (mesh, tf) in [
+        (&capsule, Transform::from_xyz(0.0, 0.93, 0.0).with_scale(Vec3::new(r * 2.0 + 0.04, 0.84, r * 2.0 + 0.04))),
+        (&sphere, Transform::from_xyz(0.0, 1.82, 0.0).with_scale(Vec3::splat(r * 0.62 + 0.02))),
+    ] {
+        kit.commands.spawn((
+            Mesh3d(mesh.clone()),
+            MeshMaterial3d(xray_mat.clone()),
+            tf,
+            NotShadowCaster,
+            ChildOf(root),
+        ));
+    }
     kit.child(root, &torus, gold, Transform::from_xyz(0.0, 0.95, 0.0).with_scale(Vec3::new(r * 1.1, 1.6, r * 1.1)));
     let pivot = kit.commands.spawn((Transform::from_xyz(0.0, 1.05, 0.0), Visibility::default(), ChildOf(root))).id();
     kit.child(pivot, &cube, brass, Transform::from_xyz(r * 0.75, 0.0, -0.55).with_scale(Vec3::new(0.15, 0.15, 0.95)));
@@ -1530,6 +1554,7 @@ fn sync_players(
     mut pal: ResMut<Palette>,
     mut stores: Stores,
     mut index: ResMut<SceneIndex>,
+    xrays: Res<XRayMats>,
     mut rigs: Query<(&mut PlayerRig, &mut Transform, &mut Visibility)>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<PlayerRig>>,
     mut bodies: Query<&mut MeshMaterial3d<ToonMaterial>>,
@@ -1544,7 +1569,7 @@ fn sync_players(
         match (present, index.players[slot as usize]) {
             (Some(p), None) => {
                 let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
-                index.players[slot as usize] = Some(spawn_rig(&mut kit, &cfg.content, p));
+                index.players[slot as usize] = Some(spawn_rig(&mut kit, &cfg.content, p, &xrays.0[slot as usize]));
             }
             (None, Some(e)) => {
                 commands.entity(e).despawn();
