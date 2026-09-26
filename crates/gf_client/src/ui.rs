@@ -227,6 +227,7 @@ fn update_state(
     settings: Res<Settings>,
     spread: Res<BoonSpread>,
     mut state: ResMut<PanelState>,
+    mut focus: ResMut<crate::hud::HudFocus>,
 ) {
     let w = pw.get(&link);
     let end = w.is_some_and(|w| matches!(w.run.phase, RunPhase::Victory | RunPhase::Defeat));
@@ -239,6 +240,11 @@ fn update_state(
     };
     if *state != next {
         *state = next;
+    }
+    // The HUD steps aside under the Forge drawer and the boon spread (§7.1, §7.2).
+    if focus.forge_drawer != next.forge || focus.boon_spread != next.boons {
+        focus.forge_drawer = next.forge;
+        focus.boon_spread = next.boons;
     }
 }
 
