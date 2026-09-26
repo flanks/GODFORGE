@@ -3893,14 +3893,16 @@ def m_orbit(c, n=3, blade=g_sawblade):
         sub(c, blade, p[0], p[1], 0.3, knock=0.03)
 
 
-def m_beam(c, sweep=True, width=0.18):
-    c.rect(0.0, 0.3, 0.26, 0.7, r=0.05)
-    c.poly([(0.24, 0.5 - width / 2), (1.0, 0.5 - width / 2 - 0.04), (1.0, 0.5 + width / 2 + 0.04), (0.24, 0.5 + width / 2)])
+def m_beam(c, sweep=True, width=0.2):
+    c.circle(0.14, 0.5, 0.14)
+    with c.op("cut"):
+        c.ring(0.14, 0.5, 0.09, 0.03)
+    c.poly([(0.22, 0.5 - width / 2), (1.0, 0.5 - width / 2 - 0.05), (1.0, 0.5 + width / 2 + 0.05), (0.22, 0.5 + width / 2)])
     with c.op("shade"):
-        c.poly([(0.24, 0.5), (1.0, 0.5), (1.0, 0.5 + width / 2 + 0.04), (0.24, 0.5 + width / 2)])
+        c.poly([(0.22, 0.5), (1.0, 0.5), (1.0, 0.5 + width / 2 + 0.05), (0.22, 0.5 + width / 2)])
     if sweep:
-        c.arc(0.12, 0.5, 0.8, -40, -18, 0.05)
-        c.arc(0.12, 0.5, 0.8, 18, 40, 0.05)
+        c.arc(0.14, 0.5, 0.78, -38, -20, 0.06)
+        c.arc(0.14, 0.5, 0.78, 20, 38, 0.06)
 
 
 def m_echo(c):
@@ -4184,13 +4186,12 @@ def m_opener(c):
 
 
 def m_vs(c, glyph):
-    """Damage against a status: the status glyph with a blade driven through it."""
-    sub(c, glyph, 0.42, 0.58, 0.8)
+    """Damage against a status: a sword striking down into the status glyph."""
+    sub(c, glyph, 0.36, 0.64, 0.7)
     with c.op("cut"):
-        c.poly(stroke_poly([(0.98, 0.02), (0.2, 0.8)], 0.17))
-    c.poly(stroke_poly([(0.94, 0.06), (0.36, 0.64)], 0.08))
-    c.poly([(0.36, 0.64), (0.2, 0.8), (0.3, 0.58)])
-    c.poly(stroke_poly([(0.7, 0.18), (0.84, 0.32)], 0.07))
+        c.poly(stroke_poly([(1.04, -0.04), (0.34, 0.66)], 0.24))
+    with c.place(0.62, 0.38, 0.86, r=-135):
+        g_sword(c, 0.22, fuller=False)
 
 
 def m_heavy(c):
@@ -4447,21 +4448,30 @@ def pm_tuning(c):
 
 
 def pm_arc_relay(c):
-    for i in range(4):
-        y = 0.28 + i * 0.16
-        c.ellipse(0.34, y, 0.24, 0.07)
-        with c.op("cut"):
-            c.ellipse(0.34, y - 0.01, 0.17, 0.035)
-    c.rect(0.08, 0.2, 0.14, 0.84)
-    c.line([(0.6, 0.5), (0.72, 0.36), (0.8, 0.56), (0.9, 0.4), (0.98, 0.5)], 0.05)
-    c.line([(0.6, 0.66), (0.7, 0.8), (0.8, 0.66), (0.88, 0.84)], 0.045)
+    """A conductor coil: a ringed column under a sphere throwing two arcs."""
+    c.rect(0.08, 0.9, 0.62, 1.0, r=0.03)
+    c.rect(0.28, 0.36, 0.42, 0.92)
+    for y in (0.46, 0.58, 0.7, 0.82):
+        c.rect(0.2, y - 0.04, 0.5, y + 0.04, r=0.03)
+    with c.op("shade"):
+        c.rect(0.35, 0.36, 0.5, 0.92)
+    c.circle(0.35, 0.22, 0.16)
+    with c.op("cut"):
+        c.circle(0.3, 0.17, 0.045)
+    c.line([(0.5, 0.18), (0.62, 0.3), (0.74, 0.14), (0.88, 0.28), (0.98, 0.16)], 0.06)
+    c.line([(0.48, 0.32), (0.6, 0.48), (0.72, 0.4), (0.84, 0.58)], 0.05)
 
 
 def pm_needle_ray(c):
-    c.rect(0.0, 0.38, 0.18, 0.62, r=0.04)
-    c.poly([(0.16, 0.47), (1.0, 0.5), (0.16, 0.53)])
-    c.line([(0.1, 0.38), (0.1, 0.2)], 0.05)
-    c.ring(0.1, 0.16, 0.08, 0.03)
+    c.circle(0.14, 0.5, 0.14)
+    with c.op("cut"):
+        c.circle(0.14, 0.5, 0.05)
+    c.poly([(0.24, 0.42), (1.0, 0.5), (0.24, 0.58)])
+    with c.op("shade"):
+        c.poly([(0.24, 0.5), (1.0, 0.5), (0.24, 0.58)])
+    for x in (0.46, 0.7):
+        c.line([(x, 0.3), (x + 0.1, 0.3)], 0.04)
+        c.line([(x, 0.7), (x + 0.1, 0.7)], 0.04)
 
 
 def pm_whirling_anvils(c):
@@ -5184,7 +5194,7 @@ TAG_MOTIFS: list[tuple[str, Callable]] = [
     ("velocity", m_velocity), ("dash", m_dash), ("elite", m_giant), ("low_hp", m_low_hp), ("luck", m_clover),
     ("coin", g_coin), ("nova", m_nova), ("shrapnel", m_shrapnel), ("contagion", m_contagion), ("chaos", m_chaos),
 ]
-PART_BOLD = {"mech_needle_ray": 0.014, "mech_impaler": 0.012, "relic_misericorde": 0.014, "relic_stormcatcher": 0.012,
+PART_BOLD = {"mech_needle_ray": 0.004, "mech_impaler": 0.012, "relic_misericorde": 0.014, "relic_stormcatcher": 0.012,
              "relic_pinning_stake": 0.01, "relic_reapers_tithe": 0.01, "relic_razorwake": 0.008, "relic_hexnail": 0.008,
              "mech_railspike": 0.008, "mech_seeker_swarm": 0.006, "mech_homing_shards": 0.006, "mech_quickdraw_string": 0.008,
              "mech_deep_draw": 0.008, "relic_bloodletter": 0.006, "mech_arc_relay": 0.004}
@@ -5266,10 +5276,10 @@ def b_ult_ground_el(el_glyph):
 def b_seared_heart(c):
     g_heart(c)
     with c.op("cut"):
-        c.line([(0.3, 0.32), (0.4, 0.44), (0.5, 0.36), (0.6, 0.48), (0.7, 0.38)], 0.05)
-    for x in (0.36, 0.5, 0.64):
-        with c.op("cut"):
-            c.line([(x, 0.56), (x, 0.68)], 0.035)
+        c.line([(0.2, 0.44), (0.8, 0.44)], 0.07)
+        for x in (0.32, 0.5, 0.68):
+            c.line([(x, 0.34), (x, 0.54)], 0.045)
+    sub(c, g_flame, 0.2, 0.8, 0.34, knock=0.03)
 
 
 def b_twin_flame(c):
@@ -5745,10 +5755,12 @@ def b_aegis_law(c):
 
 
 def b_lance_dawn(c):
-    c.poly([(0.0, 0.46), (0.7, 0.44), (1.0, 0.5), (0.7, 0.56), (0.0, 0.54)])
-    sub(c, g_radiant, 0.72, 0.5, 0.34, knock=0.02)
-    for y in (0.3, 0.7):
-        c.line([(0.1, y), (0.44, y)], 0.05)
+    c.poly([(0.0, 0.44), (0.66, 0.42), (1.0, 0.5), (0.66, 0.58), (0.0, 0.56)])
+    with c.op("shade"):
+        c.poly([(0.0, 0.5), (1.0, 0.5), (0.66, 0.58), (0.0, 0.56)])
+    sub(c, g_radiant, 0.66, 0.5, 0.4, knock=0.03)
+    for y in (0.26, 0.74):
+        c.line([(0.06, y), (0.42, y)], 0.06)
 
 
 def b_smite_mighty(c):
@@ -6116,6 +6128,10 @@ MOD_MOTIFS: list[tuple[str, Callable]] = [
 ]
 
 
+BOON_BOLD = {"nyctia_serrated_shadow": 0.01, "seraphel_lance_of_dawn": 0.006, "zephyros_quickening_gale": 0.006,
+             "nyctia_hunting_shadows": 0.006, "morwenn_plague_wake": 0.006, "zephyros_thousandfold_thunder": 0.004}
+
+
 def compose_boon(row: dict) -> tuple[Callable, str]:
     for needle, fn in MOD_MOTIFS:
         if needle in row["mods"]:
@@ -6132,7 +6148,8 @@ def register_boons(content: Content):
         tint = mix(T_BONE, god_tint(gods[0]), 0.55) if gods else T_KIT
         who = " & ".join(content.gods[g]["name"] for g in gods) if gods else "every player"
         meaning = f"{row['name']} ({row['kind']} boon, {who}): {row['desc']} Icon: {note}."
-        reg("boons", k, fn, tint, meaning, kind="boon", extra={"gods": gods, "motif_name": note})
+        reg("boons", k, fn, tint, meaning, kind="boon",
+            extra={"gods": gods, "motif_name": note, "bold": BOON_BOLD.get(k, 0.0)})
 
 
 # ───────────────────────────── special renderers ─────────────────────────────
@@ -6193,7 +6210,7 @@ def render_portrait(d: IconDef) -> np.ndarray:
 def render_boon(d: IconDef) -> np.ndarray:
     """A boon: the mechanic motif in a god-tinted ivory, with the god sigil(s) small at the top."""
     c = canvas_of(d.draw)
-    m, s, k = fit_masks(c, d.fit * 0.9, d.autofit)
+    m, s, k = fit_masks(c, d.fit * 0.9, d.autofit, d.extra.get("bold", 0.0))
     shift = int(WORK * 0.035)
     m, s, k = (np.roll(np.roll(a, shift, axis=0), -shift // 2, axis=1) for a in (m, s, k))
     main = enamel(m, s, k, d.tint, d.light)
