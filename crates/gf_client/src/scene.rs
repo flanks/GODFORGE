@@ -38,6 +38,9 @@ const XRAY_TOWARD_LENS: f32 = 1.25;
 /// Hit flash length and the shortest time between two flashes of one body.
 const FLASH_TIME: f32 = 0.07;
 const FLASH_COOLDOWN: f32 = 0.2;
+/// A big body changes status tint at most this often (s): a boss under burn, shock and a stun
+/// must not strobe through its colours.
+const BIG_TINT_HOLD: f32 = 0.5;
 /// POI beacon shaft height: tall enough that, seen by the fixed 55° camera, a shaft standing up
 /// to ~28 u beyond the bottom edge of the view still reaches into it.
 const BEACON_H: f32 = 40.0;
@@ -103,6 +106,9 @@ pub struct Visual {
     /// incomplete objective), bright beacon (a live one). Enemies: [_, elite ring, contact shadow, _, _].
     parts: [Option<Entity>; 5],
     tint: Tint,
+    /// When the tint last changed (s of age): a big body's status tints change at most every
+    /// [`BIG_TINT_HOLD`] s.
+    tint_at: f32,
     base_mat: Option<Handle<ToonMaterial>>,
     /// Seconds since this proxy appeared.
     pub age: f32,
@@ -130,6 +136,14 @@ pub struct Visual {
 }
 
 impl Visual {
+    /// A boss, an elite or a body over 1 m of radius: softer flashes, a narrow rim, statuses on
+    /// the rim only.
+    pub fn big(&self) -> bool {
+        self.flags.intersects(EntityFlags::BOSS | EntityFlags::ELITE) || self.radius > 1.0
+    }
+}
+
+impl Visual {
     fn new(e: &EntityView, color: Color, radius: f32, lift: f32) -> Self {
         let pos = e.pos.to_vec2();
         let mut v = Visual {
@@ -151,6 +165,7 @@ impl Visual {
             body: None,
             parts: [None; 5],
             tint: Tint::Base,
+            tint_at: 0.0,
             base_mat: None,
             age: 0.0,
             shown_facing: 0.0,
@@ -279,6 +294,8 @@ pub struct Corpse {
     pub depth: f32,
     /// Swarms fade to ash in their clip: the contact shadow goes with them.
     pub swarm: bool,
+    /// Painted with the big-body skin.
+    big: bool,
     shadow: Option<Entity>,
     /// The model, and whether the killing blow's flash has been taken off it yet.
     model: Option<Entity>,
@@ -539,6 +556,7 @@ fn sync_entities(
                 hold: f32::INFINITY,
                 depth: v.radius * 2.0 + 0.5,
                 swarm: v.radius < 0.8,
+                big: v.big(),
                 shadow: v.parts[2],
                 model: v.model,
                 hot: v.hot,
@@ -640,7 +658,7 @@ fn sync_enemy_models(
                         rotation: Quat::from_rotation_y(std::f32::consts::PI),
                         scale: Vec3::splat(s),
                     };
-                    let e = models::spawn_model(&mut commands, ent, &model, Skin::FOE, tf);
+                    let e = models::spawn_model(&mut commands, ent, &model, Skin::foe(v.big()), tf);
                     // A summoned add pops from its ember (`spawn`) when there is one.
                     let fresh = v.age < 0.35;
                     commands.entity(e).insert(EnemyAnim::new(ent, v.id, d, db, fresh));
@@ -688,7 +706,7 @@ fn tick_corpses(
         if !c.dressed && c.age >= FLASH_TIME {
             c.dressed = true;
             if let Some(mut parts) = c.model.and_then(|m| models.get_mut(m).ok()) {
-                let skin = Skin::Foe { tint: FoeTint::Base, hot: c.hot };
+                let skin = Skin::Foe { tint: FoeTint::Base, hot: c.hot, big: c.big };
                 models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
             }
         }
@@ -1706,8 +1724,10 @@ fn tint_entities(
         if !matches!(v.kind, EntityKind::Enemy { .. }) {
             continue;
         }
-        let big = v.flags.intersects(EntityFlags::BOSS | EntityFlags::ELITE) || v.radius > 1.0;
-        let tint = if v.flash > 0.0 {
+        let big = v.big();
+        // The flash and the wind-up blink outrank a status; a big body only swaps statuses every
+        // `BIG_TINT_HOLD` s (its status reads on the rim and in motes, not as a repaint).
+        let mut tint = if v.flash > 0.0 {
             if big { Tint::SoftFlash } else { Tint::Flash }
         } else if blink && v.flags.intersects(EntityFlags::WINDUP | EntityFlags::PRIMED | EntityFlags::CHARGING) {
             Tint::Warn
@@ -1720,6 +1740,13 @@ fn tint_entities(
         } else {
             Tint::Base
         };
+        let status = |t: Tint| matches!(t, Tint::Frozen | Tint::Stunned | Tint::Status(_) | Tint::Base);
+        if big && tint != v.tint && status(tint) && status(v.tint) && v.age - v.tint_at < BIG_TINT_HOLD {
+            tint = v.tint;
+        }
+        if tint != v.tint {
+            v.tint_at = v.age;
+        }
         // An authored model swaps between a few cached tints of its own painted material.
         if v.model_shown {
             let foe = match tint {
@@ -1732,7 +1759,7 @@ fn tint_entities(
                 Tint::Status(b) => FoeTint::Status(b),
             };
             if let Some(mut parts) = v.model.and_then(|m| models.get_mut(m).ok()) {
-                let skin = Skin::Foe { tint: foe, hot: v.hot };
+                let skin = Skin::Foe { tint: foe, hot: v.hot, big };
                 models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
             }
             v.tint = tint;

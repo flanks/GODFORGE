@@ -7,7 +7,7 @@ use crate::camera::{MainCamera, w3};
 use crate::input::Settings;
 use crate::models::HeroGear;
 use crate::net::Link;
-use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix};
+use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix, status_color};
 use crate::scene::{PlayerRig, SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
 use gf_content::VfxTier;
@@ -78,6 +78,7 @@ pub fn build(app: &mut App) {
             choose_tier,
             spawn_from_events,
             muzzle_flashes,
+            status_motes,
             update_particles,
             update_shockwaves,
             update_fades,
@@ -127,6 +128,60 @@ fn muzzle_flashes(
             NotShadowCaster,
         ));
     }
+}
+
+/// A big body's statuses show as motes around its hit centre, since its paint stays its own (the
+/// rim takes the status colour, `models::skin_material`): embers rise off a burning boss, sparks
+/// jump off a shocked one, frost drifts off a frozen one.
+#[allow(clippy::too_many_arguments)]
+fn status_motes(
+    mut commands: Commands,
+    time: Res<Time>,
+    cfg: Res<ClientConfig>,
+    visuals: Query<&Visual>,
+    mut pal: ResMut<Palette>,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+    mut state: ResMut<VfxState>,
+    mut seed: Local<u32>,
+) {
+    let dt = time.delta_secs();
+    if dt <= 0.0 || state.tier == VfxTier::Silhouette {
+        return;
+    }
+    let budget = cfg.content.game.vfx.particles[state.tier as usize];
+    *seed = seed.wrapping_add((time.elapsed_secs() * 977.0) as u32) | 1;
+    let mut fx =
+        Fx { commands: &mut commands, pal: &mut pal, mats: &mut mats, budget, alive: state.particles, rng: *seed };
+    for v in &visuals {
+        if !matches!(v.kind, gf_net::EntityKind::Enemy { .. }) || !v.big() {
+            continue;
+        }
+        let mut kinds: Vec<(Color, f32)> = Vec::new();
+        if v.flags.contains(gf_net::EntityFlags::FROZEN) {
+            kinds.push((hex("#BFE8FF"), 1.2));
+        }
+        if v.flags.contains(gf_net::EntityFlags::STUNNED) {
+            kinds.push((hex("#FFE27A"), 0.0));
+        }
+        let mut bits = v.status;
+        while bits != 0 && kinds.len() < 2 {
+            let bit = bits.trailing_zeros() as u8;
+            bits &= bits - 1;
+            // Burn rises, shock and the rest hang.
+            kinds.push((status_color(bit), if bit == 0 { -3.0 } else { 0.0 }));
+        }
+        for (c, gravity) in kinds {
+            // About 9 motes a second per status, more on a bigger body.
+            if fx.rand() > dt * (7.0 + 2.0 * v.radius) {
+                continue;
+            }
+            let a = fx.rand() * TAU;
+            let r = v.radius * (0.4 + 0.5 * fx.rand());
+            let at = w3(v.shown, v.hit_height * (0.6 + 0.7 * fx.rand())) + Vec3::new(a.cos() * r, 0.0, a.sin() * r);
+            fx.mote(at, c, gravity);
+        }
+    }
+    state.particles = fx.alive;
 }
 
 fn choose_tier(cfg: Res<ClientConfig>, index: Res<SceneIndex>, mut state: ResMut<VfxState>) {
@@ -180,6 +235,26 @@ impl Fx<'_, '_, '_> {
                 Transform::from_translation(at).with_scale(Vec3::splat(sz)),
             ));
         }
+    }
+
+    /// One slow mote (a status ember, a frost flake).
+    fn mote(&mut self, at: Vec3, color: Color, gravity: f32) {
+        if self.alive >= self.budget {
+            return;
+        }
+        self.alive += 1;
+        let mat = self.pal.mat(self.mats, hdr(color, 2.2), Look::Additive);
+        let a = self.rand() * TAU;
+        let vel = Vec3::new(a.cos() * 0.5, 0.6 + self.rand() * 0.8, a.sin() * 0.5);
+        let sz = 0.05 + self.rand() * 0.04;
+        let life = 0.45 + self.rand() * 0.3;
+        self.commands.spawn((
+            Particle { vel, life, max: life, size: Vec3::splat(sz), gravity, drag: 1.5 },
+            Mesh3d(self.pal.low_sphere.clone()),
+            MeshMaterial3d(mat),
+            Transform::from_translation(at).with_scale(Vec3::splat(sz)),
+            NotShadowCaster,
+        ));
     }
 
     fn shockwave(&mut self, at: Vec2, color: Color, from: f32, to: f32, life: f32) {
