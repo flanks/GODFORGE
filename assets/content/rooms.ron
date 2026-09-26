@@ -1191,9 +1191,9 @@
                     cover: 0.010,
                     comps: 1,
                     story: 1,
-                    frame: 0.5,
+                    frame: 0.6,
                     districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)],
-                    // Black glassy slag, orange seams.
+                    // Black glassy slag: pale cold seams, orange ones only near heat (§3.6.7).
                     tint: "#737173",
                     map_color: "#3C2A24",
                     names: ["The Slag Flats", "The Glass Wastes", "Clinker Plain", "The Cooling Fields"],
@@ -1208,7 +1208,7 @@
                     cover: 0.022,
                     comps: 2,
                     story: 1,
-                    frame: 0.55,
+                    frame: 0.65,
                     districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)],
                     // Soot brick and iron plate.
                     tint: "#7A7777",
@@ -1225,7 +1225,7 @@
                     cover: 0.018,
                     comps: 2,
                     story: 1,
-                    frame: 0.5,
+                    frame: 0.6,
                     districts: [(ColonnadeCourt, 1.5), (ForgeHall, 0.4)],
                     // Pale marble and gold.
                     tint: "#8B867D",
@@ -1243,7 +1243,7 @@
                     cover: 0.010,
                     comps: 1,
                     story: 1,
-                    frame: 0.45,
+                    frame: 0.55,
                     districts: [(SlagChannel, 0.6)],
                     // Pale grey ash in wind ripples.
                     tint: "#8E8C8B",
@@ -1260,7 +1260,7 @@
                     cover: 0.018,
                     comps: 2,
                     story: 1,
-                    frame: 0.55,
+                    frame: 0.65,
                     districts: [(CrucibleYard, 1.4), (ForgeHall, 0.6)],
                     // Rust red, scrap and chains.
                     tint: "#8B796E",
