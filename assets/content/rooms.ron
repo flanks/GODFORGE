@@ -1276,7 +1276,7 @@
             // Slag rivers (pits, bridged at the road passes) and forge walls (breached at the passes).
             barriers: (chance: 0.45, kinds: [(River, 0.30), (Wall, 0.15)]),
             roads: (width: 6.0, loop_chance: 0.3, pass_width: 8.0),
-            // 14 Seals on offer, 6 open the gate (the Warlord's 2 included). No Gate quota: the gate
+            // 14 Seals on offer, 8 open the gate (the Warlord's 2 included). No Gate quota: the gate
             // is implicit. The Watchfire quota arrives in phase 3.
             pois: [
                 (kind: Anvil, count: 3, seals: 1),
@@ -1296,7 +1296,9 @@
             // colossal god-weapon, 14–20 u tall) arrive early from phase 4 so every map has tall
             // silhouettes. No SealedGate: a second sealed gate reads as the real Boss Gate.
             landmarks: [(FallenWeapon, 1.2), (GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.5), (GreatBrazier, 0.7)],
-            seals_required: 7,
+            // 7 -> 8 with the composition pass (OPEN_WORLD.md §3.6.12, retune rung 1): the open map
+            // runs faster (a data-only declutter took the seed-7 stage from 367 s to 328 s).
+            seals_required: 8,
             gate_requires_warlord: true,
             gate_force_minute: 12.0,
             // Today's boss after 7 rooms (hp_growth_per_room 0.05 × 7).
