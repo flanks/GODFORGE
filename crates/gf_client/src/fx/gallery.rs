@@ -10,7 +10,7 @@
 use super::api::{F, Fx, Hit, HitKind, Smear, trail_style};
 use super::library::{Decal, Glyph, Ramp, seq, strip};
 use super::ribbon::RibbonStyle;
-use super::{BodyMesh, Class, FxBody, FxSprite, FxTrail, Layer, Owner, RibbonId};
+use super::{BodyMesh, Class, FxBody, FxRing, FxSprite, FxTrail, Layer, Owner, RibbonId};
 use crate::camera::MainCamera;
 use crate::net::Link;
 use crate::scene::SceneIndex;
@@ -47,7 +47,7 @@ struct Bench {
 }
 
 #[derive(Component)]
-struct Label(usize);
+struct GalleryLabel(usize);
 
 const LABELS: [&str; COLS * ROWS] = [
     // row 0: hit punctuation
@@ -85,7 +85,7 @@ const LABELS: [&str; COLS * ROWS] = [
     "slash",
     "ring shock",
     "dust wall",
-    "ring tick",
+    "ring tick + zone hem",
     // row 4: ribbons
     "body + trail slug",
     "body + trail arrow",
@@ -138,7 +138,7 @@ pub fn build(app: &mut App) {
 fn spawn_labels(mut commands: Commands) {
     for (i, text) in LABELS.iter().enumerate() {
         commands.spawn((
-            Label(i),
+            GalleryLabel(i),
             Text::new(*text),
             font_px(12.0),
             TextColor(Color::srgba(1.0, 0.95, 0.85, 0.85)),
@@ -173,7 +173,7 @@ fn cell_pos(center: Vec3, i: usize) -> Vec3 {
 fn place_labels(
     gallery: Res<Gallery>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    mut labels: Query<(&Label, &mut Node)>,
+    mut labels: Query<(&GalleryLabel, &mut Node)>,
 ) {
     let Ok((camera, cam_tf)) = cameras.single() else { return };
     let Some(center) = gallery.center else { return };
@@ -330,6 +330,13 @@ const SHOTS: [(usize, ProjectileStyle, Ramp, f32); 5] = [
 ];
 
 fn spawn_shots(commands: &mut Commands, center: Vec3) {
+    // A persistent zone hem (the way a player-side field carries its gold ring).
+    commands.spawn((
+        Name::new("vfx gallery hem"),
+        Transform::from_translation(cell_pos(center, 31)),
+        Visibility::default(),
+        FxRing::hem(1.7, Ramp::ZoneGold, Owner::Mine),
+    ));
     for (k, (cell, style, ramp, speed)) in SHOTS.iter().enumerate() {
         let (sprite, trail) = if *ramp == Ramp::EnemyShot {
             (

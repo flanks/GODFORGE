@@ -10,7 +10,8 @@
 //! ```
 
 use super::api::{F, Fx};
-use super::library::{Ramp, Seq, seq};
+use super::arc::{Arc, Profile};
+use super::library::{Ramp, Seq, Strip, seq, strip};
 use super::mesh::Layers;
 use super::particle::{Orient, Particle, Play};
 use super::ribbon::RibbonStyle;
@@ -132,10 +133,90 @@ impl FxTrail {
     }
 }
 
+/// A broken ring drawn around this entity every frame: hazard and field hems, the Still Field
+/// bubble, charge rings (VFX_STYLE §2 "Ring": always broken and tapered, marking a true radius).
+#[derive(Component, Clone, Debug)]
+pub struct FxRing {
+    pub radius: f32,
+    /// Band width (or wall height with `wall`).
+    pub width: f32,
+    pub strip: Strip,
+    pub ramp: Ramp,
+    pub gain: f32,
+    pub alpha: f32,
+    /// Texture repeats around the ring (the gaps of a broken ring).
+    pub repeats: f32,
+    /// Turns of the texture per second.
+    pub spin: f32,
+    /// Stand up as a low wall instead of lying on the floor.
+    pub wall: bool,
+    /// Height above the entity's feet.
+    pub height: f32,
+    pub layer: Layer,
+    pub owner: Owner,
+    pub class: Class,
+    pub(crate) age: f32,
+}
+
+impl FxRing {
+    /// A hem on the floor at a true radius: player-side zones are gold, enemy ones use their own
+    /// ramp (the red-white enemy hem stays the scene's telegraph language).
+    pub fn hem(radius: f32, ramp: Ramp, owner: Owner) -> FxRing {
+        FxRing {
+            radius,
+            width: (radius * 0.08).clamp(0.12, 0.5),
+            strip: strip::ACCENT_RING,
+            ramp,
+            gain: 1.0,
+            alpha: 1.0,
+            repeats: (radius * 1.4).round().clamp(3.0, 16.0),
+            spin: 0.05,
+            wall: false,
+            height: 0.04,
+            layer: Layer::Ground,
+            owner,
+            class: Class::Core,
+            age: 0.0,
+        }
+    }
+}
+
 /// Start the ribbons of newly tagged entities.
 pub(super) fn start_trails(mut fx: Fx, mut trails: Query<(Entity, &mut FxTrail), Added<FxTrail>>) {
     for (e, mut t) in &mut trails {
         t.id = fx.trail_for(e, t.offset, t.style, t.owner);
+    }
+}
+
+/// Emit every attached ring into its layer (called from the layer build).
+pub(super) fn emit_rings(
+    store: &FxStore,
+    layers: &mut Layers,
+    rings: &mut Query<(&GlobalTransform, &mut FxRing)>,
+    dt: f32,
+) {
+    let cam = store.cam;
+    for (g, mut r) in rings.iter_mut() {
+        let Some(grant) = store.grant(r.owner, r.class) else { continue };
+        r.age += dt;
+        let at = g.translation() + Vec3::Y * r.height;
+        let mut a = Arc::new(r.strip, at, r.radius, r.width, r.age + 1.0);
+        a.age = r.age;
+        a.world = at;
+        a.repeats = r.repeats;
+        a.spin = r.spin * r.repeats;
+        a.ramp = r.ramp;
+        a.gain = r.gain;
+        a.cap = grant.cap;
+        a.alpha = super::Curve::flat(r.alpha * grant.alpha);
+        a.erode = Vec2::new(1.0, 0.0);
+        a.segments = ((r.radius * 12.0) as u16).clamp(24, 128);
+        a.pull = 0.0;
+        a.layer = r.layer;
+        if r.wall {
+            a.profile = Profile::Wall { flare: r.width * 0.3 };
+        }
+        a.emit(layers.buf(r.strip.sheet, r.layer), &cam);
     }
 }
 

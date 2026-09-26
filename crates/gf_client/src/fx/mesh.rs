@@ -192,7 +192,9 @@ impl Layers {
     }
 }
 
-/// Keep every layer material's view and hero points current (only rewritten when they change).
+/// Keep the drawing layers' view and hero points current. A material is rewritten only when a
+/// hero has moved more than [`REVEAL_SLACK`] since it was last written (a rewrite re-uploads its
+/// bind group), so a crowd of layers costs a few uploads a second, not one per frame each.
 pub(super) fn update_reveal(
     layers: &Layers,
     materials: &mut Assets<FxMaterial>,
@@ -200,19 +202,28 @@ pub(super) fn update_reveal(
     heroes: &[Vec4; REVEAL_SLOTS],
 ) {
     let view = cam.fwd.extend(REVEAL_RADIUS);
+    let moved = |old: &[Vec4; REVEAL_SLOTS]| {
+        old.iter()
+            .zip(heroes)
+            .any(|(a, b)| a.w != b.w || a.truncate().distance_squared(b.truncate()) > REVEAL_SLACK * REVEAL_SLACK)
+    };
     for slot in &layers.slots {
-        if slot.entity.is_none() {
+        if slot.entity.is_none() || slot.buf.is_empty() {
             continue;
         }
         let stale = materials
             .get(&slot.material)
-            .is_some_and(|m| m.params.heroes != *heroes || (m.params.view - view).length_squared() > 1e-6);
+            .is_some_and(|m| moved(&m.params.heroes) || (m.params.view - view).length_squared() > 1e-6);
         if stale && let Some(mut m) = materials.get_mut(&slot.material) {
             m.params.heroes = *heroes;
             m.params.view = view;
         }
     }
 }
+
+/// How far a hero may move before the layer materials hear of it (metres; the reveal radius is
+/// 0.95 m with a soft edge, so the lag never shows).
+pub const REVEAL_SLACK: f32 = 0.2;
 
 /// Streak-noise strength of a sheet: strips break into brush streaks along their length.
 fn streak_of(sheet: Sheet) -> f32 {

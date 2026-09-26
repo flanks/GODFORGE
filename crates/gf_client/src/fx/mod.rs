@@ -37,7 +37,7 @@ pub mod textures;
 
 pub use api::{Fx, Hit, HitKind, RibbonId, SpriteBuilder};
 pub use arc::{Arc, Profile, Sweep};
-pub use attach::{FxSprite, FxTrail};
+pub use attach::{FxRing, FxSprite, FxTrail};
 pub use body::{BodyMesh, FxBody};
 pub use library::{Decal, Glyph, Mote, Pip, Ramp, Seq, Sheet, Strip, seq, strip, value};
 pub use particle::{Curve, Orient, Particle, Path, Play};
@@ -508,6 +508,7 @@ fn draw(
     mut visibility: mesh::LayerVisibility,
     mut lights: light::LightPool,
     mut sprites: Query<(&GlobalTransform, &mut attach::FxSprite)>,
+    mut rings: Query<(&GlobalTransform, &mut attach::FxRing)>,
     index: Res<crate::scene::SceneIndex>,
     globals: Query<&GlobalTransform>,
     mut scratch: Local<(Vec<(u32, f32, u32)>, Vec<Vec3>)>,
@@ -544,6 +545,7 @@ fn draw(
     }
     let dt = if store.frozen { 0.0 } else { time.delta_secs().min(0.1) * store.time_scale };
     attach::emit_sprites(store, &mut layers, &mut sprites, dt);
+    attach::emit_rings(store, &mut layers, &mut rings, dt);
     let (draws, verts) =
         mesh::upload(&mut commands, &mut layers, &textures, &mut meshes, &mut materials, &mut visibility, &cam);
     light::assign(&store.flashes, &mut lights);

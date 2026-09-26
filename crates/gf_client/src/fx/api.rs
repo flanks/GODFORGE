@@ -576,7 +576,8 @@ impl Fx<'_> {
     }
 
     /// A straight strip between two points, refreshed every frame by its caller (beams, loot
-    /// beams, tethers). `key` identifies it across frames.
+    /// beams, tethers). `key` identifies it across frames; [`Fx::beam`] uses `2k` and `2k + 1` and
+    /// [`Fx::tether`] sets the top bit, so pick other keys above `0x4000_0000`.
     pub fn immediate_line(&mut self, key: u32, from: Vec3, to: Vec3, style: RibbonStyle, owner: Owner) {
         let now = self.store.time;
         let found = self
@@ -624,7 +625,8 @@ impl Fx<'_> {
         self.store.push_ribbon(r);
     }
 
-    /// A braided tether between two points for `life` seconds (revive, harpoon rope).
+    /// A braided tether between two points (revive, harpoon rope): immediate mode, call it every
+    /// frame while it holds.
     pub fn tether(&mut self, key: u32, from: Vec3, to: Vec3, width: f32, ramp: Ramp, owner: Owner) {
         let style = RibbonStyle {
             tile: 1.4,
