@@ -29,7 +29,7 @@ use gf_engine::prelude::*;
 use gf_net::quant::{u8_to_dir, u8_to_frac, u16_to_dir};
 use gf_net::*;
 use std::collections::HashMap;
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI, TAU};
+use std::f32::consts::{FRAC_PI_2, PI, TAU};
 
 const PROJECTILE_HEIGHT: f32 = 0.9;
 /// How far (m) a glTF hero's x-ray proxies slide toward the lens: past a fist or a cannon thrust at
@@ -820,80 +820,55 @@ fn spawn_visual(
             Visual::new(e, kit.pal.danger, r, 0.8)
         }
         EntityKind::Telegraph { shape, .. } => spawn_telegraph(kit, parent, e, shape),
-        EntityKind::Hazard { kind, element, radius_q } => {
+        EntityKind::Hazard { element, radius_q, .. } => {
+            // The painted, animated zone (its look, hem and ambience) is dressed on by
+            // `vfx::zone::dress`: player zones quiet with a broken gold hem, enemy zones in their
+            // own paint with a red-white hem on the danger layer.
             let r = radius_q as f32 / 32.0;
             let ally = e.flags.contains(EntityFlags::ALLY);
             let c = if ally { element_color(element) } else { mix(kit.pal.danger, element_color(element), 0.35) };
-            let alpha = match kind {
-                HazardKind::Well => 0.4,
-                HazardKind::Field => 0.2,
-                HazardKind::Pool | HazardKind::Puddle => 0.36,
-                HazardKind::Trail | HazardKind::Ground => 0.3,
-            };
-            // Readability budget: player-made zones stay quiet (no bloom, low alpha) so enemy
-            // danger and the characters read first; at 4P they can cover a third of the screen.
-            let (alpha, edge_alpha, fill_gain, edge_gain) =
-                if ally { (alpha * 0.35, 0.3, 1.0, 1.1) } else { (alpha, 0.75, 1.3, 2.6) };
-            let fill = kit.mat(hdr(c, fill_gain).with_alpha(alpha), Look::Decal);
-            let edge = kit.mat(hdr(c, edge_gain).with_alpha(edge_alpha), Look::Decal);
-            let (disc, ring) = (kit.pal.disc.clone(), kit.pal.ring.clone());
-            kit.child(parent, &disc, fill, Transform::from_scale(Vec3::splat(r)));
-            kit.child(
-                parent,
-                &ring,
-                edge,
-                Transform { translation: Vec3::Z * 0.002, scale: Vec3::splat(r), ..default() },
-            );
-            let mut v = Visual::new(e, c, r, 0.015 + (e.id.0 % 5) as f32 * 0.002);
-            if kind == HazardKind::Well {
-                let swirl_mat =
-                    kit.mat(hdr(c, if ally { 1.2 } else { 3.0 }).with_alpha(if ally { 0.3 } else { 0.5 }), Look::Decal);
-                let swirl = kit.pal.sector(kit.meshes, 70);
-                v.parts[0] = Some(kit.child(
-                    parent,
-                    &swirl,
-                    swirl_mat,
-                    Transform { translation: Vec3::Z * 0.004, scale: Vec3::splat(r * 0.8), ..default() },
-                ));
-            }
-            v
+            Visual::new(e, c, r, 0.015 + (e.id.0 % 5) as f32 * 0.002)
         }
         EntityKind::Pickup { kind, owner } => {
+            // A painted glyph that bobs in place (VFX_STYLE §17): a part in its rarity's paint,
+            // a crystal shard, a heart with a heal halo. Other players' loot is ghosted and gets
+            // no beam; the loot beams of Rare+ parts are drawn by `vfx::live`.
+            use crate::fx::{FxSprite, Layer, Owner as FxOwner, Pip, Ramp as FxRamp};
             let mine = owner.is_none() || owner == me;
-            let (c, mesh, scale, rot) = match kind {
-                PickupKind::Part { rarity } => (
-                    rarity_color(rarity),
-                    kit.pal.cube.clone(),
-                    Vec3::splat(0.34),
-                    Quat::from_rotation_x(FRAC_PI_4) * Quat::from_rotation_z(FRAC_PI_4),
-                ),
-                PickupKind::Shards(n) => {
-                    let s = 0.2 + 0.05 * (n as f32).max(1.0).ln();
-                    (hex("#8FF7FF"), kit.pal.cone.clone(), Vec3::new(s * 0.6, s * 1.6, s * 0.6), Quat::IDENTITY)
+            let (c, pip, ramp, h) = match kind {
+                PickupKind::Part { rarity } => {
+                    let ramp = match rarity {
+                        Rarity::Common => FxRamp::Mono,
+                        Rarity::Rare => FxRamp::Storm,
+                        Rarity::Epic => FxRamp::Void,
+                        Rarity::Godforged => FxRamp::ZoneGold,
+                    };
+                    (rarity_color(rarity), Pip::Part, ramp, 0.75)
                 }
-                PickupKind::Health => (hex("#FF4D6D"), kit.pal.sphere.clone(), Vec3::splat(0.26), Quat::IDENTITY),
+                PickupKind::Shards(n) => {
+                    (hex("#8FF7FF"), Pip::Shard, FxRamp::Storm, 0.55 + 0.06 * (n as f32).max(1.0).ln())
+                }
+                PickupKind::Health => (hex("#FF4D6D"), Pip::Heart, FxRamp::EnemyShot, 0.7),
             };
-            let mat = if mine { kit.mat(c, Look::Glow) } else { kit.mat(c.with_alpha(0.25), Look::Ghost) };
-            let body = kit.child(parent, &mesh, mat, Transform { rotation: rot, scale, ..default() });
-            if mine
-                && let PickupKind::Part { rarity } = kind
-                && rarity >= Rarity::Rare
-            {
-                // Loot beam: readable from across a 400-enemy room.
-                let beam =
-                    kit.mat(hdr(c, 2.0).with_alpha(if rarity >= Rarity::Epic { 0.45 } else { 0.28 }), Look::Decal);
-                let cyl = kit.pal.cylinder.clone();
-                kit.child(
-                    parent,
-                    &cyl,
-                    beam,
-                    Transform::from_xyz(0.0, 1.6, 0.0).with_scale(Vec3::new(0.07, 3.6, 0.07)),
-                );
+            let mut glyph = FxSprite::new(pip.seq(), h, ramp, FxOwner::World);
+            glyph.class = crate::fx::Class::Danger;
+            glyph.gain = if mine { 1.25 } else { 0.8 };
+            glyph.alpha = if mine { 1.0 } else { 0.25 };
+            glyph.layer = Layer::Front;
+            glyph.pull = 0.4;
+            kit.commands.entity(parent).insert(glyph);
+            if mine && kind == PickupKind::Health {
+                // The heal halo keeps the heart apart from any telegraph red.
+                let mut halo = FxSprite::new(crate::fx::seq::GLINT.nth(3), 1.15, FxRamp::Heal, FxOwner::World);
+                halo.class = crate::fx::Class::Danger;
+                halo.alpha = 0.55;
+                halo.layer = Layer::Main;
+                halo.spin = 0.8;
+                let halo_e = kit.commands.spawn((Transform::default(), Visibility::default(), halo)).id();
+                kit.commands.entity(parent).add_child(halo_e);
             }
             kit.shadow(parent, 0.3, 0.45);
-            let mut v = Visual::new(e, c, 0.3, 0.45);
-            v.body = Some(body);
-            v
+            Visual::new(e, c, 0.3, 0.45)
         }
         EntityKind::Anvil => spawn_anvil(kit, db, parent, e, false),
         EntityKind::Door { reward, .. } => {
@@ -1195,101 +1170,13 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
     v
 }
 
-fn spawn_telegraph(kit: &mut Kit, parent: Entity, e: &EntityView, shape: TeleShape) -> Visual {
+/// A telegraph proxy. Its painted shape (the red-white fill growing from the centre with a
+/// white-hot front, the crackling rim, the last-fifth blink; gold for player-side telegraphs) is
+/// one shader quad dressed on by `vfx::zone::dress`, drawn above every VFX layer.
+fn spawn_telegraph(kit: &mut Kit, _parent: Entity, e: &EntityView, _shape: TeleShape) -> Visual {
     let ally = e.flags.contains(EntityFlags::ALLY);
     let col = if ally { hex(GOLD) } else { kit.pal.danger };
-    let outline = kit.mat(hdr(col, 1.4).with_alpha(0.2), Look::Decal);
-    let fill = kit.mat(hdr(col, 2.2).with_alpha(0.42), Look::Decal);
-    let edge = kit.mat(hdr(col, 3.0).with_alpha(0.9), Look::Decal);
-    let (disc, ring, quad) = (kit.pal.disc.clone(), kit.pal.ring.clone(), kit.pal.quad.clone());
-    let z = |k: f32| Vec3::Z * k;
-    let fill_ent = match gf_sim::bot::tele_shape(shape) {
-        gf_content::TelegraphShape::Circle { radius } => {
-            kit.child(parent, &disc, outline, Transform::from_scale(Vec3::splat(radius)));
-            kit.child(
-                parent,
-                &ring,
-                edge,
-                Transform { translation: z(0.001), scale: Vec3::splat(radius), ..default() },
-            );
-            kit.child(parent, &disc, fill, Transform { translation: z(0.002), scale: Vec3::splat(0.001), ..default() })
-        }
-        gf_content::TelegraphShape::Line { length, width } => {
-            kit.child(
-                parent,
-                &quad,
-                outline,
-                Transform {
-                    translation: Vec3::new(0.0, length * 0.5, 0.0),
-                    scale: Vec3::new(width, length, 1.0),
-                    ..default()
-                },
-            );
-            kit.child(
-                parent,
-                &quad,
-                edge.clone(),
-                Transform {
-                    translation: Vec3::new(0.0, length, 0.001),
-                    scale: Vec3::new(width, 0.1, 1.0),
-                    ..default()
-                },
-            );
-            for x in [-0.5, 0.5] {
-                kit.child(
-                    parent,
-                    &quad,
-                    edge.clone(),
-                    Transform {
-                        translation: Vec3::new(x * width, length * 0.5, 0.001),
-                        scale: Vec3::new(0.06, length, 1.0),
-                        ..default()
-                    },
-                );
-            }
-            kit.child(
-                parent,
-                &quad,
-                fill,
-                Transform { translation: z(0.002), scale: Vec3::new(width, 0.001, 1.0), ..default() },
-            )
-        }
-        gf_content::TelegraphShape::Cone { range, angle_deg } => {
-            let sector = kit.pal.sector(kit.meshes, angle_deg.clamp(1.0, 255.0) as u8);
-            kit.child(parent, &sector, outline, Transform::from_scale(Vec3::splat(range)));
-            kit.child(
-                parent,
-                &sector,
-                fill,
-                Transform { translation: z(0.002), scale: Vec3::splat(0.001), ..default() },
-            )
-        }
-        gf_content::TelegraphShape::Ring { inner, outer } => {
-            let annulus = kit.pal.annulus(kit.meshes, inner / outer.max(0.01));
-            kit.child(parent, &annulus, outline, Transform::from_scale(Vec3::splat(outer)));
-            kit.child(
-                parent,
-                &ring,
-                edge.clone(),
-                Transform { translation: z(0.001), scale: Vec3::splat(outer), ..default() },
-            );
-            kit.child(
-                parent,
-                &ring,
-                edge,
-                Transform { translation: z(0.001), scale: Vec3::splat(inner.max(0.05)), ..default() },
-            );
-            kit.child(
-                parent,
-                &annulus,
-                fill,
-                Transform { translation: z(0.002), scale: Vec3::splat(0.001), ..default() },
-            )
-        }
-    };
-    let mut v = Visual::new(e, col, 1.0, 0.02 + (e.id.0 % 8) as f32 * 0.003);
-    v.parts[0] = Some(fill_ent);
-    v
+    Visual::new(e, col, 1.0, 0.02 + (e.id.0 % 8) as f32 * 0.003)
 }
 
 /// A flat interaction ring of `radius` whose band is [`RING_BAND`] wide at any radius.
@@ -1643,39 +1530,14 @@ fn animate_entities(
                 tf.translation = w3(v.shown, v.lift);
                 tf.rotation = yaw(v.facing);
             }
-            EntityKind::Telegraph { shape, windup_ticks, start, dir } => {
+            EntityKind::Telegraph { dir, .. } => {
                 tf.translation = w3(v.shown, v.lift);
                 let d = u16_to_dir(dir);
                 tf.rotation = flat(d.y.atan2(d.x));
-                let p = ((rt - start as f64) / windup_ticks.max(1) as f64).clamp(0.0, 1.0) as f32;
-                if let Some(fill) = v.parts[0]
-                    && let Ok(mut ftf) = parts.get_mut(fill)
-                {
-                    match gf_sim::bot::tele_shape(shape) {
-                        gf_content::TelegraphShape::Circle { radius } => {
-                            ftf.scale = Vec3::splat((radius * p).max(0.001))
-                        }
-                        gf_content::TelegraphShape::Cone { range, .. } => {
-                            ftf.scale = Vec3::splat((range * p).max(0.001))
-                        }
-                        gf_content::TelegraphShape::Ring { outer, .. } => {
-                            ftf.scale = Vec3::splat((outer * p).max(0.001))
-                        }
-                        gf_content::TelegraphShape::Line { length, width } => {
-                            ftf.scale = Vec3::new(width, (length * p).max(0.001), 1.0);
-                            ftf.translation = Vec3::new(0.0, length * p * 0.5, 0.002);
-                        }
-                    }
-                }
             }
             EntityKind::Hazard { .. } => {
                 tf.translation = w3(v.shown, v.lift);
                 tf.rotation = flat(FRAC_PI_2);
-                if let Some(swirl) = v.parts[0]
-                    && let Ok(mut stf) = parts.get_mut(swirl)
-                {
-                    stf.rotation = Quat::from_rotation_z(t * 2.5);
-                }
             }
             EntityKind::Pickup { .. } => {
                 tf.translation = w3(v.shown, v.lift + 0.12 * (t * 3.0 + phase).sin());
@@ -1687,6 +1549,12 @@ fn animate_entities(
             }
             EntityKind::Echo { .. } => {
                 tf.translation = w3(v.shown, v.lift + 0.15 * (t * 2.0 + phase).sin());
+            }
+            EntityKind::Barricade { .. } => {
+                // The forge wall rises out of its molten seam in 8 frames.
+                tf.translation = w3(v.shown, v.lift);
+                let k = (v.age / (8.0 / 60.0)).min(1.0);
+                tf.scale = Vec3::new(1.0, 0.05 + 0.95 * (1.0 - (1.0 - k) * (1.0 - k)), 1.0);
             }
             EntityKind::Door { .. } => {
                 tf.translation = w3(v.shown, 0.0);

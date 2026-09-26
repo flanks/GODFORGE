@@ -104,7 +104,10 @@ struct BladeFx {
 pub fn build(app: &mut App) {
     app.init_resource::<Arsenal>().add_systems(
         Update,
-        (refresh, track, events, dress, hold, orbit, unstick).chain().in_set(ClientSet::Presentation),
+        (refresh, track, events, dress, hold, orbit, unstick)
+            .chain()
+            .after(crate::vfx::spawn_from_events)
+            .in_set(ClientSet::Presentation),
     );
     gallery::build(app);
 }
@@ -275,6 +278,7 @@ fn events(
     index: Res<SceneIndex>,
     visuals: Query<&Visual>,
     mut arsenal: ResMut<Arsenal>,
+    claims: Res<crate::vfx::EventClaims>,
     mut fx: Fx,
 ) {
     if link.fresh_events.is_empty() {
@@ -287,7 +291,11 @@ fn events(
     if arsenal.last_star.len() > 512 {
         arsenal.last_star.retain(|_, t| now - *t < 0.5);
     }
-    for ev in &link.fresh_events {
+    for (i, ev) in link.fresh_events.iter().enumerate() {
+        // Lane A drew this one as part of a synergy or an ability set piece.
+        if claims.claimed(i) {
+            continue;
+        }
         match *ev {
             GameEvent::Shot { slot, dir, .. } => {
                 let s = slot as usize % 4;

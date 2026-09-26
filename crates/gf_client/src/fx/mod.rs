@@ -44,14 +44,12 @@ pub use particle::{Curve, Orient, Particle, Path, Play};
 pub use ribbon::{Facing, RibbonStyle, Source};
 
 use crate::camera::MainCamera;
-use crate::scene::Visual;
 use gf_content::VfxTier;
 use gf_engine::bevy::asset::AssetEventSystems;
 use gf_engine::bevy::camera::visibility::VisibilitySystems;
 use gf_engine::bevy::transform::TransformSystems;
 use gf_engine::client::embedded_asset;
 use gf_engine::prelude::*;
-use gf_net::EntityKind;
 use material::FxMaterial;
 use mesh::{CamBasis, Layers};
 use ribbon::Ribbon;
@@ -411,10 +409,7 @@ pub fn build(app: &mut App) {
         .init_resource::<Layers>()
         .init_resource::<body::FxBodies>()
         .add_systems(Startup, (textures::load, light::spawn_pool, body::load))
-        .add_systems(
-            Update,
-            (lift_telegraphs, clear_on_room_change, body::update.in_set(crate::ClientSet::Presentation)),
-        )
+        .add_systems(Update, (clear_on_room_change, body::update.in_set(crate::ClientSet::Presentation)))
         .add_systems(
             PostUpdate,
             (attach::start_trails, step, draw)
@@ -581,31 +576,5 @@ fn clear_on_room_change(room: Res<crate::net::CurrentRoom>, mut store: ResMut<Fx
     if room.generation != *seen {
         *seen = room.generation;
         store.clear();
-    }
-}
-
-/// Enemy telegraphs must composite over every VFX layer (VFX_STYLE §15.1, §21.3). The scene
-/// draws them with cached decal materials; lift those materials' draw order once, as they
-/// appear.
-///
-/// Interim: once `scene.rs` builds telegraphs with `TELEGRAPH_BIAS` itself (the integration
-/// phase), delete this system.
-fn lift_telegraphs(
-    visuals: Query<(&Visual, &Children), Added<Visual>>,
-    parts: Query<&MeshMaterial3d<StandardMaterial>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    for (v, children) in &visuals {
-        if !matches!(v.kind, EntityKind::Telegraph { .. }) {
-            continue;
-        }
-        for child in children.iter() {
-            let Ok(mat) = parts.get(child) else { continue };
-            if materials.get(&mat.0).is_some_and(|m| m.depth_bias < TELEGRAPH_BIAS)
-                && let Some(mut m) = materials.get_mut(&mat.0)
-            {
-                m.depth_bias = TELEGRAPH_BIAS;
-            }
-        }
     }
 }
