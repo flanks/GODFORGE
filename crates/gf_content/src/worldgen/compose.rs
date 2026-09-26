@@ -69,7 +69,8 @@ struct Plan {
     clear: Vec<Rect>,
     /// Story clusters: region, centre, reach.
     stories: Vec<(usize, Vec2, f32)>,
-    /// Barrier wall runs: regions (a, b), the wall line's midpoint, the direction from a to b.
+    /// Barrier wall runs and seam runs: regions (a, b), the line's midpoint, the direction from
+    /// a to b.
     runs: Vec<(usize, usize, Vec2, Vec2)>,
     /// Framed runs of void shore: region, tiles with their outward directions.
     shores: Vec<(usize, Vec<(usize, Vec2)>)>,
@@ -129,6 +130,7 @@ pub(crate) fn build(g: &mut Gen) -> Built {
     for r in 0..g.regions.len() {
         frame(g, &mut b, &x, r, &mut plan);
     }
+    seams(g, &mut b, &x, &mut plan);
     if x.road_silhouettes > 0.0 {
         road_silhouettes(g, &mut b, x.road_silhouettes);
     }
@@ -650,9 +652,41 @@ fn wall(g: &Gen, b: &mut Builder, x: &ComposeDef, approach: &[(Vec2, f32)], plan
     plan.solids.extend(n0..b.obstacles.len());
 }
 
-/// An arch over road `k` where it crosses its regions' border (the pass: its door, §3.6.4):
-/// always through a wall or ridge, at an open border by `compose.pass_arches`, never over a
-/// bridge (the deck is the landmark there). A brazier pair lights it from the road's shoulders.
+/// Two standing pylons flanking the road through `at` running along `dir`, just off its
+/// shoulders, each hung with a banner: the door of an open border (a lintel with no wall on
+/// either side read as a plank lying across the road from the fixed camera). The offset of their
+/// outer faces from the road's centre line when they stand.
+fn road_pylons(g: &Gen, b: &mut Builder, at: Vec2, dir: Vec2, width: f32) -> Option<f32> {
+    let r = q(b.rl(0.55, 0.7));
+    let n = Vec2::new(-dir.y, dir.x);
+    let off = width * 0.5 + r + 0.6;
+    let posts = [qv(at + n * off), qv(at - n * off)];
+    let pieces: Vec<Obstacle> = posts.iter().map(|&c| Obstacle::Circle { center: c, radius: r }).collect();
+    if !pieces.iter().all(|o| open_ground(g, b, o, None)) {
+        return None;
+    }
+    let grp = b.group();
+    let height = q(b.rd(4.8, 5.8));
+    let placed = unmasked(b, |b| {
+        b.solid(grp, &pieces[..1], Decor::Pillar { at: posts[0], radius: r, height })
+            && b.solid(grp, &pieces[1..], Decor::Pillar { at: posts[1], radius: r, height })
+    });
+    if !placed {
+        return None;
+    }
+    let god = b.god();
+    for (k, p) in posts.iter().enumerate() {
+        let side = if k == 0 { n } else { -n };
+        let bh = q(height - b.rd(0.6, 1.2));
+        b.decal(Decor::Banner { at: qv(*p + side * (r + 0.15)), height: bh, rot: rot_of(side), god });
+    }
+    Some(off + r)
+}
+
+/// The door where road `k` crosses its regions' border (the pass, §3.6.4): an arch through a
+/// wall or ridge (always), at an open border by `compose.pass_arches` (else two bannered pylons
+/// when `compose.pass_pylons`), nothing over a bridge (the deck is the landmark there). A
+/// brazier pair lights it from the road's shoulders.
 fn pass_arch(g: &Gen, b: &mut Builder, x: &ComposeDef, k: usize) {
     let road = &g.roads[k];
     b.lay = g.root.fork(600 + k as u64);
@@ -663,14 +697,16 @@ fn pass_arch(g: &Gen, b: &mut Builder, x: &ComposeDef, k: usize) {
         Some(_) => 0.0,
         None => x.pass_arches.clamp(0.0, 1.0),
     };
-    if !b.lay.chance(chance) {
+    let arch = b.lay.chance(chance);
+    if !arch && !(barrier.is_none() && x.pass_pylons) {
         return;
     }
     let dir = road_dir(&road.lanes, road.pass);
     let width = q(g.x.roads.width);
     for s in [0.0f32, -2.5, 2.5, -5.0, 5.0] {
         let at = road.pass + dir * s;
-        if let Some(reach) = road_arch(g, b, at, dir, width, None) {
+        let door = if arch { road_arch(g, b, at, dir, width, None) } else { road_pylons(g, b, at, dir, width) };
+        if let Some(reach) = door {
             let n = Vec2::new(-dir.y, dir.x);
             for side in [1.0f32, -1.0] {
                 b.brazier(at + n * (side * (reach + 1.0)) - dir * 0.9);
@@ -1451,6 +1487,187 @@ fn frame(g: &Gen, b: &mut Builder, x: &ComposeDef, r: usize, plan: &mut Plan) {
     }
     for run in runs {
         plan.shores.push((r, run));
+    }
+}
+
+/// Open region borders (no wall, ridge or river) as seams (the critique of §3.6.4: an open
+/// border was only a tint blend, so the map read as one plain): chains of the border's tile
+/// faces on region a's side are walked in order, and `compose.seam` of their length is laid as
+/// runs of `seam_run` u with gaps of at least `seam_gap`, never within `seam_pass_clear` of a
+/// road crossing it, a POI clearing, a hub or the Landing. Each run gets low `Scenery::Seam`
+/// courses every 2.6–4.2 u (dress, `2700 + k`; the client paints a dark scree band under them) and
+/// one colliding ruined pier at an end (lay, `2600 + k`): the frame mass the eye reads as the
+/// edge of a place, while the border stays open to walk across.
+fn seams(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
+    let share = x.seam.clamp(0.0, 1.0);
+    if share <= 0.0 {
+        return;
+    }
+    let t = &g.tiles;
+    let w = t.w as usize;
+    let lanes = g.lanes();
+    let (run_lo, run_hi) = (x.seam_run.0.min(x.seam_run.1).max(4.0), x.seam_run.1.max(x.seam_run.0).max(4.0));
+    let ratio = ((1.0 - share) / share.max(0.05)).max(0.0);
+    let hubs: Vec<Vec2> = g.regions.iter().filter(|r| r.landmark.is_some()).map(|r| r.site).collect();
+    for (k, adj) in g.adj.iter().enumerate() {
+        if adj.barrier.is_some() || adj.border == 0 {
+            continue;
+        }
+        let (ra, rb) = (adj.a, adj.b);
+        b.lay = g.root.fork(2600 + k as u64);
+        b.dress = g.root.fork(2700 + k as u64);
+        // Region a's border tiles: the point on the border line and the normal toward b.
+        let mut faces: BTreeMap<usize, (Vec2, Vec2)> = BTreeMap::new();
+        for i in 0..t.kind.len() {
+            if t.region[i] as usize != ra || !t.kind[i].is_land() {
+                continue;
+            }
+            let (xx, yy) = ((i % w) as i32, (i / w) as i32);
+            let mut n = Vec2::ZERO;
+            for (dx, dy) in [(1i32, 0i32), (-1, 0), (0, 1), (0, -1)] {
+                let (nx, ny) = (xx + dx, yy + dy);
+                if nx < 0 || ny < 0 || nx >= t.w as i32 || ny >= t.h as i32 {
+                    continue;
+                }
+                let j = t.index(nx as u16, ny as u16);
+                if t.kind[j].is_land() && t.region[j] as usize == rb {
+                    n += Vec2::new(dx as f32, dy as f32);
+                }
+            }
+            if n != Vec2::ZERO {
+                let n = n / n.length();
+                faces.insert(i, (t.center(xx as u16, yy as u16) + n * (t.size * 0.5), n));
+            }
+        }
+        if faces.is_empty() {
+            continue;
+        }
+        let crossings: Vec<Vec2> =
+            g.roads.iter().filter(|r| (r.a, r.b) == (ra, rb) || (r.a, r.b) == (rb, ra)).map(|r| r.pass).collect();
+        let open = |q: Vec2| -> bool {
+            t.kind_at(q) == TileKind::Ground
+                && crossings.iter().all(|c| c.distance(q) >= x.seam_pass_clear)
+                && lanes.iter().all(|l| point_seg(q, l.from, l.to) >= l.width * 0.5 + 3.0)
+                && g.pois.iter().all(|poi| q.distance(poi.site.at) >= poi.plaza + 5.0)
+                && q.distance(g.landing) >= LANDING_R + 6.0
+                && hubs.iter().all(|h| q.distance(*h) >= HUB_R + 3.0)
+        };
+        // Chains in walking order (8-neighbours, lowest index first), as in `shore_chains`.
+        let neighbours = |i: usize| -> Vec<usize> {
+            let (xx, yy) = ((i % w) as i32, (i / w) as i32);
+            let mut v = Vec::new();
+            for dy in -1..=1 {
+                for dx in -1..=1 {
+                    let (nx, ny) = (xx + dx, yy + dy);
+                    if (dx, dy) != (0, 0) && nx >= 0 && ny >= 0 && nx < t.w as i32 && ny < t.h as i32 {
+                        let j = t.index(nx as u16, ny as u16);
+                        if faces.contains_key(&j) {
+                            v.push(j);
+                        }
+                    }
+                }
+            }
+            v
+        };
+        let mut seen: BTreeMap<usize, bool> = faces.keys().map(|&i| (i, false)).collect();
+        let mut runs: Vec<Vec<(Vec2, Vec2)>> = Vec::new();
+        loop {
+            let open_tiles: Vec<usize> = seen.iter().filter(|(_, v)| !**v).map(|(i, _)| *i).collect();
+            let Some(&start) =
+                open_tiles.iter().min_by_key(|&&i| (neighbours(i).iter().filter(|j| !seen[*j]).count(), i))
+            else {
+                break;
+            };
+            let mut cur = start;
+            let mut framing = false;
+            let mut left = b.rd(0.0, run_hi * ratio);
+            let mut run: Vec<(Vec2, Vec2)> = Vec::new();
+            let mut prev: Option<Vec2> = None;
+            loop {
+                seen.insert(cur, true);
+                let (p, n) = faces[&cur];
+                let step = prev.map_or(t.size, |q| q.distance(p));
+                prev = Some(p);
+                if step > t.size * 1.6 || !open(p) {
+                    if run.len() > 1 {
+                        runs.push(std::mem::take(&mut run));
+                    }
+                    run.clear();
+                    if framing {
+                        framing = false;
+                        left = (b.rd(run_lo, run_hi) * ratio).max(x.seam_gap);
+                    }
+                } else {
+                    left -= step;
+                    if left <= 0.0 {
+                        framing = !framing;
+                        if framing {
+                            left = b.rd(run_lo, run_hi);
+                        } else {
+                            if run.len() > 1 {
+                                runs.push(std::mem::take(&mut run));
+                            }
+                            run.clear();
+                            left = (b.rd(run_lo, run_hi) * ratio).max(x.seam_gap);
+                        }
+                    }
+                    if framing {
+                        run.push((p, n));
+                    }
+                }
+                match neighbours(cur).into_iter().find(|j| !seen[j]) {
+                    Some(j) => cur = j,
+                    None => break,
+                }
+            }
+            if run.len() > 1 {
+                runs.push(run);
+            }
+        }
+        // The seam's look by the themes on either side: a ruined wall course (foundry,
+        // colonnade), a scrap heap (chainyard), else a slag berm; variants 4–7 are the second form.
+        let style = |r: usize| match g.x.themes.get(g.regions[r].theme as usize).map_or("", |th| th.key.as_str()) {
+            "foundry_ruins" | "colonnade_of_oaths" => 0u8,
+            "chainyard" => 3,
+            _ => 2,
+        };
+        let styles = [style(ra), style(rb)];
+        for run in runs {
+            // Courses every 2.6–4.2 u along the run's polyline.
+            let mut s_next = b.rd(0.5, 2.0);
+            let mut s = 0.0;
+            for i in 1..run.len() {
+                let ((p0, _), (p, n)) = (run[i - 1], run[i]);
+                let len = p0.distance(p);
+                while s_next <= s + len {
+                    let along = (p - p0).normalize_or(n.perp());
+                    let on = p0.lerp(p, ((s_next - s) / len.max(1e-3)).clamp(0.0, 1.0));
+                    let at = qv(on + n * b.rd(-0.5, 0.5));
+                    let variant = styles[b.dress.range_u32(0, 2) as usize] + if b.dress.chance(0.5) { 0 } else { 4 };
+                    let (radius, height) = (q(b.rd(1.1, 1.8)), q(b.rd(0.45, 1.15)));
+                    if t.kind_at(at) == TileKind::Ground {
+                        let rot = rot_of(along);
+                        b.decal(Decor::Scenery { at, radius, height, kind: SceneryKind::Seam, rot, variant });
+                    }
+                    s_next += b.rd(2.6, 4.2);
+                }
+                s += len;
+            }
+            // One ruined pier at an end of the run: the frame's vertical note, a kiting nook.
+            let end = if b.lay.chance(0.5) { run[0] } else { run[run.len() - 1] };
+            let at = qv(end.0 - end.1 * 0.6);
+            let half = qv(Vec2::splat(b.rl(0.6, 0.85)));
+            let height = q(b.rd(1.8, 3.0));
+            let variant = b.vd(4);
+            let grp = b.group();
+            let n0 = b.obstacles.len();
+            if b.block(grp, at, half, |at, half| Decor::Wall { at, half, height, style: WallStyle::Ruin, variant }) {
+                plan.solids.extend(n0..b.obstacles.len());
+                b.rubble(at - end.1.perp() * 1.4, 0.5, 0.9);
+            }
+            let mid = run[run.len() / 2];
+            plan.runs.push((ra, rb, mid.0, mid.1));
+        }
     }
 }
 

@@ -26,7 +26,7 @@ use crate::materials::{
 use crate::palette::{Palette, hdr, hex, lighten, mix};
 use crate::scene::RoomGeometry;
 use crate::terrain;
-use gf_content::schema::{Decor, MapLayout, TileKind};
+use gf_content::schema::{Decor, MapLayout, SceneryKind, TileKind};
 use gf_content::{ContentDb, RoomDef};
 use gf_core::movement::Obstacle;
 use gf_core::poi::PoiKind;
@@ -824,6 +824,29 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, ro
     let field = land_field(map, &mask);
     let looks = tile_looks(map, room);
     let t = &map.tiles;
+    // Seams along open region borders: the ground under their courses sinks into a darker band
+    // of scree (vertex alpha, like the cliffs' lip; the floor shader drifts pebbles there).
+    const SEAM_CELL: f32 = 8.0;
+    let mut seam_cells: HashMap<(i32, i32), Vec<(Vec2, f32)>> = HashMap::new();
+    for d in &room.decor {
+        if let Decor::Scenery { at, radius, kind: SceneryKind::Seam, .. } = *d {
+            let key = ((at.x / SEAM_CELL).floor() as i32, (at.y / SEAM_CELL).floor() as i32);
+            seam_cells.entry(key).or_default().push((at, radius));
+        }
+    }
+    let seam_band = |p: Vec2| -> f32 {
+        let (cx, cy) = ((p.x / SEAM_CELL).floor() as i32, (p.y / SEAM_CELL).floor() as i32);
+        let mut d = f32::MAX;
+        for dy in -1..=1 {
+            for dx in -1..=1 {
+                for &(at, r) in seam_cells.get(&(cx + dx, cy + dy)).map_or(&[][..], |v| v.as_slice()) {
+                    d = d.min(p.distance(at) - r * 0.8);
+                }
+            }
+        }
+        let k = ((d - 0.3) / 2.6).clamp(0.0, 1.0);
+        0.42 + 0.58 * k * k * (3.0 - 2.0 * k)
+    };
     // Bilinear over tile centres: (vertex colour, ground recipe: paving and ash as the first UV
     // set, glass as the second set's y).
     let look_at = |p: Vec2| -> ([f32; 4], Vec3) {
@@ -959,8 +982,8 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, ro
                     // Alpha carries how far inland the vertex is (0 on the shore, 1 from 3 u in):
                     // the floor darkens toward cliffs and banks.
                     let (mut col, recipe) = look_at(*p);
-                    // Alpha: how far inland (0 on the shore, 1 from 3 u in).
-                    col[3] = (-f / 3.0).clamp(0.0, 1.0);
+                    // Alpha: how far inland (0 on the shore, 1 from 3 u in), lower along a seam.
+                    col[3] = (-f / 3.0).clamp(0.0, 1.0).min(seam_band(*p));
                     *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, [recipe.x, recipe.y], col));
                     heat.push([heat_at(*p), recipe.z]);
                 }
