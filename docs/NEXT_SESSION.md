@@ -197,6 +197,12 @@ To do:
   - `UiMaterial` shaders import `bevy_ui_render::ui_vertex_output::UiVertexOutput`; the material
     binds at `@group(1)`. WGSL reserved words such as `active` fail at runtime, not at build.
   - QA boards: `--ui-shot kit|icons|cards`; `--hud-off` hides every UI root for clean plates.
+  - Panels (`gf_client::ui`, split into `ui/{forge,boons,end,help,doors,tips,qa}.rs`) are built
+    from the kit. `--ui-shot forge|boon|end|defeat|help|doors` forces one open over the live game
+    with sample data (`ui/qa.rs`; only the panels see it, the host keeps the real run).
+    `PanelState` tells the HUD which panels are up, `PanelFraming` eases the camera aside (read
+    in `camera.rs`), and every button is a `UiAction` resolved by one global `On<Activate>`
+    observer; the pad walks `Nav` buttons with the D-pad and presses with South.
 * **Combat HUD gotchas** (`gf_client::hud`, rebuilt on the kit per UI_STYLE §6):
   - A node's screen rect is `UiGlobalTransform.translation × ComputedNode.inverse_scale_factor()`
     (centre) and `size() × inverse_scale_factor()`, in the same UI px as `Node.left/top` and as

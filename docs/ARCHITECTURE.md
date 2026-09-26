@@ -190,6 +190,12 @@ as the fallback. The colour and readability rules are final:
     rect to `theme::HudRects` after layout, and pins, prompts, tags and numbers keep out of it.
   - `hud::HudFocus` is how panels hide the tracker, the Arsenal and the boon chip. The net line
     and FPS live in the debug strip (F10 or `--fps`).
+* Panels (`gf_client::ui`, UI_STYLE §7): the Forge drawer at a hot anvil, the boon spread on
+  god-tinted niche cards, the end screen (victory and defeat), the help tome, the door panel and
+  hover tooltips. They rebuild only when their content changes; hover, selection and heat update in
+  place. The Forge previews run `gf_core::forge::apply_action` on a copy of the build, so the DPS
+  delta it shows is what the host will apply. An open panel eases the camera aside
+  (`PanelFraming`) so the hero stays in view.
 
 ## 8. Performance and LOD budgets
 

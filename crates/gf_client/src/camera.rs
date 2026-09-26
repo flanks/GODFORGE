@@ -92,6 +92,7 @@ fn follow(
     pred: Res<Prediction>,
     room: Res<CurrentRoom>,
     settings: Res<Settings>,
+    framing: Option<Res<crate::ui::PanelFraming>>,
     mut shake: ResMut<Shake>,
     mut cams: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
     mut pinned: Local<Option<Option<Vec2>>>,
@@ -147,7 +148,14 @@ fn follow(
     let pitch = cam.pitch_deg.to_radians();
     let yaw = cam.yaw_deg.to_radians();
     let back = Vec3::new(yaw.sin() * pitch.cos(), pitch.sin(), yaw.cos() * pitch.cos()) * 60.0;
-    let target = w3(smoothed, 0.0);
+    let mut target = w3(smoothed, 0.0);
+    // PanelFraming (UI_STYLE §7.1, §7.2): an open panel eases the view aside so the hero stays in
+    // sight; the offset is in window heights (x: the view moves right, y: the hero moves down).
+    if let Some(f) = framing.filter(|f| f.current != Vec2::ZERO) {
+        let right = Vec3::Y.cross(back).normalize_or_zero();
+        let ahead = Vec3::new(-back.x, 0.0, -back.z).normalize_or_zero();
+        target += right * f.current.x * view_h + ahead * f.current.y * view_h / pitch.sin().max(0.2);
+    }
     // Shake: trauma² jitter, budgeted by the accessibility slider.
     shake.trauma = (shake.trauma - dt * 1.6).max(0.0);
     let s = shake.trauma * shake.trauma * settings.screen_shake * 0.6;
