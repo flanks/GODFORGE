@@ -230,7 +230,7 @@ pub fn rgba_image(width: u32, height: u32, data: Vec<u8>, repeat: bool) -> Image
 // Added for the UI kit (`gf_client::{theme, uikit}`). Add-only: new UI needs go below.
 
 pub use bevy::image::{ImageSampler, ImageSamplerDescriptor};
-pub use bevy::input_focus::{AutoFocus, tab_navigation::TabIndex};
+pub use bevy::input_focus::{AutoFocus, InputFocus, tab_navigation::TabIndex};
 pub use bevy::picking::Pickable;
 pub use bevy::text::{FontFeatureTag, FontFeatures, LetterSpacing, LineHeight};
 pub use bevy::ui::{InteractionDisabled, Pressed};

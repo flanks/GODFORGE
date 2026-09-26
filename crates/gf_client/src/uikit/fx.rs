@@ -10,7 +10,7 @@ use super::{ButtonKind, UiKit};
 use crate::input::Settings;
 use crate::theme::{hx, tok};
 use gf_engine::client::{
-    AsBindGroup, Hovered, InteractionDisabled, Pressed, ShaderRef, ShaderType, UiMaterial, UiMaterialPlugin,
+    AsBindGroup, Hovered, InputFocus, InteractionDisabled, Pressed, ShaderRef, ShaderType, UiMaterial, UiMaterialPlugin,
 };
 use gf_engine::prelude::*;
 use std::f32::consts::{PI, TAU};
@@ -104,11 +104,14 @@ pub fn button_texture(kind: ButtonKind, hover: bool, pressed: bool, disabled: bo
 
 fn button_visuals(
     kit: Res<UiKit>,
-    mut buttons: Query<(&KitButton, &Hovered, Has<Pressed>, Has<InteractionDisabled>, &mut ImageNode)>,
+    focus: Option<Res<InputFocus>>,
+    mut buttons: Query<(Entity, &KitButton, &Hovered, Has<Pressed>, Has<InteractionDisabled>, &mut ImageNode)>,
     mut labels: Query<&mut TextColor>,
 ) {
-    for (button, hovered, pressed, disabled, mut image) in &mut buttons {
-        let hover = hovered.get() && !disabled;
+    let focused = focus.and_then(|f| f.get());
+    for (entity, button, hovered, pressed, disabled, mut image) in &mut buttons {
+        // Keyboard / pad focus reads as hover (§7.6).
+        let hover = (hovered.get() || focused == Some(entity)) && !disabled;
         let tex = kit.tex_handle(button_texture(button.kind, hover, pressed && !disabled, disabled));
         if image.image != tex {
             image.image = tex;
@@ -500,11 +503,12 @@ pub struct KitRing {
 pub struct RingAnim {
     shown: f32,
     q: i32,
+    meniscus: Option<Entity>,
 }
 
-impl Default for RingAnim {
-    fn default() -> Self {
-        Self { shown: -1.0, q: -1 }
+impl RingAnim {
+    pub fn new(meniscus: Option<Entity>) -> Self {
+        Self { shown: -1.0, q: -1, meniscus }
     }
 }
 
@@ -558,8 +562,13 @@ fn ring_stops(style: RingStyle, a: f32, ready: bool) -> Vec<AngularColorStop> {
     stops
 }
 
-/// §10: the level eases 0.2 s toward its target; the gradient is rewritten per 1/360 step.
-fn ring_visuals(time: Res<Time>, mut rings: Query<(Ref<KitRing>, &mut RingAnim, &mut BorderGradient)>) {
+/// §10: the level eases 0.2 s toward its target; the gradient is rewritten per 1/360 step, and
+/// the molten meniscus rides the pour front.
+fn ring_visuals(
+    time: Res<Time>,
+    mut rings: Query<(&KitRing, &mut RingAnim, &mut BorderGradient)>,
+    mut lines: Query<(&mut Node, &mut UiTransform)>,
+) {
     let dt = time.delta_secs();
     for (ring, mut a, mut g) in &mut rings {
         let target = ring.value.clamp(0.0, 1.0);
@@ -569,15 +578,20 @@ fn ring_visuals(time: Res<Time>, mut rings: Query<(Ref<KitRing>, &mut RingAnim, 
             a.shown = target - (target - a.shown) * (-dt / 0.07).exp();
         }
         let q = (a.shown * 360.0).round() as i32 + if ring.ready { 1000 } else { 0 };
-        if q == a.q && !ring.is_changed() {
+        if q == a.q {
             continue;
         }
         a.q = q;
+        let angle = (q % 1000) as f32 / 360.0 * TAU;
         *g = BorderGradient(vec![
-            ConicGradient::new(UiPosition::CENTER, ring_stops(ring.style, a.shown * TAU, ring.ready))
-                .with_start(0.0)
-                .into(),
+            ConicGradient::new(UiPosition::CENTER, ring_stops(ring.style, angle, ring.ready)).with_start(0.0).into(),
         ]);
+        if let Some(m) = a.meniscus
+            && let Ok((mut n, mut tf)) = lines.get_mut(m)
+        {
+            set_display(&mut n, angle > 0.02 && angle < TAU - 0.02);
+            tf.rotation = Rot2::radians(angle);
+        }
     }
 }
 

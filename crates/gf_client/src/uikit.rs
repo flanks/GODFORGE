@@ -1496,16 +1496,55 @@ pub fn medallion(p: &mut ChildSpawnerCommands, kit: &UiKit, spec: MedallionSpec)
 }
 
 /// A ring meter (§11.4): a border ring whose conic gradient pours clockwise from 12 o'clock.
-/// Drive it with [`KitRing`]. `thickness` is the ring width; the centre stays clear.
+/// Drive it with [`KitRing`]. `thickness` is the ring width; the centre stays clear. Molten rings
+/// carry the 1.6 px `#FFFBEA` meniscus at the pour front. `node` must set a px width.
 pub fn ring_meter(p: &mut ChildSpawnerCommands, node: Node, thickness: f32, style: RingStyle, value: f32) -> Entity {
-    p.spawn((
-        Node { border: UiRect::all(px(thickness)), border_radius: BorderRadius::MAX, ..node },
-        BorderGradient::default(),
-        KitRing { value, style, ready: false },
-        fx::RingAnim::default(),
-        Pickable::IGNORE,
-    ))
-    .id()
+    let outer = match node.width {
+        Val::Px(w) => w,
+        _ => 0.0,
+    };
+    let mut meniscus = None;
+    let root = p
+        .spawn((
+            Node { border: UiRect::all(px(thickness)), border_radius: BorderRadius::MAX, ..node },
+            BorderGradient::default(),
+            Pickable::IGNORE,
+        ))
+        .with_children(|c| {
+            if style == RingStyle::Molten && outer > 0.0 {
+                // Spans the whole diameter through the centre (so it rotates about it) and is lit
+                // only across the ring's width at the top.
+                meniscus = Some(
+                    c.spawn((
+                        Node {
+                            position_type: PositionType::Absolute,
+                            left: percent(50.0),
+                            top: px(-thickness),
+                            width: px(1.8),
+                            height: px(outer),
+                            margin: UiRect::left(px(-0.9)),
+                            display: Display::None,
+                            ..default()
+                        },
+                        BackgroundGradient(vec![
+                            LinearGradient::to_bottom(vec![
+                                ColorStop::px(tok::MOLTEN[0], 0.0),
+                                ColorStop::px(tok::MOLTEN[0], thickness),
+                                ColorStop::px(Color::NONE, thickness),
+                            ])
+                            .into(),
+                        ]),
+                        UiTransform::default(),
+                        ZIndex(1),
+                        Pickable::IGNORE,
+                    ))
+                    .id(),
+                );
+            }
+        })
+        .id();
+    p.commands_mut().entity(root).insert((KitRing { value, style, ready: false }, fx::RingAnim::new(meniscus)));
+    root
 }
 
 /// Parts of the Hearth medallion.
@@ -1539,7 +1578,7 @@ pub fn hearth_medallion(p: &mut ChildSpawnerCommands, kit: &UiKit, portrait: &st
                 BackgroundColor(hx(0x140C08)),
                 Pickable::IGNORE,
             ));
-            parts.ult = ring_meter(c, inset(64.0 - 59.5), 5.0, RingStyle::Molten, 0.0);
+            parts.ult = ring_meter(c, centered(119.0, 119.0), 5.0, RingStyle::Molten, 0.0);
             // Band r 49.7..52.7, separator, window Ø98.
             c.spawn((
                 Node { border_radius: BorderRadius::MAX, ..inset(64.0 - 52.7) },
