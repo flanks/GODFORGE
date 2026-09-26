@@ -16,6 +16,14 @@ every-frame audit and the review sheets. The user's visual approval is the one h
 - **The cloth pass**: his cape (5 × 5 chains), loincloth (3 × 3) and braids (5 × 2) are keyed in every clip.
 - **1254 frames** in total, 30 fps, in place. The 13 loops close by construction (the last frame is the first, cloth included).
 
+**Review of stages 2-5 (2026-09-26).** An adversarial re-check of the shipped file
+([`review_stage2_5.md`](review_stage2_5.md)) found the cloth pass below wrong in three ways: the sabatons pierced the
+cape in the kneels, the wraith loop and the backpedal; the cape was 0.4-0.6 m off the reference pose at the first frame
+of every upper-layer one-shot (a shot, a flinch, the ping); and the wraith's cape and the strafing loincloth jittered.
+`s4_valdris_cloth.py` now drapes the cape and the loincloth over the legs, smooths the cape's and the loincloth's
+corrections over ±2 frames, and settles the upper-layer one-shots on their base clip's cloth state; the cloth pass, the
+audit, the sheets and the export were re-run, so the cloth and audit numbers below are the new ones.
+
 The review sheets are in [`anim/`](anim/): one per clip and three game-size boards next to the concept. The numbers are
 in [`anim/clips.json`](anim/clips.json) (the bake), [`anim/cloth.json`](anim/cloth.json) (the cloth pass),
 [`anim/render_checks.json`](anim/render_checks.json) (the every-frame audit) and
@@ -113,9 +121,14 @@ vocabulary (`V`):
 - **The cloth pass** (`s4_valdris_cloth.py`) keys the cape, loincloth and braid chains after the bake. Each chain bone
   follows a lagged hang: a damped spring toward the apparent gravity at its pin (so a landing throws the cape forward),
   limited to a cone around the vertical so the heavy cape never flips over his back, with drag against the design
-  travel (the run streams it back). Then the stage-3 clear step pushes the cloth out of the plates and the ground every
-  frame, and its corrections are dilated and smoothed over time so nothing pops. Without the pass the cape rides the
-  torso like a board and the legs stride through it; the client has no cloth spring yet.
+  travel (the run streams it back). Then a drape (added by the review) lays the cape and the loincloth over the legs
+  like a rope, each chain bone turning outward just past the leg-armour vertices in its lateral band and lifted with
+  its neighbours so the cloth never rips; then the stage-3 clear step pushes the cloth out of the plates and the ground
+  every frame, and its corrections are dilated and smoothed over time (±2 frames and four passes for the cape and the
+  loincloth, ±1 and two for the quick braids) so nothing pops. Upper-layer one-shots lay their own cloth motion on
+  their base clip's frame-0 cloth state and settle back into it, so their first and last frames are that reference
+  pose for every bone. Without the pass the cape rides the torso like a board and the legs stride through it; the
+  client has no cloth spring yet.
 
 ## 3. Validation
 
@@ -123,40 +136,40 @@ Every number comes from `reports/anim/*.json`; the audit columns cover EVERY fra
 
 | Clip | Ball slide / sole slip (mm) | Loop seam (deg/frame², seam / inside) | Elbow L / R (°) | Knee (°) | Keep-out push (mm) / left | Plate clipping max (median) | Cannon poke / cuts | Cloth inside cape / loin / braids | Lowest solid / cloth (mm) |
 |---|---|---|---|---|---|---|---|---|---|
-| `idle` | 0.0 / 0.0 | 0.04 / 0.09 | 22 / 19 | 31 | 0 / 0 | 64 (52) | 4 / 1 | 25 / 7 / 0 | -12 / 130 |
-| `idle_combat` | 0.0 / 0.0 | 0.49 / 0.49 | 49 / 35 | 42 | 8 / 0 | 133 (122) | 5 / 14 | 24 / 12 / 0 | -13 / 114 |
-| `walk` | 0.0 / 2.5 | 29.12 / 29.12 | 28 / 21 | 108 | 0 / 0 | 126 (105) | 5 / 0 | 26 / 14 / 0 | -12 / 143 |
-| `run` | 0.0 / 2.4 | 24.31 / 35.47 | 53 / 35 | 132 | 23 / 1 | 226 (154) | 1 / 14 | 25 / 15 / 0 | -0 / 154 |
-| `strafe_left` | 0.0 / 1.8 | 22.11 / 57.02 | 50 / 34 | 131 | 12 / 0 | 389 (207) | 5 / 14 | 24 / 39 / 0 | -0 / 146 |
-| `strafe_right` | 0.0 / 1.8 | 24.09 / 57.02 | 50 / 34 | 131 | 12 / 0 | 380 (165) | 5 / 14 | 28 / 41 / 0 | -0 / 116 |
-| `backpedal` | 0.0 / 2.0 | 21.81 / 50.49 | 50 / 34 | 130 | 12 / 0 | 203 (165) | 5 / 14 | 51 / 14 / 0 | -0 / 75 |
-| `dash` | 0.0 / 0.0 | - | 49 / 44 | 139 | 8 / 0 | 171 (161) | 5 / 28 | 24 / 15 / 0 | -12 / 51 |
-| `dash_recover` | 0.0 / 0.0 | - | 58 / 44 | 138 | 17 / 0 | 168 (131) | 5 / 28 | 38 / 17 / 0 | -14 / 58 |
-| `fire_light` | 0.0 / 0.0 | - | 50 / 34 | 36 | 8 / 0 | 117 (115) | 5 / 14 | 34 / 7 / 0 | -12 / 130 |
-| `fire_heavy` | 0.0 / 0.0 | - | 61 / 46 | 46 | 8 / 0 | 133 (116) | 5 / 30 | 31 / 20 / 0 | -14 / 84 |
-| `fire_charge` | 0.0 / 0.0 | 0.43 / 0.43 | 58 / 44 | 46 | 0 / 0 | 130 (127) | 29 / 28 | 20 / 6 / 0 | -12 / 100 |
-| `hit_light` | 0.0 / 0.0 | - | 49 / 34 | 36 | 8 / 0 | 125 (118) | 5 / 14 | 33 / 9 / 0 | -12 / 123 |
-| `hit_heavy` | 0.0 / 0.0 | - | 58 / 45 | 82 | 18 / 0 | 167 (126) | 6 / 28 | 32 / 23 / 0 | -16 / 16 |
-| `knockdown` | 0.0 / 16.8 | - | 86 / 37 | 137 | 133 / 2 | 191 (142) | 5 / 17 | 36 / 11 / 0 | -31 / -55 |
-| `get_up` | 0.0 / 16.8 | - | 81 / 35 | 149 | 133 / 1 | 374 (141) | 5 / 14 | 34 / 34 / 0 | -19 / -69 |
-| `death` | 0.0 / 16.8 | - | 49 / 34 | 141 | 138 / 1 | 258 (196) | 5 / 14 | 40 / 11 / 1 | -35 / -66 |
-| `downed` | 0.0 / 0.0 | 0.12 / 0.15 | 32 / 27 | 146 | 0 / 0 | 250 (240) | 4 / 4 | 45 / 14 / 0 | 140 / -3 |
-| `revive` | 0.0 / 0.0 | - | 49 / 35 | 148 | 46 / 0 | 250 (122) | 5 / 16 | 32 / 29 / 1 | -17 / -14 |
-| `reforge_in` | 0.0 / 16.8 | - | 92 / 36 | 149 | 134 / 1 | 361 (128) | 5 / 16 | 37 / 32 / 0 | -19 / -30 |
-| `victory` | 0.0 / 0.0 | - | 58 / 44 | 57 | 18 / 0 | 161 (154) | 6 / 28 | 34 / 20 / 0 | -19 / 40 |
-| `ping` | 0.0 / 0.0 | - | 49 / 48 | 36 | 8 / 0 | 122 (108) | 6 / 29 | 26 / 7 / 17 | -12 / 126 |
-| `interact` | 0.0 / 0.0 | - | 86 / 34 | 78 | 51 / 0 | 162 (133) | 5 / 12 | 30 / 18 / 0 | -33 / 105 |
-| `forge_hammer` | 0.0 / 0.0 | 8.77 / 65.92 | 101 / 15 | 59 | 54 / 1 | 170 (137) | 4 / 0 | 32 / 19 / 0 | -20 / 77 |
-| `idle_signature` | 0.0 / 0.0 | 0.15 / 18.92 | 26 / 35 | 33 | 0 / 0 | 70 (51) | 5 / 14 | 27 / 6 / 0 | -9 / 117 |
-| `bulwark_slam` | 0.0 / 50.3 | - | 49 / 40 | 121 | 124 / 3 | 248 (128) | 5 / 22 | 30 / 35 / 0 | -40 / -32 |
-| `siege_stance_enter` | 0.0 / 28.2 | - | 58 / 46 | 113 | 18 / 0 | 154 (135) | 6 / 28 | 37 / 15 / 1 | -16 / -38 |
-| `siege_stance` | 0.0 / 0.0 | 0.23 / 0.24 | 28 / 41 | 82 | 0 / 0 | 135 (129) | 5 / 25 | 18 / 6 / 0 | -0 / -13 |
-| `siege_stance_exit` | 0.0 / 27.4 | - | 55 / 41 | 107 | 8 / 0 | 142 (124) | 5 / 24 | 30 / 12 / 0 | -15 / 26 |
-| `siege_fire` | 0.0 / 0.0 | - | 25 / 41 | 79 | 0 / 0 | 120 (112) | 5 / 24 | 31 / 4 / 0 | -0 / -16 |
-| `mountainfall_start` | 0.0 / 16.8 | - | 49 / 50 | 119 | 8 / 0 | 146 (114) | 6 / 32 | 39 / 25 / 0 | -23 / -22 |
-| `mountainfall` | 0.0 / 0.0 | 0.37 / 0.37 | 53 / 47 | 56 | 0 / 0 | 133 (119) | 6 / 29 | 22 / 8 / 0 | -10 / 39 |
-| `mountainfall_pound` | 0.0 / 0.0 | - | 48 / 41 | 52 | 0 / 0 | 134 (110) | 5 / 25 | 32 / 2 / 0 | -9 / 26 |
-| `armor_break` | 0.0 / 0.0 | - | 51 / 61 | 48 | 119 / 0 | 163 (67) | 6 / 44 | 43 / 17 / 11 | -14 / 128 |
+| `idle` | 0.0 / 0.0 | 0.04 / 0.09 | 22 / 19 | 31 | 0 / 0 | 64 (52) | 4 / 1 | 25 / 2 / 0 | -12 / 130 |
+| `idle_combat` | 0.0 / 0.0 | 0.49 / 0.49 | 49 / 35 | 42 | 8 / 0 | 133 (122) | 5 / 14 | 24 / 6 / 0 | -13 / 114 |
+| `walk` | 0.0 / 2.5 | 29.12 / 29.12 | 28 / 21 | 108 | 0 / 0 | 126 (105) | 5 / 0 | 32 / 0 / 0 | -12 / 139 |
+| `run` | 0.0 / 2.4 | 24.31 / 35.47 | 53 / 35 | 132 | 23 / 1 | 226 (154) | 1 / 14 | 26 / 10 / 0 | -0 / 240 |
+| `strafe_left` | 0.0 / 1.8 | 22.11 / 57.02 | 50 / 34 | 131 | 12 / 0 | 389 (207) | 5 / 14 | 24 / 9 / 0 | -0 / 151 |
+| `strafe_right` | 0.0 / 1.8 | 24.09 / 57.02 | 50 / 34 | 131 | 12 / 0 | 380 (165) | 5 / 14 | 29 / 6 / 0 | -0 / 231 |
+| `backpedal` | 0.0 / 2.0 | 21.81 / 50.49 | 50 / 34 | 130 | 12 / 0 | 203 (165) | 5 / 14 | 28 / 10 / 0 | -0 / 58 |
+| `dash` | 0.0 / 0.0 | - | 49 / 44 | 139 | 8 / 0 | 171 (161) | 5 / 28 | 24 / 7 / 0 | -12 / 60 |
+| `dash_recover` | 0.0 / 0.0 | - | 58 / 44 | 138 | 17 / 0 | 168 (131) | 5 / 28 | 24 / 3 / 0 | -14 / 70 |
+| `fire_light` | 0.0 / 0.0 | - | 50 / 34 | 36 | 8 / 0 | 117 (115) | 5 / 14 | 25 / 2 / 0 | -12 / 139 |
+| `fire_heavy` | 0.0 / 0.0 | - | 61 / 46 | 46 | 8 / 0 | 133 (116) | 5 / 30 | 28 / 4 / 0 | -14 / 128 |
+| `fire_charge` | 0.0 / 0.0 | 0.43 / 0.43 | 58 / 44 | 46 | 0 / 0 | 130 (127) | 29 / 28 | 21 / 1 / 0 | -12 / 102 |
+| `hit_light` | 0.0 / 0.0 | - | 49 / 34 | 36 | 8 / 0 | 125 (118) | 5 / 14 | 26 / 1 / 0 | -12 / 139 |
+| `hit_heavy` | 0.0 / 0.0 | - | 58 / 45 | 82 | 18 / 0 | 167 (126) | 6 / 28 | 30 / 4 / 0 | -16 / 16 |
+| `knockdown` | 0.0 / 16.8 | - | 86 / 37 | 137 | 133 / 2 | 191 (142) | 5 / 17 | 34 / 8 / 0 | -31 / 82 |
+| `get_up` | 0.0 / 16.8 | - | 81 / 35 | 149 | 133 / 1 | 374 (141) | 5 / 14 | 28 / 15 / 0 | -19 / -9 |
+| `death` | 0.0 / 16.8 | - | 49 / 34 | 141 | 138 / 1 | 258 (196) | 5 / 14 | 33 / 8 / 1 | -35 / 71 |
+| `downed` | 0.0 / 0.0 | 0.12 / 0.15 | 32 / 27 | 146 | 0 / 0 | 250 (240) | 4 / 4 | 18 / 5 / 0 | 140 / 15 |
+| `revive` | 0.0 / 0.0 | - | 49 / 35 | 148 | 46 / 0 | 250 (122) | 5 / 16 | 34 / 9 / 1 | -17 / -14 |
+| `reforge_in` | 0.0 / 16.8 | - | 92 / 36 | 149 | 134 / 1 | 361 (128) | 5 / 16 | 34 / 13 / 0 | -19 / 38 |
+| `victory` | 0.0 / 0.0 | - | 58 / 44 | 57 | 18 / 0 | 161 (154) | 6 / 28 | 35 / 5 / 0 | -19 / 37 |
+| `ping` | 0.0 / 0.0 | - | 49 / 48 | 36 | 8 / 0 | 122 (108) | 6 / 29 | 24 / 1 / 17 | -12 / 136 |
+| `interact` | 0.0 / 0.0 | - | 86 / 34 | 78 | 51 / 0 | 162 (133) | 5 / 12 | 25 / 8 / 0 | -33 / 105 |
+| `forge_hammer` | 0.0 / 0.0 | 8.77 / 65.92 | 101 / 15 | 59 | 54 / 1 | 170 (137) | 4 / 0 | 31 / 12 / 0 | -20 / 73 |
+| `idle_signature` | 0.0 / 0.0 | 0.15 / 18.92 | 26 / 35 | 33 | 0 / 0 | 70 (51) | 5 / 14 | 26 / 3 / 0 | -9 / 116 |
+| `bulwark_slam` | 0.0 / 50.3 | - | 49 / 40 | 121 | 124 / 3 | 248 (128) | 5 / 22 | 30 / 17 / 0 | -40 / -30 |
+| `siege_stance_enter` | 0.0 / 28.2 | - | 58 / 46 | 113 | 18 / 0 | 154 (135) | 6 / 28 | 24 / 8 / 1 | -16 / -8 |
+| `siege_stance` | 0.0 / 0.0 | 0.23 / 0.24 | 28 / 41 | 82 | 0 / 0 | 135 (129) | 5 / 25 | 21 / 3 / 0 | -0 / -13 |
+| `siege_stance_exit` | 0.0 / 27.4 | - | 55 / 41 | 107 | 8 / 0 | 142 (124) | 5 / 24 | 30 / 4 / 0 | -15 / 46 |
+| `siege_fire` | 0.0 / 0.0 | - | 25 / 41 | 79 | 0 / 0 | 120 (112) | 5 / 24 | 21 / 0 / 0 | -0 / -2 |
+| `mountainfall_start` | 0.0 / 16.8 | - | 49 / 50 | 119 | 8 / 0 | 146 (114) | 6 / 32 | 38 / 6 / 0 | -23 / -23 |
+| `mountainfall` | 0.0 / 0.0 | 0.37 / 0.37 | 53 / 47 | 56 | 0 / 0 | 133 (119) | 6 / 29 | 23 / 0 / 0 | -10 / 38 |
+| `mountainfall_pound` | 0.0 / 0.0 | - | 48 / 41 | 52 | 0 / 0 | 134 (110) | 5 / 25 | 30 / 0 / 0 | -9 / 60 |
+| `armor_break` | 0.0 / 0.0 | - | 51 / 61 | 48 | 119 / 0 | 163 (67) | 6 / 44 | 40 / 4 / 11 | -14 / 151 |
 
 How to read the columns:
 - **Ball slide**: s4_anim's metric, the world drift of a planted ball joint inside one contact (the design travel added back). **Sole slip**: the audit's, how far the sabaton sole's vertices touching the ground move between frames, summed over one contact: a rolling foot keeps its contact edge still, so this is the honest foot-slide number for him.
@@ -202,9 +215,10 @@ nearest) and at the three game-size boards next to the concept.
   Mountainfall gathers, steps wide, flings both arms up and stamps. Its loop breathes wider and lower, and the pound
   heaves both arms up and hammers them down. The armour break hunches, then throws the chest and arms open. The
   signature idle vents the pauldrons, lifts the cannon to look down the barrel and flexes the fist.
-- **Cloth.** The cape hangs heavy, trails in the run and drapes over his heels when he kneels. The thighs push the
-  loincloth in the strafes. A few cape-hem vertices (at most 7) go under the ground when he kneels or lands (down to -69
-  mm).
+- **Cloth.** The cape hangs heavy and trails in the run. *Corrected by the review:* before its fix the cape did NOT
+  drape over his heels when he knelt: the rear sabaton pierced it in the knockdown (held on its last frame), the death,
+  the get-up, the whole wraith loop and every frame of the backpedal. Since the fix it lies over the rear leg and trails
+  on the floor behind it; see [`review/cape_before_after.png`](review/cape_before_after.png).
 
 ## 5. Mapping notes for the engine agent (`crates/` is not the art track's)
 
@@ -253,14 +267,23 @@ nearest) and at the three game-size boards next to the concept.
    the ground (f2-f7).
 4. **Foot slip in the kit.** Every loop keeps its soles still (at most 2.5 mm per contact). The one-shots slip where the
    pelvis travels a long way: the Bulwark landing 43-50 mm (the sabatons settle while he absorbs), the Siege Stance
-   steps 27-28 mm and the steps onto the knee 17 mm.
+   steps 27-28 mm and the steps onto the knee 17 mm. *The review of stages 2-5 measured more with its own metric (the
+   best-anchored sole vertex within 5 mm of the ground, summed per contact): the knockdown's right sabaton skids 64 mm in
+   one frame (f3) and the death's 47.5 mm. Open.*
 5. **Motion.** The fastest joint accelerations sit in the gait at the toe-off and the landing: the strafes 57
    deg/frame², the backpedal 50, the run 35. The rolling sabaton snaps from its toe edge into the swing. At play speed
    it reads as a stomp, but it wants an in-engine look. `forge_hammer` reaches 66 at the hammer's impact, on purpose.
-6. **Cloth.** The pinned top rows of the cape and the loincloth overlap the plates they hang from, as at rest (25 cape
-   vertices in the idle). The loincloth is pushed through by the thighs in the strafes (39-41 vertices). The braids go
-   into the pauldron lames in `ping` and `armor_break` (11-17). Cape-hem vertices go under the ground in the kneels and
-   landings (at most 7 vertices, down to -69 mm).
+6. **Cloth** (after the review's fix). The pinned top rows of the cape overlap the plates they hang from, as at rest (25
+   cape vertices in the idle; the cape's worst is 40, in `armor_break`). The loincloth's worst is 17 vertices inside a
+   plate (was 41 in the strafes). The braids still go into the pauldron lames in `ping` and `armor_break` (11-17). At most
+   7 cape-hem vertices go under the ground, down to -30 mm (was -69 mm), in the Bulwark landing.
+   - **Leg-armour triangles cutting the cloth** (the review's exact overlap test): the cape is cut in 212 of 1,288 frames
+     (was 376), mostly its side edges brushing the calves in the walk, the strafes and the dash (up to 153 faces). The
+     loincloth is cut in 583 frames (was 1,177): the thighs brushing its side panels in the stride and the kneels.
+   - **Quick motion left:** the cape hem still swings up to 0.17 m in one frame in the idle, and up to 0.5 m at the
+     big impacts (`reforge_in`, `forge_hammer`).
+   - `cloth.json`'s `deepest_mm` uses the nearest face's normal for inside / outside and can report false depths (up
+     to 0.6 m in the walk). The ray-parity counts of `render_checks.json` are the reliable ones.
 7. **The cannon.** In the elbow crook the upper-arm plate is enclosed by the sleeve at the aim's 33 deg elbow: cuts of
    up to 44 vertices (`armor_break`; 14 at the plain aim), the case stage 3 accepted. The sleeve's poke-through stays at
    1-6 vertices, except 29 in `fire_charge`.

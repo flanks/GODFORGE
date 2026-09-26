@@ -19,8 +19,9 @@ every stage, and the user gives the final visual approval.
 | 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated at 2.3 m; **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)): the only seed with the anvil plate mounted on the chest, the cleanest surface, a solid cape clear of the legs. Its GLB is in Git LFS; s101/s303 stay local (sha256 in `manifest.json`). Never shipped, never in `assets/models/`. Review views: [`blockout_views.json`](blockout_views.json) |
 | 2 Production mesh | **done, polished 2026-09-26** (made by AI; the user's visual approval pending) | 24,958 tris: the hm08 under-suit body, 168 rigid armour pieces (stepped layered pauldrons with glowing slots and upright plates, the protruding anvil with a glowing gasket, shingled cuirass, fauld and tassets, massive gold-banded arm plates, chunky box-lame gauntlet fists, cuisses, big knee cops over glowing seams, greaves, huge sabatons), the beard with five braids, the separate cape. One 2048 atlas: cracked stone-like gunmetal with a lava network in the joints, emissive seams, a tangent normal map from the blockout. The siege cannon is the separate `colossus_cannon` weapon on the right-hand frame; the massive forearm lies inside its sleeve wall, hidden (the weapon track is asked to widen the sleeve). Report: [`reports/stage2_production_mesh.md`](reports/stage2_production_mesh.md); sheets in [`reports/stage2/`](reports/stage2/), before / after in [`reports/stage2/stage2_before_after.png`](reports/stage2/stage2_before_after.png). **For the user: the visual approval** |
 | 3 Rig | **done 2026-09-26** (made by AI; the user's visual approval pending) | GF_Hero_v1 (116 bones: the 63 contract bones + 53 per-hero `x_` extras). The under-suit is weighted like Brax's body; the 168 armour pieces are rigid, one weight row each; the pauldrons, couters, poleyns, tassets and fauld ride **driven helpers** that follow their joint by a measured fraction (baked into clips by the export, like the twist bones); the cape (5 x 5), loincloth (3 x 3) and braids (5 x 2) hang on `x_` chains. The colossus_cannon GLB rides `weapon_R` by the identity attach, proven with the shipped file (0.3 um). Range-of-motion sweeps set the helper factors and the animation ranges; 13 validation poses with the cloth posed clear. Report: [`reports/rig_report.md`](reports/rig_report.md), sheets in [`reports/stage3/`](reports/stage3/). **For the user: the visual approval** |
-| 4 Animation | not_started | Shared clip set + Valdris's unique set (proposal in [`brief.md`](brief.md) §8), inside the stage-3 ranges ([`reports/rig_report.md`](reports/rig_report.md) §6: arm and head limits, keyed pauldrons for overhead moves, no keys on the `x_` helpers) |
-| 5 Export & validate | not_started | `assets/models/characters/valdris.glb`, then the final visual approval |
+| 4 Animation | **done 2026-09-26** (made by AI; the user's visual approval pending) | 34 clips on GF_Hero_v1: the 24 shared clips re-posed inside his stage-3 ranges and his 10 kit clips (signature idle, Bulwark Slam, Siege Stance enter / loop / exit / fire, Mountainfall start / loop / pound, the Reforged Flesh armour break), with the cape, loincloth and braid chains keyed by a cloth pass (fixed by the stage 2-5 review: draped over the legs, smoothed, upper-layer shots settle on their base pose). Report: [`reports/anim_report.md`](reports/anim_report.md), sheets in [`reports/anim/`](reports/anim/). **For the user: the visual approval** |
+| 5 Export & validate | **done 2026-09-26** (made by AI; the user's final approval pending) | `assets/models/characters/valdris.glb` (Git LFS) + `valdris.meta.json`: one mesh, 116 joints, 34 clips; the gate passes (0 errors, one warning: 2.33 m to the pauldron tops); the colossus_cannon rides `weapon_R`. Report: [`reports/export_report.json`](reports/export_report.json), [`reports/stage5/`](reports/stage5/). **For the user: the final approval** |
+| Review of stages 2-5 | **done 2026-09-26** | An adversarial re-check of every claim on the shipped files, the fixes it made and what stays open: [`reports/review_stage2_5.md`](reports/review_stage2_5.md), sheets in [`reports/review/`](reports/review/) |
 
 ## Stage 0 files
 
@@ -65,6 +66,20 @@ Rebuild: `python tools/blender/gf_hero/s2_valdris_run.py` (4-9 min, CPU only).
 
 Rebuild: `python tools/blender/gf_hero/s3_valdris_run.py` (about 2 min, CPU only).
 
+## Stage 4 and 5 files
+
+| File | What it is |
+|---|---|
+| [`reports/anim_report.md`](reports/anim_report.md) · [`reports/anim/`](reports/anim/) | The clip table, how each clip maps to game states, the every-frame audit, a sheet per clip and the game-size boards; `clips.json`, `cloth.json`, `render_checks.json`, `gltf_check.json` |
+| `production/valdris_anim.blend` | The rig with every clip as an action and a muted NLA track (Git LFS) |
+| `assets/models/characters/valdris.glb` · `valdris.meta.json` | The shipped file (Git LFS) and its sidecar: clip events, design speeds, sockets, the upper-layer base clips, the default weapon |
+| [`reports/export_report.json`](reports/export_report.json) · [`reports/stage5/`](reports/stage5/) | The gate, the Blender re-import, the review sheet and the board next to the concept |
+| [`reports/review_stage2_5.md`](reports/review_stage2_5.md) · [`reports/review/`](reports/review/) | The adversarial review of stages 2-5: every claim re-measured on the shipped files, the fixes, the open items |
+
+Rebuild: `python tools/blender/gf_hero/s4_valdris_run.py` (about 15 min), then `python tools/blender/gf_hero/run_stage5.py valdris`
+(about 35 s). The review: `tools/blender/gf_hero/valdris_review.py`, `valdris_review_lineup.py`, `valdris_review_sheets.py`
+(commands in the review report).
+
 ## Folders
 
 | Folder | Content | In git |
@@ -72,8 +87,8 @@ Rebuild: `python tools/blender/gf_hero/s3_valdris_run.py` (about 2 min, CPU only
 | `references/` | `VALDRIS_front_approved.jpg` and `VALDRIS_sheet_turnaround.jpg`: the user's approved concepts, verbatim copies of `docs/media/playable_characters/VALDRIS.jpg` (sha256 `55d018f3…`) and `…/VALDRIS THE ANVIL-BORN.jpg` (sha256 `d27bf5f3…`), so git stores one blob each. `valdris_concept_front_mirrored.png`: **derived**, the hero front mirrored left-right, lossless (the stage-1 TRELLIS input, sha256 `62fc6eed…`). `valdris_concept_front_mirrored_mask.png`: **derived**, the TRELLIS graph's own birefnet figure mask of that input (the stage-0 tools use it because the concept's background is a gradient). Approved sheets land here as `VALDRIS_<sheet>_approved.<ext>` | yes |
 | `source/` | raw TRELLIS.2 GLBs (`valdris_trellis2_s<seed>.glb`) + ComfyUI previews; the selected seed's GLB goes to git through Git LFS | local except the selected GLB and the provenance JSONs |
 | `work/` | full-size renders, mask checks, logs, the intermediate stage-2 `.blend` files | no |
-| `reports/` | `stage0_*` review sheets and notes; stage-1 review sheets in `reports/blockout/`; stage 2 in `reports/stage2/` | yes |
-| `production/`, `textures/` | the stage-2 production `.blend`, the stage-3 rig `.blend` and the textures | yes (Git LFS) |
+| `reports/` | `stage0_*` review sheets and notes; stage-1 review sheets in `reports/blockout/`; stage 2 in `reports/stage2/`, stage 3 in `reports/stage3/`, stage 4 in `reports/anim/`, stage 5 in `reports/stage5/`, the review of stages 2-5 in `reports/review/` | yes |
+| `production/`, `textures/` | the stage-2 production `.blend`, the stage-3 rig `.blend`, the stage-4 animation `.blend` and the textures | yes (Git LFS) |
 
 **Everything in `source/` is a stage-1 SCULPT REFERENCE ONLY.** It is dense, unrigged and carries
 baked lighting in its texture; it is never copied to `assets/models/` and never shipped.

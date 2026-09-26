@@ -743,7 +743,7 @@
    "tools": [
     "tools/blender/gf_hero/s4_valdris_run.py",
     "tools/blender/gf_hero/s4_valdris.py",
-    "tools/blender/gf_hero/s4_valdris_cloth.py",
+    "tools/blender/gf_hero/s4_valdris_cloth.py (the drape, per-group smoothing and the upper-layer settle added by the review of stages 2-5)",
     "tools/blender/gf_hero/s4_valdris_render.py",
     "tools/blender/gf_hero/s4_valdris_sheets.py",
     "tools/blender/gf_hero/s4_anim.py (shared; gained the optional hero hooks: shared_clips, KEEPOUT_LOOSE_PARTS, KEEPOUT_OWN_BONES, Clip.extra_keyed / base)",
@@ -774,23 +774,24 @@
     "solver_vs_blender_max_error": 1.0328128010728036e-06,
     "audited_frames": 1288,
     "plate_clipping_max_verts": 389,
-    "plate_clipping_median_of_clip_medians": 128.0,
+    "plate_clipping_median_of_clip_medians": 127.5,
     "cannon_poke_max": 29,
     "cannon_cuts_max": 44,
     "cloth_inside_max": {
-     "cape": 51,
-     "loincloth": 41,
+     "cape": 40,
+     "loincloth": 17,
      "braids": 17
     },
     "lowest_solid_vertex_mm": -40.3,
-    "lowest_cloth_vertex_mm": -69.2,
+    "lowest_cloth_vertex_mm": -29.7,
     "pelvis_drift_max_mm": 584.9,
     "design_speed_run_mps": 5.6,
     "design_speed_walk_mps": 1.698,
     "cloth_keyed_bones": 44,
     "gltf_animations": 34,
     "gltf_check_ok": true,
-    "gltf_bytes": 16904360
+    "gltf_bytes": 16905476,
+    "cloth_fixed_by_review": "2026-09-26: the drape, the wider smoothing and the upper-layer settle (reports/review_stage2_5.md)"
    },
    "items": {
     "shared_clip_set": {
@@ -819,7 +820,7 @@
       "tools/blender/gf_hero/s4_valdris_cloth.py",
       "art/characters/valdris/reports/anim/cloth.json"
      ],
-     "notes": "the cape, loincloth and braid chains keyed in every clip (lagged hang, drag, cleared out of the plates every frame)"
+     "notes": "the cape, loincloth and braid chains keyed in every clip (lagged hang, drag, draped over the legs, cleared out of the plates every frame, smoothed); fixed by the review of stages 2-5 (2026-09-26): the sabatons no longer pierce the cape in the kneels, the wraith or the backpedal, the wraith's cape and the strafing loincloth no longer jitter, and the upper-layer one-shots start and end on their base clip's cloth state (reports/review_stage2_5.md)"
     },
     "baked_clips_and_checks": {
      "status": "done",
@@ -856,7 +857,7 @@
    ],
    "tools": [
     "tools/blender/gf_hero/run_stage5.py (shared; gained the optional 'board' step)",
-    "tools/blender/gf_hero/export_glb.py (shared; the sidecar's sleeve-weapon branch)",
+    "tools/blender/gf_hero/export_glb.py (shared; the sidecar's sleeve-weapon branch; clip_info.<clip>.base for upper-layer clips on another clip's frame 0, added by the review of stages 2-5, default-off)",
     "tools/blender/gf_hero/validate_glb.py (shared, unchanged)",
     "tools/blender/gf_hero/smoke_import.py (shared; the per-hero hook and the sleeve weapon without an offhand node)",
     "tools/blender/gf_hero/s5_sheets.py (shared; a line for a weapon the chain did not build)",
@@ -865,8 +866,8 @@
     "tools/blender/gf_hero/s5_valdris_sheets.py"
    ],
    "metrics": {
-    "glb_bytes": 16889700,
-    "glb_sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+    "glb_bytes": 16890816,
+    "glb_sha256": "49da26a167f2a143bfb0117a06bcb8e3e3bdedf6c224152fce15118396c9fe0c",
     "tris": 24958,
     "tris_budget": [
      15000,
@@ -907,9 +908,13 @@
     "deterministic_reexport": true,
     "weapon_glb": "assets/models/weapons/colossus_cannon.glb (weapon track, not re-exported)",
     "weapon_glb_sha256": "b1c49e3905add3167727461aa2284cd2cdcfc7656ef99891069e68b81306f786",
-    "brax_outputs_unchanged": true
+    "brax_outputs_unchanged": true,
+    "upper_layer_bases_in_sidecar": {
+     "valdris_siege_fire": "valdris_siege_stance@loop",
+     "valdris_mountainfall_pound": "valdris_mountainfall@loop"
+    }
    },
-   "notes": "valdris.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 contract joints incl. the 4 sockets) + his 53 x_ extras (armour helpers, cape / loincloth / beard chains) = 116 joints, ONE skinned mesh valdris_mesh (the 12 parts joined: one draw call; every part closed, so M_valdris is single-sided, with 2048 base colour / emissive / normal PNGs, tangents, no vertex colours), 34 clips named valdris_<clip>[@loop] sampled at 30 fps with the helpers and cloth baked. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend: 0 errors, one warning (rest height 2.33 m to the pauldron tops, over the 2.0-2.3 m hero range; stage 2 measured the same). The sidecar valdris.meta.json carries the clip events, design speeds, sockets and status ai_final_pending_user_approval; the colossus_cannon (the weapon track's shipped GLB, arm-mounted, no offhand node, no variants) is its default weapon, attached as the identity child of weapon_R; clip_info.weapon_variant is null and his own finger poses are clip_info.hand_pose. Re-export is byte-identical. The shared-tool changes are default-off and Brax's stage-5 outputs are unchanged (reports/stage5/brax_regression.json). The Bevy-side import test comes with the engine integration.",
+   "notes": "valdris.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 contract joints incl. the 4 sockets) + his 53 x_ extras (armour helpers, cape / loincloth / beard chains) = 116 joints, ONE skinned mesh valdris_mesh (the 12 parts joined: one draw call; every part closed, so M_valdris is single-sided, with 2048 base colour / emissive / normal PNGs, tangents, no vertex colours), 34 clips named valdris_<clip>[@loop] sampled at 30 fps with the helpers and cloth baked. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend: 0 errors, one warning (rest height 2.33 m to the pauldron tops, over the 2.0-2.3 m hero range; stage 2 measured the same). The sidecar valdris.meta.json carries the clip events, design speeds, sockets and status ai_final_pending_user_approval; the colossus_cannon (the weapon track's shipped GLB, arm-mounted, no offhand node, no variants) is its default weapon, attached as the identity child of weapon_R; clip_info.weapon_variant is null and his own finger poses are clip_info.hand_pose. Re-export is byte-identical. The shared-tool changes are default-off and Brax's stage-5 outputs are unchanged (reports/stage5/brax_regression.json). The Bevy-side import test comes with the engine integration. Re-exported 2026-09-26 after the review of stages 2-5 fixed the cloth pass and added clip_info.<clip>.base (valdris_siege_fire -> valdris_siege_stance@loop, valdris_mountainfall_pound -> valdris_mountainfall@loop) with a playback.upper_layer text that names them; the gate still passes with the one height warning.",
    "items": {
     "glb_export": {
      "status": "done",
@@ -1002,5 +1007,39 @@
    "state": "pending_human",
    "via": "art/characters/valdris/reports/anim/ + reports/anim_report.md"
   }
- ]
+ ],
+ "review_stage2_5": {
+  "date": "2026-09-26",
+  "by": "AI (Claude), adversarial review of stages 2-5 requested by the workflow orchestrator",
+  "report": "art/characters/valdris/reports/review_stage2_5.md",
+  "sheets": [
+   "art/characters/valdris/reports/review/closeups_1..6.png",
+   "art/characters/valdris/reports/review/cape_before_after.png",
+   "art/characters/valdris/reports/review/lineup.png",
+   "art/characters/valdris/reports/review/horde.png"
+  ],
+  "data": [
+   "art/characters/valdris/reports/review/review.json",
+   "art/characters/valdris/reports/review/lineup_stats.json",
+   "art/characters/valdris/reports/review/brax_regression.json"
+  ],
+  "tools": [
+   "tools/blender/gf_hero/valdris_review.py",
+   "tools/blender/gf_hero/valdris_review_lineup.py",
+   "tools/blender/gf_hero/valdris_review_sheets.py"
+  ],
+  "confirmed": "the gate (0 errors, 1 warning) and the Blender re-import; the byte-identical re-export; 24,958 tris, 116 joints, 34 clips named as required_clips.json; a closed mesh (0 open edges after welding); weights (<= 4, sums 1.3e-7, left / right symmetric); sockets on the fist, the anvil and the crown; the cannon on weapon_R; loops closed; soles still in every loop; the sleeve rule (0 wrist bend); every file over 10 MB in Git LFS",
+  "refuted_and_fixed": [
+   "the sabatons pierced the cape (knockdown, death, get_up, the wraith loop, the backpedal, dash_recover, revive)",
+   "the cape and braids were 0.4-0.6 m off idle_combat / siege_stance / mountainfall frame 0 at the first frame of every upper-layer one-shot",
+   "the wraith loop's cape reversed direction in 46 of 60 frames; the strafing loincloth moved up to 0.68 m in a frame",
+   "the sidecar said every upper-layer clip starts on idle_combat frame 0 (siege_fire and mountainfall_pound do not)",
+   "README.md still showed stages 4 and 5 as not_started"
+  ],
+  "refuted_open": [
+   "one-shot foot skids larger than reported: knockdown 64 mm (right sabaton, f3), death 47.5 mm",
+   "at game size his mean L* (30-32) is only 1-3 below the darkest swarm enemies: gold rims cover ~20 % of his pixels"
+  ],
+  "shared_tool_changes": "export_glb.py: clip_info.<clip>.base only when clips.json sets it (Brax's GLB, sidecar and export report byte-identical)"
+ }
 }

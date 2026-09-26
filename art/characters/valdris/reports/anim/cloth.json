@@ -123,16 +123,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 54.4,
-     "frames_with_contact": 51,
-     "accel_max_deg_per_frame2": 4.9
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 54.9,
+     "frames_with_contact": 48,
+     "accel_max_deg_per_frame2": 2.56
     },
     "loin": {
-     "inside_gt3mm_max": 8,
-     "deepest_mm": 41.4,
-     "frames_with_contact": 72,
-     "accel_max_deg_per_frame2": 9.13
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 19.2,
+     "frames_with_contact": 112,
+     "accel_max_deg_per_frame2": 2.39
     },
     "braids": {
      "inside_gt3mm_max": 2,
@@ -141,7 +141,7 @@
      "accel_max_deg_per_frame2": 6.65
     }
    },
-   "seconds": 12.0
+   "seconds": 30.5
   },
   "idle_combat": {
    "action": "valdris_idle_combat@loop",
@@ -150,16 +150,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 0,
-     "deepest_mm": 0.0,
-     "frames_with_contact": 0,
-     "accel_max_deg_per_frame2": 2.43
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 44.4,
+     "frames_with_contact": 10,
+     "accel_max_deg_per_frame2": 0.79
     },
     "loin": {
-     "inside_gt3mm_max": 11,
-     "deepest_mm": 18.8,
-     "frames_with_contact": 41,
-     "accel_max_deg_per_frame2": 12.52
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 8.3,
+     "frames_with_contact": 22,
+     "accel_max_deg_per_frame2": 3.05
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -168,7 +168,7 @@
      "accel_max_deg_per_frame2": 4.04
     }
    },
-   "seconds": 4.2
+   "seconds": 9.3
   },
   "walk": {
    "action": "valdris_walk@loop",
@@ -177,16 +177,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 4,
-     "deepest_mm": 587.2,
-     "frames_with_contact": 15,
-     "accel_max_deg_per_frame2": 6.86
+     "inside_gt3mm_max": 10,
+     "deepest_mm": 619.1,
+     "frames_with_contact": 17,
+     "accel_max_deg_per_frame2": 2.86
     },
     "loin": {
-     "inside_gt3mm_max": 17,
-     "deepest_mm": 146.5,
-     "frames_with_contact": 29,
-     "accel_max_deg_per_frame2": 12.38
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 29.2,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 7.55
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -195,7 +195,7 @@
      "accel_max_deg_per_frame2": 0.83
     }
    },
-   "seconds": 3.6
+   "seconds": 8.2
   },
   "run": {
    "action": "valdris_run@loop",
@@ -204,16 +204,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 45.8,
-     "frames_with_contact": 6,
-     "accel_max_deg_per_frame2": 4.35
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 45.4,
+     "frames_with_contact": 5,
+     "accel_max_deg_per_frame2": 2.32
     },
     "loin": {
-     "inside_gt3mm_max": 14,
-     "deepest_mm": 111.1,
-     "frames_with_contact": 21,
-     "accel_max_deg_per_frame2": 18.26
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 528.9,
+     "frames_with_contact": 11,
+     "accel_max_deg_per_frame2": 10.44
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -222,7 +222,7 @@
      "accel_max_deg_per_frame2": 7.91
     }
    },
-   "seconds": 2.3
+   "seconds": 6.4
   },
   "strafe_left": {
    "action": "valdris_strafe_left@loop",
@@ -231,16 +231,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 1,
-     "deepest_mm": 43.5,
-     "frames_with_contact": 1,
-     "accel_max_deg_per_frame2": 3.3
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 10.59
     },
     "loin": {
-     "inside_gt3mm_max": 32,
-     "deepest_mm": 118.4,
-     "frames_with_contact": 19,
-     "accel_max_deg_per_frame2": 20.89
+     "inside_gt3mm_max": 7,
+     "deepest_mm": 404.9,
+     "frames_with_contact": 16,
+     "accel_max_deg_per_frame2": 7.67
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -249,7 +249,7 @@
      "accel_max_deg_per_frame2": 9.03
     }
    },
-   "seconds": 2.5
+   "seconds": 5.0
   },
   "strafe_right": {
    "action": "valdris_strafe_right@loop",
@@ -258,16 +258,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 4,
-     "deepest_mm": 69.9,
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 46.0,
      "frames_with_contact": 16,
-     "accel_max_deg_per_frame2": 8.76
+     "accel_max_deg_per_frame2": 6.65
     },
     "loin": {
-     "inside_gt3mm_max": 47,
-     "deepest_mm": 191.8,
-     "frames_with_contact": 19,
-     "accel_max_deg_per_frame2": 40.02
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 360.3,
+     "frames_with_contact": 14,
+     "accel_max_deg_per_frame2": 7.63
     },
     "braids": {
      "inside_gt3mm_max": 2,
@@ -276,7 +276,7 @@
      "accel_max_deg_per_frame2": 12.25
     }
    },
-   "seconds": 3.0
+   "seconds": 6.2
   },
   "backpedal": {
    "action": "valdris_backpedal@loop",
@@ -285,16 +285,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 29,
-     "deepest_mm": 183.9,
-     "frames_with_contact": 19,
-     "accel_max_deg_per_frame2": 18.9
+     "inside_gt3mm_max": 6,
+     "deepest_mm": 44.0,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 15.58
     },
     "loin": {
-     "inside_gt3mm_max": 14,
-     "deepest_mm": 118.8,
-     "frames_with_contact": 19,
-     "accel_max_deg_per_frame2": 17.04
+     "inside_gt3mm_max": 7,
+     "deepest_mm": 333.5,
+     "frames_with_contact": 18,
+     "accel_max_deg_per_frame2": 3.69
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -303,7 +303,7 @@
      "accel_max_deg_per_frame2": 7.95
     }
    },
-   "seconds": 3.6
+   "seconds": 5.6
   },
   "dash": {
    "action": "valdris_dash",
@@ -312,16 +312,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 3,
-     "deepest_mm": 35.0,
-     "frames_with_contact": 5,
-     "accel_max_deg_per_frame2": 2.07
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 45.6,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 2.33
     },
     "loin": {
-     "inside_gt3mm_max": 17,
-     "deepest_mm": 66.0,
+     "inside_gt3mm_max": 13,
+     "deepest_mm": 350.6,
      "frames_with_contact": 9,
-     "accel_max_deg_per_frame2": 17.04
+     "accel_max_deg_per_frame2": 7.5
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -330,7 +330,7 @@
      "accel_max_deg_per_frame2": 6.34
     }
    },
-   "seconds": 1.2
+   "seconds": 1.8
   },
   "dash_recover": {
    "action": "valdris_dash_recover",
@@ -339,16 +339,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 25,
-     "deepest_mm": 149.5,
-     "frames_with_contact": 5,
-     "accel_max_deg_per_frame2": 13.66
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 8.81
     },
     "loin": {
-     "inside_gt3mm_max": 18,
-     "deepest_mm": 109.4,
-     "frames_with_contact": 17,
-     "accel_max_deg_per_frame2": 14.66
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 187.4,
+     "frames_with_contact": 8,
+     "accel_max_deg_per_frame2": 8.3
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -357,7 +357,7 @@
      "accel_max_deg_per_frame2": 8.96
     }
    },
-   "seconds": 2.2
+   "seconds": 2.7
   },
   "fire_light": {
    "action": "valdris_fire_light",
@@ -366,25 +366,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 13,
-     "deepest_mm": 35.6,
-     "frames_with_contact": 5,
-     "accel_max_deg_per_frame2": 6.61
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 33.8,
+     "frames_with_contact": 2,
+     "accel_max_deg_per_frame2": 8.42
     },
     "loin": {
-     "inside_gt3mm_max": 6,
-     "deepest_mm": 36.4,
-     "frames_with_contact": 9,
-     "accel_max_deg_per_frame2": 4.34
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 4.1,
+     "frames_with_contact": 4,
+     "accel_max_deg_per_frame2": 5.35
     },
     "braids": {
      "inside_gt3mm_max": 1,
      "deepest_mm": 72.6,
-     "frames_with_contact": 2,
-     "accel_max_deg_per_frame2": 13.87
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 17.95
     }
    },
-   "seconds": 1.3
+   "seconds": 1790418697.1
   },
   "fire_heavy": {
    "action": "valdris_fire_heavy",
@@ -393,25 +393,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 3,
-     "deepest_mm": 61.2,
-     "frames_with_contact": 5,
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 53.6,
+     "frames_with_contact": 4,
      "accel_max_deg_per_frame2": 11.07
     },
     "loin": {
-     "inside_gt3mm_max": 19,
-     "deepest_mm": 81.7,
-     "frames_with_contact": 19,
-     "accel_max_deg_per_frame2": 19.3
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 25.9,
+     "frames_with_contact": 12,
+     "accel_max_deg_per_frame2": 6.34
     },
     "braids": {
      "inside_gt3mm_max": 1,
-     "deepest_mm": 69.0,
-     "frames_with_contact": 2,
-     "accel_max_deg_per_frame2": 17.98
+     "deepest_mm": 64.2,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 20.3
     }
    },
-   "seconds": 2.3
+   "seconds": 1790418702.9
   },
   "fire_charge": {
    "action": "valdris_fire_charge@loop",
@@ -420,15 +420,15 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 10.5,
-     "frames_with_contact": 5,
-     "accel_max_deg_per_frame2": 3.49
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 8.5,
+     "frames_with_contact": 7,
+     "accel_max_deg_per_frame2": 1.52
     },
     "loin": {
-     "inside_gt3mm_max": 5,
-     "deepest_mm": 14.5,
-     "frames_with_contact": 25,
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
      "accel_max_deg_per_frame2": 0.0
     },
     "braids": {
@@ -438,7 +438,7 @@
      "accel_max_deg_per_frame2": 4.27
     }
    },
-   "seconds": 2.6
+   "seconds": 4.2
   },
   "hit_light": {
    "action": "valdris_hit_light",
@@ -447,25 +447,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 9,
-     "deepest_mm": 44.3,
-     "frames_with_contact": 11,
-     "accel_max_deg_per_frame2": 4.72
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 33.8,
+     "frames_with_contact": 4,
+     "accel_max_deg_per_frame2": 5.86
     },
     "loin": {
-     "inside_gt3mm_max": 8,
-     "deepest_mm": 29.3,
-     "frames_with_contact": 13,
-     "accel_max_deg_per_frame2": 6.82
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 1.5,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 3.34
     },
     "braids": {
      "inside_gt3mm_max": 0,
      "deepest_mm": 0.0,
      "frames_with_contact": 0,
-     "accel_max_deg_per_frame2": 15.98
+     "accel_max_deg_per_frame2": 18.43
     }
    },
-   "seconds": 1.8
+   "seconds": 1790418705.1
   },
   "hit_heavy": {
    "action": "valdris_hit_heavy",
@@ -474,16 +474,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 9,
-     "deepest_mm": 43.2,
-     "frames_with_contact": 11,
-     "accel_max_deg_per_frame2": 5.3
+     "inside_gt3mm_max": 6,
+     "deepest_mm": 15.5,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 4.38
     },
     "loin": {
-     "inside_gt3mm_max": 23,
-     "deepest_mm": 95.2,
-     "frames_with_contact": 31,
-     "accel_max_deg_per_frame2": 23.18
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 191.1,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 10.3
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -492,7 +492,7 @@
      "accel_max_deg_per_frame2": 8.37
     }
    },
-   "seconds": 4.0
+   "seconds": 6.4
   },
   "knockdown": {
    "action": "valdris_knockdown",
@@ -501,16 +501,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 17,
-     "deepest_mm": 197.6,
-     "frames_with_contact": 33,
-     "accel_max_deg_per_frame2": 27.54
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 403.0,
+     "frames_with_contact": 16,
+     "accel_max_deg_per_frame2": 18.83
     },
     "loin": {
-     "inside_gt3mm_max": 14,
-     "deepest_mm": 298.3,
-     "frames_with_contact": 37,
-     "accel_max_deg_per_frame2": 44.82
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 186.4,
+     "frames_with_contact": 26,
+     "accel_max_deg_per_frame2": 33.73
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -519,7 +519,7 @@
      "accel_max_deg_per_frame2": 11.83
     }
    },
-   "seconds": 6.5
+   "seconds": 8.4
   },
   "get_up": {
    "action": "valdris_get_up",
@@ -528,16 +528,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 17,
-     "deepest_mm": 312.7,
-     "frames_with_contact": 27,
-     "accel_max_deg_per_frame2": 20.16
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 450.4,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 14.07
     },
     "loin": {
-     "inside_gt3mm_max": 28,
-     "deepest_mm": 282.9,
-     "frames_with_contact": 41,
-     "accel_max_deg_per_frame2": 15.8
+     "inside_gt3mm_max": 16,
+     "deepest_mm": 188.4,
+     "frames_with_contact": 33,
+     "accel_max_deg_per_frame2": 9.2
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -546,7 +546,7 @@
      "accel_max_deg_per_frame2": 10.83
     }
    },
-   "seconds": 6.1
+   "seconds": 9.8
   },
   "death": {
    "action": "valdris_death",
@@ -555,16 +555,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 36,
-     "deepest_mm": 354.8,
-     "frames_with_contact": 53,
-     "accel_max_deg_per_frame2": 17.14
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 239.5,
+     "frames_with_contact": 21,
+     "accel_max_deg_per_frame2": 18.48
     },
     "loin": {
-     "inside_gt3mm_max": 13,
-     "deepest_mm": 64.6,
-     "frames_with_contact": 47,
-     "accel_max_deg_per_frame2": 22.62
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 193.3,
+     "frames_with_contact": 41,
+     "accel_max_deg_per_frame2": 19.84
     },
     "braids": {
      "inside_gt3mm_max": 8,
@@ -573,7 +573,7 @@
      "accel_max_deg_per_frame2": 16.15
     }
    },
-   "seconds": 11.3
+   "seconds": 16.8
   },
   "downed": {
    "action": "valdris_downed@loop",
@@ -582,16 +582,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 35,
-     "deepest_mm": 323.2,
-     "frames_with_contact": 58,
-     "accel_max_deg_per_frame2": 21.01
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 311.1,
+     "frames_with_contact": 18,
+     "accel_max_deg_per_frame2": 5.35
     },
     "loin": {
-     "inside_gt3mm_max": 14,
-     "deepest_mm": 30.5,
-     "frames_with_contact": 61,
-     "accel_max_deg_per_frame2": 11.18
+     "inside_gt3mm_max": 7,
+     "deepest_mm": 41.0,
+     "frames_with_contact": 56,
+     "accel_max_deg_per_frame2": 9.01
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -600,7 +600,7 @@
      "accel_max_deg_per_frame2": 0.15
     }
    },
-   "seconds": 11.3
+   "seconds": 20.8
   },
   "revive": {
    "action": "valdris_revive",
@@ -609,16 +609,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 18,
-     "deepest_mm": 72.3,
-     "frames_with_contact": 12,
-     "accel_max_deg_per_frame2": 9.33
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 266.7,
+     "frames_with_contact": 18,
+     "accel_max_deg_per_frame2": 5.58
     },
     "loin": {
-     "inside_gt3mm_max": 32,
-     "deepest_mm": 142.2,
-     "frames_with_contact": 41,
-     "accel_max_deg_per_frame2": 18.08
+     "inside_gt3mm_max": 6,
+     "deepest_mm": 202.6,
+     "frames_with_contact": 16,
+     "accel_max_deg_per_frame2": 11.04
     },
     "braids": {
      "inside_gt3mm_max": 13,
@@ -627,7 +627,7 @@
      "accel_max_deg_per_frame2": 22.61
     }
    },
-   "seconds": 5.3
+   "seconds": 13.0
   },
   "reforge_in": {
    "action": "valdris_reforge_in",
@@ -636,16 +636,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 13,
-     "deepest_mm": 341.3,
-     "frames_with_contact": 29,
-     "accel_max_deg_per_frame2": 15.22
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 174.8,
+     "frames_with_contact": 15,
+     "accel_max_deg_per_frame2": 17.66
     },
     "loin": {
-     "inside_gt3mm_max": 32,
-     "deepest_mm": 152.1,
-     "frames_with_contact": 47,
-     "accel_max_deg_per_frame2": 20.44
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 193.8,
+     "frames_with_contact": 32,
+     "accel_max_deg_per_frame2": 14.8
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -654,7 +654,7 @@
      "accel_max_deg_per_frame2": 9.26
     }
    },
-   "seconds": 6.7
+   "seconds": 13.7
   },
   "victory": {
    "action": "valdris_victory",
@@ -664,15 +664,15 @@
    "groups": {
     "cape": {
      "inside_gt3mm_max": 7,
-     "deepest_mm": 273.0,
-     "frames_with_contact": 6,
-     "accel_max_deg_per_frame2": 5.01
+     "deepest_mm": 190.4,
+     "frames_with_contact": 10,
+     "accel_max_deg_per_frame2": 2.18
     },
     "loin": {
-     "inside_gt3mm_max": 24,
-     "deepest_mm": 115.0,
-     "frames_with_contact": 61,
-     "accel_max_deg_per_frame2": 15.89
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 72.3,
+     "frames_with_contact": 42,
+     "accel_max_deg_per_frame2": 8.57
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -681,7 +681,7 @@
      "accel_max_deg_per_frame2": 6.98
     }
    },
-   "seconds": 6.3
+   "seconds": 14.8
   },
   "ping": {
    "action": "valdris_ping",
@@ -690,15 +690,15 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 12.9,
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 57.3,
      "frames_with_contact": 4,
-     "accel_max_deg_per_frame2": 2.97
+     "accel_max_deg_per_frame2": 3.54
     },
     "loin": {
-     "inside_gt3mm_max": 6,
-     "deepest_mm": 13.3,
-     "frames_with_contact": 21,
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 1.5,
+     "frames_with_contact": 0,
      "accel_max_deg_per_frame2": 0.0
     },
     "braids": {
@@ -708,7 +708,7 @@
      "accel_max_deg_per_frame2": 24.9
     }
    },
-   "seconds": 4.3
+   "seconds": 1790418712.0
   },
   "interact": {
    "action": "valdris_interact",
@@ -717,16 +717,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 12,
-     "deepest_mm": 261.5,
-     "frames_with_contact": 30,
-     "accel_max_deg_per_frame2": 8.4
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 103.3,
+     "frames_with_contact": 21,
+     "accel_max_deg_per_frame2": 4.63
     },
     "loin": {
-     "inside_gt3mm_max": 19,
-     "deepest_mm": 124.6,
-     "frames_with_contact": 41,
-     "accel_max_deg_per_frame2": 22.84
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 194.1,
+     "frames_with_contact": 31,
+     "accel_max_deg_per_frame2": 11.7
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -735,7 +735,7 @@
      "accel_max_deg_per_frame2": 12.28
     }
    },
-   "seconds": 6.0
+   "seconds": 11.0
   },
   "forge_hammer": {
    "action": "valdris_forge_hammer@loop",
@@ -744,16 +744,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 9,
-     "deepest_mm": 116.5,
-     "frames_with_contact": 23,
-     "accel_max_deg_per_frame2": 8.48
+     "inside_gt3mm_max": 11,
+     "deepest_mm": 74.3,
+     "frames_with_contact": 19,
+     "accel_max_deg_per_frame2": 4.43
     },
     "loin": {
-     "inside_gt3mm_max": 19,
-     "deepest_mm": 110.8,
-     "frames_with_contact": 37,
-     "accel_max_deg_per_frame2": 14.5
+     "inside_gt3mm_max": 15,
+     "deepest_mm": 299.0,
+     "frames_with_contact": 20,
+     "accel_max_deg_per_frame2": 8.99
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -762,7 +762,7 @@
      "accel_max_deg_per_frame2": 7.13
     }
    },
-   "seconds": 5.0
+   "seconds": 4.9
   },
   "idle_signature": {
    "action": "valdris_idle_signature@loop",
@@ -772,15 +772,15 @@
    "groups": {
     "cape": {
      "inside_gt3mm_max": 3,
-     "deepest_mm": 54.9,
-     "frames_with_contact": 96,
-     "accel_max_deg_per_frame2": 5.55
+     "deepest_mm": 46.0,
+     "frames_with_contact": 83,
+     "accel_max_deg_per_frame2": 4.21
     },
     "loin": {
-     "inside_gt3mm_max": 8,
-     "deepest_mm": 30.6,
-     "frames_with_contact": 87,
-     "accel_max_deg_per_frame2": 10.22
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 19.4,
+     "frames_with_contact": 144,
+     "accel_max_deg_per_frame2": 1.99
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -789,7 +789,7 @@
      "accel_max_deg_per_frame2": 4.21
     }
    },
-   "seconds": 14.5
+   "seconds": 25.1
   },
   "bulwark_slam": {
    "action": "valdris_bulwark_slam",
@@ -798,16 +798,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 9,
-     "deepest_mm": 46.6,
-     "frames_with_contact": 12,
-     "accel_max_deg_per_frame2": 16.52
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 55.2,
+     "frames_with_contact": 13,
+     "accel_max_deg_per_frame2": 15.61
     },
     "loin": {
-     "inside_gt3mm_max": 31,
-     "deepest_mm": 125.4,
-     "frames_with_contact": 51,
-     "accel_max_deg_per_frame2": 31.17
+     "inside_gt3mm_max": 13,
+     "deepest_mm": 437.0,
+     "frames_with_contact": 34,
+     "accel_max_deg_per_frame2": 30.7
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -816,7 +816,7 @@
      "accel_max_deg_per_frame2": 11.33
     }
    },
-   "seconds": 6.2
+   "seconds": 6.9
   },
   "siege_stance_enter": {
    "action": "valdris_siege_stance_enter",
@@ -825,16 +825,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 15,
-     "deepest_mm": 51.2,
-     "frames_with_contact": 16,
-     "accel_max_deg_per_frame2": 10.12
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 112.6,
+     "frames_with_contact": 8,
+     "accel_max_deg_per_frame2": 4.82
     },
     "loin": {
-     "inside_gt3mm_max": 15,
-     "deepest_mm": 145.6,
-     "frames_with_contact": 27,
-     "accel_max_deg_per_frame2": 12.94
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 517.8,
+     "frames_with_contact": 14,
+     "accel_max_deg_per_frame2": 11.83
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -843,7 +843,7 @@
      "accel_max_deg_per_frame2": 12.38
     }
    },
-   "seconds": 3.7
+   "seconds": 3.6
   },
   "siege_stance": {
    "action": "valdris_siege_stance@loop",
@@ -852,16 +852,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 3,
-     "deepest_mm": 186.6,
-     "frames_with_contact": 20,
-     "accel_max_deg_per_frame2": 3.74
+     "inside_gt3mm_max": 7,
+     "deepest_mm": 212.1,
+     "frames_with_contact": 19,
+     "accel_max_deg_per_frame2": 1.24
     },
     "loin": {
-     "inside_gt3mm_max": 8,
-     "deepest_mm": 108.0,
-     "frames_with_contact": 39,
-     "accel_max_deg_per_frame2": 10.81
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 12.0,
+     "frames_with_contact": 12,
+     "accel_max_deg_per_frame2": 1.89
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -870,7 +870,7 @@
      "accel_max_deg_per_frame2": 4.43
     }
    },
-   "seconds": 5.0
+   "seconds": 5.4
   },
   "siege_stance_exit": {
    "action": "valdris_siege_stance_exit",
@@ -880,15 +880,15 @@
    "groups": {
     "cape": {
      "inside_gt3mm_max": 6,
-     "deepest_mm": 221.7,
-     "frames_with_contact": 6,
-     "accel_max_deg_per_frame2": 3.39
+     "deepest_mm": 54.3,
+     "frames_with_contact": 10,
+     "accel_max_deg_per_frame2": 2.47
     },
     "loin": {
-     "inside_gt3mm_max": 11,
-     "deepest_mm": 23.7,
-     "frames_with_contact": 21,
-     "accel_max_deg_per_frame2": 13.52
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 193.2,
+     "frames_with_contact": 10,
+     "accel_max_deg_per_frame2": 9.81
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -897,7 +897,7 @@
      "accel_max_deg_per_frame2": 17.08
     }
    },
-   "seconds": 2.5
+   "seconds": 2.4
   },
   "siege_fire": {
    "action": "valdris_siege_fire",
@@ -906,25 +906,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 13,
-     "deepest_mm": 55.1,
-     "frames_with_contact": 3,
-     "accel_max_deg_per_frame2": 2.95
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 2.3,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 10.07
     },
     "loin": {
-     "inside_gt3mm_max": 4,
-     "deepest_mm": 5.7,
-     "frames_with_contact": 6,
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
      "accel_max_deg_per_frame2": 0.0
     },
     "braids": {
      "inside_gt3mm_max": 0,
      "deepest_mm": 0.0,
      "frames_with_contact": 0,
-     "accel_max_deg_per_frame2": 7.37
+     "accel_max_deg_per_frame2": 10.44
     }
    },
-   "seconds": 0.9
+   "seconds": 1790418713.1
   },
   "mountainfall_start": {
    "action": "valdris_mountainfall_start",
@@ -933,16 +933,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 8,
-     "deepest_mm": 163.7,
-     "frames_with_contact": 20,
-     "accel_max_deg_per_frame2": 6.19
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 400.7,
+     "frames_with_contact": 17,
+     "accel_max_deg_per_frame2": 3.96
     },
     "loin": {
-     "inside_gt3mm_max": 25,
-     "deepest_mm": 108.1,
-     "frames_with_contact": 46,
-     "accel_max_deg_per_frame2": 15.44
+     "inside_gt3mm_max": 6,
+     "deepest_mm": 196.3,
+     "frames_with_contact": 20,
+     "accel_max_deg_per_frame2": 18.2
     },
     "braids": {
      "inside_gt3mm_max": 1,
@@ -951,7 +951,7 @@
      "accel_max_deg_per_frame2": 15.23
     }
    },
-   "seconds": 5.8
+   "seconds": 5.6
   },
   "mountainfall": {
    "action": "valdris_mountainfall@loop",
@@ -960,16 +960,16 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 267.8,
-     "frames_with_contact": 9,
-     "accel_max_deg_per_frame2": 6.53
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 288.2,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 3.62
     },
     "loin": {
-     "inside_gt3mm_max": 11,
-     "deepest_mm": 147.5,
-     "frames_with_contact": 41,
-     "accel_max_deg_per_frame2": 13.2
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 1.72
     },
     "braids": {
      "inside_gt3mm_max": 0,
@@ -978,7 +978,7 @@
      "accel_max_deg_per_frame2": 3.78
     }
    },
-   "seconds": 4.3
+   "seconds": 3.8
   },
   "mountainfall_pound": {
    "action": "valdris_mountainfall_pound",
@@ -987,25 +987,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 12,
-     "deepest_mm": 45.9,
-     "frames_with_contact": 14,
-     "accel_max_deg_per_frame2": 9.64
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 40.9,
+     "frames_with_contact": 4,
+     "accel_max_deg_per_frame2": 10.59
     },
     "loin": {
-     "inside_gt3mm_max": 2,
-     "deepest_mm": 7.6,
-     "frames_with_contact": 34,
-     "accel_max_deg_per_frame2": 0.0
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.91
     },
     "braids": {
      "inside_gt3mm_max": 1,
      "deepest_mm": 85.5,
      "frames_with_contact": 2,
-     "accel_max_deg_per_frame2": 12.46
+     "accel_max_deg_per_frame2": 17.17
     }
    },
-   "seconds": 4.0
+   "seconds": 1790418718.8
   },
   "armor_break": {
    "action": "valdris_armor_break",
@@ -1014,25 +1014,25 @@
    "keyed_bones": 44,
    "groups": {
     "cape": {
-     "inside_gt3mm_max": 9,
-     "deepest_mm": 87.7,
+     "inside_gt3mm_max": 15,
+     "deepest_mm": 61.8,
      "frames_with_contact": 20,
-     "accel_max_deg_per_frame2": 9.11
+     "accel_max_deg_per_frame2": 15.31
     },
     "loin": {
-     "inside_gt3mm_max": 16,
-     "deepest_mm": 40.0,
-     "frames_with_contact": 33,
-     "accel_max_deg_per_frame2": 11.1
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 6.9,
+     "frames_with_contact": 25,
+     "accel_max_deg_per_frame2": 11.69
     },
     "braids": {
      "inside_gt3mm_max": 11,
      "deepest_mm": 79.1,
      "frames_with_contact": 3,
-     "accel_max_deg_per_frame2": 11.32
+     "accel_max_deg_per_frame2": 19.0
     }
    },
-   "seconds": 4.7
+   "seconds": 1790418726.6
   }
  },
  "cloth_keyed_bones": [
@@ -1081,5 +1081,5 @@
   "x_beard_5_01",
   "x_beard_5_02"
  ],
- "seconds": 167.1
+ "seconds": 31.9
 }

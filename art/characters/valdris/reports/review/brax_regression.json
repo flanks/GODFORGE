@@ -1,0 +1,11 @@
+{
+ "what": "Brax's stage-5 export re-run with the changed shared tools/blender/gf_hero/export_glb.py (clip_info.<clip>.base, written only when clips.json sets a base) in a scratch copy of the repository (tools/blender/gf_hero, art/characters/brax/{production/brax_anim.blend, reports/anim/clips.json, reports/export_report.json, status.json, work/brax_landmarks.json, textures/}, assets/models/weapons/anvil_gauntlets.*); nothing under art/characters/brax/ in the repository was written",
+ "date": "2026-09-26",
+ "command": "blender -b --python-exit-code 1 <scratch>/art/characters/brax/production/brax_anim.blend -P <scratch>/tools/blender/gf_hero/export_glb.py -- --key brax",
+ "results": {
+  "assets/models/characters/brax.glb": {"shipped_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a", "rebuilt_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a", "identical": true},
+  "assets/models/characters/brax.meta.json": {"shipped_sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62", "rebuilt_sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62", "identical": true},
+  "art/characters/brax/reports/export_report.json": {"identical": true}
+ },
+ "also": "validate_glb.py --blender on the shipped brax.glb and valdris.glb: both pass (the CI job hero-glb)"
+}

@@ -1233,7 +1233,8 @@
      "start": "fist",
      "swap_frames": []
     }
-   }
+   },
+   "base": "valdris_siege_stance@loop"
   },
   "valdris_mountainfall_start": {
    "clip": "mountainfall_start",
@@ -1334,7 +1335,8 @@
      "start": "fist",
      "swap_frames": []
     }
-   }
+   },
+   "base": "valdris_mountainfall@loop"
   },
   "valdris_armor_break": {
    "clip": "armor_break",
@@ -1379,7 +1381,7 @@
   "fps": 30,
   "naming": "<key>_<clip>, loops <key>_<clip>@loop (docs/art/GF_HERO_SKELETON.md section 8)",
   "locomotion": "playback rate = ground speed / clip_info.design_speed_mps (walk, run, strafe_*, backpedal)",
-  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are valdris_idle_combat@loop frame 0",
+  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are valdris_idle_combat@loop frame 0, except the clips whose clip_info.<clip>.base names another clip (valdris_mountainfall_pound, valdris_siege_fire): theirs are frame 0 of that clip",
   "events": "glTF has no events: clip_info.<clip>.events gives the frame and time of each (30 fps)",
   "weapon_variant": "clip_info.<clip>.weapon_variant is null: colossus_cannon has no hand variants, so nothing swaps. The fist / open hand poses are the hero's own keyed fingers; clip_info.<clip>.hand_pose lists them per hand for reference",
   "in_place": "only pelvis translates; the entity moves in the sim"
@@ -1405,8 +1407,8 @@
  },
  "height_m": 2.3339,
  "glb": "assets/models/characters/valdris.glb",
- "glb_bytes": 16889700,
- "glb_sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+ "glb_bytes": 16890816,
+ "glb_sha256": "49da26a167f2a143bfb0117a06bcb8e3e3bdedf6c224152fce15118396c9fe0c",
  "source_blend": "art/characters/valdris/production/valdris_anim.blend",
  "build_script": "tools/blender/gf_hero/export_glb.py",
  "pipeline": "docs/ART_PIPELINE.md stage 5",

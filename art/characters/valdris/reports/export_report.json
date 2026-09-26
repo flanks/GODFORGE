@@ -10,8 +10,8 @@
   ],
   "glb": "assets/models/characters/valdris.glb",
   "meta": "assets/models/characters/valdris.meta.json",
-  "bytes": 16889700,
-  "sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+  "bytes": 16890816,
+  "sha256": "49da26a167f2a143bfb0117a06bcb8e3e3bdedf6c224152fce15118396c9fe0c",
   "source_blend": "art/characters/valdris/production/valdris_anim.blend",
   "export_settings": {
    "export_format": "GLB",
@@ -413,8 +413,8 @@
   "validation": {
    "file": "assets/models/characters/valdris.glb",
    "key": "valdris",
-   "bytes": 16889700,
-   "sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+   "bytes": 16890816,
+   "sha256": "49da26a167f2a143bfb0117a06bcb8e3e3bdedf6c224152fce15118396c9fe0c",
    "generator": "Khronos glTF Blender I/O v5.2.39",
    "extensions_used": [
     "KHR_materials_emissive_strength"
@@ -983,7 +983,7 @@
     "mesh": {
      "min_z": -0.0118,
      "extent": [
-      1.599,
+      1.549,
       1.37,
       2.318
      ]
@@ -1000,7 +1000,7 @@
      "min_z": -0.0124,
      "extent": [
       1.812,
-      1.533,
+      1.904,
       2.305
      ]
     }
@@ -1015,8 +1015,8 @@
     "mesh": {
      "min_z": 0.0165,
      "extent": [
-      1.524,
-      1.874,
+      1.521,
+      1.913,
       2.263
      ]
     }
@@ -1032,7 +1032,7 @@
      "min_z": 0.0382,
      "extent": [
       2.15,
-      1.359,
+      1.481,
       2.229
      ]
     }
@@ -1048,7 +1048,7 @@
      "min_z": 0.0382,
      "extent": [
       2.241,
-      1.467,
+      1.523,
       2.23
      ]
     }
@@ -1063,8 +1063,8 @@
     "mesh": {
      "min_z": 0.0094,
      "extent": [
-      1.607,
-      1.369,
+      1.728,
+      1.759,
       2.233
      ]
     }
@@ -1080,7 +1080,7 @@
      "min_z": 0.0631,
      "extent": [
       1.753,
-      1.639,
+      1.754,
       2.099
      ]
     }
@@ -1095,8 +1095,8 @@
     "mesh": {
      "min_z": -0.0127,
      "extent": [
-      1.549,
-      1.516,
+      1.548,
+      1.536,
       2.209
      ]
     }
@@ -1111,8 +1111,8 @@
     "mesh": {
      "min_z": -0.0119,
      "extent": [
-      1.535,
-      1.261,
+      1.534,
+      1.597,
       2.32
      ]
     }
@@ -1127,8 +1127,8 @@
     "mesh": {
      "min_z": -0.0118,
      "extent": [
-      1.585,
-      1.38,
+      1.672,
+      1.357,
       2.261
      ]
     }
@@ -1159,8 +1159,8 @@
     "mesh": {
      "min_z": -0.012,
      "extent": [
-      1.546,
-      1.257,
+      1.599,
+      1.609,
       2.318
      ]
     }
@@ -1176,7 +1176,7 @@
      "min_z": -0.0093,
      "extent": [
       1.542,
-      1.481,
+      1.499,
       2.128
      ]
     }
@@ -1191,8 +1191,8 @@
     "mesh": {
      "min_z": -0.0188,
      "extent": [
-      1.854,
-      2.0,
+      1.914,
+      2.383,
       1.939
      ]
     }
@@ -1208,7 +1208,7 @@
      "min_z": -0.0121,
      "extent": [
       1.537,
-      1.45,
+      1.543,
       2.172
      ]
     }
@@ -1223,8 +1223,8 @@
     "mesh": {
      "min_z": -0.0189,
      "extent": [
-      1.82,
-      2.0,
+      1.815,
+      2.346,
       1.899
      ]
     }
@@ -1239,8 +1239,8 @@
     "mesh": {
      "min_z": 0.0249,
      "extent": [
-      1.854,
-      1.759,
+      1.809,
+      1.73,
       1.984
      ]
     }
@@ -1256,7 +1256,7 @@
      "min_z": -0.0141,
      "extent": [
       1.546,
-      1.331,
+      1.364,
       2.207
      ]
     }
@@ -1271,8 +1271,8 @@
     "mesh": {
      "min_z": -0.0109,
      "extent": [
-      2.037,
-      1.653,
+      2.172,
+      1.669,
       2.257
      ]
     }
@@ -1303,8 +1303,8 @@
     "mesh": {
      "min_z": -0.0118,
      "extent": [
-      1.818,
-      1.359,
+      1.979,
+      1.538,
       2.324
      ]
     }
@@ -1319,8 +1319,8 @@
     "mesh": {
      "min_z": -0.021,
      "extent": [
-      1.802,
-      1.412,
+      1.746,
+      1.42,
       2.142
      ]
     }
@@ -1335,8 +1335,8 @@
     "mesh": {
      "min_z": -0.0178,
      "extent": [
-      1.833,
-      1.396,
+      1.874,
+      1.622,
       2.228
      ]
     }
@@ -1352,7 +1352,7 @@
      "min_z": -0.0072,
      "extent": [
       1.774,
-      1.324,
+      1.356,
       2.327
      ]
     }
@@ -1367,8 +1367,8 @@
     "mesh": {
      "min_z": -0.0167,
      "extent": [
-      2.254,
-      1.598,
+      2.278,
+      1.69,
       1.994
      ]
     }
@@ -1384,7 +1384,7 @@
      "min_z": -0.0001,
      "extent": [
       1.58,
-      1.435,
+      1.445,
       2.169
      ]
     }
@@ -1415,8 +1415,8 @@
     "mesh": {
      "min_z": -0.0059,
      "extent": [
-      1.666,
-      1.216,
+      1.581,
+      1.25,
       2.226
      ]
     }
@@ -1431,8 +1431,8 @@
     "mesh": {
      "min_z": -0.0,
      "extent": [
-      1.719,
-      1.241,
+      1.71,
+      1.591,
       2.134
      ]
     }
@@ -1447,8 +1447,8 @@
     "mesh": {
      "min_z": -0.0089,
      "extent": [
-      1.879,
-      1.568,
+      1.875,
+      1.584,
       2.433
      ]
     }
@@ -1464,7 +1464,7 @@
      "min_z": -0.0089,
      "extent": [
       1.734,
-      1.4,
+      1.401,
       2.221
      ]
     }
@@ -1479,8 +1479,8 @@
     "mesh": {
      "min_z": -0.0089,
      "extent": [
-      1.815,
-      1.453,
+      1.988,
+      1.858,
       2.153
      ]
     }
@@ -1495,8 +1495,8 @@
     "mesh": {
      "min_z": -0.0106,
      "extent": [
-      2.197,
-      1.593,
+      2.133,
+      1.445,
       2.352
      ]
     }
@@ -1598,7 +1598,7 @@
   "errors": [],
   "warnings": [],
   "ok": true,
-  "seconds": 5.7
+  "seconds": 9.0
  },
  "review": {
   "by": "AI (Claude), 2026-09-26, from reports/stage5/export_review.png and reports/stage5/valdris_board.png",
@@ -1608,7 +1608,8 @@
    "At game size (160 px at 22 m, 1080p) he reads as the widest, heaviest body in the roster: the pauldron blocks, the cannon's glowing muzzle and the red cape; the head is the small dark knot of the concept.",
    "Against the concept the gap is the stage-2 look, not the export: the plate edges carry a bright gold trim on every piece, so the armour reads boxier and busier than the concept's dark forged bronze; the anvil reads as a flat light-grey wedge where the concept's is dark iron; the cape is a plain red panel without the concept's tatters and emblem. These are for the user's final visual approval (the Hades-II bar), not fixable in stage 5."
   ],
-  "not_checked": "No Bevy-side load: the Rust test that loads the GLB through bevy_gltf, spawns #Scene0 and plays each clip belongs to the engine integration (crates/). The review renders are the Cycles-CPU toon preview, not the game's shading."
+  "not_checked": "No Bevy-side load: the Rust test that loads the GLB through bevy_gltf, spawns #Scene0 and plays each clip belongs to the engine integration (crates/). The review renders are the Cycles-CPU toon preview, not the game's shading.",
+  "correction_2026_09_26": "The review of stages 2-5 (reports/review_stage2_5.md) corrects the last judgement: the cape is NOT a plain panel. It carries the gold forge-sigil emblem on its back and a tattered hem (reports/review/cape_before_after.png, reports/review/closeups_*.png); from the 55-degree camera facing him neither shows, because the cape hangs behind him. The same review found and fixed the cloth pass (the sabatons pierced the cape when he knelt, floated or backpedalled; upper-layer clips started 0.4-0.6 m off their reference pose) and added clip_info.<clip>.base to the sidecar; the file was re-exported and passes the gate as before."
  },
  "shared_tool_changes": {
   "files": [

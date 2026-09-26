@@ -350,6 +350,11 @@ def export_hero():
         if sleeve_only:
             clip_info[c["action"]]["hand_pose"] = clip_info[c["action"]]["weapon_variant"]
             clip_info[c["action"]]["weapon_variant"] = None
+        if c.get("base"):
+            # an upper-layer kit clip that starts and ends on ANOTHER clip's frame 0 (Valdris's siege_fire over
+            # siege_stance): the engine's additive reference pose (added by the stage 2-5 review; absent when unset, so
+            # Brax's sidecar is unchanged)
+            clip_info[c["action"]]["base"] = man["clips"][c["base"]]["action"]
     meta = {
         "kind": "character", "key": KEY, "name": status.get("name"),
         "skeleton": "%s v%d" % (R.RIG_NAME, R.CONTRACT_VERSION), "armature": R.RIG_NAME,
@@ -379,6 +384,11 @@ def export_hero():
         "built": TODAY,
         "validation": {"ok": False, "errors": [], "warnings": []},
     }
+    based = sorted(a for a, ci in clip_info.items() if ci.get("base"))
+    if based:
+        meta["playback"]["upper_layer"] += (
+            ", except the clips whose clip_info.<clip>.base names another clip (%s): theirs are frame 0 of that clip"
+            % ", ".join(based))
     if sleeve_only:
         meta["playback"]["weapon_variant"] = (
             "clip_info.<clip>.weapon_variant is null: %s has no hand variants, so nothing swaps. The fist / open hand "

@@ -1,0 +1,261 @@
+{
+ "px_per_m": 49.09090909090909,
+ "subjects": [
+  {
+   "label": "greybox capsule 2.3 m r0.55",
+   "pixels": 4018,
+   "L_mean": 48.0,
+   "L_p10": 33.8,
+   "L_p90": 53.2,
+   "gold_share": 0.0,
+   "glow_share": 0.0,
+   "red_share": 0.0,
+   "box_px": [
+    130,
+    205
+   ],
+   "opaque_rows": 87,
+   "opaque_cols": 54
+  },
+  {
+   "label": "brax idle_combat",
+   "pixels": 2145,
+   "L_mean": 40.0,
+   "L_p10": 15.6,
+   "L_p90": 68.4,
+   "gold_share": 0.084,
+   "glow_share": 0.14,
+   "red_share": 0.034,
+   "box_px": [
+    143,
+    205
+   ],
+   "opaque_rows": 70,
+   "opaque_cols": 47
+  },
+  {
+   "label": "valdris idle_combat",
+   "pixels": 5715,
+   "L_mean": 30.7,
+   "L_p10": 13.0,
+   "L_p90": 56.0,
+   "gold_share": 0.203,
+   "glow_share": 0.042,
+   "red_share": 0.092,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 101,
+   "opaque_cols": 83
+  },
+  {
+   "label": "walk f7",
+   "pixels": 6405,
+   "L_mean": 29.9,
+   "L_p10": 12.6,
+   "L_p90": 55.1,
+   "gold_share": 0.176,
+   "glow_share": 0.04,
+   "red_share": 0.1,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 117,
+   "opaque_cols": 113
+  },
+  {
+   "label": "fire_light f1 (shot)",
+   "pixels": 6269,
+   "L_mean": 30.5,
+   "L_p10": 12.9,
+   "L_p90": 57.9,
+   "gold_share": 0.2,
+   "glow_share": 0.058,
+   "red_share": 0.091,
+   "box_px": [
+    143,
+    205
+   ],
+   "opaque_rows": 101,
+   "opaque_cols": 96
+  },
+  {
+   "label": "bulwark launch f8",
+   "pixels": 5812,
+   "L_mean": 31.5,
+   "L_p10": 12.6,
+   "L_p90": 61.4,
+   "gold_share": 0.203,
+   "glow_share": 0.072,
+   "red_share": 0.1,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 103,
+   "opaque_cols": 79
+  },
+  {
+   "label": "bulwark land f21",
+   "pixels": 6040,
+   "L_mean": 30.1,
+   "L_p10": 13.4,
+   "L_p90": 54.4,
+   "gold_share": 0.186,
+   "glow_share": 0.034,
+   "red_share": 0.108,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 110,
+   "opaque_cols": 112
+  },
+  {
+   "label": "siege_stance",
+   "pixels": 5537,
+   "L_mean": 30.7,
+   "L_p10": 12.9,
+   "L_p90": 56.1,
+   "gold_share": 0.197,
+   "glow_share": 0.043,
+   "red_share": 0.076,
+   "box_px": [
+    143,
+    205
+   ],
+   "opaque_rows": 108,
+   "opaque_cols": 82
+  },
+  {
+   "label": "death (last frame)",
+   "pixels": 5944,
+   "L_mean": 28.3,
+   "L_p10": 12.4,
+   "L_p90": 50.5,
+   "gold_share": 0.143,
+   "glow_share": 0.036,
+   "red_share": 0.261,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 129,
+   "opaque_cols": 120
+  },
+  {
+   "label": "downed f0",
+   "pixels": 4870,
+   "L_mean": 31.7,
+   "L_p10": 13.2,
+   "L_p90": 56.5,
+   "gold_share": 0.219,
+   "glow_share": 0.032,
+   "red_share": 0.086,
+   "box_px": [
+    142,
+    205
+   ],
+   "opaque_rows": 88,
+   "opaque_cols": 114
+  },
+  {
+   "label": "cinderling",
+   "pixels": 1544,
+   "L_mean": 35.4,
+   "L_p10": 15.8,
+   "L_p90": 48.8,
+   "gold_share": 0.013,
+   "glow_share": 0.056,
+   "red_share": 0.05,
+   "box_px": [
+    83,
+    205
+   ],
+   "opaque_rows": 47,
+   "opaque_cols": 47
+  },
+  {
+   "label": "ashrunner",
+   "pixels": 608,
+   "L_mean": 48.5,
+   "L_p10": 17.0,
+   "L_p90": 68.9,
+   "gold_share": 0.066,
+   "glow_share": 0.137,
+   "red_share": 0.0,
+   "box_px": [
+    84,
+    205
+   ],
+   "opaque_rows": 53,
+   "opaque_cols": 26
+  },
+  {
+   "label": "clinker",
+   "pixels": 816,
+   "L_mean": 33.7,
+   "L_p10": 7.5,
+   "L_p90": 68.8,
+   "gold_share": 0.0,
+   "glow_share": 0.0,
+   "red_share": 0.0,
+   "box_px": [
+    83,
+    205
+   ],
+   "opaque_rows": 42,
+   "opaque_cols": 42
+  },
+  {
+   "label": "emberwisp",
+   "pixels": 567,
+   "L_mean": 36.1,
+   "L_p10": 12.4,
+   "L_p90": 53.9,
+   "gold_share": 0.041,
+   "glow_share": 0.078,
+   "red_share": 0.0,
+   "box_px": [
+    84,
+    205
+   ],
+   "opaque_rows": 42,
+   "opaque_cols": 26
+  },
+  {
+   "label": "slagspitter",
+   "pixels": 1628,
+   "L_mean": 32.8,
+   "L_p10": 10.4,
+   "L_p90": 68.6,
+   "gold_share": 0.063,
+   "glow_share": 0.122,
+   "red_share": 0.003,
+   "box_px": [
+    83,
+    205
+   ],
+   "opaque_rows": 52,
+   "opaque_cols": 50
+  },
+  {
+   "label": "kindlejack",
+   "pixels": 776,
+   "L_mean": 43.8,
+   "L_p10": 9.6,
+   "L_p90": 92.4,
+   "gold_share": 0.017,
+   "glow_share": 0.0,
+   "red_share": 0.0,
+   "box_px": [
+    84,
+    205
+   ],
+   "opaque_rows": 42,
+   "opaque_cols": 40
+  }
+ ]
+}

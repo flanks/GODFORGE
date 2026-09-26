@@ -1,0 +1,3895 @@
+{
+ "glb": "assets/models/characters/valdris.glb",
+ "glb_sha256": "49da26a167f2a143bfb0117a06bcb8e3e3bdedf6c224152fce15118396c9fe0c",
+ "weapon": "assets/models/weapons/colossus_cannon.glb",
+ "blender": "5.2.0 LTS",
+ "weights": {
+  "vertices": 23838,
+  "over_4_influences": 0,
+  "sum_error_max": 1.341104507446289e-07,
+  "blended_far_influences_gt_0p35m": 317,
+  "far_examples": [
+   [
+    434,
+    "spine_03",
+    0.134,
+    0.361
+   ],
+   [
+    435,
+    "spine_03",
+    0.264,
+    0.37
+   ],
+   [
+    436,
+    "spine_03",
+    0.383,
+    0.352
+   ],
+   [
+    437,
+    "spine_03",
+    0.505,
+    0.357
+   ],
+   [
+    455,
+    "spine_03",
+    0.343,
+    0.375
+   ],
+   [
+    456,
+    "spine_03",
+    0.477,
+    0.378
+   ],
+   [
+    459,
+    "spine_03",
+    0.148,
+    0.405
+   ],
+   [
+    460,
+    "spine_03",
+    0.288,
+    0.371
+   ],
+   [
+    461,
+    "spine_03",
+    0.361,
+    0.369
+   ],
+   [
+    510,
+    "spine_03",
+    0.347,
+    0.361
+   ],
+   [
+    511,
+    "spine_03",
+    0.347,
+    0.361
+   ],
+   [
+    512,
+    "spine_03",
+    0.369,
+    0.356
+   ]
+  ],
+  "far_by_bone": {
+   "clavicle_L": 3,
+   "clavicle_R": 3,
+   "pelvis": 10,
+   "spine_01": 18,
+   "spine_02": 49,
+   "spine_03": 157,
+   "thigh_twist_L": 6,
+   "thigh_twist_R": 5,
+   "x_cape_C_05": 14,
+   "x_cape_L1_04": 2,
+   "x_cape_L1_05": 16,
+   "x_cape_L2_04": 1,
+   "x_cape_L2_05": 8,
+   "x_cape_R1_04": 2,
+   "x_cape_R1_05": 14,
+   "x_cape_R2_04": 1,
+   "x_cape_R2_05": 8
+  },
+  "mirror_pairs": 8736,
+  "mirror_mismatch_gt_0p05": 2,
+  "mirror_mismatch_by_dominant_bone": {
+   "foot_L": 1,
+   "shin_L": 1
+  },
+  "mirror_examples": [
+   [
+    2646,
+    1923,
+    0.067,
+    "foot_L",
+    "foot_R"
+   ],
+   [
+    2925,
+    1632,
+    0.062,
+    "shin_L",
+    "shin_R"
+   ]
+  ],
+  "cloth_vertices": 2250
+ },
+ "skeleton_mirror_asymmetry_top": [
+  [
+   0.0014,
+   "weapon_L"
+  ],
+  [
+   0.0,
+   "x_tasset_L"
+  ],
+  [
+   0.0,
+   "x_pauldron_L"
+  ],
+  [
+   0.0,
+   "x_loin_L_03"
+  ],
+  [
+   0.0,
+   "x_loin_L_02"
+  ],
+  [
+   0.0,
+   "x_loin_L_01"
+  ],
+  [
+   0.0,
+   "x_knee_L"
+  ],
+  [
+   0.0,
+   "x_elbow_L"
+  ],
+  [
+   0.0,
+   "x_cape_L2_05"
+  ],
+  [
+   0.0,
+   "x_cape_L2_04"
+  ]
+ ],
+ "rest_legs_through_cloth_faces": {
+  "cape": 0,
+  "loin": 22
+ },
+ "sockets": {
+  "weapon_R_to_right_hand_centroid_m": 0.0477,
+  "weapon_R": [
+   -0.9953,
+   -0.0,
+   1.78
+  ],
+  "chest_sigil_to_surface_m": 0.0,
+  "head_top_z": 2.3056,
+  "head_mesh_top_z": 2.3056,
+  "mesh_top_z": 2.3339,
+  "mesh_top_bone": "x_pauldron_L"
+ },
+ "cannon": {
+  "axis_len_m": 1.156,
+  "rear_end_behind_grip_m": 0.353,
+  "muzzle_ahead_of_grip_m": 0.803
+ },
+ "cape_shots": [
+  "renders/cape_downed_f000.png",
+  "renders/cape_downed_f045.png",
+  "renders/cape_knockdown_f014.png",
+  "renders/cape_knockdown_f036.png",
+  "renders/cape_death_f022.png",
+  "renders/cape_death_f056.png",
+  "renders/cape_get_up_f008.png",
+  "renders/cape_reforge_in_f012.png"
+ ],
+ "sidecar_problems": [],
+ "clips": {
+  "idle@loop": {
+   "frames": 120,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 167.4825
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 31.3492
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 31.585
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 6.0068
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 0.1499,
+   "seam_acc_mm_cloth": 46.6479,
+   "acc_max_mm_solid": 0.4866,
+   "acc_max_frame_solid": 89,
+   "acc_max_bone_solid": "head",
+   "acc_median_mm_solid": 0.2257,
+   "acc_max_mm_cloth": 79.2367,
+   "acc_max_frame_cloth": 28,
+   "feet": {
+    "L": {
+     "contact_frames": 120,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.0188
+    },
+    "R": {
+     "contact_frames": 120,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0194
+    }
+   },
+   "knee_L_max": 31.3744,
+   "knee_R_max": 27.5418,
+   "elbow_L_max": 22.3634,
+   "elbow_R_max": 18.8199,
+   "thigh_L_max": 24.4308,
+   "thigh_R_max": 23.0806,
+   "elev_L_range": [
+    -43.222,
+    -41.6242
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -40.548,
+    -37.1837
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.158,
+   "pelvis_xy_max": 0.0834,
+   "lowest_z_mm": -11.6583,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 63,
+   "legs_through_loin_frames": 121,
+   "cannon_poke_max": 6,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 6,
+   "cannon_cuts_frame": 11,
+   "cannon_cut_bones": {
+    "upperarm_R": 566
+   },
+   "review_frames": {
+    "lower": 35,
+    "upper": 92
+   },
+   "renders": {
+    "lower": [
+     "renders/idle_f035_shoulders.png",
+     "renders/idle_f035_cannon_elbow.png",
+     "renders/idle_f035_left_elbow.png",
+     "renders/idle_f035_knees.png",
+     "renders/idle_f035_cape.png"
+    ],
+    "upper": [
+     "renders/idle_f092_shoulders.png",
+     "renders/idle_f092_cannon_elbow.png",
+     "renders/idle_f092_left_elbow.png",
+     "renders/idle_f092_knees.png",
+     "renders/idle_f092_cape.png"
+    ]
+   }
+  },
+  "idle_combat@loop": {
+   "frames": 40,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 74.2501
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 55.8725
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 18.3938
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 13.5872
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 5.0539,
+   "seam_acc_mm_cloth": 24.2755,
+   "acc_max_mm_solid": 5.1539,
+   "acc_max_frame_solid": 30,
+   "acc_max_bone_solid": "thumb_02_R",
+   "acc_median_mm_solid": 2.197,
+   "acc_max_mm_cloth": 33.1878,
+   "acc_max_frame_cloth": 23,
+   "feet": {
+    "L": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0009,
+     "anchor_slip_max_mm_per_contact": 0.0088
+    },
+    "R": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0004,
+     "median_slip_max_mm_per_frame": 0.0005,
+     "anchor_slip_max_mm_per_contact": 0.006
+    }
+   },
+   "knee_L_max": 42.324,
+   "knee_R_max": 40.847,
+   "elbow_L_max": 49.3934,
+   "elbow_R_max": 34.5501,
+   "thigh_L_max": 34.8437,
+   "thigh_R_max": 34.334,
+   "elev_L_range": [
+    -48.1226,
+    -46.8809
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -27.9882,
+    -23.4733
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.11,
+   "pelvis_xy_max": 0.1697,
+   "lowest_z_mm": -12.7953,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 5,
+   "legs_through_cape_frame": 11,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 18,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 4,
+   "cannon_cuts_max": 14,
+   "cannon_cuts_frame": 4,
+   "cannon_cut_bones": {
+    "upperarm_R": 544
+   },
+   "review_frames": {
+    "lower": 10,
+    "upper": 0
+   },
+   "renders": {
+    "lower": [
+     "renders/idle_combat_f010_shoulders.png",
+     "renders/idle_combat_f010_cannon_elbow.png",
+     "renders/idle_combat_f010_left_elbow.png",
+     "renders/idle_combat_f010_knees.png",
+     "renders/idle_combat_f010_cape.png"
+    ],
+    "upper": [
+     "renders/idle_combat_f000_shoulders.png",
+     "renders/idle_combat_f000_cannon_elbow.png",
+     "renders/idle_combat_f000_left_elbow.png",
+     "renders/idle_combat_f000_knees.png",
+     "renders/idle_combat_f000_cape.png"
+    ]
+   }
+  },
+  "walk@loop": {
+   "frames": 28,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 10,
+     "max_speed_mm_per_frame": 130.9552
+    },
+    "loin": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 25,
+     "max_speed_mm_per_frame": 102.2634
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 25.2192
+    },
+    "solid": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 4992,
+     "max_speed_mm_per_frame": 221.8374
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 239.9643,
+   "seam_acc_mm_cloth": 55.2156,
+   "acc_max_mm_solid": 239.9648,
+   "acc_max_frame_solid": 14,
+   "acc_max_bone_solid": "foot_L",
+   "acc_median_mm_solid": 77.8826,
+   "acc_max_mm_cloth": 77.5012,
+   "acc_max_frame_cloth": 25,
+   "feet": {
+    "L": {
+     "contact_frames": 16,
+     "anchor_slip_max_mm_per_frame": 0.6,
+     "median_slip_max_mm_per_frame": 0.6001,
+     "anchor_slip_max_mm_per_contact": 0.6035
+    },
+    "R": {
+     "contact_frames": 16,
+     "anchor_slip_max_mm_per_frame": 0.6004,
+     "median_slip_max_mm_per_frame": 0.6005,
+     "anchor_slip_max_mm_per_contact": 0.6032
+    }
+   },
+   "knee_L_max": 107.7434,
+   "knee_R_max": 107.7432,
+   "elbow_L_max": 27.915,
+   "elbow_R_max": 21.3661,
+   "thigh_L_max": 55.7093,
+   "thigh_R_max": 55.7093,
+   "elev_L_range": [
+    -44.0927,
+    -40.526
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -40.2775,
+    -34.3944
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 1.1251,
+   "pelvis_xy_max": 0.0509,
+   "lowest_z_mm": -12.3568,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 153,
+   "legs_through_cape_frame": 1,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 26,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 21,
+   "cannon_cuts_max": 4,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 116
+   },
+   "review_frames": {
+    "lower": 10,
+    "upper": 24
+   },
+   "renders": {
+    "lower": [
+     "renders/walk_f010_shoulders.png",
+     "renders/walk_f010_cannon_elbow.png",
+     "renders/walk_f010_left_elbow.png",
+     "renders/walk_f010_knees.png",
+     "renders/walk_f010_cape.png"
+    ],
+    "upper": [
+     "renders/walk_f024_shoulders.png",
+     "renders/walk_f024_cannon_elbow.png",
+     "renders/walk_f024_left_elbow.png",
+     "renders/walk_f024_knees.png",
+     "renders/walk_f024_cape.png"
+    ]
+   }
+  },
+  "run@loop": {
+   "frames": 20,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 47,
+     "max_speed_mm_per_frame": 168.0586
+    },
+    "loin": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 51,
+     "max_speed_mm_per_frame": 140.2338
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 64.8999
+    },
+    "solid": {
+     "frames_with_reversals": 17,
+     "reversal_vertex_frames": 17659,
+     "max_speed_mm_per_frame": 346.9759
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 278.4049,
+   "seam_acc_mm_cloth": 83.806,
+   "acc_max_mm_solid": 314.5636,
+   "acc_max_frame_solid": 1,
+   "acc_max_bone_solid": "foot_L",
+   "acc_median_mm_solid": 161.3199,
+   "acc_max_mm_cloth": 102.5057,
+   "acc_max_frame_cloth": 4,
+   "feet": {
+    "L": {
+     "contact_frames": 5,
+     "anchor_slip_max_mm_per_frame": 0.0012,
+     "median_slip_max_mm_per_frame": 0.699,
+     "anchor_slip_max_mm_per_contact": 0.0034
+    },
+    "R": {
+     "contact_frames": 5,
+     "anchor_slip_max_mm_per_frame": 0.0015,
+     "median_slip_max_mm_per_frame": 0.698,
+     "anchor_slip_max_mm_per_contact": 0.0044
+    }
+   },
+   "knee_L_max": 131.5029,
+   "knee_R_max": 131.5028,
+   "elbow_L_max": 53.4113,
+   "elbow_R_max": 35.0623,
+   "thigh_L_max": 77.7963,
+   "thigh_R_max": 77.7963,
+   "elev_L_range": [
+    -57.2887,
+    -39.649
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -25.1172,
+    -22.3514
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.0454,
+   "pelvis_xy_max": 0.0363,
+   "lowest_z_mm": -0.0013,
+   "lowest_bone": "foot_R",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 111,
+   "legs_through_loin_frames": 10,
+   "cannon_poke_max": 0,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 18,
+   "cannon_cuts_frame": 1,
+   "cannon_cut_bones": {
+    "upperarm_R": 286
+   },
+   "review_frames": {
+    "lower": 4,
+    "upper": 5
+   },
+   "renders": {
+    "lower": [
+     "renders/run_f004_shoulders.png",
+     "renders/run_f004_cannon_elbow.png",
+     "renders/run_f004_left_elbow.png",
+     "renders/run_f004_knees.png",
+     "renders/run_f004_cape.png"
+    ],
+    "upper": [
+     "renders/run_f005_shoulders.png",
+     "renders/run_f005_cannon_elbow.png",
+     "renders/run_f005_left_elbow.png",
+     "renders/run_f005_knees.png",
+     "renders/run_f005_cape.png"
+    ]
+   }
+  },
+  "strafe_left@loop": {
+   "frames": 18,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 45,
+     "max_speed_mm_per_frame": 194.3301
+    },
+    "loin": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 12,
+     "max_speed_mm_per_frame": 151.0753
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 153,
+     "max_speed_mm_per_frame": 69.4093
+    },
+    "solid": {
+     "frames_with_reversals": 16,
+     "reversal_vertex_frames": 12370,
+     "max_speed_mm_per_frame": 322.766
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 259.4783,
+   "seam_acc_mm_cloth": 94.4464,
+   "acc_max_mm_solid": 528.778,
+   "acc_max_frame_solid": 2,
+   "acc_max_bone_solid": "x_knee_L",
+   "acc_median_mm_solid": 210.9896,
+   "acc_max_mm_cloth": 86.9363,
+   "acc_max_frame_cloth": 10,
+   "feet": {
+    "L": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0022,
+     "median_slip_max_mm_per_frame": 0.6225,
+     "anchor_slip_max_mm_per_contact": 0.005
+    },
+    "R": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0014,
+     "median_slip_max_mm_per_frame": 0.38,
+     "anchor_slip_max_mm_per_contact": 0.0042
+    }
+   },
+   "knee_L_max": 129.1561,
+   "knee_R_max": 130.6197,
+   "elbow_L_max": 49.8562,
+   "elbow_R_max": 34.1286,
+   "thigh_L_max": 84.6787,
+   "thigh_R_max": 81.131,
+   "elev_L_range": [
+    -54.7308,
+    -48.171
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -19.7761,
+    -17.7331
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 1.0202,
+   "pelvis_xy_max": 0.01,
+   "lowest_z_mm": -0.0009,
+   "lowest_bone": "foot_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 86,
+   "legs_through_loin_frames": 14,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 14,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 246
+   },
+   "review_frames": {
+    "lower": 14,
+    "upper": 15
+   },
+   "renders": {
+    "lower": [
+     "renders/strafe_left_f014_shoulders.png",
+     "renders/strafe_left_f014_cannon_elbow.png",
+     "renders/strafe_left_f014_left_elbow.png",
+     "renders/strafe_left_f014_knees.png",
+     "renders/strafe_left_f014_cape.png"
+    ],
+    "upper": [
+     "renders/strafe_left_f015_shoulders.png",
+     "renders/strafe_left_f015_cannon_elbow.png",
+     "renders/strafe_left_f015_left_elbow.png",
+     "renders/strafe_left_f015_knees.png",
+     "renders/strafe_left_f015_cape.png"
+    ]
+   }
+  },
+  "strafe_right@loop": {
+   "frames": 18,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 71,
+     "max_speed_mm_per_frame": 145.8688
+    },
+    "loin": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 42,
+     "max_speed_mm_per_frame": 150.8873
+    },
+    "braids": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 204,
+     "max_speed_mm_per_frame": 86.3645
+    },
+    "solid": {
+     "frames_with_reversals": 16,
+     "reversal_vertex_frames": 12429,
+     "max_speed_mm_per_frame": 322.7645
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 210.99,
+   "seam_acc_mm_cloth": 89.761,
+   "acc_max_mm_solid": 528.7775,
+   "acc_max_frame_solid": 11,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 212.1403,
+   "acc_max_mm_cloth": 82.6164,
+   "acc_max_frame_cloth": 1,
+   "feet": {
+    "L": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0015,
+     "median_slip_max_mm_per_frame": 0.3812,
+     "anchor_slip_max_mm_per_contact": 0.0038
+    },
+    "R": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0011,
+     "median_slip_max_mm_per_frame": 0.6233,
+     "anchor_slip_max_mm_per_contact": 0.003
+    }
+   },
+   "knee_L_max": 130.6197,
+   "knee_R_max": 129.1562,
+   "elbow_L_max": 49.8557,
+   "elbow_R_max": 34.1286,
+   "thigh_L_max": 81.1309,
+   "thigh_R_max": 84.6787,
+   "elev_L_range": [
+    -48.3945,
+    -41.584
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -25.3559,
+    -23.5959
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.0202,
+   "pelvis_xy_max": 0.01,
+   "lowest_z_mm": -0.0009,
+   "lowest_bone": "foot_R",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 71,
+   "legs_through_cape_frame": 9,
+   "legs_through_cape_frames": 19,
+   "legs_through_loin_faces_max": 88,
+   "legs_through_loin_frames": 14,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 14,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 246
+   },
+   "review_frames": {
+    "lower": 5,
+    "upper": 15
+   },
+   "renders": {
+    "lower": [
+     "renders/strafe_right_f005_shoulders.png",
+     "renders/strafe_right_f005_cannon_elbow.png",
+     "renders/strafe_right_f005_left_elbow.png",
+     "renders/strafe_right_f005_knees.png",
+     "renders/strafe_right_f005_cape.png"
+    ],
+    "upper": [
+     "renders/strafe_right_f015_shoulders.png",
+     "renders/strafe_right_f015_cannon_elbow.png",
+     "renders/strafe_right_f015_left_elbow.png",
+     "renders/strafe_right_f015_knees.png",
+     "renders/strafe_right_f015_cape.png"
+    ]
+   }
+  },
+  "backpedal@loop": {
+   "frames": 18,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 10,
+     "reversal_vertex_frames": 209,
+     "max_speed_mm_per_frame": 168.3645
+    },
+    "loin": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 6,
+     "max_speed_mm_per_frame": 68.4048
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 57.4518
+    },
+    "solid": {
+     "frames_with_reversals": 15,
+     "reversal_vertex_frames": 12022,
+     "max_speed_mm_per_frame": 345.1385
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 260.4765,
+   "seam_acc_mm_cloth": 75.9016,
+   "acc_max_mm_solid": 417.7778,
+   "acc_max_frame_solid": 2,
+   "acc_max_bone_solid": "foot_R",
+   "acc_median_mm_solid": 176.3056,
+   "acc_max_mm_cloth": 109.4571,
+   "acc_max_frame_cloth": 16,
+   "feet": {
+    "L": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0014,
+     "median_slip_max_mm_per_frame": 0.7907,
+     "anchor_slip_max_mm_per_contact": 0.0044
+    },
+    "R": {
+     "contact_frames": 4,
+     "anchor_slip_max_mm_per_frame": 0.0009,
+     "median_slip_max_mm_per_frame": 0.7913,
+     "anchor_slip_max_mm_per_contact": 0.0024
+    }
+   },
+   "knee_L_max": 130.2495,
+   "knee_R_max": 130.2493,
+   "elbow_L_max": 49.8574,
+   "elbow_R_max": 34.1286,
+   "thigh_L_max": 80.1008,
+   "thigh_R_max": 80.1008,
+   "elev_L_range": [
+    -52.814,
+    -45.7887
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -24.2852,
+    -22.1272
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 1.03,
+   "pelvis_xy_max": 0.0224,
+   "lowest_z_mm": -0.0015,
+   "lowest_bone": "foot_R",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 47,
+   "legs_through_cape_frame": 1,
+   "legs_through_cape_frames": 7,
+   "legs_through_loin_faces_max": 88,
+   "legs_through_loin_frames": 10,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 14,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 246
+   },
+   "review_frames": {
+    "lower": 8,
+    "upper": 15
+   },
+   "renders": {
+    "lower": [
+     "renders/backpedal_f008_shoulders.png",
+     "renders/backpedal_f008_cannon_elbow.png",
+     "renders/backpedal_f008_left_elbow.png",
+     "renders/backpedal_f008_knees.png",
+     "renders/backpedal_f008_cape.png"
+    ],
+    "upper": [
+     "renders/backpedal_f015_shoulders.png",
+     "renders/backpedal_f015_cannon_elbow.png",
+     "renders/backpedal_f015_left_elbow.png",
+     "renders/backpedal_f015_knees.png",
+     "renders/backpedal_f015_cape.png"
+    ]
+   }
+  },
+  "dash": {
+   "frames": 8,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 214.0762
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 228.687
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 193.124
+    },
+    "solid": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 22,
+     "max_speed_mm_per_frame": 370.9456
+    }
+   },
+   "acc_max_mm_solid": 289.9703,
+   "acc_max_frame_solid": 2,
+   "acc_max_bone_solid": "foot_R",
+   "acc_median_mm_solid": 23.85,
+   "acc_max_mm_cloth": 134.1746,
+   "acc_max_frame_cloth": 2,
+   "feet": {
+    "L": {
+     "contact_frames": 0,
+     "anchor_slip_max_mm_per_frame": 0,
+     "median_slip_max_mm_per_frame": 0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 0,
+     "anchor_slip_max_mm_per_frame": 0,
+     "median_slip_max_mm_per_frame": 0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 75.6151,
+   "knee_R_max": 139.0246,
+   "elbow_L_max": 49.3934,
+   "elbow_R_max": 43.7777,
+   "thigh_L_max": 69.9819,
+   "thigh_R_max": 72.098,
+   "elev_L_range": [
+    -48.1226,
+    -33.322
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -32.5843,
+    -23.4733
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.0078,
+   "pelvis_xy_max": 0.1175,
+   "lowest_z_mm": -11.78,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 92,
+   "legs_through_cape_frame": 8,
+   "legs_through_cape_frames": 4,
+   "legs_through_loin_faces_max": 58,
+   "legs_through_loin_frames": 7,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 47,
+   "cannon_cuts_frame": 2,
+   "cannon_cut_bones": {
+    "upperarm_R": 380
+   },
+   "review_frames": {
+    "lower": 5,
+    "upper": 0
+   },
+   "renders": {
+    "lower": [
+     "renders/dash_f005_shoulders.png",
+     "renders/dash_f005_cannon_elbow.png",
+     "renders/dash_f005_left_elbow.png",
+     "renders/dash_f005_knees.png",
+     "renders/dash_f005_cape.png"
+    ],
+    "upper": [
+     "renders/dash_f000_shoulders.png",
+     "renders/dash_f000_cannon_elbow.png",
+     "renders/dash_f000_left_elbow.png",
+     "renders/dash_f000_knees.png",
+     "renders/dash_f000_cape.png"
+    ]
+   }
+  },
+  "dash_recover": {
+   "frames": 16,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 91,
+     "max_speed_mm_per_frame": 215.8159
+    },
+    "loin": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 77,
+     "max_speed_mm_per_frame": 149.6879
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 148.7019
+    },
+    "solid": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 24,
+     "max_speed_mm_per_frame": 169.2872
+    }
+   },
+   "acc_max_mm_solid": 91.1298,
+   "acc_max_frame_solid": 3,
+   "acc_max_bone_solid": "x_knee_L",
+   "acc_median_mm_solid": 36.0043,
+   "acc_max_mm_cloth": 129.6841,
+   "acc_max_frame_cloth": 1,
+   "feet": {
+    "L": {
+     "contact_frames": 13,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0035
+    },
+    "R": {
+     "contact_frames": 9,
+     "anchor_slip_max_mm_per_frame": 0.0002,
+     "median_slip_max_mm_per_frame": 0.0004,
+     "anchor_slip_max_mm_per_contact": 0.0008
+    }
+   },
+   "knee_L_max": 75.6151,
+   "knee_R_max": 137.8347,
+   "elbow_L_max": 58.1025,
+   "elbow_R_max": 43.9535,
+   "thigh_L_max": 65.2908,
+   "thigh_R_max": 77.1686,
+   "elev_L_range": [
+    -49.7372,
+    -33.3325
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -35.1572,
+    -23.4733
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.0,
+   "pelvis_xy_max": 0.2729,
+   "lowest_z_mm": -14.2935,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 52,
+   "legs_through_loin_frames": 2,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 47,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 396
+   },
+   "review_frames": {
+    "lower": 0,
+    "upper": 3
+   },
+   "renders": {
+    "lower": [
+     "renders/dash_recover_f000_shoulders.png",
+     "renders/dash_recover_f000_cannon_elbow.png",
+     "renders/dash_recover_f000_left_elbow.png",
+     "renders/dash_recover_f000_knees.png",
+     "renders/dash_recover_f000_cape.png"
+    ],
+    "upper": [
+     "renders/dash_recover_f003_shoulders.png",
+     "renders/dash_recover_f003_cannon_elbow.png",
+     "renders/dash_recover_f003_left_elbow.png",
+     "renders/dash_recover_f003_knees.png",
+     "renders/dash_recover_f003_cape.png"
+    ]
+   }
+  },
+  "fire_light": {
+   "frames": 8,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 5,
+     "reversal_vertex_frames": 181,
+     "max_speed_mm_per_frame": 165.6648
+    },
+    "loin": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 6,
+     "max_speed_mm_per_frame": 54.3648
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 69,
+     "max_speed_mm_per_frame": 73.7176
+    },
+    "solid": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 4325,
+     "max_speed_mm_per_frame": 203.4619
+    }
+   },
+   "acc_max_mm_solid": 250.3402,
+   "acc_max_frame_solid": 1,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 7.6846,
+   "acc_max_mm_cloth": 104.7811,
+   "acc_max_frame_cloth": 2,
+   "feet": {
+    "L": {
+     "contact_frames": 8,
+     "anchor_slip_max_mm_per_frame": 0.0003,
+     "median_slip_max_mm_per_frame": 0.0004,
+     "anchor_slip_max_mm_per_contact": 0.0012
+    },
+    "R": {
+     "contact_frames": 8,
+     "anchor_slip_max_mm_per_frame": 0.0001,
+     "median_slip_max_mm_per_frame": 0.0002,
+     "anchor_slip_max_mm_per_contact": 0.0004
+    }
+   },
+   "knee_L_max": 36.089,
+   "knee_R_max": 33.8119,
+   "elbow_L_max": 49.5263,
+   "elbow_R_max": 33.7391,
+   "thigh_L_max": 28.6644,
+   "thigh_R_max": 28.1657,
+   "elev_L_range": [
+    -48.1226,
+    -45.7133
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -23.4733,
+    -13.8974
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.14,
+   "pelvis_xy_max": 0.1178,
+   "lowest_z_mm": -11.8913,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 18,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 16,
+   "cannon_cuts_frame": 6,
+   "cannon_cut_bones": {
+    "upperarm_R": 86
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0002,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "review_frames": {
+    "lower": 5,
+    "upper": 3
+   },
+   "renders": {
+    "lower": [
+     "renders/fire_light_f005_shoulders.png",
+     "renders/fire_light_f005_cannon_elbow.png",
+     "renders/fire_light_f005_left_elbow.png",
+     "renders/fire_light_f005_knees.png",
+     "renders/fire_light_f005_cape.png"
+    ],
+    "upper": [
+     "renders/fire_light_f003_shoulders.png",
+     "renders/fire_light_f003_cannon_elbow.png",
+     "renders/fire_light_f003_left_elbow.png",
+     "renders/fire_light_f003_knees.png",
+     "renders/fire_light_f003_cape.png"
+    ]
+   }
+  },
+  "fire_heavy": {
+   "frames": 18,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 9,
+     "reversal_vertex_frames": 439,
+     "max_speed_mm_per_frame": 237.4259
+    },
+    "loin": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 254,
+     "max_speed_mm_per_frame": 110.1459
+    },
+    "braids": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 2341,
+     "max_speed_mm_per_frame": 286.5031
+    },
+    "solid": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 13501,
+     "max_speed_mm_per_frame": 554.8762
+    }
+   },
+   "acc_max_mm_solid": 626.154,
+   "acc_max_frame_solid": 6,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 9.0153,
+   "acc_max_mm_cloth": 302.0676,
+   "acc_max_frame_cloth": 6,
+   "feet": {
+    "L": {
+     "contact_frames": 18,
+     "anchor_slip_max_mm_per_frame": 0.0008,
+     "median_slip_max_mm_per_frame": 0.001,
+     "anchor_slip_max_mm_per_contact": 0.004
+    },
+    "R": {
+     "contact_frames": 18,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.0033
+    }
+   },
+   "knee_L_max": 45.8161,
+   "knee_R_max": 44.8326,
+   "elbow_L_max": 60.6707,
+   "elbow_R_max": 45.6637,
+   "thigh_L_max": 38.4279,
+   "thigh_R_max": 37.8903,
+   "elev_L_range": [
+    -48.1226,
+    -37.9284
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -28.0979,
+    -3.2092
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.09,
+   "pelvis_xy_max": 0.1995,
+   "lowest_z_mm": -13.8866,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 23,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 7,
+   "cannon_cuts_max": 59,
+   "cannon_cuts_frame": 5,
+   "cannon_cut_bones": {
+    "upperarm_R": 426
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0003,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "review_frames": {
+    "lower": 9,
+    "upper": 5
+   },
+   "renders": {
+    "lower": [
+     "renders/fire_heavy_f009_shoulders.png",
+     "renders/fire_heavy_f009_cannon_elbow.png",
+     "renders/fire_heavy_f009_left_elbow.png",
+     "renders/fire_heavy_f009_knees.png",
+     "renders/fire_heavy_f009_cape.png"
+    ],
+    "upper": [
+     "renders/fire_heavy_f005_shoulders.png",
+     "renders/fire_heavy_f005_cannon_elbow.png",
+     "renders/fire_heavy_f005_left_elbow.png",
+     "renders/fire_heavy_f005_knees.png",
+     "renders/fire_heavy_f005_cape.png"
+    ]
+   }
+  },
+  "fire_charge@loop": {
+   "frames": 24,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 24.2186
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 0.0
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 21.7494
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 6.5952
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 4.0601,
+   "seam_acc_mm_cloth": 7.8624,
+   "acc_max_mm_solid": 4.0601,
+   "acc_max_frame_solid": 12,
+   "acc_max_bone_solid": "ring_03_R",
+   "acc_median_mm_solid": 1.5226,
+   "acc_max_mm_cloth": 17.3695,
+   "acc_max_frame_cloth": 10,
+   "feet": {
+    "L": {
+     "contact_frames": 24,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 24,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 45.8978,
+   "knee_R_max": 44.8371,
+   "elbow_L_max": 57.8766,
+   "elbow_R_max": 43.545,
+   "thigh_L_max": 38.473,
+   "thigh_R_max": 37.9475,
+   "elev_L_range": [
+    -44.3774,
+    -42.8009
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -28.1969,
+    -28.0824
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 1.09,
+   "pelvis_xy_max": 0.1973,
+   "lowest_z_mm": -11.8961,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 25,
+   "legs_through_cape_frame": 19,
+   "legs_through_cape_frames": 8,
+   "legs_through_loin_faces_max": 21,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 64,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 45,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 1083
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.1797,
+    0.1797
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     1.8607,
+     1.8607
+    ],
+    "cloth": [
+     0.5217,
+     0.5217
+    ],
+    "helpers": [
+     0.1886,
+     0.1886
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     221.6625,
+     221.6625
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     169.3718,
+     169.3718
+    ],
+    "solid": [
+     350.8268,
+     350.8268
+    ]
+   },
+   "review_frames": {
+    "lower": 0,
+    "upper": 12
+   },
+   "renders": {
+    "lower": [
+     "renders/fire_charge_f000_shoulders.png",
+     "renders/fire_charge_f000_cannon_elbow.png",
+     "renders/fire_charge_f000_left_elbow.png",
+     "renders/fire_charge_f000_knees.png",
+     "renders/fire_charge_f000_cape.png"
+    ],
+    "upper": [
+     "renders/fire_charge_f012_shoulders.png",
+     "renders/fire_charge_f012_cannon_elbow.png",
+     "renders/fire_charge_f012_left_elbow.png",
+     "renders/fire_charge_f012_knees.png",
+     "renders/fire_charge_f012_cape.png"
+    ]
+   }
+  },
+  "hit_light": {
+   "frames": 12,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 290,
+     "max_speed_mm_per_frame": 233.1798
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 40.8245
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 1366,
+     "max_speed_mm_per_frame": 98.8402
+    },
+    "solid": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 13076,
+     "max_speed_mm_per_frame": 124.3305
+    }
+   },
+   "acc_max_mm_solid": 186.8183,
+   "acc_max_frame_solid": 2,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 11.4431,
+   "acc_max_mm_cloth": 166.3121,
+   "acc_max_frame_cloth": 2,
+   "feet": {
+    "L": {
+     "contact_frames": 12,
+     "anchor_slip_max_mm_per_frame": 0.0003,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0019
+    },
+    "R": {
+     "contact_frames": 12,
+     "anchor_slip_max_mm_per_frame": 0.0004,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0023
+    }
+   },
+   "knee_L_max": 36.1347,
+   "knee_R_max": 33.731,
+   "elbow_L_max": 49.4004,
+   "elbow_R_max": 34.4574,
+   "thigh_L_max": 28.6657,
+   "thigh_R_max": 28.1943,
+   "elev_L_range": [
+    -49.0787,
+    -39.9602
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -27.5246,
+    -14.639
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.14,
+   "pelvis_xy_max": 0.1186,
+   "lowest_z_mm": -11.9849,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 21,
+   "legs_through_cape_frame": 7,
+   "legs_through_cape_frames": 2,
+   "legs_through_loin_faces_max": 20,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 2,
+   "cannon_cuts_max": 16,
+   "cannon_cuts_frame": 4,
+   "cannon_cut_bones": {
+    "upperarm_R": 150
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0003,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "review_frames": {
+    "lower": 6,
+    "upper": 8
+   },
+   "renders": {
+    "lower": [
+     "renders/hit_light_f006_shoulders.png",
+     "renders/hit_light_f006_cannon_elbow.png",
+     "renders/hit_light_f006_left_elbow.png",
+     "renders/hit_light_f006_knees.png",
+     "renders/hit_light_f006_cape.png"
+    ],
+    "upper": [
+     "renders/hit_light_f008_shoulders.png",
+     "renders/hit_light_f008_cannon_elbow.png",
+     "renders/hit_light_f008_left_elbow.png",
+     "renders/hit_light_f008_knees.png",
+     "renders/hit_light_f008_cape.png"
+    ]
+   }
+  },
+  "hit_heavy": {
+   "frames": 30,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 131,
+     "max_speed_mm_per_frame": 195.9132
+    },
+    "loin": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 76,
+     "max_speed_mm_per_frame": 186.5317
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 132.1805
+    },
+    "solid": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 5105,
+     "max_speed_mm_per_frame": 243.2367
+    }
+   },
+   "acc_max_mm_solid": 150.1347,
+   "acc_max_frame_solid": 3,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 30.5154,
+   "acc_max_mm_cloth": 94.4794,
+   "acc_max_frame_cloth": 21,
+   "feet": {
+    "L": {
+     "contact_frames": 14,
+     "anchor_slip_max_mm_per_frame": 20.8153,
+     "median_slip_max_mm_per_frame": 21.0096,
+     "anchor_slip_max_mm_per_contact": 20.8165
+    },
+    "R": {
+     "contact_frames": 30,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.0055
+    }
+   },
+   "knee_L_max": 82.1617,
+   "knee_R_max": 61.5855,
+   "elbow_L_max": 57.919,
+   "elbow_R_max": 44.6545,
+   "thigh_L_max": 63.7319,
+   "thigh_R_max": 54.8388,
+   "elev_L_range": [
+    -49.5519,
+    -25.3935
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -33.2148,
+    -5.7482
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.98,
+   "pelvis_xy_max": 0.381,
+   "lowest_z_mm": -15.9412,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 50,
+   "legs_through_cape_frame": 30,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 65,
+   "legs_through_loin_frames": 4,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 53,
+   "cannon_cuts_frame": 14,
+   "cannon_cut_bones": {
+    "upperarm_R": 675
+   },
+   "review_frames": {
+    "lower": 3,
+    "upper": 14
+   },
+   "renders": {
+    "lower": [
+     "renders/hit_heavy_f003_shoulders.png",
+     "renders/hit_heavy_f003_cannon_elbow.png",
+     "renders/hit_heavy_f003_left_elbow.png",
+     "renders/hit_heavy_f003_knees.png",
+     "renders/hit_heavy_f003_cape.png"
+    ],
+    "upper": [
+     "renders/hit_heavy_f014_shoulders.png",
+     "renders/hit_heavy_f014_cannon_elbow.png",
+     "renders/hit_heavy_f014_left_elbow.png",
+     "renders/hit_heavy_f014_knees.png",
+     "renders/hit_heavy_f014_cape.png"
+    ]
+   }
+  },
+  "knockdown": {
+   "frames": 36,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 88,
+     "max_speed_mm_per_frame": 355.8412
+    },
+    "loin": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 32,
+     "max_speed_mm_per_frame": 225.8679
+    },
+    "braids": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 241,
+     "max_speed_mm_per_frame": 148.0535
+    },
+    "solid": {
+     "frames_with_reversals": 11,
+     "reversal_vertex_frames": 4477,
+     "max_speed_mm_per_frame": 392.2962
+    }
+   },
+   "acc_max_mm_solid": 170.8644,
+   "acc_max_frame_solid": 11,
+   "acc_max_bone_solid": "upperarm_R",
+   "acc_median_mm_solid": 15.3585,
+   "acc_max_mm_cloth": 311.9326,
+   "acc_max_frame_cloth": 14,
+   "feet": {
+    "L": {
+     "contact_frames": 28,
+     "anchor_slip_max_mm_per_frame": 10.0263,
+     "median_slip_max_mm_per_frame": 10.6379,
+     "anchor_slip_max_mm_per_contact": 11.6081
+    },
+    "R": {
+     "contact_frames": 26,
+     "anchor_slip_max_mm_per_frame": 64.0298,
+     "median_slip_max_mm_per_frame": 66.1357,
+     "anchor_slip_max_mm_per_contact": 64.0298
+    }
+   },
+   "knee_L_max": 88.7154,
+   "knee_R_max": 136.7015,
+   "elbow_L_max": 85.8753,
+   "elbow_R_max": 36.6411,
+   "thigh_L_max": 80.3823,
+   "thigh_R_max": 49.7282,
+   "elev_L_range": [
+    -48.1226,
+    -8.065
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -48.7201,
+    -4.9468
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.7598,
+   "pelvis_xy_max": 0.5849,
+   "lowest_z_mm": -31.2189,
+   "lowest_bone": "x_knee_R",
+   "verts_below_minus_20mm_max": 11,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 61,
+   "legs_through_loin_frames": 28,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 37,
+   "cannon_cuts_frame": 7,
+   "cannon_cut_bones": {
+    "upperarm_R": 375
+   },
+   "review_frames": {
+    "lower": 9,
+    "upper": 14
+   },
+   "renders": {
+    "lower": [
+     "renders/knockdown_f009_shoulders.png",
+     "renders/knockdown_f009_cannon_elbow.png",
+     "renders/knockdown_f009_left_elbow.png",
+     "renders/knockdown_f009_knees.png",
+     "renders/knockdown_f009_cape.png"
+    ],
+    "upper": [
+     "renders/knockdown_f014_shoulders.png",
+     "renders/knockdown_f014_cannon_elbow.png",
+     "renders/knockdown_f014_left_elbow.png",
+     "renders/knockdown_f014_knees.png",
+     "renders/knockdown_f014_cape.png"
+    ]
+   }
+  },
+  "get_up": {
+   "frames": 40,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 5,
+     "reversal_vertex_frames": 309,
+     "max_speed_mm_per_frame": 392.1663
+    },
+    "loin": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 88,
+     "max_speed_mm_per_frame": 219.3782
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 171,
+     "max_speed_mm_per_frame": 99.3037
+    },
+    "solid": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 1797,
+     "max_speed_mm_per_frame": 536.1945
+    }
+   },
+   "acc_max_mm_solid": 420.8912,
+   "acc_max_frame_solid": 17,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 25.3856,
+   "acc_max_mm_cloth": 215.4168,
+   "acc_max_frame_cloth": 8,
+   "feet": {
+    "L": {
+     "contact_frames": 31,
+     "anchor_slip_max_mm_per_frame": 1.6191,
+     "median_slip_max_mm_per_frame": 4.8711,
+     "anchor_slip_max_mm_per_contact": 3.2044
+    },
+    "R": {
+     "contact_frames": 28,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.005
+    }
+   },
+   "knee_L_max": 85.7285,
+   "knee_R_max": 149.2942,
+   "elbow_L_max": 80.7589,
+   "elbow_R_max": 34.8302,
+   "thigh_L_max": 76.8254,
+   "thigh_R_max": 70.6077,
+   "elev_L_range": [
+    -53.304,
+    -15.8595
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -50.4494,
+    -23.4732
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.7909,
+   "pelvis_xy_max": 0.5696,
+   "lowest_z_mm": -19.0966,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 40,
+   "legs_through_cape_frame": 33,
+   "legs_through_cape_frames": 9,
+   "legs_through_loin_faces_max": 160,
+   "legs_through_loin_frames": 25,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 16,
+   "cannon_cuts_frame": 20,
+   "cannon_cut_bones": {
+    "upperarm_R": 376
+   },
+   "review_frames": {
+    "lower": 16,
+    "upper": 8
+   },
+   "renders": {
+    "lower": [
+     "renders/get_up_f016_shoulders.png",
+     "renders/get_up_f016_cannon_elbow.png",
+     "renders/get_up_f016_left_elbow.png",
+     "renders/get_up_f016_knees.png",
+     "renders/get_up_f016_cape.png"
+    ],
+    "upper": [
+     "renders/get_up_f008_shoulders.png",
+     "renders/get_up_f008_cannon_elbow.png",
+     "renders/get_up_f008_left_elbow.png",
+     "renders/get_up_f008_knees.png",
+     "renders/get_up_f008_cape.png"
+    ]
+   }
+  },
+  "death": {
+   "frames": 56,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 9,
+     "reversal_vertex_frames": 208,
+     "max_speed_mm_per_frame": 296.5851
+    },
+    "loin": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 56,
+     "max_speed_mm_per_frame": 187.7323
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 110.7067
+    },
+    "solid": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 1663,
+     "max_speed_mm_per_frame": 284.6378
+    }
+   },
+   "acc_max_mm_solid": 123.999,
+   "acc_max_frame_solid": 9,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 6.244,
+   "acc_max_mm_cloth": 157.4028,
+   "acc_max_frame_cloth": 16,
+   "feet": {
+    "L": {
+     "contact_frames": 46,
+     "anchor_slip_max_mm_per_frame": 6.1798,
+     "median_slip_max_mm_per_frame": 9.0768,
+     "anchor_slip_max_mm_per_contact": 7.7682
+    },
+    "R": {
+     "contact_frames": 44,
+     "anchor_slip_max_mm_per_frame": 47.5189,
+     "median_slip_max_mm_per_frame": 50.0718,
+     "anchor_slip_max_mm_per_contact": 47.5195
+    }
+   },
+   "knee_L_max": 90.0778,
+   "knee_R_max": 141.0361,
+   "elbow_L_max": 49.3934,
+   "elbow_R_max": 33.7391,
+   "thigh_L_max": 81.1887,
+   "thigh_R_max": 52.0616,
+   "elev_L_range": [
+    -48.1226,
+    -25.4121
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -52.7042,
+    -7.3432
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.751,
+   "pelvis_xy_max": 0.5737,
+   "lowest_z_mm": -35.3591,
+   "lowest_bone": "x_knee_R",
+   "verts_below_minus_20mm_max": 3,
+   "legs_through_cape_faces_max": 38,
+   "legs_through_cape_frame": 16,
+   "legs_through_cape_frames": 7,
+   "legs_through_loin_faces_max": 62,
+   "legs_through_loin_frames": 45,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 14,
+   "cannon_cuts_frame": 2,
+   "cannon_cut_bones": {
+    "upperarm_R": 365,
+    "x_cape_R2_02": 76,
+    "spine_02": 39,
+    "spine_01": 10
+   },
+   "review_frames": {
+    "lower": 11,
+    "upper": 0
+   },
+   "renders": {
+    "lower": [
+     "renders/death_f011_shoulders.png",
+     "renders/death_f011_cannon_elbow.png",
+     "renders/death_f011_left_elbow.png",
+     "renders/death_f011_knees.png",
+     "renders/death_f011_cape.png"
+    ],
+    "upper": [
+     "renders/death_f000_shoulders.png",
+     "renders/death_f000_cannon_elbow.png",
+     "renders/death_f000_left_elbow.png",
+     "renders/death_f000_knees.png",
+     "renders/death_f000_cape.png"
+    ]
+   }
+  },
+  "downed@loop": {
+   "frames": 60,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 80,
+     "max_speed_mm_per_frame": 160.2276
+    },
+    "loin": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 54,
+     "max_speed_mm_per_frame": 175.1087
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 6.8162
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 10.906
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 2.235,
+   "seam_acc_mm_cloth": 63.7836,
+   "acc_max_mm_solid": 2.3458,
+   "acc_max_frame_solid": 45,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 1.2614,
+   "acc_max_mm_cloth": 95.0323,
+   "acc_max_frame_cloth": 45,
+   "feet": {
+    "L": {
+     "contact_frames": 0,
+     "anchor_slip_max_mm_per_frame": 0,
+     "median_slip_max_mm_per_frame": 0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 0,
+     "anchor_slip_max_mm_per_frame": 0,
+     "median_slip_max_mm_per_frame": 0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 146.1401,
+   "knee_R_max": 142.8578,
+   "elbow_L_max": 31.7244,
+   "elbow_R_max": 26.7827,
+   "thigh_L_max": 54.349,
+   "thigh_R_max": 55.2554,
+   "elev_L_range": [
+    -26.0079,
+    -17.8757
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -21.1276,
+    -13.4301
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.93,
+   "pelvis_xy_max": 0.01,
+   "lowest_z_mm": 14.583,
+   "lowest_bone": "x_loin_R_03",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 48,
+   "legs_through_cape_frame": 27,
+   "legs_through_cape_frames": 47,
+   "legs_through_loin_faces_max": 56,
+   "legs_through_loin_frames": 28,
+   "cannon_poke_max": 6,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 4,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 244
+   },
+   "review_frames": {
+    "lower": 0,
+    "upper": 45
+   },
+   "renders": {
+    "lower": [
+     "renders/downed_f000_shoulders.png",
+     "renders/downed_f000_cannon_elbow.png",
+     "renders/downed_f000_left_elbow.png",
+     "renders/downed_f000_knees.png",
+     "renders/downed_f000_cape.png"
+    ],
+    "upper": [
+     "renders/downed_f045_shoulders.png",
+     "renders/downed_f045_cannon_elbow.png",
+     "renders/downed_f045_left_elbow.png",
+     "renders/downed_f045_knees.png",
+     "renders/downed_f045_cape.png"
+    ]
+   }
+  },
+  "revive": {
+   "frames": 40,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 268,
+     "max_speed_mm_per_frame": 284.5055
+    },
+    "loin": {
+     "frames_with_reversals": 5,
+     "reversal_vertex_frames": 121,
+     "max_speed_mm_per_frame": 218.933
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 225,
+     "max_speed_mm_per_frame": 236.0107
+    },
+    "solid": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 5293,
+     "max_speed_mm_per_frame": 325.5113
+    }
+   },
+   "acc_max_mm_solid": 208.4863,
+   "acc_max_frame_solid": 4,
+   "acc_max_bone_solid": "upperarm_R",
+   "acc_median_mm_solid": 8.793,
+   "acc_max_mm_cloth": 182.2177,
+   "acc_max_frame_cloth": 6,
+   "feet": {
+    "L": {
+     "contact_frames": 29,
+     "anchor_slip_max_mm_per_frame": 16.2137,
+     "median_slip_max_mm_per_frame": 17.528,
+     "anchor_slip_max_mm_per_contact": 16.2181
+    },
+    "R": {
+     "contact_frames": 29,
+     "anchor_slip_max_mm_per_frame": 15.7773,
+     "median_slip_max_mm_per_frame": 16.0537,
+     "anchor_slip_max_mm_per_contact": 15.781
+    }
+   },
+   "knee_L_max": 147.5352,
+   "knee_R_max": 142.5035,
+   "elbow_L_max": 49.3947,
+   "elbow_R_max": 34.7877,
+   "thigh_L_max": 92.9686,
+   "thigh_R_max": 85.0885,
+   "elev_L_range": [
+    -51.5599,
+    -16.5715
+   ],
+   "wrist_L_bend_max": 0.0003,
+   "elev_R_range": [
+    -41.0705,
+    -16.8643
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.92,
+   "pelvis_xy_max": 0.3413,
+   "lowest_z_mm": -17.377,
+   "lowest_bone": "shin_R",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 19,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 4,
+   "legs_through_loin_faces_max": 86,
+   "legs_through_loin_frames": 10,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 3,
+   "cannon_cuts_max": 19,
+   "cannon_cuts_frame": 12,
+   "cannon_cut_bones": {
+    "upperarm_R": 418,
+    "x_knee_R": 11,
+    "x_cape_R1_04": 1
+   },
+   "review_frames": {
+    "lower": 2,
+    "upper": 25
+   },
+   "renders": {
+    "lower": [
+     "renders/revive_f002_shoulders.png",
+     "renders/revive_f002_cannon_elbow.png",
+     "renders/revive_f002_left_elbow.png",
+     "renders/revive_f002_knees.png",
+     "renders/revive_f002_cape.png"
+    ],
+    "upper": [
+     "renders/revive_f025_shoulders.png",
+     "renders/revive_f025_cannon_elbow.png",
+     "renders/revive_f025_left_elbow.png",
+     "renders/revive_f025_knees.png",
+     "renders/revive_f025_cape.png"
+    ]
+   }
+  },
+  "reforge_in": {
+   "frames": 46,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 12,
+     "reversal_vertex_frames": 372,
+     "max_speed_mm_per_frame": 513.5663
+    },
+    "loin": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 158,
+     "max_speed_mm_per_frame": 247.7137
+    },
+    "braids": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 48,
+     "max_speed_mm_per_frame": 126.4819
+    },
+    "solid": {
+     "frames_with_reversals": 14,
+     "reversal_vertex_frames": 5038,
+     "max_speed_mm_per_frame": 527.4869
+    }
+   },
+   "acc_max_mm_solid": 405.1931,
+   "acc_max_frame_solid": 17,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 58.5429,
+   "acc_max_mm_cloth": 218.232,
+   "acc_max_frame_cloth": 12,
+   "feet": {
+    "L": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.3811,
+     "median_slip_max_mm_per_frame": 4.0615,
+     "anchor_slip_max_mm_per_contact": 1.5848
+    },
+    "R": {
+     "contact_frames": 35,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.004
+    }
+   },
+   "knee_L_max": 85.7286,
+   "knee_R_max": 149.1967,
+   "elbow_L_max": 91.5921,
+   "elbow_R_max": 36.4782,
+   "thigh_L_max": 76.8254,
+   "thigh_R_max": 70.026,
+   "elev_L_range": [
+    -53.532,
+    31.2004
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -51.0468,
+    21.109
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 0.7909,
+   "pelvis_xy_max": 0.5686,
+   "lowest_z_mm": -18.7745,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 40,
+   "legs_through_cape_frame": 1,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 102,
+   "legs_through_loin_frames": 21,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 35,
+   "cannon_cuts_frame": 22,
+   "cannon_cut_bones": {
+    "upperarm_R": 456,
+    "x_pauldron_R": 34
+   },
+   "review_frames": {
+    "lower": 16,
+    "upper": 28
+   },
+   "renders": {
+    "lower": [
+     "renders/reforge_in_f016_shoulders.png",
+     "renders/reforge_in_f016_cannon_elbow.png",
+     "renders/reforge_in_f016_left_elbow.png",
+     "renders/reforge_in_f016_knees.png",
+     "renders/reforge_in_f016_cape.png"
+    ],
+    "upper": [
+     "renders/reforge_in_f028_shoulders.png",
+     "renders/reforge_in_f028_cannon_elbow.png",
+     "renders/reforge_in_f028_left_elbow.png",
+     "renders/reforge_in_f028_knees.png",
+     "renders/reforge_in_f028_cape.png"
+    ]
+   }
+  },
+  "victory": {
+   "frames": 60,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 110,
+     "max_speed_mm_per_frame": 130.4833
+    },
+    "loin": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 101,
+     "max_speed_mm_per_frame": 148.3512
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 93.321
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 210.8484
+    }
+   },
+   "acc_max_mm_solid": 83.9322,
+   "acc_max_frame_solid": 11,
+   "acc_max_bone_solid": "thumb_02_L",
+   "acc_median_mm_solid": 0.6378,
+   "acc_max_mm_cloth": 91.3976,
+   "acc_max_frame_cloth": 4,
+   "feet": {
+    "L": {
+     "contact_frames": 60,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0101
+    },
+    "R": {
+     "contact_frames": 60,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0113
+    }
+   },
+   "knee_L_max": 56.6262,
+   "knee_R_max": 56.5677,
+   "elbow_L_max": 58.2113,
+   "elbow_R_max": 44.3583,
+   "thigh_L_max": 49.3528,
+   "thigh_R_max": 48.8183,
+   "elev_L_range": [
+    -48.7835,
+    14.0377
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -35.3825,
+    13.8416
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.02,
+   "pelvis_xy_max": 0.2729,
+   "lowest_z_mm": -18.8931,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 59,
+   "legs_through_cape_frame": 13,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 22,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 6,
+   "cannon_cuts_max": 74,
+   "cannon_cuts_frame": 19,
+   "cannon_cut_bones": {
+    "x_pauldron_R": 1419,
+    "upperarm_R": 663
+   },
+   "review_frames": {
+    "lower": 10,
+    "upper": 11
+   },
+   "renders": {
+    "lower": [
+     "renders/victory_f010_shoulders.png",
+     "renders/victory_f010_cannon_elbow.png",
+     "renders/victory_f010_left_elbow.png",
+     "renders/victory_f010_knees.png",
+     "renders/victory_f010_cape.png"
+    ],
+    "upper": [
+     "renders/victory_f011_shoulders.png",
+     "renders/victory_f011_cannon_elbow.png",
+     "renders/victory_f011_left_elbow.png",
+     "renders/victory_f011_knees.png",
+     "renders/victory_f011_cape.png"
+    ]
+   }
+  },
+  "ping": {
+   "frames": 20,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 163,
+     "max_speed_mm_per_frame": 220.6649
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 0.0003
+    },
+    "braids": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 3,
+     "max_speed_mm_per_frame": 120.6355
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 231.5609
+    }
+   },
+   "acc_max_mm_solid": 169.9252,
+   "acc_max_frame_solid": 16,
+   "acc_max_bone_solid": "middle_03_L",
+   "acc_median_mm_solid": 31.5428,
+   "acc_max_mm_cloth": 132.904,
+   "acc_max_frame_cloth": 2,
+   "feet": {
+    "L": {
+     "contact_frames": 20,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 20,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 36.0796,
+   "knee_R_max": 33.731,
+   "elbow_L_max": 49.3934,
+   "elbow_R_max": 47.7275,
+   "thigh_L_max": 28.6591,
+   "thigh_R_max": 28.1641,
+   "elev_L_range": [
+    -48.1226,
+    5.9408
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -27.5362,
+    -23.3098
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.14,
+   "pelvis_xy_max": 0.1175,
+   "lowest_z_mm": -11.78,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 17,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 3,
+   "cannon_cuts_max": 60,
+   "cannon_cuts_frame": 5,
+   "cannon_cut_bones": {
+    "upperarm_R": 870
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0003,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "review_frames": {
+    "lower": 0,
+    "upper": 16
+   },
+   "renders": {
+    "lower": [
+     "renders/ping_f000_shoulders.png",
+     "renders/ping_f000_cannon_elbow.png",
+     "renders/ping_f000_left_elbow.png",
+     "renders/ping_f000_knees.png",
+     "renders/ping_f000_cape.png"
+    ],
+    "upper": [
+     "renders/ping_f016_shoulders.png",
+     "renders/ping_f016_cannon_elbow.png",
+     "renders/ping_f016_left_elbow.png",
+     "renders/ping_f016_knees.png",
+     "renders/ping_f016_cape.png"
+    ]
+   }
+  },
+  "interact": {
+   "frames": 40,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 11,
+     "reversal_vertex_frames": 428,
+     "max_speed_mm_per_frame": 269.604
+    },
+    "loin": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 126,
+     "max_speed_mm_per_frame": 220.4926
+    },
+    "braids": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 130,
+     "max_speed_mm_per_frame": 195.9458
+    },
+    "solid": {
+     "frames_with_reversals": 9,
+     "reversal_vertex_frames": 7769,
+     "max_speed_mm_per_frame": 321.01
+    }
+   },
+   "acc_max_mm_solid": 205.7171,
+   "acc_max_frame_solid": 7,
+   "acc_max_bone_solid": "upperarm_L",
+   "acc_median_mm_solid": 32.1641,
+   "acc_max_mm_cloth": 184.9107,
+   "acc_max_frame_cloth": 33,
+   "feet": {
+    "L": {
+     "contact_frames": 25,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0012,
+     "anchor_slip_max_mm_per_contact": 0.0026
+    },
+    "R": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0054
+    }
+   },
+   "knee_L_max": 78.3316,
+   "knee_R_max": 48.8378,
+   "elbow_L_max": 86.2814,
+   "elbow_R_max": 33.5285,
+   "thigh_L_max": 63.9451,
+   "thigh_R_max": 47.6303,
+   "elev_L_range": [
+    -43.1414,
+    -17.4872
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -40.8725,
+    -22.8615
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.03,
+   "pelvis_xy_max": 0.2275,
+   "lowest_z_mm": -32.8894,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 15,
+   "legs_through_cape_faces_max": 50,
+   "legs_through_cape_frame": 10,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 114,
+   "legs_through_loin_frames": 20,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 28,
+   "cannon_cuts_max": 12,
+   "cannon_cuts_frame": 28,
+   "cannon_cut_bones": {
+    "upperarm_R": 208
+   },
+   "review_frames": {
+    "lower": 4,
+    "upper": 11
+   },
+   "renders": {
+    "lower": [
+     "renders/interact_f004_shoulders.png",
+     "renders/interact_f004_cannon_elbow.png",
+     "renders/interact_f004_left_elbow.png",
+     "renders/interact_f004_knees.png",
+     "renders/interact_f004_cape.png"
+    ],
+    "upper": [
+     "renders/interact_f011_shoulders.png",
+     "renders/interact_f011_cannon_elbow.png",
+     "renders/interact_f011_left_elbow.png",
+     "renders/interact_f011_knees.png",
+     "renders/interact_f011_cape.png"
+    ]
+   }
+  },
+  "forge_hammer@loop": {
+   "frames": 36,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 6,
+     "max_speed_mm_per_frame": 480.0328
+    },
+    "loin": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 60,
+     "max_speed_mm_per_frame": 262.4335
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 70.2559
+    },
+    "solid": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 2772,
+     "max_speed_mm_per_frame": 418.0034
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 62.8119,
+   "seam_acc_mm_cloth": 26.3618,
+   "acc_max_mm_solid": 473.4067,
+   "acc_max_frame_solid": 3,
+   "acc_max_bone_solid": "upperarm_L",
+   "acc_median_mm_solid": 25.2839,
+   "acc_max_mm_cloth": 206.94,
+   "acc_max_frame_cloth": 10,
+   "feet": {
+    "L": {
+     "contact_frames": 36,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0074
+    },
+    "R": {
+     "contact_frames": 36,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0009,
+     "anchor_slip_max_mm_per_contact": 0.0087
+    }
+   },
+   "knee_L_max": 59.0449,
+   "knee_R_max": 52.8523,
+   "elbow_L_max": 101.0083,
+   "elbow_R_max": 15.279,
+   "thigh_L_max": 50.7134,
+   "thigh_R_max": 50.2025,
+   "elev_L_range": [
+    -41.2627,
+    1.4866
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -37.3236,
+    -35.9191
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.01,
+   "pelvis_xy_max": 0.2331,
+   "lowest_z_mm": -20.1996,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 3,
+   "legs_through_cape_faces_max": 41,
+   "legs_through_cape_frame": 11,
+   "legs_through_cape_frames": 20,
+   "legs_through_loin_faces_max": 104,
+   "legs_through_loin_frames": 8,
+   "cannon_poke_max": 6,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 4,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 148
+   },
+   "review_frames": {
+    "lower": 9,
+    "upper": 12
+   },
+   "renders": {
+    "lower": [
+     "renders/forge_hammer_f009_shoulders.png",
+     "renders/forge_hammer_f009_cannon_elbow.png",
+     "renders/forge_hammer_f009_left_elbow.png",
+     "renders/forge_hammer_f009_knees.png",
+     "renders/forge_hammer_f009_cape.png"
+    ],
+    "upper": [
+     "renders/forge_hammer_f012_shoulders.png",
+     "renders/forge_hammer_f012_cannon_elbow.png",
+     "renders/forge_hammer_f012_left_elbow.png",
+     "renders/forge_hammer_f012_knees.png",
+     "renders/forge_hammer_f012_cape.png"
+    ]
+   }
+  },
+  "idle_signature@loop": {
+   "frames": 150,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 92,
+     "max_speed_mm_per_frame": 183.196
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 40.0671
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 30.0183
+    },
+    "solid": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 3,
+     "max_speed_mm_per_frame": 73.2279
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 1.282,
+   "seam_acc_mm_cloth": 57.2024,
+   "acc_max_mm_solid": 66.5897,
+   "acc_max_frame_solid": 106,
+   "acc_max_bone_solid": "middle_03_L",
+   "acc_median_mm_solid": 4.4241,
+   "acc_max_mm_cloth": 104.3669,
+   "acc_max_frame_cloth": 24,
+   "feet": {
+    "L": {
+     "contact_frames": 150,
+     "anchor_slip_max_mm_per_frame": 0.0086,
+     "median_slip_max_mm_per_frame": 0.0087,
+     "anchor_slip_max_mm_per_contact": 0.043
+    },
+    "R": {
+     "contact_frames": 150,
+     "anchor_slip_max_mm_per_frame": 0.004,
+     "median_slip_max_mm_per_frame": 0.0041,
+     "anchor_slip_max_mm_per_contact": 0.0297
+    }
+   },
+   "knee_L_max": 32.6016,
+   "knee_R_max": 31.439,
+   "elbow_L_max": 25.6957,
+   "elbow_R_max": 34.7967,
+   "thigh_L_max": 26.2612,
+   "thigh_R_max": 25.8475,
+   "elev_L_range": [
+    -43.0673,
+    -40.8977
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -41.6367,
+    -22.6906
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.149,
+   "pelvis_xy_max": 0.1066,
+   "lowest_z_mm": -9.2125,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 36,
+   "legs_through_cape_frame": 32,
+   "legs_through_cape_frames": 5,
+   "legs_through_loin_faces_max": 53,
+   "legs_through_loin_frames": 151,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 41,
+   "cannon_cuts_max": 16,
+   "cannon_cuts_frame": 73,
+   "cannon_cut_bones": {
+    "upperarm_R": 884
+   },
+   "review_frames": {
+    "lower": 18,
+    "upper": 55
+   },
+   "renders": {
+    "lower": [
+     "renders/idle_signature_f018_shoulders.png",
+     "renders/idle_signature_f018_cannon_elbow.png",
+     "renders/idle_signature_f018_left_elbow.png",
+     "renders/idle_signature_f018_knees.png",
+     "renders/idle_signature_f018_cape.png"
+    ],
+    "upper": [
+     "renders/idle_signature_f055_shoulders.png",
+     "renders/idle_signature_f055_cannon_elbow.png",
+     "renders/idle_signature_f055_left_elbow.png",
+     "renders/idle_signature_f055_knees.png",
+     "renders/idle_signature_f055_cape.png"
+    ]
+   }
+  },
+  "bulwark_slam": {
+   "frames": 50,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 13,
+     "reversal_vertex_frames": 741,
+     "max_speed_mm_per_frame": 288.7236
+    },
+    "loin": {
+     "frames_with_reversals": 12,
+     "reversal_vertex_frames": 341,
+     "max_speed_mm_per_frame": 286.553
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 1665,
+     "max_speed_mm_per_frame": 361.8278
+    },
+    "solid": {
+     "frames_with_reversals": 12,
+     "reversal_vertex_frames": 18692,
+     "max_speed_mm_per_frame": 654.7862
+    }
+   },
+   "acc_max_mm_solid": 463.3373,
+   "acc_max_frame_solid": 21,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 40.6569,
+   "acc_max_mm_cloth": 301.8478,
+   "acc_max_frame_cloth": 21,
+   "feet": {
+    "L": {
+     "contact_frames": 37,
+     "anchor_slip_max_mm_per_frame": 11.5001,
+     "median_slip_max_mm_per_frame": 27.7758,
+     "anchor_slip_max_mm_per_contact": 23.0154
+    },
+    "R": {
+     "contact_frames": 37,
+     "anchor_slip_max_mm_per_frame": 15.7547,
+     "median_slip_max_mm_per_frame": 31.7254,
+     "anchor_slip_max_mm_per_contact": 31.5119
+    }
+   },
+   "knee_L_max": 114.5445,
+   "knee_R_max": 121.1671,
+   "elbow_L_max": 49.3988,
+   "elbow_R_max": 40.5374,
+   "thigh_L_max": 78.9685,
+   "thigh_R_max": 79.4747,
+   "elev_L_range": [
+    -49.328,
+    3.8458
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -45.6132,
+    6.2779
+   ],
+   "wrist_R_bend_max": 0.0003,
+   "pelvis_z_min": 0.7907,
+   "pelvis_xy_max": 0.4051,
+   "lowest_z_mm": -40.3084,
+   "lowest_bone": "foot_R",
+   "verts_below_minus_20mm_max": 18,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 259,
+   "legs_through_loin_frames": 23,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 2,
+   "cannon_cuts_max": 39,
+   "cannon_cuts_frame": 13,
+   "cannon_cut_bones": {
+    "upperarm_R": 576,
+    "x_cape_R2_04": 30,
+    "spine_03": 23,
+    "x_cape_R2_05": 14,
+    "x_cape_R2_03": 8
+   },
+   "review_frames": {
+    "lower": 15,
+    "upper": 44
+   },
+   "renders": {
+    "lower": [
+     "renders/bulwark_slam_f015_shoulders.png",
+     "renders/bulwark_slam_f015_cannon_elbow.png",
+     "renders/bulwark_slam_f015_left_elbow.png",
+     "renders/bulwark_slam_f015_knees.png",
+     "renders/bulwark_slam_f015_cape.png"
+    ],
+    "upper": [
+     "renders/bulwark_slam_f044_shoulders.png",
+     "renders/bulwark_slam_f044_cannon_elbow.png",
+     "renders/bulwark_slam_f044_left_elbow.png",
+     "renders/bulwark_slam_f044_knees.png",
+     "renders/bulwark_slam_f044_cape.png"
+    ]
+   }
+  },
+  "siege_stance_enter": {
+   "frames": 26,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 313,
+     "max_speed_mm_per_frame": 191.5514
+    },
+    "loin": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 103,
+     "max_speed_mm_per_frame": 318.6963
+    },
+    "braids": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 830,
+     "max_speed_mm_per_frame": 154.0312
+    },
+    "solid": {
+     "frames_with_reversals": 5,
+     "reversal_vertex_frames": 24065,
+     "max_speed_mm_per_frame": 191.2076
+    }
+   },
+   "acc_max_mm_solid": 178.2695,
+   "acc_max_frame_solid": 12,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 65.6331,
+   "acc_max_mm_cloth": 149.2105,
+   "acc_max_frame_cloth": 5,
+   "feet": {
+    "L": {
+     "contact_frames": 19,
+     "anchor_slip_max_mm_per_frame": 13.581,
+     "median_slip_max_mm_per_frame": 13.6466,
+     "anchor_slip_max_mm_per_contact": 27.6749
+    },
+    "R": {
+     "contact_frames": 19,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0008,
+     "anchor_slip_max_mm_per_contact": 0.0036
+    }
+   },
+   "knee_L_max": 84.1722,
+   "knee_R_max": 113.052,
+   "elbow_L_max": 57.7868,
+   "elbow_R_max": 46.1924,
+   "thigh_L_max": 69.3266,
+   "thigh_R_max": 86.9012,
+   "elev_L_range": [
+    -49.8013,
+    -35.9354
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -28.6712,
+    -23.4733
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.9295,
+   "pelvis_xy_max": 0.286,
+   "lowest_z_mm": -15.749,
+   "lowest_bone": "shin_R",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 59,
+   "legs_through_cape_frame": 18,
+   "legs_through_cape_frames": 8,
+   "legs_through_loin_faces_max": 89,
+   "legs_through_loin_frames": 12,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 8,
+   "cannon_cuts_max": 58,
+   "cannon_cuts_frame": 8,
+   "cannon_cut_bones": {
+    "upperarm_R": 889
+   },
+   "review_frames": {
+    "lower": 12,
+    "upper": 8
+   },
+   "renders": {
+    "lower": [
+     "renders/siege_stance_enter_f012_shoulders.png",
+     "renders/siege_stance_enter_f012_cannon_elbow.png",
+     "renders/siege_stance_enter_f012_left_elbow.png",
+     "renders/siege_stance_enter_f012_knees.png",
+     "renders/siege_stance_enter_f012_cape.png"
+    ],
+    "upper": [
+     "renders/siege_stance_enter_f008_shoulders.png",
+     "renders/siege_stance_enter_f008_cannon_elbow.png",
+     "renders/siege_stance_enter_f008_left_elbow.png",
+     "renders/siege_stance_enter_f008_knees.png",
+     "renders/siege_stance_enter_f008_cape.png"
+    ]
+   }
+  },
+  "siege_stance@loop": {
+   "frames": 40,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 3,
+     "max_speed_mm_per_frame": 73.6645
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 36.6416
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 18.7374
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 9.255
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 3.3848,
+   "seam_acc_mm_cloth": 7.4571,
+   "acc_max_mm_solid": 3.489,
+   "acc_max_frame_solid": 30,
+   "acc_max_bone_solid": "x_pauldron_R",
+   "acc_median_mm_solid": 1.4999,
+   "acc_max_mm_cloth": 41.3598,
+   "acc_max_frame_cloth": 12,
+   "feet": {
+    "L": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0007,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.011
+    },
+    "R": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0006,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0112
+    }
+   },
+   "knee_L_max": 82.3664,
+   "knee_R_max": 79.5582,
+   "elbow_L_max": 27.6593,
+   "elbow_R_max": 41.2074,
+   "thigh_L_max": 66.4479,
+   "thigh_R_max": 66.0908,
+   "elev_L_range": [
+    -39.2697,
+    -35.9354
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -28.6012,
+    -28.0329
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.945,
+   "pelvis_xy_max": 0.1343,
+   "lowest_z_mm": -12.8935,
+   "lowest_bone": "x_cape_R2_05",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 51,
+   "legs_through_cape_frame": 12,
+   "legs_through_cape_frames": 6,
+   "legs_through_loin_faces_max": 32,
+   "legs_through_loin_frames": 14,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 40,
+   "cannon_cuts_frame": 4,
+   "cannon_cut_bones": {
+    "upperarm_R": 1613
+   },
+   "review_frames": {
+    "lower": 30,
+    "upper": 0
+   },
+   "renders": {
+    "lower": [
+     "renders/siege_stance_f030_shoulders.png",
+     "renders/siege_stance_f030_cannon_elbow.png",
+     "renders/siege_stance_f030_left_elbow.png",
+     "renders/siege_stance_f030_knees.png",
+     "renders/siege_stance_f030_cape.png"
+    ],
+    "upper": [
+     "renders/siege_stance_f000_shoulders.png",
+     "renders/siege_stance_f000_cannon_elbow.png",
+     "renders/siege_stance_f000_left_elbow.png",
+     "renders/siege_stance_f000_knees.png",
+     "renders/siege_stance_f000_cape.png"
+    ]
+   }
+  },
+  "siege_stance_exit": {
+   "frames": 20,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 636,
+     "max_speed_mm_per_frame": 173.4895
+    },
+    "loin": {
+     "frames_with_reversals": 9,
+     "reversal_vertex_frames": 231,
+     "max_speed_mm_per_frame": 194.6336
+    },
+    "braids": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 2118,
+     "max_speed_mm_per_frame": 138.7564
+    },
+    "solid": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 28780,
+     "max_speed_mm_per_frame": 232.8044
+    }
+   },
+   "acc_max_mm_solid": 196.3188,
+   "acc_max_frame_solid": 11,
+   "acc_max_bone_solid": "x_knee_R",
+   "acc_median_mm_solid": 70.0477,
+   "acc_max_mm_cloth": 129.4861,
+   "acc_max_frame_cloth": 13,
+   "feet": {
+    "L": {
+     "contact_frames": 14,
+     "anchor_slip_max_mm_per_frame": 9.6326,
+     "median_slip_max_mm_per_frame": 9.9314,
+     "anchor_slip_max_mm_per_contact": 25.5053
+    },
+    "R": {
+     "contact_frames": 13,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.001
+    }
+   },
+   "knee_L_max": 79.3313,
+   "knee_R_max": 106.7691,
+   "elbow_L_max": 54.8482,
+   "elbow_R_max": 41.2074,
+   "thigh_L_max": 63.4766,
+   "thigh_R_max": 78.9859,
+   "elev_L_range": [
+    -49.3281,
+    -39.2697
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -28.6012,
+    -23.4733
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.97,
+   "pelvis_xy_max": 0.2256,
+   "lowest_z_mm": -14.9086,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 80,
+   "legs_through_cape_frame": 12,
+   "legs_through_cape_frames": 3,
+   "legs_through_loin_faces_max": 33,
+   "legs_through_loin_frames": 1,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 40,
+   "cannon_cuts_frame": 5,
+   "cannon_cut_bones": {
+    "upperarm_R": 447
+   },
+   "review_frames": {
+    "lower": 8,
+    "upper": 4
+   },
+   "renders": {
+    "lower": [
+     "renders/siege_stance_exit_f008_shoulders.png",
+     "renders/siege_stance_exit_f008_cannon_elbow.png",
+     "renders/siege_stance_exit_f008_left_elbow.png",
+     "renders/siege_stance_exit_f008_knees.png",
+     "renders/siege_stance_exit_f008_cape.png"
+    ],
+    "upper": [
+     "renders/siege_stance_exit_f004_shoulders.png",
+     "renders/siege_stance_exit_f004_cannon_elbow.png",
+     "renders/siege_stance_exit_f004_left_elbow.png",
+     "renders/siege_stance_exit_f004_knees.png",
+     "renders/siege_stance_exit_f004_cape.png"
+    ]
+   }
+  },
+  "siege_fire": {
+   "frames": 5,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 380,
+     "max_speed_mm_per_frame": 190.7455
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 0.0001
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 527,
+     "max_speed_mm_per_frame": 85.055
+    },
+    "solid": {
+     "frames_with_reversals": 1,
+     "reversal_vertex_frames": 4005,
+     "max_speed_mm_per_frame": 188.0984
+    }
+   },
+   "acc_max_mm_solid": 232.2731,
+   "acc_max_frame_solid": 1,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 28.3987,
+   "acc_max_mm_cloth": 271.3435,
+   "acc_max_frame_cloth": 3,
+   "feet": {
+    "L": {
+     "contact_frames": 5,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 5,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 79.3313,
+   "knee_R_max": 76.389,
+   "elbow_L_max": 25.2269,
+   "elbow_R_max": 41.2074,
+   "thigh_L_max": 63.4766,
+   "thigh_R_max": 63.1362,
+   "elev_L_range": [
+    -39.6349,
+    -39.2697
+   ],
+   "wrist_L_bend_max": 0.0001,
+   "elev_R_range": [
+    -28.6012,
+    -20.5334
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.97,
+   "pelvis_xy_max": 0.1212,
+   "lowest_z_mm": -2.2997,
+   "lowest_bone": "x_cape_R2_05",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 11,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 0,
+   "cannon_cuts_max": 39,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 161
+   },
+   "upper_reference": "siege_stance",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0002,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_vs_idle_combat_m": [
+    0.382,
+    0.382
+   ],
+   "review_frames": {
+    "lower": 0,
+    "upper": 1
+   },
+   "renders": {
+    "lower": [
+     "renders/siege_fire_f000_shoulders.png",
+     "renders/siege_fire_f000_cannon_elbow.png",
+     "renders/siege_fire_f000_left_elbow.png",
+     "renders/siege_fire_f000_knees.png",
+     "renders/siege_fire_f000_cape.png"
+    ],
+    "upper": [
+     "renders/siege_fire_f001_shoulders.png",
+     "renders/siege_fire_f001_cannon_elbow.png",
+     "renders/siege_fire_f001_left_elbow.png",
+     "renders/siege_fire_f001_knees.png",
+     "renders/siege_fire_f001_cape.png"
+    ]
+   }
+  },
+  "mountainfall_start": {
+   "frames": 46,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 8,
+     "reversal_vertex_frames": 217,
+     "max_speed_mm_per_frame": 217.853
+    },
+    "loin": {
+     "frames_with_reversals": 6,
+     "reversal_vertex_frames": 197,
+     "max_speed_mm_per_frame": 272.5268
+    },
+    "braids": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 144,
+     "max_speed_mm_per_frame": 174.8105
+    },
+    "solid": {
+     "frames_with_reversals": 7,
+     "reversal_vertex_frames": 11165,
+     "max_speed_mm_per_frame": 407.0931
+    }
+   },
+   "acc_max_mm_solid": 224.46,
+   "acc_max_frame_solid": 30,
+   "acc_max_bone_solid": "thumb_02_R",
+   "acc_median_mm_solid": 31.4045,
+   "acc_max_mm_cloth": 180.4328,
+   "acc_max_frame_cloth": 15,
+   "feet": {
+    "L": {
+     "contact_frames": 38,
+     "anchor_slip_max_mm_per_frame": 0.1171,
+     "median_slip_max_mm_per_frame": 0.912,
+     "anchor_slip_max_mm_per_contact": 0.7714
+    },
+    "R": {
+     "contact_frames": 38,
+     "anchor_slip_max_mm_per_frame": 0.2341,
+     "median_slip_max_mm_per_frame": 1.8439,
+     "anchor_slip_max_mm_per_contact": 1.5833
+    }
+   },
+   "knee_L_max": 68.2449,
+   "knee_R_max": 119.1106,
+   "elbow_L_max": 49.3934,
+   "elbow_R_max": 49.7903,
+   "thigh_L_max": 66.6078,
+   "thigh_R_max": 84.3541,
+   "elev_L_range": [
+    -48.1226,
+    27.3797
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -34.058,
+    26.6213
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 0.9502,
+   "pelvis_xy_max": 0.326,
+   "lowest_z_mm": -23.0764,
+   "lowest_bone": "shin_R",
+   "verts_below_minus_20mm_max": 17,
+   "legs_through_cape_faces_max": 78,
+   "legs_through_cape_frame": 18,
+   "legs_through_cape_frames": 19,
+   "legs_through_loin_faces_max": 66,
+   "legs_through_loin_frames": 8,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 3,
+   "cannon_cuts_max": 61,
+   "cannon_cuts_frame": 30,
+   "cannon_cut_bones": {
+    "upperarm_R": 1134,
+    "x_pauldron_R": 120
+   },
+   "review_frames": {
+    "lower": 26,
+    "upper": 30
+   },
+   "renders": {
+    "lower": [
+     "renders/mountainfall_start_f026_shoulders.png",
+     "renders/mountainfall_start_f026_cannon_elbow.png",
+     "renders/mountainfall_start_f026_left_elbow.png",
+     "renders/mountainfall_start_f026_knees.png",
+     "renders/mountainfall_start_f026_cape.png"
+    ],
+    "upper": [
+     "renders/mountainfall_start_f030_shoulders.png",
+     "renders/mountainfall_start_f030_cannon_elbow.png",
+     "renders/mountainfall_start_f030_left_elbow.png",
+     "renders/mountainfall_start_f030_knees.png",
+     "renders/mountainfall_start_f030_cape.png"
+    ]
+   }
+  },
+  "mountainfall@loop": {
+   "frames": 40,
+   "loop": true,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 84,
+     "max_speed_mm_per_frame": 113.4581
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 20.9417
+    },
+    "braids": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 15.2023
+    },
+    "solid": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 14.2855
+    }
+   },
+   "loop_last_vs_first_mm": 0.0,
+   "seam_acc_mm_solid": 5.2271,
+   "seam_acc_mm_cloth": 18.0061,
+   "acc_max_mm_solid": 5.3648,
+   "acc_max_frame_solid": 30,
+   "acc_max_bone_solid": "thumb_02_R",
+   "acc_median_mm_solid": 2.3193,
+   "acc_max_mm_cloth": 84.683,
+   "acc_max_frame_cloth": 10,
+   "feet": {
+    "L": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0079
+    },
+    "R": {
+     "contact_frames": 40,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0006,
+     "anchor_slip_max_mm_per_contact": 0.0097
+    }
+   },
+   "knee_L_max": 56.2594,
+   "knee_R_max": 54.5127,
+   "elbow_L_max": 52.7382,
+   "elbow_R_max": 47.1207,
+   "thigh_L_max": 49.2249,
+   "thigh_R_max": 48.9078,
+   "elev_L_range": [
+    -38.2657,
+    -36.9705
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -29.7379,
+    -24.4984
+   ],
+   "wrist_R_bend_max": 0.0001,
+   "pelvis_z_min": 1.02,
+   "pelvis_xy_max": 0.1463,
+   "lowest_z_mm": -9.4936,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 28,
+   "legs_through_cape_frame": 36,
+   "legs_through_cape_frames": 10,
+   "legs_through_loin_faces_max": 11,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 5,
+   "cannon_cuts_max": 60,
+   "cannon_cuts_frame": 28,
+   "cannon_cut_bones": {
+    "upperarm_R": 1676
+   },
+   "review_frames": {
+    "lower": 10,
+    "upper": 30
+   },
+   "renders": {
+    "lower": [
+     "renders/mountainfall_f010_shoulders.png",
+     "renders/mountainfall_f010_cannon_elbow.png",
+     "renders/mountainfall_f010_left_elbow.png",
+     "renders/mountainfall_f010_knees.png",
+     "renders/mountainfall_f010_cape.png"
+    ],
+    "upper": [
+     "renders/mountainfall_f030_shoulders.png",
+     "renders/mountainfall_f030_cannon_elbow.png",
+     "renders/mountainfall_f030_left_elbow.png",
+     "renders/mountainfall_f030_knees.png",
+     "renders/mountainfall_f030_cape.png"
+    ]
+   }
+  },
+  "mountainfall_pound": {
+   "frames": 33,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 35,
+     "max_speed_mm_per_frame": 213.4239
+    },
+    "loin": {
+     "frames_with_reversals": 0,
+     "reversal_vertex_frames": 0,
+     "max_speed_mm_per_frame": 33.4897
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 173,
+     "max_speed_mm_per_frame": 112.6043
+    },
+    "solid": {
+     "frames_with_reversals": 4,
+     "reversal_vertex_frames": 3272,
+     "max_speed_mm_per_frame": 477.09
+    }
+   },
+   "acc_max_mm_solid": 338.906,
+   "acc_max_frame_solid": 13,
+   "acc_max_bone_solid": "thumb_03_R",
+   "acc_median_mm_solid": 23.6481,
+   "acc_max_mm_cloth": 163.8284,
+   "acc_max_frame_cloth": 2,
+   "feet": {
+    "L": {
+     "contact_frames": 33,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    },
+    "R": {
+     "contact_frames": 33,
+     "anchor_slip_max_mm_per_frame": 0.0,
+     "median_slip_max_mm_per_frame": 0.0,
+     "anchor_slip_max_mm_per_contact": 0
+    }
+   },
+   "knee_L_max": 51.7772,
+   "knee_R_max": 49.6339,
+   "elbow_L_max": 47.4517,
+   "elbow_R_max": 40.7447,
+   "thigh_L_max": 44.8068,
+   "thigh_R_max": 44.5161,
+   "elev_L_range": [
+    -38.4853,
+    10.7609
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -25.1649,
+    10.0227
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.05,
+   "pelvis_xy_max": 0.118,
+   "lowest_z_mm": -8.9444,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 0,
+   "legs_through_cape_frame": 0,
+   "legs_through_cape_frames": 0,
+   "legs_through_loin_faces_max": 11,
+   "legs_through_loin_frames": 0,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 2,
+   "cannon_cuts_max": 40,
+   "cannon_cuts_frame": 0,
+   "cannon_cut_bones": {
+    "upperarm_R": 828,
+    "x_pauldron_R": 21
+   },
+   "upper_reference": "mountainfall",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0004,
+     0.0003
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_vs_idle_combat_m": [
+    0.1668,
+    0.1668
+   ],
+   "review_frames": {
+    "lower": 0,
+    "upper": 13
+   },
+   "renders": {
+    "lower": [
+     "renders/mountainfall_pound_f000_shoulders.png",
+     "renders/mountainfall_pound_f000_cannon_elbow.png",
+     "renders/mountainfall_pound_f000_left_elbow.png",
+     "renders/mountainfall_pound_f000_knees.png",
+     "renders/mountainfall_pound_f000_cape.png"
+    ],
+    "upper": [
+     "renders/mountainfall_pound_f013_shoulders.png",
+     "renders/mountainfall_pound_f013_cannon_elbow.png",
+     "renders/mountainfall_pound_f013_left_elbow.png",
+     "renders/mountainfall_pound_f013_knees.png",
+     "renders/mountainfall_pound_f013_cape.png"
+    ]
+   }
+  },
+  "armor_break": {
+   "frames": 32,
+   "loop": false,
+   "jitter": {
+    "cape": {
+     "frames_with_reversals": 19,
+     "reversal_vertex_frames": 658,
+     "max_speed_mm_per_frame": 331.9552
+    },
+    "loin": {
+     "frames_with_reversals": 5,
+     "reversal_vertex_frames": 347,
+     "max_speed_mm_per_frame": 138.998
+    },
+    "braids": {
+     "frames_with_reversals": 2,
+     "reversal_vertex_frames": 1569,
+     "max_speed_mm_per_frame": 170.3079
+    },
+    "solid": {
+     "frames_with_reversals": 3,
+     "reversal_vertex_frames": 13466,
+     "max_speed_mm_per_frame": 579.157
+    }
+   },
+   "acc_max_mm_solid": 413.1287,
+   "acc_max_frame_solid": 5,
+   "acc_max_bone_solid": "hand_R",
+   "acc_median_mm_solid": 10.1092,
+   "acc_max_mm_cloth": 206.7113,
+   "acc_max_frame_cloth": 30,
+   "feet": {
+    "L": {
+     "contact_frames": 32,
+     "anchor_slip_max_mm_per_frame": 0.0008,
+     "median_slip_max_mm_per_frame": 0.0009,
+     "anchor_slip_max_mm_per_contact": 0.0067
+    },
+    "R": {
+     "contact_frames": 32,
+     "anchor_slip_max_mm_per_frame": 0.0005,
+     "median_slip_max_mm_per_frame": 0.0007,
+     "anchor_slip_max_mm_per_contact": 0.0044
+    }
+   },
+   "knee_L_max": 47.5544,
+   "knee_R_max": 46.7626,
+   "elbow_L_max": 50.609,
+   "elbow_R_max": 60.9812,
+   "thigh_L_max": 40.1965,
+   "thigh_R_max": 39.6468,
+   "elev_L_range": [
+    -48.6908,
+    -9.4506
+   ],
+   "wrist_L_bend_max": 0.0002,
+   "elev_R_range": [
+    -47.2604,
+    -7.324
+   ],
+   "wrist_R_bend_max": 0.0002,
+   "pelvis_z_min": 1.08,
+   "pelvis_xy_max": 0.2084,
+   "lowest_z_mm": -14.1946,
+   "lowest_bone": "shin_L",
+   "verts_below_minus_20mm_max": 0,
+   "legs_through_cape_faces_max": 39,
+   "legs_through_cape_frame": 5,
+   "legs_through_cape_frames": 4,
+   "legs_through_loin_faces_max": 39,
+   "legs_through_loin_frames": 7,
+   "cannon_poke_max": 8,
+   "cannon_poke_frame": 1,
+   "cannon_cuts_max": 87,
+   "cannon_cuts_frame": 4,
+   "cannon_cut_bones": {
+    "upperarm_R": 581
+   },
+   "upper_reference": "idle_combat",
+   "upper_first_last_vs_reference_m": [
+    0.0,
+    0.0
+   ],
+   "upper_first_last_joint_err_m_by_group": {
+    "contract": [
+     0.0,
+     0.0
+    ],
+    "cloth": [
+     0.0,
+     0.0
+    ],
+    "helpers": [
+     0.0,
+     0.0
+    ]
+   },
+   "upper_first_last_cloth_vertex_jump_mm": {
+    "in_upper_mask (cape, beard)": [
+     0.0004,
+     0.0004
+    ],
+    "loincloth (pelvis, outside the mask)": [
+     0.0002,
+     0.0002
+    ],
+    "solid": [
+     0.0,
+     0.0
+    ]
+   },
+   "review_frames": {
+    "lower": 4,
+    "upper": 5
+   },
+   "renders": {
+    "lower": [
+     "renders/armor_break_f004_shoulders.png",
+     "renders/armor_break_f004_cannon_elbow.png",
+     "renders/armor_break_f004_left_elbow.png",
+     "renders/armor_break_f004_knees.png",
+     "renders/armor_break_f004_cape.png"
+    ],
+    "upper": [
+     "renders/armor_break_f005_shoulders.png",
+     "renders/armor_break_f005_cannon_elbow.png",
+     "renders/armor_break_f005_left_elbow.png",
+     "renders/armor_break_f005_knees.png",
+     "renders/armor_break_f005_cape.png"
+    ]
+   }
+  }
+ }
+}

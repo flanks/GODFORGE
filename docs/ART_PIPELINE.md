@@ -400,7 +400,7 @@ python tools/blender/gf_hero/s4_valdris_run.py            # [--from <step>] [--o
 | Step | Script | What it adds |
 |---|---|---|
 | anim | `s4_anim.py` + `s4_valdris.py` | `shared_clips(K)`: the 24 shared clips (same names, loops, layers, events, timing) re-posed in his vocabulary: arms as upper-arm / forearm directions inside his ranges, interpolated by direction; planted feet with upright shins (the pelvis solved through s4lib's own leg IK); feet that roll about the sole's front and rear edges and, in the air, hang in line with the shins; a wider, heavier gait; one knee down built, not solved. `unique_clips(K)`: his 10 kit clips. `KEEPOUT_LOOSE_PARTS` / `KEEPOUT_OWN_BONES` for the arm keep-out |
-| cloth | `s4_valdris_cloth.py` | the cape, loincloth and braid chains keyed in every clip: a lagged hang under the apparent gravity at the pin, drag against the design travel, cleared out of the plates and the ground every frame (the stage-3 clear step), smoothed so it never pops |
+| cloth | `s4_valdris_cloth.py` | the cape, loincloth and braid chains keyed in every clip: a lagged hang under the apparent gravity at the pin, drag against the design travel, draped over the legs (the legs stay on the body side of the cape and the loincloth: a rope laid over them, lifted with its neighbours), cleared out of the plates and the ground every frame (the stage-3 clear step), smoothed over ±2 frames so it never pops; upper-layer one-shots start and end on their base clip's frame-0 cloth state |
 | render | `s4_valdris_render.py` | the key-frame renders, and the stage-3 measures on EVERY frame: plate clipping, the cannon's poke-through and cuts, cloth inside a plate, the ground, sole slip |
 | sheets | `s4_valdris_sheets.py` | a sheet per clip and the game-size boards next to the concept |
 | gltf_check, contract | `s4_gltf_check.py`, `check_clips.py` (shared, unchanged) | as for Brax |
@@ -538,6 +538,23 @@ His results:
   (`art/characters/valdris/reports/stage5/brax_regression.json`);
 - all of it in `art/characters/valdris/reports/export_report.json`, `reports/stage5/export_review.png` and
   `reports/stage5/valdris_board.png`.
+
+**Valdris: adversarial review of stages 2-5 (2026-09-26).** Every frame of the SHIPPED file is re-measured with the
+cannon on `weapon_R`, independently of the stage-4 audit, and the game-size read is rendered next to Brax, a greybox
+capsule and the Cinder Wastes swarm:
+
+```sh
+blender -b --factory-startup --python-exit-code 1 -P tools/blender/gf_hero/valdris_review.py -- [--glb <other file>] [--out <dir>]
+blender -b --factory-startup --python-exit-code 1 -P tools/blender/gf_hero/valdris_review_lineup.py
+<comfy-python> tools/blender/gf_hero/valdris_review_sheets.py [--before <review dir of the previous file>]
+```
+
+It found the sabatons piercing the cape in the kneels, the wraith and the backpedal, the cape 0.4-0.6 m off the
+reference pose at the first frame of every upper-layer shot, a jittering cape in the wraith loop and loincloth, and a
+sidecar that did not say which clip `siege_fire` / `mountainfall_pound` layer over; the cloth pass (drape, wider
+smoothing, the upper-layer settle) and `export_glb.py` (`clip_info.<clip>.base`, default-off: Brax's GLB, sidecar and
+report are byte-identical) were fixed. Report: `art/characters/valdris/reports/review_stage2_5.md`; sheets in
+`art/characters/valdris/reports/review/`.
 
 ## 6. Export format note (stage 5)
 

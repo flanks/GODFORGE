@@ -494,3 +494,10 @@ GF_Hero_v1          the scene's only root: the armature node (Bevy's animation t
   own. The weapon has no fist / open variants, so the sidecar's `clip_info.<clip>.weapon_variant` is null; the hero's
   own finger poses (keyed in the clips) are listed as `clip_info.<clip>.hand_pose` for reference. The re-import smoke
   test attaches such a weapon the same way (Valdris, 2026-09-26; docs/ART_PIPELINE.md §5 "Stage 5").
+- *Additive note (Valdris review of stages 2-5, 2026-09-26).* An upper-layer clip that starts and ends on ANOTHER
+  clip's frame 0 (`Clip(base=...)`, §8: Valdris's `siege_fire` over `siege_stance`, `mountainfall_pound` over
+  `mountainfall`) carries `clip_info.<clip>.base` = that clip's animation name in the sidecar, and `playback.upper_layer`
+  lists those exceptions; the engine takes that frame as the clip's additive reference pose. The rule covers every
+  bone, the per-hero cloth chains included: a hero's cloth pass must start and end its upper-layer one-shots on the
+  reference frame's cloth state (Valdris's cape was 0.4-0.6 m off it at the first frame of each shot before the
+  review). A hero without such clips writes exactly what it did (Brax's sidecar is byte-identical).

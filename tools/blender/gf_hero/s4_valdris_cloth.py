@@ -14,8 +14,17 @@ Per clip and chain bone, every frame:
      streams the cape back), ramped in along the chain from the torso-riding top row (as s3_valdris_cloth's hang);
   2. lag: a damped spring on that direction (natural frequency and damping per group: the heavy cape swings slowly,
      the braids quickly), warmed up over three cycles for a loop and made exactly periodic;
-  3. clear: s3_valdris_cloth.ClothGroup's clear step on the posed mesh (every closed body and armour piece its own BVH):
-     cloth vertices inside a piece or under the ground turn the chain bones out, least squares, per frame.
+  3. drape (added by the stage 2-5 review, 2026-09-26): the legs stay on the body side of the cape and of the loincloth.
+     Each chain bone, top to bottom, turns outward (the cape backward, the loincloth forward, in the torso's / pelvis's
+     frame) just far enough that no leg-armour vertex in its lateral band lies outside it, like a rope laid over the
+     legs. Before this step a kneeling or floating hero's sabatons pierced the cape (the clear step only sees cloth
+     vertices inside a plate, not a plate passing between them);
+  4. clear: s3_valdris_cloth.ClothGroup's clear step on the posed mesh (every closed body and armour piece its own BVH):
+     cloth vertices inside a piece or under the ground turn the chain bones out, least squares, per frame;
+  5. upper-layer one-shots (fire_light, hit_light, ping, siege_fire, ...) keep only their own cloth motion ON TOP of their
+     base clip's frame-0 cloth state (idle_combat, or clips.json 'base') and settle back into it, then are cleared
+     again, so their first and last frames equal that reference pose for every bone, cloth included (docs/art/GF_HERO_SKELETON.md section 8; the review
+     found the cape 0.55 m off it at a shot's first frame).
 The chain bones' local rotations are written as LINEAR keys (a loop's last frame is its first). Output: the actions in
 production/valdris_anim.blend, reports/anim/cloth.json (per clip: cloth vertices left inside after the clear, the
 deepest, and how hard the chains move).
@@ -134,6 +143,100 @@ def cone(d, axis, deg):
     return axis * math.cos(lim) + perp / n * math.sin(lim)
 
 
+DRAPE = {  # group -> (obstacle objects, rest outward direction (Blender, he faces -Y), frame bone, band in, band at the edge, margin)
+    "cape": (("LEGS", "SABATONS"), (0.0, 1.0, 0.0), "spine_03", 0.22, 0.04, 0.05),
+    "loin": (("LEGS",), (0.0, -1.0, 0.0), "pelvis", 0.10, 0.03, 0.02),
+}
+DRAPE_MAX_DEG = 80.0
+
+
+def drape_points(g, co):
+    """The leg-armour vertices a group's cloth must stay outside of (armature space)."""
+    if g not in DRAPE:
+        return None
+    pts = np.concatenate([co[n] for n in DRAPE[g][0] if n in co])
+    Mi = np.linalg.inv(np.array(arm.matrix_world))
+    return pts @ Mi[:3, :3].T + Mi[:3, 3]
+
+
+def _turn(grp, Mext, basis, b, dn):
+    """Turn chain bone b (in basis) so that its world direction becomes dn."""
+    M = grp.fk(Mext, basis)
+    d = M[b][:3, 1] / np.linalg.norm(M[b][:3, 1])
+    A = M[b][:3, :3]
+    basis[b] = ortho(basis[b] @ (A.T @ rot_between(d, dn) @ A))
+
+
+def drape(grp, g, Mext, basis, pts):
+    """A rope laid over the legs: each chain bone, top to bottom, keeps its hang direction unless a leg point in its
+    lateral band would lie outside the cloth line; then it turns outward just past that point (+ margin), and the bones
+    below hang again. Two passes: the second lifts each chain at least 0.75 x (0.45 x) as far as its neighbours (two
+    chains away) so the cloth between chains never shears into a rip."""
+    _objs, out_rest, fb, band, edge, margin = DRAPE[g]
+    Rt = Mext[fb][:3, :3] @ grp.rest[fb][:3, :3].T            # the frame bone's rotation from rest
+    out = Rt @ np.array(out_rest)
+    lat = Rt @ np.array((1.0, 0.0, 0.0))
+    nch = len(grp.chains)
+    M0 = grp.fk(Mext, basis)
+    D0 = {b: M0[b][:3, 1] / np.linalg.norm(M0[b][:3, 1]) for b in grp.bones}
+    start = {b: basis[b].copy() for b in grp.bones}
+
+    def need(j, b):
+        """(outward angle this bone needs beyond its hang direction, e2) from the current state of the bones above."""
+        lo = -(edge if j == 0 else band)            # chain 0 is the cloth's -X edge (his right), the last its +X edge
+        hi = edge if j == nch - 1 else band
+        M = grp.fk(Mext, basis)
+        h = M[b][:3, 3]
+        d = D0[b]
+        r = pts - h
+        u = r @ lat
+        m = (u > lo) & (u < hi)
+        e2 = out - d * float(out @ d)
+        if not m.any() or np.linalg.norm(e2) < 0.35 or e2[2] < -0.5 * np.linalg.norm(e2):
+            return 0.0, None          # nothing in the band, or the bone already trails along the outward direction
+        e2 = e2 / np.linalg.norm(e2)
+        a = r[m] @ d
+        cc = r[m] @ e2
+        L = grp.length[b]
+        sel = (a > 0.0) & (a < L + margin) & (cc > -margin) & (cc < 0.8)
+        if not sel.any():
+            return 0.0, e2
+        R_ = np.hypot(a[sel], cc[sel])
+        phi = np.arctan2(cc[sel], a[sel]) + np.arcsin(np.clip(margin / np.maximum(R_, margin), 0.0, 1.0))
+        return min(float(phi.max()), math.radians(DRAPE_MAX_DEG)), e2
+
+    def run(extra):
+        got = {}
+        for j, c in enumerate(grp.chains):
+            for k, b in enumerate(c):
+                ang, e2 = need(j, b)
+                ang = max(ang, extra.get((j, k), 0.0))
+                d = D0[b]
+                if e2 is None:
+                    e2 = out - d * float(out @ d)
+                    e2 = e2 / np.linalg.norm(e2) if np.linalg.norm(e2) >= 0.35 and e2[2] >= -0.5 * np.linalg.norm(e2) else None
+                if e2 is None:
+                    ang = 0.0
+                dn = d * math.cos(ang) + e2 * math.sin(ang) if ang > 1e-4 else d
+                _turn(grp, Mext, basis, b, dn)
+                got[(j, k)] = ang
+        return got
+
+    first = run({})
+    if max(first.values(), default=0.0) <= 1e-4:
+        for b in grp.bones:
+            basis[b] = start[b]
+        return 0.0
+    lift = {}
+    for (j, k), _a in first.items():
+        nb = [0.75 * first.get((j + s_, k), 0.0) for s_ in (-1, 1)] + [0.45 * first.get((j + s_, k), 0.0) for s_ in (-2, 2)]
+        lift[(j, k)] = max(nb)
+    for b in grp.bones:
+        basis[b] = start[b].copy()
+    got = run(lift)
+    return max(got.values())
+
+
 def targets(grp, dyn, mats, travel, loop):
     """Per chain bone, per frame: the lagged world hang direction.
     mats[f][bone] = armature-space 4x4 of the chain parents (and the chain bones riding at rest basis)."""
@@ -203,24 +306,10 @@ def targets(grp, dyn, mats, travel, loop):
     return out
 
 
-def solve_frame(grp, built, Mext, tdirs, fidx):
-    """ClothGroup's hang (toward the lagged target directions, ramped in along the chain) + its clear step, from the
-    parent matrices Mext. -> ({bone: 3x3 local basis}, report)."""
-    basis = {b: np.eye(3) for b in grp.bones}
-    hang = None
-    for c in grp.chains:
-        for k, b in enumerate(c):
-            g = grp.gravity * (min(1.0, k / float(grp.ramp)) if grp.ramp else 1.0)
-            M = grp.fk(Mext, basis)
-            A = (M[grp.parent[b]] @ grp.rel[b])[:3, :3]
-            d_f = A[:, 1] / np.linalg.norm(A[:, 1])
-            d_t = tdirs[b][fidx]
-            d = (1 - g) * d_f + g * d_t
-            d /= np.linalg.norm(d)
-            basis[b] = ortho(A.T @ rot_between(d_f, d) @ A)
-    # the ground: a chain bone whose tail would go under it folds up about its head to lie along it (a kneeling or
-    # floating hero's 1.8 m cape trails on the floor instead of hanging through it); its heading keeps its horizontal part,
-    # or trails backward
+def ground_fold(grp, Mext, basis):
+    """The ground: a chain bone whose tail would go under it folds up about its head to lie along it (a kneeling or
+    floating hero's 1.8 m cape trails on the floor instead of hanging through it); its heading keeps its horizontal part,
+    or trails backward."""
     for c in grp.chains:
         for b in c:
             M = grp.fk(Mext, basis)
@@ -238,7 +327,35 @@ def solve_frame(grp, built, Mext, tdirs, fidx):
             dn = hz * math.sqrt(max(0.0, 1.0 - dz * dz)) + np.array([0.0, 0.0, dz])
             A = M[b][:3, :3]
             basis[b] = ortho(basis[b] @ (A.T @ rot_between(d, dn) @ A))
+
+
+def solve_frame(grp, built, Mext, tdirs, fidx, gname=None, pts=None):
+    """ClothGroup's hang (toward the lagged target directions, ramped in along the chain), the drape over the legs (pts)
+    + its clear step, from the parent matrices Mext. -> ({bone: 3x3 local basis}, report)."""
+    basis = {b: np.eye(3) for b in grp.bones}
+    hang = None
+    for c in grp.chains:
+        for k, b in enumerate(c):
+            g = grp.gravity * (min(1.0, k / float(grp.ramp)) if grp.ramp else 1.0)
+            M = grp.fk(Mext, basis)
+            A = (M[grp.parent[b]] @ grp.rel[b])[:3, :3]
+            d_f = A[:, 1] / np.linalg.norm(A[:, 1])
+            d_t = tdirs[b][fidx]
+            d = (1 - g) * d_f + g * d_t
+            d /= np.linalg.norm(d)
+            basis[b] = ortho(A.T @ rot_between(d_f, d) @ A)
+    ground_fold(grp, Mext, basis)
     hang = {b: basis[b].copy() for b in grp.bones}
+    if pts is not None:          # the drape is a correction like the clear: smooth_deltas dilates and smooths it over time
+        if drape(grp, gname, Mext, basis, pts) > 0.0:
+            ground_fold(grp, Mext, basis)
+    return clear(grp, built, Mext, basis), hang
+
+
+def clear(grp, built, Mext, basis):
+    """ClothGroup's clear step from the given chain bases: cloth vertices inside a piece or under the ground turn the
+    chain bones out (least squares, a capped step per round); the best round is kept. -> {bone: 3x3 local basis}."""
+    basis = {b: basis[b].copy() for b in grp.bones}
     wc = grp.W[:, [grp.bi[b] for b in grp.bones]].sum(1)
     movable = wc >= 0.35
     acc = {b: 0.0 for b in grp.bones}
@@ -275,7 +392,7 @@ def solve_frame(grp, built, Mext, tdirs, fidx):
                 Wr = M[b][:3, :3]
                 Aa = Wr @ basis[b].T
                 basis[b] = ortho(Aa.T @ axis_angle(ax, ang) @ Wr)
-    return best[1], hang
+    return best[1]
 
 
 def penetration(grp, built, Mext, basis):
@@ -295,10 +412,17 @@ def qmat(q):
     return np.array(Quaternion(q).normalized().to_matrix())
 
 
-def smooth_deltas(hangs, clears, bones, loop):
-    """The clear's correction per bone and frame (delta = cleared @ hang^T), dilated by one frame (the largest turn of
-    f-1, f, f+1 survives) and smoothed [1, 2, 1] / 4 twice over time (cyclic for a loop): the per-frame clear jumps
-    between rounds, and a cape must not pop. -> smoothed cleared bases."""
+SMOOTH = {"cape": (2, 4), "loin": (2, 4), "braids": (1, 2)}
+# (frames either side whose largest correction survives, [1, 2, 1] / 4 passes over time) per group. The stage 2-5 review
+# widened the cape's and the loincloth's from (1, 2): it measured hem flicks of 0.1-0.2 m in one frame in the quiet loops
+# (idle, siege_stance, idle_signature) with the narrow kernel. The short, quick braids keep it (a wide kernel lagged their
+# clear behind a head turn: ping)
+
+
+def smooth_deltas(hangs, clears, bones, loop, dilate=1, passes=2):
+    """The clear's (and the drape's) correction per bone and frame (delta = cleared @ hang^T), dilated by `dilate` frames
+    (the largest turn of f-k..f+k survives) and smoothed [1, 2, 1] / 4 `passes` times over time (cyclic for a loop): the
+    per-frame clear jumps between rounds, and a cape must not pop. -> smoothed cleared bases."""
     n = len(hangs)
     out = [dict() for _ in range(n)]
     for b in bones:
@@ -314,11 +438,11 @@ def smooth_deltas(hangs, clears, bones, loop):
         ang = [2.0 * math.acos(min(1.0, abs(q[0]))) for q in D]
         dil = []
         for f in range(n):
-            cand = [(f - 1), f, (f + 1)]
+            cand = list(range(f - dilate, f + dilate + 1))
             k = max(cand, key=lambda i: at(ang, i))
             dil.append(at(D, k))
         cur = dil
-        for _ in range(2):
+        for _ in range(passes):
             nxt = []
             for f in range(n):
                 q = at(cur, f - 1) + 2.0 * at(cur, f) + at(cur, f + 1)
@@ -329,6 +453,40 @@ def smooth_deltas(hangs, clears, bones, loop):
         for f in range(n):
             out[f][b] = qmat(cur[f]) @ hangs[f][b]
     return out
+
+
+def ref_bases(ref_clip):
+    """The chain bones' local rotations at frame 0 of an already processed clip (read from its keys)."""
+    from mathutils import Euler
+    cb = action_fcurves(bpy.data.actions[MAN["clips"][ref_clip]["action"]])
+    out = {}
+    for b in CHAIN_BONES:
+        e = [0.0, 0.0, 0.0]
+        for i in range(3):
+            fc = cb.fcurves.find('pose.bones["%s"].rotation_euler' % b, index=i) if cb is not None else None
+            if fc is not None:
+                e[i] = fc.evaluate(0.0)
+        out[b] = np.array(Euler(e, "XYZ").to_matrix())
+    return out
+
+
+def settle_on_reference(bases, bones, ref, n, compose=True):
+    """An upper-layer one-shot: its own cloth motion (relative to its own first frame) on top of the reference clip's
+    frame-0 state, eased back into that state over the last k frames: frame 0 and frame n-1 ARE the reference.
+    compose=False (the short, quick braids, whose own state is close to the reference): the own solution itself, eased
+    in from and out to the reference over two frames at both ends."""
+    from mathutils import Quaternion
+    k = max(2, min(8, (n - 1) // 2)) if compose else 2
+    first = {b: bases[0][b].copy() for b in bones}
+    for f in range(n):
+        t = min(1.0, (n - 1 - f) / float(k)) if compose else min(1.0, f / float(k), (n - 1 - f) / float(k))
+        w = t * t * (3.0 - 2.0 * t)
+        for b in bones:
+            own = ref[b] @ first[b].T @ bases[f][b] if compose else bases[f][b]
+            qa = Matrix(ref[b].tolist()).to_quaternion()
+            qb = Matrix(own.tolist()).to_quaternion()
+            bases[f][b] = np.array(Quaternion(qa).slerp(qb, w).to_matrix())
+    return bases
 
 
 def write_keys(act, bones, eul_by_bone, n):
@@ -396,11 +554,33 @@ for name in MAN["order"]:
                 builts.append(builts[0])
                 continue
             built = obst.build(cos[f])
-            bs, hg = solve_frame(grp, built, mats[f], td, f)
+            bs, hg = solve_frame(grp, built, mats[f], td, f, g, drape_points(g, cos[f]))
             hangs.append(hg)
             clears.append(bs)
             builts.append(built)
-        bases = smooth_deltas(hangs, clears, grp.bones, loop)
+        bases = smooth_deltas(hangs, clears, grp.bones, loop, *SMOOTH[g])
+        if info.get("layer") == "upper" and not loop:
+            bases = settle_on_reference(bases, grp.bones, ref_bases(info.get("base") or "idle_combat"), n, g != "braids")
+            # the settled chains are draped and cleared again (the clip's own motion laid on the reference state can push
+            # the cape into a plate or leave a leg outside it); the corrections are smoothed like the first ones and taper
+            # to nothing at the first and last frames, which stay exactly the reference
+            def redo(f):
+                """the drape and the clear again, from the settled state of frame f"""
+                b0 = {b: bases[f][b].copy() for b in grp.bones}
+                pts = drape_points(g, cos[f])
+                if pts is not None and drape(grp, g, mats[f], b0, pts) > 0.0:
+                    ground_fold(grp, mats[f], b0)
+                return clear(grp, builts[f], mats[f], b0)
+            again = smooth_deltas(bases, [redo(f) for f in range(n)], grp.bones, False,
+                                  *SMOOTH[g]) if g != "braids" else bases     # the braids' own solution is already cleared
+            from mathutils import Quaternion
+            for f in range(n):
+                t = min(1.0, f / 2.0, (n - 1 - f) / 2.0)
+                w = t * t * (3.0 - 2.0 * t)
+                for b in grp.bones:
+                    qa = Matrix(bases[f][b].tolist()).to_quaternion()
+                    qb = Matrix(again[f][b].tolist()).to_quaternion()
+                    bases[f][b] = np.array(Quaternion(qa).slerp(qb, w).to_matrix())
         for f in range(n):
             r = penetration(grp, builts[f], mats[f], bases[f])
             worst = max(worst, r["inside_gt3mm"])
