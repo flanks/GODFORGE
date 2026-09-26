@@ -24,13 +24,14 @@
 //!    `motifs` first: a colonnade court, a collapsed forge hall around a great anvil, a slag channel
 //!    crossed by bridges, a cloister, a fallen giant tree, a broken spiral stair, a rift field...
 //!    Compositions put their backs to the rim and open toward the fight; in a four-slot room one
-//!    slot stays an open killing field.
-//! 4. **Density.** Compact ruin clusters along the north and flank bands and at the skirts of the
-//!    districts top the floor cover up to the pre-grammar density, so pacing holds while the middle
-//!    of the field stays open.
+//!    slot stays an open killing field: painted paving and, most of the time, one kiting
+//!    [`anchor`] (OPEN_WORLD.md §3.6.10).
+//! 4. **Density.** Compact ruin clusters along the north and flank rim band (the room's frame)
+//!    top the floor cover up to the room kind's target; the middle of the field stays open and the
+//!    south edge, between the camera and the fight, stays low.
 //! 5. **Dressing** (visual only, its own RNG stream, so re-dressing never moves an obstacle):
 //!    banners, clutter and rubble along the rim, braziers at the gates and the plaza, floor inlays,
-//!    paving, ground cover and fissures.
+//!    paving, rubble at the feet of walls, ground cover (Verdant) and fissures.
 //!
 //! Guarantees: the spawn, plaza and gates stay clear; separate features keep ≥ 2.8 u lanes between
 //! them (pieces of one composition may squeeze closer: colonnade gaps are chokepoints for the
@@ -45,7 +46,8 @@
 //! Biome maps ([`RoomKind::Expedition`], built by [`crate::worldgen`]) reuse this grammar at map
 //! scale: the [`Builder`] runs over the whole map with a [`TileMask`], so compositions stand only on
 //! open ground (never on roads, plazas, bridges, liquid or void) and props only on land, and its
-//! obstacle queries go through a bucket index. Rooms have no mask and generate exactly as before.
+//! obstacle queries go through a bucket index. On a map every piece also keeps `lane_pad` of open
+//! road shoulder, and glowing fissures need heat nearby (`heat_reach`); rooms have neither rule.
 
 use crate::db::ContentDb;
 use crate::schema::*;
@@ -217,14 +219,24 @@ pub(crate) const LANE_W: f32 = 4.0;
 /// Resolution of the floor-cover budget grid.
 pub(crate) const CELL: f32 = 0.5;
 
-/// Share of the floor ruins cover, by room kind: the pre-grammar scatter's density, so the new
-/// layouts pace like the old ones (measured with `gf-content layout-stats`).
+/// Share of the floor ruins cover, by room kind (OPEN_WORLD.md §3.6.10): the compositions, the
+/// fields' anchors and a top-up in the north and flank rim band, the room's frame. The open middle
+/// is where the fight is (measured with `gf-content layout-stats`).
 fn cover_target(kind: RoomKind) -> f32 {
     match kind {
-        RoomKind::Combat | RoomKind::Elite => 0.050,
-        RoomKind::Anvil => 0.044,
-        _ => 0.031,
+        RoomKind::Combat | RoomKind::Elite => 0.032,
+        RoomKind::Anvil => 0.025,
+        _ => 0.022,
     }
+}
+
+/// A room field holds a kiting anchor this often (§3.6.10).
+const ROOM_ANCHOR: f32 = 0.7;
+
+/// Composition rules in rooms: no road shoulders or tile mask, a tighter clear ring around a
+/// field's anchor (a room field is a fraction of a map field).
+fn room_rules() -> ComposeDef {
+    ComposeDef { road_clear: 0.0, anchor_clear: 5.0, ..ComposeDef::default() }
 }
 
 /// Composition scale by room kind: smaller rooms get smaller districts.
@@ -563,6 +575,25 @@ impl TileMask {
             && (0..self.h as i64).contains(&y)
             && self.kind[y as usize * self.w + x as usize].is_land()
     }
+
+    /// Does a `Liquid` tile lie within `reach` of `p`?
+    pub(crate) fn liquid_near(&self, p: Vec2, reach: f32) -> bool {
+        let (x0, x1) = (self.tile(p.x - reach, self.origin.x), self.tile(p.x + reach, self.origin.x));
+        let (y0, y1) = (self.tile(p.y - reach, self.origin.y), self.tile(p.y + reach, self.origin.y));
+        let hs = Vec2::splat(self.size * 0.5);
+        for y in y0.max(0)..=y1.min(self.h as i64 - 1) {
+            for x in x0.max(0)..=x1.min(self.w as i64 - 1) {
+                if self.kind[y as usize * self.w + x as usize] != TileKind::Liquid {
+                    continue;
+                }
+                let c = self.origin + Vec2::new(x as f32 + 0.5, y as f32 + 0.5) * self.size;
+                if point_box(p, c, hs) <= reach {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }
 
 pub(crate) struct Builder {
@@ -590,6 +621,15 @@ pub(crate) struct Builder {
     pub(crate) exits: Vec<Vec2>,
     /// Map mode: the tiles pieces and props may stand on (`None` in rooms).
     pub(crate) mask: Option<TileMask>,
+    /// Extra clearance (u) every piece keeps from the lanes beyond their half-width (biome maps:
+    /// `compose.road_clear`, so road shoulders stay open; 0 in rooms). [`Builder::unmasked`]-style
+    /// placement lifts it.
+    pub(crate) lane_pad: f32,
+    /// Heat on the floor (segments; a point is a segment of length 0): crucibles, great anvils,
+    /// channels and POI hearts. Glowing fissures start only within `heat_reach` of heat.
+    pub(crate) heat: Vec<(Vec2, Vec2)>,
+    /// Map mode: fissures need heat (or a liquid tile) this close; 0 = no rule (rooms).
+    pub(crate) heat_reach: f32,
 }
 
 impl Builder {
@@ -617,6 +657,9 @@ impl Builder {
             spawn: Vec2::ZERO,
             exits: Vec::new(),
             mask: None,
+            lane_pad: 0.0,
+            heat: Vec::new(),
+            heat_reach: 0.0,
         }
     }
 
@@ -659,7 +702,7 @@ impl Builder {
         if self.keep.iter().any(|(k, kr)| bc.distance(*k) < br + kr) {
             return false;
         }
-        if self.lanes.iter().any(|l| seg_dist(o, l.from, l.to) < l.width * 0.5) {
+        if self.lanes.iter().any(|l| seg_dist(o, l.from, l.to) < l.width * 0.5 + self.lane_pad) {
             return false;
         }
         // Anything a lane or more away passes either rule, so only the neighbours can refuse.
@@ -703,8 +746,24 @@ impl Builder {
             self.obstacles.push(*o);
             self.owner.push(g);
         }
+        match d {
+            Decor::Crucible { at, .. } | Decor::GreatAnvil { at, .. } => self.heat.push((at, at)),
+            Decor::Channel { from, to, .. } => self.heat.push((from, to)),
+            _ => {}
+        }
         self.decor.push(d);
         true
+    }
+
+    /// Is `p` hot enough for a glowing fissure (map mode: within `heat_reach` of heat or a liquid
+    /// tile)? Always true in rooms.
+    pub(crate) fn hot(&self, p: Vec2) -> bool {
+        if self.heat_reach <= 0.0 {
+            return true;
+        }
+        let r = self.heat_reach;
+        self.heat.iter().any(|&(a, z)| point_seg(p, a, z) <= r)
+            || self.mask.as_ref().is_some_and(|m| m.liquid_near(p, r))
     }
 
     pub(crate) fn circle(&mut self, g: u16, at: Vec2, r: f32, make: impl FnOnce(Vec2, f32) -> Decor) -> bool {
@@ -791,8 +850,12 @@ impl Builder {
         self.prop(Decor::Brazier { at: qv(at) }, 0.5);
     }
 
-    /// A glowing fissure wandering from `start` roughly along `dir`.
+    /// A glowing fissure wandering from `start` roughly along `dir` (on a biome map only where
+    /// there is heat nearby: open ground shows cold cracked earth instead, §3.6.7).
     pub(crate) fn fissure(&mut self, start: Vec2, dir: Vec2, segs: u32, width: f32) {
+        if !self.hot(start) {
+            return;
+        }
         let mut p = start;
         let mut d = dir.normalize_or(Vec2::X);
         let limit = self.half - Vec2::splat(0.8);
@@ -801,7 +864,8 @@ impl Builder {
             d = (d + jitter).normalize_or(d);
             let len = self.rd(2.5, 5.5);
             let next = (p + d * len).clamp(-limit, limit);
-            if next.distance(p) < 0.5 {
+            // On a map a fissure also dies out where the heat does.
+            if next.distance(p) < 0.5 || !self.hot(next) {
                 break;
             }
             self.decal(Decor::LavaCrack { from: qv(p), to: qv(next), width: q(width) });
@@ -1051,14 +1115,16 @@ fn court(b: &mut Builder, f: Frame, cloister: bool) -> Option<Rect> {
     let g = b.group();
     let r = q(b.rl(0.75, 0.95));
     let h = b.biome.column(&mut b.dress);
-    let sp = b.rl(4.1, 4.6);
+    // Columns stand wide apart (§3.6.3): a court reads as a place and its gaps as open floor,
+    // not as a fence. The back row, and one side row now and then.
+    let sp = b.rl(5.5, 6.2);
     let e = r + 0.25;
     let sides = if cloister {
         4
-    } else if b.lay.chance(0.75) {
-        3
-    } else {
+    } else if b.lay.chance(0.6) {
         2
+    } else {
+        1
     };
     let left = b.lay.chance(0.5);
     let back_door = cloister || b.lay.chance(0.3);
@@ -1074,7 +1140,7 @@ fn court(b: &mut Builder, f: Frame, cloister: bool) -> Option<Rect> {
     let piers = cloister;
     let back = colonnade(b, g, (c.p(-cl, cw), c.p(cl, cw)), sp, r, h, back_door, 0.08, (!piers, !piers));
     let v_end = if sides == 4 { -cw } else { -cw * b.rl(0.1, 0.5) };
-    for (u, on) in [(-cl, sides >= 3 || left), (cl, sides >= 3 || !left)] {
+    for (u, on) in [(-cl, sides >= 3 || (sides == 2 && left)), (cl, sides >= 3 || (sides == 2 && !left))] {
         if on {
             colonnade(b, g, (c.p(u, cw), c.p(u, v_end)), sp, r, h, cloister, 0.1, (false, sides != 4));
         }
@@ -1477,7 +1543,7 @@ fn fallen_giant(b: &mut Builder, f: Frame) -> Option<Rect> {
         (from - dir.perp() * (knot + LANE + 1.4) + dir * 3.5, 1.0, 1.4),
         (to + dir.perp() * (rt + LANE + 1.6), 1.2, 1.8),
     ] {
-        if b.lay.chance(0.7) {
+        if b.lay.chance(0.45) {
             let kg = b.group();
             let (r, variant) = (b.rl(lo, hi), 1);
             b.circle(kg, at, r, |at, radius| Decor::Boulder { at, radius, variant });
@@ -1554,8 +1620,9 @@ fn root_terrace(b: &mut Builder, f: Frame) -> Option<Rect> {
     if b.obstacles.len() == before {
         return None;
     }
-    // Root knots heave the paving: lane-spaced from everything.
-    for _ in 0..b.lay.range_u32(2, 4) {
+    // Root knots heave the paving: lane-spaced from everything (a couple, so the terrace stays a
+    // floor to fight on).
+    for _ in 0..b.lay.range_u32(1, 3) {
         let at = c.p(b.rl(-c.hl * 0.6, c.hl * 0.6), b.rl(-c.hw * 0.5, c.hw * 0.2));
         let kg = b.group();
         let (r, variant) = (b.rl(1.2, 1.7), 1);
@@ -1901,38 +1968,120 @@ fn inverted_nave(b: &mut Builder, f: Frame) -> Option<Rect> {
     Some(c.rect())
 }
 
-/// An open killing field: a few solitary ruins, ground cover and fissures.
+/// An open killing field (§3.6.3): paint only, one island of broken paving off its centre. The
+/// caller decides whether it also holds a kiting [`anchor`]. The floor itself carries the detail
+/// (ash drifts, cracked earth, pebble drifts), so the fight has the whole field.
 pub(crate) fn field(b: &mut Builder, f: Frame) -> Option<Rect> {
-    let area = f.hl * f.hw * 4.0;
-    let n = if area > 600.0 { 2 } else { 1 };
-    let mut placed = 0;
-    for _ in 0..n * 5 {
-        if placed >= n {
-            break;
-        }
-        let at = f.p(b.rl(-f.hl + 2.0, f.hl - 2.0), b.rl(-f.hw + 2.0, f.hw - 2.0));
-        let sat = b.lay.range_u32(0, 2);
-        if ruin(b, at, sat) {
-            placed += 1;
-        }
-    }
-    for _ in 0..b.dress.range_u32(2, 5) {
-        let at = f.p(b.rd(-f.hl, f.hl), b.rd(-f.hw, f.hw));
-        b.cover_patch(at, 1.5, 3.2);
-    }
-    for _ in 0..b.dress.range_u32(1, 3) {
-        let at = f.p(b.rd(-f.hl, f.hl), b.rd(-f.hw, f.hw));
-        b.rubble(at, 0.8, 1.5);
-    }
-    let at = f.p(b.rd(-f.hl, f.hl), b.rd(-f.hw, f.hw));
-    let d = rot16_dir(b.vd(16));
-    let segs = b.dress.range_u32(2, 5);
-    b.fissure(at, d, segs, 0.3);
-    if b.dress.chance(0.5) {
-        let at = f.p(b.rd(-f.hl, f.hl), b.rd(-f.hw, f.hw));
-        b.clutter(at, 0.6, 1.0, Some(ClutterKind::Bones));
+    let half = qv(Vec2::new(b.rd(2.5, 4.0), b.rd(2.5, 4.0)));
+    let at = qv(f.p(b.rd(-0.45, 0.45) * f.hl, b.rd(-0.45, 0.45) * f.hw));
+    if b.island_ok(at, ISLAND_APART) {
+        b.decal(Decor::Paving { at, half, variant: 3 });
     }
     Some(f.rect())
+}
+
+/// Cobble islands (broken paving, `Paving { variant: 3 }` at most [`ISLAND_MAX`] across) keep
+/// this far apart, so a floor chunk never runs out of paving slots.
+pub(crate) const ISLAND_APART: f32 = 14.0;
+/// Largest half extent of a cobble island (bigger broken paving is a composition's floor).
+pub(crate) const ISLAND_MAX: f32 = 5.0;
+
+impl Builder {
+    /// May a cobble island stand at `at` (no other island within `apart`)?
+    pub(crate) fn island_ok(&self, at: Vec2, apart: f32) -> bool {
+        self.decor.iter().all(|d| match *d {
+            Decor::Paving { at: o, half, variant: 3 } if half.max_element() <= ISLAND_MAX => o.distance(at) >= apart,
+            _ => true,
+        })
+    }
+}
+
+/// One chunky kiting anchor near an open field's middle (§3.6.3): the biome's boulder, fallen
+/// column or plinth, alone, with `x.anchor_clear` of open floor around it and no satellites. At
+/// most 10 spots are tried; a piece bigger than `max_area` (the region's cover ceiling) is
+/// skipped. True when one stands.
+pub(crate) fn anchor(b: &mut Builder, f: Frame, x: &ComposeDef, max_area: f32) -> bool {
+    // What it is (drawn once, before the spots, so a retry never re-rolls the piece).
+    enum Piece {
+        Boulder(f32, u8),
+        Column(f32, f32, u8),
+        Plinth(Vec2, f32, WallStyle),
+        Tree(f32, f32),
+        Crystal(f32, f32),
+        Inverted(f32, f32),
+    }
+    let roll = b.lay.f32();
+    let (lo, hi) = (x.anchor_radius.0.min(x.anchor_radius.1), x.anchor_radius.1.max(x.anchor_radius.0));
+    let plinth = |b: &mut Builder, style: WallStyle| {
+        let (a, c) = (b.rl(1.3, 1.8), b.rl(0.9, 1.3));
+        let half = if b.lay.chance(0.5) { Vec2::new(a, c) } else { Vec2::new(c, a) };
+        let height = q(b.rd(1.0, 1.6) * if style == WallStyle::Monolith { 2.5 } else { 1.0 });
+        Piece::Plinth(half, height, style)
+    };
+    let piece = match b.biome {
+        Biome::Cinder if roll < 0.55 => Piece::Boulder(b.rl(lo, hi), b.vd(4)),
+        Biome::Cinder if roll < 0.8 => Piece::Column(b.rl(0.8, 0.95), b.rl(4.0, 5.5), b.lay.range_u32(0, 16) as u8),
+        Biome::Cinder => plinth(b, WallStyle::Plinth),
+        Biome::Verdant if roll < 0.45 => Piece::Tree(b.rl(1.3, 1.7), q(b.rd(8.0, 11.0))),
+        Biome::Verdant if roll < 0.8 => Piece::Boulder(b.rl(lo, hi), 1),
+        Biome::Verdant => plinth(b, WallStyle::Hedge),
+        Biome::Spire if roll < 0.4 => Piece::Crystal(b.rl(1.2, 1.8), b.rd(2.2, 3.2)),
+        Biome::Spire if roll < 0.75 => Piece::Boulder(b.rl(lo, hi), b.vd(4)),
+        Biome::Spire => plinth(b, WallStyle::Plinth),
+        Biome::Unmaking if roll < 0.35 => plinth(b, WallStyle::Monolith),
+        Biome::Unmaking if roll < 0.7 => Piece::Crystal(b.rl(1.2, 1.8), b.rd(2.2, 3.2)),
+        Biome::Unmaking => Piece::Inverted(b.rl(0.8, 1.1), q(b.rd(4.0, 6.5))),
+    };
+    let (reach, area) = match piece {
+        Piece::Boulder(r, _) | Piece::Tree(r, _) | Piece::Crystal(r, _) | Piece::Inverted(r, _) => {
+            (r, std::f32::consts::PI * r * r)
+        }
+        Piece::Column(r, len, _) => (len * 0.5 + r, 2.0 * r * len),
+        Piece::Plinth(half, ..) => (half.length(), 4.0 * half.x * half.y),
+    };
+    if area > max_area {
+        return false;
+    }
+    let need = reach + x.anchor_clear;
+    for _ in 0..10 {
+        let at = qv(f.p(b.rl(-0.4, 0.4) * f.hl, b.rl(-0.4, 0.4) * f.hw));
+        let ground = b.mask.as_ref().is_none_or(|m| m.ground(at, Vec2::splat(reach + x.road_clear)));
+        if !ground
+            || b.clearance(at, need) < need
+            || b.keep.iter().any(|(k, kr)| at.distance(*k) < kr + reach + 6.0)
+            || !b.off_lanes(at, reach + x.road_clear)
+        {
+            continue;
+        }
+        let g = b.group();
+        let placed = match piece {
+            Piece::Boulder(r, variant) => b.circle(g, at, r, |at, radius| Decor::Boulder { at, radius, variant }),
+            Piece::Tree(r, height) => b.circle(g, at, r, |at, radius| Decor::Tree { at, radius, height, variant: 0 }),
+            Piece::Crystal(r, k) => {
+                let (height, rot, variant) = (q(r * k), b.vd(16), b.vd(4));
+                b.circle(g, at, r, |at, radius| Decor::Crystal { at, radius, height, rot, variant })
+            }
+            Piece::Inverted(r, height) => b.circle(g, at, r, |at, radius| Decor::InvertedColumn { at, radius, height }),
+            Piece::Column(r, len, k) => {
+                let (d, r) = (rot16_dir(k), q(r));
+                let (from, to) = (at - d * (len * 0.5), at + d * (len * 0.5));
+                b.chain(g, from, to, r, r, |from, to| Decor::FallenColumn { from, to, radius: r })
+            }
+            Piece::Plinth(half, height, style) => {
+                let variant = b.vd(4);
+                let ok = b.block(g, at, half, |at, half| Decor::Wall { at, half, height, style, variant });
+                if ok && style == WallStyle::Plinth && b.biome == Biome::Cinder {
+                    let scale = q(b.rd(0.7, 1.0));
+                    b.decal(Decor::BrokenAnvil { at, scale });
+                }
+                ok
+            }
+        };
+        if placed {
+            return true;
+        }
+    }
+    false
 }
 
 /// Build district `kind` in frame `f`; on failure nothing it tried is left behind.
@@ -2442,20 +2591,23 @@ fn dress_floor(b: &mut Builder, plaza: f32) {
         let width = b.rd(0.25, 0.5);
         b.fissure(start, dir, segs, width);
     }
-    let bases: Vec<(Vec2, f32)> = b
+    // Base dressing only where masonry fell (§3.6.10): rubble at the foot of walls and plinths.
+    // Verdant keeps its ground cover at the feet of its ruins (grass is its identity).
+    let verdant = b.biome == Biome::Verdant;
+    let bases: Vec<(Vec2, f32, bool)> = b
         .obstacles
         .iter()
         .map(|o| {
             let (c, e) = extent(o);
-            (c, e.max_element())
+            (c, e.max_element(), matches!(o, Obstacle::Box { .. }))
         })
         .collect();
-    for (i, (c, r)) in bases.into_iter().enumerate() {
-        if i % 3 != 0 {
+    for (i, (c, r, masonry)) in bases.into_iter().enumerate() {
+        if i % 3 != 0 || !(masonry || verdant) {
             continue;
         }
         let at = c + rot16_dir(b.vd(16)) * (r + b.rd(0.6, 1.4));
-        if b.dress.chance(0.5) {
+        if verdant && b.dress.chance(0.6) {
             b.cover_patch(at, 0.9, 1.8);
         } else {
             b.rubble(at, 0.5, 1.0);
@@ -2607,6 +2759,9 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
         }
         if kind == DistrictKind::Field {
             field(&mut b, f);
+            if b.lay.chance(ROOM_ANCHOR) {
+                anchor(&mut b, f, &room_rules(), f32::MAX);
+            }
         }
         districts.push(District { kind, min: qv(slot.rect.min), max: qv(slot.rect.max) });
     }
@@ -2619,36 +2774,26 @@ pub fn generate(t: &RoomDef, seed: u32) -> RoomDef {
     if b.lay.chance(p_colossus) {
         colossus(&mut b, plaza);
     }
-    // The rest of the budget crowds the rim band and the skirts of the districts, so the middle of
-    // the field stays open for the fight.
+    // The rest of the budget stands in the north and flank rim band, the room's frame (§3.6.10):
+    // the middle of the field stays open for the fight, and the south edge stands between the
+    // camera and it.
     let target = cover_target(t.kind) * half.x * half.y * 4.0;
-    let comps = b.comps.clone();
+    // A fight room never drops below a handful of features to kite around, even when its
+    // compositions came out lean.
+    let floor = if matches!(t.kind, RoomKind::Combat | RoomKind::Elite) { 16 } else { 0 };
     let mut tries = 0;
-    while b.covered_area() < target && tries < 900 {
+    while (b.covered_area() < target || b.obstacles.len() < floor) && tries < 900 {
         tries += 1;
-        let roll = b.lay.f32();
-        let at = if roll < 0.4 && !comps.is_empty() {
-            let r = comps[b.lay.range_u32(0, comps.len() as u32) as usize];
-            let m = b.rl(1.5, 4.5);
-            match b.lay.range_u32(0, 4) {
-                0 => Vec2::new(b.rl(r.min.x, r.max.x), r.max.y + m),
-                1 => Vec2::new(b.rl(r.min.x, r.max.x), r.min.y - m),
-                2 => Vec2::new(r.min.x - m, b.rl(r.min.y, r.max.y)),
-                _ => Vec2::new(r.max.x + m, b.rl(r.min.y, r.max.y)),
-            }
-        } else {
-            // The north and flank bands only: the south edge stands between the camera and the fight.
-            let d = b.rl(RIM + 2.0, RIM + 7.0);
-            match b.lay.range_u32(0, 3) {
-                0 => Vec2::new(b.rl(-half.x + d, half.x - d), half.y - d),
-                1 => Vec2::new(-half.x + d, b.rl(-half.y + d * 2.0, half.y - d)),
-                _ => Vec2::new(half.x - d, b.rl(-half.y + d * 2.0, half.y - d)),
-            }
+        let d = b.rl(RIM + 2.0, RIM + 7.0);
+        let at = match b.lay.range_u32(0, 3) {
+            0 => Vec2::new(b.rl(-half.x + d, half.x - d), half.y - d),
+            1 => Vec2::new(-half.x + d, b.rl(-half.y + d * 2.0, half.y - d)),
+            _ => Vec2::new(half.x - d, b.rl(-half.y + d * 2.0, half.y - d)),
         };
         if b.comps.iter().chain(&reserve).any(|r| r.contains(at, 1.0)) {
             continue;
         }
-        let sat = b.lay.range_u32(1, 3);
+        let sat = b.lay.range_u32(0, 2);
         ruin(&mut b, at, sat);
     }
     // 5. Dressing (visual stream only).

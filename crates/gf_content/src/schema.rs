@@ -1579,6 +1579,34 @@ pub enum Decor {
         #[serde(default)]
         variant: u8,
     },
+    /// Visual (biome maps): framing mass that never blocks (OPEN_WORLD.md §3.6.5). `Lip`: a rock
+    /// or ruin fragment on the cliff lip, past the walkable edge. `Backdrop`: a tall silhouette
+    /// rising from the void beyond a far (north, east or west) shore. `Foreground`: a low dark
+    /// shape in the void off a camera-side (south) shore. `radius` is its footprint, `height` its
+    /// top above the floor; `rot` turns it and `variant` picks its shape.
+    Scenery {
+        at: Vec2,
+        radius: f32,
+        height: f32,
+        #[serde(default)]
+        kind: SceneryKind,
+        #[serde(default)]
+        rot: Rot16,
+        #[serde(default)]
+        variant: u8,
+    },
+}
+
+/// Where a [`Decor::Scenery`] piece frames the map.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum SceneryKind {
+    /// On the cliff lip, half over the drop.
+    #[default]
+    Lip,
+    /// A tall silhouette rising from the abyss beyond a far shore.
+    Backdrop,
+    /// A low, near-black shape in the void between the camera and a south shore.
+    Foreground,
 }
 
 impl Decor {
@@ -1644,7 +1672,8 @@ impl Decor {
             | Decor::Rubble { at, .. }
             | Decor::Clutter { at, .. }
             | Decor::Banner { at, .. }
-            | Decor::Debris { at, .. } => at,
+            | Decor::Debris { at, .. }
+            | Decor::Scenery { at, .. } => at,
         }
     }
 
@@ -1904,12 +1933,23 @@ pub struct RegionTheme {
     /// Shown in the region banner ("The Slag Flats").
     pub name: String,
     pub weight: f32,
-    /// Room-grammar composition pool for this region's slots (pick weights).
+    /// Room-grammar composition pool for this region's edge slots (pick weights).
     pub districts: Vec<(DistrictKind, f32)>,
-    /// Share of slots left open as killing fields (0..=1).
+    /// Share of the region's open fields left bare (0..=1); every other field holds one kiting
+    /// anchor (OPEN_WORLD.md §3.6.3).
     pub fields: f32,
-    /// Floor-cover target of the density top-up (0.0..=0.08).
+    /// Ceiling on colliding cover of the region's interior land (0.0..=0.08): anchors and story
+    /// clusters that would push past it are skipped (§3.6.9).
     pub cover: f32,
+    /// Compositions per region, on edge slots only (their backs to the coast or a border).
+    #[serde(default = "RegionTheme::default_comps")]
+    pub comps: u8,
+    /// Story clusters per region, on its frame band (a pit or barrier-wall edge).
+    #[serde(default = "RegionTheme::default_story")]
+    pub story: u8,
+    /// Share of the region's void shore that is framed (lip pieces, coast anchors, silhouettes).
+    #[serde(default = "RegionTheme::default_frame")]
+    pub frame: f32,
     /// `#RRGGBB`: the floor vertex tint and the minimap land colour.
     pub tint: String,
     pub map_color: String,
@@ -1929,6 +1969,16 @@ pub struct RegionTheme {
 }
 
 impl RegionTheme {
+    fn default_comps() -> u8 {
+        2
+    }
+    fn default_story() -> u8 {
+        1
+    }
+    fn default_frame() -> f32 {
+        0.5
+    }
+
     /// The name of the `k`-th region of this theme on a map.
     pub fn region_name(&self, k: u8) -> &str {
         match self.names.len() {
@@ -1999,6 +2049,78 @@ impl Default for RoadDef {
     }
 }
 
+/// How a biome map is composed (OPEN_WORLD.md §3.6): where compositions stand, what keeps clear,
+/// how the frame, vignettes and light pools are dressed. Every field defaults to the shipped
+/// composition, so templates may omit the block.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ComposeDef {
+    /// Slots per region: edge slots first (compositions), then open fields.
+    pub slots: u8,
+    /// Tiles: an edge slot's back lies within this many tiles (+1) of the coast or a border.
+    pub edge_band: u8,
+    /// Share of the back side's tiles that must touch that edge.
+    pub edge_share: f32,
+    /// Free floor (u) kept on a composition's three open sides.
+    pub slot_clear: f32,
+    /// Compositions, stories and anchors keep this far (u) from every pass.
+    pub pass_clear: f32,
+    /// Nothing colliding within road half-width + this (u) (`Builder.lane_pad`), except the
+    /// pieces laid with the mask lifted (pass arches, POI set pieces, hub monuments).
+    pub road_clear: f32,
+    /// A boulder anchor's radius range (u).
+    pub anchor_radius: (f32, f32),
+    /// Obstacle-free floor (u) around a field anchor.
+    pub anchor_clear: f32,
+    /// Chance of an arch where a road crosses an open region border (walls and ridges: always;
+    /// bridges: never).
+    pub pass_arches: f32,
+    /// Arches where roads enter POI clearings.
+    pub entry_arches: bool,
+    /// Chance per 22–28 u road slot of a tall shoulder piece (0 = none).
+    pub road_silhouettes: f32,
+    /// Length range (u) of a framed run of shore.
+    pub frame_run: (f32, f32),
+    /// Shore left unframed (u) around roads, bridges, plazas and passes.
+    pub frame_gap: f32,
+    /// Framed shore (u) per colliding coast anchor, at most.
+    pub coast_anchor_every: f32,
+    /// Land (u²) per vignette, at most.
+    pub vignette_area: f32,
+    /// Distance (u) between vignettes, at least.
+    pub vignette_spacing: f32,
+    /// Glowing fissures only this close (u) to heat (a crucible, great anvil, channel, liquid or a
+    /// POI heart).
+    pub heat_reach: f32,
+    /// Every land lattice point (11 × 7 u) has a warm source inside this box (u), centred on it.
+    pub light_box: (f32, f32),
+}
+
+impl Default for ComposeDef {
+    fn default() -> Self {
+        Self {
+            slots: 5,
+            edge_band: 1,
+            edge_share: 0.75,
+            slot_clear: 8.0,
+            pass_clear: 10.0,
+            road_clear: 4.0,
+            anchor_radius: (1.6, 2.6),
+            anchor_clear: 8.0,
+            pass_arches: 1.0,
+            entry_arches: false,
+            road_silhouettes: 0.0,
+            frame_run: (8.0, 24.0),
+            frame_gap: 10.0,
+            coast_anchor_every: 12.0,
+            vignette_area: 2000.0,
+            vignette_spacing: 18.0,
+            heat_reach: 9.0,
+            light_box: (30.0, 18.0),
+        }
+    }
+}
+
 /// How many POIs of a kind the map places, and the Seals each is worth.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PoiQuota {
@@ -2056,6 +2178,8 @@ pub struct ExpeditionDef {
     pub roads: RoadDef,
     pub pois: Vec<PoiQuota>,
     pub camps: CampDef,
+    /// Composition and negative space (§3.6).
+    pub compose: ComposeDef,
     /// Grand monuments for regions without a major POI (pick weights).
     pub landmarks: Vec<(MapMark, f32)>,
     /// Seals that open the Boss Gate (the Warlord counts its own).
@@ -2082,6 +2206,7 @@ impl Default for ExpeditionDef {
             roads: RoadDef::default(),
             pois: Vec::new(),
             camps: CampDef::default(),
+            compose: ComposeDef::default(),
             landmarks: Vec::new(),
             seals_required: 6,
             gate_requires_warlord: true,

@@ -1172,8 +1172,11 @@
             size: (432.0, 272.0),
             regions: (5, 3),
             start_theme: "slag_flats",
-            // Region themes: each region's slots are filled from its `districts` pool (room-grammar
-            // compositions), `fields` of them stay open killing ground, `cover` tops up ruins.
+            // Region themes (OPEN_WORLD.md §3.6): up to `comps` edge slots (backs to the coast or a
+            // border) are filled from the `districts` pool (room-grammar compositions); every other
+            // slot is an open field, painted, and `fields` of them stay bare (the rest hold one
+            // kiting anchor). `cover` is the ceiling on the interior's colliding cover, `story` the
+            // story clusters on the frame band, `frame` the share of void shore that is framed.
             // Camps draw their pack from `camp_pool` (one enemy kind per camp, 6–12 strong; bombers
             // stay out of camps, a dozen sleeping kindlejacks is a wipe, not a fight).
             // `tint` multiplies the ground (#808080 = unchanged: hue *and* value), `ground` paints
@@ -1185,13 +1188,16 @@
                     weight: 1.3,
                     open: true,
                     fields: 0.6,
-                    cover: 0.035,
+                    cover: 0.010,
+                    comps: 1,
+                    story: 1,
+                    frame: 0.6,
                     districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)],
-                    // Black glassy slag, orange seams.
+                    // Black glassy slag: pale cold seams, orange ones only near heat (§3.6.7).
                     tint: "#737173",
                     map_color: "#3C2A24",
                     names: ["The Slag Flats", "The Glass Wastes", "Clinker Plain", "The Cooling Fields"],
-                    ground: (paving: -0.2, ash: 0.0),
+                    ground: (paving: -0.2, ash: 0.2),
                     camp_pool: [(key: "cinderling", weight: 1.0), (key: "emberwisp", weight: 0.6), (key: "slagspitter", weight: 0.3)],
                 ),
                 (
@@ -1199,13 +1205,16 @@
                     name: "Foundry Ruins",
                     weight: 1.0,
                     fields: 0.2,
-                    cover: 0.07,
+                    cover: 0.022,
+                    comps: 2,
+                    story: 1,
+                    frame: 0.65,
                     districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)],
                     // Soot brick and iron plate.
                     tint: "#7A7777",
                     map_color: "#4A403C",
                     names: ["Foundry Ruins", "The Dead Furnaces", "Bellows Hall", "The Cold Smelteries", "Ingot Row"],
-                    ground: (paving: 0.25, ash: 0.1),
+                    ground: (paving: 0.25, ash: 0.25),
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "cinderling", weight: 0.7), (key: "slagspitter", weight: 0.4)],
                 ),
                 (
@@ -1213,13 +1222,16 @@
                     name: "Colonnade of Oaths",
                     weight: 0.9,
                     fields: 0.25,
-                    cover: 0.07,
+                    cover: 0.018,
+                    comps: 2,
+                    story: 1,
+                    frame: 0.6,
                     districts: [(ColonnadeCourt, 1.5), (ForgeHall, 0.4)],
                     // Pale marble and gold.
                     tint: "#8B867D",
                     map_color: "#6E6252",
                     names: ["Colonnade of Oaths", "The Oathbound Walk", "Hall of Vows", "The Pledge Stones", "Court of the Sworn"],
-                    ground: (paving: 0.4, ash: 0.0),
+                    ground: (paving: 0.4, ash: 0.15),
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "cinderling", weight: 0.6), (key: "emberwisp", weight: 0.4)],
                 ),
                 (
@@ -1228,7 +1240,10 @@
                     weight: 0.8,
                     open: true,
                     fields: 0.75,
-                    cover: 0.03,
+                    cover: 0.010,
+                    comps: 1,
+                    story: 1,
+                    frame: 0.55,
                     districts: [(SlagChannel, 0.6)],
                     // Pale grey ash in wind ripples.
                     tint: "#8E8C8B",
@@ -1242,13 +1257,16 @@
                     name: "The Chainyard",
                     weight: 0.7,
                     fields: 0.3,
-                    cover: 0.07,
+                    cover: 0.018,
+                    comps: 2,
+                    story: 1,
+                    frame: 0.65,
                     districts: [(CrucibleYard, 1.4), (ForgeHall, 0.6)],
                     // Rust red, scrap and chains.
                     tint: "#8B796E",
                     map_color: "#6A3826",
                     names: ["The Chainyard", "Rust Gallows", "The Anchor Pits", "The Shackle Rows"],
-                    ground: (paving: -0.05, ash: 0.0),
+                    ground: (paving: -0.05, ash: 0.2),
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "slagspitter", weight: 0.5), (key: "cinderling", weight: 0.5)],
                 ),
             ],
@@ -1258,7 +1276,7 @@
             // Slag rivers (pits, bridged at the road passes) and forge walls (breached at the passes).
             barriers: (chance: 0.45, kinds: [(River, 0.30), (Wall, 0.15)]),
             roads: (width: 6.0, loop_chance: 0.3, pass_width: 8.0),
-            // 14 Seals on offer, 6 open the gate (the Warlord's 2 included). No Gate quota: the gate
+            // 14 Seals on offer, 8 open the gate (the Warlord's 2 included). No Gate quota: the gate
             // is implicit. The Watchfire quota arrives in phase 3.
             pois: [
                 (kind: Anvil, count: 3, seals: 1),
@@ -1270,11 +1288,17 @@
                 (kind: Spring, count: 3, seals: 0),
             ],
             camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
+            // Composition (OPEN_WORLD.md §3.6.9): the defaults, but the widest light box a screen
+            // still holds whole, so the light gaps add few fire bowls and the dusk between the
+            // pools survives.
+            compose: (light_box: (34.0, 21.0)),
             // Grand monuments for regions without a major POI: the skyline. The Fallen Arms (a
             // colossal god-weapon, 14–20 u tall) arrive early from phase 4 so every map has tall
             // silhouettes. No SealedGate: a second sealed gate reads as the real Boss Gate.
             landmarks: [(FallenWeapon, 1.2), (GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.5), (GreatBrazier, 0.7)],
-            seals_required: 7,
+            // 7 -> 8 with the composition pass (OPEN_WORLD.md §3.6.12, retune rung 1): the open map
+            // runs faster (a data-only declutter took the seed-7 stage from 367 s to 328 s).
+            seals_required: 8,
             gate_requires_warlord: true,
             gate_force_minute: 12.0,
             // Today's boss after 7 rooms (hp_growth_per_room 0.05 × 7).
