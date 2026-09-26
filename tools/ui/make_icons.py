@@ -2323,13 +2323,16 @@ def g_pistol(c):
         c.poly(Path(0.28, 0.6).C(0.26, 0.76, 0.24, 0.86, 0.22, 0.96).L(0.02, 0.96).C(0.04, 0.9, 0.06, 0.8, 0.08, 0.72).pts())
 
 
-def k_kael_r(c):  # Bullet Ballet: twin spectral pistols spinning back to back
-    with c.place(0.58, 0.34, 0.62):
+def k_kael_r(c):  # Bullet Ballet: twin spectral pistols crossed under a star
+    with c.place(0.36, 0.6, 0.78, r=-48):
         g_pistol(c)
-    with c.place(0.42, 0.68, 0.62, sx=-1):
+    with c.op("cut"):
+        with c.place(0.64, 0.6, 0.86, r=48, sx=-1):
+            c.rect(0.2, 0.16, 1.0, 0.46, r=0.04)
+    with c.place(0.64, 0.6, 0.78, r=48, sx=-1):
         g_pistol(c)
-    c.arc(0.5, 0.5, 0.5, 190, 300, 0.07, 0.01)
-    c.arc(0.5, 0.5, 0.5, 10, 120, 0.07, 0.01)
+    with c.place(0.5, 0.1, 0.26):
+        g_spark4(c, 0.16)
 
 
 def k_kael_p(c):  # Ghost Step: a footprint with a ghost trail
@@ -2545,16 +2548,19 @@ def k_epoch_e(c):  # Rewind Wounds: a counter-clockwise arrow around a heart
         g_heart(c)
 
 
-def k_epoch_r(c):  # Stolen Second: a clock with a missing wedge, the wedge pulled away
-    c.circle(0.46, 0.54, 0.46)
+def k_epoch_r(c):  # Stolen Second: a clock with a missing wedge, the wedge lifted out
+    cx, cy, r = 0.44, 0.56, 0.44
+    c.circle(cx, cy, r)
     with c.op("cut"):
-        c.ring(0.46, 0.54, 0.38, 0.04)
-        c.poly([(0.46, 0.54), polar(0.46, 0.54, 0.7, -90), polar(0.46, 0.54, 0.7, -35)])
-        c.line([(0.46, 0.54), polar(0.46, 0.54, 0.24, -150)], 0.07)
-        c.line([(0.46, 0.54), polar(0.46, 0.54, 0.17, 130)], 0.07)
-    off = polar(0, 0, 0.14, -62)
-    c.poly([(0.46 + off[0], 0.54 + off[1]), polar(0.46 + off[0], 0.54 + off[1], 0.46, -88),
-            polar(0.46 + off[0], 0.54 + off[1], 0.46, -37)])
+        c.ring(cx, cy, r - 0.08, 0.035)
+        c.poly([(cx, cy), polar(cx, cy, 0.7, -95), polar(cx, cy, 0.7, -25)])
+        c.line([(cx, cy), polar(cx, cy, 0.22, -150)], 0.07)
+        c.line([(cx, cy), polar(cx, cy, 0.16, 130)], 0.07)
+    off = polar(0, 0, 0.1, -60)
+    ox, oy = cx + off[0], cy + off[1]
+    c.poly([(ox, oy)] + arcpts(ox, oy, r, r, -88, -32, 16))
+    with c.op("cut"):
+        c.poly(stroke_poly(arcpts(ox, oy, r - 0.06, r - 0.06, -84, -36, 12), 0.03))
 
 
 def k_epoch_p(c):  # Borrowed Time: an hourglass with a stride arrow
