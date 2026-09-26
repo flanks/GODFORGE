@@ -629,6 +629,7 @@ pub(super) fn region_banner(
     link: Res<Link>,
     room: Res<CurrentRoom>,
     kit: Res<UiKit>,
+    focus: Res<super::HudFocus>,
     mut t: ResMut<Top>,
     mut ui: Ui,
 ) {
@@ -668,8 +669,9 @@ pub(super) fn region_banner(
         t.banner_t = 0.0;
     }
     t.banner_t += time.delta_secs();
-    // Suppressed while the boss bar shows.
-    let on = t.banner_t < BANNER_LIFE && t.boss_t < 0.0;
+    // Suppressed while the boss bar shows, and under the Forge drawer and the boon spread, whose
+    // titles sit in the same band.
+    let on = t.banner_t < BANNER_LIFE && t.boss_t < 0.0 && !focus.forge_drawer && !focus.boon_spread;
     ui.show(root, on);
     if on {
         let a = (t.banner_t / 0.35).min(1.0) * (1.0 - ((t.banner_t - (BANNER_LIFE - 1.0)) / 1.0).clamp(0.0, 1.0));

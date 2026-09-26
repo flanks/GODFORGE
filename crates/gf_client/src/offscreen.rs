@@ -194,6 +194,7 @@ fn update_pins(
     index: Res<SceneIndex>,
     rects: Res<HudRects>,
     scale: Res<UiScale>,
+    panels: Res<crate::ui::PanelState>,
     mut pings: ResMut<Pings>,
     mut pool: ResMut<PinPool>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
@@ -371,6 +372,10 @@ fn update_pins(
         .map(|(_, t)| t)
         .collect();
     let targets = downed.into_iter().chain(gate_open).chain(shared).chain(allies).chain(pinged).chain(objectives);
+    // A full panel (the Forge, the boon spread, the end screen, the help tome) owns the screen:
+    // pins would sit on its frame and title, so they wait until it closes.
+    let covered = panels.forge || panels.boons || panels.end || panels.help;
+    let targets = targets.filter(|_| !covered);
 
     // Place: edge pin, off the HUD rects, and off earlier pins along the edge.
     let mut placed: Vec<(Vec2, f32, Target, Option<f32>)> = Vec::new();

@@ -33,7 +33,7 @@ block lists which phase 3/4 items that pass already delivered. **Start with phas
 run-length target (§13 there) needs the user's sign-off.
 
 QA helpers added by the pass: `GF_CAM_AT="x,y"` pins the camera to a sim point (coast and set-piece
-captures), and `--fps` (or the H help overlay) shows the net stats line.
+captures), and `--fps` (or F10, the debug strip) shows the net stats line and FPS.
 
 ## 1. Where the project stands
 
@@ -162,10 +162,17 @@ To do:
   - Projectile trails, muzzle flashes (budgeted).
   - Kill motes flying to the killer.
   - Layered explosions (flash, ring, sparks, smoke).
-* **UI:**
-  - Gold-framed gradient panels (`BackgroundGradient`, `BoxShadow`) and better bars and boon cards.
-  - Done in the UI pass: Cinzel and Alegreya Sans are embedded, and `gf_client::uikit` is the
-    widget kit (`docs/art/UI_STYLE.md`).
+* **UI: done.** The UI pass is merged into the main line (`1b3f8af`, `ce691eb`, `0c49c00`,
+  `1997dd0`), following `docs/art/UI_STYLE.md`:
+  - Cinzel and Alegreya Sans are embedded, and `gf_client::uikit` is the widget kit.
+  - The combat HUD (`gf_client::hud`) has four corner clusters and a thin top band. The south of
+    the view stays clear.
+  - The panels (`gf_client::ui`): the Forge drawer, the boon spread, the end screen, the help tome,
+    the door panel and tooltips. `ui.rs` drives `hud::HudFocus` so the HUD steps aside.
+  - Record shots are `shots/ui_final_*.png` at 1600x900 and 1920x1080.
+  - Still open: clippy and tests were on hold for the pass and need one cleanup run. The touch
+    overlay has no QA flag, so it is untested on screen. Heroes draw through the end-screen scrim
+    (camera or scene order).
 * **Docs:** update `docs/ARCHITECTURE.md` (procgen, materials) and re-capture `docs/media/*.jpg`.
 
 ## 4. Bevy 0.20 notes that cost time to find
