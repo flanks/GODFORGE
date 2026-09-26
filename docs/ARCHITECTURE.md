@@ -172,6 +172,24 @@ as the fallback. The colour and readability rules are final:
   `include_bytes!` (`assets/fonts`), and Alegreya Sans Medium replaces Bevy's default font. The
   colour tokens and the closed type ramp live in `gf_client::theme`; the widgets, their motion and
   the embedded UI art in `gf_client::uikit` (spec: `docs/art/UI_STYLE.md`).
+* Combat HUD (`gf_client::hud`, UI_STYLE §6): four corner clusters and a thin top band, built
+  once on the kit and updated in place with change-only writes.
+  - `hud/hearth.rs` (bottom-left): the portrait medallion with the ult ring, HP with a drain ghost
+    and ward hatch, armour plates, dash lozenges, Q / E with the cooldown sweep, the Team
+    Overdrive hex, the aim chip and the low-HP vignette.
+  - `hud/arsenal.rs` (bottom-right): the forged weapon as a chassis hex and four part slots with
+    rarity gems, the wallet and the boon chip. Nothing persistent sits in the south lane.
+  - `hud/party.rs` (top-left): ally frames and the toast rail.
+  - `hud/wayfinder.rs` (top-right): the objective tracker (timer, Seals, Warlord and gate, threat,
+    surge, live events, next objectives; a room line on legacy rooms) under the hidden
+    `uikit::MinimapFrame`, the hook OPEN_WORLD phase 3 fills.
+  - `hud/top.rs`: the boss / Warlord bar, the callout lane, the region banner, the surge flash.
+  - `hud/world.rs`: world-anchored prompt plates, the state banner, ally tags, elite bars, POI
+    labels, downed markers and the touch overlay.
+  - Edge pins are in `offscreen.rs`, damage numbers in `vfx.rs`. Every visible cluster writes its
+    rect to `theme::HudRects` after layout, and pins, prompts, tags and numbers keep out of it.
+  - `hud::HudFocus` is how panels hide the tracker, the Arsenal and the boon chip. The net line
+    and FPS live in the debug strip (F10 or `--fps`).
 
 ## 8. Performance and LOD budgets
 

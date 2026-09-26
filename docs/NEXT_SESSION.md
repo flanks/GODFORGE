@@ -197,6 +197,18 @@ To do:
   - `UiMaterial` shaders import `bevy_ui_render::ui_vertex_output::UiVertexOutput`; the material
     binds at `@group(1)`. WGSL reserved words such as `active` fail at runtime, not at build.
   - QA boards: `--ui-shot kit|icons|cards`; `--hud-off` hides every UI root for clean plates.
+* **Combat HUD gotchas** (`gf_client::hud`, rebuilt on the kit per UI_STYLE §6):
+  - A node's screen rect is `UiGlobalTransform.translation × ComputedNode.inverse_scale_factor()`
+    (centre) and `size() × inverse_scale_factor()`, in the same UI px as `Node.left/top` and as
+    `world_to_screen / UiScale`. `hud::fill_hud_rects` writes them into `HudRects` in PostUpdate.
+  - A minimized or occluded window reports a zero viewport (and 1×1 screenshots). Never
+    `f32::clamp` against the viewport without checking `lo <= hi`: it panics.
+  - Screenshots from two game instances at once come out 1×1 or with stale layouts; run them one
+    at a time.
+  - `hud::FadeGroup` fades a whole subtree by scaling captured base colours; keep kit slots (which
+    own their tints) out of faded groups.
+  - Set `hud::HudFocus { forge_drawer, boon_spread }` from the panels so the tracker, the Arsenal
+    and the boon chip step aside; `InputState.forge_open` already counts as the drawer.
 * **Lights:** `DirectionalLight.shadow_maps_enabled` (not `shadows_enabled`), `bevy::light::{NotShadowCaster, CascadeShadowConfigBuilder}`.
 * **Pick one aim abstraction.** Never branch weapon code per aim mode. Content is data (CSV →
   `gf-content import` → RON). No stats in code.

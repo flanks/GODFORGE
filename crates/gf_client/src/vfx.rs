@@ -13,7 +13,7 @@ use crate::{ClientConfig, ClientSet};
 use gf_content::VfxTier;
 use gf_core::damage::DamageType;
 use gf_core::ids::NetId;
-use gf_engine::client::{NotShadowCaster, font_px, world_to_screen};
+use gf_engine::client::{NotShadowCaster, world_to_screen};
 use gf_engine::prelude::*;
 use gf_net::GameEvent;
 use gf_net::quant::QPos;
@@ -51,6 +51,8 @@ struct Fade {
     shrink_xz: bool,
 }
 
+/// A damage number (UI_STYLE §6.12): `Dmg` 21 in the element hue, crits 28 in `ichor` with a
+/// spark. Pops with `UiTransform.scale` (never the font size), rises 18 px, fades at the end.
 #[derive(Component)]
 pub struct DamageNumber {
     world: Vec3,
@@ -58,8 +60,13 @@ pub struct DamageNumber {
     max: f32,
     target: NetId,
     amount: u32,
-    rise: f32,
     px: f32,
+    crit: bool,
+    color: Color,
+    /// The pop restarts when hits merge into this number.
+    pop: f32,
+    fresh: bool,
+    spark: Option<Entity>,
 }
 
 #[derive(Resource, Default)]
@@ -354,6 +361,7 @@ fn spawn_from_events(
     mut mats: ResMut<Assets<StandardMaterial>>,
     mut state: ResMut<VfxState>,
     mut numbers: Query<&mut DamageNumber>,
+    kit: Res<crate::uikit::UiKit>,
 ) {
     if link.fresh_events.is_empty() {
         return;
@@ -388,16 +396,11 @@ fn spawn_from_events(
                     fx.burst(at, element_color(element), n, 4.0, 0.06, 0.25, 6.0);
                 }
                 if settings.damage_numbers && mine && amount > 0 {
-                    let color = if precision {
-                        hex("#7FF6FF")
-                    } else if crit {
-                        hex("#FFC940")
-                    } else if element == DamageType::Kinetic {
-                        Color::srgb(1.0, 0.97, 0.9)
-                    } else {
-                        mix(element_color(element), Color::WHITE, 0.35)
-                    };
-                    let px = if crit || precision { 21.0 } else { 14.0 };
+                    // Element hue for normal hits (Kinetic reads as bone); crits and precision
+                    // hits in ichor at 28 (§6.12). Never red-white: that is danger only.
+                    let big = crit || precision;
+                    let color = if big { crate::theme::tok::ICHOR } else { element_color(element) };
+                    let px = if big { 28.0 } else { 21.0 };
                     new_numbers.push((target, w3(p, 1.4 + r), amount as u32, color, px));
                 }
             }
@@ -531,25 +534,57 @@ fn spawn_from_events(
             n.amount += amount;
             n.life = n.max;
             n.world = at;
-            n.px = n.px.max(px);
+            n.pop = 0.0;
+            // A crit merging into a normal number does not restyle it (fixed atlas sizes).
             continue;
         }
         if state.numbers >= 40 {
             continue;
         }
         state.numbers += 1;
+        let crit = px > 24.0;
+        // A 16 px radiant spark at a crit's upper right.
+        let spark = crit.then(|| {
+            commands
+                .spawn((
+                    Node {
+                        position_type: PositionType::Absolute,
+                        right: px_val(-14.0),
+                        top: px_val(-6.0),
+                        width: px_val(16.0),
+                        height: px_val(16.0),
+                        ..default()
+                    },
+                    kit.tex_tinted("fx/spark4@2x.png", hex("#FFB347")),
+                    gf_engine::client::Pickable::IGNORE,
+                ))
+                .id()
+        });
         let e = commands
             .spawn((
-                DamageNumber { world: at, life: 0.8, max: 0.8, target, amount, rise: 0.0, px },
-                Text::new(amount.to_string()),
-                font_px(px),
-                TextColor(color),
-                TextShadow { offset: Vec2::new(1.5, 1.5), color: Color::srgba(0.0, 0.0, 0.0, 0.85) },
+                DamageNumber {
+                    world: at,
+                    life: 0.8,
+                    max: 0.8,
+                    target,
+                    amount,
+                    px,
+                    crit,
+                    color,
+                    pop: 0.0,
+                    fresh: true,
+                    spark,
+                },
+                kit.text_px(crate::theme::Ty::Dmg, px, amount.to_string(), color),
                 // Hidden until `update_numbers` projects it (no one-frame flash at the origin).
                 Node { position_type: PositionType::Absolute, display: Display::None, ..default() },
-                GlobalZIndex(5),
+                UiTransform::default(),
+                GlobalZIndex(crate::theme::z::WORLD),
             ))
             .id();
+        if let Some(sp) = spark {
+            commands.entity(e).add_child(sp);
+        }
         state.recent.insert(target, e);
     }
 }
@@ -625,18 +660,43 @@ fn update_fades(mut commands: Commands, time: Res<Time>, mut q: Query<(Entity, &
     }
 }
 
+fn px_val(v: f32) -> Val {
+    Val::Px(v)
+}
+
+/// §6.12: pop 1.4 → 1.0 over 120 ms (crit 1.5), rise 18 px over 0.7 s, fade over the last
+/// 0.25 s. Only targets within 480 px of the hero show numbers (crits always); a number never
+/// sits inside the HUD clusters or the callout band.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
 fn update_numbers(
     mut commands: Commands,
     time: Res<Time>,
+    link: Res<Link>,
+    scale: Res<UiScale>,
+    rects: Res<crate::theme::HudRects>,
     mut state: ResMut<VfxState>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    mut q: Query<(Entity, &mut DamageNumber, &mut Node, &mut Text, &mut TextFont, &mut TextColor)>,
+    mut q: Query<(Entity, &mut DamageNumber, &mut Node, &mut Text, &mut TextColor, &mut TextShadow, &mut UiTransform)>,
+    mut images: Query<&mut ImageNode>,
 ) {
     let dt = time.delta_secs();
     let Ok((camera, cam_tf)) = cameras.single() else { return };
+    let s = scale.0.max(0.01);
+    let hero = link.me().and_then(|p| world_to_screen(camera, cam_tf, w3(p.mover.pos, 1.0))).map(|p| p / s);
     let mut alive = 0;
-    for (e, mut n, mut node, mut text, mut font, mut color) in &mut q {
+    for (e, mut n, mut node, mut text, mut color, mut shadow, mut tf) in &mut q {
         n.life -= dt;
+        let Some(p) = world_to_screen(camera, cam_tf, n.world).map(|p| p / s) else {
+            node.display = Display::None;
+            continue;
+        };
+        // Far from the hero: only crits are worth a number.
+        if n.fresh {
+            n.fresh = false;
+            if !n.crit && hero.is_some_and(|h| h.distance(p) > 480.0) {
+                n.life = 0.0;
+            }
+        }
         if n.life <= 0.0 {
             if state.recent.get(&n.target) == Some(&e) {
                 state.recent.remove(&n.target);
@@ -645,23 +705,34 @@ fn update_numbers(
             continue;
         }
         alive += 1;
-        n.rise += dt * 1.6;
         let label = n.amount.to_string();
+        let w = label.len() as f32 * n.px * 0.52;
         if text.0 != label {
             text.0 = label;
         }
-        let k = n.life / n.max;
-        let pop = if k > 0.85 { 1.0 + (k - 0.85) * 3.0 } else { 1.0 };
-        *font = font_px(n.px * pop);
-        color.0 = color.0.with_alpha((k * 2.0).min(1.0));
-        match world_to_screen(camera, cam_tf, n.world + Vec3::Y * n.rise) {
-            Some(p) => {
-                node.display = Display::Flex;
-                node.left = Val::Px(p.x - n.px * 0.3 * text.0.len() as f32);
-                node.top = Val::Px(p.y - n.px);
-            }
-            None => node.display = Display::None,
+        let age = n.max - n.life;
+        n.pop += dt;
+        let k = (n.pop / 0.12).min(1.0);
+        let from = if n.crit { 1.5 } else { 1.4 };
+        let pop = from + (1.0 - from) * (1.0 - (1.0 - k).powi(3));
+        let sc = Vec2::splat(pop);
+        if tf.scale != sc {
+            tf.scale = sc;
         }
+        let rise = 18.0 * (1.0 - (1.0 - (age / 0.7).min(1.0)).powi(2));
+        let alpha = (n.life / 0.25).min(1.0);
+        color.0 = n.color.with_alpha(alpha);
+        shadow.color = crate::theme::tok::INK.with_alpha(0.9 * alpha);
+        if let Some(sp) = n.spark
+            && let Ok(mut img) = images.get_mut(sp)
+        {
+            img.color = hex("#FFB347").with_alpha(alpha);
+        }
+        let at = Vec2::new(p.x, p.y - rise);
+        let blocked = rects.hits(at, 6.0) || at.y < 200.0;
+        node.display = if blocked { Display::None } else { Display::Flex };
+        node.left = Val::Px((at.x - w * 0.5).round());
+        node.top = Val::Px((at.y - n.px).round());
     }
     state.numbers = alive;
 }
