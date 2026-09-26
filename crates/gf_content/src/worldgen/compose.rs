@@ -1673,9 +1673,9 @@ fn seams(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
 
 // ───────────────────────────── dressing ─────────────────────────────
 
-/// Braziers along every road, 30–40 u apart on alternating sides (pools of warm light with dusk
-/// between them), skipped where another fire already burns within 12 u; bridge decks with fire
-/// at their heads.
+/// Braziers along every road, 36–48 u apart on alternating sides (pools of warm light with dusk
+/// between them), skipped where another fire already burns within 16 u or a lit POI clearing
+/// lies within 14 u of its rim; bridge decks with fire at their heads.
 fn dress_roads(g: &Gen, b: &mut Builder) {
     let lanes = g.lanes();
     let mut fires: Vec<Vec2> = b
@@ -1698,22 +1698,25 @@ fn dress_roads(g: &Gen, b: &mut Builder) {
         let mut side = if b.dress.chance(0.5) { 1.0 } else { -1.0 };
         while s < len - 3.0 {
             let at = l.from + dir * s + n * (side * (l.width * 0.5 + 1.3));
-            if fires.iter().all(|f| f.distance(at) >= 12.0) {
+            // A lit clearing already carries the road past it (its ring and key light).
+            let lit = g.pois.iter().any(|p| p.site.at.distance(at) < p.plaza + 14.0);
+            if !lit && fires.iter().all(|f| f.distance(at) >= 16.0) {
                 b.brazier(at);
                 fires.push(at);
             }
             side = -side;
-            s += b.rd(30.0, 40.0);
+            s += b.rd(36.0, 48.0);
         }
     }
     for (k, deck) in g.bridges.iter().enumerate() {
         b.dress = g.root.fork(760 + k as u64);
         b.decal(Decor::Bridge { from: deck.from, to: deck.to, width: deck.width });
         let dir = (deck.to - deck.from).normalize_or(Vec2::X);
+        // One fire at each head, on opposite sides: the deck reads lit end to end without a
+        // pair of pools at both.
         let n = Vec2::new(-dir.y, dir.x) * (deck.width * 0.5 + 0.9);
         for (end, s) in [(deck.from, -1.0f32), (deck.to, 1.0)] {
-            b.brazier(end + dir * (s * 1.2) + n);
-            b.brazier(end + dir * (s * 1.2) - n);
+            b.brazier(end + dir * (s * 1.2) + n * s);
         }
     }
 }
@@ -2029,7 +2032,7 @@ fn vignettes(g: &Gen, b: &mut Builder, x: &ComposeDef, r: usize, plan: &mut Plan
             if !ok {
                 continue;
             }
-            let lit = b.dress.chance(0.6);
+            let lit = b.dress.chance(0.45);
             vignette(b, p, o, wall, lit);
             plan.vignettes.push((p, o, lit));
             placed += 1;
@@ -2074,9 +2077,10 @@ fn vignette(b: &mut Builder, p: Vec2, o: Vec2, wall: bool, lit: bool) {
 /// Light gaps (§3.6.8): every land lattice point (11 × 7 u) needs a warm source (a brazier, great
 /// brazier or crucible, a liquid tile or a POI heart) inside the `light_box` centred on it, so
 /// every screen holds a warm pool. Points without one, in a seeded order, light an unlit vignette
-/// in the box, else set a fire bowl beside a frame solid (on the side facing the point), else on
-/// the nearest road shoulder. Among the candidates of a kind, the one that lights the most dark
-/// points goes first (then the nearest), so the pools stay few and far between.
+/// in the box, else set a fire bowl against a frame solid (within 3 u, on the side facing the
+/// point); a point with neither stays dark (a lone bowl on open floor is scatter). Among the
+/// candidates of a kind, the one that lights the most dark points goes first (then the nearest),
+/// so the pools stay few and far between.
 fn light_gaps(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
     b.dress = g.root.fork(2300);
     let t = &g.tiles;
@@ -2113,7 +2117,6 @@ fn light_gaps(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
         points.swap(i, j);
     }
     let mut dark = vec![true; points.len()];
-    let lanes = g.lanes();
     for k in 0..points.len() {
         if !dark[k] {
             continue;
@@ -2144,7 +2147,8 @@ fn light_gaps(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
                 break;
             }
         }
-        // 2. A fire bowl beside a frame solid in the box, on the side facing the point.
+        // 2. A fire bowl against a frame solid in the box (within 3 u of it), on the side facing
+        //    the point.
         if placed.is_none() {
             let mut cands: Vec<((i64, i64), usize, Vec2)> = plan
                 .solids
@@ -2153,9 +2157,10 @@ fn light_gaps(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
                 .filter(|(_, (c, _))| inside(*c, p))
                 .map(|(i, (c, e))| {
                     let d = (p - c).normalize_or(Vec2::NEG_Y);
-                    let at = qv(c + d * (e.max_element() + 1.2));
+                    let at = qv(c + d * (e.min_element() + 1.2));
                     (rank(at), i, at)
                 })
+                .filter(|(_, i, at)| crate::procgen::sd(&b.obstacles[*i], *at) <= 3.0)
                 .collect();
             cands.sort_by_key(|c| (c.0, c.1));
             for (_, _, at) in cands.into_iter().take(8) {
@@ -2165,27 +2170,8 @@ fn light_gaps(g: &Gen, b: &mut Builder, x: &ComposeDef, plan: &mut Plan) {
                 }
             }
         }
-        // 3. A fire bowl on the nearest road shoulder in the box.
-        if placed.is_none() {
-            let near = lanes
-                .iter()
-                .map(|l| {
-                    let ab = l.to - l.from;
-                    let s = ((p - l.from).dot(ab) / ab.length_squared().max(1e-6)).clamp(0.0, 1.0);
-                    (l.from + ab * s, l)
-                })
-                .filter(|(q, _)| inside(*q, p))
-                .min_by(|a, z| a.0.distance_squared(p).total_cmp(&z.0.distance_squared(p)));
-            if let Some((q, l)) = near {
-                let dir = (l.to - l.from).normalize_or(Vec2::X);
-                let n = Vec2::new(-dir.y, dir.x);
-                let s = if (p - q).dot(n) >= 0.0 { 1.0 } else { -1.0 };
-                let at = qv(q + n * (s * (l.width * 0.5 + 1.3)));
-                if b.prop(Decor::Brazier { at }, 0.5) {
-                    placed = Some(at);
-                }
-            }
-        }
+        // (No third rung: a lone fire bowl on a road shoulder or open floor is random scatter;
+        // a point with no solid to set one against stays in the dusk.)
         if let Some(at) = placed {
             for (u, d) in points.iter().zip(dark.iter_mut()) {
                 if inside(at, *u) {
