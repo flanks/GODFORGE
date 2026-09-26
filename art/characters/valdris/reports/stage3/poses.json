@@ -1,0 +1,3327 @@
+{
+ "hero": "valdris",
+ "poses": {
+  "bind": {
+   "solver": {},
+   "body": {
+    "stretch_mm_p99_9": 0.0,
+    "stretch_mm_max": 0.0,
+    "edges_over_40pct": 0,
+    "edges_under_minus40pct": 0,
+    "collapsed_verts_area_lt_0_4": 0,
+    "volume_ratio": 1.0,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ]
+   },
+   "plates": {
+    "clipping": 0,
+    "clipping_worst": [],
+    "sliding": 0,
+    "sliding_worst": [],
+    "suit": 0,
+    "suit_worst": []
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 18,
+     "violations_per_iteration": [
+      4,
+      3,
+      7,
+      3,
+      2,
+      4,
+      4,
+      2,
+      1,
+      2,
+      13,
+      7,
+      7,
+      4,
+      1,
+      1,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 4,
+     "deepest_mm": 8.3
+    },
+    "loin": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.7
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 4,
+     "under_ground": 0,
+     "inside_by_part": {
+      "PAULDRONS": 4
+     }
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 28,
+    "poke_by_piece": [
+     [
+      "BODY",
+      11
+     ],
+     [
+      "FINGER_THUMB_2_R",
+      9
+     ],
+     [
+      "FINGER_THUMB_3_R",
+      8
+     ]
+    ],
+    "cuts": 0,
+    "cuts_by_piece": [],
+    "grip_L_from_left_shoulder_m": 1.269,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 2.8
+  },
+  "apose": {
+   "solver": {},
+   "body": {
+    "stretch_mm_p99_9": 16.5,
+    "stretch_mm_max": 23.6,
+    "edges_over_40pct": 58,
+    "edges_under_minus40pct": 122,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 1.0007,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 27,
+    "clipping_worst": [
+     [
+      "REREBRACE1_R -> CHEST",
+      6
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      5
+     ],
+     [
+      "REREBRACE2_L -> RIBS",
+      3
+     ],
+     [
+      "REREBRACE2_R -> RIBS",
+      3
+     ],
+     [
+      "CHEST -> REREBRACE2_L",
+      2
+     ],
+     [
+      "CHEST -> REREBRACE2_R",
+      2
+     ]
+    ],
+    "sliding": 75,
+    "sliding_worst": [
+     [
+      "VAMBRACE1_L -> COUTER_L",
+      6
+     ],
+     [
+      "REREBRACE2_R -> COUTER_R",
+      6
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      4
+     ],
+     [
+      "COUTER_COP_R -> REREBRACE2_R",
+      4
+     ],
+     [
+      "FINGER_MIDDLE_1_L -> FINGER_THUMB_3_L",
+      3
+     ],
+     [
+      "FINGER_MIDDLE_1_R -> FINGER_THUMB_3_R",
+      3
+     ]
+    ],
+    "suit": 76,
+    "suit_worst": [
+     [
+      "GORGET_1 -> BODY",
+      18
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      18
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      17
+     ],
+     [
+      "CHEST -> BODY",
+      15
+     ],
+     [
+      "GORGET_2 -> BODY",
+      4
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      2
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 13,
+     "violations_per_iteration": [
+      6,
+      1,
+      3,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 1,
+     "deepest_mm": 9.0
+    },
+    "loin": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.7
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 1,
+     "under_ground": 0,
+     "inside_by_part": {
+      "PAULDRONS": 1
+     }
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 1,
+    "poke_by_piece": [
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 1,
+    "cuts_by_piece": [
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 1.181,
+    "left_arm_reach_m": 0.666
+   },
+   "helpers_off": {
+    "plates": {
+     "clipping": 27,
+     "clipping_worst": [
+      [
+       "REREBRACE1_R -> CHEST",
+       6
+      ],
+      [
+       "REREBRACE1_L -> CHEST",
+       5
+      ],
+      [
+       "REREBRACE2_L -> RIBS",
+       3
+      ],
+      [
+       "REREBRACE2_R -> RIBS",
+       3
+      ],
+      [
+       "CHEST -> REREBRACE2_L",
+       2
+      ],
+      [
+       "CHEST -> REREBRACE2_R",
+       2
+      ]
+     ],
+     "sliding": 69,
+     "sliding_worst": [
+      [
+       "VAMBRACE1_L -> COUTER_L",
+       6
+      ],
+      [
+       "VAMBRACE1_R -> COUTER_R",
+       6
+      ],
+      [
+       "FINGER_MIDDLE_1_L -> FINGER_THUMB_3_L",
+       3
+      ],
+      [
+       "FINGER_MIDDLE_1_R -> FINGER_THUMB_3_R",
+       3
+      ],
+      [
+       "COUTER_L -> VAMBRACE1_L",
+       2
+      ],
+      [
+       "COUTER_R -> VAMBRACE1_R",
+       2
+      ]
+     ],
+     "suit": 76,
+     "suit_worst": [
+      [
+       "GORGET_1 -> BODY",
+       18
+      ],
+      [
+       "REREBRACE1_R -> BODY",
+       18
+      ],
+      [
+       "REREBRACE1_L -> BODY",
+       17
+      ],
+      [
+       "CHEST -> BODY",
+       15
+      ],
+      [
+       "GORGET_2 -> BODY",
+       4
+      ],
+      [
+       "REREBRACE2_L -> BODY",
+       2
+      ]
+     ]
+    },
+    "one_muted": {
+     "x_pauldron": {
+      "clipping": 27,
+      "sliding": 75,
+      "suit": 76
+     },
+     "x_elbow": {
+      "clipping": 27,
+      "sliding": 69,
+      "suit": 76
+     },
+     "x_knee": {
+      "clipping": 27,
+      "sliding": 75,
+      "suit": 76
+     },
+     "x_tasset": {
+      "clipping": 27,
+      "sliding": 75,
+      "suit": 76
+     },
+     "x_fauld": {
+      "clipping": 27,
+      "sliding": 75,
+      "suit": 76
+     }
+    }
+   },
+   "seconds": 2.1
+  },
+  "cannon_aim": {
+   "solver": {
+    "reach_L": 0.895,
+    "fold_eased_L": false,
+    "reach_R": 0.964,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.947,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.947,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 23.5,
+    "stretch_mm_max": 29.3,
+    "edges_over_40pct": 61,
+    "edges_under_minus40pct": 126,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9895,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 107,
+    "clipping_worst": [
+     [
+      "REREBRACE2_L -> RIBS",
+      10
+     ],
+     [
+      "VAMBRACE2_L -> PAULDRON_LAME2_L",
+      10
+     ],
+     [
+      "REREBRACE1_R -> CHEST",
+      10
+     ],
+     [
+      "COUTER_L -> RIBS",
+      8
+     ],
+     [
+      "REREBRACE2_R -> CHEST",
+      6
+     ],
+     [
+      "PAULDRON_LAME2_L -> VAMBRACE2_L",
+      5
+     ]
+    ],
+    "sliding": 279,
+    "sliding_worst": [
+     [
+      "COUTER_L -> REREBRACE2_L",
+      18
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      16
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      13
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      13
+     ],
+     [
+      "REREBRACE2_L -> VAMBRACE1_L",
+      12
+     ],
+     [
+      "COUTER_L -> VAMBRACE1_L",
+      12
+     ]
+    ],
+    "suit": 86,
+    "suit_worst": [
+     [
+      "REREBRACE1_L -> BODY",
+      23
+     ],
+     [
+      "GORGET_1 -> BODY",
+      15
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      12
+     ],
+     [
+      "CHEST -> BODY",
+      10
+     ],
+     [
+      "GORGET_2 -> BODY",
+      7
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      5
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 5,
+     "violations_per_iteration": [
+      4,
+      1,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 6,
+     "violations_per_iteration": [
+      18,
+      4,
+      7,
+      4,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 3,
+     "deepest_mm": 18.9
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 3,
+     "under_ground": 0,
+     "inside_by_part": {
+      "LEGS": 2,
+      "HIPS": 1
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 13,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.961,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 1.5
+  },
+  "guard": {
+   "solver": {
+    "reach_L": 0.875,
+    "fold_eased_L": false,
+    "reach_R": 0.959,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.947,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.947,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 23.3,
+    "stretch_mm_max": 33.5,
+    "edges_over_40pct": 60,
+    "edges_under_minus40pct": 131,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9867,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 67,
+    "clipping_worst": [
+     [
+      "VAMBRACE2_L -> PAULDRON_LAME2_L",
+      9
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      7
+     ],
+     [
+      "REREBRACE1_R -> CHEST",
+      5
+     ],
+     [
+      "PAULDRON_RAME2_R -> CHEST",
+      4
+     ],
+     [
+      "COUTER_R -> CHEST",
+      4
+     ],
+     [
+      "PAULDRON_LAME2_L -> VAMBRACE2_L",
+      3
+     ]
+    ],
+    "sliding": 292,
+    "sliding_worst": [
+     [
+      "COUTER_R -> REREBRACE2_R",
+      22
+     ],
+     [
+      "COUTER_L -> REREBRACE2_L",
+      18
+     ],
+     [
+      "COUTER_L -> VAMBRACE1_L",
+      18
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      13
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      13
+     ],
+     [
+      "GORGET_2 -> GORGET_1",
+      10
+     ]
+    ],
+    "suit": 55,
+    "suit_worst": [
+     [
+      "REREBRACE1_R -> BODY",
+      15
+     ],
+     [
+      "GORGET_1 -> BODY",
+      12
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      8
+     ],
+     [
+      "CHEST -> BODY",
+      4
+     ],
+     [
+      "BELLY -> BODY",
+      4
+     ],
+     [
+      "GORGET_2 -> BODY",
+      4
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 2,
+     "violations_per_iteration": [
+      2,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 6,
+     "violations_per_iteration": [
+      18,
+      4,
+      7,
+      4,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 3,
+     "deepest_mm": 18.9
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 3,
+     "under_ground": 0,
+     "inside_by_part": {
+      "LEGS": 2,
+      "HIPS": 1
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 14,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      2
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.943,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 1.6
+  },
+  "siege_brace": {
+   "solver": {
+    "reach_L": 1.106,
+    "fold_eased_L": false,
+    "reach_R": 0.961,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.801,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.801,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 29.1,
+    "stretch_mm_max": 55.4,
+    "edges_over_40pct": 89,
+    "edges_under_minus40pct": 152,
+    "collapsed_verts_area_lt_0_4": 25,
+    "volume_ratio": 0.9566,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "shin_R",
+      4
+     ],
+     [
+      "shin_L",
+      4
+     ],
+     [
+      "thigh_R",
+      4
+     ],
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "thigh_L",
+      2
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 171,
+    "clipping_worst": [
+     [
+      "GREAVE_L -> SABATON_FOOT_L",
+      11
+     ],
+     [
+      "GREAVE_R -> SABATON_FOOT_R",
+      11
+     ],
+     [
+      "COUTER_L -> CHEST",
+      10
+     ],
+     [
+      "TASSET1_L -> ANVIL_GASKET",
+      9
+     ],
+     [
+      "REREBRACE1_R -> CHEST",
+      8
+     ],
+     [
+      "SHIN_PLATE_L -> SABATON_TOE2_L",
+      8
+     ]
+    ],
+    "sliding": 261,
+    "sliding_worst": [
+     [
+      "COUTER_R -> REREBRACE2_R",
+      22
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      17
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      17
+     ],
+     [
+      "SABATON_FOOT_L -> SABATON_TOE1_L",
+      12
+     ],
+     [
+      "SABATON_FOOT_R -> SABATON_TOE1_R",
+      12
+     ],
+     [
+      "BELLY -> BELT",
+      11
+     ]
+    ],
+    "suit": 208,
+    "suit_worst": [
+     [
+      "REREBRACE1_L -> BODY",
+      36
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      29
+     ],
+     [
+      "PAULDRON_LAME2_L -> BODY",
+      25
+     ],
+     [
+      "COUTER_L -> BODY",
+      21
+     ],
+     [
+      "GORGET_1 -> BODY",
+      14
+     ],
+     [
+      "GORGET_2 -> BODY",
+      13
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 25,
+     "violations_per_iteration": [
+      12,
+      19,
+      11,
+      10,
+      9,
+      10,
+      6,
+      6,
+      6,
+      4,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "inside_after_mm_gt3": 6,
+     "deepest_mm": 74.6
+    },
+    "braids": {
+     "iterations": 3,
+     "violations_per_iteration": [
+      5,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 3,
+     "under_ground": 0,
+     "inside_by_part": {
+      "LEGS": 3
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 14,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      2
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.946,
+    "left_arm_reach_m": 0.666
+   },
+   "helpers_off": {
+    "plates": {
+     "clipping": 156,
+     "clipping_worst": [
+      [
+       "GREAVE_L -> SABATON_FOOT_L",
+       11
+      ],
+      [
+       "GREAVE_R -> SABATON_FOOT_R",
+       11
+      ],
+      [
+       "COUTER_L -> CHEST",
+       9
+      ],
+      [
+       "REREBRACE1_R -> CHEST",
+       8
+      ],
+      [
+       "SHIN_PLATE_L -> SABATON_TOE2_L",
+       8
+      ],
+      [
+       "SHIN_PLATE_R -> SABATON_TOE2_R",
+       8
+      ]
+     ],
+     "sliding": 272,
+     "sliding_worst": [
+      [
+       "COUTER_R -> VAMBRACE1_R",
+       20
+      ],
+      [
+       "SABATON_TOE1_L -> SABATON_FOOT_L",
+       17
+      ],
+      [
+       "SABATON_TOE1_R -> SABATON_FOOT_R",
+       17
+      ],
+      [
+       "SABATON_FOOT_L -> SABATON_TOE1_L",
+       12
+      ],
+      [
+       "SABATON_FOOT_R -> SABATON_TOE1_R",
+       12
+      ],
+      [
+       "BELLY -> BELT",
+       11
+      ]
+     ],
+     "suit": 208,
+     "suit_worst": [
+      [
+       "REREBRACE1_L -> BODY",
+       36
+      ],
+      [
+       "REREBRACE2_L -> BODY",
+       29
+      ],
+      [
+       "PAULDRON_LAME2_L -> BODY",
+       25
+      ],
+      [
+       "COUTER_L -> BODY",
+       19
+      ],
+      [
+       "GORGET_1 -> BODY",
+       14
+      ],
+      [
+       "GORGET_2 -> BODY",
+       13
+      ]
+     ]
+    },
+    "one_muted": {
+     "x_pauldron": {
+      "clipping": 171,
+      "sliding": 261,
+      "suit": 208
+     },
+     "x_elbow": {
+      "clipping": 170,
+      "sliding": 272,
+      "suit": 210
+     },
+     "x_knee": {
+      "clipping": 183,
+      "sliding": 261,
+      "suit": 208
+     },
+     "x_tasset": {
+      "clipping": 157,
+      "sliding": 261,
+      "suit": 206
+     },
+     "x_fauld": {
+      "clipping": 171,
+      "sliding": 261,
+      "suit": 208
+     }
+    }
+   },
+   "seconds": 2.3
+  },
+  "deep_squat": {
+   "solver": {
+    "reach_L": 0.917,
+    "fold_eased_L": false,
+    "reach_R": 0.957,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.588,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.588,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 37.4,
+    "stretch_mm_max": 75.4,
+    "edges_over_40pct": 112,
+    "edges_under_minus40pct": 161,
+    "collapsed_verts_area_lt_0_4": 36,
+    "volume_ratio": 0.9331,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "thigh_R",
+      7
+     ],
+     [
+      "thigh_L",
+      7
+     ],
+     [
+      "thigh_twist_R",
+      4
+     ],
+     [
+      "thigh_twist_L",
+      4
+     ],
+     [
+      "shin_L",
+      2
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 360,
+    "clipping_worst": [
+     [
+      "GREAVE_L -> SABATON_FOOT_L",
+      17
+     ],
+     [
+      "SHIN_PLATE_L -> SABATON_TOE2_L",
+      17
+     ],
+     [
+      "GREAVE_R -> SABATON_FOOT_R",
+      17
+     ],
+     [
+      "SHIN_PLATE_R -> SABATON_TOE2_R",
+      17
+     ],
+     [
+      "POLEYN_L -> ANVIL_BODY",
+      12
+     ],
+     [
+      "POLEYN_R -> ANVIL_BODY",
+      12
+     ]
+    ],
+    "sliding": 322,
+    "sliding_worst": [
+     [
+      "COUTER_R -> REREBRACE2_R",
+      22
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      15
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      15
+     ],
+     [
+      "BELLY -> BELT",
+      13
+     ],
+     [
+      "SABATON_FOOT_L -> SABATON_TOE1_L",
+      13
+     ],
+     [
+      "SABATON_FOOT_R -> SABATON_TOE1_R",
+      13
+     ]
+    ],
+    "suit": 203,
+    "suit_worst": [
+     [
+      "GORGET_2 -> BODY",
+      26
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      22
+     ],
+     [
+      "GORGET_1 -> BODY",
+      17
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      16
+     ],
+     [
+      "TASSET2_R -> BODY",
+      13
+     ],
+     [
+      "CHEST -> BODY",
+      12
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 19,
+     "violations_per_iteration": [
+      38,
+      40,
+      38,
+      39,
+      40,
+      36,
+      36,
+      35,
+      33,
+      29,
+      25,
+      20,
+      15,
+      12,
+      7,
+      3,
+      3,
+      3,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.3
+    },
+    "loin": {
+     "iterations": 25,
+     "violations_per_iteration": [
+      41,
+      30,
+      22,
+      22,
+      17,
+      15,
+      16,
+      16,
+      14,
+      16,
+      16,
+      15,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14,
+      14
+     ],
+     "inside_after_mm_gt3": 20,
+     "deepest_mm": 64.4
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 12,
+     "under_ground": 4,
+     "inside_by_part": {
+      "BODY": 1,
+      "LEGS": 5,
+      "SABATONS": 6
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 21,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "POLEYN_R",
+      8
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.935,
+    "left_arm_reach_m": 0.666
+   },
+   "helpers_off": {
+    "plates": {
+     "clipping": 335,
+     "clipping_worst": [
+      [
+       "GREAVE_L -> SABATON_FOOT_L",
+       17
+      ],
+      [
+       "SHIN_PLATE_L -> SABATON_TOE2_L",
+       17
+      ],
+      [
+       "GREAVE_R -> SABATON_FOOT_R",
+       17
+      ],
+      [
+       "SHIN_PLATE_R -> SABATON_TOE2_R",
+       17
+      ],
+      [
+       "POLEYN_L -> ANVIL_BODY",
+       15
+      ],
+      [
+       "POLEYN_R -> ANVIL_BODY",
+       15
+      ]
+     ],
+     "sliding": 319,
+     "sliding_worst": [
+      [
+       "COUTER_R -> VAMBRACE1_R",
+       20
+      ],
+      [
+       "COUTER_L -> VAMBRACE1_L",
+       16
+      ],
+      [
+       "SABATON_TOE1_L -> SABATON_FOOT_L",
+       15
+      ],
+      [
+       "SABATON_TOE1_R -> SABATON_FOOT_R",
+       15
+      ],
+      [
+       "BELLY -> BELT",
+       13
+      ],
+      [
+       "SABATON_FOOT_L -> SABATON_TOE1_L",
+       13
+      ]
+     ],
+     "suit": 197,
+     "suit_worst": [
+      [
+       "GORGET_2 -> BODY",
+       26
+      ],
+      [
+       "REREBRACE1_L -> BODY",
+       22
+      ],
+      [
+       "GORGET_1 -> BODY",
+       17
+      ],
+      [
+       "REREBRACE1_R -> BODY",
+       16
+      ],
+      [
+       "CHEST -> BODY",
+       12
+      ],
+      [
+       "CUISSE1_L -> BODY",
+       9
+      ]
+     ]
+    },
+    "one_muted": {
+     "x_pauldron": {
+      "clipping": 360,
+      "sliding": 322,
+      "suit": 203
+     },
+     "x_elbow": {
+      "clipping": 336,
+      "sliding": 319,
+      "suit": 212
+     },
+     "x_knee": {
+      "clipping": 365,
+      "sliding": 322,
+      "suit": 203
+     },
+     "x_tasset": {
+      "clipping": 354,
+      "sliding": 322,
+      "suit": 188
+     },
+     "x_fauld": {
+      "clipping": 360,
+      "sliding": 322,
+      "suit": 203
+     }
+    }
+   },
+   "seconds": 2.3
+  },
+  "lunge": {
+   "solver": {
+    "reach_L": 0.743,
+    "fold_eased_L": false,
+    "reach_R": 0.964,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.834,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.997,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 27.8,
+    "stretch_mm_max": 47.6,
+    "edges_over_40pct": 81,
+    "edges_under_minus40pct": 148,
+    "collapsed_verts_area_lt_0_4": 21,
+    "volume_ratio": 0.9745,
+    "collapsed_shoulder_L_R": [
+     1,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "lowerarm_L",
+      5
+     ],
+     [
+      "shin_L",
+      2
+     ],
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "thigh_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 194,
+    "clipping_worst": [
+     [
+      "SHIN_PLATE_R -> SABATON_TOE2_R",
+      22
+     ],
+     [
+      "GREAVE_R -> SABATON_FOOT_R",
+      14
+     ],
+     [
+      "REREBRACE1_R -> CHEST",
+      10
+     ],
+     [
+      "COUTER_L -> RIBS",
+      9
+     ],
+     [
+      "TASSET1_L -> ANVIL_GASKET",
+      9
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      7
+     ]
+    ],
+    "sliding": 354,
+    "sliding_worst": [
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      17
+     ],
+     [
+      "COUTER_L -> REREBRACE2_L",
+      16
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      16
+     ],
+     [
+      "SABATON_TOE2_R -> SABATON_SOLE_R",
+      16
+     ],
+     [
+      "COUTER_L -> VAMBRACE1_L",
+      14
+     ],
+     [
+      "BELT -> BELLY",
+      13
+     ]
+    ],
+    "suit": 169,
+    "suit_worst": [
+     [
+      "REREBRACE1_L -> BODY",
+      29
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      24
+     ],
+     [
+      "GORGET_1 -> BODY",
+      16
+     ],
+     [
+      "CHEST -> BODY",
+      13
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      12
+     ],
+     [
+      "BELLY -> BODY",
+      11
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 25,
+     "violations_per_iteration": [
+      30,
+      25,
+      33,
+      30,
+      29,
+      28,
+      26,
+      22,
+      25,
+      28,
+      21,
+      19,
+      17,
+      20,
+      19,
+      20,
+      14,
+      16,
+      16,
+      14,
+      13,
+      14,
+      11,
+      12,
+      10
+     ],
+     "inside_after_mm_gt3": 13,
+     "deepest_mm": 129.6
+    },
+    "loin": {
+     "iterations": 25,
+     "violations_per_iteration": [
+      20,
+      8,
+      8,
+      5,
+      8,
+      7,
+      5,
+      3,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+     ],
+     "inside_after_mm_gt3": 8,
+     "deepest_mm": 99.9
+    },
+    "braids": {
+     "iterations": 41,
+     "violations_per_iteration": [
+      7,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 63.7
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 11,
+     "under_ground": 2,
+     "inside_by_part": {
+      "BODY": 4,
+      "LEGS": 2,
+      "SABATONS": 5
+     }
+    },
+    "loin": {
+     "inside_gt3mm": 4,
+     "under_ground": 0,
+     "inside_by_part": {
+      "BODY": 2,
+      "LEGS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 1,
+     "under_ground": 0,
+     "inside_by_part": {
+      "PAULDRONS": 1
+     }
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 13,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.961,
+    "left_arm_reach_m": 0.666
+   },
+   "helpers_off": {
+    "plates": {
+     "clipping": 175,
+     "clipping_worst": [
+      [
+       "SHIN_PLATE_R -> SABATON_TOE2_R",
+       22
+      ],
+      [
+       "GREAVE_R -> SABATON_FOOT_R",
+       14
+      ],
+      [
+       "REREBRACE1_R -> CHEST",
+       10
+      ],
+      [
+       "COUTER_L -> RIBS",
+       8
+      ],
+      [
+       "REREBRACE1_L -> CHEST",
+       7
+      ],
+      [
+       "REREBRACE2_L -> RIBS",
+       7
+      ]
+     ],
+     "sliding": 346,
+     "sliding_worst": [
+      [
+       "SABATON_TOE1_R -> SABATON_FOOT_R",
+       17
+      ],
+      [
+       "COUTER_L -> VAMBRACE1_L",
+       16
+      ],
+      [
+       "COUTER_R -> VAMBRACE1_R",
+       16
+      ],
+      [
+       "SABATON_TOE2_R -> SABATON_SOLE_R",
+       16
+      ],
+      [
+       "BELT -> BELLY",
+       13
+      ],
+      [
+       "BELLY -> RIBS",
+       12
+      ]
+     ],
+     "suit": 208,
+     "suit_worst": [
+      [
+       "REREBRACE1_L -> BODY",
+       29
+      ],
+      [
+       "REREBRACE2_L -> BODY",
+       24
+      ],
+      [
+       "COUTER_L -> BODY",
+       24
+      ],
+      [
+       "GORGET_1 -> BODY",
+       16
+      ],
+      [
+       "CHEST -> BODY",
+       13
+      ],
+      [
+       "REREBRACE1_R -> BODY",
+       12
+      ]
+     ]
+    },
+    "one_muted": {
+     "x_pauldron": {
+      "clipping": 194,
+      "sliding": 354,
+      "suit": 169
+     },
+     "x_elbow": {
+      "clipping": 192,
+      "sliding": 340,
+      "suit": 194
+     },
+     "x_knee": {
+      "clipping": 199,
+      "sliding": 360,
+      "suit": 169
+     },
+     "x_tasset": {
+      "clipping": 176,
+      "sliding": 354,
+      "suit": 183
+     },
+     "x_fauld": {
+      "clipping": 194,
+      "sliding": 354,
+      "suit": 169
+     }
+    }
+   },
+   "seconds": 2.7
+  },
+  "torso_twist": {
+   "solver": {
+    "reach_L": 0.895,
+    "fold_eased_L": false,
+    "reach_R": 0.964,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.947,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.947,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 25.4,
+    "stretch_mm_max": 33.1,
+    "edges_over_40pct": 66,
+    "edges_under_minus40pct": 126,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9813,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 100,
+    "clipping_worst": [
+     [
+      "VAMBRACE2_L -> PAULDRON_LAME2_L",
+      10
+     ],
+     [
+      "REREBRACE1_R -> CHEST",
+      10
+     ],
+     [
+      "COUTER_L -> RIBS",
+      8
+     ],
+     [
+      "REREBRACE2_L -> RIBS",
+      7
+     ],
+     [
+      "REREBRACE2_R -> CHEST",
+      6
+     ],
+     [
+      "PAULDRON_LAME2_L -> VAMBRACE2_L",
+      5
+     ]
+    ],
+    "sliding": 326,
+    "sliding_worst": [
+     [
+      "COUTER_L -> REREBRACE2_L",
+      18
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      16
+     ],
+     [
+      "RIBS -> BELLY",
+      14
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      13
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      13
+     ],
+     [
+      "REREBRACE2_L -> VAMBRACE1_L",
+      12
+     ]
+    ],
+    "suit": 89,
+    "suit_worst": [
+     [
+      "REREBRACE1_L -> BODY",
+      23
+     ],
+     [
+      "GORGET_1 -> BODY",
+      15
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      12
+     ],
+     [
+      "CHEST -> BODY",
+      10
+     ],
+     [
+      "GORGET_2 -> BODY",
+      9
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      5
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 2,
+     "violations_per_iteration": [
+      2,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 2.3
+    },
+    "loin": {
+     "iterations": 6,
+     "violations_per_iteration": [
+      18,
+      4,
+      7,
+      4,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 3,
+     "deepest_mm": 18.9
+    },
+    "braids": {
+     "iterations": 4,
+     "violations_per_iteration": [
+      5,
+      3,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 3,
+     "under_ground": 0,
+     "inside_by_part": {
+      "LEGS": 2,
+      "HIPS": 1
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 13,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.961,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 1.6
+  },
+  "head_left_down": {
+   "solver": {},
+   "body": {
+    "stretch_mm_p99_9": 17.7,
+    "stretch_mm_max": 23.6,
+    "edges_over_40pct": 58,
+    "edges_under_minus40pct": 122,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9997,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 44,
+    "clipping_worst": [
+     [
+      "REREBRACE1_R -> CHEST",
+      6
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      5
+     ],
+     [
+      "BEARD_LOCK -> GORGET_2",
+      4
+     ],
+     [
+      "REREBRACE2_L -> RIBS",
+      3
+     ],
+     [
+      "REREBRACE2_R -> RIBS",
+      3
+     ],
+     [
+      "BEARD_BLOCK -> GORGET_1",
+      3
+     ]
+    ],
+    "sliding": 154,
+    "sliding_worst": [
+     [
+      "BRAID5_CAP -> BRAID4_LOBE",
+      14
+     ],
+     [
+      "GORGET_2 -> GORGET_1",
+      13
+     ],
+     [
+      "BRAID4_CAP -> BRAID5_CAP",
+      12
+     ],
+     [
+      "BRAID4_LOBE -> BRAID5_CAP",
+      8
+     ],
+     [
+      "GORGET_1 -> GORGET_2",
+      7
+     ],
+     [
+      "BRAID5_CAP -> BRAID4_CAP",
+      7
+     ]
+    ],
+    "suit": 81,
+    "suit_worst": [
+     [
+      "GORGET_1 -> BODY",
+      18
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      18
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      17
+     ],
+     [
+      "CHEST -> BODY",
+      15
+     ],
+     [
+      "GORGET_2 -> BODY",
+      9
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      2
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 13,
+     "violations_per_iteration": [
+      6,
+      1,
+      3,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 1,
+     "deepest_mm": 9.0
+    },
+    "loin": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.7
+    },
+    "braids": {
+     "iterations": 41,
+     "violations_per_iteration": [
+      88,
+      36,
+      22,
+      13,
+      10,
+      6,
+      2,
+      7,
+      3,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "inside_after_mm_gt3": 1,
+     "deepest_mm": 19.8
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 1,
+     "under_ground": 0,
+     "inside_by_part": {
+      "PAULDRONS": 1
+     }
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 1,
+    "poke_by_piece": [
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 1,
+    "cuts_by_piece": [
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 1.181,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 2.1
+  },
+  "head_right_up": {
+   "solver": {},
+   "body": {
+    "stretch_mm_p99_9": 17.8,
+    "stretch_mm_max": 23.6,
+    "edges_over_40pct": 58,
+    "edges_under_minus40pct": 122,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 1.0014,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 30,
+    "clipping_worst": [
+     [
+      "REREBRACE1_R -> CHEST",
+      6
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      5
+     ],
+     [
+      "GORGET_2 -> BEARD_BLOCK",
+      3
+     ],
+     [
+      "REREBRACE2_L -> RIBS",
+      3
+     ],
+     [
+      "REREBRACE2_R -> RIBS",
+      3
+     ],
+     [
+      "CHEST -> REREBRACE2_L",
+      2
+     ]
+    ],
+    "sliding": 140,
+    "sliding_worst": [
+     [
+      "BRAID1_LOBE -> BRAID2_LOBE",
+      13
+     ],
+     [
+      "BRAID2_LOBE -> BRAID1_LOBE",
+      12
+     ],
+     [
+      "BRAID1_CAP -> BRAID2_LOBE",
+      10
+     ],
+     [
+      "BRAID2_LOBE -> BRAID1_CAP",
+      9
+     ],
+     [
+      "GORGET_2 -> GORGET_1",
+      7
+     ],
+     [
+      "BRAID1_CAP -> BRAID3_LOBE",
+      7
+     ]
+    ],
+    "suit": 88,
+    "suit_worst": [
+     [
+      "GORGET_1 -> BODY",
+      19
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      18
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      17
+     ],
+     [
+      "CHEST -> BODY",
+      15
+     ],
+     [
+      "GORGET_2 -> BODY",
+      13
+     ],
+     [
+      "REREBRACE2_L -> BODY",
+      2
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 13,
+     "violations_per_iteration": [
+      6,
+      1,
+      3,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 1,
+     "deepest_mm": 9.0
+    },
+    "loin": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.7
+    },
+    "braids": {
+     "iterations": 6,
+     "violations_per_iteration": [
+      64,
+      30,
+      5,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 1.6
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 1,
+     "under_ground": 0,
+     "inside_by_part": {
+      "PAULDRONS": 1
+     }
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 1,
+    "poke_by_piece": [
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 1,
+    "cuts_by_piece": [
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 1.181,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 1.7
+  },
+  "bulwark_raise": {
+   "solver": {
+    "reach_L": 0.967,
+    "fold_eased_L": false,
+    "reach_R": 0.967,
+    "fold_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 31.7,
+    "stretch_mm_max": 39.1,
+    "edges_over_40pct": 72,
+    "edges_under_minus40pct": 125,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9943,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 126,
+    "clipping_worst": [
+     [
+      "VAMBRACE2_L -> PAULDRON_LAME1_L",
+      18
+     ],
+     [
+      "VAMBRACE2_R -> PAULDRON_RAME1_R",
+      16
+     ],
+     [
+      "PAULDRON_RIVET_L -> VAMBRACE2_L",
+      9
+     ],
+     [
+      "PAULDRON_RIVET_R -> VAMBRACE2_R",
+      9
+     ],
+     [
+      "VAMBRACE1_L -> PAULDRON_LAME1_L",
+      7
+     ],
+     [
+      "VAMBRACE1_R -> PAULDRON_RAME1_R",
+      7
+     ]
+    ],
+    "sliding": 164,
+    "sliding_worst": [
+     [
+      "PAULDRON_LAME2_L -> PAULDRON_LAME1_L",
+      19
+     ],
+     [
+      "PAULDRON_RAME2_R -> PAULDRON_RAME1_R",
+      19
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      16
+     ],
+     [
+      "BELLY -> BELT",
+      9
+     ],
+     [
+      "REREBRACE2_L -> COUTER_L",
+      8
+     ],
+     [
+      "COUTER_L -> REREBRACE2_L",
+      8
+     ]
+    ],
+    "suit": 84,
+    "suit_worst": [
+     [
+      "REREBRACE1_L -> BODY",
+      20
+     ],
+     [
+      "REREBRACE1_R -> BODY",
+      20
+     ],
+     [
+      "GORGET_1 -> BODY",
+      9
+     ],
+     [
+      "GORGET_2 -> BODY",
+      9
+     ],
+     [
+      "PAULDRON_LAME2_L -> BODY",
+      9
+     ],
+     [
+      "PAULDRON_RAME2_R -> BODY",
+      9
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.7
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 1,
+    "poke_by_piece": [
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 29,
+    "cuts_by_piece": [
+     [
+      "PAULDRON_RIVET_R",
+      13
+     ],
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "ANVIL_SLAB",
+      2
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      2
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.758,
+    "left_arm_reach_m": 0.666
+   },
+   "helpers_off": {
+    "plates": {
+     "clipping": 188,
+     "clipping_worst": [
+      [
+       "VAMBRACE2_L -> PAULDRON_LAME1_L",
+       17
+      ],
+      [
+       "VAMBRACE2_R -> PAULDRON_RAME1_R",
+       17
+      ],
+      [
+       "COUTER_L -> PAULDRON_LAME1_L",
+       16
+      ],
+      [
+       "COUTER_R -> PAULDRON_RAME1_R",
+       16
+      ],
+      [
+       "VAMBRACE1_L -> PAULDRON_LAME1_L",
+       15
+      ],
+      [
+       "VAMBRACE1_R -> PAULDRON_RAME1_R",
+       15
+      ]
+     ],
+     "sliding": 180,
+     "sliding_worst": [
+      [
+       "PAULDRON_LAME2_L -> PAULDRON_LAME1_L",
+       25
+      ],
+      [
+       "PAULDRON_RAME2_R -> PAULDRON_RAME1_R",
+       25
+      ],
+      [
+       "COUTER_L -> VAMBRACE1_L",
+       18
+      ],
+      [
+       "COUTER_R -> VAMBRACE1_R",
+       18
+      ],
+      [
+       "BELLY -> BELT",
+       9
+      ],
+      [
+       "BELLY -> RIBS",
+       7
+      ]
+     ],
+     "suit": 85,
+     "suit_worst": [
+      [
+       "REREBRACE1_L -> BODY",
+       20
+      ],
+      [
+       "REREBRACE1_R -> BODY",
+       20
+      ],
+      [
+       "GORGET_1 -> BODY",
+       9
+      ],
+      [
+       "GORGET_2 -> BODY",
+       9
+      ],
+      [
+       "PAULDRON_LAME2_L -> BODY",
+       9
+      ],
+      [
+       "PAULDRON_RAME2_R -> BODY",
+       9
+      ]
+     ]
+    },
+    "one_muted": {
+     "x_pauldron": {
+      "clipping": 192,
+      "sliding": 176,
+      "suit": 84
+     },
+     "x_elbow": {
+      "clipping": 126,
+      "sliding": 168,
+      "suit": 85
+     },
+     "x_knee": {
+      "clipping": 126,
+      "sliding": 164,
+      "suit": 84
+     },
+     "x_tasset": {
+      "clipping": 126,
+      "sliding": 164,
+      "suit": 84
+     },
+     "x_fauld": {
+      "clipping": 126,
+      "sliding": 164,
+      "suit": 84
+     }
+    }
+   },
+   "seconds": 2.1
+  },
+  "forearm_twist": {
+   "solver": {
+    "reach_L": 0.943,
+    "fold_eased_L": false,
+    "reach_R": 0.964,
+    "fold_eased_R": false,
+    "reach_leg_L": 0.947,
+    "knee_eased_L": false,
+    "reach_leg_R": 0.947,
+    "knee_eased_R": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 23.5,
+    "stretch_mm_max": 27.1,
+    "edges_over_40pct": 60,
+    "edges_under_minus40pct": 122,
+    "collapsed_verts_area_lt_0_4": 11,
+    "volume_ratio": 0.9876,
+    "collapsed_shoulder_L_R": [
+     0,
+     0
+    ],
+    "collapsed_by_bone": [
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "pinky_02_R",
+      1
+     ],
+     [
+      "index_02_R",
+      1
+     ],
+     [
+      "pinky_01_R",
+      1
+     ],
+     [
+      "hand_R",
+      1
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 66,
+    "clipping_worst": [
+     [
+      "REREBRACE1_R -> CHEST",
+      10
+     ],
+     [
+      "REREBRACE1_L -> CHEST",
+      7
+     ],
+     [
+      "REREBRACE2_R -> CHEST",
+      6
+     ],
+     [
+      "PAULDRON_LAME2_L -> CHEST",
+      5
+     ],
+     [
+      "ANVIL_SLAB -> PAULDRON_RAME2_R",
+      4
+     ],
+     [
+      "PAULDRON_RAME2_R -> CHEST",
+      3
+     ]
+    ],
+    "sliding": 263,
+    "sliding_worst": [
+     [
+      "COUTER_R -> REREBRACE2_R",
+      16
+     ],
+     [
+      "SABATON_TOE1_L -> SABATON_FOOT_L",
+      13
+     ],
+     [
+      "SABATON_TOE1_R -> SABATON_FOOT_R",
+      13
+     ],
+     [
+      "COUTER_L -> REREBRACE2_L",
+      12
+     ],
+     [
+      "GORGET_2 -> GORGET_1",
+      10
+     ],
+     [
+      "REREBRACE2_L -> COUTER_L",
+      10
+     ]
+    ],
+    "suit": 50,
+    "suit_worst": [
+     [
+      "REREBRACE1_R -> BODY",
+      12
+     ],
+     [
+      "GORGET_1 -> BODY",
+      11
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      9
+     ],
+     [
+      "GORGET_2 -> BODY",
+      5
+     ],
+     [
+      "BELLY -> BODY",
+      4
+     ],
+     [
+      "CHEST -> BODY",
+      3
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 5,
+     "violations_per_iteration": [
+      2,
+      1,
+      2,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 6,
+     "violations_per_iteration": [
+      18,
+      4,
+      7,
+      4,
+      1,
+      0
+     ],
+     "inside_after_mm_gt3": 3,
+     "deepest_mm": 18.9
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 3,
+     "under_ground": 0,
+     "inside_by_part": {
+      "LEGS": 2,
+      "HIPS": 1
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "cannon": {
+    "poke_through": 5,
+    "poke_by_piece": [
+     [
+      "VAMBRACE1_R",
+      4
+     ],
+     [
+      "BODY",
+      1
+     ]
+    ],
+    "cuts": 13,
+    "cuts_by_piece": [
+     [
+      "REREBRACE2_R",
+      12
+     ],
+     [
+      "PAULDRON_RAME2_R",
+      1
+     ]
+    ],
+    "grip_L_from_left_shoulder_m": 0.961,
+    "left_arm_reach_m": 0.666
+   },
+   "seconds": 1.5
+  },
+  "elbow_knee_max": {
+   "solver": {
+    "reach_leg_L": 0.996,
+    "knee_eased_L": false
+   },
+   "body": {
+    "stretch_mm_p99_9": 31.3,
+    "stretch_mm_max": 60.9,
+    "edges_over_40pct": 96,
+    "edges_under_minus40pct": 161,
+    "collapsed_verts_area_lt_0_4": 33,
+    "volume_ratio": 0.9945,
+    "collapsed_shoulder_L_R": [
+     3,
+     2
+    ],
+    "collapsed_by_bone": [
+     [
+      "lowerarm_L",
+      9
+     ],
+     [
+      "lowerarm_R",
+      8
+     ],
+     [
+      "upperarm_L",
+      3
+     ],
+     [
+      "pinky_01_L",
+      2
+     ],
+     [
+      "upperarm_R",
+      2
+     ]
+    ]
+   },
+   "plates": {
+    "clipping": 754,
+    "clipping_worst": [
+     [
+      "GAUNTLET_KNUCKLE_L -> PAULDRON_LAME1_L",
+      88
+     ],
+     [
+      "GAUNTLET_KNUCKLE_R -> PAULDRON_RAME1_R",
+      88
+     ],
+     [
+      "GAUNTLET_BACK_L -> PAULDRON_LAME1_L",
+      32
+     ],
+     [
+      "GAUNTLET_BACK_R -> PAULDRON_RAME1_R",
+      32
+     ],
+     [
+      "FINGER_RING_1_L -> PAULDRON_LAME1_L",
+      20
+     ],
+     [
+      "FINGER_RING_1_R -> PAULDRON_RAME1_R",
+      20
+     ]
+    ],
+    "sliding": 223,
+    "sliding_worst": [
+     [
+      "REREBRACE2_L -> VAMBRACE1_L",
+      16
+     ],
+     [
+      "COUTER_L -> VAMBRACE1_L",
+      16
+     ],
+     [
+      "REREBRACE2_R -> VAMBRACE1_R",
+      16
+     ],
+     [
+      "COUTER_R -> REREBRACE2_R",
+      14
+     ],
+     [
+      "SABATON_TOE2_L -> SABATON_TOE1_L",
+      13
+     ],
+     [
+      "SABATON_FOOT_L -> SABATON_TOE1_L",
+      9
+     ]
+    ],
+    "suit": 557,
+    "suit_worst": [
+     [
+      "VAMBRACE2_L -> BODY",
+      56
+     ],
+     [
+      "VAMBRACE2_R -> BODY",
+      56
+     ],
+     [
+      "WRIST_CUFF_L -> BODY",
+      40
+     ],
+     [
+      "WRIST_CUFF_R -> BODY",
+      40
+     ],
+     [
+      "COUTER_R -> BODY",
+      34
+     ],
+     [
+      "REREBRACE1_L -> BODY",
+      32
+     ]
+    ]
+   },
+   "cloth_solve": {
+    "cape": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    },
+    "loin": {
+     "iterations": 3,
+     "violations_per_iteration": [
+      2,
+      2,
+      0
+     ],
+     "inside_after_mm_gt3": 2,
+     "deepest_mm": 9.0
+    },
+    "braids": {
+     "iterations": 1,
+     "violations_per_iteration": [
+      0
+     ],
+     "inside_after_mm_gt3": 0,
+     "deepest_mm": 0.0
+    }
+   },
+   "cloth": {
+    "cape": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    },
+    "loin": {
+     "inside_gt3mm": 2,
+     "under_ground": 0,
+     "inside_by_part": {
+      "HIPS": 2
+     }
+    },
+    "braids": {
+     "inside_gt3mm": 0,
+     "under_ground": 0,
+     "inside_by_part": {}
+    }
+   },
+   "seconds": 1.4
+  }
+ },
+ "cloth_at_rest": {
+  "cape": {
+   "inside_gt3mm": 4,
+   "under_ground": 0,
+   "inside_by_part": {
+    "PAULDRONS": 4
+   }
+  },
+  "loin": {
+   "inside_gt3mm": 2,
+   "under_ground": 0,
+   "inside_by_part": {
+    "HIPS": 2
+   }
+  },
+  "braids": {
+   "inside_gt3mm": 0,
+   "under_ground": 0,
+   "inside_by_part": {}
+  }
+ },
+ "cannon_reference": {
+  "right_arm_vertices_in_sleeve_with_fist": 1421,
+  "cuts_at_rest": {
+   "PAULDRON_RAME2_R": 2,
+   "COUTER_R": 12
+  }
+ },
+ "seconds": 29.6
+}

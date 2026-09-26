@@ -1,0 +1,751 @@
+{
+ "hero": "valdris",
+ "contract": "GF_Hero_v1 v1",
+ "landmarks": "art/characters/valdris/work/valdris_landmarks.json",
+ "bones": {
+  "total": 116,
+  "core": 23,
+  "twist": 6,
+  "fingers": 30,
+  "sockets": 4,
+  "extras": 53
+ },
+ "hook": {
+  "module": "s3_valdris_skin",
+  "after_armature": {
+   "x_pauldron_L": "Transformation from upperarm_L: swing-Z (elevation) x 0.60, upward only",
+   "x_elbow_L": "Copy Rotation of lowerarm_L (local), influence 0.50",
+   "x_knee_L": "Copy Rotation of shin_L (local), influence 0.50",
+   "x_tasset_L": "Copy Rotation of thigh_L (local), influence 0.25",
+   "x_pauldron_R": "Transformation from upperarm_R: swing-Z (elevation) x 0.60, upward only",
+   "x_elbow_R": "Copy Rotation of lowerarm_R (local), influence 1.00",
+   "x_knee_R": "Copy Rotation of shin_R (local), influence 0.50",
+   "x_tasset_R": "Copy Rotation of thigh_R (local), influence 0.25",
+   "x_fauld_01": "driver rotation_euler.x = max(max(l, r), 0.0) * 0.800 (thigh_L / thigh_R local ROT_X; a simple expression, no Python)"
+  },
+  "after_bind": {
+   "hook_parts": {
+    "CUIRASS": {
+     "pieces": 8,
+     "rigid_rows": {
+      "CHEST": {
+       "spine_03": 1.0
+      },
+      "RIBS": {
+       "spine_02": 1.0
+      },
+      "BELLY": {
+       "spine_01": 1.0
+      },
+      "BELT": {
+       "pelvis": 1.0
+      },
+      "BUCKLE": {
+       "pelvis": 1.0
+      },
+      "GORGET_1": {
+       "spine_03": 1.0
+      },
+      "GORGET_2": {
+       "neck": 0.6,
+       "spine_03": 0.4
+      }
+     }
+    },
+    "ANVIL": {
+     "pieces": 3,
+     "rigid_rows": {
+      "ANVIL_SLAB": {
+       "spine_03": 1.0
+      },
+      "ANVIL_BODY": {
+       "spine_03": 1.0
+      },
+      "ANVIL_GASKET": {
+       "spine_03": 1.0
+      }
+     }
+    },
+    "PAULDRONS": {
+     "pieces": 30,
+     "rigid_rows": {
+      "PAULDRON_TOPLAME1_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_TOPLAME2_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_TOPLAME3_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_CAP_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_SLOT_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_LAME1_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_LAME2_L": {
+       "upperarm_L": 1.0
+      },
+      "PAULDRON_UPRIGHT_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_RIVET_L": {
+       "x_pauldron_L": 1.0
+      },
+      "PAULDRON_TOPLAME1_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_TOPLAME2_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_TOPLAME3_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_CAP_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_SLOT_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_RAME1_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_RAME2_R": {
+       "upperarm_R": 1.0
+      },
+      "PAULDRON_UPRIGHT_R": {
+       "x_pauldron_R": 1.0
+      },
+      "PAULDRON_RIVET_R": {
+       "x_pauldron_R": 1.0
+      }
+     }
+    },
+    "ARMS": {
+     "pieces": 20,
+     "rigid_rows": {
+      "REREBRACE1_L": {
+       "upperarm_L": 1.0
+      },
+      "REREBRACE2_L": {
+       "upperarm_L": 1.0
+      },
+      "ELBOW_GLOW_L": {
+       "x_elbow_L": 1.0
+      },
+      "COUTER_L": {
+       "x_elbow_L": 1.0
+      },
+      "COUTER_COP_L": {
+       "x_elbow_L": 1.0
+      },
+      "VAMBRACE1_L": {
+       "lowerarm_L": 1.0
+      },
+      "VAMBRACE2_L": {
+       "lowerarm_twist_L": 1.0
+      },
+      "WRIST_CUFF_L": {
+       "lowerarm_twist_L": 1.0
+      },
+      "GAUNTLET_CUFF_L": {
+       "hand_L": 1.0
+      },
+      "REREBRACE1_R": {
+       "upperarm_R": 1.0
+      },
+      "REREBRACE2_R": {
+       "upperarm_R": 1.0
+      },
+      "ELBOW_GLOW_R": {
+       "x_elbow_R": 1.0
+      },
+      "COUTER_R": {
+       "x_elbow_R": 1.0
+      },
+      "COUTER_COP_R": {
+       "x_elbow_R": 1.0
+      },
+      "VAMBRACE1_R": {
+       "lowerarm_R": 1.0
+      },
+      "VAMBRACE2_R": {
+       "lowerarm_twist_R": 1.0
+      },
+      "WRIST_CUFF_R": {
+       "lowerarm_twist_R": 1.0
+      },
+      "GAUNTLET_CUFF_R": {
+       "hand_R": 1.0
+      }
+     }
+    },
+    "GAUNTLETS": {
+     "pieces": 42,
+     "rigid_rows": {
+      "GAUNTLET_BACK_L": {
+       "hand_L": 1.0
+      },
+      "GAUNTLET_KNUCKLE_L": {
+       "hand_L": 1.0
+      },
+      "FINGER_THUMB_1_L": {
+       "thumb_01_L": 1.0
+      },
+      "FINGER_THUMB_2_L": {
+       "thumb_02_L": 1.0
+      },
+      "FINGER_THUMB_3_L": {
+       "thumb_03_L": 1.0
+      },
+      "FINGER_INDEX_1_L": {
+       "index_01_L": 1.0
+      },
+      "FINGER_INDEX_2_L": {
+       "index_02_L": 1.0
+      },
+      "FINGER_INDEX_3_L": {
+       "index_03_L": 1.0
+      },
+      "FINGER_MIDDLE_1_L": {
+       "middle_01_L": 1.0
+      },
+      "FINGER_MIDDLE_2_L": {
+       "middle_02_L": 1.0
+      },
+      "FINGER_MIDDLE_3_L": {
+       "middle_03_L": 1.0
+      },
+      "FINGER_RING_1_L": {
+       "ring_01_L": 1.0
+      },
+      "FINGER_RING_2_L": {
+       "ring_02_L": 1.0
+      },
+      "FINGER_RING_3_L": {
+       "ring_03_L": 1.0
+      },
+      "FINGER_PINKY_1_L": {
+       "pinky_01_L": 1.0
+      },
+      "FINGER_PINKY_2_L": {
+       "pinky_02_L": 1.0
+      },
+      "FINGER_PINKY_3_L": {
+       "pinky_03_L": 1.0
+      },
+      "GAUNTLET_BACK_R": {
+       "hand_R": 1.0
+      },
+      "GAUNTLET_KNUCKLE_R": {
+       "hand_R": 1.0
+      },
+      "FINGER_THUMB_1_R": {
+       "thumb_01_R": 1.0
+      },
+      "FINGER_THUMB_2_R": {
+       "thumb_02_R": 1.0
+      },
+      "FINGER_THUMB_3_R": {
+       "thumb_03_R": 1.0
+      },
+      "FINGER_INDEX_1_R": {
+       "index_01_R": 1.0
+      },
+      "FINGER_INDEX_2_R": {
+       "index_02_R": 1.0
+      },
+      "FINGER_INDEX_3_R": {
+       "index_03_R": 1.0
+      },
+      "FINGER_MIDDLE_1_R": {
+       "middle_01_R": 1.0
+      },
+      "FINGER_MIDDLE_2_R": {
+       "middle_02_R": 1.0
+      },
+      "FINGER_MIDDLE_3_R": {
+       "middle_03_R": 1.0
+      },
+      "FINGER_RING_1_R": {
+       "ring_01_R": 1.0
+      },
+      "FINGER_RING_2_R": {
+       "ring_02_R": 1.0
+      },
+      "FINGER_RING_3_R": {
+       "ring_03_R": 1.0
+      },
+      "FINGER_PINKY_1_R": {
+       "pinky_01_R": 1.0
+      },
+      "FINGER_PINKY_2_R": {
+       "pinky_02_R": 1.0
+      },
+      "FINGER_PINKY_3_R": {
+       "pinky_03_R": 1.0
+      }
+     }
+    },
+    "LEGS": {
+     "pieces": 14,
+     "rigid_rows": {
+      "CUISSE1_L": {
+       "thigh_L": 1.0
+      },
+      "CUISSE2_L": {
+       "thigh_L": 1.0
+      },
+      "POLEYN_L": {
+       "x_knee_L": 1.0
+      },
+      "KNEE_SMILE_L": {
+       "x_knee_L": 1.0
+      },
+      "GREAVE_L": {
+       "shin_L": 1.0
+      },
+      "SHIN_GASKET_L": {
+       "shin_L": 1.0
+      },
+      "SHIN_PLATE_L": {
+       "shin_L": 1.0
+      },
+      "CUISSE1_R": {
+       "thigh_R": 1.0
+      },
+      "CUISSE2_R": {
+       "thigh_R": 1.0
+      },
+      "POLEYN_R": {
+       "x_knee_R": 1.0
+      },
+      "KNEE_SMILE_R": {
+       "x_knee_R": 1.0
+      },
+      "GREAVE_R": {
+       "shin_R": 1.0
+      },
+      "SHIN_GASKET_R": {
+       "shin_R": 1.0
+      },
+      "SHIN_PLATE_R": {
+       "shin_R": 1.0
+      }
+     }
+    },
+    "SABATONS": {
+     "pieces": 12,
+     "rigid_rows": {
+      "SABATON_FOOT_L": {
+       "foot_L": 1.0
+      },
+      "SABATON_TOE1_L": {
+       "shin_L": 1.0
+      },
+      "SABATON_TOE2_L": {
+       "toe_L": 1.0
+      },
+      "SABATON_TOE3_L": {
+       "toe_L": 1.0
+      },
+      "SABATON_SOLE_L": {
+       "foot_L": 1.0
+      },
+      "SABATON_CUFF_L": {
+       "shin_L": 1.0
+      },
+      "SABATON_FOOT_R": {
+       "foot_R": 1.0
+      },
+      "SABATON_TOE1_R": {
+       "shin_R": 1.0
+      },
+      "SABATON_TOE2_R": {
+       "toe_R": 1.0
+      },
+      "SABATON_TOE3_R": {
+       "toe_R": 1.0
+      },
+      "SABATON_SOLE_R": {
+       "foot_R": 1.0
+      },
+      "SABATON_CUFF_R": {
+       "shin_R": 1.0
+      }
+     }
+    },
+    "HIPS": {
+     "pieces": 8,
+     "rigid_rows": {
+      "FAULD_1": {
+       "pelvis": 1.0
+      },
+      "FAULD_2": {
+       "pelvis": 1.0
+      },
+      "FAULD_3": {
+       "x_fauld_01": 1.0
+      },
+      "FAULD_4": {
+       "x_fauld_01": 1.0
+      },
+      "TASSET1_L": {
+       "x_tasset_L": 1.0
+      },
+      "TASSET2_L": {
+       "x_tasset_L": 1.0
+      },
+      "TASSET1_R": {
+       "x_tasset_R": 1.0
+      },
+      "TASSET2_R": {
+       "x_tasset_R": 1.0
+      }
+     }
+    },
+    "LOINCLOTH": {
+     "pieces": 1,
+     "rigid_rows": {}
+    },
+    "CAPE": {
+     "pieces": 2,
+     "rigid_rows": {
+      "CAPE_COLLAR": {
+       "spine_03": 1.0
+      }
+     }
+    },
+    "BEARD": {
+     "pieces": 44,
+     "rigid_rows": {}
+    }
+   },
+   "preview_weapon": {
+    "file": "assets/models/weapons/colossus_cannon.glb",
+    "object": "PREVIEW_colossus_cannon_R",
+    "vertices": 4799,
+    "glb_root_is_identity_max_abs": 0.0,
+    "rest_attach_vs_grip_frame_max_abs": 0.0,
+    "sockets_in_grip_frame": {
+     "eject": {
+      "origin": [
+       0.212,
+       0.49,
+       0.07
+      ],
+      "y_axis": [
+       0.91863,
+       -0.22966,
+       0.32152
+      ],
+      "z_axis": [
+       -0.31192,
+       0.07798,
+       0.9469
+      ]
+     },
+     "glow_core": {
+      "origin": [
+       0.0,
+       0.23,
+       0.0
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "grip_L": {
+      "origin": [
+       -0.1862,
+       -0.115,
+       0.1075
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "grip_R": {
+      "origin": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "muzzle": {
+      "origin": [
+       0.0,
+       0.8,
+       0.0
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     }
+    }
+   }
+  }
+ },
+ "rest_relax": [
+  {
+   "name": "extra_loops_onto_the_profile",
+   "vertices_moved": 57,
+   "max_move_m": 0.01
+  }
+ ],
+ "body_seed": {
+  "base_vertices": 3657,
+  "extra_loop_vertices": 192,
+  "extra_left_unfilled": 0,
+  "separate_pieces_to_head": 104
+ },
+ "body_heat": {
+  "weighted_vertices": 3849,
+  "mix_min": 0.0,
+  "mix_max": 0.5,
+  "seed_filled_by_heat": 0,
+  "mean_abs_diff_seed_vs_heat_per_bone": {
+   "pelvis": 0.188,
+   "spine_01": 0.133,
+   "spine_02": 0.125,
+   "spine_03": 0.232,
+   "neck": 0.256,
+   "head": 0.365,
+   "clavicle_L": 0.261,
+   "upperarm_L": 0.156,
+   "lowerarm_L": 0.111,
+   "hand_L": 0.291,
+   "clavicle_R": 0.275,
+   "upperarm_R": 0.158,
+   "lowerarm_R": 0.111,
+   "hand_R": 0.285,
+   "thigh_L": 0.144,
+   "shin_L": 0.125,
+   "foot_L": 0.283,
+   "toe_L": 0.255,
+   "thigh_R": 0.144,
+   "shin_R": 0.127,
+   "foot_R": 0.286,
+   "toe_R": 0.255
+  }
+ },
+ "body_fixes": {
+  "joint_blend_knee_L": 97,
+  "joint_blend_elbow_L": 108,
+  "joint_blend_knee_R": 97,
+  "joint_blend_elbow_R": 110,
+  "spatial_smooth_neck_jaw_fold": 1043,
+  "spatial_smooth_shoulder_L": 143,
+  "spatial_smooth_shoulder_R": 145,
+  "spatial_smooth_knee_L": 177,
+  "spatial_smooth_knee_R": 175
+ },
+ "objects": {
+  "CUIRASS": {
+   "mode": "hook",
+   "pieces": 8,
+   "rigid_pieces": 0,
+   "vertices": 1080,
+   "unweighted": 0,
+   "max_influences": 2,
+   "influence_histogram": {
+    "0": 0,
+    "1": 936,
+    "2": 144
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "ANVIL": {
+   "mode": "hook",
+   "pieces": 3,
+   "rigid_pieces": 0,
+   "vertices": 183,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 183
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "PAULDRONS": {
+   "mode": "hook",
+   "pieces": 30,
+   "rigid_pieces": 0,
+   "vertices": 764,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 764
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "ARMS": {
+   "mode": "hook",
+   "pieces": 20,
+   "rigid_pieces": 0,
+   "vertices": 1562,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 1562
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "GAUNTLETS": {
+   "mode": "hook",
+   "pieces": 42,
+   "rigid_pieces": 0,
+   "vertices": 1046,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 1046
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "LEGS": {
+   "mode": "hook",
+   "pieces": 14,
+   "rigid_pieces": 0,
+   "vertices": 1138,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 1138
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "SABATONS": {
+   "mode": "hook",
+   "pieces": 12,
+   "rigid_pieces": 0,
+   "vertices": 1000,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 1000
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "HIPS": {
+   "mode": "hook",
+   "pieces": 8,
+   "rigid_pieces": 0,
+   "vertices": 268,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 268
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "LOINCLOTH": {
+   "mode": "hook",
+   "pieces": 1,
+   "rigid_pieces": 0,
+   "vertices": 126,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 21,
+    "2": 45,
+    "3": 20,
+    "4": 40
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "CAPE": {
+   "mode": "hook",
+   "pieces": 2,
+   "rigid_pieces": 0,
+   "vertices": 504,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 112,
+    "2": 98,
+    "3": 117,
+    "4": 177
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "BEARD": {
+   "mode": "hook",
+   "pieces": 44,
+   "rigid_pieces": 0,
+   "vertices": 1177,
+   "unweighted": 0,
+   "max_influences": 2,
+   "influence_histogram": {
+    "0": 0,
+    "1": 1073,
+    "2": 104
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "BODY": {
+   "mode": "seed+heat+fixes",
+   "vertices": 3953,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 460,
+    "2": 2119,
+    "3": 651,
+    "4": 723
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  }
+ },
+ "weight_check": {
+  "ok": true,
+  "problems": []
+ },
+ "preview_weapon": null,
+ "seconds": 0.6
+}

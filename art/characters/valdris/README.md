@@ -18,8 +18,8 @@ every stage, and the user gives the final visual approval.
 | 0 Concept & reference | **done** | The user supplied and approved two concepts: the turnaround sheet [`references/VALDRIS_sheet_turnaround.jpg`](references/VALDRIS_sheet_turnaround.jpg) (front A-pose, side, back, colour script, lighting note) and the hero front [`references/VALDRIS_front_approved.jpg`](references/VALDRIS_front_approved.jpg). They disagree in places; **the pack resolves them as cannon on his RIGHT arm, anvil chest plate kept** (the orchestrator's default; the user may override), so the stage-1 input is the hero front mirrored: [`references/valdris_concept_front_mirrored.png`](references/valdris_concept_front_mirrored.png). Every difference and its resolution: [`reports/stage0_sheet_analysis.md`](reports/stage0_sheet_analysis.md). Optional, not blocking: 3/4 view, expression sheet, siege-cannon weapon sheet, Mountainfall concept, cape emblem detail (prompts in [`turnaround_prompts.md`](turnaround_prompts.md)). For the user: confirm the resolution and the head size (brief §7.2 Q1) |
 | 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated at 2.3 m; **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)): the only seed with the anvil plate mounted on the chest, the cleanest surface, a solid cape clear of the legs. Its GLB is in Git LFS; s101/s303 stay local (sha256 in `manifest.json`). Never shipped, never in `assets/models/`. Review views: [`blockout_views.json`](blockout_views.json) |
 | 2 Production mesh | **done, polished 2026-09-26** (made by AI; the user's visual approval pending) | 24,958 tris: the hm08 under-suit body, 168 rigid armour pieces (stepped layered pauldrons with glowing slots and upright plates, the protruding anvil with a glowing gasket, shingled cuirass, fauld and tassets, massive gold-banded arm plates, chunky box-lame gauntlet fists, cuisses, big knee cops over glowing seams, greaves, huge sabatons), the beard with five braids, the separate cape. One 2048 atlas: cracked stone-like gunmetal with a lava network in the joints, emissive seams, a tangent normal map from the blockout. The siege cannon is the separate `colossus_cannon` weapon on the right-hand frame; the massive forearm lies inside its sleeve wall, hidden (the weapon track is asked to widen the sleeve). Report: [`reports/stage2_production_mesh.md`](reports/stage2_production_mesh.md); sheets in [`reports/stage2/`](reports/stage2/), before / after in [`reports/stage2/stage2_before_after.png`](reports/stage2/stage2_before_after.png). **For the user: the visual approval** |
-| 3 Rig | not_started | The GF_Hero_v1 master skeleton (the stage-2 report §8 plans the rigid pieces and the `x_` cloth / braid chains); weight-paint sign-off |
-| 4 Animation | not_started | Shared clip set + Valdris's unique set (proposal in [`brief.md`](brief.md) §8) |
+| 3 Rig | **done 2026-09-26** (made by AI; the user's visual approval pending) | GF_Hero_v1 (116 bones: the 63 contract bones + 53 per-hero `x_` extras). The under-suit is weighted like Brax's body; the 168 armour pieces are rigid, one weight row each; the pauldrons, couters, poleyns, tassets and fauld ride **driven helpers** that follow their joint by a measured fraction (baked into clips by the export, like the twist bones); the cape (5 x 5), loincloth (3 x 3) and braids (5 x 2) hang on `x_` chains. The colossus_cannon GLB rides `weapon_R` by the identity attach, proven with the shipped file (0.3 um). Range-of-motion sweeps set the helper factors and the animation ranges; 13 validation poses with the cloth posed clear. Report: [`reports/rig_report.md`](reports/rig_report.md), sheets in [`reports/stage3/`](reports/stage3/). **For the user: the visual approval** |
+| 4 Animation | not_started | Shared clip set + Valdris's unique set (proposal in [`brief.md`](brief.md) §8), inside the stage-3 ranges ([`reports/rig_report.md`](reports/rig_report.md) §6: arm and head limits, keyed pauldrons for overhead moves, no keys on the `x_` helpers) |
 | 5 Export & validate | not_started | `assets/models/characters/valdris.glb`, then the final visual approval |
 
 ## Stage 0 files
@@ -53,6 +53,18 @@ Regenerate (with `<comfy-python>` = `D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\s
 
 Rebuild: `python tools/blender/gf_hero/s2_valdris_run.py` (4-9 min, CPU only).
 
+## Stage 3 files
+
+| File | What it is |
+|---|---|
+| [`reports/rig_report.md`](reports/rig_report.md) | The rig: landmarks, the extras and helpers, the weights, the cannon's identity attach, the range-of-motion study, the validation poses reviewed honestly, the animation ranges for stage 4 |
+| [`reports/stage3/`](reports/stage3/) | Sheets (`stage3_skeleton`, `_poses_1..4`, `_ingame`, `_weapon`, `_limits`) and the measured JSON (landmarks, seed, skin, glTF check, limits, poses, the Brax regression of the shared-tool hooks) |
+| [`stage3_skin.json`](stage3_skin.json) | Every hand-set rig number: the under-suit weight fixes, the helpers and their follow factors, the cloth grids, the armour piece to bone table |
+| `work/valdris_landmarks.json` | The GF_Hero_v1 landmark file (committed; the rest of `work/` is local) |
+| `production/valdris_rig.blend` | The rig (Git LFS) |
+
+Rebuild: `python tools/blender/gf_hero/s3_valdris_run.py` (about 2 min, CPU only).
+
 ## Folders
 
 | Folder | Content | In git |
@@ -61,7 +73,7 @@ Rebuild: `python tools/blender/gf_hero/s2_valdris_run.py` (4-9 min, CPU only).
 | `source/` | raw TRELLIS.2 GLBs (`valdris_trellis2_s<seed>.glb`) + ComfyUI previews; the selected seed's GLB goes to git through Git LFS | local except the selected GLB and the provenance JSONs |
 | `work/` | full-size renders, mask checks, logs, the intermediate stage-2 `.blend` files | no |
 | `reports/` | `stage0_*` review sheets and notes; stage-1 review sheets in `reports/blockout/`; stage 2 in `reports/stage2/` | yes |
-| `production/`, `textures/` | the stage-2 production `.blend` and its textures | yes (Git LFS) |
+| `production/`, `textures/` | the stage-2 production `.blend`, the stage-3 rig `.blend` and the textures | yes (Git LFS) |
 
 **Everything in `source/` is a stage-1 SCULPT REFERENCE ONLY.** It is dense, unrigged and carries
 baked lighting in its texture; it is never copied to `assets/models/` and never shipped.

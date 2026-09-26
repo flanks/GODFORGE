@@ -434,10 +434,285 @@
    }
   },
   "3_rig": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "The GF_Hero_v1 master skeleton (docs/art/GF_HERO_SKELETON.md). The colossus_cannon rides weapon_R (the stage-2 hand_frames, on the forearm axis); the right hand is a normal gauntlet hand (decisions[weapons_separate_arms]). Rigid armour pieces carry suggested bones (reports/stage2/parts.json piece_table); cape, loincloth, fauld and braids on x_ helper chains as planned in reports/stage2_production_mesh.md section 8."
+   "outputs": [
+    "art/characters/valdris/production/valdris_rig.blend (Git LFS)",
+    "art/characters/valdris/work/valdris_landmarks.json (committed, git add -f)",
+    "art/characters/valdris/stage3_skin.json",
+    "art/characters/valdris/reports/rig_report.md",
+    "art/characters/valdris/reports/stage3/stage3_{skeleton,poses_1,poses_2,poses_3,poses_4,ingame,weapon,limits}.png",
+    "art/characters/valdris/reports/stage3/{landmarks,mh_seed,skin,gltf_check,limits,poses,brax_regression}.json"
+   ],
+   "notes": "GF_Hero_v1 on the armoured stage-2 mesh. Landmarks from the stage-2 fit (shared s3_landmarks.py), finished by s3_valdris_landmarks.py: finger joints on the gauntlet lames, the hand bone's tail on the forearm axis (the sleeve cannon stays coaxial when the hand twists), chest_sigil on the anvil's front face, 53 x_ extras. Under-suit BODY weighted as Brax (MakeHuman CC0 seed + heat + twist split + joint fixes); every armour piece rigid (one row); pauldron, couter, poleyn and tassets on driven helpers (a Transformation of the arm's elevation, Copy Rotations, a max-of-thighs driver for the fauld), all additive and baked by the glTF export like the twist bones; beard hair on head / neck, braids, cape and loincloth on x_ chains with linear grid falloff. The colossus_cannon GLB rides weapon_R by the identity attach, proven with the shipped file. Range-of-motion sweeps chose the helper factors and set the animation ranges; 13 validation poses posed by the stage-4 solver with the cloth chains posed clear. Honest findings in reports/rig_report.md section 5: the arms have a small clean range between the anvil and the pauldrons (overhead arms need keyed pauldrons), the head barely nods before the beard meets the chest, the cannon's rear cuff cuts the upper-arm plate past ~25 deg of elbow, the cannon's brace handle is out of the left hand's reach, and the greave sinks into the sabaton past ~20 deg of ankle flexion. The user's visual approval is the remaining gate.",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s3_valdris_run.py; no human artist",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes the rig and weights, the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md, tools/blender/gf_hero/gf_hero_rig.py) + 53 per-hero x_ extras",
+   "tools": [
+    "tools/blender/gf_hero/s3_valdris_run.py",
+    "tools/blender/gf_hero/s3_landmarks.py",
+    "tools/blender/gf_hero/s3_valdris_landmarks.py",
+    "tools/blender/gf_hero/s3_mh_seed.py",
+    "tools/blender/gf_hero/s3_skin.py (shared; gained the optional hook)",
+    "tools/blender/gf_hero/s3_valdris_skin.py",
+    "tools/blender/gf_hero/s3_gltf_check.py (shared; gained the GLB-weapon identity proof)",
+    "tools/blender/gf_hero/s3_valdris_limits.py",
+    "tools/blender/gf_hero/s3_valdris_poses.py",
+    "tools/blender/gf_hero/s3_valdris_check.py",
+    "tools/blender/gf_hero/s3_valdris_cloth.py",
+    "tools/blender/gf_hero/s3_valdris_sheets.py",
+    "tools/blender/gf_hero/s4lib.py (read only: the stage-4 solver poses the validation set)",
+    "tools/blender/gf_hero/check_skeleton.py"
+   ],
+   "metrics": {
+    "bones": 116,
+    "bones_by_group": {
+     "core": 23,
+     "twist": 6,
+     "fingers": 30,
+     "sockets": 4,
+     "extras": 53
+    },
+    "extras": {
+     "driven_helpers": [
+      "x_pauldron_L/R",
+      "x_elbow_L/R",
+      "x_knee_L/R",
+      "x_tasset_L/R",
+      "x_fauld_01"
+     ],
+     "cloth_chains": {
+      "x_cape": "5 x 5",
+      "x_loin": "3 x 3",
+      "x_beard": "5 x 2"
+     }
+    },
+    "weighted_objects": 12,
+    "unweighted_vertices": 0,
+    "max_influences": 4,
+    "weight_sum_error_max": 2.220446049250313e-16,
+    "body_influence_histogram": {
+     "0": 0,
+     "1": 460,
+     "2": 2119,
+     "3": 651,
+     "4": 723
+    },
+    "armour": "168 rigid pieces, one weight row each (a single bone for all but the gorget's neck lame, 60/40 neck / spine_03)",
+    "gltf_joints": 116,
+    "gltf_socket_frame_error_max": 8.344650268554688e-07,
+    "weapon_identity_attach_error_m": {
+     "colossus_cannon.glb (shipped file) on weapon_R": 2.811545414260763e-07
+    },
+    "validation_poses": 13,
+    "new_clipping_vertices_per_pose": {
+     "bind": 0,
+     "apose": 27,
+     "cannon_aim": 107,
+     "guard": 67,
+     "siege_brace": 171,
+     "deep_squat": 360,
+     "lunge": 194,
+     "torso_twist": 100,
+     "head_left_down": 44,
+     "head_right_up": 30,
+     "bulwark_raise": 126,
+     "forearm_twist": 66,
+     "elbow_knee_max": 754
+    },
+    "cloth_inside_after_solve_cape_loin_braids": {
+     "bind": [
+      4,
+      2,
+      0
+     ],
+     "apose": [
+      1,
+      2,
+      0
+     ],
+     "cannon_aim": [
+      0,
+      3,
+      0
+     ],
+     "guard": [
+      0,
+      3,
+      0
+     ],
+     "siege_brace": [
+      0,
+      3,
+      0
+     ],
+     "deep_squat": [
+      0,
+      12,
+      0
+     ],
+     "lunge": [
+      11,
+      4,
+      1
+     ],
+     "torso_twist": [
+      0,
+      3,
+      0
+     ],
+     "head_left_down": [
+      1,
+      2,
+      0
+     ],
+     "head_right_up": [
+      1,
+      2,
+      0
+     ],
+     "bulwark_raise": [
+      0,
+      2,
+      0
+     ],
+     "forearm_twist": [
+      0,
+      3,
+      0
+     ],
+     "elbow_knee_max": [
+      0,
+      2,
+      0
+     ]
+    },
+    "cannon_poke_cuts": {
+     "bind": [
+      28,
+      0
+     ],
+     "apose": [
+      1,
+      1
+     ],
+     "cannon_aim": [
+      5,
+      13
+     ],
+     "guard": [
+      5,
+      14
+     ],
+     "siege_brace": [
+      5,
+      14
+     ],
+     "deep_squat": [
+      5,
+      21
+     ],
+     "lunge": [
+      5,
+      13
+     ],
+     "torso_twist": [
+      5,
+      13
+     ],
+     "head_left_down": [
+      1,
+      1
+     ],
+     "head_right_up": [
+      1,
+      1
+     ],
+     "bulwark_raise": [
+      1,
+      29
+     ],
+     "forearm_twist": [
+      5,
+      13
+     ]
+    },
+    "shoulder_collapse_verts_max_gameplay_poses": 1,
+    "clean_ranges": {
+     "shoulder_side_raise_deg": 30,
+     "shoulder_forward_raise_deg": 15,
+     "arms_lowered": "to about -45 deg (below that the rerebrace meets the chest band at the armpit)",
+     "cannon_elbow_deg": [
+      0,
+      25
+     ],
+     "left_elbow_deg": [
+      0,
+      75
+     ],
+     "knee_deg": [
+      0,
+      90
+     ],
+     "ankle_flexion_deg": [
+      -10,
+      20
+     ],
+     "thigh_flexion_deg": [
+      0,
+      45
+     ],
+     "head_yaw_deg": "25 with the braid chains posed",
+     "torso_twist_deg": 40
+    }
+   },
+   "items": {
+    "skeleton_and_sockets": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/work/valdris_landmarks.json",
+      "art/characters/valdris/reports/stage3/landmarks.json"
+     ]
+    },
+    "skin_weights": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/production/valdris_rig.blend",
+      "art/characters/valdris/stage3_skin.json",
+      "art/characters/valdris/reports/stage3/skin.json"
+     ]
+    },
+    "weapon_attach": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/reports/stage3/gltf_check.json",
+      "art/characters/valdris/reports/stage3/stage3_weapon.png"
+     ]
+    },
+    "validation_poses": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/reports/stage3/poses.json",
+      "art/characters/valdris/reports/stage3/limits.json",
+      "art/characters/valdris/reports/rig_report.md"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made rig and weights (sheets in reports/stage3/, findings in reports/rig_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "4_animation": {
    "status": "not_started",
@@ -482,8 +757,9 @@
    "via": "art/characters/valdris/reports/stage2/ (polished 2026-09-26; stage2_before_after.png)"
   },
   {
-   "gate": "stage 3: weight-paint sign-off",
-   "state": "not_started"
+   "gate": "stage 3: the user's visual approval of the AI-made rig and weights (no human artist, 2026-09-25)",
+   "state": "pending_human",
+   "via": "art/characters/valdris/reports/stage3/ and reports/rig_report.md"
   },
   {
    "gate": "stage 5: final Hades-II bar",

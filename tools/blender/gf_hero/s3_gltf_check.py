@@ -11,7 +11,8 @@ only, 4 influences, no compression) to art/characters/<key>/work/gltf_check/<key
     Blender grip frame at the socket, C = the +Y-up conversion). Proven with real data too: each signature-weapon
     gauntlet is exported on its own in its authoring frame (identity object transform, as the weapon GLB will be),
     its glTF vertices are pushed through the socket node's world matrix and compared with the Blender positions of the
-    same gauntlet held on the socket by the rig (converted to +Y up).
+    same gauntlet held on the socket by the rig (converted to +Y up). A signature weapon shipped as a GLB (a PREVIEW
+    object with the custom property gf_weapon_glb, e.g. Valdris's colossus_cannon) is proven with the shipped file itself.
 Writes reports/stage3/gltf_check.json; exits 1 when a check fails.
 """
 import json
@@ -199,6 +200,43 @@ for ob in [o for o in scene.objects if o.name.startswith("PREVIEW_GAUNTLET_FIST_
     bpy.data.objects.remove(tmp)
     if d.max() > 1e-4:
         fails.append("%s attached by identity at weapon_%s is off by %.2e m" % (ob.data.name, side, d.max()))
+# a signature weapon shipped as a GLB (a PREVIEW object carrying "gf_weapon_glb", e.g. Valdris's colossus_cannon; Brax has
+# none): the SHIPPED file itself is read, every mesh node pushed through the socket node's world matrix, and compared with
+# the object the rig holds on that socket (converted to +Y up)
+for ob in [o for o in scene.objects if o.type == "MESH" and o.name.startswith("PREVIEW_") and "gf_weapon_glb" in o]:
+    from mathutils.kdtree import KDTree
+    side = ob.name[-1]
+    held = get_co(ob.data) @ np.array(ob.matrix_world)[:3, :3].T + np.array(ob.matrix_world)[:3, 3]
+    held_gltf = held @ np.array(C.to_3x3()).T
+    wpath = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(P["A"]))), ob["gf_weapon_glb"])
+    wjs, wbin = read_glb(wpath)
+    wpar = {c: i for i, n in enumerate(wjs["nodes"]) for c in n.get("children", [])}
+
+    def wworld(i):
+        m = node_local(wjs["nodes"][i])
+        while i in wpar:
+            i = wpar[i]
+            m = node_local(wjs["nodes"][i]) @ m
+        return m
+    G = world(names.index("weapon_" + side))
+    pos = []
+    for i, n in enumerate(wjs["nodes"]):
+        if "mesh" in n:
+            p = np.concatenate([accessor(wjs, wbin, pr["attributes"]["POSITION"]) for pr in wjs["meshes"][n["mesh"]]["primitives"]]).astype(np.float64)
+            M = np.array(G @ wworld(i))
+            pos.append(p @ M[:3, :3].T + M[:3, 3])
+    attached = np.concatenate(pos)
+    kd = KDTree(len(held_gltf))
+    for i, p in enumerate(held_gltf):
+        kd.insert(p, i)
+    kd.balance()
+    d = np.array([kd.find(p)[2] for p in attached])
+    scene_roots = wjs["scenes"][wjs.get("scene", 0)]["nodes"]
+    wtest[ob.name] = {"socket": "weapon_" + side, "weapon_file": ob["gf_weapon_glb"],
+                      "weapon_scene_roots_identity": bool(all(np.allclose(np.array(node_local(wjs["nodes"][r])), np.eye(4), atol=1e-6) for r in scene_roots)),
+                      "vertices": int(len(attached)), "max_distance_m": float(d.max()), "mean_distance_m": float(d.mean())}
+    if d.max() > 1e-4:
+        fails.append("%s (%s) attached by identity at weapon_%s is off by %.2e m" % (ob.name, ob["gf_weapon_glb"], side, d.max()))
 report["checks"]["weapon_identity_attach"] = wtest
 log("weapon identity attach:", {k: "%.1e m" % v["max_distance_m"] for k, v in wtest.items()})
 report["ok"] = not fails

@@ -1,0 +1,376 @@
+{
+ "_doc": "Stage-3 rig and skinning inputs for Valdris (tools/blender/gf_hero/s3_valdris_run.py). Metres, Blender axes (Z up, faces -Y, +X = his left). Hand-edited; rerun python tools/blender/gf_hero/s3_valdris_run.py after a change. body + parts follow the shared s3_skin.py format (Brax: art/characters/brax/stage3_skin.json); every armour, beard and cloth part uses mode 'hook', weighted by tools/blender/gf_hero/s3_valdris_skin.py from the 'rig' block below.",
+ "hook": {
+  "module": "s3_valdris_skin",
+  "_doc": "s3_skin.py (shared) imports this module: after_armature() installs the driven x_ helpers, part_weights() weights every part in mode 'hook', after_bind() links the colossus_cannon GLB onto weapon_R (PREVIEW, not exported)."
+ },
+ "body": {
+  "_doc": "BODY = the fitted MakeHuman hm08 under-suit (mail, padding, the face and the gauntlet glove). seed = MakeHuman CC0 game_engine weights (exact per vertex, s3_mh_seed.py); heat_mix blends Blender's bone heat into the seed per region (0 = seed only).",
+  "heat_mix": {
+   "_doc": "Torso and limbs half seed, half heat (as Brax). The glove hands keep the seed (heat is unreliable on fingers, and the lames hide them); the head keeps most of the seed (face loops).",
+   "default": 0.5,
+   "regions": [
+    {
+     "bones": [
+      "hand_L",
+      "hand_R"
+     ],
+     "radius": 0.2,
+     "mix": 0.0
+    },
+    {
+     "bones": [
+      "head"
+     ],
+     "radius": 0.16,
+     "mix": 0.2
+    }
+   ]
+  },
+  "twist": {
+   "_doc": "share of a limb class moved onto its twist bone along the bone (t = 0 at the bone head, 1 at the tail).",
+   "upperarm_fade_end": 0.85,
+   "thigh_fade_end": 0.85,
+   "lowerarm_fade_start": 0.15
+  },
+  "joint_blend": [
+   {
+    "name": "knee_L",
+    "parent_class": [
+     "thigh_L",
+     "thigh_twist_L"
+    ],
+    "child_class": [
+     "shin_L"
+    ],
+    "axis_bone": "shin_L",
+    "half_width": 0.07,
+    "offset": 0.0,
+    "radius": 0.22,
+    "outer_dir": [
+     0,
+     -1,
+     0
+    ],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_L",
+    "parent_class": [
+     "upperarm_L",
+     "upperarm_twist_L"
+    ],
+    "child_class": [
+     "lowerarm_L",
+     "lowerarm_twist_L"
+    ],
+    "axis_bone": "lowerarm_L",
+    "half_width": 0.055,
+    "offset": 0.0,
+    "radius": 0.16,
+    "outer_dir": [
+     0,
+     1,
+     0
+    ],
+    "offset_outer": -0.025
+   },
+   {
+    "name": "knee_R",
+    "parent_class": [
+     "thigh_R",
+     "thigh_twist_R"
+    ],
+    "child_class": [
+     "shin_R"
+    ],
+    "axis_bone": "shin_R",
+    "half_width": 0.07,
+    "offset": 0.0,
+    "radius": 0.22,
+    "outer_dir": [
+     0,
+     -1,
+     0
+    ],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_R",
+    "parent_class": [
+     "upperarm_R",
+     "upperarm_twist_R"
+    ],
+    "child_class": [
+     "lowerarm_R",
+     "lowerarm_twist_R"
+    ],
+    "axis_bone": "lowerarm_R",
+    "half_width": 0.055,
+    "offset": 0.0,
+    "radius": 0.16,
+    "outer_dir": [
+     0,
+     1,
+     0
+    ],
+    "offset_outer": -0.025
+   }
+  ],
+  "smooth": [],
+  "spatial_smooth": [
+   {
+    "name": "neck_jaw_fold",
+    "bone": "neck",
+    "radius": 0.13,
+    "sigma": 0.015,
+    "iters": 2
+   },
+   {
+    "name": "shoulder_L",
+    "bone": "upperarm_twist_L",
+    "radius": 0.2,
+    "sigma": 0.03,
+    "iters": 2
+   },
+   {
+    "name": "shoulder_R",
+    "bone": "upperarm_twist_R",
+    "radius": 0.2,
+    "sigma": 0.03,
+    "iters": 2
+   },
+   {
+    "name": "knee_L",
+    "bone": "shin_L",
+    "radius": 0.18,
+    "sigma": 0.035,
+    "iters": 3
+   },
+   {
+    "name": "knee_R",
+    "bone": "shin_R",
+    "radius": 0.18,
+    "sigma": 0.035,
+    "iters": 3
+   }
+  ],
+  "_doc_fixes": "As Brax (shared s3_skin.py): rest_relax first (positions only), then after the seed / heat mix and the twist split: joint_blend, smooth, spatial_smooth; then 4 influences, normalised.",
+  "rest_relax": [
+   {
+    "name": "extra_loops_onto_the_profile",
+    "mode": "extra_loops_4pt",
+    "_doc": "the stage-2 knee / elbow / wrist loops sit on edge chords; each loop vertex moves onto the 4-point subdivision curve of its edge loop"
+   }
+  ]
+ },
+ "parts": {
+  "_doc": "Every separate part is weighted by the hook (s3_valdris_skin.part_weights) from the rig block.",
+  "CUIRASS": {
+   "mode": "hook"
+  },
+  "ANVIL": {
+   "mode": "hook"
+  },
+  "PAULDRONS": {
+   "mode": "hook"
+  },
+  "ARMS": {
+   "mode": "hook"
+  },
+  "GAUNTLETS": {
+   "mode": "hook"
+  },
+  "LEGS": {
+   "mode": "hook"
+  },
+  "SABATONS": {
+   "mode": "hook"
+  },
+  "HIPS": {
+   "mode": "hook"
+  },
+  "LOINCLOTH": {
+   "mode": "hook"
+  },
+  "CAPE": {
+   "mode": "hook"
+  },
+  "BEARD": {
+   "mode": "hook"
+  },
+  "hang": {
+   "knee_z": 0.62,
+   "follow_max": 0.85,
+   "side_blend_m": 0.07
+  }
+ },
+ "rig": {
+  "_doc": "Valdris's per-hero x_ extras (docs/art/GF_HERO_SKELETON.md section 2: leaf chains prefixed x_, deform, never keyed by shared clips). Two kinds: DRIVEN helpers (a Copy Rotation of a core bone at a partial influence, or a driver; Blender evaluates them and the stage-5 exporter bakes them into every clip, as it bakes the twist bones) and CLOTH chains (cape, loincloth, braids: at rest in shared clips, sprung in the engine or posed by his unique clips; s3_valdris_cloth.py poses them clear of the body for the validation poses). The helper bones are built with the rest orientation of the core bone they follow (same direction and roll), so a local-to-local Copy Rotation turns them by the same axis.",
+  "helpers": {
+   "pauldron": {
+    "_doc": "x_pauldron_L/R, parent clavicle, the upperarm's rest orientation, head at the pauldron's inner hinge (by the neck, under the cap). A Transformation constraint turns it by `follow` x the upper arm's ELEVATION only (the Z part of its swing with the twist about the arm removed, clamped upward): raising the arm lifts the pauldron's outer end about the hinge, the upright plate by the head barely moves, and a forward swing or a lowered arm leaves the pauldron where it is (a full Copy Rotation also swung it forward into the beard: reports/stage3/limits.json). The lower arm lame rides the upper arm.",
+    "pivot": [
+     0.25,
+     0.0,
+     1.99
+    ],
+    "length": 0.12,
+    "follow": 0.6,
+    "_doc_follow": "0.6 and the hinge by the neck were chosen by the sweep in reports/stage3/limits.json (shoulder): follow 0 / 0.35 / 0.5 / 0.65 / 0.8 / 1.0 and hinges at |x| 0.25 / 0.32 / 0.37. A side raise stays clean to about 35 deg; beyond ~45 deg the forearm meets the pauldron's outer lame whatever the follow, and a higher follow or an outer hinge swings the upright plate into the head and the braids. The helpers' constraints are additive (mix AFTER), so a unique clip (the Bulwark Slam leap) may key x_pauldron on top."
+   },
+   "elbow": {
+    "_doc": "x_elbow_L/R, parent upperarm, the lowerarm's rest orientation, head at the elbow joint: the elbow ring and the couter turn `follow` of the elbow bend. Left 0.5 (the cap sits between the arm segments). Right 1.0: the colossus_cannon is rigid on the forearm and its rear cuff ends 5 cm in front of the elbow, so a half-turning couter cut into the cuff at any bend (limits.json 'cannon'); on the forearm it moves with it.",
+    "length": 0.08,
+    "follow": 0.5,
+    "follow_R": 1.0
+   },
+   "knee": {
+    "_doc": "x_knee_L/R, parent thigh, the shin's rest orientation, head at the knee joint: the poleyn (knee cop) and the glowing knee smile turn half the knee bend.",
+    "length": 0.1,
+    "follow": 0.5
+   },
+   "tasset": {
+    "_doc": "x_tasset_L/R, parent pelvis, the thigh's rest orientation, head at the tasset's hinge on the belt: both tasset lames swing with this fraction of the thigh, so the lifted thigh does not cut through them.",
+    "pivot": [
+     0.29,
+     -0.13,
+     1.29
+    ],
+    "length": 0.18,
+    "follow": 0.25,
+    "_doc_follow": "0.25 from the hip sweep (reports/stage3/limits.json 'hip') and the poses: with the torso upright a higher follow keeps the thigh plate from sliding under the tasset (0.5-0.65 clean to 45 deg), but in the braced, leaning poses (Siege Stance, lunge, squat) it swings the upper tasset up into the anvil's underside. Measured on the poses: brace 207 new clipping vertices at 0.5, 171 at 0.25, 157 at 0; stance poses (cannon aim, guard) 103 / 69 at 0.5, 107 / 67 at 0.25, 126 / 85 at 0."
+   },
+   "fauld": {
+    "_doc": "x_fauld_01, parent pelvis, from the top of fauld lame 3 to the fauld point: lames 3 and 4 swing forward with the forward-most thigh (a driver: max of the two thighs' flexion, never backward).",
+    "head": [
+     0.0,
+     -0.35,
+     1.075
+    ],
+    "tail": [
+     0.0,
+     -0.37,
+     0.815
+    ],
+    "follow": 0.8
+   }
+  },
+  "cape": {
+   "_doc": "x_cape_{R2,R1,C,L1,L2}_01..05, parent spine_03: 5 chains at u = -1, -1/2, 0, 1/2, 1 across the cape's rows (stage2_parts.json cape.rows, x = u half_width, y on the cape's mid-surface), joints at joints_z. Weights: a vertex at (u, z) blends linearly between its two nearest chains and, along a chain, between the bones either side of its height (hat functions centred on each bone's middle); the top row is pinned to spine_03 (the cape hangs under the pauldrons from the collar line). The collar is rigid on spine_03.",
+   "columns_u": [
+    -1.0,
+    -0.5,
+    0.0,
+    0.5,
+    1.0
+   ],
+   "names": [
+    "R2",
+    "R1",
+    "C",
+    "L1",
+    "L2"
+   ],
+   "joints_z": [
+    2.03,
+    1.7,
+    1.36,
+    1.02,
+    0.68,
+    0.3
+   ],
+   "pin_top_z": 2.0
+  },
+  "loin": {
+   "_doc": "x_loin_{R,C,L}_01..03, parent pelvis: 3 chains at u = -1, 0, 1 across the loincloth (stage2_parts.json loin), joints at joints_z; the same blend as the cape, the top row pinned to pelvis at the belt.",
+   "columns_u": [
+    -1.0,
+    0.0,
+    1.0
+   ],
+   "names": [
+    "R",
+    "C",
+    "L"
+   ],
+   "joints_z": [
+    1.25,
+    0.99,
+    0.72,
+    0.44
+   ],
+   "pin_top_z": 1.22
+  },
+  "braids": {
+   "_doc": "x_beard_{1..5}_01..02, parent head (1 = his right, x -0.14): _01 from the braid root to between plait lobes 2 and 3, _02 from there to the bottom of the steel cap. Lobes 1-2 ride _01, lobes 3-4, the ring and the cap ride _02 (rigid per piece).",
+   "bones": 2
+  },
+  "beard": {
+   "_doc": "The beard block, the locks and the moustache are hair on the head. The block's lowest band (the bib in front of the gorget) blends toward the neck, so a nod folds it instead of driving it through the gorget: head 100 % above z_head, down to bib_head at z_bib. Locks are rigid, one row each (the block's weights at the lock root).",
+   "z_head": 2.07,
+   "z_bib": 1.995,
+   "bib_head": 0.55
+  },
+  "pieces": {
+   "_doc": "Armour piece name (stage-2 gf_piece -> reports/stage2/parts.json piece_table) -> bone, or {bone: share} for a blended rigid row. A piece is always rigid: every vertex of a piece carries the same row. <S> = L or R. Pieces not listed keep the stage-2 suggestion (MakeHuman names mapped to GF_Hero_v1).",
+   "CHEST": "spine_03",
+   "RIBS": "spine_02",
+   "BELLY": "spine_01",
+   "BELT": "pelvis",
+   "BUCKLE": "pelvis",
+   "GORGET_1": "spine_03",
+   "GORGET_2": {
+    "neck": 0.6,
+    "spine_03": 0.4
+   },
+   "ANVIL_SLAB": "spine_03",
+   "ANVIL_BODY": "spine_03",
+   "ANVIL_GASKET": "spine_03",
+   "PAULDRON_TOPLAME1_<S>": "x_pauldron_<S>",
+   "PAULDRON_TOPLAME2_<S>": "x_pauldron_<S>",
+   "PAULDRON_TOPLAME3_<S>": "x_pauldron_<S>",
+   "PAULDRON_CAP_<S>": "x_pauldron_<S>",
+   "PAULDRON_SLOT_<S>": "x_pauldron_<S>",
+   "PAULDRON_LAME1_<S>": "x_pauldron_<S>",
+   "PAULDRON_RAME1_<S>": "x_pauldron_<S>",
+   "PAULDRON_UPRIGHT_<S>": "x_pauldron_<S>",
+   "PAULDRON_RIVET_<S>": "x_pauldron_<S>",
+   "PAULDRON_LAME2_<S>": "upperarm_<S>",
+   "PAULDRON_RAME2_<S>": "upperarm_<S>",
+   "REREBRACE1_<S>": "upperarm_<S>",
+   "REREBRACE2_<S>": "upperarm_<S>",
+   "ELBOW_GLOW_<S>": "x_elbow_<S>",
+   "COUTER_<S>": "x_elbow_<S>",
+   "COUTER_COP_<S>": "x_elbow_<S>",
+   "VAMBRACE1_<S>": "lowerarm_<S>",
+   "VAMBRACE2_<S>": "lowerarm_twist_<S>",
+   "WRIST_CUFF_<S>": "lowerarm_twist_<S>",
+   "GAUNTLET_CUFF_<S>": "hand_<S>",
+   "GAUNTLET_BACK_<S>": "hand_<S>",
+   "GAUNTLET_KNUCKLE_<S>": "hand_<S>",
+   "CUISSE1_<S>": "thigh_<S>",
+   "CUISSE2_<S>": "thigh_<S>",
+   "POLEYN_<S>": "x_knee_<S>",
+   "KNEE_SMILE_<S>": "x_knee_<S>",
+   "GREAVE_<S>": "shin_<S>",
+   "SHIN_GASKET_<S>": "shin_<S>",
+   "SHIN_PLATE_<S>": "shin_<S>",
+   "SABATON_FOOT_<S>": "foot_<S>",
+   "SABATON_SOLE_<S>": "foot_<S>",
+   "SABATON_CUFF_<S>": "shin_<S>",
+   "SABATON_TOE1_<S>": "shin_<S>",
+   "SABATON_TOE2_<S>": "toe_<S>",
+   "SABATON_TOE3_<S>": "toe_<S>",
+   "TASSET1_<S>": "x_tasset_<S>",
+   "TASSET2_<S>": "x_tasset_<S>",
+   "FAULD_1": "pelvis",
+   "FAULD_2": "pelvis",
+   "FAULD_3": "x_fauld_01",
+   "FAULD_4": "x_fauld_01",
+   "CAPE_COLLAR": "spine_03",
+   "_doc_sabaton": "The ankle cuff and the instep lame (toe lame 1) ride the SHIN: the greave and the shin plate sink into them, and the ankle sweep (limits.json 'ankle') measured the fewest cuts that way - clean to +20 deg of dorsiflexion (9 vertices), where on the foot they took 64, and a half-turning helper 38. The instep lame slides over the foot shell instead (lames of one boot)."
+  },
+  "_doc_constraints": "Every helper constraint mixes AFTER the bone's own local rotation (additive): shared clips leave the helpers at rest and the constraint does the work; a unique clip may key a helper and the follow is added on top."
+ }
+}

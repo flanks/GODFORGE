@@ -1,0 +1,221 @@
+{
+ "hero": "valdris",
+ "file": "art/characters/valdris/work/gltf_check/valdris_rig.glb (local scratch)",
+ "checks": {
+  "joints": {
+   "count": 116,
+   "missing": [],
+   "unexpected": []
+  },
+  "hierarchy": {
+   "armature_node": true,
+   "wrong_parents": []
+  },
+  "primitives": [
+   {
+    "mesh": "ANVIL",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "ARMS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "BEARD",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "BODY",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "CAPE",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "CUIRASS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "GAUNTLETS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "HIPS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "LEGS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "LOINCLOTH",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "PAULDRONS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   },
+   {
+    "mesh": "SABATONS",
+    "JOINTS_0": true,
+    "WEIGHTS_0": true,
+    "extra_sets": []
+   }
+  ],
+  "extensionsRequired": [],
+  "weights_sum_max_error": 1.341104507446289e-07,
+  "socket_frames": {
+   "weapon_R": {
+    "gltf_world": [
+     [
+      0.0,
+      0.0,
+      1.0,
+      -0.99532
+     ],
+     [
+      0.0,
+      1.0,
+      0.0,
+      1.78
+     ],
+     [
+      -1.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 3.5762786865234375e-07
+   },
+   "weapon_L": {
+    "gltf_world": [
+     [
+      0.0,
+      0.0,
+      -1.0,
+      0.99671
+     ],
+     [
+      -0.0,
+      1.0,
+      0.0,
+      1.78
+     ],
+     [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 8.344650268554688e-07
+   },
+   "head_top": {
+    "gltf_world": [
+     [
+      -1.0,
+      0.0,
+      -0.0,
+      0.0
+     ],
+     [
+      -0.0,
+      1.0,
+      0.0,
+      2.30562
+     ],
+     [
+      0.0,
+      0.0,
+      -1.0,
+      0.1
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 2.980232238769531e-07
+   },
+   "chest_sigil": {
+    "gltf_world": [
+     [
+      -1.0,
+      0.0,
+      0.0,
+      -0.0
+     ],
+     [
+      0.0,
+      0.99923,
+      0.03922,
+      1.515
+     ],
+     [
+      -0.0,
+      0.03922,
+      -0.99923,
+      0.59928
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+     ]
+    ],
+    "max_abs_vs_grip_frame": 1.1920928955078125e-07
+   }
+  },
+  "weapon_identity_attach": {
+   "PREVIEW_colossus_cannon_R": {
+    "socket": "weapon_R",
+    "weapon_file": "assets/models/weapons/colossus_cannon.glb",
+    "weapon_scene_roots_identity": true,
+    "vertices": 4799,
+    "max_distance_m": 2.811545414260763e-07,
+    "mean_distance_m": 1.1510809491972232e-07
+   }
+  }
+ },
+ "ok": true,
+ "failures": []
+}

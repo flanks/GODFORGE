@@ -155,7 +155,7 @@ the runners read `COMFY_PY`). Review renders use Cycles on the CPU or Workbench,
 | 1 generate | `python -u tools/comfy/run_trellis.py <key> <concept.png> --seed 101 --seed 202 --seed 303` | `source/<key>_trellis2_s<seed>.glb` + provenance JSON |
 | 1 review | `<blender> -b -P tools/blender/gf_hero/render_blockout.py -- <glb> art/characters/<key>/work/renders/<stem> <stem>`, then `<comfy-python> tools/comfy/blockout_sheets.py <renders> <reports/blockout> <concept> <mask> <stems...> --selected <stem>` and `python tools/comfy/art_manifest.py <key> --selected <glb>` | review sheets, `manifest.json` |
 | 2 production mesh | `python tools/blender/gf_hero/run_stage2.py <key>` (armoured variant: `python tools/blender/gf_hero/s2_valdris_run.py`) | `production/<key>_stage2.blend`, `textures/`, the signature weapon pack, `reports/stage2/` |
-| 3 rig | `python tools/blender/gf_hero/run_stage3.py <key>` | `production/<key>_rig.blend`, `work/<key>_landmarks.json`, `reports/stage3/` |
+| 3 rig | `python tools/blender/gf_hero/run_stage3.py <key>` (armoured variant: `python tools/blender/gf_hero/s3_valdris_run.py`) | `production/<key>_rig.blend`, `work/<key>_landmarks.json`, `reports/stage3/` |
 | 4 animation | `python tools/blender/gf_hero/run_stage4.py <key>` | `production/<key>_anim.blend`, `reports/anim/` |
 | 5 export & validate | `python tools/blender/gf_hero/run_stage5.py <key>` | `assets/models/characters/<key>.glb` + `.meta.json`, `assets/models/weapons/<chassis>.glb` + `.meta.json`, `reports/export_report.json`, `reports/stage5/` |
 | 5 gate only (CI) | `python tools/blender/gf_hero/validate_glb.py assets/models/characters/*.glb [--blender <blender>] [--json <report>]` | exit 1 on any error |
@@ -343,6 +343,25 @@ Rotation, 15-bone hands, deform flags.
   proves the identity attach numerically. CI (`check_skeleton.py`) checks every landmark file and the stage-3 reports.
 * Rebuild: `python tools/blender/gf_hero/run_stage3.py <key>` (about a minute). Brax's results:
   `art/characters/brax/reports/rig_report.md`. A retarget test between two heroes comes when the second hero is rigged.
+
+**Valdris (2026-09-26), the armoured variant.** The same master skeleton and the same under-suit weighting, through the
+shared scripts; what his plate needs is added by Valdris files and two default-off hooks:
+
+```sh
+python tools/blender/gf_hero/s3_valdris_run.py            # [--from <step>] [--only <step>], about 2 min, CPU only
+```
+
+| Step | Script | What it adds |
+|---|---|---|
+| landmarks, lm_valdris | `s3_landmarks.py` + `s3_valdris_landmarks.py` | finger joints on the gauntlet lames, the hand bone's tail on the forearm axis (a sleeve weapon stays coaxial when the hand twists), `chest_sigil` on the anvil, 53 `x_` extras |
+| skin | `s3_skin.py` + its new optional `hook` (`s3_valdris_skin.py`) | driven helpers (pauldrons lift with the arm's elevation, half-turning couters and knee cops, tassets, a max-of-thighs fauld), all additive and baked into clips by the export like the twist bones; 137 armour pieces rigid, one weight row each; beard, braids, cape and loincloth on `x_` chains; the colossus_cannon GLB as a PREVIEW on `weapon_R` |
+| gltf_check | `s3_gltf_check.py` (new branch for GLB weapons) | the identity attach proven with the SHIPPED weapon GLB (0.28 µm) |
+| limits | `s3_valdris_limits.py` | range-of-motion sweeps of the rigid armour (plate-inside-plate by ray parity), which chose the helper factors and set his animation ranges |
+| poses, sheets | `s3_valdris_poses.py`, `s3_valdris_cloth.py`, `s3_valdris_check.py`, `s3_valdris_sheets.py` | 13 validation poses written with the stage-4 solver, the cloth chains posed clear, metrics and review sheets |
+
+Results, the ranges stage 4 must keep, and the honest limits: `art/characters/valdris/reports/rig_report.md`. The
+hooks are default-off, and Brax's stage-3 outputs are byte-identical with them
+(`art/characters/valdris/reports/stage3/brax_regression.json`).
 
 ### Stage 4: animation (implemented; made by AI, 2026-09-25)
 

@@ -108,6 +108,16 @@ frame rule. **A contract bone is never renamed or reparented.**
 for cloth, hair or tails. They are deform bones and may be weighted. Shared clips never key them; they are
 driven, simulated in the engine, or keyed only by that hero's unique clips. Brax has none yet.
 
+*Valdris (2026-09-26, additive note)* has 53 extras (`art/characters/valdris/reports/rig_report.md` §2):
+- **9 driven helpers.** Each is built with the rest orientation of the bone it follows, so a local constraint turns it
+  about the same axes. Every constraint mixes AFTER (additive), so a unique clip may key the helper on top.
+  - `x_pauldron_L/R`: a Transformation of the upper arm's swing-Z (its elevation), upward only;
+  - `x_elbow_L/R`, `x_knee_L/R`, `x_tasset_L/R`: Copy Rotation at a partial influence;
+  - `x_fauld_01`: a simple-expression driver.
+- **Cloth chains:** `x_cape_*` 5 × 5, `x_loin_*` 3 × 3, `x_beard_*` 5 × 2.
+
+The stage-5 exporter samples every bone, so clips carry the helpers baked, like the twist bones.
+
 ## 3. Socket frames and the identity attach (the glTF axis mapping)
 
 A weapon GLB is authored in its **grip frame**:
@@ -258,6 +268,18 @@ The per-hero numbers live in `art/characters/<key>/stage3_skin.json`:
 
 Brax's results: `art/characters/brax/reports/rig_report.md`.
 
+*Additive note (Valdris, 2026-09-26).* The shared chain has two default-off hooks for heroes that are not a plain
+MakeHuman body.
+- **`s3_skin.py`** reads `stage3_skin.json` `"hook": {"module": ...}`. The module may:
+  - drive `x_` helpers after the armature is built (`after_armature`);
+  - weight parts in mode `"hook"` (`part_weights`);
+  - add a PREVIEW weapon (`after_bind`).
+- **`s3_gltf_check.py`** proves the identity attach with a weapon shipped as a GLB, for a PREVIEW object carrying
+  `gf_weapon_glb`.
+
+Valdris uses both (`tools/blender/gf_hero/s3_valdris_run.py`). Brax's outputs are byte-identical with them
+(`art/characters/valdris/reports/stage3/brax_regression.json`).
+
 ## 7. Rules for animators (stage 4) and weapon makers
 
 - **FK on the core bones only.** Never key `root`, the twist bones or the sockets. Clips are in place: `pelvis`
@@ -293,6 +315,16 @@ Brax's results: `art/characters/brax/reports/rig_report.md`.
   fingers must be inside the fist mesh). The open variant needs the fingers extended.
 - **Retargeting from other rigs** (Mixamo / ActorCore stand-ins): map onto the core names and let the twist
   bones drive themselves.
+- *Additive notes from Valdris's rig (2026-09-26):*
+  - **`x_` bones stay unkeyed in shared clips** (§2). `s4lib.Rig.keyed` currently keys every bone but root, the twist
+    bones and the sockets, so for a hero with extras it must skip the `x_` prefix. Valdris's fauld helper is driven
+    on its own `rotation_euler.x`, which must not carry keys.
+  - **A sleeve weapon stays coaxial only if the hand bone's tail sits on the forearm axis.** The hand twists about its
+    own Y, so a tail off the axis tilts the sleeve when the hand twists. Valdris's landmark file puts the tail there
+    (1.3 cm from the knuckle).
+  - **Plate-armoured heroes have hero-specific joint ranges.** Valdris's are in his `rig_report.md` §6, measured by
+    `s3_valdris_limits.py`. Clips for him keep inside them (the shared solver's elbow / knee limits are the outer
+    bound).
 
 ## 8. The clip library (stage 4)
 

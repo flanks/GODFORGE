@@ -24,6 +24,11 @@ on root or a socket), an Armature modifier, parented to GF_Hero_v1.
 The signature weapon is linked (not copied) into a PREVIEW collection: local objects that use the weapon file's meshes,
 held on weapon_L / weapon_R by Child Of constraints whose inverse is gf_hero_rig.SOCKET_TO_GRIP - the Blender form of
 the identity attach. The stage-5 export selects the armature and the body parts only.
+
+Optional hero hook (stage3_skin.json "hook": {"module": <name>}; Brax has none, so his path is unchanged): the module is
+imported from this folder and may define after_armature(arm, ctx) (e.g. drive x_ helper bones), part_weights(name, ob,
+pc, ctx) for parts in mode "hook" (returns the (n_verts, n_bones) weight matrix over ctx["BONES"]) and after_bind(arm,
+ctx) (e.g. a PREVIEW weapon from a GLB). What they return goes into skin.json under "hook".
 """
 import os
 import sys
@@ -65,6 +70,13 @@ log("armature", arm.name, report["bones"])
 BONES = R.weight_bone_names() + [b.name for b in arm.data.bones if b.name.startswith(R.EXTRA_PREFIX)]
 C = {b: j for j, b in enumerate(BONES)}
 SEG = {b.name: (np.array(b.head_local), np.array(b.tail_local)) for b in arm.data.bones}
+HOOK, CTX = None, {"key": KEY, "paths": P, "cfg": CFG, "landmarks": LM, "fit": FIT, "BONES": BONES, "C": C, "SEG": SEG}
+if CFG.get("hook"):                   # optional per-hero hook (see the module doc); Brax has none
+    import importlib
+    HOOK = importlib.import_module(CFG["hook"]["module"])
+    report["hook"] = {"module": CFG["hook"]["module"]}
+    if hasattr(HOOK, "after_armature"):
+        report["hook"]["after_armature"] = HOOK.after_armature(arm, CTX)
 meshes = [o for o in scene.objects if o.type == "MESH" and not o.name.startswith(("REF", "WIRE", "PREVIEW"))]
 for o in meshes:                      # every body part in the hero collection (BODY sat in the scene root)
     if hero_col not in o.users_collection:
@@ -344,6 +356,7 @@ def hang_weights(points, attach_z, copy_band):
 
 
 part_report = {}
+CTX.update({"body": body, "body_W": body_W, "body_main": main, "copy_from_body": copy_from_body, "hang_weights": hang_weights})
 for name, pc in CFG["parts"].items():
     if name in ("_doc", "hang"):
         continue
@@ -359,6 +372,8 @@ for name, pc in CFG["parts"].items():
         wm.W = copy_from_body(wm.co)
     elif pc["mode"] == "hang":
         wm.W = hang_weights(wm.co, pc["attach_z"], pc["copy_band_m"])
+    elif pc["mode"] == "hook":
+        wm.W = HOOK.part_weights(name, ob, pc, CTX)
     rigid = 0
     for k in range(npieces):
         m = pl == k
@@ -451,6 +466,8 @@ if wkey:
         log("preview weapon linked; rest attach vs authored placement: %.2e" % err)
         if err > 1e-4:
             raise SystemExit("the weapon's authored placement does not match the socket frame (%.2e)" % err)
+if HOOK and hasattr(HOOK, "after_bind"):
+    report["hook"]["after_bind"] = HOOK.after_bind(arm, CTX)
 
 select_only(arm)
 arm.data.pose_position = "POSE"
