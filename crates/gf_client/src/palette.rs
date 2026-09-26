@@ -211,7 +211,8 @@ fn make_toon(color: Color, look: Look, players: &[Color; 4], block: &Handle<Imag
         ),
         Look::Matte => toon(color, Some(block.clone()), LinearRgba::BLACK, &ToonStyle::prop()),
         Look::Hero(slot) => toon(color, None, LinearRgba::BLACK, &ToonStyle::hero(players[slot as usize % 4])),
-        Look::Foe => toon(color, None, LinearRgba::BLACK, &ToonStyle::foe()),
+        // A darker core under a bright warm rim: the horde reads against warm ground by its edges.
+        Look::Foe => toon(lighten(color, 0.8), None, LinearRgba::BLACK, &ToonStyle::foe()),
         Look::Smolder => toon(color, None, emissive(0.6), &ToonStyle::foe()),
         Look::Hot => toon(color, None, emissive(2.4), &ToonStyle::foe()),
         Look::Ghost => {
@@ -325,6 +326,23 @@ pub fn element_color(e: DamageType) -> Color {
         DamageType::Void => hex("#A45CFF"),
         DamageType::Plague => hex("#86E03A"),
         DamageType::Radiant => hex("#FFE27A"),
+    }
+}
+
+/// The colour of a POI kind: beacons, markers, waymark pennants (a shrine takes its god's colour
+/// where the god is known, see `scene::poi_color`).
+pub fn poi_kind_color(kind: gf_core::poi::PoiKind) -> Color {
+    use gf_core::poi::PoiKind as K;
+    match kind {
+        K::Anvil => hex("#FFB82E"),
+        K::Warlord => hex("#FF3B30"),
+        K::Lair => hex("#E0703A"),
+        K::Shrine => hex("#FFC940"),
+        K::Reliquary => hex("#B865FF"),
+        K::Vein => hex("#8FF7FF"),
+        K::Spring => hex("#FF4D6D"),
+        K::Watchfire => hex("#FFB347"),
+        K::Gate => hex("#F4E3C1"),
     }
 }
 

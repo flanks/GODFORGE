@@ -11,7 +11,9 @@ use crate::camera::{KeyLight, w3};
 use crate::input::InputState;
 use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial};
 use crate::net::{CurrentRoom, Link, Prediction};
-use crate::palette::{Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, rarity_color, yaw};
+use crate::palette::{
+    Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, poi_kind_color, rarity_color, yaw,
+};
 use crate::world::{self, EnvLights, WorldStores};
 use crate::{ClientConfig, ClientSet};
 use gf_content::schema::{MapLayout, PoiSite};
@@ -295,7 +297,7 @@ fn rebuild_room(
     // the lava and the lit roads make the pools of warmth and the shadows never read as holes.
     let on_map = room_is_map(&current);
     ambient.color = look.ambient;
-    ambient.brightness = look.ambient_brightness * if on_map { 1.7 } else { 1.0 };
+    ambient.brightness = look.ambient_brightness * if on_map { 2.2 } else { 1.0 };
     for mut key in &mut keys {
         key.color = if on_map { mix(look.key, hex("#C4CCE6"), 0.4) } else { look.key };
         key.illuminance = look.key_lux * if on_map { 0.8 } else { 1.0 };
@@ -708,8 +710,9 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
     let body = kit.child(parent, body_mesh, base.clone(), body_tf);
     if shape != EnemyShape::Wisp {
         let ink = kit.mat(hex(INK), Look::Ink);
-        let outline =
-            kit.child(parent, body_mesh, ink, Transform { scale: body_tf.scale + Vec3::splat(0.1), ..body_tf });
+        // The ink hull grows with the body, so a big foe keeps a bold outline against the ground.
+        let hull = Vec3::splat(0.1 + 0.07 * r);
+        let outline = kit.child(parent, body_mesh, ink, Transform { scale: body_tf.scale + hull, ..body_tf });
         kit.commands.entity(outline).insert(NotShadowCaster);
     }
     let eye_size = (r * 0.17).max(0.07);
@@ -1009,16 +1012,9 @@ fn spawn_anvil(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, po
 
 /// Beacon and marker colour of a POI kind (a shrine takes its god's colour).
 pub fn poi_color(db: &ContentDb, god: Option<u8>, kind: PoiKind) -> Color {
-    match kind {
-        PoiKind::Anvil => hex("#FFB82E"),
-        PoiKind::Warlord => hex("#FF3B30"),
-        PoiKind::Lair => hex("#E0703A"),
-        PoiKind::Shrine => god.and_then(|g| db.gods.try_get(g as u16)).map_or(hex(GOLD), |g| hex(&g.color)),
-        PoiKind::Reliquary => hex("#B865FF"),
-        PoiKind::Vein => hex("#8FF7FF"),
-        PoiKind::Spring => hex("#FF4D6D"),
-        PoiKind::Watchfire => hex("#FFB347"),
-        PoiKind::Gate => hex("#F4E3C1"),
+    match (kind, god.and_then(|g| db.gods.try_get(g as u16))) {
+        (PoiKind::Shrine, Some(g)) => hex(&g.color),
+        _ => poi_kind_color(kind),
     }
 }
 
@@ -1250,12 +1246,16 @@ fn tint_entities(
 /// dim beacon shaft, turned bright while it is live, so the map always shows where to go.
 fn animate_anvils(
     time: Res<Time>,
+    link: Res<Link>,
     room: Res<CurrentRoom>,
     q: Query<&Visual>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<Visual>>,
 ) {
     let t = time.elapsed_secs();
+    let me = link.me().map(|p| p.mover.pos);
     for v in &q {
+        // Standing at a POI, its beacon would only wall off the screen.
+        let here = me.is_some_and(|m| m.distance(v.pos) < v.radius + 7.0);
         let (ring_on, fill_on, glow_on, dim_on, bright_on) = match v.kind {
             EntityKind::Anvil => {
                 let s = AnvilState::from_u8(v.status);
@@ -1292,8 +1292,8 @@ fn animate_anvils(
         show(&mut parts, ring, ring_on);
         show(&mut parts, fill, fill_on);
         show(&mut parts, glow, glow_on);
-        show(&mut parts, dim, dim_on);
-        show(&mut parts, bright, bright_on);
+        show(&mut parts, dim, dim_on && !here);
+        show(&mut parts, bright, bright_on && !here);
         if let Some(f) = fill
             && let Ok((mut tf, _)) = parts.get_mut(f)
         {

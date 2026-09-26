@@ -159,9 +159,9 @@ impl ToonStyle {
     /// Enemies: warm red rim, a little more shadow so heroes stay on top of the value ladder.
     pub fn foe() -> Self {
         ToonStyle {
-            rim: hdr(hex(FOE_RIM), 1.6),
-            rim_strength: 0.85,
-            rim_width: 0.36,
+            rim: hdr(hex(FOE_RIM), 2.2),
+            rim_strength: 1.0,
+            rim_width: 0.38,
             shade_amount: 0.45,
             paint: 0.1,
             world_paint: false,

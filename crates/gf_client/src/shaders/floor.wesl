@@ -661,7 +661,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // off into dusk, so paths read at a glance and the frame gets its darks.
     if map_mode {
         let near_way = max(1.0 - smoothstep(1.5, 13.0, path_d), 1.0 - smoothstep(1.0, 10.0, clearing_d));
-        color *= mix(0.8, 1.0, near_way);
+        color *= mix(0.84, 1.0, near_way);
     }
     // Soot and contact shade under the solid pieces (they sit in the ground, not on it).
     let n_foot = i32(fp.misc.w);
