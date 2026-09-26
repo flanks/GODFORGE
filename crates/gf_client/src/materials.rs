@@ -19,7 +19,7 @@
 
 use crate::palette::{hdr, hex, lighten, mix};
 use gf_engine::client::{
-    AsBindGroup, ExtendedMaterial, MaterialExtension, MaterialPlugin, ShaderRef, ShaderType, embedded_asset,
+    AsBindGroup, ExtendedMaterial, Face, MaterialExtension, MaterialPlugin, ShaderRef, ShaderType, embedded_asset,
 };
 use gf_engine::prelude::*;
 
@@ -27,6 +27,7 @@ pub type ToonMaterial = ExtendedMaterial<StandardMaterial, Toon>;
 pub type XRayMaterial = ExtendedMaterial<StandardMaterial, XRay>;
 pub type FloorMaterial = ExtendedMaterial<StandardMaterial, Floor>;
 pub type AbyssMaterial = ExtendedMaterial<StandardMaterial, Abyss>;
+pub type InkHullMaterial = InkHull;
 
 /// World height of the abyss surface below the arena floor (y = 0).
 pub const ABYSS_Y: f32 = -7.0;
@@ -35,11 +36,13 @@ pub fn build(app: &mut App) {
     embedded_asset!(app, "shaders/toon.wesl");
     embedded_asset!(app, "shaders/floor.wesl");
     embedded_asset!(app, "shaders/abyss.wesl");
+    embedded_asset!(app, "shaders/ink_hull.wesl");
     app.add_plugins((
         MaterialPlugin::<ToonMaterial>::default(),
         MaterialPlugin::<FloorMaterial>::default(),
         MaterialPlugin::<AbyssMaterial>::default(),
         MaterialPlugin::<XRayMaterial>::default(),
+        MaterialPlugin::<InkHullMaterial>::default(),
     ));
 }
 
@@ -158,19 +161,20 @@ impl ToonStyle {
         }
     }
 
-    /// Enemies: warm red rim, a little more shadow so heroes stay on top of the value ladder.
+    /// Enemies: warm red rim, one value step under the heroes (more shadow, almost no lift) so a
+    /// hero stays on top of the value ladder in the thick of the horde. Shadows keep their hue.
     pub fn foe() -> Self {
         ToonStyle {
             rim: hdr(hex(FOE_RIM), 2.2),
             rim_strength: 1.0,
             rim_width: 0.38,
-            shade_amount: 0.45,
+            shade_amount: 0.55,
             paint: 0.1,
             world_paint: false,
             band: 1.2,
             softness: 0.1,
-            shadow_saturation: 0.5,
-            lift: 0.15,
+            shadow_saturation: 0.8,
+            lift: 0.05,
             ink_width: 0.0,
             ink: 0.0,
             ..Self::prop()
@@ -232,6 +236,68 @@ pub fn toon(color: Color, texture: Option<Handle<Image>>, emissive: LinearRgba, 
         ..default()
     };
     toon_from_standard(base, style)
+}
+
+// ───────────────────────────── ink hull ─────────────────────────────
+
+/// GPU layout of `InkHullParams` in `ink_hull.wesl`.
+#[derive(Clone, Copy, Debug, Default, ShaderType, Reflect)]
+pub struct InkHullParams {
+    /// rgb colour (linear, HDR allowed), a = unused.
+    pub color: Vec4,
+    /// x = width (m) along the normal, y = push away from the camera (m).
+    pub shape: Vec4,
+}
+
+/// The painted contour of a glTF hero: the mesh grown along its skinned normals in the vertex
+/// shader, front faces culled, unlit (the greybox's inverted hull, for a body that deforms). The
+/// dark ink hull closes the silhouette; a wider halo hull pushed back behind it rings it in the
+/// player's colour. Presentation only; no shadows, no prepass.
+#[derive(Asset, AsBindGroup, Reflect, Clone, Debug)]
+pub struct InkHull {
+    #[uniform(0)]
+    pub params: InkHullParams,
+}
+
+impl InkHull {
+    /// A hull `width` metres out, `push` metres further from the camera, in `color`.
+    pub fn new(color: Color, width: f32, push: f32) -> Self {
+        let l = color.to_linear();
+        InkHull {
+            params: InkHullParams {
+                color: Vec4::new(l.red, l.green, l.blue, 1.0),
+                shape: Vec4::new(width, push, 0.0, 0.0),
+            },
+        }
+    }
+}
+
+impl gf_engine::bevy::pbr::Material for InkHull {
+    fn vertex_shader() -> ShaderRef {
+        "embedded://gf_client/shaders/ink_hull.wesl".into()
+    }
+
+    fn fragment_shader() -> ShaderRef {
+        "embedded://gf_client/shaders/ink_hull.wesl".into()
+    }
+
+    fn enable_prepass() -> bool {
+        false
+    }
+
+    fn enable_shadows() -> bool {
+        false
+    }
+
+    fn specialize(
+        _pipeline: &gf_engine::bevy::pbr::MaterialPipeline,
+        descriptor: &mut gf_engine::bevy::render::render_resource::RenderPipelineDescriptor,
+        _layout: &gf_engine::bevy::mesh::MeshVertexBufferLayoutRef,
+        _key: gf_engine::bevy::pbr::MaterialPipelineKey<Self>,
+    ) -> Result<(), gf_engine::bevy::render::render_resource::SpecializedMeshPipelineError> {
+        descriptor.primitive.cull_mode = Some(Face::Front);
+        Ok(())
+    }
 }
 
 // ───────────────────────────── x-ray ─────────────────────────────

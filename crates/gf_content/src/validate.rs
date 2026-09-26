@@ -668,6 +668,12 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
         if !(0.0..=1.0).contains(&t.fields) || !(0.0..=0.08).contains(&t.cover) {
             err(format!("theme `{}`: fields must be within 0..=1 and cover within 0..=0.08", t.key));
         }
+        if t.comps > x.compose.slots || t.story > 3 || !(0.0..=1.0).contains(&t.frame) {
+            err(format!(
+                "theme `{}`: comps must be ≤ compose.slots ({}), story ≤ 3 and frame within 0..=1",
+                t.key, x.compose.slots
+            ));
+        }
         for c in [&t.tint, &t.map_color] {
             if parse_hex_color(c).is_none() {
                 err(format!("theme `{}`: colour `{c}` is not #RRGGBB", t.key));
@@ -749,6 +755,28 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
     }
     if x.landmarks.iter().any(|(_, w)| !finite_positive(*w)) {
         err("landmark weights must be positive".into());
+    }
+    // ── composition (§3.6.9) ──
+    let k = &x.compose;
+    if !(1..=8).contains(&k.slots) || k.edge_band > 2 || !(0.5..=1.0).contains(&k.edge_share) {
+        err("compose: slots within 1..=8, edge_band ≤ 2 and edge_share within 0.5..=1".into());
+    }
+    if k.slot_clear < crate::procgen::LANE || k.pass_clear < 0.0 || k.road_clear < 0.0 || k.anchor_clear < 0.0 {
+        err(format!("compose: slot_clear must be ≥ LANE ({}) and the clearances ≥ 0", crate::procgen::LANE));
+    }
+    if !(k.anchor_radius.0 > 0.0 && k.anchor_radius.0 <= k.anchor_radius.1 && k.anchor_radius.1 <= 3.0)
+        || !(k.frame_run.0 > 0.0 && k.frame_run.0 <= k.frame_run.1)
+    {
+        err("compose: 0 < anchor_radius.0 ≤ anchor_radius.1 ≤ 3 and 0 < frame_run.0 ≤ frame_run.1".into());
+    }
+    if !(0.0..=1.0).contains(&k.pass_arches) || !(0.0..=1.0).contains(&k.road_silhouettes) {
+        err("compose: pass_arches and road_silhouettes are chances within 0..=1".into());
+    }
+    if k.vignette_area < 500.0 || k.vignette_spacing < 0.0 || k.heat_reach < 0.0 || k.coast_anchor_every < 4.0 {
+        err("compose: vignette_area ≥ 500, coast_anchor_every ≥ 4 and the spacings ≥ 0".into());
+    }
+    if !(8.0..=34.0).contains(&k.light_box.0) || !(8.0..=21.0).contains(&k.light_box.1) {
+        err("compose: light_box must be 8..=34 × 8..=21 u (a 45 × 28 u screen holds a whole box)".into());
     }
     if !finite_positive(x.gate_force_minute) || !finite_positive(x.boss_hp_mult) || x.threat_start_minute < 0.0 {
         err("gate_force_minute and boss_hp_mult must be positive, threat_start_minute ≥ 0".into());

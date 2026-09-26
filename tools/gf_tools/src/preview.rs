@@ -401,6 +401,14 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::Bridge { .. } => ("BRIDGE", hex("#D8C8A8")),
         Decor::Pool { .. } => ("POOL", hex("#4A9AC8")),
         Decor::Paving { .. } => ("PAVING", p.ground.scale(3.2).mix(WHITE, 0.15)),
+        Decor::FloorMark { kind, .. } => match kind {
+            FloorMarkKind::Burn => ("MARK BURN SCAR", hex("#2A1C18")),
+            FloorMarkKind::Slag => ("MARK SLAG SPILL", hex("#15141C")),
+            FloorMarkKind::Ash => ("MARK ASH DRIFT", hex("#B4AEA6")),
+            FloorMarkKind::Collapse => ("MARK COLLAPSE", hex("#5A4E46")),
+            FloorMarkKind::Rust => ("MARK RUST DRAG", hex("#8A4A2A")),
+            FloorMarkKind::Soot => ("MARK SOOT FAN", hex("#201A1A")),
+        },
         Decor::FloorInlay { .. } => ("FLOOR INLAY", hex("#E8C060")),
         Decor::Overgrowth { .. } => ("OVERGROWTH", p.cover),
         Decor::Roots { .. } => ("ROOTS", hex("#5A6A2E")),
@@ -410,13 +418,18 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::Chains { .. } => ("CHAINS", hex("#6A6A74")),
         Decor::Waymark { .. } => ("WAYMARK", hex("#F0C860")),
         Decor::Debris { .. } => ("FLOATING DEBRIS", hex("#B0A8C8")),
+        Decor::Scenery { kind, .. } => match kind {
+            SceneryKind::Lip => ("SCENERY LIP", hex("#6E6258")),
+            SceneryKind::Backdrop => ("SCENERY BACKDROP", hex("#4A4050")),
+            SceneryKind::Foreground => ("SCENERY FOREGROUND", hex("#1E1A1C")),
+        },
     }
 }
 
 /// Draw order: floor-level decals first, then solids, then props and markers.
 fn layer(d: &Decor) -> u8 {
     match d {
-        Decor::Paving { .. } => 0,
+        Decor::Scenery { .. } | Decor::Paving { .. } | Decor::FloorMark { .. } => 0,
         Decor::Overgrowth { .. } | Decor::Pool { .. } | Decor::FloorInlay { .. } => 1,
         Decor::LavaCrack { .. } | Decor::Roots { .. } | Decor::Channel { .. } => 2,
         Decor::Bridge { .. } => 3,
@@ -444,6 +457,16 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
                 segment(cv, v, Vec2::new(at.x - half.x, y), Vec2::new(at.x + half.x, y), 0.03, ink, 0.18);
                 y += step;
             }
+        }
+        Decor::FloorMark { at, half, rot, .. } => {
+            // A painted oval turned to its facing (no joints: it is paint, not paving).
+            let u = rot16_dir(rot);
+            let r = half.max_element();
+            fill(cv, v, at - Vec2::splat(r), at + Vec2::splat(r), col, 0.5, |q| {
+                let d = q - at;
+                let l = Vec2::new(d.dot(u), d.dot(u.perp())) / half;
+                (l.length() - 1.0) * half.min_element()
+            });
         }
         Decor::Overgrowth { at, radius, .. } => {
             circle(cv, v, at, radius, col, 0.22);
@@ -680,6 +703,12 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             circle(cv, v, at + Vec2::new(0.4, -0.4), radius, INK, 0.25);
             circle(cv, v, at, radius, col, 0.85);
             ring(cv, v, at, radius, 0.07, ink, 0.8);
+        }
+        Decor::Scenery { at, radius, kind, .. } => {
+            // Visual framing mass over the void: never blocks, so drawn as a hatched ring.
+            let a = if kind == SceneryKind::Lip { 0.8 } else { 0.9 };
+            circle(cv, v, at, radius, col, a);
+            ring(cv, v, at, radius, 0.08, ink, 0.6);
         }
     }
 }
@@ -1407,6 +1436,620 @@ fn stats_line(s: &Stats) -> String {
     )
 }
 
+// ───────────────────────────── composition readout (§3.6.1) ─────────────────────────────
+
+/// Composition and negative-space metrics of one biome map (OPEN_WORLD.md §3.6.1), measured on a
+/// 0.5 u raster with exact distance transforms. A design readout: `layout-stats --maps` prints it
+/// and marks the §3.6.2 targets.
+#[derive(Clone, Debug, Default)]
+pub struct CompStats {
+    /// Colliding obstacle shapes.
+    pub shapes: usize,
+    /// Obstacle area over land area.
+    pub cover: f32,
+    /// ... over interior land (more than 6 u from pits and other regions), overall and per theme.
+    pub interior: f32,
+    pub themes: Vec<(String, f32)>,
+    /// Clusters per 45 × 28 u screen: median, p90, max; interior clusters: median, p90.
+    pub clusters: (f32, f32, f32),
+    pub inner_clusters: (f32, f32),
+    /// Median clearance (u) of walkable floor.
+    pub clearance: f32,
+    /// Walkable floor inside a blocker-free disk of r 10 / r 16.
+    pub disk10: f32,
+    pub disk16: f32,
+    /// The largest clear disk (radius, u) in the region where it is smallest.
+    pub min_region_disk: f32,
+    /// Colliding shapes within road half-width + 4 u (pass arches, passes, POI set pieces and hub
+    /// monuments aside), per 100 u of road.
+    pub road_shapes: f32,
+    /// Colliding shapes in a POI's approach arcs.
+    pub approach: usize,
+    pub props: usize,
+    /// Glowing fissure segments per screen, p90, and segments farther than 9 u from heat.
+    pub fissures_p90: f32,
+    pub fissures_far: usize,
+    /// Screens without a warm pool; the median share of a screen's land the pools light.
+    pub unlit: f32,
+    pub pool_share: f32,
+    /// Screens holding frame mass; screens with no solid and no POI.
+    pub framed: f32,
+    pub barren: f32,
+    /// Obstacles per 50 × 34 u audit window (half overlap), median.
+    pub audit_window: f32,
+    pub scenery: usize,
+}
+
+/// Squared Euclidean distance transform (Felzenszwalb–Huttenlocher) of a `w × h` grid: for every
+/// cell, the distance (cells) to the nearest `source` cell; `f32::MAX` when there is none.
+fn edt(source: &[bool], w: usize, h: usize) -> Vec<f32> {
+    const INF: f32 = 1.0e20;
+    fn pass(f: &[f32], d: &mut [f32], v: &mut [usize], z: &mut [f32]) {
+        let n = f.len();
+        let sect =
+            |q: usize, p: usize| ((f[q] + (q * q) as f32) - (f[p] + (p * p) as f32)) / (2.0 * (q as f32 - p as f32));
+        let mut k = 0usize;
+        v[0] = 0;
+        z[0] = -INF;
+        z[1] = INF;
+        for q in 1..n {
+            let mut s = sect(q, v[k]);
+            while s <= z[k] && k > 0 {
+                k -= 1;
+                s = sect(q, v[k]);
+            }
+            k += 1;
+            v[k] = q;
+            z[k] = s;
+            z[k + 1] = INF;
+        }
+        k = 0;
+        for (q, out) in d.iter_mut().enumerate() {
+            while z[k + 1] < q as f32 {
+                k += 1;
+            }
+            let p = v[k];
+            *out = (q as f32 - p as f32).powi(2) + f[p];
+        }
+    }
+    let n = w.max(h);
+    let (mut v, mut z) = (vec![0usize; n + 1], vec![0.0f32; n + 2]);
+    let mut grid: Vec<f32> = source.iter().map(|&s| if s { 0.0 } else { INF }).collect();
+    let (mut f, mut d) = (vec![0.0f32; n], vec![0.0f32; n]);
+    for x in 0..w {
+        for y in 0..h {
+            f[y] = grid[y * w + x];
+        }
+        pass(&f[..h], &mut d[..h], &mut v, &mut z);
+        for y in 0..h {
+            grid[y * w + x] = d[y];
+        }
+    }
+    for y in 0..h {
+        f[..w].copy_from_slice(&grid[y * w..y * w + w]);
+        pass(&f[..w], &mut d[..w], &mut v, &mut z);
+        grid[y * w..y * w + w].copy_from_slice(&d[..w]);
+    }
+    grid.into_iter().map(|s| if s >= INF * 0.5 { f32::MAX } else { s.sqrt() }).collect()
+}
+
+fn quantile(v: &mut [f32], q: f32) -> f32 {
+    if v.is_empty() {
+        return 0.0;
+    }
+    v.sort_by(|a, b| a.total_cmp(b));
+    v[((v.len() - 1) as f32 * q).round() as usize]
+}
+
+pub fn comp_stats(db: &ContentDb, room: &RoomDef, map: &MapLayout) -> CompStats {
+    const C: f32 = 0.5;
+    let t = &map.tiles;
+    let half = room.half_extents;
+    let (w, h) = ((half.x * 2.0 / C) as usize, (half.y * 2.0 / C) as usize);
+    let at = |x: usize, y: usize| Vec2::new(-half.x + (x as f32 + 0.5) * C, -half.y + (y as f32 + 0.5) * C);
+    let cell = |p: Vec2| {
+        let x = ((p.x + half.x) / C).floor().clamp(0.0, (w - 1) as f32) as usize;
+        let y = ((p.y + half.y) / C).floor().clamp(0.0, (h - 1) as f32) as usize;
+        (x, y)
+    };
+    let n = w * h;
+    let tile = |p: Vec2| t.tile_of(p).map(|(x, y)| t.index(x, y));
+    let land: Vec<bool> = (0..n).map(|i| tile(at(i % w, i / w)).is_some_and(|j| t.kind[j].is_land())).collect();
+    let region: Vec<u8> = (0..n).map(|i| tile(at(i % w, i / w)).map_or(u8::MAX, |j| t.region[j])).collect();
+    // Obstacle raster.
+    let mut solid = vec![false; n];
+    for o in &room.obstacles {
+        let (c, e) = match *o {
+            Obstacle::Circle { center, radius } => (center, Vec2::splat(radius)),
+            Obstacle::Box { center, half } => (center, half),
+        };
+        let (x0, y0) = cell(c - e);
+        let (x1, y1) = cell(c + e);
+        for y in y0..=y1 {
+            for x in x0..=x1 {
+                if sd_obstacle(o, at(x, y)) <= 0.0 {
+                    solid[y * w + x] = true;
+                }
+            }
+        }
+    }
+    let floor: Vec<bool> = (0..n).map(|i| land[i] && !solid[i]).collect();
+    // Blockers: obstacles, pits and the rim (the grid's edge ring stands in for it).
+    let blocker: Vec<bool> =
+        (0..n).map(|i| !floor[i] || i % w == 0 || i / w == 0 || i % w == w - 1 || i / w == h - 1).collect();
+    let clear: Vec<f32> = edt(&blocker, w, h).into_iter().map(|d| d * C).collect();
+    // Interior: land more than 6 u from pits and other regions.
+    let edge: Vec<bool> = (0..n)
+        .map(|i| {
+            if !land[i] {
+                return true;
+            }
+            let (x, y) = (i % w, i / w);
+            [(x > 0).then(|| i - 1), (x + 1 < w).then(|| i + 1), (y > 0).then(|| i - w), (y + 1 < h).then(|| i + w)]
+                .into_iter()
+                .flatten()
+                .any(|j| region[j] != region[i])
+        })
+        .collect();
+    let to_edge = edt(&edge, w, h);
+    let interior: Vec<bool> = (0..n).map(|i| land[i] && to_edge[i] * C > 6.0).collect();
+    let count = |f: &dyn Fn(usize) -> bool| (0..n).filter(|&i| f(i)).count() as f32;
+    let n_land = count(&|i| land[i]).max(1.0);
+    let n_inner = count(&|i| interior[i]).max(1.0);
+    let cover = count(&|i| land[i] && solid[i]) / n_land;
+    let inner_cover = count(&|i| interior[i] && solid[i]) / n_inner;
+    let themes: &[RegionTheme] = room.expedition.as_ref().map_or(&[], |x| &x.themes);
+    let mut per_theme: Vec<(String, f32)> = Vec::new();
+    for (k, th) in themes.iter().enumerate() {
+        let ok = |i: usize| interior[i] && map.regions.get(region[i] as usize).is_some_and(|r| r.theme as usize == k);
+        let a = count(&|i| ok(i));
+        if a > 0.0 {
+            per_theme.push((th.key.clone(), count(&|i| ok(i) && solid[i]) / a));
+        }
+    }
+    // Clearance and clear disks.
+    let mut clr: Vec<f32> = (0..n).filter(|&i| floor[i]).map(|i| clear[i]).collect();
+    let n_floor = clr.len().max(1) as f32;
+    let clearance = quantile(&mut clr, 0.5);
+    let disk = |r: f32| {
+        let centres: Vec<bool> = (0..n).map(|i| floor[i] && clear[i] >= r).collect();
+        let d = edt(&centres, w, h);
+        (0..n).filter(|&i| floor[i] && d[i] * C <= r).count() as f32 / n_floor
+    };
+    let mut best = vec![0.0f32; map.regions.len()];
+    for i in 0..n {
+        if floor[i] && (region[i] as usize) < best.len() {
+            best[region[i] as usize] = best[region[i] as usize].max(clear[i]);
+        }
+    }
+    let min_region_disk = best.iter().copied().fold(f32::MAX, f32::min);
+    if std::env::var_os("GF_COMP_DEBUG").is_some() {
+        for (r, d) in best.iter().enumerate() {
+            let th = map.regions.get(r).and_then(|g| themes.get(g.theme as usize)).map_or("?", |t| t.key.as_str());
+            let site = map.regions.get(r).map_or(Vec2::ZERO, |g| g.site);
+            eprintln!("region {r} ({th}, site {site}): largest clear disk r {d:.1}");
+        }
+    }
+    // Clusters: obstacles joined by gaps ≤ TOUCH.
+    let obs = &room.obstacles;
+    let mut parent: Vec<usize> = (0..obs.len()).collect();
+    fn find(p: &mut [usize], i: usize) -> usize {
+        let mut r = i;
+        while p[r] != r {
+            r = p[r];
+        }
+        let mut i = i;
+        while p[i] != r {
+            let n = p[i];
+            p[i] = r;
+            i = n;
+        }
+        r
+    }
+    let centre = |o: &Obstacle| match *o {
+        Obstacle::Circle { center, .. } | Obstacle::Box { center, .. } => center,
+    };
+    let mut buckets: BTreeMap<(i32, i32), Vec<usize>> = BTreeMap::new();
+    let key = |p: Vec2| ((p.x / 8.0).floor() as i32, (p.y / 8.0).floor() as i32);
+    for (i, o) in obs.iter().enumerate() {
+        buckets.entry(key(centre(o))).or_default().push(i);
+    }
+    for (i, o) in obs.iter().enumerate() {
+        let (kx, ky) = key(centre(o));
+        for dy in -2..=2 {
+            for dx in -2..=2 {
+                for &j in buckets.get(&(kx + dx, ky + dy)).map_or(&[][..], |v| v.as_slice()) {
+                    if j > i && procgen::gap(o, &obs[j]) <= 0.3 {
+                        let (a, b) = (find(&mut parent, i), find(&mut parent, j));
+                        parent[a] = b;
+                    }
+                }
+            }
+        }
+    }
+    let roots: Vec<usize> = (0..obs.len()).map(|i| find(&mut parent, i)).collect();
+    let mut sums: BTreeMap<usize, (Vec2, f32)> = BTreeMap::new();
+    for (i, o) in obs.iter().enumerate() {
+        let e = sums.entry(roots[i]).or_insert((Vec2::ZERO, 0.0));
+        e.0 += centre(o);
+        e.1 += 1.0;
+    }
+    let inner_root: BTreeMap<usize, bool> = sums
+        .iter()
+        .map(|(&r, &(s, k))| {
+            let (x, y) = cell(s / k);
+            (r, interior[y * w + x])
+        })
+        .collect();
+    // Warm pools.
+    let mut warm = vec![false; n];
+    let mut paint = |c: Vec2, r: f32| {
+        let (x0, y0) = cell(c - Vec2::splat(r));
+        let (x1, y1) = cell(c + Vec2::splat(r));
+        for y in y0..=y1 {
+            for x in x0..=x1 {
+                if at(x, y).distance(c) <= r {
+                    warm[y * w + x] = true;
+                }
+            }
+        }
+    };
+    for d in &room.decor {
+        match *d {
+            Decor::Brazier { at } => paint(at, 7.0),
+            Decor::GreatBrazier { at, .. } | Decor::Crucible { at, .. } => paint(at, 10.0),
+            _ => {}
+        }
+    }
+    for p in &map.pois {
+        let plaza = db.game.expedition.poi(p.kind).map_or(p.radius + 3.0, |t| t.plaza).max(p.radius);
+        paint(p.at, plaza);
+    }
+    let liquid: Vec<bool> =
+        (0..n).map(|i| tile(at(i % w, i / w)).is_some_and(|j| t.kind[j] == TileKind::Liquid)).collect();
+    let to_liquid = edt(&liquid, w, h);
+    for i in 0..n {
+        warm[i] |= to_liquid[i] * C <= 3.0;
+    }
+    // Screens.
+    let pre = |v: &[bool]| {
+        let mut p = vec![0u32; (w + 1) * (h + 1)];
+        for y in 0..h {
+            for x in 0..w {
+                p[(y + 1) * (w + 1) + x + 1] =
+                    u32::from(v[y * w + x]) + p[y * (w + 1) + x + 1] + p[(y + 1) * (w + 1) + x] - p[y * (w + 1) + x];
+            }
+        }
+        p
+    };
+    let sum = |p: &[u32], x0: usize, y0: usize, x1: usize, y1: usize| {
+        let s = w + 1;
+        p[y1 * s + x1] + p[y0 * s + x0] - p[y0 * s + x1] - p[y1 * s + x0]
+    };
+    let (pl, pw) = (pre(&land), pre(&(0..n).map(|i| land[i] && warm[i]).collect::<Vec<bool>>()));
+    let heat: Vec<(Vec2, Vec2)> = room
+        .decor
+        .iter()
+        .filter_map(|d| match *d {
+            Decor::Crucible { at, .. } | Decor::GreatAnvil { at, .. } => Some((at, at)),
+            Decor::Channel { from, to, .. } => Some((from, to)),
+            _ => None,
+        })
+        .chain(map.pois.iter().map(|p| (p.at, p.at)))
+        .collect();
+    let cracks: Vec<Vec2> = room
+        .decor
+        .iter()
+        .filter_map(|d| match *d {
+            Decor::LavaCrack { from, to, .. } => Some((from + to) * 0.5),
+            _ => None,
+        })
+        .collect();
+    let fissures_far = cracks
+        .iter()
+        .filter(|&&m| {
+            let (x, y) = cell(m);
+            heat.iter().all(|&(a, b)| procgen_point_seg(m, a, b) > 9.0) && to_liquid[y * w + x] * C > 9.0
+        })
+        .count();
+    let frame_pts: Vec<Vec2> = room
+        .decor
+        .iter()
+        .filter_map(|d| match *d {
+            Decor::Scenery { at, .. } => Some(at),
+            Decor::Wall { at, .. } => {
+                let (x, y) = cell(at);
+                (to_edge[y * w + x] * C <= 3.0).then_some(at)
+            }
+            _ => None,
+        })
+        .collect();
+    let comps: Vec<(Vec2, Vec2)> = room
+        .districts
+        .iter()
+        .filter(|d| !matches!(d.kind, DistrictKind::Field | DistrictKind::Plaza))
+        .map(|d| (d.min, d.max))
+        .collect();
+    let (sw, sh) = ((45.0 / C) as usize, (28.0 / C) as usize);
+    let (stx, sty) = ((9.0 / C) as usize, (7.0 / C) as usize);
+    let (mut per, mut per_in, mut per_crack, mut shares) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    let (mut screens, mut unlit, mut framed, mut barren) = (0.0f32, 0.0f32, 0.0f32, 0.0f32);
+    let mut y0 = 0;
+    while y0 + sh <= h {
+        let mut x0 = 0;
+        while x0 + sw <= w {
+            let lc = sum(&pl, x0, y0, x0 + sw, y0 + sh) as f32;
+            if lc >= 0.6 * (sw * sh) as f32 {
+                screens += 1.0;
+                let (lo, hi) = (at(x0, y0) - Vec2::splat(C * 0.5), at(x0 + sw - 1, y0 + sh - 1) + Vec2::splat(C * 0.5));
+                let inside = |p: Vec2| p.x >= lo.x && p.x < hi.x && p.y >= lo.y && p.y < hi.y;
+                let mut seen: Vec<usize> =
+                    obs.iter().enumerate().filter(|(_, o)| inside(centre(o))).map(|(i, _)| roots[i]).collect();
+                seen.sort_unstable();
+                seen.dedup();
+                per.push(seen.len() as f32);
+                per_in.push(seen.iter().filter(|r| inner_root[r]).count() as f32);
+                per_crack.push(cracks.iter().filter(|c| inside(**c)).count() as f32);
+                let lit = sum(&pw, x0, y0, x0 + sw, y0 + sh) as f32;
+                shares.push(lit / lc.max(1.0));
+                if lit == 0.0 {
+                    unlit += 1.0;
+                }
+                let has_frame = frame_pts.iter().any(|p| inside(*p))
+                    || comps.iter().any(|(a, b)| a.x < hi.x && b.x > lo.x && a.y < hi.y && b.y > lo.y);
+                if has_frame {
+                    framed += 1.0;
+                }
+                if seen.is_empty() && !map.pois.iter().any(|p| inside(p.at)) {
+                    barren += 1.0;
+                }
+            }
+            x0 += stx;
+        }
+        y0 += sty;
+    }
+    // Audit windows: 50 × 34 u at half overlap, at least half land.
+    let (aw, ah) = ((50.0 / C) as usize, (34.0 / C) as usize);
+    let mut audit = Vec::new();
+    let mut y0 = 0;
+    while y0 + ah <= h {
+        let mut x0 = 0;
+        while x0 + aw <= w {
+            if sum(&pl, x0, y0, x0 + aw, y0 + ah) as f32 >= 0.5 * (aw * ah) as f32 {
+                let (lo, hi) = (at(x0, y0), at(x0 + aw - 1, y0 + ah - 1));
+                audit.push(
+                    obs.iter()
+                        .filter(|o| {
+                            let c = centre(o);
+                            c.x >= lo.x && c.x <= hi.x && c.y >= lo.y && c.y <= hi.y
+                        })
+                        .count() as f32,
+                );
+            }
+            x0 += aw / 2;
+        }
+        y0 += ah / 2;
+    }
+    // Road shoulders and POI approaches.
+    let arch_piers: Vec<Vec2> = room
+        .decor
+        .iter()
+        .filter_map(|d| match *d {
+            Decor::Arch { from, to, .. } => Some([from, to]),
+            _ => None,
+        })
+        .flatten()
+        .collect();
+    let plaza = |p: &PoiSite| db.game.expedition.poi(p.kind).map_or(p.radius + 3.0, |t| t.plaza).max(p.radius);
+    let exempt = |o: &Obstacle| {
+        let c = centre(o);
+        arch_piers.iter().any(|a| a.distance(c) < 0.05)
+            || map.passes.iter().any(|p| sd_obstacle(o, p.at) < 10.0)
+            || map.pois.iter().any(|p| p.at.distance(c) < plaza(p) + 6.0)
+            || map.regions.iter().any(|r| r.landmark.is_some() && r.site.distance(c) < 14.0)
+    };
+    let road_len: f32 = map.roads.iter().map(|l| l.from.distance(l.to)).sum();
+    let debug = std::env::var_os("GF_COMP_DEBUG").is_some();
+    let dressing = |o: &Obstacle| {
+        let c = centre(o);
+        room.decor.iter().find(|d| d.covers(c)).map_or("?".to_string(), |d| {
+            let s = format!("{d:?}");
+            s.split([' ', '(', '{']).next().unwrap_or("").to_string()
+        })
+    };
+    let near_road = obs
+        .iter()
+        .filter(|o| !exempt(o) && map.roads.iter().any(|l| procgen_seg_dist(o, l.from, l.to) < l.width * 0.5 + 4.0))
+        .inspect(|o| {
+            if debug {
+                eprintln!("road shoulder: {} at {}", dressing(o), centre(o));
+            }
+        })
+        .count();
+    let lanes: Vec<Lane> = map.roads.clone();
+    let approach = obs
+        .iter()
+        .filter(|o| {
+            let c = centre(o);
+            // A pass arch spans the way itself: the passage under it stays open.
+            !arch_piers.iter().any(|a| a.distance(c) < 0.05)
+                && map.pois.iter().any(|p| {
+                    let (d, r) = (c.distance(p.at), plaza(p));
+                    d >= r + 6.0 && d < r + 10.0 && {
+                        let v = (c - p.at) / d;
+                        // The ways in, as the generator sees them: each lane through the plaza leaves
+                        // toward the ends that lie away from the POI.
+                        lanes.iter().any(|l| {
+                            let near = procgen_point_seg(p.at, l.from, l.to) < r;
+                            let dir = (l.to - l.from).normalize_or(Vec2::ZERO);
+                            near && ((l.to.distance(p.at) > 0.5 && dir.dot(v) >= 0.866)
+                                || (l.from.distance(p.at) > 0.5 && (-dir).dot(v) >= 0.866))
+                        })
+                    }
+                })
+        })
+        .inspect(|o| {
+            if debug {
+                let c = centre(o);
+                let p = map.pois.iter().min_by(|a, b| a.at.distance(c).total_cmp(&b.at.distance(c)));
+                let p = p.map(|p| format!("{:?} at {} plaza {} d {:.1}", p.kind, p.at, plaza(p), p.at.distance(c)));
+                eprintln!("approach: {} at {c} near {}", dressing(o), p.unwrap_or_default());
+            }
+        })
+        .count();
+    let props = room
+        .decor
+        .iter()
+        .filter(|d| {
+            matches!(
+                d,
+                Decor::Rubble { .. }
+                    | Decor::Brazier { .. }
+                    | Decor::Clutter { .. }
+                    | Decor::Chains { .. }
+                    | Decor::BrokenAnvil { .. }
+                    | Decor::Banner { .. }
+                    | Decor::Waymark { .. }
+            )
+        })
+        .count();
+    CompStats {
+        shapes: obs.len(),
+        cover,
+        interior: inner_cover,
+        themes: per_theme,
+        clusters: (quantile(&mut per.clone(), 0.5), quantile(&mut per.clone(), 0.9), quantile(&mut per, 1.0)),
+        inner_clusters: (quantile(&mut per_in.clone(), 0.5), quantile(&mut per_in, 0.9)),
+        clearance,
+        disk10: disk(10.0),
+        disk16: disk(16.0),
+        min_region_disk,
+        road_shapes: near_road as f32 * 100.0 / road_len.max(1.0),
+        approach,
+        props,
+        fissures_p90: quantile(&mut per_crack, 0.9),
+        fissures_far,
+        unlit: unlit / screens.max(1.0),
+        pool_share: quantile(&mut shares, 0.5),
+        framed: framed / screens.max(1.0),
+        barren: barren / screens.max(1.0),
+        audit_window: quantile(&mut audit, 0.5),
+        scenery: room.decor.iter().filter(|d| matches!(d, Decor::Scenery { .. })).count(),
+    }
+}
+
+/// The §3.6.2 composition table: one row per map and the mean row, gates marked (`!` misses).
+/// A gate that misses on the mean row fails `layout-stats --maps`.
+fn comp_table(rows: &[(String, CompStats)], failures: &mut Vec<String>) {
+    if rows.is_empty() {
+        return;
+    }
+    println!(
+        "\ncomposition (§3.6.1)    shapes cover% inner%  clusters/screen  inner/scr  clear   r10%  r16% minDisk road/100u appr props fis90 fisFar unlit% pool% frame% barren% audit scenery"
+    );
+    let line = |name: &str, s: &CompStats| {
+        println!(
+            "{:<22} {:>7.0} {:>6.2} {:>6.2}  {:>4.1}/{:>4.1}/{:>4.1}   {:>3.1}/{:>3.1} {:>6.1} {:>6.1} {:>5.1} {:>7.1} {:>9.2} {:>4} {:>5} {:>5.1} {:>6} {:>6.1} {:>5.1} {:>6.1} {:>8.1} {:>5.1} {:>7}",
+            name,
+            s.shapes,
+            s.cover * 100.0,
+            s.interior * 100.0,
+            s.clusters.0,
+            s.clusters.1,
+            s.clusters.2,
+            s.inner_clusters.0,
+            s.inner_clusters.1,
+            s.clearance,
+            s.disk10 * 100.0,
+            s.disk16 * 100.0,
+            s.min_region_disk,
+            s.road_shapes,
+            s.approach,
+            s.props,
+            s.fissures_p90,
+            s.fissures_far,
+            s.unlit * 100.0,
+            s.pool_share * 100.0,
+            s.framed * 100.0,
+            s.barren * 100.0,
+            s.audit_window,
+            s.scenery
+        );
+    };
+    for (name, s) in rows {
+        line(name, s);
+    }
+    let n = rows.len() as f32;
+    let m = |f: &dyn Fn(&CompStats) -> f32| rows.iter().map(|(_, s)| f(s)).sum::<f32>() / n;
+    let mean = CompStats {
+        shapes: m(&|s| s.shapes as f32).round() as usize,
+        cover: m(&|s| s.cover),
+        interior: m(&|s| s.interior),
+        themes: Vec::new(),
+        clusters: (m(&|s| s.clusters.0), m(&|s| s.clusters.1), m(&|s| s.clusters.2)),
+        inner_clusters: (m(&|s| s.inner_clusters.0), m(&|s| s.inner_clusters.1)),
+        clearance: m(&|s| s.clearance),
+        disk10: m(&|s| s.disk10),
+        disk16: m(&|s| s.disk16),
+        min_region_disk: rows.iter().map(|(_, s)| s.min_region_disk).fold(f32::MAX, f32::min),
+        road_shapes: m(&|s| s.road_shapes),
+        approach: rows.iter().map(|(_, s)| s.approach).sum(),
+        props: m(&|s| s.props as f32).round() as usize,
+        fissures_p90: m(&|s| s.fissures_p90),
+        fissures_far: rows.iter().map(|(_, s)| s.fissures_far).sum(),
+        unlit: m(&|s| s.unlit),
+        pool_share: m(&|s| s.pool_share),
+        framed: m(&|s| s.framed),
+        barren: m(&|s| s.barren),
+        audit_window: m(&|s| s.audit_window),
+        scenery: m(&|s| s.scenery as f32).round() as usize,
+    };
+    line("mean", &mean);
+    let mut themes: BTreeMap<String, (f32, f32)> = BTreeMap::new();
+    for (_, s) in rows {
+        for (k, v) in &s.themes {
+            let e = themes.entry(k.clone()).or_default();
+            e.0 += v;
+            e.1 += 1.0;
+        }
+    }
+    let per: Vec<String> = themes.iter().map(|(k, (v, n))| format!("{k} {:.2}%", v / n * 100.0)).collect();
+    println!("interior cover by theme (mean): {}", per.join(", "));
+    let gates = [
+        ("shapes ≤ 550", mean.shapes <= 550),
+        ("cover ≤ 2.5 %", mean.cover <= 0.025),
+        ("interior cover ≤ 2.0 %", mean.interior <= 0.02),
+        ("clusters/screen median ≤ 3", mean.clusters.0 <= 3.0),
+        ("clusters/screen p90 ≤ 8", mean.clusters.1 <= 8.0),
+        ("interior clusters median ≤ 2", mean.inner_clusters.0 <= 2.0),
+        ("interior clusters p90 ≤ 4", mean.inner_clusters.1 <= 4.0),
+        ("median clearance ≥ 7 u", mean.clearance >= 7.0),
+        ("r10 clear-disk share ≥ 80 %", mean.disk10 >= 0.8),
+        ("smallest region disk ≥ r15", mean.min_region_disk >= 15.0),
+        ("road shoulders clear", mean.road_shapes <= 0.0),
+        ("POI approaches clear", mean.approach == 0),
+    ];
+    let missed: Vec<&str> = gates.iter().filter(|g| !g.1).map(|g| g.0).collect();
+    if missed.is_empty() {
+        println!("composition gates: all met");
+    } else {
+        println!("composition gates missed: {}", missed.join("; "));
+        failures.extend(missed.iter().map(|m| format!("composition gate missed (mean): {m}")));
+    }
+}
+
+fn procgen_point_seg(p: Vec2, a: Vec2, b: Vec2) -> f32 {
+    let ab = b - a;
+    let t = ((p - a).dot(ab) / ab.length_squared().max(1e-6)).clamp(0.0, 1.0);
+    p.distance(a + ab * t)
+}
+
+/// Clear distance from an obstacle's surface to the segment a–b (sampled; a readout, not a rule).
+fn procgen_seg_dist(o: &Obstacle, a: Vec2, b: Vec2) -> f32 {
+    let steps = ((a.distance(b) / 0.5).ceil() as usize).max(1);
+    (0..=steps).map(|k| sd_obstacle(o, a + (b - a) * (k as f32 / steps as f32))).fold(f32::MAX, f32::min)
+}
+
 // ───────────────────────────── legend ─────────────────────────────
 
 fn legend(db: &ContentDb, rooms: &[&RoomDef], width: usize, height: usize) -> Canvas {
@@ -1636,18 +2279,19 @@ pub fn layout_stats(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Result<(
         }
     }
     println!(
-        "{:<30} {:>5} {:>7} {:>7} {:>6} {:>6} {:>7} {:>7} {:>5} {:>6}",
-        "biome/kind", "n", "obst", "block%", "open%", "sqz", "sealH%", "sealE%", "undr", "decor"
+        "{:<30} {:>5} {:>7} {:>6} {:>7} {:>6} {:>6} {:>7} {:>7} {:>5} {:>6}",
+        "biome/kind", "n", "obst", "minob", "block%", "open%", "sqz", "sealH%", "sealE%", "undr", "decor"
     );
     for (k, v) in &by_kind {
         let n = v.len() as f32;
         let mean = |f: &dyn Fn(&Stats) -> f32| v.iter().map(f).sum::<f32>() / n;
         let worst = |f: &dyn Fn(&Stats) -> f32| v.iter().map(f).fold(0.0f32, f32::max);
         println!(
-            "{:<30} {:>5} {:>7.1} {:>7.2} {:>6.1} {:>6.1} {:>7.2} {:>7.2} {:>5} {:>6.0}",
+            "{:<30} {:>5} {:>7.1} {:>6} {:>7.2} {:>6.1} {:>6.1} {:>7.2} {:>7.2} {:>5} {:>6.0}",
             k,
             v.len(),
             mean(&|s| s.obstacles as f32),
+            v.iter().map(|s| s.obstacles).min().unwrap_or(0),
             mean(&|s| s.blocked * 100.0),
             mean(&|s| s.open * 100.0),
             mean(&|s| s.squeezes as f32),
@@ -1691,6 +2335,7 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
         "repairs"
     );
     let mut failures = Vec::new();
+    let mut comp: Vec<(String, CompStats)> = Vec::new();
     for k in &keys {
         for seed in 1..=seeds {
             let (room, ms) = resolve_timed(db, k, seed)?;
@@ -1731,8 +2376,10 @@ pub fn layout_stats_maps(db: &ContentDb, biome: Option<&str>, seeds: u32) -> Res
             if s.ms > MAP_BUDGET_MS {
                 failures.push(format!("{k} seed {seed}: generated in {:.0} ms (budget {MAP_BUDGET_MS} ms)", s.ms));
             }
+            comp.push((format!("{k} {seed}"), comp_stats(db, &room, map)));
         }
     }
+    comp_table(&comp, &mut failures);
     if failures.is_empty() {
         println!("\n{} map(s): 0 repairs, 0 relaxed, all within {MAP_BUDGET_MS} ms", keys.len() as u32 * seeds);
         Ok(())

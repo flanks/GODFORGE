@@ -16,6 +16,8 @@ gf_engine = { workspace = true, features = ["client"] }
 # Listed only so derive macros resolve; code imports through gf_engine.
 bevy = { workspace = true }
 glam = { workspace = true }
+# Art sidecars (assets/models/**/*.meta.json).
+serde_json = { workspace = true }
 
 [lints]
 workspace = true

@@ -15,9 +15,11 @@
 //! Presentation only: every variation comes from hashing positions, never from the sim RNG.
 
 use crate::camera::w3;
-use crate::materials::{AbyssKind, BiomeLook};
+use crate::materials::{ABYSS_Y, AbyssKind, BiomeLook};
 use crate::palette::{hdr, hex, lighten, mix, poi_kind_color};
-use gf_content::schema::{ClutterKind, Decor, MapLayout, RimEdge, RimStyle, TileKind, WallStyle, rot16_dir};
+use gf_content::schema::{
+    ClutterKind, Decor, MapLayout, RimEdge, RimStyle, SceneryKind, TileKind, WallStyle, rot16_dir,
+};
 use gf_core::poi::PoiKind;
 use gf_engine::client::triangle_mesh;
 use gf_engine::prelude::*;
@@ -579,8 +581,18 @@ impl Env {
     /// A noise-displaced faceted rock (icosphere), `radius` per local axis, varied by `seed`.
     pub fn rock(&mut self, pos: Vec3, rot: Quat, radius: Vec3, seed: u32, rough: f32, p: Paint) {
         // Small stones use the bare icosahedron (20 facets), big ones the subdivided one.
-        let (verts, faces) =
-            if radius.max_element() < 0.65 { &ICO.get_or_init(icospheres).0 } else { &ICO.get_or_init(icospheres).1 };
+        self.rock_facets(pos, rot, radius, seed, rough, p, radius.max_element() < 0.65);
+    }
+
+    /// A big rock on the bare icosahedron (20 bold facets, a quarter of the vertices): the
+    /// stylized chunks of the map's frame.
+    pub fn rock_coarse(&mut self, pos: Vec3, rot: Quat, radius: Vec3, seed: u32, rough: f32, p: Paint) {
+        self.rock_facets(pos, rot, radius, seed, rough, p, true);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn rock_facets(&mut self, pos: Vec3, rot: Quat, radius: Vec3, seed: u32, rough: f32, p: Paint, coarse: bool) {
+        let (verts, faces) = if coarse { &ICO.get_or_init(icospheres).0 } else { &ICO.get_or_init(icospheres).1 };
         // Tiny stones need no ink hull.
         let p = if radius.max_element() < 0.3 { Paint { ink: 0.0, ..p } } else { p };
         let disp: Vec<Vec3> = verts
@@ -592,8 +604,9 @@ impl Env {
                 *v * (1.0 + rough * (n * 0.9 + m * 0.5))
             })
             .collect();
-        for (key, c, grow) in [(p.key, p.color, 0.0), (Key::Ink, [1.0; 4], p.ink)] {
-            if key == Key::Ink && p.ink <= 0.0 {
+        // The body, then its ink hull (a body painted in the ink family itself is a silhouette).
+        for (hull, (key, c, grow)) in [(p.key, p.color, 0.0), (Key::Ink, [1.0; 4], p.ink)].into_iter().enumerate() {
+            if hull == 1 && p.ink <= 0.0 {
                 continue;
             }
             let s = radius + Vec3::splat(grow);
@@ -1074,7 +1087,7 @@ pub fn decor(env: &mut Env, ctx: &Ctx, d: &Decor) {
     let c = ctx.colors;
     match *d {
         // Painted into the floor as glowing rifts (floor.wesl).
-        Decor::LavaCrack { .. } | Decor::Paving { .. } | Decor::FloorInlay { .. } => {}
+        Decor::LavaCrack { .. } | Decor::Paving { .. } | Decor::FloorMark { .. } | Decor::FloorInlay { .. } => {}
         Decor::BrokenAnvil { at, scale } => broken_anvil(env, ctx, at, scale),
         Decor::Brazier { at } => brazier(env, ctx, at),
         Decor::Pillar { at, radius, height } => {
@@ -1131,6 +1144,9 @@ pub fn decor(env: &mut Env, ctx: &Ctx, d: &Decor) {
         Decor::Chains { from, to, height } => chains(env, c, w3(from, height), w3(to, height), 0.12),
         Decor::Waymark { at, rot, kind } => waymark(env, c, at, rot16_dir(rot), kind),
         Decor::Debris { at, radius, height, variant } => debris(env, c, at, radius, height, variant),
+        Decor::Scenery { at, radius, height, kind, rot, variant } => {
+            scenery(env, c, at, radius, height, kind, rot16_dir(rot), variant)
+        }
     }
 }
 
@@ -3714,6 +3730,147 @@ fn fallen_weapon(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, lean_to: V
         env.tube(&[p0, p1, p2], &[0.07, 0.05, 0.015], 4, glow);
     }
     env.disc(base + Vec3::Y * 0.04, r * 0.55, 10, lin(hdr(c.glow, 0.35)), [0.0; 4], Key::Glow);
+}
+
+// ───────────────────────────── map frame ─────────────────────────────
+
+/// Depth (world y) the frame's silhouettes rise from: under the abyss plane, so they grow out of
+/// the glow instead of standing on nothing.
+const FRAME_FOOT: f32 = ABYSS_Y - 0.6;
+
+/// Framing mass of a biome map (OPEN_WORLD.md §3.6.5): visual only, it never blocks. Lip pieces
+/// crowd the cliff edge, backdrop silhouettes rise out of the abyss beyond the far shores (their
+/// feet sink into its glow through the rock material's depth fade), and foreground shapes hunch
+/// near-black in the void off the camera-side shores, so the play space reads framed, not cut.
+#[allow(clippy::too_many_arguments)]
+fn scenery(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, kind: SceneryKind, facing: Vec2, variant: u8) {
+    let mut v = Vr::new(at, 101 + variant as u32);
+    let yaw = face(facing) * Quat::from_rotation_y(v.r(-0.3, 0.3));
+    let base = w3(at, 0.0);
+    match kind {
+        SceneryKind::Lip => {
+            let chunk = mix(c.rock, c.dark, 0.3);
+            if c.abyss == AbyssKind::Chaos {
+                // A shard of the unmade floor, leaning out over the drop.
+                let lean = yaw * Quat::from_rotation_x(v.r(0.3, 0.7));
+                env.crystal_spike(base - Vec3::Y * 0.4, lean, r * 0.45, h, r * 0.4, 5, {
+                    Paint::new(Key::Stone, vary(c.stone, v.f(), 0.1)).ink(INK_S)
+                });
+            } else if variant % 4 == 2 {
+                // A toppled block of masonry, half over the edge.
+                let tilt = yaw * Quat::from_rotation_z(v.r(0.15, 0.45)) * Quat::from_rotation_x(v.r(-0.25, 0.25));
+                let half = Vec3::new(r * 0.85, (h * 0.42).max(0.28), r * 0.55);
+                let stone = mix(c.stone, c.dark, 0.45);
+                env.block(base + Vec3::Y * (half.y * 0.55 - 0.3), tilt, half, 0.06, {
+                    Paint::new(Key::Stone, vary(stone, v.f(), 0.08)).ink(INK_S)
+                });
+            } else {
+                // A chunk of slag or basalt, sunk into the lip.
+                let rr = Vec3::new(r, h.max(0.5) * 0.7, r * 0.8);
+                let col = vary(chunk, v.f(), 0.12);
+                env.rock_coarse(base + Vec3::Y * (rr.y * 0.45 - 0.35), yaw, rr, v.seed, 0.4, {
+                    Paint::new(Key::Rock, col).ink(INK_S)
+                });
+                if c.abyss == AbyssKind::Magma && v.f() < 0.33 {
+                    // An ember seam glowing through the crust.
+                    let d = wd(dir(v.r(0.0, TAU)));
+                    let p0 = base + d * (r * 0.75) + Vec3::Y * 0.05;
+                    let p1 = p0 + Vec3::Y * (rr.y * 0.6) + d * 0.1;
+                    env.tube(&[p0, p1], &[0.05, 0.02], 4, Paint::new(Key::Glow, hdr(c.molten, 0.6)));
+                }
+                if c.abyss == AbyssKind::Water {
+                    moss_cap(env, c, base + Vec3::Y * (rr.y * 0.8), r * 0.7, &mut v);
+                }
+            }
+        }
+        SceneryKind::Backdrop => {
+            let dark = mix(c.rock, hex("#0C0A0E"), 0.5);
+            let span = h - FRAME_FOOT;
+            match variant % 4 {
+                2 => {
+                    // A ruined chimney stack: soot brick, iron bands, a broken crown with embers.
+                    let half = r * 0.55;
+                    let stone = mix(c.stone, hex("#141016"), 0.55);
+                    let mark = env.mark();
+                    env.block(
+                        base + Vec3::Y * (FRAME_FOOT + span * 0.5),
+                        yaw,
+                        Vec3::new(half, span * 0.5, half),
+                        0.08,
+                        Paint::new(Key::Stone, stone).ink(INK),
+                    );
+                    jag_top(env, mark, h, (half * 0.9).min(1.4), v.seed);
+                    for band in [0.3f32, 0.62] {
+                        env.block(
+                            base + Vec3::Y * (h * band),
+                            yaw,
+                            Vec3::new(half + 0.12, 0.14, half + 0.12),
+                            0.0,
+                            Paint::new(Key::Metal, c.iron).ink(INK_S),
+                        );
+                    }
+                    if c.abyss == AbyssKind::Magma {
+                        let glow = lin(hdr(c.molten, 0.5));
+                        env.disc(base + Vec3::Y * (h - half * 0.9), half * 0.7, 8, glow, [0.0; 4], Key::Glow);
+                    }
+                }
+                3 => {
+                    // The stump of a colossal column, snapped two thirds up.
+                    let top = h * 0.8;
+                    let stone = mix(c.stone, c.dark, 0.5);
+                    let prof = [(r * 1.08, FRAME_FOOT), (r, FRAME_FOOT + (top - FRAME_FOOT) * 0.5), (r * 0.92, top)];
+                    let mark = env.mark();
+                    env.lathe(Vec3::new(base.x, 0.0, base.z), yaw, &prof, 12, (8, 0.12), {
+                        Paint::new(Key::Stone, stone).ink(INK)
+                    });
+                    jag_top(env, mark, top, r * 0.7, v.seed);
+                }
+                _ => {
+                    // A basalt spire: stacked, leaning, dark at the top, its foot in the glow.
+                    let lean = Vec3::new(v.r(-0.12, 0.12), 1.0, v.r(-0.12, 0.12)).normalize();
+                    let n = 4;
+                    let seg = span / n as f32;
+                    for k in 0..n {
+                        let t = k as f32 / (n - 1) as f32;
+                        let rr = r * (1.0 - 0.5 * t) * v.r(0.9, 1.1);
+                        let centre = base + Vec3::Y * FRAME_FOOT + lean * (seg * (k as f32 + 0.5));
+                        let col = vary(mix(c.rock, dark, 0.35 + 0.5 * t), v.f(), 0.08);
+                        let spin = yaw * Quat::from_rotation_y(k as f32 * 1.3);
+                        env.rock_coarse(centre, spin, Vec3::new(rr, seg * 0.72, rr * 0.85), v.seed + k, 0.35, {
+                            Paint::new(Key::Rock, col).ink(INK)
+                        });
+                    }
+                    if c.abyss == AbyssKind::Magma {
+                        // An ember vein down its flank, hottest at the foot.
+                        let side = wd(dir(v.r(0.0, TAU)));
+                        let p0 = base + Vec3::Y * (FRAME_FOOT + seg * 0.6) + side * r * 0.95;
+                        let p1 = base + Vec3::Y * (FRAME_FOOT + seg * 1.8) + side * r * 0.8 + lean * 0.2;
+                        env.tube(&[p0, p1], &[0.09, 0.03], 4, Paint::new(Key::Glow, hdr(c.molten, 0.55)));
+                    }
+                }
+            }
+        }
+        SceneryKind::Foreground => {
+            // A low hump between the camera and the shore: a flat near-black silhouette (the ink
+            // material), unlit and without a rim, so it frames the view and never competes.
+            let depth = 6.0;
+            let rr = Vec3::new(r, (h + depth) * 0.5, r * 0.85);
+            env.rock_coarse(
+                base + Vec3::Y * ((h - depth) * 0.5),
+                yaw,
+                rr,
+                v.seed,
+                0.4,
+                Paint::new(Key::Ink, Color::WHITE),
+            );
+            if v.f() < 0.55 {
+                let d = wd(dir(v.r(0.0, TAU)));
+                let rr2 = Vec3::new(r * 0.6, (h * 0.6 + depth) * 0.5, r * 0.55);
+                let at2 = base + d * (r * 1.1) + Vec3::Y * ((h * 0.6 - depth) * 0.5);
+                env.rock_coarse(at2, yaw, rr2, v.seed ^ 7, 0.4, Paint::new(Key::Ink, Color::WHITE));
+            }
+        }
+    }
 }
 
 // ───────────────────────────── room rim ─────────────────────────────

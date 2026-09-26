@@ -25,16 +25,56 @@ pub use bevy::window::{PresentMode, PrimaryWindow, WindowResolution};
 
 /// Default plugins configured for GODFORGE's window.
 pub fn default_plugins(title: &str, width: u32, height: u32, vsync: bool) -> bevy::app::PluginGroupBuilder {
-    DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: title.into(),
-            name: Some("godforge".into()),
-            resolution: (width, height).into(),
-            present_mode: if vsync { PresentMode::AutoVsync } else { PresentMode::AutoNoVsync },
+    DefaultPlugins
+        .set(WindowPlugin {
+            primary_window: Some(Window {
+                title: title.into(),
+                name: Some("godforge".into()),
+                resolution: (width, height).into(),
+                present_mode: if vsync { PresentMode::AutoVsync } else { PresentMode::AutoNoVsync },
+                ..default()
+            }),
             ..default()
-        }),
-        ..default()
-    })
+        })
+        .set(asset_plugin())
+}
+
+/// The asset server rooted at [`find_asset_dir`], so models, textures and UI art load the same way
+/// from any working directory, from a copied executable and from a packaged build.
+pub fn asset_plugin() -> AssetPlugin {
+    AssetPlugin { file_path: find_asset_dir().to_string_lossy().into_owned(), ..default() }
+}
+
+/// The game's `assets/` directory (models, fonts, UI art and `content/`), searched in order:
+///
+/// 1. `GODFORGE_ASSETS` (an explicit override);
+/// 2. `./assets` when it holds the game's content or models (running from the repository root);
+/// 3. `assets/` next to the executable (a packaged build), then beside each of its parent folders
+///    up to four levels (`target/release/godforge.exe` or a copy of it inside the repository);
+/// 4. the repository's `assets/`, as this crate was compiled from it (a copy run from anywhere).
+///
+/// The same order as `gf_content::find_content_dir`, whose `assets/content` lives inside it.
+pub fn find_asset_dir() -> std::path::PathBuf {
+    use std::path::{Path, PathBuf};
+    let is_assets = |p: &Path| p.join("content").join("game.ron").exists() || p.join("models").is_dir();
+    if let Ok(dir) = std::env::var("GODFORGE_ASSETS") {
+        return PathBuf::from(dir);
+    }
+    // Absolute, but never `canonicalize`d: a `\\?\` path would not accept the asset server's `/`.
+    if let Ok(cwd) = std::env::current_dir()
+        && is_assets(&cwd.join("assets"))
+    {
+        return cwd.join("assets");
+    }
+    if let Ok(exe) = std::env::current_exe() {
+        for dir in exe.ancestors().skip(1).take(5) {
+            let candidate = dir.join("assets");
+            if is_assets(&candidate) {
+                return candidate;
+            }
+        }
+    }
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("..").join("..").join("assets")
 }
 
 /// Longest frame of the last second (ms): the number a frame budget is judged by.

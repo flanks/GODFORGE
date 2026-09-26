@@ -17,9 +17,12 @@
 //!    crossroads hub with a grand monument on every other site.
 //! 4. **Barriers** ([`barriers`]): chasms and rivers as pit bands along region borders, bridged
 //!    wherever a road crosses; walls and ridges are laid by the composer.
-//! 5. **Composition** ([`compose`]): the room grammar's [`crate::procgen::Builder`] in map mode:
-//!    POI clearings, barrier walls and ridges, arches at passes, then every region's slots filled
-//!    with its theme's compositions, a density top-up and dressing.
+//! 5. **Composition** ([`compose`], OPEN_WORLD.md §3.6): the room grammar's
+//!    [`crate::procgen::Builder`] in map mode: POI clearings, barrier walls as broken runs, arches
+//!    at passes, then every region's edge slots filled with its theme's compositions (backs to the
+//!    coast or a border), open fields painted with at most one kiting anchor, a story cluster on
+//!    the frame band; coast anchors and the visual frame (lip, backdrop and foreground scenery);
+//!    then dressing, vignettes against the walls and light gaps so every screen has a warm pool.
 //! 6. **Camps** ([`camps`]), **reachability repair** ([`repair`]) and the merged **pits**.
 //!
 //! **Determinism** (§3.1, enforced in review): integer `GfRng` output and `+ − × ÷ √` only (no

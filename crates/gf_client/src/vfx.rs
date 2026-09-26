@@ -10,14 +10,15 @@ use crate::camera::{MainCamera, w3};
 use crate::fx::api::{self, F, burst_seq, faction_ramp};
 use crate::fx::{self, Fx, FxStore, Glyph, Hit, HitKind, Owner, Play, Ramp};
 use crate::input::Settings;
+use crate::models::HeroGear;
 use crate::net::Link;
 use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix};
-use crate::scene::{SceneIndex, Visual};
+use crate::scene::{PlayerRig, SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
 use gf_content::VfxTier;
 use gf_core::damage::DamageType;
 use gf_core::ids::NetId;
-use gf_engine::client::{font_px, world_to_screen};
+use gf_engine::client::{NotShadowCaster, font_px, world_to_screen};
 use gf_engine::prelude::*;
 use gf_net::quant::QPos;
 use gf_net::{EntityKind, GameEvent};
@@ -78,10 +79,59 @@ pub struct VfxState {
 pub fn build(app: &mut App) {
     app.init_resource::<VfxState>().add_systems(
         Update,
-        (choose_tier, spawn_from_events, update_particles, update_shockwaves, update_fades, update_numbers)
+        (
+            choose_tier,
+            spawn_from_events,
+            muzzle_flashes,
+            update_particles,
+            update_shockwaves,
+            update_fades,
+            update_numbers,
+        )
             .chain()
             .in_set(ClientSet::Presentation),
     );
+}
+
+/// A short flash where each shot leaves the weapon: the glTF weapon's `muzzle` node, else the
+/// greybox gun's muzzle on the aim pivot.
+fn muzzle_flashes(
+    mut commands: Commands,
+    link: Res<Link>,
+    index: Res<SceneIndex>,
+    rigs: Query<&PlayerRig>,
+    gears: Query<&HeroGear>,
+    muzzles: Query<&GlobalTransform>,
+    mut pal: ResMut<Palette>,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+) {
+    let Some(world) = link.latest.as_deref() else { return };
+    for ev in &link.fresh_events {
+        let GameEvent::Shot { slot, dir, element } = *ev else { continue };
+        let Some(rig) = index.players.get(slot as usize).copied().flatten().and_then(|e| rigs.get(e).ok()) else {
+            continue;
+        };
+        let muzzle = rig
+            .model()
+            .and_then(|m| gears.get(m).ok())
+            .and_then(|g| g.muzzle.filter(|_| !g.greybox_gun))
+            .and_then(|m| muzzles.get(m).ok())
+            .map(|g| g.translation());
+        let at = muzzle.unwrap_or_else(|| {
+            let d = gf_net::quant::u16_to_dir(dir);
+            let height = world.players.iter().find(|p| p.slot == slot).map_or(0.0, |p| p.height);
+            w3(rig.shown + d * 1.05, 1.05 + height)
+        });
+        let mat = pal.mat(&mut mats, hdr(mix(element_color(element), Color::WHITE, 0.35), 2.2), Look::Additive);
+        let scale = Vec3::splat(0.2);
+        commands.spawn((
+            Fade { life: 0.07, max: 0.07, base_scale: scale, shrink_xz: false },
+            Mesh3d(pal.low_sphere.clone()),
+            MeshMaterial3d(mat),
+            Transform::from_translation(at).with_scale(scale),
+            NotShadowCaster,
+        ));
+    }
 }
 
 /// The readability tier from the live effect load (VFX_STYLE §20.1): replicated projectiles,
@@ -211,6 +261,8 @@ fn spawn_from_events(
     let mut legacy = Legacy { commands: &mut commands, pal: &mut pal, mats: &mut mats };
     let visual_of = |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok().map(|v| (e, v)));
     let visual_pos = |id: NetId| visual_of(id).map(|(_, v)| (v.shown, v.radius, v.color));
+    // Where a hit lands on a body: the model's `hit_center`, else the greybox body's middle.
+    let hit_at = |id: NetId| visual_of(id).map(|(_, v)| w3(v.shown, v.hit_height));
     let player_pos = |slot: u8| world.players.iter().find(|p| p.slot == slot).map(|p| p.mover.pos);
     let player_entity = |slot: u8| index.players.get(slot as usize).copied().flatten();
     let mut new_numbers: Vec<(NetId, Vec3, u32, Color, f32)> = Vec::new();
@@ -236,7 +288,8 @@ fn spawn_from_events(
                         _ => HitKind::Plain,
                     };
                     let size = if crit { 0.5 } else { 0.32 + r * 0.12 };
-                    fx.impact(Hit::new(w3(p, 0.7 + r * 0.5), ramp, size, owner).kind(kind).dir(dir).body(r));
+                    let at = hit_at(target).unwrap_or(w3(p, 0.7 + r * 0.5));
+                    fx.impact(Hit::new(at, ramp, size, owner).kind(kind).dir(dir).body(r));
                 }
                 if settings.damage_numbers && mine && amount > 0 {
                     let color = if precision {
