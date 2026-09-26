@@ -2853,7 +2853,8 @@ pub fn bridge(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, width: f32, deep:
             let w = if first { v.r(0.4, 1.3) } else { v.r(0.9, 1.6) }.min(lane - x);
             let w = if lane - x - w < 0.4 { lane - x } else { w };
             first = false;
-            let col = vary(mix(c.stone, c.trim, 0.25), v.f(), 0.1);
+            // Worn, soot-dark setts: the deck sits under the heroes' value, like the roads.
+            let col = vary(lighten(mix(c.stone, c.dark, 0.35), 0.8), v.f(), 0.12);
             env.block(
                 w3(mid + d * s + n * (x + w * 0.5), -0.14 + hump),
                 rot,
@@ -2903,8 +2904,8 @@ pub fn bridge(env: &mut Env, c: &Colors, from: Vec2, to: Vec2, width: f32, deep:
     // Balustrades: a solid parapet with a coping rail, taller end posts with a finial.
     for side in [-1.0f32, 1.0] {
         let rail = mid + n * (side * (hw - 0.18));
-        env.block(w3(rail, 0.22), rot, Vec3::new(0.2, 0.32, len * 0.5), 0.02, trim);
-        env.block(w3(rail, 0.62), rot, Vec3::new(0.24, 0.07, len * 0.5 - 0.1), 0.0, trim);
+        env.block(w3(rail, 0.3), rot, Vec3::new(0.2, 0.4, len * 0.5), 0.02, trim);
+        env.block(w3(rail, 0.76), rot, Vec3::new(0.26, 0.07, len * 0.5 - 0.1), 0.0, trim);
         let posts = (len / 1.9).ceil() as u32;
         for k in 0..=posts {
             let s = -len * 0.5 + 0.2 + (len - 0.4) * k as f32 / posts as f32;

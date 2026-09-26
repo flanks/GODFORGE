@@ -192,7 +192,7 @@ pub fn build(
     let map = room.map.as_deref();
     let ctx = Ctx { colors: &colors, gods: &gods, tops: &tops, half, map };
 
-    let mut floors: BTreeMap<u32, (MeshBuf, Rect)> = BTreeMap::new();
+    let mut floors: BTreeMap<u32, FloorBuf> = BTreeMap::new();
     match map {
         Some(map) => land(&mut env, &mut floors, map, room, &colors),
         None => {
@@ -321,7 +321,7 @@ pub fn build(
 
     // Map floors: one painted material per chunk.
     if let Some(map) = map {
-        for (chunk, (buf, rect)) in floors {
+        for (chunk, (buf, rect, heat)) in floors {
             if buf.is_empty() {
                 continue;
             }
@@ -336,7 +336,8 @@ pub fn build(
                 },
                 extension: Floor { params },
             });
-            let mesh = stores.meshes.add(buf.into_mesh());
+            // Second UV set: (liquid heat, 0) per vertex, for the hot banks.
+            let mesh = stores.meshes.add(buf.into_mesh().with_inserted_attribute(Mesh::ATTRIBUTE_UV_1, heat));
             commands.spawn((
                 RoomGeometry,
                 root,
@@ -772,7 +773,10 @@ fn tile_looks(map: &MapLayout, room: &RoomDef) -> Vec<(Vec3, Vec2)> {
     map.tiles.region.iter().map(|&r| looks.get(r as usize).copied().unwrap_or((Vec3::ONE, Vec2::ZERO))).collect()
 }
 
-fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLayout, room: &RoomDef, c: &Colors) {
+/// One map chunk's floor: its mesh, its sim rect and each vertex's liquid heat (second UV set).
+type FloorBuf = (MeshBuf, Rect, Vec<[f32; 2]>);
+
+fn land(env: &mut Env, floors: &mut BTreeMap<u32, FloorBuf>, map: &MapLayout, room: &RoomDef, c: &Colors) {
     let t0 = std::time::Instant::now();
     let mask = ground_mask(map, room);
     let field = land_field(map, &mask);
@@ -799,24 +803,29 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
             None => Ground::Void,
         }
     };
-    // Land within a tile of a liquid: its floor glows with the heat (a hot bank, not a cold lip).
-    let mut hot = vec![false; mask.len()];
-    for y in 0..t.h as i32 {
-        for x in 0..t.w as i32 {
-            if mask[t.index(x as u16, y as u16)] != Ground::Liquid {
-                continue;
-            }
-            for dy in -1..=1 {
-                for dx in -1..=1 {
-                    let (nx, ny) = (x + dx, y + dy);
-                    if nx >= 0 && ny >= 0 && nx < t.w as i32 && ny < t.h as i32 {
-                        hot[t.index(nx as u16, ny as u16)] = true;
-                    }
+    // Liquid heat at a point: 1 on a liquid's edge, fading to 0 three units inland (the floor
+    // beside a molten river glows with it instead of darkening toward the bank).
+    let heat_at = |p: Vec2| -> f32 {
+        let q = (p - t.origin) / t.size;
+        let (tx, ty) = (q.x.floor() as i32, q.y.floor() as i32);
+        let mut d = f32::MAX;
+        for dy in -1..=1 {
+            for dx in -1..=1 {
+                let (x, y) = (tx + dx, ty + dy);
+                if x < 0 || y < 0 || x >= t.w as i32 || y >= t.h as i32 {
+                    continue;
                 }
+                if mask[t.index(x as u16, y as u16)] != Ground::Liquid {
+                    continue;
+                }
+                let c = t.center(x as u16, y as u16);
+                let e = ((p - c).abs() - Vec2::splat(t.size * 0.5)).max(Vec2::ZERO);
+                d = d.min(e.length());
             }
         }
-    }
-    let hot_at = |p: Vec2| t.tile_of(p).is_some_and(|(x, y)| hot[t.index(x, y)]);
+        let k = (1.0 - d / 3.0).clamp(0.0, 1.0);
+        k * k * (3.0 - 2.0 * k)
+    };
 
     let t_field = t0.elapsed().as_secs_f64() * 1000.0;
     // ── floor (marching squares) and shore contour ──
@@ -846,7 +855,7 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
     };
     let mut cliffs: Vec<(Vec2, Vec2, u64, Vec2, Vec2, u64)> = Vec::new();
     let (_, cols) = env.grid();
-    let mut chunk_bufs: Vec<Option<(MeshBuf, Rect)>> = Vec::new();
+    let mut chunk_bufs: Vec<Option<FloorBuf>> = Vec::new();
     let corner_key = |ci: usize, cj: usize| (2u64 << 62) | ((cj as u64) << 32) | ((ci as u64) << 1);
     for j in 0..field.h - 1 {
         let mut run_chunk = u32::MAX;
@@ -872,9 +881,9 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
             let chunk = run_chunk;
             let entry = chunk_bufs[chunk as usize].get_or_insert_with(|| {
                 let x0 = env_chunk_min(env, chunk);
-                (MeshBuf::default(), Rect::from_corners(x0, x0 + Vec2::splat(CHUNK)))
+                (MeshBuf::default(), Rect::from_corners(x0, x0 + Vec2::splat(CHUNK)), Vec::new())
             });
-            let buf = &mut entry.0;
+            let (buf, _, heat) = entry;
             // Polygon around the cell, counter-clockwise (sim): corner, crossing, corner, …
             let corners = [(i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1)];
             let mut poly = [(Vec2::ZERO, 0u64, Vec2::ZERO, false, 0.0f32); 8];
@@ -907,9 +916,10 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                     // Alpha carries how far inland the vertex is (0 on the shore, 1 from 3 u in):
                     // the floor darkens toward cliffs and banks.
                     let (mut col, recipe) = look_at(*p);
-                    // Alpha: how far inland (0 on the shore, 1 from 3 u in); + 2 beside a liquid.
-                    col[3] = (-f / 3.0).clamp(0.0, 1.0) + if hot_at(*p) { 2.0 } else { 0.0 };
+                    // Alpha: how far inland (0 on the shore, 1 from 3 u in).
+                    col[3] = (-f / 3.0).clamp(0.0, 1.0);
                     *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, recipe, col));
+                    heat.push([heat_at(*p), 0.0]);
                 }
                 idx[k] = s.1;
             }

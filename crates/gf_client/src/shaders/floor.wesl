@@ -680,15 +680,16 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     }
     color = mix(color, color * 0.45, foot * 0.8);
 
-    // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland
-    // (+ 2 beside a liquid), so the ground darkens toward cliffs and glows toward hot banks.
+    // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland,
+    // so the ground darkens toward cliffs. The second UV set carries the liquid heat: the bank of
+    // a molten river glows instead of darkening.
     var bank_heat = 0.0;
+    @if(VERTEX_UVS_B) {
+        bank_heat = in.uv_b.x;
+    }
     @if(VERTEX_COLORS) {
-        let beside_liquid = in.color.a > 1.5;
-        let inland = select(in.color.a, in.color.a - 2.0, beside_liquid);
-        let shade = select(mix(0.5, 1.0, smoothstep(0.0, 0.85, inland)), 1.0, beside_liquid);
+        let shade = max(mix(0.5, 1.0, smoothstep(0.0, 0.85, in.color.a)), bank_heat);
         color = color * in.color.rgb * shade;
-        bank_heat = select(0.0, 1.0 - smoothstep(0.0, 0.9, inland), beside_liquid);
     }
 
     // ── fissures ──
