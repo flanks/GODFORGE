@@ -1,22 +1,29 @@
 //! Off-screen indicators for NIMRODS-scale arenas: the camera stays on the local player, so
-//! allies, doors, the anvil and pings outside the view get an arrow pinned to the screen edge
-//! (colour-coded, labelled, with distance).
+//! allies, doors, the anvil, pings and (on biome maps) the objectives outside the view get an
+//! arrow pinned to the screen edge (colour-coded, labelled, with distance).
+//!
+//! On a map the view covers under 1 % of the ground, so the objectives always point the way: the
+//! Boss Gate, and the three nearest Seal POIs still to do.
 
 use crate::camera::{MainCamera, w3};
-use crate::net::Link;
+use crate::net::{CurrentRoom, Link};
 use crate::palette::hex;
-use crate::scene::{SceneIndex, door_label};
+use crate::scene::{SceneIndex, door_label, poi_color, poi_label};
 use crate::{ClientConfig, ClientSet};
 use gf_engine::client::text;
 use gf_engine::prelude::*;
 use gf_net::*;
 
-/// Pool size: allies (3) + doors (3) + anvil + pings.
-const POOL: usize = 10;
+/// Pool size: allies (3) + doors (3) + anvil + pings + the gate and three objectives.
+const POOL: usize = 16;
+/// Seal POIs still to do that get a marker (nearest first).
+const OBJECTIVES: usize = 3;
 /// Seconds a ping stays tracked.
 const PING_LIFE: f32 = 5.0;
 /// Inset from the screen edge (px).
 const MARGIN: f32 = 34.0;
+/// Pins closer than this (px, per axis) to an earlier pin slide along their edge.
+const SPREAD: Vec2 = Vec2::new(120.0, 44.0);
 
 #[derive(Component)]
 struct Indicator;
@@ -72,11 +79,35 @@ fn spawn_pool(mut commands: Commands) {
                         top: Val::Px(12.0),
                         ..default()
                     },
-                    text("", 12.0, Color::WHITE),
+                    text("", 13.0, Color::WHITE),
+                    TextLayout::no_wrap(),
                     TextShadow::default(),
                 ));
             });
     }
+}
+
+/// Move a pin out of the HUD panels (vitals top left, party top right, run banner top centre,
+/// the arsenal bottom centre, aim bottom left, stats bottom right): straight down out of a top
+/// panel, straight up out of a bottom one. Logical pixels, matching `hud.rs`.
+fn clear_of_hud(p: Vec2, size: Vec2) -> Vec2 {
+    let cx = size.x * 0.5;
+    // (min x, min y, max x, max y) of each panel, padded.
+    let panels = [
+        (0.0, 0.0, 440.0, 176.0),
+        (size.x - 300.0, 0.0, size.x, 146.0),
+        (cx - 300.0, 0.0, cx + 300.0, 96.0),
+        (cx - 300.0, size.y - 124.0, cx + 300.0, size.y),
+        (0.0, size.y - 100.0, 400.0, size.y),
+        (size.x - 320.0, size.y - 70.0, size.x, size.y),
+    ];
+    let mut q = p;
+    for (x0, y0, x1, y1) in panels {
+        if q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1 {
+            q.y = if y0 <= 0.0 { y1 + 12.0 } else { y0 - 30.0 };
+        }
+    }
+    q
 }
 
 /// Where an off-screen point pins to the viewport edge, and the arrow rotation (clockwise from
@@ -98,6 +129,7 @@ fn update_indicators(
     time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
+    room: Res<CurrentRoom>,
     index: Res<SceneIndex>,
     mut pings: ResMut<Pings>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
@@ -150,13 +182,56 @@ fn update_indicators(
     for (pos, slot, _) in &pings.0 {
         targets.push((w3(*pos, 0.5), hex(&db.game.player_colors[*slot as usize % 4]), "!".into()));
     }
+    // Biome maps: the gate always, then the nearest Seal POIs still to do.
+    if let Some(map) = room.def.map.as_deref() {
+        let from = me.unwrap_or(room.def.player_spawn);
+        let mut todo: Vec<(f32, Vec3, Color, String)> = Vec::new();
+        for e in &world.entities {
+            let EntityKind::Poi { index } = e.kind else { continue };
+            let Some(site) = map.pois.get(index as usize) else { continue };
+            let state = PoiState::from_u8(e.status);
+            if state == PoiState::Done {
+                continue;
+            }
+            let c = poi_color(db, site.god, site.kind);
+            let at = w3(site.at, 1.0);
+            if site.kind == PoiKind::Gate {
+                let label = match (&world.run.stage, state) {
+                    (_, PoiState::Open | PoiState::Gathering) => "BOSS GATE OPEN".to_string(),
+                    (Some(st), _) => format!("Boss Gate {}/{}", st.seals, st.required),
+                    (None, _) => poi_label(db, site),
+                };
+                targets.push((at, c, label));
+            } else if site.seals > 0 {
+                let live = matches!(state, PoiState::Active | PoiState::Hot);
+                let tag = if live { " ◆" } else { "" };
+                todo.push((site.at.distance(from), at, c, format!("{}{tag}", poi_label(db, site))));
+            }
+        }
+        todo.sort_by(|a, b| a.0.total_cmp(&b.0));
+        targets.extend(todo.into_iter().take(OBJECTIVES).map(|(_, at, c, s)| (at, c, s)));
+    }
 
-    let mut pins = targets.into_iter().filter_map(|(at, c, s)| {
-        let screen = gf_engine::client::world_to_screen(camera, cam_tf, at)?;
-        let (pin, angle) = edge_pin(screen, size, MARGIN)?;
+    // Pins in priority order; a pin landing on an earlier one slides along its edge.
+    let mut placed: Vec<(Vec2, f32, Color, String, Option<f32>)> = Vec::new();
+    for (at, c, s) in targets {
+        let Some(screen) = gf_engine::client::world_to_screen(camera, cam_tf, at) else { continue };
+        let Some((pin, angle)) = edge_pin(screen, size, MARGIN) else { continue };
+        let mut pin = clear_of_hud(pin, size);
+        let along_x = pin.y <= MARGIN + 1.0 || pin.y >= size.y - MARGIN - 1.0;
+        let step = if along_x { Vec2::new(SPREAD.x, 0.0) } else { Vec2::new(0.0, SPREAD.y) };
+        let toward_centre = if along_x { (size.x * 0.5 - pin.x).signum() } else { (size.y * 0.5 - pin.y).signum() };
+        for _ in 0..6 {
+            let clash = placed.iter().any(|(q, ..)| (q.x - pin.x).abs() < SPREAD.x && (q.y - pin.y).abs() < SPREAD.y);
+            if !clash {
+                break;
+            }
+            pin += step * toward_centre;
+        }
         let dist = me.map(|m| m.distance(Vec2::new(at.x, -at.z)));
-        Some((pin, angle, c, s, dist))
-    });
+        placed.push((pin, angle, c, s, dist));
+    }
+    let mut pins = placed.into_iter();
     for (mut node, children) in &mut roots {
         let Some((pin, angle, color, label, dist)) = pins.next() else {
             if node.display != Display::None {
@@ -174,7 +249,7 @@ fn update_indicators(
             }
             if let Ok((mut label_node, mut t, mut tc)) = labels.get_mut(child) {
                 let s = match dist {
-                    Some(d) => format!("{label} {d:.0}m"),
+                    Some(d) => format!("{label} · {d:.0}m"),
                     None => label.clone(),
                 };
                 if t.0 != s {
@@ -183,7 +258,8 @@ fn update_indicators(
                 if tc.0 != color {
                     tc.0 = color;
                 }
-                // Keep the label on screen: it hangs inward from pins on the right/bottom edges.
+                // Keep the label on screen: it hangs inward from pins on the right edge, and below
+                // the arrow except on the bottom edge (so pins stacked down a side never overprint).
                 let (left, right) = if pin.x > size.x * 0.7 {
                     (Val::Auto, Val::Px(-10.0))
                 } else if pin.x < size.x * 0.3 {
@@ -191,8 +267,11 @@ fn update_indicators(
                 } else {
                     (Val::Px(-40.0), Val::Auto)
                 };
-                let (top, bottom) =
-                    if pin.y > size.y * 0.5 { (Val::Auto, Val::Px(14.0)) } else { (Val::Px(12.0), Val::Auto) };
+                let (top, bottom) = if pin.y > size.y - MARGIN - 40.0 {
+                    (Val::Auto, Val::Px(14.0))
+                } else {
+                    (Val::Px(12.0), Val::Auto)
+                };
                 if (label_node.left, label_node.right, label_node.top, label_node.bottom) != (left, right, top, bottom)
                 {
                     label_node.left = left;

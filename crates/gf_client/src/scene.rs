@@ -28,6 +28,16 @@ use std::collections::HashMap;
 use std::f32::consts::{FRAC_PI_2, FRAC_PI_4};
 
 const PROJECTILE_HEIGHT: f32 = 0.9;
+/// Hit flash length and the shortest time between two flashes of one body.
+const FLASH_TIME: f32 = 0.07;
+const FLASH_COOLDOWN: f32 = 0.2;
+/// POI beacon shaft height: tall enough that, seen by the fixed 55° camera, a shaft standing up
+/// to ~28 u beyond the bottom edge of the view still reaches into it.
+const BEACON_H: f32 = 40.0;
+/// World width of an interaction ring's band (every radius reads with the same line weight).
+const RING_BAND: f32 = 0.3;
+/// Interaction rings are the POI language, never the danger language: one gold for every kind.
+const RING_GOLD: &str = "#E3B95C";
 const GOLD: &str = "#FFC940";
 const BRONZE: &str = "#7E5E36";
 const IRON: &str = "#3B3633";
@@ -40,6 +50,8 @@ pub struct RoomGeometry;
 enum Tint {
     Base,
     Flash,
+    /// Bosses and elites: a warm lift of their own colour instead of the white-hot swap.
+    SoftFlash,
     Warn,
     Frozen,
     Stunned,
@@ -65,11 +77,15 @@ pub struct Visual {
     pub radius: f32,
     /// Hit-flash timer.
     pub flash: f32,
+    /// Hit-flash cooldown: a stream of hits (beams, DoTs, multi-hits) re-arms the flash at most
+    /// every [`FLASH_COOLDOWN`] s, so a big body never locks white.
+    flash_cool: f32,
     pub lift: f32,
     fresh: bool,
     body: Option<Entity>,
-    /// Animated children: telegraph fill / anvil progress, anvil ring, anvil hot glow.
-    parts: [Option<Entity>; 3],
+    /// Animated children: telegraph fill / hold progress, ring, anvil hot glow, dim beacon (an
+    /// incomplete objective), bright beacon (a live one).
+    parts: [Option<Entity>; 5],
     tint: Tint,
     base_mat: Option<Handle<ToonMaterial>>,
 }
@@ -90,10 +106,11 @@ impl Visual {
             color,
             radius,
             flash: 0.0,
+            flash_cool: 0.0,
             lift,
             fresh: true,
             body: None,
-            parts: [None; 3],
+            parts: [None; 5],
             tint: Tint::Base,
             base_mat: None,
         };
@@ -273,12 +290,15 @@ fn rebuild_room(
         hex("#140D0A"),
     ]);
     let look = BiomeLook::new(biome.map_or("", |b| b.key.as_str()), colors);
-    // Lighting: warm key against a cool ambient (saturated cool shadows, warm light pools).
+    // Lighting: warm key against a cool ambient (saturated cool shadows, warm light pools). A
+    // biome map is a dusk field: a cooler, dimmer key and a lifted violet fill, so the braziers,
+    // the lava and the lit roads make the pools of warmth and the shadows never read as holes.
+    let on_map = room_is_map(&current);
     ambient.color = look.ambient;
-    ambient.brightness = look.ambient_brightness;
+    ambient.brightness = look.ambient_brightness * if on_map { 1.7 } else { 1.0 };
     for mut key in &mut keys {
-        key.color = look.key;
-        key.illuminance = look.key_lux;
+        key.color = if on_map { mix(look.key, hex("#C4CCE6"), 0.4) } else { look.key };
+        key.illuminance = look.key_lux * if on_map { 0.8 } else { 1.0 };
     }
     // Visual variety from the replicated room seed (authored rooms: their key).
     let seed = match world.run.room_seed {
@@ -294,6 +314,10 @@ fn rebuild_room(
         abysses: abysses.as_mut(),
     };
     world::build(&mut commands, world_stores, &pal, &cfg.content, room, &look, seed, &mut lights);
+}
+
+fn room_is_map(current: &CurrentRoom) -> bool {
+    current.def.map.is_some()
 }
 
 // ───────────────────────────── replicated entities ─────────────────────────────
@@ -434,10 +458,12 @@ fn spawn_visual(
                 HazardKind::Pool | HazardKind::Puddle => 0.36,
                 HazardKind::Trail | HazardKind::Ground => 0.3,
             };
-            // Readability budget: player-made zones stay quiet so enemy danger reads first.
-            let (alpha, edge_alpha) = if ally { (alpha * 0.5, 0.4) } else { (alpha, 0.75) };
-            let fill = kit.mat(hdr(c, 1.3).with_alpha(alpha), Look::Decal);
-            let edge = kit.mat(hdr(c, 2.6).with_alpha(edge_alpha), Look::Decal);
+            // Readability budget: player-made zones stay quiet (no bloom, low alpha) so enemy
+            // danger and the characters read first; at 4P they can cover a third of the screen.
+            let (alpha, edge_alpha, fill_gain, edge_gain) =
+                if ally { (alpha * 0.35, 0.3, 1.0, 1.1) } else { (alpha, 0.75, 1.3, 2.6) };
+            let fill = kit.mat(hdr(c, fill_gain).with_alpha(alpha), Look::Decal);
+            let edge = kit.mat(hdr(c, edge_gain).with_alpha(edge_alpha), Look::Decal);
             let (disc, ring) = (kit.pal.disc.clone(), kit.pal.ring.clone());
             kit.child(parent, &disc, fill, Transform::from_scale(Vec3::splat(r)));
             kit.child(
@@ -448,7 +474,8 @@ fn spawn_visual(
             );
             let mut v = Visual::new(e, c, r, 0.015 + (e.id.0 % 5) as f32 * 0.002);
             if kind == HazardKind::Well {
-                let swirl_mat = kit.mat(hdr(c, 3.0).with_alpha(0.5), Look::Decal);
+                let swirl_mat =
+                    kit.mat(hdr(c, if ally { 1.2 } else { 3.0 }).with_alpha(if ally { 0.3 } else { 0.5 }), Look::Decal);
                 let swirl = kit.pal.sector(kit.meshes, 70);
                 v.parts[0] = Some(kit.child(
                     parent,
@@ -496,7 +523,7 @@ fn spawn_visual(
             v.body = Some(body);
             v
         }
-        EntityKind::Anvil => spawn_anvil(kit, db, parent, e),
+        EntityKind::Anvil => spawn_anvil(kit, db, parent, e, false),
         EntityKind::Door { reward, .. } => {
             let c = door_color(db, reward);
             let stone = kit.mat(hex("#4A403A"), Look::Matte);
@@ -609,7 +636,7 @@ fn spawn_visual(
         EntityKind::Poi { index } => {
             let site = map.and_then(|m| m.pois.get(index as usize));
             match site {
-                Some(s) if s.kind == PoiKind::Anvil => spawn_anvil(kit, db, parent, e),
+                Some(s) if s.kind == PoiKind::Anvil => spawn_anvil(kit, db, parent, e, true),
                 _ => spawn_poi(kit, db, parent, e, site),
             }
         }
@@ -880,35 +907,82 @@ fn spawn_telegraph(kit: &mut Kit, parent: Entity, e: &EntityView, shape: TeleSha
     v
 }
 
-fn spawn_anvil(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView) -> Visual {
+/// A flat interaction ring of `radius` whose band is [`RING_BAND`] wide at any radius.
+fn ring_mesh(kit: &mut Kit, radius: f32) -> Handle<Mesh> {
+    kit.pal.annulus(kit.meshes, (1.0 - RING_BAND / radius.max(0.5)).clamp(0.4, 0.97))
+}
+
+/// The dim (an objective still to do) and bright (live) beacon shafts of a POI, both hidden.
+fn beacons(kit: &mut Kit, parent: Entity, c: Color) -> [Entity; 2] {
+    let cyl = kit.pal.cylinder.clone();
+    let dim = kit.mat(hdr(c, 1.2).with_alpha(0.12), Look::Decal);
+    let bright = kit.mat(hdr(c, 1.5).with_alpha(0.2), Look::Decal);
+    let shaft = |r: f32| Transform::from_xyz(0.0, BEACON_H * 0.5, 0.0).with_scale(Vec3::new(r, BEACON_H, r));
+    let a = kit.hidden_child(parent, &cyl, dim, shaft(0.35));
+    let b = kit.hidden_child(parent, &cyl, bright, shaft(0.42));
+    kit.commands.entity(a).insert(NotShadowCaster);
+    kit.commands.entity(b).insert(NotShadowCaster);
+    [a, b]
+}
+
+/// An anvil: the legacy room anvil, or a map Anvil POI (`poi`), which stands larger on a stepped
+/// plinth and carries a beacon so it reads from across the map.
+fn spawn_anvil(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, poi: bool) -> Visual {
     let iron = kit.mat(hex(IRON), Look::Metal);
     let bronze = kit.mat(hex(BRONZE), Look::Metal);
+    let stone = kit.mat(hex("#4A403A"), Look::Matte);
     let hot = kit.mat(hdr(hex("#FFB347"), 1.4), Look::Glow);
-    let gold_ring = kit.mat(hdr(hex(GOLD), 2.2).with_alpha(0.85), Look::Decal);
-    let gold_fill = kit.mat(hdr(hex(GOLD), 1.4).with_alpha(0.22), Look::Decal);
-    let (cube, cone, ring, disc) =
-        (kit.pal.cube.clone(), kit.pal.cone.clone(), kit.pal.ring.clone(), kit.pal.disc.clone());
-    kit.child(parent, &cube, bronze.clone(), Transform::from_xyz(0.0, 0.08, 0.0).with_scale(Vec3::new(1.6, 0.16, 1.1)));
-    kit.child(parent, &cube, iron.clone(), Transform::from_xyz(0.0, 0.4, 0.0).with_scale(Vec3::new(0.8, 0.5, 0.6)));
+    let gold_ring = kit.mat(hex(RING_GOLD).with_alpha(0.55), Look::Decal);
+    let gold_fill = kit.mat(hdr(hex(GOLD), 1.2).with_alpha(0.2), Look::Decal);
+    let (cube, cone, disc) = (kit.pal.cube.clone(), kit.pal.cone.clone(), kit.pal.disc.clone());
+    // The Forge is the game's core verb: on a map the anvil is the size of a hero and a half.
+    let (s, base) = if poi { (1.75, 0.5) } else { (1.0, 0.0) };
+    if poi {
+        kit.child(
+            parent,
+            &cube,
+            stone.clone(),
+            Transform::from_xyz(0.0, 0.15, 0.0).with_scale(Vec3::new(4.4, 0.3, 3.4)),
+        );
+        kit.child(parent, &cube, stone, Transform::from_xyz(0.0, 0.4, 0.0).with_scale(Vec3::new(3.5, 0.22, 2.5)));
+    }
+    let at = |x: f32, y: f32, z: f32| Vec3::new(x * s, base + y * s, z * s);
+    kit.child(
+        parent,
+        &cube,
+        bronze.clone(),
+        Transform::from_translation(at(0.0, 0.08, 0.0)).with_scale(Vec3::new(1.6, 0.16, 1.1) * s),
+    );
+    kit.child(
+        parent,
+        &cube,
+        iron.clone(),
+        Transform::from_translation(at(0.0, 0.4, 0.0)).with_scale(Vec3::new(0.8, 0.5, 0.6) * s),
+    );
     let body = kit.child(
         parent,
         &cube,
         iron.clone(),
-        Transform::from_xyz(0.0, 0.85, 0.0).with_scale(Vec3::new(1.9, 0.42, 0.9)),
+        Transform::from_translation(at(0.0, 0.85, 0.0)).with_scale(Vec3::new(1.9, 0.42, 0.9) * s),
     );
     kit.child(
         parent,
         &cone,
         iron,
         Transform {
-            translation: Vec3::new(1.25, 0.9, 0.0),
+            translation: at(1.25, 0.9, 0.0),
             rotation: Quat::from_rotation_z(-FRAC_PI_2),
-            scale: Vec3::new(0.3, 0.7, 0.3),
+            scale: Vec3::new(0.3, 0.7, 0.3) * s,
         },
     );
-    let glow =
-        kit.hidden_child(parent, &cube, hot, Transform::from_xyz(0.0, 1.07, 0.0).with_scale(Vec3::new(1.8, 0.05, 0.8)));
+    let glow = kit.hidden_child(
+        parent,
+        &cube,
+        hot,
+        Transform::from_translation(at(0.0, 1.07, 0.0)).with_scale(Vec3::new(1.8, 0.05, 0.8) * s),
+    );
     let radius = db.game.anvil.radius;
+    let ring = ring_mesh(kit, radius);
     let ring_ent = kit.hidden_child(
         parent,
         &ring,
@@ -921,21 +995,25 @@ fn spawn_anvil(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView) ->
         gold_fill,
         Transform { translation: Vec3::Y * 0.02, rotation: flat(FRAC_PI_2), scale: Vec3::splat(0.001) },
     );
-    kit.shadow(parent, 1.2, 0.0);
+    kit.shadow(parent, 1.2 * s, 0.0);
     let mut v = Visual::new(e, hex(GOLD), radius, 0.0);
     v.body = Some(body);
-    v.parts = [Some(fill), Some(ring_ent), Some(glow)];
+    v.parts = [Some(fill), Some(ring_ent), Some(glow), None, None];
+    if poi {
+        let [dim, bright] = beacons(kit, parent, poi_color(db, None, PoiKind::Anvil));
+        v.parts[3] = Some(dim);
+        v.parts[4] = Some(bright);
+    }
     v
 }
 
-/// Beacon colour of a POI kind (a shrine takes its god's colour).
-fn poi_color(db: &ContentDb, site: Option<&PoiSite>) -> Color {
-    let Some(site) = site else { return hex(GOLD) };
-    match site.kind {
+/// Beacon and marker colour of a POI kind (a shrine takes its god's colour).
+pub fn poi_color(db: &ContentDb, god: Option<u8>, kind: PoiKind) -> Color {
+    match kind {
         PoiKind::Anvil => hex("#FFB82E"),
         PoiKind::Warlord => hex("#FF3B30"),
-        PoiKind::Lair => hex("#C8402E"),
-        PoiKind::Shrine => site.god.and_then(|g| db.gods.try_get(g as u16)).map_or(hex(GOLD), |g| hex(&g.color)),
+        PoiKind::Lair => hex("#E0703A"),
+        PoiKind::Shrine => god.and_then(|g| db.gods.try_get(g as u16)).map_or(hex(GOLD), |g| hex(&g.color)),
         PoiKind::Reliquary => hex("#B865FF"),
         PoiKind::Vein => hex("#8FF7FF"),
         PoiKind::Spring => hex("#FF4D6D"),
@@ -944,45 +1022,56 @@ fn poi_color(db: &ContentDb, site: Option<&PoiSite>) -> Color {
     }
 }
 
+/// What a POI is called on markers and prompts ("Shrine of Pyra").
+pub fn poi_label(db: &ContentDb, site: &PoiSite) -> String {
+    match (site.kind, site.god.and_then(|g| db.gods.try_get(g as u16))) {
+        (PoiKind::Shrine, Some(g)) => format!("Shrine of {}", g.name),
+        (PoiKind::Gate, _) => "Boss Gate".into(),
+        (k, _) => k.name().into(),
+    }
+}
+
 /// A generic POI marker until the per-kind silhouettes land: a stone plinth, a pillar and a cap in
-/// the kind's colour, the interaction ring with its hold fill, and a beacon while it is live.
+/// the kind's colour, the gold interaction ring with its hold fill (hold POIs only: a Lair or the
+/// Warlord is an arena, not a ring), and its beacons.
 fn spawn_poi(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, site: Option<&PoiSite>) -> Visual {
-    let c = poi_color(db, site);
+    let kind = site.map_or(PoiKind::Shrine, |s| s.kind);
+    let c = site.map_or(hex(GOLD), |s| poi_color(db, s.god, s.kind));
     let radius = site.map_or(4.0, |s| s.radius).max(1.0);
     let stone = kit.mat(hex("#4A403A"), Look::Matte);
     let pillar = kit.mat(mix(c, hex("#3A2E28"), 0.55), Look::Matte);
     let cap = kit.mat(c, Look::Glow);
-    let beacon = kit.mat(hdr(c, 2.0).with_alpha(0.3), Look::Decal);
-    let ring_mat = kit.mat(hdr(c, 2.2).with_alpha(0.85), Look::Decal);
-    let fill_mat = kit.mat(hdr(c, 1.4).with_alpha(0.22), Look::Decal);
-    let (cyl, sphere, ring, disc) =
-        (kit.pal.cylinder.clone(), kit.pal.sphere.clone(), kit.pal.ring.clone(), kit.pal.disc.clone());
+    let ring_mat = kit.mat(hex(RING_GOLD).with_alpha(0.45), Look::Decal);
+    let fill_mat = kit.mat(hex(RING_GOLD).with_alpha(0.18), Look::Decal);
+    let (cyl, sphere, disc) = (kit.pal.cylinder.clone(), kit.pal.sphere.clone(), kit.pal.disc.clone());
     kit.child(parent, &cyl, stone, Transform::from_xyz(0.0, 0.15, 0.0).with_scale(Vec3::new(1.1, 0.3, 1.1)));
     let body =
         kit.child(parent, &cyl, pillar, Transform::from_xyz(0.0, 1.5, 0.0).with_scale(Vec3::new(0.35, 2.4, 0.35)));
     kit.child(parent, &sphere, cap, Transform::from_xyz(0.0, 2.95, 0.0).with_scale(Vec3::splat(0.42)));
-    let glow = kit.hidden_child(
-        parent,
-        &cyl,
-        beacon,
-        Transform::from_xyz(0.0, 9.0, 0.0).with_scale(Vec3::new(0.3, 18.0, 0.3)),
-    );
-    let ring_ent = kit.hidden_child(
-        parent,
-        &ring,
-        ring_mat,
-        Transform { translation: Vec3::Y * 0.025, rotation: flat(FRAC_PI_2), scale: Vec3::splat(radius) },
-    );
-    let fill = kit.hidden_child(
-        parent,
-        &disc,
-        fill_mat,
-        Transform { translation: Vec3::Y * 0.02, rotation: flat(FRAC_PI_2), scale: Vec3::splat(0.001) },
-    );
+    let arena = matches!(kind, PoiKind::Lair | PoiKind::Warlord);
+    let (ring_ent, fill) = if arena {
+        (None, None)
+    } else {
+        let ring = ring_mesh(kit, radius);
+        let r = kit.hidden_child(
+            parent,
+            &ring,
+            ring_mat,
+            Transform { translation: Vec3::Y * 0.025, rotation: flat(FRAC_PI_2), scale: Vec3::splat(radius) },
+        );
+        let f = kit.hidden_child(
+            parent,
+            &disc,
+            fill_mat,
+            Transform { translation: Vec3::Y * 0.02, rotation: flat(FRAC_PI_2), scale: Vec3::splat(0.001) },
+        );
+        (Some(r), Some(f))
+    };
+    let [dim, bright] = beacons(kit, parent, c);
     kit.shadow(parent, 1.1, 0.0);
     let mut v = Visual::new(e, c, radius, 0.0);
     v.body = Some(body);
-    v.parts = [Some(fill), Some(ring_ent), Some(glow)];
+    v.parts = [fill, ring_ent, None, Some(dim), Some(bright)];
     v
 }
 
@@ -991,8 +1080,10 @@ fn hit_flash(link: Res<Link>, index: Res<SceneIndex>, mut visuals: Query<&mut Vi
         if let GameEvent::Hit { target, .. } = *ev
             && let Some(ent) = index.entity(target)
             && let Ok(mut v) = visuals.get_mut(ent)
+            && v.flash_cool <= 0.0
         {
-            v.flash = 0.07;
+            v.flash = FLASH_TIME;
+            v.flash_cool = FLASH_COOLDOWN;
         }
     }
 }
@@ -1009,6 +1100,7 @@ fn animate_entities(
     let ease = 1.0 - (-18.0 * dt).exp();
     for (mut v, mut tf) in &mut q {
         v.flash = (v.flash - dt).max(0.0);
+        v.flash_cool = (v.flash_cool - dt).max(0.0);
         let target = match v.motion {
             Some(m) => v.pos + m.vel.to_vec2() * ((rt - m.t0 as f64).max(0.0) as f32 * gf_core::SIM_DT),
             None => v.pos,
@@ -1025,7 +1117,8 @@ fn animate_entities(
             EntityKind::Enemy { .. } => {
                 let warn = v.flags.intersects(EntityFlags::WINDUP | EntityFlags::PRIMED | EntityFlags::CHARGING);
                 let pulse = if warn { 1.0 + 0.08 * (t * 24.0).sin() } else { 1.0 };
-                let squash = v.flash * 2.2;
+                // Big bodies barely squash: a hit reads on their rim, not as a jelly wobble.
+                let squash = v.flash * if v.radius > 1.0 { 0.8 } else { 2.2 };
                 let bob = if v.lift > 0.0 { 0.12 * (t * 3.0 + phase).sin() } else { 0.0 };
                 tf.translation = w3(v.shown, v.lift + bob);
                 tf.rotation = yaw(v.facing);
@@ -1118,8 +1211,9 @@ fn tint_entities(
         if !matches!(v.kind, EntityKind::Enemy { .. }) {
             continue;
         }
+        let big = v.flags.intersects(EntityFlags::BOSS | EntityFlags::ELITE) || v.radius > 1.0;
         let tint = if v.flash > 0.0 {
-            Tint::Flash
+            if big { Tint::SoftFlash } else { Tint::Flash }
         } else if blink && v.flags.intersects(EntityFlags::WINDUP | EntityFlags::PRIMED | EntityFlags::CHARGING) {
             Tint::Warn
         } else if v.flags.contains(EntityFlags::FROZEN) {
@@ -1141,6 +1235,7 @@ fn tint_entities(
         m.0 = match tint {
             Tint::Base => base,
             Tint::Flash => pal.toon(&mut toons, Color::srgb(1.0, 0.96, 0.9), Look::Hot),
+            Tint::SoftFlash => pal.toon(&mut toons, lighten(mix(v.color, hex("#FFE6C0"), 0.3), 1.12), Look::Smolder),
             Tint::Warn => pal.toon(&mut toons, mix(v.color, danger, 0.7), Look::Hot),
             Tint::Frozen => pal.toon(&mut toons, mix(v.color, hex("#BFE8FF"), 0.6), Look::Smolder),
             Tint::Stunned => pal.toon(&mut toons, mix(v.color, hex("#FFE27A"), 0.45), Look::Smolder),
@@ -1150,8 +1245,9 @@ fn tint_entities(
 }
 
 /// Anvils and POIs animate from their own replicated state (`status`, `hp` = progress and the
-/// CONTESTED flag): the ring while it can be used, the hold fill while active, the glow while hot
-/// (an anvil's forge window, a POI's beacon).
+/// CONTESTED flag): the ring while it can be used, the hold fill while active, the hot plate while
+/// an anvil's forge window is open. Every objective still to do (a Seal POI or the gate) keeps a
+/// dim beacon shaft, turned bright while it is live, so the map always shows where to go.
 fn animate_anvils(
     time: Res<Time>,
     room: Res<CurrentRoom>,
@@ -1160,33 +1256,44 @@ fn animate_anvils(
 ) {
     let t = time.elapsed_secs();
     for v in &q {
-        let (ring_on, fill_on, glow_on) = match v.kind {
+        let (ring_on, fill_on, glow_on, dim_on, bright_on) = match v.kind {
             EntityKind::Anvil => {
                 let s = AnvilState::from_u8(v.status);
-                (s != AnvilState::Spent, s == AnvilState::Kindling, s == AnvilState::Hot)
+                (s != AnvilState::Spent, s == AnvilState::Kindling, s == AnvilState::Hot, false, false)
             }
             EntityKind::Poi { index } => {
                 let s = PoiState::from_u8(v.status);
-                let anvil = room.def.map.as_ref().and_then(|m| m.pois.get(index as usize)).map(|p| p.kind)
-                    == Some(PoiKind::Anvil);
+                let site = room.def.map.as_ref().and_then(|m| m.pois.get(index as usize));
+                let anvil = site.map(|p| p.kind) == Some(PoiKind::Anvil);
                 let live = matches!(s, PoiState::Hot | PoiState::Open | PoiState::Gathering)
                     || (!anvil && s == PoiState::Active);
-                (s != PoiState::Done, s == PoiState::Active, live)
+                let objective = site.is_some_and(|p| p.seals > 0 || p.kind == PoiKind::Gate);
+                let todo = objective && s != PoiState::Done;
+                // A Lair or the Warlord in a fight needs no beacon: its guards are the marker.
+                let fight =
+                    s == PoiState::Active && site.is_some_and(|p| matches!(p.kind, PoiKind::Lair | PoiKind::Warlord));
+                let (dim, bright) = if fight { (false, false) } else { (todo && !live, live) };
+                (s != PoiState::Done, s == PoiState::Active, anvil && s == PoiState::Hot, dim, bright)
             }
             _ => continue,
         };
-        let [fill, ring, glow] = v.parts;
+        let [fill, ring, glow, dim, bright] = v.parts;
         let show =
             |parts: &mut Query<(&mut Transform, &mut Visibility), Without<Visual>>, e: Option<Entity>, on: bool| {
                 if let Some(e) = e
                     && let Ok((_, mut vis)) = parts.get_mut(e)
                 {
-                    *vis = if on { Visibility::Inherited } else { Visibility::Hidden };
+                    let want = if on { Visibility::Inherited } else { Visibility::Hidden };
+                    if *vis != want {
+                        *vis = want;
+                    }
                 }
             };
         show(&mut parts, ring, ring_on);
         show(&mut parts, fill, fill_on);
         show(&mut parts, glow, glow_on);
+        show(&mut parts, dim, dim_on);
+        show(&mut parts, bright, bright_on);
         if let Some(f) = fill
             && let Ok((mut tf, _)) = parts.get_mut(f)
         {
@@ -1198,6 +1305,12 @@ fn animate_anvils(
             let contested = v.flags.contains(EntityFlags::CONTESTED);
             let pulse = if contested { 1.0 + 0.03 * (t * 10.0).sin() } else { 1.0 };
             tf.scale = Vec3::splat(v.radius * pulse);
+        }
+        if let Some(b) = bright
+            && let Ok((mut tf, _)) = parts.get_mut(b)
+        {
+            let w = 0.42 * (1.0 + 0.12 * (t * 3.0).sin());
+            tf.scale = Vec3::new(w, BEACON_H, w);
         }
     }
 }
