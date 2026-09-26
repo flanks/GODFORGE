@@ -1027,23 +1027,132 @@ pub fn poi_label(db: &ContentDb, site: &PoiSite) -> String {
     }
 }
 
-/// A generic POI marker until the per-kind silhouettes land: a stone plinth, a pillar and a cap in
-/// the kind's colour, the gold interaction ring with its hold fill (hold POIs only: a Lair or the
-/// Warlord is an arena, not a ring), and its beacons.
+/// A POI's own silhouette at its heart (the clearing's set piece stands around it, from worldgen):
+/// a shrine's altar with a fire in its god's colour, a reliquary's gilded chest, a vein's crystal
+/// lode, a spring's basin, a watchfire's pyre, a lair's skull stakes, the Warlord's war totem, the
+/// gate's seal pedestal. Plus the gold interaction ring with its hold fill (hold POIs only: a Lair
+/// or the Warlord is an arena, not a ring) and its beacons.
 fn spawn_poi(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, site: Option<&PoiSite>) -> Visual {
     let kind = site.map_or(PoiKind::Shrine, |s| s.kind);
     let c = site.map_or(hex(GOLD), |s| poi_color(db, s.god, s.kind));
     let radius = site.map_or(4.0, |s| s.radius).max(1.0);
     let stone = kit.mat(hex("#4A403A"), Look::Matte);
-    let pillar = kit.mat(mix(c, hex("#3A2E28"), 0.55), Look::Matte);
-    let cap = kit.mat(c, Look::Glow);
+    let dark_stone = kit.mat(hex("#2E2622"), Look::Matte);
+    let bronze = kit.mat(hex(BRONZE), Look::Metal);
+    let gold = kit.mat(hex(GOLD), Look::Metal);
+    let bone = kit.mat(hex("#D8CDB4"), Look::Matte);
+    let glow = kit.mat(hdr(c, 1.6), Look::Glow);
+    let ink = kit.mat(hex(INK), Look::Ink);
     let ring_mat = kit.mat(hex(RING_GOLD).with_alpha(0.45), Look::Decal);
     let fill_mat = kit.mat(hex(RING_GOLD).with_alpha(0.18), Look::Decal);
-    let (cyl, sphere, disc) = (kit.pal.cylinder.clone(), kit.pal.sphere.clone(), kit.pal.disc.clone());
-    kit.child(parent, &cyl, stone, Transform::from_xyz(0.0, 0.15, 0.0).with_scale(Vec3::new(1.1, 0.3, 1.1)));
-    let body =
-        kit.child(parent, &cyl, pillar, Transform::from_xyz(0.0, 1.5, 0.0).with_scale(Vec3::new(0.35, 2.4, 0.35)));
-    kit.child(parent, &sphere, cap, Transform::from_xyz(0.0, 2.95, 0.0).with_scale(Vec3::splat(0.42)));
+    let (cyl, sphere, disc, cube, cone) = (
+        kit.pal.cylinder.clone(),
+        kit.pal.sphere.clone(),
+        kit.pal.disc.clone(),
+        kit.pal.cube.clone(),
+        kit.pal.cone.clone(),
+    );
+    // A piece with an inverted-hull ink outline (the painterly silhouette every prop carries).
+    let inked = |kit: &mut Kit, mesh: &Handle<Mesh>, m: Mat, tf: Transform| -> Entity {
+        let e = kit.child(parent, mesh, m, tf);
+        let hull = kit.child(parent, mesh, ink.clone(), Transform { scale: tf.scale + Vec3::splat(0.09), ..tf });
+        kit.commands.entity(hull).insert(NotShadowCaster);
+        e
+    };
+    let at = |x: f32, y: f32, z: f32| Transform::from_xyz(x, y, z);
+    let body = match kind {
+        PoiKind::Shrine => {
+            let b = inked(kit, &cube, stone.clone(), at(0.0, 0.45, 0.0).with_scale(Vec3::new(1.5, 0.9, 1.0)));
+            kit.child(parent, &cube, bronze.clone(), at(0.0, 0.96, 0.0).with_scale(Vec3::new(1.7, 0.12, 1.2)));
+            kit.child(parent, &cyl, bronze.clone(), at(0.0, 1.15, 0.0).with_scale(Vec3::new(0.48, 0.26, 0.48)));
+            let f = kit.child(parent, &cone, glow.clone(), at(0.0, 1.75, 0.0).with_scale(Vec3::new(0.34, 0.95, 0.34)));
+            kit.commands.entity(f).insert(NotShadowCaster);
+            b
+        }
+        PoiKind::Reliquary => {
+            kit.child(parent, &cube, dark_stone.clone(), at(0.0, 0.22, 0.0).with_scale(Vec3::new(1.6, 0.44, 1.2)));
+            let b = inked(kit, &cube, gold.clone(), at(0.0, 0.78, 0.0).with_scale(Vec3::new(1.15, 0.62, 0.72)));
+            let lid = Transform {
+                translation: Vec3::new(0.0, 1.1, 0.0),
+                rotation: Quat::from_rotation_z(FRAC_PI_2),
+                scale: Vec3::new(0.36, 1.15, 0.36),
+            };
+            inked(kit, &cyl, gold.clone(), lid);
+            let seam =
+                kit.child(parent, &cube, glow.clone(), at(0.0, 1.1, 0.0).with_scale(Vec3::new(1.18, 0.06, 0.76)));
+            kit.commands.entity(seam).insert(NotShadowCaster);
+            b
+        }
+        PoiKind::Vein => {
+            kit.child(parent, &sphere, dark_stone.clone(), at(0.0, 0.1, 0.0).with_scale(Vec3::new(1.2, 0.45, 1.0)));
+            let mut first = None;
+            for (x, z, h, r, lean) in
+                [(0.0f32, 0.0f32, 2.2f32, 0.4f32, 0.0f32), (0.55, 0.25, 1.5, 0.3, -0.35), (-0.5, 0.3, 1.2, 0.26, 0.4)]
+            {
+                let tf = Transform {
+                    translation: Vec3::new(x, h * 0.5, z),
+                    rotation: Quat::from_rotation_z(lean) * Quat::from_rotation_x(lean * 0.4),
+                    scale: Vec3::new(r, h, r),
+                };
+                let e = inked(kit, &cone, glow.clone(), tf);
+                first.get_or_insert(e);
+            }
+            first.unwrap_or(parent)
+        }
+        PoiKind::Spring => {
+            let b = inked(kit, &cyl, stone.clone(), at(0.0, 0.25, 0.0).with_scale(Vec3::new(1.3, 0.5, 1.3)));
+            let water = kit.child(
+                parent,
+                &disc,
+                glow.clone(),
+                Transform { translation: Vec3::Y * 0.52, rotation: flat(FRAC_PI_2), scale: Vec3::splat(1.08) },
+            );
+            kit.commands.entity(water).insert(NotShadowCaster);
+            b
+        }
+        PoiKind::Watchfire => {
+            let wood = kit.mat(hex("#4A3020"), Look::Matte);
+            for (k, y) in [0.15f32, 0.45, 0.75].into_iter().enumerate() {
+                let r = if k % 2 == 0 { 0.0 } else { FRAC_PI_2 };
+                let tf = Transform {
+                    translation: Vec3::Y * y,
+                    rotation: Quat::from_rotation_y(r),
+                    scale: Vec3::new(1.5, 0.22, 0.22),
+                };
+                kit.child(parent, &cube, wood.clone(), tf);
+            }
+            let f = kit.child(parent, &cone, glow.clone(), at(0.0, 1.5, 0.0).with_scale(Vec3::new(0.5, 1.2, 0.5)));
+            kit.commands.entity(f).insert(NotShadowCaster);
+            f
+        }
+        PoiKind::Lair => {
+            let mut first = None;
+            for k in 0..3 {
+                let a = k as f32 * std::f32::consts::TAU / 3.0;
+                let (x, z) = (a.cos() * 0.9, a.sin() * 0.9);
+                let h = 1.9 + 0.3 * k as f32;
+                let e = inked(kit, &cyl, bone.clone(), at(x, h * 0.5, z).with_scale(Vec3::new(0.08, h, 0.08)));
+                inked(kit, &sphere, bone.clone(), at(x, h + 0.2, z).with_scale(Vec3::new(0.24, 0.26, 0.27)));
+                first.get_or_insert(e);
+            }
+            first.unwrap_or(parent)
+        }
+        PoiKind::Warlord => {
+            let cloth = kit.mat(mix(c, hex("#2A0E0A"), 0.35), Look::Matte);
+            let b = inked(kit, &cyl, bronze.clone(), at(0.0, 2.2, 0.0).with_scale(Vec3::new(0.1, 4.4, 0.1)));
+            kit.child(parent, &cube, bronze.clone(), at(0.0, 4.1, 0.0).with_scale(Vec3::new(1.6, 0.1, 0.1)));
+            inked(kit, &cube, cloth, at(0.0, 3.2, 0.06).with_scale(Vec3::new(1.4, 1.7, 0.05)));
+            inked(kit, &sphere, bone.clone(), at(0.0, 4.55, 0.0).with_scale(Vec3::new(0.3, 0.32, 0.34)));
+            b
+        }
+        PoiKind::Gate | PoiKind::Anvil => {
+            let b = inked(kit, &cube, stone.clone(), at(0.0, 0.5, 0.0).with_scale(Vec3::new(1.2, 1.0, 1.2)));
+            kit.child(parent, &cube, bronze.clone(), at(0.0, 1.04, 0.0).with_scale(Vec3::new(1.4, 0.1, 1.4)));
+            let orb = kit.child(parent, &sphere, glow.clone(), at(0.0, 1.5, 0.0).with_scale(Vec3::splat(0.36)));
+            kit.commands.entity(orb).insert(NotShadowCaster);
+            b
+        }
+    };
     let arena = matches!(kind, PoiKind::Lair | PoiKind::Warlord);
     let (ring_ent, fill) = if arena {
         (None, None)
@@ -1064,7 +1173,7 @@ fn spawn_poi(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, site
         (Some(r), Some(f))
     };
     let [dim, bright] = beacons(kit, parent, c);
-    kit.shadow(parent, 1.1, 0.0);
+    kit.shadow(parent, 1.3, 0.0);
     let mut v = Visual::new(e, c, radius, 0.0);
     v.body = Some(body);
     v.parts = [fill, ring_ent, None, Some(dim), Some(bright)];
