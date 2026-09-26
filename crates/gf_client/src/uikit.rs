@@ -30,7 +30,7 @@
 //! | [`keycap`], [`key_chip`] | – |
 //! | [`button`], [`chip`] | `InteractionDisabled` (disable); hover and press are automatic |
 //! | [`pill`], [`ribbon`], [`pchip`], [`delta_chip`] | – |
-//! | [`slot`] | [`SlotState`] (cooldown fraction and seconds, disabled) |
+//! | [`slot`] | [`SlotState`] (cooldown fraction and seconds, disabled), [`SlotIcon`] (swap or clear the icon) |
 //! | [`medallion`], [`hearth_medallion`] | [`KitRing`] on the ult ring ([`HearthParts`]) |
 //! | [`niche_card`] (boon card shell) | [`KitHover`] (lift and aura on hover), [`NicheParts`] |
 //! | [`ring_meter`] | [`KitRing`] |
@@ -64,7 +64,7 @@ pub mod gallery;
 pub use assets::{KitEntry, KitMode, UiDecode, UiIcon, UiKit};
 pub use fx::{
     BarParts, KitBar, KitButton, KitCard, KitPips, KitPlates, KitRing, MoltenFill, MoltenMaterial, PinParts, Pulse,
-    RingStyle, SlotParts, SlotState, Tween, TweenTarget, pop,
+    RingStyle, SlotIcon, SlotParts, SlotState, Tween, TweenTarget, pop,
 };
 
 use crate::palette::rarity_color;
@@ -1269,23 +1269,36 @@ pub fn slot(p: &mut ChildSpawnerCommands, kit: &UiKit, spec: SlotSpec) -> Entity
                 ));
             }
             let isz = (s * spec.icon_frac).round();
-            if let Some(key) = spec.icon.as_deref() {
-                parts.icon = c
+            // The icon node always exists (hidden while empty) so `SlotIcon` can swap it; the
+            // ghost glyph shows only while the slot is empty.
+            if let Some(key) = spec.ghost.as_deref() {
+                parts.ghost = c
                     .spawn((
-                        centered(isz, isz),
+                        Node {
+                            display: if spec.icon.is_some() { Display::None } else { Display::Flex },
+                            ..centered(isz, isz)
+                        },
                         UiIcon::new(key, isz),
-                        ImageNode { color: spec.icon_tint, image_mode: NodeImageMode::Stretch, ..default() },
+                        ImageNode {
+                            color: tok::BONE.with_alpha(0.35),
+                            image_mode: NodeImageMode::Stretch,
+                            ..default()
+                        },
                         Pickable::IGNORE,
                     ))
                     .id();
-            } else if let Some(key) = spec.ghost.as_deref() {
-                c.spawn((
-                    centered(isz, isz),
-                    UiIcon::new(key, isz),
-                    ImageNode { color: tok::BONE.with_alpha(0.35), image_mode: NodeImageMode::Stretch, ..default() },
-                    Pickable::IGNORE,
-                ));
             }
+            parts.icon = c
+                .spawn((
+                    Node {
+                        display: if spec.icon.is_some() { Display::Flex } else { Display::None },
+                        ..centered(isz, isz)
+                    },
+                    UiIcon::new(spec.icon.as_deref().unwrap_or("ui/info"), isz),
+                    ImageNode { color: spec.icon_tint, image_mode: NodeImageMode::Stretch, ..default() },
+                    Pickable::IGNORE,
+                ))
+                .id();
             let ins = (s * spec.shape.sweep_inset()).round();
             parts.sweep = c
                 .spawn((
@@ -1394,7 +1407,7 @@ pub fn slot(p: &mut ChildSpawnerCommands, kit: &UiKit, spec: SlotSpec) -> Entity
             }
         })
         .id();
-    p.commands_mut().entity(root).insert((parts, SlotState::READY, fx::SlotAnim::default()));
+    p.commands_mut().entity(root).insert((parts, SlotState::READY, SlotIcon(spec.icon), fx::SlotAnim::default()));
     root
 }
 

@@ -19,6 +19,7 @@ pub fn build(app: &mut App) {
     app.add_plugins(UiMaterialPlugin::<MoltenMaterial>::default()).add_systems(
         PostUpdate,
         (
+            slot_icons,
             super::assets::resolve_icons,
             (
                 button_visuals,
@@ -311,6 +312,8 @@ pub struct SlotParts {
     pub secs: Entity,
     pub flash: Entity,
     pub burst: Entity,
+    /// The empty-slot ghost glyph (a placeholder when the slot has none).
+    pub ghost: Entity,
     /// The slot size in logical px.
     pub size: f32,
 }
@@ -318,7 +321,45 @@ pub struct SlotParts {
 impl Default for SlotParts {
     fn default() -> Self {
         let e = Entity::PLACEHOLDER;
-        Self { glow: e, icon: e, sweep: e, edge: e, sheen: e, rim: e, secs: e, flash: e, burst: e, size: 60.0 }
+        Self {
+            glow: e,
+            icon: e,
+            sweep: e,
+            edge: e,
+            sheen: e,
+            rim: e,
+            secs: e,
+            flash: e,
+            burst: e,
+            ghost: e,
+            size: 60.0,
+        }
+    }
+}
+
+/// The icon a slot shows (`<group>/<name>`); `None` empties it and shows its ghost glyph. Write
+/// it when the part, ability or buff changes.
+#[derive(Component, Clone, Debug, PartialEq)]
+pub struct SlotIcon(pub Option<String>);
+
+fn slot_icons(
+    slots: Query<(&SlotIcon, &SlotParts), Changed<SlotIcon>>,
+    mut icons: Query<&mut super::UiIcon>,
+    mut nodes: Query<&mut Node>,
+) {
+    for (icon, parts) in &slots {
+        if let Some(key) = icon.0.as_deref()
+            && let Ok(mut i) = icons.get_mut(parts.icon)
+            && i.key != key
+        {
+            i.key = key.to_string();
+        }
+        if let Ok(mut n) = nodes.get_mut(parts.icon) {
+            set_display(&mut n, icon.0.is_some());
+        }
+        if let Ok(mut n) = nodes.get_mut(parts.ghost) {
+            set_display(&mut n, icon.0.is_none());
+        }
     }
 }
 
