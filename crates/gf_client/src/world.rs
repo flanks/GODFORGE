@@ -288,6 +288,13 @@ pub fn build(
 
     lights.flames = std::mem::take(&mut env.flames);
     soften_clusters(&mut lights.flames);
+    if let Some(map) = map {
+        // POI key lights (§3.6.8): each heart gets the brightest light on its screen, pushed after
+        // the softening so its brazier ring never dims it.
+        for poi in &map.pois {
+            lights.flames.push(envkit::Flame { at: w3(poi.at, 2.0), color: colors.flame, power: 1.8, range: 14.0 });
+        }
+    }
     lights.lumens = look.brazier;
     lights.timer = 0.0;
     let verts: usize;
@@ -593,6 +600,39 @@ fn gallery() -> Vec<Decor> {
         items.push(Box::new(move |at| Decor::Debris { at, radius: 1.0, height: 1.2, variant: k }));
     }
     row(-23.5, 5.4, items);
+    // The map frame (Scenery): lip pieces, backdrop silhouettes, foreground humps.
+    let mut items: Vec<Box<dyn Fn(Vec2) -> Decor>> = Vec::new();
+    for k in 0..4u8 {
+        items.push(Box::new(move |at| Decor::Scenery {
+            at,
+            radius: 1.3,
+            height: 1.6,
+            kind: gf_content::schema::SceneryKind::Lip,
+            rot: 4 * k,
+            variant: k,
+        }));
+    }
+    for k in 0..4u8 {
+        items.push(Box::new(move |at| Decor::Scenery {
+            at,
+            radius: 2.0,
+            height: 9.0,
+            kind: gf_content::schema::SceneryKind::Backdrop,
+            rot: 3 * k,
+            variant: k,
+        }));
+    }
+    for k in 0..2u8 {
+        items.push(Box::new(move |at| Decor::Scenery {
+            at,
+            radius: 2.0,
+            height: 3.0,
+            kind: gf_content::schema::SceneryKind::Foreground,
+            rot: 5 * k,
+            variant: k,
+        }));
+    }
+    row(-30.0, 6.5, items);
     // The floor paint pieces sit along the east and west edges.
     for (k, y) in [-8.0f32, 0.0, 8.0, 16.0].into_iter().enumerate() {
         out.push(Decor::Paving { at: v(-37.0, y), half: v(2.5, 3.0), variant: k as u8 });
@@ -1223,11 +1263,13 @@ fn map_floor_params(
     // props > ground > abyss): darker stone and earth, low paving contrast, hand-sized slabs.
     // Open country is bare ground with old paving in patches; roads and clearings are paved.
     p.stone = lin4(lighten(look.stone(), 0.7), 0.2);
-    p.dirt = lin4(lighten(look.dirt(), 0.8), 0.14);
+    // The bare ground carries the open country's painted detail (ash drifts, scree, cracked
+    // earth), so it sits a step above the stones' mortar instead of reading as a hole.
+    p.dirt = lin4(lighten(look.dirt(), 0.95), 0.14);
     p.shape.z = 1.05;
-    // Fissures glow, but under the characters.
+    // Fissures glow, but under the characters and under the orange of the swarm (§3.6.7).
     if look.cracks >= 1.0 {
-        p.accent.w = 1.3;
+        p.accent.w = 1.0;
     }
     // POI clearings, first so they win the slots: the Anvil's gold mosaic (variant 0), every other
     // kind a paved disc with a curb (variant 5) laid in its kind's pattern (the rotation slot).

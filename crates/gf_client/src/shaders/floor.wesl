@@ -509,6 +509,25 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // Soft occlusion bleeding into the stone next to the gap.
     let ao = smoothstep(gap_w, gap_w + 0.3, st.edge);
 
+    // Distance to the nearest footing of a solid piece (walls, rocks, columns): the contact shade
+    // below, and on maps the debris skirt, where the masonry and slag that used to be meshes lie
+    // painted as scree around each solid.
+    let n_foot = i32(fp.misc.w);
+    var foot_d = 99.0;
+    for (var i = 0; i < 32; i++) {
+        if i < n_foot {
+            let f = fp.footings[i];
+            var d = 0.0;
+            if f.w < 0.0 {
+                d = length(w - f.xy) - f.z;
+            } else {
+                d = length(max(abs(w - f.xy) - f.zw, vec2(0.0)));
+            }
+            foot_d = min(foot_d, d);
+        }
+    }
+    let skirt = select(0.0, smoothstep(0.1, 0.5, foot_d) * (1.0 - smoothstep(1.5, 2.2, foot_d)), map_mode);
+
     // ── bare ground where stones are missing ──
     // Layered earth: big patches of pale ash and dark scorched ground, brushy mid-tones, faint
     // networks of cracked earth in some patches, a sparse scatter of stones and a fine grit.
@@ -532,13 +551,21 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let crack_mask = smoothstep(0.5, 0.66, fbm(w * 0.11 + seed * 2.0 + vec2(3.0, 9.0))) * select(1.0, scorch, map_mode);
     let earth_cracks = (1.0 - smoothstep(0.015, 0.06, ce.d2 - ce.d1)) * crack_mask;
     ground = mix(ground, fp.mortar.rgb * 0.45, earth_cracks * 0.75);
+    // Biome maps: open country away from heat is cold, so its seams are not lit but broken edges
+    // of glassy crust catching the light, a loose network over the whole bare ground. The fight's
+    // floor keeps a painted texture (it reads as ground, never as a hole) without glowing.
+    if map_mode {
+        let seam_mask = smoothstep(0.38, 0.62, fbm(w * 0.07 + seed * 2.7 + vec2(8.0, 1.0))) * (1.0 - scorch * 0.5);
+        let seams = (1.0 - smoothstep(0.02, 0.07, ce.d2 - ce.d1)) * seam_mask * (1.0 - earth_cracks);
+        ground = mix(ground, ground * 1.9 + fp.stone.rgb * 0.06, seams * 0.55);
+    }
     let pebble = voronoi(w * 1.25 + seed);
     let pick = hash21(pebble.id);
     let pebble_r = 0.1 + 0.2 * hash21(pebble.id + 5.0);
     // Stones gather in drifts (under walls, around rubble, along the shoulders) instead of an even
     // polka-dot scatter.
-    let drift = smoothstep(0.5, 0.72, fbm(w * 0.12 + seed * 1.1 + vec2(2.0, 7.0)) + shoulder * 0.25);
-    let is_pebble = step(0.84, pick) * select(1.0, drift, map_mode);
+    let drift = max(smoothstep(0.5, 0.72, fbm(w * 0.12 + seed * 1.1 + vec2(2.0, 7.0)) + shoulder * 0.25), skirt);
+    let is_pebble = step(mix(0.84, 0.7, skirt), pick) * select(1.0, drift, map_mode);
     let pebbles = (1.0 - smoothstep(pebble_r - 0.04, pebble_r, pebble.d1)) * is_pebble;
     let pebble_rim = (1.0 - smoothstep(pebble_r, pebble_r + 0.06, pebble.d1)) * is_pebble;
     ground = mix(ground, fp.mortar.rgb * 0.35, pebble_rim * select(0.8, 0.4, map_mode));
@@ -658,26 +685,16 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let grime = smoothstep(0.55, 0.8, fbm(w * 0.2 + seed + vec2(5.0, 1.0))) * (1.0 - worn);
     color = mix(color, fp.mortar.rgb, grime * 0.4);
     // Biome maps: the ways (roads and clearings) are lit pools; the country between them falls
-    // off into dusk, so paths read at a glance and the frame gets its darks.
+    // off into a cooler dusk, so paths read at a glance and the frame gets its darks.
     if map_mode {
         let near_way = max(1.0 - smoothstep(1.5, 13.0, path_d), 1.0 - smoothstep(1.0, 10.0, clearing_d));
-        color *= mix(0.84, 1.0, near_way);
+        color *= mix(0.78, 1.0, near_way);
+        // A hue lean, not a second darkening: the cool tint at the colour's own value.
+        let cool_hue = fp.cool.rgb / max(luma(fp.cool.rgb), 1.0e-3);
+        color = mix(color, color * cool_hue, 0.2 * (1.0 - near_way));
     }
     // Soot and contact shade under the solid pieces (they sit in the ground, not on it).
-    let n_foot = i32(fp.misc.w);
-    var foot = 0.0;
-    for (var i = 0; i < 32; i++) {
-        if i < n_foot {
-            let f = fp.footings[i];
-            var d = 0.0;
-            if f.w < 0.0 {
-                d = length(w - f.xy) - f.z;
-            } else {
-                d = length(max(abs(w - f.xy) - f.zw, vec2(0.0)));
-            }
-            foot = max(foot, 1.0 - smoothstep(-0.2, 1.5 + (fbm2(w * 0.9) - 0.5) * 0.8, d));
-        }
-    }
+    let foot = select(0.0, 1.0 - smoothstep(-0.2, 1.5 + (fbm2(w * 0.9) - 0.5) * 0.8, foot_d), n_foot > 0);
     color = mix(color, color * 0.45, foot * 0.8);
 
     // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland,
