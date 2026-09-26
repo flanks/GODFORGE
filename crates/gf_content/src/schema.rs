@@ -1644,6 +1644,10 @@ pub enum SceneryKind {
     Backdrop,
     /// A low, near-black shape in the void between the camera and a south shore.
     Foreground,
+    /// On land: a low course along an open region border (a ruined wall course, a slag berm, a
+    /// scrap heap), at most knee high, so the border reads as a seam between two places
+    /// without closing it.
+    Seam,
 }
 
 impl Decor {
@@ -2117,8 +2121,11 @@ pub struct ComposeDef {
     /// Obstacle-free floor (u) around a field anchor.
     pub anchor_clear: f32,
     /// Chance of an arch where a road crosses an open region border (walls and ridges: always;
-    /// bridges: never).
+    /// bridges: never). A free-standing lintel reads as a plank across the road from the fixed
+    /// camera, so the default is 0 and `pass_pylons` marks those doors instead.
     pub pass_arches: f32,
+    /// Two bannered pylons flank a road where it crosses an open border without an arch.
+    pub pass_pylons: bool,
     /// Arches where roads enter POI clearings.
     pub entry_arches: bool,
     /// Chance per 22–28 u road slot of a tall shoulder piece (0 = none).
@@ -2143,6 +2150,14 @@ pub struct ComposeDef {
     pub mark_spacing: f32,
     /// A mark's half length along its facing (u); across it is 55–100 % of that.
     pub mark_size: (f32, f32),
+    /// Share of each open region border (no wall, ridge or river) laid as a seam: low courses
+    /// along it, a painted dark band, a ruined pier at one end of each run (0 = none).
+    pub seam: f32,
+    /// Length range (u) of a seam run; the gaps between runs are at least `seam_gap`.
+    pub seam_run: (f32, f32),
+    pub seam_gap: f32,
+    /// Seams keep this far (u) from a road crossing the border (the pass stays a door).
+    pub seam_pass_clear: f32,
 }
 
 impl Default for ComposeDef {
@@ -2156,7 +2171,8 @@ impl Default for ComposeDef {
             road_clear: 4.0,
             anchor_radius: (1.6, 2.6),
             anchor_clear: 8.0,
-            pass_arches: 1.0,
+            pass_arches: 0.0,
+            pass_pylons: true,
             entry_arches: false,
             road_silhouettes: 0.0,
             frame_run: (8.0, 24.0),
@@ -2168,6 +2184,10 @@ impl Default for ComposeDef {
             light_box: (30.0, 18.0),
             mark_spacing: 16.5,
             mark_size: (2.2, 5.5),
+            seam: 0.6,
+            seam_run: (10.0, 20.0),
+            seam_gap: 12.0,
+            seam_pass_clear: 16.0,
         }
     }
 }

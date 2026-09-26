@@ -422,6 +422,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
             SceneryKind::Lip => ("SCENERY LIP", hex("#6E6258")),
             SceneryKind::Backdrop => ("SCENERY BACKDROP", hex("#4A4050")),
             SceneryKind::Foreground => ("SCENERY FOREGROUND", hex("#1E1A1C")),
+            SceneryKind::Seam => ("SCENERY SEAM", hex("#7A6454")),
         },
     }
 }
@@ -703,6 +704,11 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             circle(cv, v, at + Vec2::new(0.4, -0.4), radius, INK, 0.25);
             circle(cv, v, at, radius, col, 0.85);
             ring(cv, v, at, radius, 0.07, ink, 0.8);
+        }
+        Decor::Scenery { at, radius, kind: SceneryKind::Seam, rot, .. } => {
+            // A low course along an open border: a short bar along its facing.
+            let u = rot16_dir(rot) * radius;
+            segment(cv, v, at - u, at + u, 0.35, col, 0.9);
         }
         Decor::Scenery { at, radius, kind, .. } => {
             // Visual framing mass over the void: never blocks, so drawn as a hatched ring.

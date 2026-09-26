@@ -8,7 +8,7 @@
 
 use crate::camera::{MainCamera, w3};
 use crate::fx::api::{self, F, burst_seq, faction_ramp};
-use crate::fx::{self, Fx, FxStore, Glyph, Hit, HitKind, Owner, Play, Ramp};
+use crate::fx::{self, Fx, FxStore, Glyph, Hit, HitKind, Mote, Owner, Play, Ramp};
 use crate::input::Settings;
 use crate::models::HeroGear;
 use crate::net::Link;
@@ -83,6 +83,7 @@ pub fn build(app: &mut App) {
             choose_tier,
             spawn_from_events,
             muzzle_flashes,
+            status_motes,
             update_particles,
             update_shockwaves,
             update_fades,
@@ -131,6 +132,67 @@ fn muzzle_flashes(
             Transform::from_translation(at).with_scale(scale),
             NotShadowCaster,
         ));
+    }
+}
+
+/// A big body's statuses show as motes around its hit centre, since its paint stays its own (the
+/// rim takes the status colour, `models::skin_material`): embers rise off a burning boss, sparks
+/// jump off a shocked one, frost drifts off a frozen one.
+fn status_motes(time: Res<Time>, visuals: Query<&Visual>, state: Res<VfxState>, mut fx: Fx) {
+    let dt = time.delta_secs();
+    if dt <= 0.0 || state.tier == VfxTier::Silhouette {
+        return;
+    }
+    for v in &visuals {
+        if !matches!(v.kind, gf_net::EntityKind::Enemy { .. }) || !v.big() {
+            continue;
+        }
+        let mut kinds: Vec<(Ramp, Mote, f32)> = Vec::new();
+        if v.flags.contains(gf_net::EntityFlags::FROZEN) {
+            kinds.push((Ramp::Time, Mote::Hex, 1.2));
+        }
+        if v.flags.contains(gf_net::EntityFlags::STUNNED) {
+            kinds.push((Ramp::Radiant, Mote::Hex, 0.0));
+        }
+        let mut bits = v.status;
+        while bits != 0 && kinds.len() < 2 {
+            let bit = bits.trailing_zeros() as u8;
+            bits &= bits - 1;
+            // Burn rises, shock and the rest hang.
+            kinds.push(match bit {
+                0 => (Ramp::Flame, Mote::Ember, -3.0),
+                1 => (Ramp::Storm, Mote::Hex, 0.0),
+                2 => (Ramp::Void, Mote::Hex, 0.0),
+                3 => (Ramp::Plague, Mote::Spore, 0.0),
+                4 => (Ramp::Bleed, Mote::Ash, 2.0),
+                _ => (Ramp::Radiant, Mote::Hex, 0.0),
+            });
+        }
+        for (ramp, mote, gravity) in kinds {
+            // About 9 motes a second per status, more on a bigger body.
+            if fx.rand() > dt * (7.0 + 2.0 * v.radius) {
+                continue;
+            }
+            let dir = fx.rand_dir();
+            let r = v.radius * fx.range(0.4, 0.9);
+            let at = w3(v.shown, v.hit_height * fx.range(0.6, 1.3)) + dir * r;
+            let vel = dir * 0.5 + Vec3::Y * fx.range(0.6, 1.4);
+            let life = fx.range(0.45, 0.75);
+            let size = fx.range(0.14, 0.22);
+            fx.sprite(mote.seq(), at)
+                .size(size)
+                .ramp(ramp)
+                .gain(1.3)
+                .vel(vel)
+                .gravity(gravity)
+                .drag(1.5)
+                .life(life)
+                .erode(0.6, 1.0)
+                .layer(fx::Layer::Front)
+                .class(fx::Class::Secondary)
+                .owner(Owner::World)
+                .emit();
+        }
     }
 }
 

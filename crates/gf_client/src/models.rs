@@ -422,6 +422,14 @@ fn prepare_models(
                     graph.add_clip(handle.clone(), 1.0, base)
                 };
                 let duration = clips.get(handle).map_or(1.0, AnimationClip::duration);
+                // A hero's full-body one-shots also get an upper-body copy (`<clip>@upper`): a
+                // move cut short by a dash finishes its payoff on the arms while the legs dash.
+                if *kind == ModelKind::Character && !m.upper && !m.looping {
+                    let node = graph.add_clip_with_mask(handle.clone(), 1 << LOWER_BODY_GROUP, 1.0, graph.root);
+                    let meta = ClipMeta { upper: true, ..m.clone() };
+                    lib.insert(format!("{short}@upper"), AnimClip { node, duration, meta });
+                    layered = true;
+                }
                 lib.insert(short, AnimClip { node, duration, meta: m });
             }
             ClipLib { graph: graphs.add(graph), clips: lib, layered }
@@ -445,13 +453,20 @@ pub enum Skin {
     /// A hero's weapon: a quieter rim in the player's colour.
     Gear(u8),
     /// Enemies: warm red rim, with a tint (hit flash, wind-up blink, status). `hot` pushes the
-    /// emissive toward white (the Slag King's Final Pour).
-    Foe { tint: FoeTint, hot: bool },
+    /// emissive toward white (the Slag King's Final Pour). `big` (bosses, elites, bodies over 1 m
+    /// of radius): a narrow, dim rim (a wide one outlined every plate of a many-part boss like a
+    /// neon wireframe), and statuses only recolour that rim, never the painted body.
+    Foe { tint: FoeTint, hot: bool, big: bool },
 }
 
 impl Skin {
     /// The plain enemy skin.
-    pub const FOE: Skin = Skin::Foe { tint: FoeTint::Base, hot: false };
+    pub const FOE: Skin = Skin::Foe { tint: FoeTint::Base, hot: false, big: false };
+
+    /// The plain skin of an enemy, big or not.
+    pub fn foe(big: bool) -> Skin {
+        Skin::Foe { tint: FoeTint::Base, hot: false, big }
+    }
 }
 
 /// A tint over an enemy's painted material. A handful per asset, cached like every skin, so a
@@ -575,7 +590,7 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
             base.emissive = LinearRgba::rgb(l.red, l.green, l.blue) + base.emissive * 0.5;
             toon_from_standard(base, &ToonStyle::hero(c))
         }
-        Skin::Foe { tint, hot } => {
+        Skin::Foe { tint, hot, big } => {
             if hot {
                 // The Final Pour: every glow runs hotter and whiter (the white crown, the core).
                 base.emissive =
@@ -591,6 +606,17 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
                 base.base_color = Color::linear_rgba(c.red * k.red, c.green * k.green, c.blue * k.blue, c.alpha);
             };
             let mut style = ToonStyle { ink_width: 0.12, ink: 0.5, ..ToonStyle::foe() };
+            if big {
+                style.rim = hdr(hex(FOE_RIM_BIG), 1.2);
+                style.rim_width = 0.15;
+            }
+            // A status on a big body: its painted colours stay, only the rim takes the status
+            // colour (the status itself shows as motes at its hit centre, `vfx.rs`).
+            let accent = |style: &mut ToonStyle, c: Color| {
+                style.rim = hdr(c, 1.8);
+                style.rim_strength = 0.6;
+                style.rim_width = 0.15;
+            };
             match tint {
                 FoeTint::Base => {}
                 FoeTint::Flash => {
@@ -607,21 +633,25 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
                     style.rim_strength = 1.3;
                 }
                 FoeTint::Warn => {
-                    let d = tone(pal.danger);
-                    mul(&mut base, LinearRgba::rgb(0.55 + d.red, 0.45 + d.green * 0.5, 0.45 + d.blue * 0.5));
-                    base.emissive_texture = None;
-                    base.emissive = d * 0.55;
-                    style.rim = hdr(pal.danger, 2.6);
+                    // The wind-up blink heats the body toward molten orange (multiplying it by the
+                    // danger red turned a cinderling's maw salmon pink); the rim carries the red.
+                    let hot = tone(hex(WARN_GLOW));
+                    mul(&mut base, LinearRgba::rgb(1.12, 1.0, 0.88));
+                    base.emissive = base.emissive * 1.4 + hot * if big { 0.18 } else { 0.4 };
+                    style.rim = hdr(pal.danger, if big { 1.8 } else { 2.6 });
                 }
+                FoeTint::Frozen if big => accent(&mut style, hex(FROST)),
                 FoeTint::Frozen => {
                     mul(&mut base, LinearRgba::rgb(0.75, 0.95, 1.35));
                     base.emissive = base.emissive * 0.35 + LinearRgba::rgb(0.02, 0.05, 0.08);
-                    style.rim = hdr(hex("#BFE8FF"), 2.2);
+                    style.rim = hdr(hex(FROST), 2.2);
                 }
+                FoeTint::Stunned if big => accent(&mut style, hex(STUN)),
                 FoeTint::Stunned => {
                     mul(&mut base, LinearRgba::rgb(1.3, 1.2, 0.8));
-                    style.rim = hdr(hex("#FFE27A"), 2.2);
+                    style.rim = hdr(hex(STUN), 2.2);
                 }
+                FoeTint::Status(bit) if big => accent(&mut style, status_color(bit)),
                 FoeTint::Status(bit) => {
                     let s = tone(status_color(bit));
                     mul(&mut base, LinearRgba::rgb(0.55 + s.red * 0.7, 0.55 + s.green * 0.7, 0.55 + s.blue * 0.7));
@@ -633,6 +663,13 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
         }
     }
 }
+
+/// A big foe's base rim: the warm red, dimmer and narrower than the horde's.
+const FOE_RIM_BIG: &str = "#FF6A44";
+/// The wind-up heat on a body (molten orange).
+const WARN_GLOW: &str = "#FFB050";
+const FROST: &str = "#BFE8FF";
+const STUN: &str = "#FFE27A";
 
 // ───────────────────────────── instances ─────────────────────────────
 
