@@ -15,20 +15,25 @@
 //! Everything here reads replicated state and cosmetic events; nothing feeds back into the sim.
 //! `--anim-log` logs every clip change (the QA clip-state log).
 
+use crate::camera::{MainCamera, w3};
 use crate::input::InputState;
 use crate::models::{HeroGear, Model, ModelParts};
 use crate::net::{Link, Prediction};
 use crate::palette::yaw;
-use crate::scene::Visual;
+use crate::scene::{Corpse, SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
+use gf_content::EnemyClass;
 use gf_core::aim::AimMode;
+use gf_core::damage::DamageType;
+use gf_core::ids::NetId;
 use gf_core::revive::LifeState;
 use gf_core::weapon::FireKind;
 use gf_engine::bevy::animation::{AnimationTargetId, RepeatAnimation, graph::AnimationNodeIndex};
+use gf_engine::client::world_to_screen;
 use gf_engine::prelude::*;
 use gf_net::quant::u16_to_dir;
-use gf_net::{EntityKind, GameEvent, PlayerFlags, PlayerView, RunPhase};
-use std::collections::VecDeque;
+use gf_net::{EntityFlags, EntityKind, GameEvent, PlayerFlags, PlayerView, RunPhase, TeleShape};
+use std::collections::{HashMap, VecDeque};
 use std::f32::consts::{PI, TAU};
 use std::sync::Arc;
 
@@ -1045,17 +1050,1021 @@ fn fire_clip(
     }
 }
 
-/// `--anim-gallery [N]`: the clip to start from.
-fn gallery_start() -> usize {
+// ───────────────────────────── enemies ─────────────────────────────
+
+/// How an enemy's behaviour reads on its clips (docs/art/ENEMIES.md, each sidecar's clip notes).
+#[derive(Clone, Debug)]
+enum Brain {
+    /// Contact fighters (Chaser, Swarmer): a bite when touching a hero.
+    Melee,
+    /// `WINDUP` holds the wind-up; `CHARGING` launches with `attack`, then `charge@loop`.
+    Charger { windup: f32 },
+    /// Lobs at a circle telegraph it casts on a hero: a quick wind-up, then the throw.
+    Lobber { radius: f32, range: f32 },
+    /// `WINDUP`: wind-up, `channel@loop`, then `attack` with its fire key on the beam's resolve.
+    Caster { windup: f32 },
+    /// `PRIMED`: wind-up into `primed@loop`; the corpse plays `attack`, the detonation.
+    Bomber { fuse: f32 },
+    /// Shields its allies every `interval` (`cast`); bashes a hero in reach.
+    Support { interval: f32 },
+    /// A scripted fight: its `bosses.ron` script and the HP fractions each phase starts below.
+    Boss { script: String, phases: Vec<f32> },
+}
+
+/// Until when an enemy one-shot plays.
+#[derive(Clone, Copy, Debug)]
+enum Until {
+    /// Real seconds.
+    Time(f32),
+    /// While any of these flags is up.
+    Flag(EntityFlags),
+}
+
+/// A clip that overrides an enemy's locomotion for a while.
+#[derive(Clone, Debug)]
+struct Act {
+    clip: String,
+    speed: f32,
+    seek: f32,
+    until: Until,
+    /// Nothing else (a hit, a bite, another boss attack) cuts in before this many seconds.
+    locked: f32,
+    /// Face this sim angle while it plays.
+    face: Option<f32>,
+}
+
+/// A telegraph, a volley or a wave of adds this enemy set off, read from this frame's fresh
+/// entities (the snapshot does not say who cast what; `drive_enemies` matches them by place).
+#[derive(Clone, Copy, Debug)]
+enum Cue {
+    /// A telegraph: its shape, at the caster's feet or not, its wind-up (s), direction (sim
+    /// angle), place, and for a boss the script attack it belongs to.
+    Tele {
+        shape: TeleShape,
+        at_self: bool,
+        windup: f32,
+        dir: f32,
+        at: Vec2,
+        attack: Option<&'static str>,
+    },
+    Radial,
+    Summon,
+}
+
+/// An anvil brute's plates (sidecar `plate_states`): 0 intact, 1 cracked, 2 stripped.
+#[derive(Clone, Debug)]
+struct Plates {
+    state: [u8; 5],
+    wear: f32,
+    plate_hp: f32,
+    /// `plates_break` plays until then (the plates stay cracked for its fling).
+    breaking: f32,
+    /// (intact, cracked) joints per plate, found on first use.
+    nodes: Option<Vec<(Option<Entity>, Option<Entity>)>>,
+}
+
+const PLATE_NAMES: [&str; 5] = ["back", "pauldron", "helm", "cuff_L", "cuff_R"];
+const PLATE_CRACK_AT: [f32; 5] = [0.15, 0.35, 0.55, 0.7, 0.85];
+
+/// The per-enemy state machine, on the enemy model entity (beside its `ModelParts`).
+#[derive(Component)]
+pub struct EnemyAnim {
+    /// The `scene::Visual` proxy this model rides.
+    visual: Entity,
+    id: NetId,
+    /// The content key (logs).
+    name: String,
+    tier: EnemyClass,
+    brain: Brain,
+    phase: usize,
+    phase_known: bool,
+    act: Option<(Act, f32)>,
+    queue: VecDeque<Act>,
+    last_pos: Option<Vec2>,
+    speed: f32,
+    moving: bool,
+    last_hit: f32,
+    next_contact: f32,
+    next_cast: f32,
+    flags: EntityFlags,
+    dying: bool,
+    frozen: bool,
+    /// Off screen: the animation graph is detached (no evaluation at all).
+    culled: bool,
+    /// Play `spawn` first (a summoned or just-emerged add).
+    spawn: bool,
+    /// 0..1 per enemy: desyncs a horde's loops and bites.
+    seed: f32,
+    /// The Slag King's crown: accumulated spin (rad) about `crown_spin`'s +Y.
+    crown: f32,
+    plates: Option<Plates>,
+    logged: String,
+}
+
+impl EnemyAnim {
+    pub fn new(visual: Entity, id: NetId, def: &gf_content::EnemyDef, db: &gf_content::ContentDb, fresh: bool) -> Self {
+        use gf_content::EnemyBehavior as B;
+        let brain = match &def.behavior {
+            B::Chaser | B::Swarmer { .. } => Brain::Melee,
+            B::Charger { windup, .. } => Brain::Charger { windup: *windup },
+            B::Lobber { radius, range, .. } => Brain::Lobber { radius: *radius, range: *range },
+            B::Caster { windup, .. } => Brain::Caster { windup: *windup },
+            B::Bomber { fuse, .. } => Brain::Bomber { fuse: *fuse },
+            B::Support { interval, .. } => Brain::Support { interval: *interval },
+            B::Boss { script } => Brain::Boss {
+                script: script.clone(),
+                phases: db
+                    .bosses
+                    .by_key(script)
+                    .map(|s| s.phases.iter().map(|p| p.below).collect())
+                    .unwrap_or_default(),
+            },
+        };
+        let seed = ((id.0.wrapping_mul(2_654_435_761) >> 8) & 0xffff) as f32 / 65535.0;
+        EnemyAnim {
+            visual,
+            id,
+            name: def.key.clone(),
+            tier: def.class,
+            brain,
+            phase: 0,
+            phase_known: false,
+            act: None,
+            queue: VecDeque::new(),
+            last_pos: None,
+            speed: 0.0,
+            moving: false,
+            last_hit: -100.0,
+            next_contact: 0.0,
+            next_cast: f32::INFINITY,
+            flags: EntityFlags::empty(),
+            dying: false,
+            frozen: false,
+            culled: false,
+            spawn: fresh,
+            seed,
+            crown: 0.0,
+            plates: def.plating.as_ref().map(|p| Plates {
+                state: [0; 5],
+                wear: 0.0,
+                plate_hp: p.plate_hp.max(1.0),
+                breaking: 0.0,
+                nodes: None,
+            }),
+            logged: String::new(),
+        }
+    }
+
+    fn boss(&self) -> bool {
+        matches!(self.brain, Brain::Boss { .. })
+    }
+
+    /// The clip for `base` in the current phase: `<base>_p2` from the second phase on when the
+    /// model has it (docs/art/ENEMIES.md §6), else `<base>`.
+    fn resolve(&self, an: &Animator, base: &str) -> Option<String> {
+        if self.phase >= 1 {
+            let p2 = format!("{base}_p2");
+            if an.has(&p2) {
+                return Some(p2);
+            }
+        }
+        an.has(base).then(|| base.to_string())
+    }
+
+    /// An act for `base` (resolved per phase) played once through at `speed`.
+    fn once(&self, an: &Animator, base: &str, speed: f32) -> Option<Act> {
+        let clip = self.resolve(an, base)?;
+        let len = clip_len(an, &clip);
+        Some(Act { clip, speed, seek: 0.0, until: Until::Time(len / speed.max(0.05)), locked: 0.0, face: None })
+    }
+
+    /// Replace whatever plays and is queued.
+    fn interrupt(&mut self, an: &mut Animator, ap: &mut AnimationPlayer, act: Act, now: f32) {
+        self.queue.clear();
+        self.begin(an, ap, act, now);
+    }
+
+    fn begin(&mut self, an: &mut Animator, ap: &mut AnimationPlayer, act: Act, now: f32) {
+        let fade = if self.boss() {
+            0.25
+        } else if self.tier == EnemyClass::Swarm {
+            0.06
+        } else {
+            0.12
+        };
+        an.set_base_at(ap, &act.clip, act.speed, fade, true, act.seek);
+        self.act = Some((act, now));
+    }
+
+    /// Is the current act past its lock (or is there none)?
+    fn free(&self, now: f32) -> bool {
+        self.act.as_ref().is_none_or(|(a, start)| now - start >= a.locked)
+    }
+
+    fn playing(&self, clip: &str) -> bool {
+        self.act.as_ref().is_some_and(|(a, _)| a.clip.starts_with(clip))
+    }
+}
+
+/// Which of a boss script's attacks sets down this telegraph (by shape and size; the snapshot
+/// quantizes sizes to 1/32 m), named like its clip: `strike_<shape>`, `slam_trail`, `pools`
+/// (docs/art/ENEMIES.md §6: attack clips carry the `bosses.ron` variant's name).
+fn boss_telegraph(script: &gf_content::BossScript, shape: TeleShape, at_self: bool) -> Option<&'static str> {
+    use gf_content::{BossAttack as A, TelegraphShape as S};
+    let near = |a: f32, q: u16| (a - f32::from(q) / 32.0).abs() < 0.06;
+    for attack in script.phases.iter().flat_map(|p| &p.attacks) {
+        let name = match (attack, shape) {
+            (A::Strike { shape: s, at_self: own, .. }, _) => match (*s, shape) {
+                (S::Circle { radius }, TeleShape::Circle { r }) if near(radius, r) && *own == at_self => {
+                    "strike_circle"
+                }
+                (S::Ring { inner, outer }, TeleShape::Ring { inner: i, outer: o })
+                    if near(inner, i) && near(outer, o) =>
+                {
+                    "strike_ring"
+                }
+                (S::Cone { range, .. }, TeleShape::Cone { range: r, .. }) if near(range, r) => "strike_cone",
+                (S::Line { length, width }, TeleShape::Line { len, width: w })
+                    if near(length, len) && near(width, w) =>
+                {
+                    "strike_line"
+                }
+                _ => continue,
+            },
+            (A::SlamTrail { radius, .. }, TeleShape::Circle { r }) if near(*radius, r) => "slam_trail",
+            (A::Pools { radius, .. }, TeleShape::Circle { r }) if near(*radius, r) => "pools",
+            _ => continue,
+        };
+        return Some(name);
+    }
+    None
+}
+
+/// The attack a boss starts this frame, from its cues. A slam trail's circles and a volley of
+/// pools arrive over several frames: only the first starts the clip.
+fn boss_attack(ea: &EnemyAnim, cues: &[Cue]) -> Option<(String, Cue)> {
+    cues.iter().find_map(|cue| match *cue {
+        Cue::Tele { attack: Some(name), .. } if !(matches!(name, "slam_trail" | "pools") && ea.playing(name)) => {
+            Some((name.to_string(), *cue))
+        }
+        Cue::Radial => Some(("radial".to_string(), *cue)),
+        Cue::Summon => Some(("summon".to_string(), *cue)),
+        _ => None,
+    })
+}
+
+/// Sim angle from `a` to `b`.
+fn angle_to(a: Vec2, b: Vec2) -> f32 {
+    let d = b - a;
+    d.y.atan2(d.x)
+}
+
+/// Drives every enemy model from the snapshot: locomotion from the rendered ground speed, the
+/// behaviour's wind-ups and attacks from its flags and the telegraphs it casts, hits (throttled),
+/// boss phases and attacks, deaths on the corpse proxy. Off-screen swarms detach their graph
+/// (the animation LOD).
+#[allow(clippy::too_many_arguments)]
+fn drive_enemies(
+    mut commands: Commands,
+    time: Res<Time>,
+    cfg: Res<ClientConfig>,
+    link: Res<Link>,
+    index: Res<SceneIndex>,
+    log: Res<AnimLog>,
+    cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+    mut enemies: Query<(&mut EnemyAnim, &ModelParts)>,
+    mut visuals: Query<&mut Visual>,
+    mut corpses: Query<&mut Corpse>,
+    mut animators: Query<(&mut Animator, &mut AnimationPlayer)>,
+) {
+    let Some(world) = link.latest.as_deref() else { return };
+    let now = time.elapsed_secs();
+    let dt = time.delta_secs().max(1.0e-4);
+    let heroes: Vec<Vec2> = world.players.iter().filter(|p| p.life.is_alive()).map(|p| p.mover.pos).collect();
+    let nearest_hero =
+        |p: Vec2| heroes.iter().copied().min_by(|a, b| a.distance_squared(p).total_cmp(&b.distance_squared(p)));
+
+    // Who stands where (models only), for matching telegraphs, volleys and adds to their caster.
+    struct Body<'a> {
+        visual: Entity,
+        pos: Vec2,
+        radius: f32,
+        /// Casts at its own feet (a charge line, a beam, a fuse).
+        feet: bool,
+        script: Option<&'a gf_content::BossScript>,
+        lob: Option<(f32, f32)>,
+    }
+    let db = &cfg.content;
+    let bodies: Vec<Body> = enemies
+        .iter()
+        .filter(|(ea, _)| !ea.dying)
+        .filter_map(|(ea, _)| {
+            let v = visuals.get(ea.visual).ok()?;
+            Some(Body {
+                visual: ea.visual,
+                pos: v.pos,
+                radius: v.radius,
+                feet: matches!(ea.brain, Brain::Charger { .. } | Brain::Caster { .. } | Brain::Bomber { .. }),
+                script: match &ea.brain {
+                    Brain::Boss { script, .. } => db.bosses.by_key(script),
+                    _ => None,
+                },
+                lob: match ea.brain {
+                    Brain::Lobber { radius, range } => Some((radius, range)),
+                    _ => None,
+                },
+            })
+        })
+        .collect();
+    let mut cues: HashMap<Entity, Vec<Cue>> = HashMap::new();
+    let (mut shots, mut adds) = (Vec::new(), Vec::new());
+    for e in &index.fresh {
+        let at = e.pos.to_vec2();
+        match e.kind {
+            // Heroes' telegraphs (gold) are theirs.
+            EntityKind::Telegraph { shape, dir, windup_ticks, .. } if !e.flags.contains(EntityFlags::ALLY) => {
+                let near = |b: &&Body| b.pos.distance_squared(at);
+                let at_feet = |b: &Body| b.pos.distance(at) < 0.3 + 0.12 * b.radius;
+                // At a caster's feet, else a lob of the right size in range, else one of a boss's
+                // attacks by its script.
+                let own = bodies.iter().filter(|b| b.feet && at_feet(b)).min_by(|a, b| near(a).total_cmp(&near(b)));
+                let lob = || match shape {
+                    TeleShape::Circle { r } => bodies
+                        .iter()
+                        .filter(|b| {
+                            b.lob.is_some_and(|(radius, range)| {
+                                (radius - f32::from(r) / 32.0).abs() < 0.12 && b.pos.distance(at) <= range + 2.0
+                            })
+                        })
+                        .min_by(|a, b| near(a).total_cmp(&near(b))),
+                    _ => None,
+                };
+                let boss = || {
+                    bodies
+                        .iter()
+                        .filter(|b| b.pos.distance(at) < 45.0)
+                        .filter_map(|b| Some((b, boss_telegraph(b.script?, shape, at_feet(b))?)))
+                        .min_by(|a, b| near(&a.0).total_cmp(&near(&b.0)))
+                };
+                let (owner, at_self, attack) = if let Some(b) = own {
+                    (b.visual, true, None)
+                } else if let Some(b) = lob() {
+                    (b.visual, false, None)
+                } else if let Some((b, name)) = boss() {
+                    (b.visual, at_feet(b), Some(name))
+                } else {
+                    continue;
+                };
+                let d = u16_to_dir(dir);
+                cues.entry(owner).or_default().push(Cue::Tele {
+                    shape,
+                    at_self,
+                    windup: windup_ticks as f32 * gf_core::SIM_DT,
+                    dir: d.y.atan2(d.x),
+                    at,
+                    attack,
+                });
+            }
+            EntityKind::EnemyShot { .. } => shots.push(at),
+            EntityKind::Enemy { .. } if !e.flags.contains(EntityFlags::BOSS) => adds.push(at),
+            _ => {}
+        }
+    }
+    for b in bodies.iter().filter(|b| b.script.is_some()) {
+        let reach = |p: &&Vec2, r: f32| p.distance(b.pos) < b.radius + r;
+        if shots.iter().filter(|p| reach(p, 2.5)).count() >= 5 {
+            cues.entry(b.visual).or_default().push(Cue::Radial);
+        }
+        if adds.iter().filter(|p| reach(p, 5.0)).count() >= 2 {
+            cues.entry(b.visual).or_default().push(Cue::Summon);
+        }
+    }
+    let mut hits: HashMap<NetId, (f32, DamageType, bool)> = HashMap::new();
+    let mut shattered = Vec::new();
+    for ev in &link.fresh_events {
+        match *ev {
+            GameEvent::Hit { target, amount, element, crit, .. } => {
+                let h = hits.entry(target).or_insert((0.0, element, false));
+                h.0 += f32::from(amount);
+                h.2 |= crit;
+            }
+            GameEvent::PlatesShattered { target } => shattered.push(target),
+            _ => {}
+        }
+    }
+    let view = cameras.single().ok().and_then(|(c, t)| Some((c, t, c.logical_viewport_size()?)));
+    let on_screen = |p: Vec3, pad: f32| -> bool {
+        let Some((cam, tf, size)) = view else { return true };
+        world_to_screen(cam, tf, p).is_some_and(|s| {
+            s.x > -pad * size.x && s.x < (1.0 + pad) * size.x && s.y > -pad * size.y && s.y < (1.0 + pad) * size.y
+        })
+    };
+
+    for (mut ea, parts) in &mut enemies {
+        let ea = &mut *ea;
+        let Some(pe) = parts.player else { continue };
+        let Ok((mut an, mut ap)) = animators.get_mut(pe) else { continue };
+        let (an, ap) = (&mut *an, &mut *ap);
+        let graph = an.model.anim.as_ref().map(|l| l.graph.clone());
+        let mut attach = |ea: &mut EnemyAnim, on: bool| {
+            if ea.culled == !on {
+                return;
+            }
+            ea.culled = !on;
+            match (on, &graph) {
+                (true, Some(g)) => {
+                    commands.entity(pe).insert(AnimationGraphHandle(g.clone()));
+                }
+                _ => {
+                    commands.entity(pe).remove::<AnimationGraphHandle>();
+                }
+            }
+        };
+
+        // ── death: the corpse plays it ──
+        if let Ok(mut corpse) = corpses.get_mut(ea.visual) {
+            if !ea.dying {
+                ea.dying = true;
+                attach(ea, true);
+                ap.resume_all();
+                ea.queue.clear();
+                ea.act = None;
+                match ea.resolve(an, corpse.clip) {
+                    Some(clip) => {
+                        if log.0 && ea.tier != EnemyClass::Swarm {
+                            info!("anim E{} {}: {} -> {clip} (corpse)", ea.id.0, ea.name, an.base_name());
+                            ea.logged = clip.clone();
+                        }
+                        an.set_base(ap, &clip, 1.0, 0.08, true);
+                        let linger = match ea.tier {
+                            EnemyClass::Swarm => 0.3,
+                            EnemyClass::Elite => 1.6,
+                            _ => 4.0,
+                        };
+                        corpse.hold = clip_len(an, &clip) + linger;
+                    }
+                    None => corpse.hold = 0.0,
+                }
+            }
+            continue;
+        }
+        let Ok(mut v) = visuals.get_mut(ea.visual) else { continue };
+
+        // ── LOD: an off-screen swarm stops evaluating its skeleton ──
+        let swarm = ea.tier == EnemyClass::Swarm;
+        attach(ea, !swarm || on_screen(w3(v.shown, 0.5), 0.12));
+
+        // ── ground speed (from the rendered motion) ──
+        let raw = ea.last_pos.map_or(0.0, |l| l.distance(v.shown) / dt);
+        ea.last_pos = Some(v.shown);
+        ea.speed += (raw.min(30.0) - ea.speed) * (1.0 - (-10.0 * dt).exp());
+        ea.moving = if ea.moving { ea.speed > 0.2 } else { ea.speed > 0.45 };
+
+        // ── time freeze: the pose holds ──
+        let frozen = v.flags.contains(EntityFlags::FROZEN);
+        if frozen != ea.frozen {
+            ea.frozen = frozen;
+            if frozen {
+                ap.pause_all();
+            } else {
+                ap.resume_all();
+            }
+        }
+        let (prev, flags) = (ea.flags, v.flags);
+        ea.flags = flags;
+        if frozen {
+            continue;
+        }
+        let rose = |f: EntityFlags| flags.contains(f) && !prev.contains(f);
+        let fell = |f: EntityFlags| !flags.contains(f) && prev.contains(f);
+        let my_cues = cues.remove(&ea.visual).unwrap_or_default();
+        let hero = nearest_hero(v.pos);
+
+        // ── the act in charge ends ──
+        if let Some((act, start)) = &ea.act {
+            let t = now - start;
+            let over = match act.until {
+                Until::Time(l) => t >= l,
+                Until::Flag(f) => !v.flags.intersects(f) && t > 0.05,
+            };
+            if over {
+                ea.act = None;
+            }
+        }
+        if ea.spawn {
+            ea.spawn = false;
+            if let Some(a) = ea.once(an, "spawn", 1.0) {
+                ea.interrupt(an, ap, Act { locked: 0.25, ..a }, now);
+            }
+        }
+
+        // ── boss phases ──
+        let boss_phase = match &ea.brain {
+            Brain::Boss { phases, .. } => Some(phases.iter().rposition(|b| v.hp <= *b + 0.003).unwrap_or(0)),
+            _ => None,
+        };
+        if let Some(idx) = boss_phase {
+            if !ea.phase_known {
+                ea.phase = idx;
+                ea.phase_known = true;
+            } else if idx > ea.phase {
+                ea.phase = idx;
+                let name = if idx >= 2 && an.has("phase3") { "phase3" } else { "phase2" };
+                if an.has(name) {
+                    let key = an.model.clip(name).and_then(|c| {
+                        c.meta.event("burst").or_else(|| c.meta.event("peak")).or_else(|| c.meta.event("crack"))
+                    });
+                    let len = clip_len(an, name);
+                    let act = Act {
+                        clip: name.to_string(),
+                        speed: 1.0,
+                        seek: 0.0,
+                        until: Until::Time(len),
+                        locked: key.unwrap_or(len * 0.5) + 0.25,
+                        face: hero.map(|h| angle_to(v.pos, h)),
+                    };
+                    ea.interrupt(an, ap, act, now);
+                    if log.0 {
+                        info!("anim E{} {}: phase {} -> {name}", ea.id.0, ea.name, idx + 1);
+                    }
+                }
+            }
+            // The Final Pour burns white; the crown spins (75°/s, 150°/s, twice that in a radial).
+            v.hot = ea.phase >= 2 && an.has("phase3");
+            let rate = match ea.phase {
+                0 => 0.0,
+                1 => 75.0f32,
+                _ => 150.0,
+            }
+            .to_radians();
+            let boost = if ea.playing("radial") { 2.0 } else { 1.0 };
+            ea.crown = (ea.crown + rate * boost * dt).rem_euclid(TAU);
+        }
+
+        // ── plates (the anvil brute): wear cracks them in order, the shatter flings them ──
+        let shatter = ea.plates.is_some() && shattered.contains(&v.id);
+        if let Some(pl) = &mut ea.plates {
+            if let Some(&(amount, element, _)) = hits.get(&v.id)
+                && flags.contains(EntityFlags::PLATED)
+            {
+                pl.wear += amount * if element == DamageType::Kinetic { 1.5 } else { 0.5 };
+                for (i, at) in PLATE_CRACK_AT.iter().enumerate() {
+                    if pl.wear / pl.plate_hp >= *at && pl.state[i] == 0 {
+                        pl.state[i] = 1;
+                    }
+                }
+            }
+            if shatter {
+                pl.state = [1; 5];
+                pl.breaking = now + clip_len(an, "plates_break");
+            }
+            if !flags.contains(EntityFlags::PLATED) && now >= pl.breaking {
+                pl.state = [2; 5];
+            }
+        }
+        if shatter && let Some(a) = ea.once(an, "plates_break", 1.0) {
+            let locked = clip_len(an, &a.clip) * 0.8;
+            ea.interrupt(an, ap, Act { locked, ..a }, now);
+        }
+
+        // ── behaviour: wind-ups, attacks, casts ──
+        let tele = my_cues.iter().find_map(|c| match *c {
+            Cue::Tele { windup, dir, at, at_self, .. } => Some((windup, dir, at, at_self)),
+            _ => None,
+        });
+        match ea.brain.clone() {
+            Brain::Charger { windup } => {
+                if rose(EntityFlags::WINDUP)
+                    && let Some(a) = ea.once(an, "windup", 1.0)
+                {
+                    let w = tele.map_or(windup, |t| t.0).max(0.1);
+                    let len = clip_len(an, &a.clip);
+                    let act = Act {
+                        speed: (len / w).clamp(0.3, 3.0),
+                        until: Until::Flag(EntityFlags::WINDUP),
+                        locked: w,
+                        face: tele.map(|t| t.1),
+                        ..a
+                    };
+                    ea.interrupt(an, ap, act, now);
+                }
+                if rose(EntityFlags::CHARGING) {
+                    ea.queue.clear();
+                    if let Some(a) = ea.once(an, "attack", 1.0) {
+                        let locked = clip_len(an, &a.clip);
+                        ea.interrupt(an, ap, Act { locked, ..a }, now);
+                    }
+                    if let Some(c) = ea.resolve(an, "charge") {
+                        let speed = 1.0 + 0.3 * ea.seed;
+                        ea.queue.push_back(Act {
+                            clip: c,
+                            speed,
+                            seek: 0.0,
+                            until: Until::Flag(EntityFlags::CHARGING),
+                            locked: 0.5,
+                            face: None,
+                        });
+                    }
+                }
+            }
+            Brain::Caster { windup } => {
+                if rose(EntityFlags::WINDUP) {
+                    let w = tele.map_or(windup, |t| t.0).max(0.2);
+                    let fire = an.model.clip("attack").and_then(|c| c.meta.event("beam_fire")).unwrap_or(0.2);
+                    let fire_at = (w - fire).max(0.15);
+                    let wl = clip_len(an, "windup");
+                    ea.queue.clear();
+                    let face = tele.map(|t| t.1);
+                    if let Some(a) = ea.once(an, "windup", 1.0) {
+                        let (len, speed) = if fire_at < wl { (fire_at, wl / fire_at) } else { (wl, 1.0) };
+                        let act = Act { speed, until: Until::Time(len), locked: len, face, ..a };
+                        ea.interrupt(an, ap, act, now);
+                        if fire_at > wl
+                            && let Some(c) = ea.resolve(an, "channel")
+                        {
+                            let hold = fire_at - wl;
+                            ea.queue.push_back(Act {
+                                clip: c,
+                                speed: 1.0,
+                                seek: 0.0,
+                                until: Until::Time(hold),
+                                locked: hold,
+                                face,
+                            });
+                        }
+                    }
+                    if let Some(a) = ea.once(an, "attack", 1.0) {
+                        let locked = clip_len(an, &a.clip) * 0.6;
+                        ea.queue.push_back(Act { locked, face, ..a });
+                    }
+                }
+                // The beam resolves: fire now if the channel ran long (or a stun cut it).
+                if fell(EntityFlags::WINDUP) && (ea.playing("windup") || ea.playing("channel")) {
+                    ea.queue.retain(|a| a.clip.starts_with("attack"));
+                    ea.act = None;
+                }
+            }
+            Brain::Bomber { fuse } => {
+                if rose(EntityFlags::PRIMED) {
+                    let f = tele.map_or(fuse, |t| t.0).max(0.2);
+                    if let Some(a) = ea.once(an, "windup", 1.0) {
+                        let len = clip_len(an, &a.clip);
+                        let speed = (len / (f * 0.5)).max(1.0);
+                        let act = Act { speed, until: Until::Time(len / speed), locked: f, ..a };
+                        ea.interrupt(an, ap, act, now);
+                    }
+                    if let Some(c) = ea.resolve(an, "primed") {
+                        ea.queue.push_back(Act {
+                            clip: c,
+                            speed: 1.0,
+                            seek: 0.0,
+                            until: Until::Flag(EntityFlags::PRIMED),
+                            locked: f,
+                            face: None,
+                        });
+                    }
+                }
+            }
+            Brain::Lobber { .. } => {
+                if let Some((w, _, at, false)) = tele
+                    && let Some(a) = ea.once(an, "windup", 1.0)
+                {
+                    // The glob leaves early in the telegraph and flies for the rest of it.
+                    let wind = (w * 0.45).clamp(0.25, 0.6);
+                    let len = clip_len(an, &a.clip);
+                    let face = Some(angle_to(v.pos, at));
+                    let act = Act { speed: len / wind, until: Until::Time(wind), locked: wind, face, ..a };
+                    ea.interrupt(an, ap, act, now);
+                    if let Some(t) = ea.once(an, "attack", 1.0) {
+                        let locked = clip_len(an, &t.clip) * 0.5;
+                        ea.queue.push_back(Act { locked, face, ..t });
+                    }
+                }
+            }
+            Brain::Support { interval } => {
+                if ea.next_cast.is_infinite() {
+                    ea.next_cast = now + interval * (0.3 + ea.seed);
+                }
+                // Its own shield rising marks the pulse; between those it keeps the sim's rhythm.
+                let pulse = rose(EntityFlags::SHIELDED) || now >= ea.next_cast;
+                if pulse {
+                    ea.next_cast = now + interval;
+                    if ea.free(now)
+                        && hero.is_some_and(|h| h.distance(v.pos) < 18.0)
+                        && let Some(a) = ea.once(an, "cast", 1.0)
+                    {
+                        let locked = clip_len(an, &a.clip) * 0.7;
+                        ea.interrupt(an, ap, Act { locked, ..a }, now);
+                    }
+                }
+            }
+            Brain::Boss { .. } => {
+                if ea.free(now)
+                    && let Some((name, cue)) = boss_attack(ea, &my_cues)
+                    && let Some(clip) = ea.resolve(an, &name)
+                {
+                    let meta = an.model.clip(&clip).map(|c| c.meta.clone()).unwrap_or_default();
+                    let len = clip_len(an, &clip);
+                    let key = meta
+                        .event("impact")
+                        .or_else(|| meta.event("release"))
+                        .or_else(|| meta.events.iter().map(|(_, t)| *t).reduce(f32::min));
+                    let (mut speed, mut seek, mut face) = (1.0, 0.0, hero.map(|h| angle_to(v.pos, h)));
+                    match cue {
+                        Cue::Tele { windup, dir, shape, .. } => {
+                            // The clip's impact lands with the telegraph (pools: the fling comes first).
+                            let land = if name == "pools" { windup * 0.6 } else { windup };
+                            if let Some(k) = key.filter(|k| *k > 0.05) {
+                                speed = (k / land.max(0.1)).clamp(0.6, 1.8);
+                            }
+                            if matches!(shape, TeleShape::Cone { .. } | TeleShape::Line { .. }) {
+                                face = Some(dir);
+                            }
+                        }
+                        // The volley and the adds are already out: start on their key.
+                        Cue::Radial | Cue::Summon => {
+                            let k = meta.event("release").or_else(|| meta.event("spawn")).unwrap_or(0.0);
+                            seek = (k - 0.1).max(0.0);
+                        }
+                    }
+                    let locked = key.map_or(len * 0.5, |k| ((k - seek) / speed).max(0.0) + 0.15);
+                    let act = Act { clip, speed, seek, until: Until::Time((len - seek) / speed), locked, face };
+                    if log.0 {
+                        info!(
+                            "anim E{} {}: {} -> {} (attack, phase {}, x{speed:.2})",
+                            ea.id.0,
+                            ea.name,
+                            an.base_name(),
+                            act.clip,
+                            ea.phase + 1
+                        );
+                        ea.logged = act.clip.clone();
+                    }
+                    ea.interrupt(an, ap, act, now);
+                }
+            }
+            Brain::Melee => {}
+        }
+
+        // ── a bite or a bash on a hero in reach ──
+        let melee = matches!(ea.brain, Brain::Melee | Brain::Support { .. });
+        if melee
+            && ea.act.is_none()
+            && now >= ea.next_contact
+            && let Some(h) = hero.filter(|h| h.distance(v.pos) < v.radius + 0.95)
+        {
+            ea.next_contact = now + 0.8 + 0.7 * ea.seed;
+            let face = Some(angle_to(v.pos, h));
+            if matches!(ea.brain, Brain::Support { .. })
+                && let Some(w) = ea.once(an, "windup", 1.6)
+            {
+                ea.interrupt(an, ap, Act { face, locked: 0.3, ..w }, now);
+                if let Some(a) = ea.once(an, "attack", 1.0) {
+                    ea.queue.push_back(Act { face, ..a });
+                }
+            } else if let Some(a) = ea.once(an, "attack", 1.0 + 0.2 * ea.seed) {
+                ea.interrupt(an, ap, Act { face, ..a }, now);
+            }
+        }
+
+        // ── hit reactions (throttled; bosses only flinch when idle) ──
+        if let Some(&(_, _, crit)) = hits.get(&v.id) {
+            // A boss takes a stream of hits: only a crit rocks it, now and then (its rim flashes
+            // for the rest).
+            let gap = match ea.tier {
+                EnemyClass::Swarm => 0.45,
+                EnemyClass::Elite => 1.1,
+                _ if crit => 7.0,
+                _ => f32::INFINITY,
+            };
+            let idle = (ea.act.is_none() || ea.playing("hit")) && ea.queue.is_empty();
+            if now - ea.last_hit >= gap
+                && idle
+                && let Some(a) = ea.once(an, "hit", 1.0)
+            {
+                ea.last_hit = now;
+                ea.interrupt(an, ap, a, now);
+            }
+        }
+
+        // ── the next queued act, else locomotion ──
+        if ea.act.is_none()
+            && let Some(next) = ea.queue.pop_front()
+        {
+            ea.begin(an, ap, next, now);
+        }
+        v.face_override = match &ea.act {
+            Some((a, _)) => a.face,
+            // A boss squares up to its target; the rest face where they go.
+            None if ea.boss() => hero.map(|h| angle_to(v.pos, h)),
+            None => None,
+        };
+        if ea.act.is_none() {
+            let charging = flags.contains(EntityFlags::CHARGING);
+            let (clip, rate) = if charging && an.has("charge") {
+                ("charge".to_string(), 1.0)
+            } else if ea.moving {
+                // The move loop covers `move_cycle_m` per cycle: its rate follows the ground speed.
+                let clip = ea.resolve(an, "move").unwrap_or_else(|| "move".into());
+                let len = clip_len(an, &clip);
+                let cycle = an.model.clip(&clip).and_then(|c| c.meta.move_cycle).unwrap_or(len * 3.0);
+                let rate = (len * ea.speed / cycle.max(0.05)).clamp(0.3, 3.0);
+                (clip, rate)
+            } else {
+                (ea.resolve(an, "idle").unwrap_or_else(|| "idle".into()), 0.92 + 0.16 * ea.seed)
+            };
+            let fade = if ea.boss() { 0.35 } else { 0.15 };
+            // A horde's loops start at scattered points so it never marches in step.
+            let seek = clip_len(an, &clip) * ea.seed;
+            an.set_base_at(ap, &clip, rate, fade, false, seek);
+        }
+        if log.0 && ea.tier != EnemyClass::Swarm && ea.logged != an.base_name() {
+            info!(
+                "anim E{} {}: {} -> {} (speed {:.1} m/s, phase {})",
+                ea.id.0,
+                ea.name,
+                if ea.logged.is_empty() { "-" } else { ea.logged.as_str() },
+                an.base_name(),
+                ea.speed,
+                ea.phase + 1
+            );
+            ea.logged = an.base_name().to_string();
+        }
+    }
+}
+
+/// Pose work the clips leave to the client, after the animation and before transforms propagate:
+/// the Slag King's crown spin and the anvil brute's plate states (sidecar `phase_switch`,
+/// `plate_states`).
+fn pose_enemies(mut q: Query<(&mut EnemyAnim, &ModelParts)>, mut tfs: Query<&mut Transform>) {
+    for (mut ea, parts) in &mut q {
+        if ea.culled {
+            continue;
+        }
+        if ea.crown != 0.0
+            && let Some(j) = parts.node("crown_spin")
+            && let Ok(mut tf) = tfs.get_mut(j)
+        {
+            tf.rotation *= Quat::from_rotation_y(ea.crown);
+        }
+        let Some(pl) = &mut ea.plates else { continue };
+        let nodes = pl.nodes.get_or_insert_with(|| {
+            PLATE_NAMES
+                .iter()
+                .map(|p| (parts.node(&format!("plate_{p}")), parts.node(&format!("plate_{p}_crk"))))
+                .collect()
+        });
+        for (i, (intact, cracked)) in nodes.iter().enumerate() {
+            let (a, b) = match pl.state[i] {
+                0 => (1.0, 0.001),
+                1 => (0.001, 1.0),
+                _ => (0.001, 0.001),
+            };
+            for (e, s) in [(intact, a), (cracked, b)] {
+                if let Some(e) = e
+                    && let Ok(mut tf) = tfs.get_mut(*e)
+                {
+                    tf.scale = Vec3::splat(s);
+                }
+            }
+        }
+    }
+}
+
+// ───────────────────────────── enemy gallery (QA) ─────────────────────────────
+
+/// `--enemy-gallery [N]`: QA. Every enemy look of the run's biome stands in one row 3 m below the
+/// local hero (client side only: the sim never sees it), swarms first, then elites, the
+/// mini-boss and the boss, facing the camera three-quarters. All play the same clip of
+/// [`ENEMY_GALLERY_CLIPS`] for [`GALLERY_PERIOD`] s (one-shots held on their key pose), starting
+/// at the N-th; a look without that clip idles. Pin the view with `GF_CAM_AT`, zoom with
+/// `GF_QA_ZOOM`.
+#[derive(Resource)]
+pub struct EnemyGallery {
+    pub start: Option<usize>,
+    spawned: bool,
+    shown: String,
+}
+
+/// The clips the enemy gallery steps through (the shared set, then the extras).
+const ENEMY_GALLERY_CLIPS: [&str; 16] = [
+    "idle",
+    "move",
+    "windup",
+    "attack",
+    "hit",
+    "death",
+    "spawn",
+    "primed",
+    "charge",
+    "plates_break",
+    "channel",
+    "cast",
+    "phase2",
+    "idle_p2",
+    "radial",
+    "summon",
+];
+
+/// One look in the enemy gallery.
+#[derive(Component)]
+struct GalleryItem;
+
+fn enemy_gallery(
+    mut commands: Commands,
+    time: Res<Time>,
+    cfg: Res<ClientConfig>,
+    link: Res<Link>,
+    server: Res<AssetServer>,
+    mut gallery: ResMut<EnemyGallery>,
+    mut models: ResMut<crate::models::Models>,
+    items: Query<&ModelParts, With<GalleryItem>>,
+    mut animators: Query<(&mut Animator, &mut AnimationPlayer)>,
+) {
+    let Some(from) = gallery.start else { return };
+    let Some(world) = link.latest.as_deref() else { return };
+    let Some(me) = link.me() else { return };
+    let db = &cfg.content;
+    if !gallery.spawned {
+        let Some(biome) = db.biomes.try_get(world.run.biome) else { return };
+        let mut defs: Vec<&gf_content::EnemyDef> = db.enemies.iter().filter(|d| d.biome == biome.key).collect();
+        defs.sort_by_key(|d| d.class.index());
+        let mut looks = Vec::new();
+        for d in defs {
+            for look in models.looks(crate::models::ModelKind::Enemy, &d.key, &server) {
+                looks.push(look);
+            }
+        }
+        let ready: Vec<_> =
+            looks.iter().filter_map(|k| models.get(crate::models::ModelKind::Enemy, k, &server)).collect();
+        if ready.len() < looks.len() {
+            return;
+        }
+        gallery.spawned = true;
+        let origin = me.mover.pos + Vec2::new(-4.0, -3.0);
+        let root = commands.spawn((Transform::from_translation(w3(origin, 0.0)), Visibility::default())).id();
+        let mut x = 0.0;
+        for model in &ready {
+            let (lo, hi) = model.meta.bounds.unwrap_or((Vec3::splat(-0.5), Vec3::splat(0.5)));
+            let half = (hi.x - lo.x).max(hi.z - lo.z) * 0.5;
+            x += half;
+            let tf = Transform::from_translation(Vec3::new(x, 0.0, 0.0)).with_rotation(Quat::from_rotation_y(-0.55));
+            let e = crate::models::spawn_model(&mut commands, root, model, crate::models::Skin::FOE, tf);
+            commands.entity(e).insert(GalleryItem);
+            info!("enemy gallery: {} at x {:.1} (sim {:.1}, {:.1})", model.key, x, origin.x + x, origin.y);
+            x += half + 0.35;
+        }
+        return;
+    }
+    let now = time.elapsed_secs();
+    let clip = ENEMY_GALLERY_CLIPS[(from + (now / GALLERY_PERIOD) as usize) % ENEMY_GALLERY_CLIPS.len()];
+    let fresh = gallery.shown != clip;
+    if fresh {
+        info!("enemy gallery: {clip} at {now:.1}s");
+        gallery.shown = clip.to_string();
+    }
+    for parts in &items {
+        let Some((mut an, mut ap)) = parts.player.and_then(|e| animators.get_mut(e).ok()) else { continue };
+        let name = if an.has(clip) { clip } else { "idle" };
+        if !fresh && an.base_name() == name {
+            continue;
+        }
+        let Some(c) = an.model.clip(name) else { continue };
+        let (node, looping) = (c.node, c.meta.looping);
+        let key = c.meta.events.iter().map(|(_, t)| *t).reduce(f32::min).unwrap_or(c.duration * 0.45);
+        an.set_base(&mut ap, name, 1.0, 0.1, true);
+        if !looping && let Some(a) = ap.animation_mut(node) {
+            a.set_seek_time(key).pause();
+        }
+    }
+}
+
+/// `--anim-gallery [N]` / `--enemy-gallery [N]`: the clip to start from.
+fn gallery_start(flag: &str, env: &str) -> usize {
     let args: Vec<String> = std::env::args().collect();
-    let arg =
-        args.iter().position(|a| a == "--anim-gallery").and_then(|i| args.get(i + 1)).and_then(|v| v.parse().ok());
-    arg.or_else(|| std::env::var("GODFORGE_ANIM_GALLERY").ok()?.parse().ok()).unwrap_or(0)
+    let arg = args.iter().position(|a| a == flag).and_then(|i| args.get(i + 1)).and_then(|v| v.parse().ok());
+    arg.or_else(|| std::env::var(env).ok()?.parse().ok()).unwrap_or(0)
 }
 
 pub fn build(app: &mut App) {
     let flag = |arg: &str, env: &str| std::env::args().any(|a| a == arg) || std::env::var(env).is_ok_and(|v| v != "0");
+    let heroes = flag("--anim-gallery", "GODFORGE_ANIM_GALLERY");
+    let enemies = flag("--enemy-gallery", "GODFORGE_ENEMY_GALLERY");
     app.insert_resource(AnimLog(flag("--anim-log", "GODFORGE_ANIM_LOG")))
-        .insert_resource(AnimGallery(flag("--anim-gallery", "GODFORGE_ANIM_GALLERY").then(gallery_start)))
-        .add_systems(Update, (drive_heroes, tick_animators).chain().in_set(ClientSet::Presentation));
+        .insert_resource(AnimGallery(heroes.then(|| gallery_start("--anim-gallery", "GODFORGE_ANIM_GALLERY"))))
+        .insert_resource(EnemyGallery {
+            start: enemies.then(|| gallery_start("--enemy-gallery", "GODFORGE_ENEMY_GALLERY")),
+            spawned: false,
+            shown: String::new(),
+        })
+        .add_systems(
+            Update,
+            (drive_heroes, drive_enemies, enemy_gallery, tick_animators).chain().in_set(ClientSet::Presentation),
+        )
+        .add_systems(
+            PostUpdate,
+            pose_enemies
+                .after(gf_engine::bevy::app::AnimationSystems)
+                .before(gf_engine::bevy::transform::TransformSystems::Propagate),
+        );
 }

@@ -20,7 +20,7 @@
 use crate::ClientSet;
 use crate::anim::{Animator, lower_body_targets};
 use crate::materials::{ToonMaterial, ToonStyle, toon_from_standard};
-use crate::palette::{Palette, hdr};
+use crate::palette::{Palette, hdr, hex, status_color};
 use gf_engine::bevy::animation::{AnimationTargetId, graph::AnimationNodeIndex};
 use gf_engine::bevy::world_serialization::WorldInstanceReady;
 use gf_engine::prelude::*;
@@ -73,6 +73,9 @@ pub struct ClipMeta {
     pub upper: bool,
     /// Ground speed the feet are planted at (locomotion: playback rate = speed / this).
     pub design_speed: Option<f32>,
+    /// Metres travelled per cycle of an enemy's move loop (`move_cycle_m`): the loop plays at
+    /// `speed / move_cycle` cycles per second.
+    pub move_cycle: Option<f32>,
     /// Named events (hit frames, launch, slam…) at their time in seconds.
     pub events: Vec<(String, f32)>,
     /// Per hand (L, R), when the clip swaps a gauntlet pair between fist and open.
@@ -97,15 +100,50 @@ pub struct ModelMeta {
     pub fist_nodes: Option<[String; 2]>,
     pub open_nodes: Option<[String; 2]>,
     pub height: Option<f32>,
+    /// An enemy's looks (`variant_set`): one file per look, the same rig, sockets and clip
+    /// suffixes. Empty when the key has one look.
+    pub variants: Vec<String>,
+    /// Bounding box (glTF axes: +Y up, +Z the creature's front), in metres.
+    pub bounds: Option<(Vec3, Vec3)>,
+    /// Socket positions in the rest pose (glTF axes), by name.
+    pub sockets: HashMap<String, Vec3>,
     pub raw: Value,
+}
+
+/// Seconds of a clip event: a number, or the first of a list (`spawn: [0.63, 1.0, 1.37]`).
+fn event_time(v: &Value) -> Option<f32> {
+    v.as_f64().or_else(|| v.as_array()?.first()?.as_f64()).map(|t| t as f32)
+}
+
+fn vec3(v: &Value) -> Option<Vec3> {
+    let a = v.as_array()?;
+    Some(Vec3::new(a.first()?.as_f64()? as f32, a.get(1)?.as_f64()? as f32, a.get(2)?.as_f64()? as f32))
 }
 
 impl ModelMeta {
     fn parse(key: &str, raw: Value) -> ModelMeta {
         let mut clips = HashMap::new();
         let info = raw.get("clip_info");
+        // `move_cycle_m`: one number (the move loop's), or per loop (`{"move@loop": 4.45, …}`).
+        let cycles = raw.get("move_cycle_m");
+        let cycle_of = |short: &str| -> Option<f32> {
+            match cycles? {
+                Value::Object(m) => {
+                    m.iter().find(|(k, _)| k.strip_suffix("@loop").unwrap_or(k) == short).and_then(|(_, v)| v.as_f64())
+                }
+                v if short == "move" => v.as_f64(),
+                _ => None,
+            }
+            .map(|c| c as f32)
+        };
         for full in raw.get("clips").and_then(Value::as_array).into_iter().flatten().filter_map(Value::as_str) {
-            let ci = info.and_then(|i| i.get(full));
+            let short = short_clip_name(key, full);
+            // Enemy sidecars key `clip_info` by the short name (`idle@loop`, `slam_trail`).
+            let ci = info.and_then(|i| {
+                i.get(full)
+                    .or_else(|| i.get(short))
+                    .or_else(|| i.get(full.strip_prefix(key).and_then(|r| r.strip_prefix('_')).unwrap_or(full)))
+            });
             let fps = ci.and_then(|c| c.get("fps")).and_then(Value::as_f64).unwrap_or(30.0) as f32;
             let hand = |side: &str| -> Option<HandVariant> {
                 let h = ci?.get("weapon_variant")?.get(side)?;
@@ -121,33 +159,62 @@ impl ModelMeta {
                         .collect(),
                 })
             };
+            let mut events: Vec<(String, f32)> = ci
+                .and_then(|c| c.get("events"))
+                .and_then(Value::as_object)
+                .map(|evs| {
+                    evs.iter()
+                        .filter_map(|(n, e)| {
+                            let t = e
+                                .get("time_s")
+                                .and_then(Value::as_f64)
+                                .or_else(|| e.get("frame").and_then(Value::as_f64).map(|f| f / f64::from(fps)))?;
+                            Some((n.clone(), t as f32))
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+            // Enemy sidecars: `clip_info.<clip>.events_s` and the top-level `clip_events_s`.
+            let timed = ci
+                .and_then(|c| c.get("events_s"))
+                .into_iter()
+                .chain(raw.get("clip_events_s").and_then(|e| e.get(full)))
+                .filter_map(Value::as_object)
+                .flatten();
+            for (n, e) in timed {
+                if let Some(t) = event_time(e) {
+                    events.push((n.trim_end_matches("_s").to_string(), t));
+                }
+            }
             let meta = ClipMeta {
                 looping: full.ends_with("@loop")
                     || ci.and_then(|c| c.get("loop")).and_then(Value::as_bool) == Some(true),
                 upper: ci.and_then(|c| c.get("layer")).and_then(Value::as_str) == Some("upper"),
                 design_speed: ci.and_then(|c| c.get("design_speed_mps")).and_then(Value::as_f64).map(|v| v as f32),
-                events: ci
-                    .and_then(|c| c.get("events"))
-                    .and_then(Value::as_object)
-                    .map(|evs| {
-                        evs.iter()
-                            .filter_map(|(n, e)| {
-                                let t = e
-                                    .get("time_s")
-                                    .and_then(Value::as_f64)
-                                    .or_else(|| e.get("frame").and_then(Value::as_f64).map(|f| f / f64::from(fps)))?;
-                                Some((n.clone(), t as f32))
-                            })
-                            .collect()
-                    })
-                    .unwrap_or_default(),
+                move_cycle: ci
+                    .and_then(|c| c.get("move_cycle_m"))
+                    .and_then(Value::as_f64)
+                    .map(|v| v as f32)
+                    .or_else(|| cycle_of(short)),
+                events,
                 hands: match (hand("L"), hand("R")) {
                     (Some(l), Some(r)) => Some([l, r]),
                     _ => None,
                 },
             };
-            clips.insert(short_clip_name(key, full).to_string(), meta);
+            clips.insert(short.to_string(), meta);
         }
+        let bounds = raw.get("bounds_m").and_then(|b| Some((vec3(b.get("min")?)?, vec3(b.get("max")?)?)));
+        let sockets = raw
+            .get("sockets")
+            .and_then(Value::as_object)
+            .map(|s| s.iter().filter_map(|(n, v)| Some((n.clone(), vec3(v.get("translation")?)?))).collect())
+            .unwrap_or_default();
+        let looks = raw
+            .get("variant_set")
+            .and_then(Value::as_array)
+            .map(|v| v.iter().filter_map(Value::as_str).map(str::to_string).collect())
+            .unwrap_or_default();
         let pair = |v: Option<&Value>| -> Option<[String; 2]> {
             let v = v?;
             Some([v.get("L")?.as_str()?.to_string(), v.get("R")?.as_str()?.to_string()])
@@ -160,6 +227,9 @@ impl ModelMeta {
             fist_nodes: pair(variants.and_then(|v| v.get("fist"))),
             open_nodes: pair(variants.and_then(|v| v.get("open"))),
             height: raw.get("height_m").and_then(Value::as_f64).map(|h| h as f32),
+            variants: looks,
+            bounds,
+            sockets,
             raw,
         }
     }
@@ -264,6 +334,25 @@ impl Models {
         matches!(self.entries.get(&(kind, key.to_string())), Some(Entry::Missing | Entry::Failed))
     }
 
+    /// The looks of a key (its sidecar's `variant_set`, files that exist), starting every load:
+    /// `[key]` for a key with one look, empty for a key without a model.
+    pub fn looks(&mut self, kind: ModelKind, key: &str, server: &AssetServer) -> Vec<String> {
+        self.get(kind, key, server);
+        let set = match self.entries.get(&(kind, key.to_string())) {
+            Some(Entry::Loading { meta, .. }) => meta.variants.clone(),
+            Some(Entry::Ready(m)) => m.meta.variants.clone(),
+            _ => return Vec::new(),
+        };
+        let mut looks: Vec<String> = set.into_iter().filter(|k| self.exists(kind, k)).collect();
+        if looks.is_empty() {
+            looks.push(key.to_string());
+        }
+        for k in &looks {
+            self.get(kind, k, server);
+        }
+        looks
+    }
+
     fn start(&self, kind: ModelKind, key: &str, server: &AssetServer) -> Entry {
         if !self.exists(kind, key) {
             return Entry::Missing;
@@ -352,8 +441,31 @@ pub enum Skin {
     Ghost(u8),
     /// A hero's weapon: a quieter rim in the player's colour.
     Gear(u8),
-    /// Enemies: warm red rim.
-    Foe,
+    /// Enemies: warm red rim, with a tint (hit flash, wind-up blink, status). `hot` pushes the
+    /// emissive toward white (the Slag King's Final Pour).
+    Foe { tint: FoeTint, hot: bool },
+}
+
+impl Skin {
+    /// The plain enemy skin.
+    pub const FOE: Skin = Skin::Foe { tint: FoeTint::Base, hot: false };
+}
+
+/// A tint over an enemy's painted material. A handful per asset, cached like every skin, so a
+/// flashing horde swaps between shared handles and keeps batching.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum FoeTint {
+    Base,
+    /// A swarm hit: white-hot.
+    Flash,
+    /// An elite or boss hit: a warm lift that keeps the painted read.
+    SoftFlash,
+    /// The wind-up blink (the engine's red telegraph on the body).
+    Warn,
+    Frozen,
+    Stunned,
+    /// Status bit n (burn, shock, void, plague, bleed, …).
+    Status(u8),
 }
 
 /// Toon materials made from glTF materials, per (source, skin).
@@ -420,8 +532,60 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
             base.emissive = LinearRgba::rgb(l.red, l.green, l.blue) + base.emissive * 0.5;
             toon_from_standard(base, &ToonStyle::hero(c))
         }
-        Skin::Foe => {
-            let style = ToonStyle { ink_width: 0.12, ink: 0.5, ..ToonStyle::foe() };
+        Skin::Foe { tint, hot } => {
+            if hot {
+                // The Final Pour: every glow runs hotter and whiter (the white crown, the core).
+                base.emissive =
+                    LinearRgba::rgb(base.emissive.red * 2.2, base.emissive.green * 2.1, base.emissive.blue * 1.9)
+                        + LinearRgba::rgb(0.05, 0.04, 0.03);
+            }
+            let tone = |c: Color| {
+                let l = c.to_linear();
+                LinearRgba::rgb(l.red, l.green, l.blue)
+            };
+            let mul = |base: &mut StandardMaterial, k: LinearRgba| {
+                let c = base.base_color.to_linear();
+                base.base_color = Color::linear_rgba(c.red * k.red, c.green * k.green, c.blue * k.blue, c.alpha);
+            };
+            let mut style = ToonStyle { ink_width: 0.12, ink: 0.5, ..ToonStyle::foe() };
+            match tint {
+                FoeTint::Base => {}
+                FoeTint::Flash => {
+                    // The whole body goes white-hot for a frame or two (the painted glow map would
+                    // only light the cracks).
+                    mul(&mut base, LinearRgba::rgb(1.6, 1.5, 1.4));
+                    base.emissive_texture = None;
+                    base.emissive = LinearRgba::rgb(1.6, 1.35, 1.05);
+                    style.rim_strength = 1.4;
+                }
+                FoeTint::SoftFlash => {
+                    mul(&mut base, LinearRgba::rgb(1.35, 1.25, 1.12));
+                    base.emissive = base.emissive * 1.7 + LinearRgba::rgb(0.06, 0.04, 0.02);
+                    style.rim_strength = 1.3;
+                }
+                FoeTint::Warn => {
+                    let d = tone(pal.danger);
+                    mul(&mut base, LinearRgba::rgb(0.55 + d.red, 0.45 + d.green * 0.5, 0.45 + d.blue * 0.5));
+                    base.emissive_texture = None;
+                    base.emissive = d * 0.55;
+                    style.rim = hdr(pal.danger, 2.6);
+                }
+                FoeTint::Frozen => {
+                    mul(&mut base, LinearRgba::rgb(0.75, 0.95, 1.35));
+                    base.emissive = base.emissive * 0.35 + LinearRgba::rgb(0.02, 0.05, 0.08);
+                    style.rim = hdr(hex("#BFE8FF"), 2.2);
+                }
+                FoeTint::Stunned => {
+                    mul(&mut base, LinearRgba::rgb(1.3, 1.2, 0.8));
+                    style.rim = hdr(hex("#FFE27A"), 2.2);
+                }
+                FoeTint::Status(bit) => {
+                    let s = tone(status_color(bit));
+                    mul(&mut base, LinearRgba::rgb(0.55 + s.red * 0.7, 0.55 + s.green * 0.7, 0.55 + s.blue * 0.7));
+                    base.emissive = base.emissive + s * 0.12;
+                    style.rim = hdr(status_color(bit), 2.2);
+                }
+            }
             toon_from_standard(base, &style)
         }
     }
@@ -453,6 +617,27 @@ pub struct ModelParts {
 impl ModelParts {
     pub fn node(&self, name: &str) -> Option<Entity> {
         self.nodes.get(name).copied()
+    }
+}
+
+/// Paint every mesh of a ready instance with `skin` (nothing to do when it already wears it).
+pub fn reskin(
+    commands: &mut Commands,
+    parts: &mut ModelParts,
+    skin: Skin,
+    cache: &mut SkinCache,
+    stds: &Assets<StandardMaterial>,
+    toons: &mut Assets<ToonMaterial>,
+    pal: &Palette,
+) {
+    if parts.skin == Some(skin) {
+        return;
+    }
+    parts.skin = Some(skin);
+    for (e, source) in &parts.meshes {
+        if let Some(toon) = cache.get(source, skin, stds, toons, pal) {
+            commands.entity(*e).insert(MeshMaterial3d(toon));
+        }
     }
 }
 

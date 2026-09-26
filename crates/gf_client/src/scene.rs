@@ -7,14 +7,14 @@
 //!   everything else eases toward its latest authoritative position.
 //! * The local player renders at its predicted position (see `net::Prediction`).
 
-use crate::anim::HeroAnim;
+use crate::anim::{EnemyAnim, HeroAnim};
 use crate::camera::{KeyLight, w3};
 use crate::input::InputState;
 use crate::materials::{AbyssMaterial, BiomeLook, FloorMaterial, ToonMaterial, XRayMaterial, xray};
-use crate::models::{self, HeroGear, ModelKind, ModelParts, Models, Skin};
+use crate::models::{self, FoeTint, HeroGear, ModelKind, ModelParts, Models, Skin, SkinCache};
 use crate::net::{CurrentRoom, Link, Prediction};
 use crate::palette::{
-    Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, poi_kind_color, rarity_color, yaw,
+    Look, Mat, Palette, element_color, flat, hdr, hex, lighten, mix, poi_kind_color, rarity_color, status_color, yaw,
 };
 use crate::world::{self, EnvLights, WorldStores};
 use crate::{ClientConfig, ClientSet};
@@ -29,7 +29,7 @@ use gf_engine::prelude::*;
 use gf_net::quant::{u8_to_dir, u8_to_frac, u16_to_dir};
 use gf_net::*;
 use std::collections::HashMap;
-use std::f32::consts::{FRAC_PI_2, FRAC_PI_4};
+use std::f32::consts::{FRAC_PI_2, FRAC_PI_4, PI, TAU};
 
 const PROJECTILE_HEIGHT: f32 = 0.9;
 /// How far (m) a glTF hero's x-ray proxies slide toward the lens: past a fist or a cannon thrust at
@@ -52,6 +52,11 @@ const INK: &str = "#140C08";
 
 #[derive(Component)]
 pub struct RoomGeometry;
+
+/// An angle in (−π, π].
+fn wrap_angle(a: f32) -> f32 {
+    (a + PI).rem_euclid(TAU) - PI
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum Tint {
@@ -91,10 +96,33 @@ pub struct Visual {
     fresh: bool,
     body: Option<Entity>,
     /// Animated children: telegraph fill / hold progress, ring, anvil hot glow, dim beacon (an
-    /// incomplete objective), bright beacon (a live one).
+    /// incomplete objective), bright beacon (a live one). Enemies: [_, elite ring, contact shadow, _, _].
     parts: [Option<Entity>; 5],
     tint: Tint,
     base_mat: Option<Handle<ToonMaterial>>,
+    /// Seconds since this proxy appeared.
+    pub age: f32,
+    /// Enemies: the rendered facing (sim angle), eased toward `facing` (or `face_override`).
+    pub shown_facing: f32,
+    /// Enemies: face this sim angle instead of the replicated facing (set by `anim.rs` while an
+    /// attack or a boss turns on its target).
+    pub face_override: Option<f32>,
+    /// Height (m) hits land at: the model's `hit_center`, else a guess from the greybox body.
+    pub hit_height: f32,
+    /// The Slag King's Final Pour: every glow runs white-hot (set by `anim.rs`).
+    pub hot: bool,
+    /// Enemies: the authored model (`models::spawn_model`) under this proxy, once spawned.
+    pub model: Option<Entity>,
+    /// The model is in: the greybox body pieces are hidden.
+    pub model_shown: bool,
+    /// The model file (the look picked from the sidecar's `variant_set`).
+    pub look: Option<String>,
+    /// No model for this key (or `--greybox`): the greybox stays.
+    no_model: bool,
+    /// Greybox body pieces a model replaces (the elite ring and the contact shadow stay).
+    greybox: Vec<Entity>,
+    /// Rising out of the ground (`EntityFlags::EMERGING`): 1 = sunk, 0 = up.
+    rise: f32,
 }
 
 impl Visual {
@@ -120,8 +148,20 @@ impl Visual {
             parts: [None; 5],
             tint: Tint::Base,
             base_mat: None,
+            age: 0.0,
+            shown_facing: 0.0,
+            face_override: None,
+            hit_height: (lift + radius).max(0.5),
+            hot: false,
+            model: None,
+            model_shown: false,
+            look: None,
+            no_model: false,
+            greybox: Vec::new(),
+            rise: if e.flags.contains(EntityFlags::EMERGING) { 1.0 } else { 0.0 },
         };
         v.update(e);
+        v.shown_facing = v.facing;
         v
     }
 
@@ -193,6 +233,11 @@ pub struct SceneIndex {
     pub players: [Option<Entity>; 4],
     /// Live projectile / hazard / telegraph count (VFX LOD input).
     pub effect_count: u32,
+    /// Entities that appeared in this frame's snapshot (empty on frames without one): `anim.rs`
+    /// reads boss attacks, lobs and summons from the telegraphs, shots and adds they bring.
+    pub fresh: Vec<EntityView>,
+    /// Enemies playing their death on a lingering proxy ([`Corpse`]).
+    corpses: Vec<Entity>,
     room_generation: Option<u32>,
     last_tick: Option<u32>,
     stamp: u32,
@@ -209,12 +254,38 @@ impl SceneIndex {
         for (e, _) in self.visuals.values() {
             commands.entity(*e).despawn();
         }
-        for e in self.players.iter().flatten() {
+        for e in self.players.iter().flatten().chain(&self.corpses) {
             commands.entity(*e).despawn();
         }
         *self = SceneIndex::default();
     }
 }
+
+/// A slain enemy's proxy, kept after it left the snapshot to play its death clip (`anim.rs`
+/// starts it and sets `hold`), then sunk into the ground and despawned.
+#[derive(Component, Debug)]
+pub struct Corpse {
+    pub id: NetId,
+    /// The clip: `death`, or `attack` for a Bomber whose fuse ran out (the detonation).
+    pub clip: &'static str,
+    pub age: f32,
+    /// Seconds the proxy stands before it sinks (infinite until the animation sets it).
+    pub hold: f32,
+    /// How far it sinks (m).
+    pub depth: f32,
+    /// Swarms fade to ash in their clip: the contact shadow goes with them.
+    pub swarm: bool,
+    shadow: Option<Entity>,
+}
+
+/// How long a sinking corpse takes to go under (s).
+const CORPSE_SINK: f32 = 0.9;
+/// A corpse whose animation never started goes after this long (s).
+const CORPSE_MAX: f32 = 6.0;
+
+/// Recently slain enemies (a kill and its removal may arrive a snapshot apart).
+#[derive(Resource, Default)]
+struct RecentKills(HashMap<NetId, f32>);
 
 /// Each slot's x-ray silhouette material (heroes seen through whatever hides them).
 #[derive(Resource)]
@@ -227,22 +298,27 @@ fn setup_xray(mut commands: Commands, pal: Res<Palette>, mut xrays: ResMut<Asset
 }
 
 pub fn build(app: &mut App) {
-    app.init_resource::<SceneIndex>().add_systems(Startup, (spawn_markers, setup_xray)).add_systems(
-        Update,
-        (
-            rebuild_room,
-            sync_entities,
-            hit_flash,
-            animate_entities,
-            cap_ally_fields,
-            tint_entities,
-            animate_anvils,
-            sync_players,
-            update_markers,
-        )
-            .chain()
-            .in_set(ClientSet::Scene),
-    );
+    app.init_resource::<SceneIndex>()
+        .init_resource::<RecentKills>()
+        .add_systems(Startup, (spawn_markers, setup_xray))
+        .add_systems(
+            Update,
+            (
+                rebuild_room,
+                sync_entities,
+                sync_enemy_models,
+                tick_corpses,
+                hit_flash,
+                animate_entities,
+                cap_ally_fields,
+                tint_entities,
+                animate_anvils,
+                sync_players,
+                update_markers,
+            )
+                .chain()
+                .in_set(ClientSet::Scene),
+        );
 }
 
 /// The mesh and material stores every spawner needs.
@@ -284,7 +360,7 @@ impl<'a, 'w, 's> Kit<'a, 'w, 's> {
     }
 
     /// Soft contact shadow (no shadow maps: cheap and readable at 400 enemies).
-    fn shadow(&mut self, parent: Entity, radius: f32, lift: f32) {
+    fn shadow(&mut self, parent: Entity, radius: f32, lift: f32) -> Entity {
         let m = Mat::Std(self.pal.blob_shadow(self.mats, 0.6));
         let disc = self.pal.disc.clone();
         let e = self.child(
@@ -298,6 +374,7 @@ impl<'a, 'w, 's> Kit<'a, 'w, 's> {
             },
         );
         self.commands.entity(e).insert(NotShadowCaster);
+        e
     }
 }
 
@@ -370,14 +447,25 @@ fn room_is_map(current: &CurrentRoom) -> bool {
 #[allow(clippy::too_many_arguments)]
 fn sync_entities(
     mut commands: Commands,
+    time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     mut pal: ResMut<Palette>,
     mut stores: Stores,
     mut index: ResMut<SceneIndex>,
+    mut kills: ResMut<RecentKills>,
     room: Res<CurrentRoom>,
+    mut last_room: Local<u32>,
     mut visuals: Query<&mut Visual>,
 ) {
+    index.fresh.clear();
+    let now = time.elapsed_secs();
+    for ev in &link.fresh_events {
+        if let GameEvent::Kill { target, .. } = *ev {
+            kills.0.insert(target, now);
+        }
+    }
+    kills.0.retain(|_, t| now - *t < 1.0);
     let Some(world) = link.latest.clone() else { return };
     if index.last_tick == Some(world.tick) {
         return;
@@ -388,6 +476,10 @@ fn sync_entities(
     let me = link.slot;
     let ally_alpha = cfg.content.game.vfx.ally_effect_alpha;
     let mut effects = 0;
+    // A room change clears the field: nothing left behind plays a death.
+    let same_room = *last_room == room.generation;
+    *last_room = room.generation;
+    let mut fresh = std::mem::take(&mut index.fresh);
     let mut kit = Kit::new(&mut commands, &mut pal, &mut stores);
     for e in &world.entities {
         if matches!(
@@ -408,15 +500,187 @@ fn sync_entities(
         }
         let ent = spawn_visual(&mut kit, &cfg.content, room.def.map.as_deref(), e, me, ally_alpha);
         index.visuals.insert(e.id, (ent, stamp));
+        fresh.push(*e);
     }
+    index.fresh = fresh;
     index.effect_count = effects;
-    index.visuals.retain(|_, (ent, seen)| {
+    let mut corpses = Vec::new();
+    index.visuals.retain(|id, (ent, seen)| {
         if *seen == stamp {
-            true
-        } else {
-            commands.entity(*ent).despawn();
-            false
+            return true;
         }
+        // A slain enemy with an animated model plays its death on the proxy first; so does a
+        // Bomber whose fuse ran out (its `attack` is the detonation).
+        let corpse = visuals.get(*ent).ok().filter(|v| v.model_shown && same_room).and_then(|v| {
+            let clip = if kills.0.contains_key(id) {
+                "death"
+            } else if v.flags.contains(EntityFlags::PRIMED) {
+                "attack"
+            } else {
+                return None;
+            };
+            Some(Corpse {
+                id: *id,
+                clip,
+                age: 0.0,
+                hold: f32::INFINITY,
+                depth: v.radius * 2.0 + 0.5,
+                swarm: v.radius < 0.8,
+                shadow: v.parts[2],
+            })
+        });
+        match corpse {
+            Some(c) => {
+                if let Ok(v) = visuals.get(*ent)
+                    && let Some(ring) = v.parts[1]
+                {
+                    commands.entity(ring).insert(Visibility::Hidden);
+                }
+                commands.entity(*ent).remove::<Visual>().insert(c);
+                corpses.push(*ent);
+            }
+            None => commands.entity(*ent).despawn(),
+        }
+        false
+    });
+    index.corpses.extend(corpses);
+}
+
+/// A stable pick from `n` looks for one enemy (hashed, so consecutive ids do not stripe).
+fn pick_look(id: NetId, n: usize) -> usize {
+    let mut h = id.0.wrapping_mul(0x9E37_79B9);
+    h ^= h >> 15;
+    h = h.wrapping_mul(0x85EB_CA6B);
+    h ^= h >> 13;
+    (h as usize) % n.max(1)
+}
+
+/// Scale that fits a model's footprint to its collider when the art is far off the contract's
+/// 2.2-3 × radius (docs/art/ENEMIES.md §2); authored-to-size models keep 1.
+fn fit_scale(bounds: Option<(Vec3, Vec3)>, radius: f32) -> f32 {
+    let Some((lo, hi)) = bounds else { return 1.0 };
+    let footprint = (hi.x - lo.x).max(hi.z - lo.z);
+    let ratio = footprint / (2.0 * radius).max(0.1);
+    if ratio > 5.0 {
+        5.0 / ratio
+    } else if ratio < 0.7 && ratio > 0.0 {
+        0.7 / ratio
+    } else {
+        1.0
+    }
+}
+
+/// Swap enemy greyboxes for their authored models (docs/art/ENEMIES.md): preload the biome's
+/// roster, pick each enemy's look from its key's `variant_set` by `NetId`, spawn the model under
+/// the proxy (facing +Z, so turned by π; its origin on the ground under a hovering greybox), and
+/// hide the greybox body once the model is ready. The elite ring and the contact shadow stay.
+#[allow(clippy::too_many_arguments)]
+fn sync_enemy_models(
+    mut commands: Commands,
+    cfg: Res<ClientConfig>,
+    link: Res<Link>,
+    server: Res<AssetServer>,
+    mut models: ResMut<Models>,
+    mut preloaded: Local<Option<u16>>,
+    mut q: Query<(Entity, &mut Visual)>,
+    ready: Query<(), With<ModelParts>>,
+    mut vis: Query<&mut Visibility>,
+) {
+    let Some(world) = link.latest.as_deref() else { return };
+    let db = &cfg.content;
+    // The biome's roster loads up front, so a horde surge never waits on a file.
+    if *preloaded != Some(world.run.biome) && !models.greybox {
+        *preloaded = Some(world.run.biome);
+        if let Some(biome) = db.biomes.try_get(world.run.biome) {
+            for d in db.enemies.iter().filter(|d| d.biome == biome.key) {
+                models.looks(ModelKind::Enemy, &d.key, &server);
+            }
+        }
+    }
+    for (ent, mut v) in &mut q {
+        let EntityKind::Enemy { def } = v.kind else { continue };
+        if v.no_model {
+            continue;
+        }
+        let Some(model_e) = v.model else {
+            let Some(d) = db.enemies.try_get(def) else {
+                v.no_model = true;
+                continue;
+            };
+            if v.look.is_none() {
+                let looks = models.looks(ModelKind::Enemy, &d.key, &server);
+                if looks.is_empty() {
+                    v.no_model = models.missing(ModelKind::Enemy, &d.key);
+                    continue;
+                }
+                v.look = Some(looks[pick_look(v.id, looks.len())].clone());
+            }
+            let look = v.look.clone().unwrap_or_default();
+            match models.get(ModelKind::Enemy, &look, &server) {
+                Some(model) => {
+                    let s = fit_scale(model.meta.bounds, v.radius);
+                    let tf = Transform {
+                        translation: Vec3::Y * -v.lift,
+                        rotation: Quat::from_rotation_y(std::f32::consts::PI),
+                        scale: Vec3::splat(s),
+                    };
+                    let e = models::spawn_model(&mut commands, ent, &model, Skin::FOE, tf);
+                    // A summoned add pops from its ember (`spawn`) when there is one.
+                    let fresh = v.age < 0.35;
+                    commands.entity(e).insert(EnemyAnim::new(ent, v.id, d, db, fresh));
+                    v.model = Some(e);
+                    if let Some(hc) = model.meta.sockets.get("hit_center") {
+                        v.hit_height = hc.y * s;
+                    }
+                }
+                None if models.missing(ModelKind::Enemy, &look) => v.no_model = true,
+                None => {}
+            }
+            continue;
+        };
+        if !v.model_shown && ready.contains(model_e) {
+            v.model_shown = true;
+            for &e in &v.greybox {
+                if let Ok(mut vv) = vis.get_mut(e) {
+                    *vv = Visibility::Hidden;
+                }
+            }
+        }
+    }
+}
+
+/// Corpses stand for their death clip, then sink and go.
+fn tick_corpses(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut index: ResMut<SceneIndex>,
+    mut q: Query<(&mut Corpse, &mut Transform)>,
+    mut vis: Query<&mut Visibility>,
+) {
+    let dt = time.delta_secs();
+    index.corpses.retain(|&e| {
+        let Ok((mut c, mut tf)) = q.get_mut(e) else { return false };
+        c.age += dt;
+        tf.scale = Vec3::ONE;
+        if c.hold.is_infinite() && c.age > CORPSE_MAX {
+            c.hold = c.age;
+        }
+        let sink = (c.age - c.hold) / CORPSE_SINK;
+        if sink > 0.0
+            && c.swarm
+            && let Some(s) = c.shadow.take()
+            && let Ok(mut v) = vis.get_mut(s)
+        {
+            *v = Visibility::Hidden;
+        }
+        if sink >= 1.0 {
+            commands.entity(e).despawn();
+            return false;
+        }
+        if sink > 0.0 {
+            tf.translation.y -= c.depth * dt / CORPSE_SINK;
+        }
+        true
     });
 }
 
@@ -751,12 +1015,15 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
         ),
     };
     let body = kit.child(parent, body_mesh, base.clone(), body_tf);
+    // Every greybox body piece, hidden once the authored model is in.
+    let mut greybox = vec![body];
     if shape != EnemyShape::Wisp {
         let ink = kit.mat(hex(INK), Look::Ink);
         // The ink hull grows with the body, so a big foe keeps a bold outline against the ground.
         let hull = Vec3::splat(0.1 + 0.07 * r);
         let outline = kit.child(parent, body_mesh, ink, Transform { scale: body_tf.scale + hull, ..body_tf });
         kit.commands.entity(outline).insert(NotShadowCaster);
+        greybox.push(outline);
     }
     let eye_size = (r * 0.17).max(0.07);
     for x in [-0.3, 0.3] {
@@ -767,6 +1034,7 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
             Transform::from_xyz(x * r, eye_y, eye_z).with_scale(Vec3::splat(eye_size)),
         );
         kit.commands.entity(e).insert(NotShadowCaster);
+        greybox.push(e);
     }
     // Silhouette accents: ember crowns on blobs, ears on hounds, mandibles on crawlers.
     let accent = kit.mat(lighten(mix(color, hex("#FFD27A"), 0.55), 1.1), Look::Glow);
@@ -780,20 +1048,21 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
                 Transform::from_xyz(0.0, r * 1.75, 0.0).with_scale(Vec3::new(r * 0.32, r * 0.7, r * 0.32)),
             );
             kit.commands.entity(f).insert(NotShadowCaster);
+            greybox.push(f);
         }
         EnemyShape::Hound => {
             for x in [-0.35, 0.35] {
-                kit.child(
+                greybox.push(kit.child(
                     parent,
                     &cone,
                     dark.clone(),
                     Transform::from_xyz(x * r, r * 1.3, -r * 0.8).with_scale(Vec3::new(r * 0.2, r * 0.55, r * 0.2)),
-                );
+                ));
             }
         }
         EnemyShape::Crawler => {
             for x in [-0.4, 0.4] {
-                kit.child(
+                greybox.push(kit.child(
                     parent,
                     &cone,
                     dark.clone(),
@@ -802,24 +1071,24 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
                         rotation: Quat::from_rotation_x(-FRAC_PI_2),
                         scale: Vec3::new(r * 0.16, r * 0.6, r * 0.16),
                     },
-                );
+                ));
             }
         }
         EnemyShape::Brute => {
             for x in [-1.0, 1.0] {
-                kit.child(
+                greybox.push(kit.child(
                     parent,
                     &sphere,
                     dark.clone(),
                     Transform::from_xyz(x * r * 0.95, r * 1.75, 0.0).with_scale(Vec3::splat(r * 0.42)),
-                );
+                ));
             }
         }
         _ => {}
     }
     if shape == EnemyShape::Wisp {
         let trail = kit.mat(hdr(color, 1.5).with_alpha(0.4), Look::Decal);
-        kit.child(
+        greybox.push(kit.child(
             parent,
             &cone,
             trail,
@@ -828,31 +1097,36 @@ fn spawn_enemy(kit: &mut Kit, db: &ContentDb, parent: Entity, e: &EntityView, de
                 rotation: Quat::from_rotation_x(-FRAC_PI_2),
                 scale: Vec3::new(r * 0.6, r * 1.6, r * 0.6),
             },
-        );
+        ));
     }
+    let mut ring_ent = None;
     if e.flags.contains(EntityFlags::ELITE) || boss {
         let ring = kit.mat(if boss { hdr(kit.pal.danger, 1.5) } else { hex(GOLD) }, Look::Metal);
-        kit.child(
+        ring_ent = Some(kit.child(
             parent,
             &torus,
             ring,
             Transform::from_xyz(0.0, 0.08 - lift, 0.0).with_scale(Vec3::new(r * 1.45, 1.5, r * 1.45)),
-        );
+        ));
     }
     if boss {
         let crown = kit.mat(hex(GOLD), Look::Metal);
         let top = body_tf.translation.y + body_tf.scale.y * 0.5 + 0.2;
-        kit.child(
+        greybox.push(kit.child(
             parent,
             &torus,
             crown,
             Transform::from_xyz(0.0, top, 0.0).with_scale(Vec3::new(r * 0.55, 4.0, r * 0.55)),
-        );
+        ));
     }
-    kit.shadow(parent, r * 1.2, lift);
+    let shadow = kit.shadow(parent, r * 1.2, lift);
     let mut v = Visual::new(e, color, r, lift);
     v.body = Some(body);
     v.base_mat = base.toon();
+    v.parts[1] = ring_ent;
+    v.parts[2] = Some(shadow);
+    v.hit_height = (body_tf.translation.y + lift).max(0.4);
+    v.greybox = greybox;
     v
 }
 
@@ -1238,6 +1512,7 @@ fn hit_flash(link: Res<Link>, index: Res<SceneIndex>, mut visuals: Query<&mut Vi
 
 fn animate_entities(
     time: Res<Time>,
+    cfg: Res<ClientConfig>,
     link: Res<Link>,
     mut q: Query<(&mut Visual, &mut Transform)>,
     mut parts: Query<&mut Transform, Without<Visual>>,
@@ -1246,9 +1521,11 @@ fn animate_entities(
     let dt = time.delta_secs();
     let t = time.elapsed_secs();
     let ease = 1.0 - (-18.0 * dt).exp();
+    let emerge = cfg.content.game.expedition.horde.emerge_time.max(0.05);
     for (mut v, mut tf) in &mut q {
         v.flash = (v.flash - dt).max(0.0);
         v.flash_cool = (v.flash_cool - dt).max(0.0);
+        v.age += dt;
         let target = match v.motion {
             Some(m) => v.pos + m.vel.to_vec2() * ((rt - m.t0 as f64).max(0.0) as f32 * gf_core::SIM_DT),
             None => v.pos,
@@ -1263,13 +1540,30 @@ fn animate_entities(
         let phase = (v.id.0 % 97) as f32 * 0.37;
         match v.kind {
             EntityKind::Enemy { .. } => {
+                // An authored model carries its own wind-up, hover and hit reaction: the greybox's
+                // throb, bob and squash only whisper under it.
+                let model = v.model_shown;
                 let warn = v.flags.intersects(EntityFlags::WINDUP | EntityFlags::PRIMED | EntityFlags::CHARGING);
-                let pulse = if warn { 1.0 + 0.08 * (t * 24.0).sin() } else { 1.0 };
+                let pulse = if warn && !model { 1.0 + 0.08 * (t * 24.0).sin() } else { 1.0 };
                 // Big bodies barely squash: a hit reads on their rim, not as a jelly wobble.
-                let squash = v.flash * if v.radius > 1.0 { 0.8 } else { 2.2 };
-                let bob = if v.lift > 0.0 { 0.12 * (t * 3.0 + phase).sin() } else { 0.0 };
-                tf.translation = w3(v.shown, v.lift + bob);
-                tf.rotation = yaw(v.facing);
+                let squash = v.flash * if v.radius > 1.0 { 0.8 } else { 2.2 } * if model { 0.3 } else { 1.0 };
+                let bob = if v.lift > 0.0 && !model { 0.12 * (t * 3.0 + phase).sin() } else { 0.0 };
+                // A horde spawn rises out of the ground.
+                v.rise = (v.rise - dt / emerge).max(0.0);
+                let sunk = v.rise * v.rise * (v.radius * 2.5 + 0.4);
+                tf.translation = w3(v.shown, v.lift + bob - sunk);
+                // Turn toward the facing instead of snapping (Swarmer jitter, quantized angles).
+                let want = v.face_override.unwrap_or(v.facing);
+                let k = if v.radius > 1.5 {
+                    4.0
+                } else if v.radius > 0.6 {
+                    9.0
+                } else {
+                    16.0
+                };
+                let f = v.shown_facing;
+                v.shown_facing = wrap_angle(f + wrap_angle(want - f) * (1.0 - (-k * dt).exp()));
+                tf.rotation = yaw(v.shown_facing);
                 tf.scale =
                     Vec3::new(pulse * (1.0 + squash * 0.5), pulse * (1.0 - squash * 0.4), pulse * (1.0 + squash * 0.5));
             }
@@ -1363,23 +1657,17 @@ fn cap_ally_fields(link: Res<Link>, mut q: Query<(&Visual, &mut Visibility)>) {
     }
 }
 
-fn status_color(bit: u8) -> Color {
-    match bit {
-        0 => element_color(gf_core::damage::DamageType::Flame),
-        1 => element_color(gf_core::damage::DamageType::Storm),
-        2 => element_color(gf_core::damage::DamageType::Void),
-        3 => hex("#7BAE4A"),
-        4 => hex("#E0312B"),
-        _ => hex(GOLD),
-    }
-}
-
+#[allow(clippy::too_many_arguments)]
 fn tint_entities(
+    mut commands: Commands,
     time: Res<Time>,
     mut pal: ResMut<Palette>,
     mut toons: ResMut<Assets<ToonMaterial>>,
+    stds: Res<Assets<StandardMaterial>>,
+    mut skins: ResMut<SkinCache>,
     mut q: Query<&mut Visual>,
     mut bodies: Query<&mut MeshMaterial3d<ToonMaterial>>,
+    mut models: Query<&mut ModelParts>,
 ) {
     let blink = (time.elapsed_secs() * 14.0).sin() > 0.0;
     for mut v in &mut q {
@@ -1400,6 +1688,24 @@ fn tint_entities(
         } else {
             Tint::Base
         };
+        // An authored model swaps between a few cached tints of its own painted material.
+        if v.model_shown {
+            let foe = match tint {
+                Tint::Base => FoeTint::Base,
+                Tint::Flash => FoeTint::Flash,
+                Tint::SoftFlash => FoeTint::SoftFlash,
+                Tint::Warn => FoeTint::Warn,
+                Tint::Frozen => FoeTint::Frozen,
+                Tint::Stunned => FoeTint::Stunned,
+                Tint::Status(b) => FoeTint::Status(b),
+            };
+            if let Some(mut parts) = v.model.and_then(|m| models.get_mut(m).ok()) {
+                let skin = Skin::Foe { tint: foe, hot: v.hot };
+                models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
+            }
+            v.tint = tint;
+            continue;
+        }
         if tint == v.tint {
             continue;
         }

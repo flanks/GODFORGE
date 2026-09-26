@@ -298,6 +298,8 @@ fn spawn_from_events(
         Fx { commands: &mut commands, pal: &mut pal, mats: &mut mats, budget, alive: state.particles, rng: seed };
     let visual_pos =
         |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok()).map(|v| (v.shown, v.radius, v.color));
+    // Where a hit lands on a body: the model's `hit_center`, else the greybox body's middle.
+    let hit_at = |id: NetId| index.entity(id).and_then(|e| visuals.get(e).ok()).map(|v| w3(v.shown, v.hit_height));
     let player_pos = |slot: u8| world.players.iter().find(|p| p.slot == slot).map(|p| p.mover.pos);
     let mut new_numbers: Vec<(NetId, Vec3, u32, Color, f32)> = Vec::new();
     for ev in &link.fresh_events {
@@ -307,7 +309,8 @@ fn spawn_from_events(
                 let mine = me.is_some() && Some(source % 4) == me && source < 12;
                 if mine || tier == VfxTier::Full {
                     let n = scale_count(if crit { 4 } else { 2 });
-                    fx.burst(w3(p, 0.8), element_color(element), n, 4.0, 0.06, 0.25, 6.0);
+                    let at = hit_at(target).unwrap_or(w3(p, 0.8));
+                    fx.burst(at, element_color(element), n, 4.0, 0.06, 0.25, 6.0);
                 }
                 if settings.damage_numbers && mine && amount > 0 {
                     let color = if precision {
