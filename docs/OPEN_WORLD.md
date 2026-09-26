@@ -1,7 +1,8 @@
 # GODFORGE: Open Biomes (NIMRODS-style exploration)
 
-> **Status: decided, 2026-09-25. Phases 1 and 2 are done (2026-09-26); phase 3 is next.** This is
-> the single design for replacing the Hades-style room run with one huge generated map per biome.
+> **Status: decided, 2026-09-25. Phases 1 and 2 are done (2026-09-26). The composition pass
+> (§3.6) comes next, then phase 3.** This is the single design for replacing the Hades-style room
+> run with one huge generated map per biome.
 > It merges two competing proposals (see §1) and is written against the code at `c0bddae` (the
 > room-scale layout grammar merge). Implementation agents execute it phase by phase (§10) without
 > re-deciding anything. Every number here is a data default in `assets/content/*.ron` and is tuned
@@ -28,13 +29,21 @@
 >   - 4A: POI set pieces (shrine statue, anvil chain posts, reliquary plinths, vein crystals, lair
 >     walls, spring stones), waymarks at crossroads (`Decor::Waymark`, the objective's colour), a
 >     tall piece every ~25 u along roads, theme story clusters in the density top-up, road braziers
->     30–40 u apart, hub monuments on the hub's north rim.
+>     30–40 u apart, hub monuments on the hub's north rim. §3.6 supersedes three of these: the tall
+>     road pieces are off by default, the story clusters move onto the frame (one per region), and
+>     the spring stones become a painted ring. It also drops the clearing entry arches (§3.2 step
+>     10).
 >   - 4B / 4C: `FallenWeapon` joins Cinder's landmarks (0.7× height); region themes gained
 >     `names` (a pool the regions of one theme take in turn) and `ground` (paving offset, ash
 >     drifts) for the floor; the rim-lit coast lip, hot river banks and thick bridge decks landed.
 >   - 2A follow-up: river and chasm bands take one integer chamfer pass (45° reaches, not L
 >     shapes). The golden hash is `0xca3521382f4a6edd` (re-pinned for the new dressing streams
 >     and the chamfer).
+> * **Composition pass (specified 2026-09-26 in §3.6; next, before the phase 3 lanes):** the user
+>   found the map cluttered with pillars and walls and pointed at Hades II. The density top-up
+>   goes. Compositions back onto the coast and region borders, the shore gets a mostly visual
+>   frame, open fields keep at most one kiting anchor, and floor detail becomes paint. The EA room
+>   grammar follows the same rules. Targets are in §3.6.2 and acceptance in §3.6.12.
 
 ## 0. The decision in one page
 
@@ -141,7 +150,9 @@ hotspots, but its answers are too thin for AAA maps and split co-op:
 
 * **Cinder's `seals_required` is 7**, raised from 6 by the phase-2 bot run: with 6 the seed-7 bot
   cleared the map in 5.4 sim-min, under the 6–10 band of §11, because the Warlord and the boss die
-  in seconds to bot builds. With 7 it takes 6.1 sim-min.
+  in seconds to bot builds. With 7 it takes 6.1 sim-min (367.2 s). The composition pass (§3.6)
+  opens the map and speeds the run up, so its pacing check (§3.6.12) retunes this number or the
+  threat rows. Record the result here.
 * **Slice** (Cinder plus boss): 10–13 min for humans, 7–9 for bots. Acceptance #5 ("finish run 1 or
   die at boss 1 within 25 min") holds.
 * **EA run** (3 biomes): 33–40 min for humans, 25–30 for bots. This is the top of NEXT_SESSION's 20–35
@@ -272,24 +283,37 @@ Cinder defaults:
    the designed chokepoints. The MST guarantees connectivity.
 8. **POI sites** (§3.3). Each site stamps its plaza (`Plaza` tiles, radius from game.ron `pois[].plaza`)
    and a spur road to the nearest `Road` tile.
-9. **Regions are composed with the room grammar.** The procgen `Builder` gets map mode (§3.4). For
-   each region:
-   - a) Push roads, spurs and passes as `Lane`s, and POI plazas and the Landing as `keep`.
-   - b) Cut up to 4 **slots**: greedy maximal axis-aligned rectangles of `Ground` tiles (histogram
-     method, deterministic), shrunk by `PAD`, at least 16 × 12 u. Each slot's frame backs away from
-     the nearest road, so compositions open toward the fight.
-   - c) Fill slots from the theme's `districts` pool with `procgen::stamp(kind, frame)`, never
-     repeating within a region. A `fields` share of slots stays open (`procgen::field`).
+9. **Regions are composed with the room grammar**, under the composition rules of §3.6. The procgen
+   `Builder` gets map mode (§3.4). For each region:
+   - a) Push roads, spurs and bridge decks as `Lane`s. Nothing colliding may stand within half a
+     lane's width + `road_clear` of it. POI plazas, the Landing and hubs become `keep` disks, and
+     every pass a `pass_clear` keep-out.
+   - b) Cut up to `compose.slots` (5) **slots**: greedy maximal axis-aligned rectangles of `Ground`
+     tiles (histogram method, deterministic), shrunk by `PAD`, at least 16 × 12 u. **Edge slots**
+     come first: their back lies on the coast, a pit or a region border, never the south edge.
+     Open fields are cut from what is left (§3.6.4).
+   - c) Fill up to the theme's `comps` edge slots from its `districts` pool with
+     `procgen::stamp(kind, frame)`, never repeating within a region. Every other slot is an open
+     field: painted, and holding one kiting anchor unless the theme's `fields` share leaves it bare
+     (§3.6.3).
    - d) A grand monument (`monument(.., grand: true)`) at the region site when the region has no
      major POI, picked from `landmarks`.
-   - e) A density top-up (ruin clusters at slot skirts) up to the theme's `cover` target.
-   - f) Dressing on the region's dress stream: braziers every 16–22 u along roads, `Arch` over roads
-     at region borders, banners near shrines, rubble along walls, fissures, ground cover.
+   - e) Up to the theme's `story` clusters on the region's frame band (§3.6.4). The density top-up
+     is gone.
+   - f) The frame: coast anchors on the lay stream, then lip pieces and silhouettes on the dress
+     stream (§3.6.4, §3.6.5). Floor dressing follows on the dress stream: fissures only near heat,
+     and cobble islands (§3.6.7).
 10. **POI clearings.**
-    - Every POI gets a heart `FloorInlay` (variant by kind), a ring of braziers, and `arch`es where
-      roads enter.
+    - Every POI gets a heart `FloorInlay` (variant by kind), a ring of braziers, and its kind's set
+      pieces. Arches where roads enter are off by default (`compose.entry_arches`, §3.6.3).
     - The Gate gets a `SealedGate` monument with one socket per Seal.
     - The Warlord gets a `Crucible` or biome set piece at the plaza edge.
+    - Map-wide dressing runs last:
+      - road braziers 30–40 u apart;
+      - a brazier pair at every pass arch. The arches themselves go up before the regions compose,
+        wherever a road crosses a wall, ridge or open border; a bridge carries its own deck;
+      - waymarks, bridge decks, hubs and the Landing;
+      - then vignettes and light gaps (§3.6.6, §3.6.8).
 11. **Camps.** Rejection-sample land tiles at least 35 u from the Landing, 20 u from POIs and 6 u off
     roads, one camp per `camps.per_area` u². Each camp's pack comes from the theme's `camp_pool` (else
     the biome swarm), with `camps.elite_chance` of an elite leader.
@@ -352,6 +376,15 @@ print it.
   `pub(crate)`, so `worldgen` builds with them.
 * `resolve_room` routes `RoomKind::Expedition` to `worldgen::generate(db, t, seed)`. `is_generated_kind`
   includes `Expedition`. Seed 0 on an Expedition template means seed 1 (a map is never "authored").
+* The composition pass (§3.6) adds map-mode switches:
+  - `Builder.lane_pad` (`road_clear` on maps, 0 in rooms);
+  - `field()` lays paint only, and a new `anchor()` places the kiting anchor;
+  - `court()` spaces its columns wider and drops a side row;
+  - `fissure()` needs heat nearby.
+
+  `lane_pad` and the fissure rule stay map-only. The `field()`, `anchor()` and `court()` rules key
+  on `b.mask.is_some()` until the room pass (§3.6.10) makes them the room behaviour too. At that
+  point room layouts change on purpose, and the before/after `preview-sheet` is the check.
 
 ### 3.5 Biome identity (initial content)
 
@@ -365,6 +398,717 @@ print it.
 **The "Fallen Arms" motif (phase 4).** Colossal broken god-weapons are driven into the ground: a
 tower-sized sword, hammer, spear, bow or cannon. They give every map a navigable skyline and
 *The Last Arsenal* its battlefield. It is one new `Decor::FallenWeapon`.
+
+### 3.6 Composition and negative space
+
+> Specified 2026-09-26 after user feedback on the Cinder map: "lots of clutter … pillars and
+> walls … look at HADES II". Two read-only passes on `cinder_expedition` (an audit of where the
+> clutter comes from, and a study that applied these rules by hand to the real layouts) supply
+> every number here. This section supersedes the density top-up (§3.2 step 9e), the ruins inside
+> open fields, the road silhouettes and the clearing entry arches. §3.6.10 applies the same rules to
+> the EA room grammar.
+
+**The problem in numbers.**
+
+* The run-7 map has 1,508 colliding shapes and 3,106 decor pieces. That includes 520 pillars,
+  384 rubble heaps, 237 boulders, 235 forge walls and 428 glowing fissure segments.
+* About two thirds of the colliding shapes (≈ 950 of ≈ 1,430 per map) come from the density
+  top-up (`compose.rs::region` step e). The top-up exists only to reach the old room generator's
+  ~5 % floor cover.
+* Another 7 % are ruins inside "open" fields. The 28 fields on the run-7 map hold 244 colliding
+  pieces.
+* The land between roads, where kiting happens, is the densest: 6.5–7.4 % cover, against 5.1 %
+  overall.
+* Walkable floor is cramped:
+  - median clearance is 3.2–3.8 u;
+  - only 48 % of it lies inside a blocker-free disk of r 10;
+  - the largest open disk per region is r 10–18 (terrain alone allows r 30–78).
+
+**The reference.** We take qualities only; nothing is traced or copied. The sources are three
+local Hades II screenshots (`docs/media/reference/1–3.png`) and Hades 1 and 2 level art in general.
+Each quality becomes a generator rule:
+
+| # | Hades quality | Our rule | § |
+|---|---|---|---|
+| 1 | The combat floor is open. Its detail is painted (cobble patches, stains, cracks, tufts). | No fill. An open field keeps at most one kiting anchor. Rubble, ash and cracks become floor paint. | 3.6.3, 3.6.7 |
+| 2 | Density lives at the edges. Buildings, cliffs and foliage frame the space, with dark silhouettes along the camera-near edge. | Compositions back onto the coast or a region border. A visual frame stands on the cliff lip, with silhouettes in the void beyond. | 3.6.4, 3.6.5 |
+| 3 | Props sit in a few purposeful vignettes against walls. | Props appear only in vignettes, at set pieces, at wall bases and on road shoulders. | 3.6.6 |
+| 4 | Obstacles in the play space are rare and meaningful. | POI set pieces, hub monuments, one kiting anchor per field and one story cluster per region. | 3.6.3, 3.6.4 |
+| 5 | Warm light pools mark paths and interactables against a dark, cool surround. | Every screen has a warm pool. Flames sit on the frame or at interactables. POIs get a key light. The dusk between is cooler. | 3.6.8 |
+| 6 | The walkable boundary is an organic shape that reads clearly. | The coast stays as it is (already good). Barrier walls become broken runs, not tile staircases. | 3.6.4 |
+
+**Scale.** At our camera a hero is about 6 % of screen height, against 10–13 % in Hades II, so one
+of our screens covers about 4× the area of a Hades room. Hades rooms hold 0–2 interior obstacles per
+screen for 5–15 enemies. We fight up to 400 enemies and kiting matters, so we take the sparse end:
+**at most 2 interior colliding clusters per screen (median) and at most 4 (p90).**
+
+#### 3.6.1 Measurement
+
+Every number in §3.6 uses these definitions. They are implemented once, in `layout-stats --maps`
+(step 0 of §3.6.12), on a 0.5 u raster with exact distance transforms.
+
+* **Land** is `Ground | Road | Plaza | Bridge` tiles.
+* A **blocker** is an obstacle, a pit tile or the map rim.
+* **Walkable floor** is land that is not inside an obstacle.
+* **Clearance** of a floor point is its distance to the nearest blocker.
+* **Clear-disk share at r R** is the share of walkable floor covered by some blocker-free disk of
+  radius R.
+* **Interior** is land more than 6 u from every pit tile and every tile of another region.
+* **Cover** is obstacle area / land area. Interior cover is obstacle area / interior land area.
+* A **screen** is a 45 × 28 u window (the 4P view footprint at 55°, rounded down), stepped 9 × 7 u.
+  A window counts when ≥ 60 % of it is land. (The audit also used 50 × 34 u windows at half
+  overlap; its "per screen" figures are marked.)
+* A **cluster** is a connected group of obstacles whose gaps are ≤ `TOUCH` (0.3 u), so a wall run
+  counts once.
+  - It is in a screen when any of its shape centres is inside the screen.
+  - It is **interior** when its centroid is interior.
+* **Props** are `Rubble`, `Brazier`, `Clutter`, `Chains`, `BrokenAnvil`, `Banner` and `Waymark`.
+* A **warm source** is a `Brazier`, `GreatBrazier` or `Crucible` decor, a `Liquid` tile or a POI
+  heart.
+* **Frame mass** is a `Scenery` piece, a barrier wall or a composition footprint.
+* **Seeds.** The game's `--seed N` builds map seed `procgen::room_seed(N, 0)`:
+
+  | Run seed | Map seed |
+  |---|---|
+  | 3 | 2298633409 |
+  | 7 | 3047268829 |
+  | 11 | 3195035749 |
+
+  So `preview-room cinder_expedition 3047268829` shows the map that `--seed 7` plays.
+  `layout-stats --maps --seeds 8` uses map seeds 1–8.
+
+#### 3.6.2 Targets
+
+* **Before** is the mean over map seeds 1–8, with the run-7 map in brackets.
+* **Gate** means `layout-stats --maps` fails on a miss, the same way it fails on a repair.
+* **Report** means the value is printed and checked by eye in the acceptance (§3.6.12).
+
+| Metric | Before | Target | |
+|---|---|---|---|
+| Colliding obstacle shapes per map | 1,443 (1,508) | ≤ 550 | gate |
+| Colliding cover of land | 5.1 % (5.27 %) | ≤ 2.5 % | gate |
+| Interior cover | 4.3 % | ≤ 2.0 % overall. Each theme stays under its `cover` ceiling: slag flats and dunes 1.0 %, colonnade and chainyard 1.8 %, foundry 2.2 %. | gate |
+| Clusters per screen: median / p90 / max | 8.1 / 13.8 / 21.1 | ≤ 3 / ≤ 8 / ≤ 14. The edge screens carry the mass. | gate (median, p90) |
+| Interior clusters per screen: median / p90 | 4.4 / 8.4 | ≤ 2 / ≤ 4 | gate |
+| Median clearance of walkable floor | 3.8 u (audit raster: 3.2–3.5 u) | ≥ 7 u | gate |
+| Floor inside a clear disk of r 10 / r 16 | 48 % / 16 % | ≥ 80 % / ≥ 60 % | gate (r 10) |
+| Largest clear disk in the smallest region | r 12.3 (audit: r 10–18 per region) | ≥ r 15 in every region | gate |
+| Colliding shapes within road half-width + 4 u | 7.5 per 100 u of road | 0, except pass arches | gate |
+| Colliding shapes within a POI's plaza + 6 u | mixed | Only that POI's own set pieces. Its approach arcs (±30° around each way in, out to plaza + 10 u) are clear. | gate |
+| Props per map | 985 (1,088) | ≤ 650. Each one stands in a vignette, at a set piece or wall base, or on a road shoulder. | report |
+| Glowing fissure segments per screen, p90 | 11–12 | ≤ 6, and none farther than 9 u from heat | report |
+| Screens without a warm pool | 13–15 % | 0 % | report |
+| Screens with frame mass | — | ≥ 70 % | report |
+| Barren screens (no solid and no POI) | — | ≤ 10 % | report |
+| Obstacles per 50 × 34 u audit window, median | 22–25 | ≤ 9 | report |
+| Generation | 9–11 ms, 0 repairs, 0 relaxed, 17/17 POIs | ≤ 60 ms release, 0 repairs, 0 relaxed, every POI placed | gate (existing) |
+
+The study applied the rules by hand to the eight layouts. It reached every gate:
+
+* 484 shapes (361–544);
+* 2.3 % cover, 1.7 % interior;
+* clusters 3.1 / 7.5 / 14.1, interior 1.3 / 4.1;
+* 7.4 u median clearance;
+* 85 % / 68 % clear-disk shares;
+* r 17.6 in the smallest region.
+
+**Per kind** counts come from the preview legend for run maps 3 / 7 / 11. Each ceiling is loose on
+its own; the shape total (≤ 550) is the one that binds.
+
+| Kind | Before | After ≤ | What stays |
+|---|---|---|---|
+| Pillar | 522 / 520 / 472 | 100 | Colonnade columns in compositions, anvil and crucible chain posts, chainyard story posts |
+| Boulder | 240 / 237 / 244 | 110 | Coast anchors, field anchors, slag-heap stories |
+| Wall (Forge) | 182 / 235 / 155 | 100 | Barrier runs, forge-hall walls, crucible stations, foundry story chimneys (north frame only) |
+| Wall (Ruin) | 72 / 73 / 84 | 55 | Composition walls, lair rims |
+| Wall (Plinth) | 67 / 67 / 66 | 25 | Reliquary plinths, plinth anchors |
+| FallenColumn | 30 / 32 / 22 | 12 | At most one per composition, and column anchors |
+| Arch | 61 / 49 / 51 | 22 | One per road pass, and colonnade stories |
+| Landmarks (Statue, GreatAnvil, Crucible, ColossusHead, FallenWeapon, GreatBrazier, SealedGate, Crystal) | as mapped | ≤ before | All of them |
+| Rubble | 364 / 384 / 361 | 110 | Wall bases and breaches, vignettes |
+| Overgrowth | 236 / 230 / 232 | 30 | Vignette bases only. The ash drifts are paint. |
+| LavaCrack (fissure) | 408 / 428 / 406 | 260 | Within 9 u of heat |
+| Brazier | 193 / 199 / 195 | 220 | Roads, clearings, hubs, composition mouths, passes, lit vignettes, light gaps |
+| Chains | 110 / 135 / 92 | 50 | Between set-piece posts |
+| Clutter | 182 / 189 / 152 | 120 | Vignettes, compositions, clearings |
+| BrokenAnvil | 75 / 80 / 77 | 35 | Vignettes, plinth anchors, forge halls |
+| Banner | 73 / 69 / 63 | 70 | Walls, POIs, hubs, vignettes |
+| Waymark | 28–35 | unchanged | — |
+| Paving / FloorInlay | 29–32 / 52–56 | 80 / 60 | Adds cobble islands and spring rings (painted) |
+| Scenery (new, visual) | 0 | 500–900 | The frame |
+
+#### 3.6.3 What gets cut
+
+Items 1–4 and 6–10 change obstacles. They are on the lay stream and move the hash (step A of
+§3.6.12). Item 5, and item 4's rune ring, are dressing (step B).
+
+**`crates/gf_content/src/worldgen/compose.rs`:**
+
+1. **`region()` step e, the density top-up, is deleted.** This removes:
+   - the `while covered < target && tries < 400` loop;
+   - its composition-skirt and `BAND` branches (`BAND` goes with them);
+   - its `ruin()` calls with 1–2 satellites.
+
+   `RegionTheme.cover` becomes the interior ceiling (§3.6.9). `story()` survives as the region's
+   frame piece (§3.6.4).
+2. **`road_silhouettes()`** runs only when `compose.road_silhouettes > 0`. The default is 0.0, the
+   chance per 22–28 u slot. The vertical rhythm now comes from compositions at the edges, backdrop
+   silhouettes and hub monuments.
+3. **`clearing()`'s entry-arch loop** (`road_arch` at plaza + 1.5 or + 3.0 u for every way in) runs
+   only when `compose.entry_arches` is true (default false). That is about 19 fewer arches per map.
+   The heart inlay, the brazier ring, the key light (§3.6.8) and the waymark already signpost the way
+   in.
+4. **`clearing()`, `PoiKind::Spring`:** the four standing-stone pillars go. The spring's rim becomes
+   a `FloorInlay { variant: 1 }` rune ring of radius `radius + 1.0`, laid on the dress stream by
+   `dress_clearing`.
+5. **`region()` step f, the floor dressing:** no `cover_patch`, no `rubble` and no `Bones` clutter on
+   open ground. `fissure()` obeys the heat rule (§3.6.7).
+
+**`crates/gf_content/src/procgen.rs`**. These apply in map mode (`b.mask.is_some()`). The room pass
+of §3.6.10 later extends items 6–8 to rooms:
+
+6. **`field()`** lays paint only:
+   - one broken-paving island (`Paving { variant: 3 }`, half 2.5–4 u, off-centre);
+   - no ruins, satellites, cover patches, rubble, fissure or bones.
+
+   `region()` decides per field whether it also gets an anchor: `lay.chance(1 − theme.fields)`,
+   then `anchor()`.
+7. **`anchor(b, f, x) -> bool`** is new. It lays one chunky kiting anchor near a field's middle:
+   - It tries up to 6 spots `f.p(±0.35 hl, ±0.35 hw)`.
+   - A spot is accepted when:
+     - `b.clearance(at, r + x.anchor_clear) ≥ r + x.anchor_clear`;
+     - the tile mask is `Ground` within `r + x.road_clear`;
+     - it is ≥ 6 u beyond every `keep` disk.
+   - It has no satellites.
+   - Cinder roll:
+     - `Boulder`, radius `x.anchor_radius` (1.6–2.6): 55 %;
+     - `FallenColumn`, r 0.8–0.95, 4–5.5 u long: 25 %;
+     - `Wall { style: Plinth }`, half 1.3–1.8 × 0.9–1.3, height 1.0–1.6, with a `BrokenAnvil` on top:
+       20 %.
+   - Other biomes (phase 4 maps, and rooms from §3.6.10):
+     - Verdant: an ancient tree (`ruin()`'s tree), a boulder or a hedge plinth;
+     - Spire: a crystal, a boulder or a plinth;
+     - Unmaking: a monolith, a crystal or an inverted column.
+8. **`court()`:**
+   - Column spacing becomes 5.5–6.2 u (was 4.1–4.6).
+   - Sides: the back row, plus one side row at 60 % (was 3 sides at 75 %).
+   - The walled back (55 %), the statue, the banners and the mouth braziers are unchanged.
+   - The Verdant cloister keeps its square of piers, spaced ≥ 5.5 u.
+9. **`Builder.lane_pad: f32`** is new. It is `compose.road_clear` on maps and 0 in rooms. `fits()`
+   refuses a piece within `lane width / 2 + lane_pad` of a lane. `unmasked()` lifts it, so pass
+   arches, POI set pieces and hub monuments may still stand on a road's shoulder.
+10. **`fissure()`** checks heat in map mode (§3.6.7).
+
+#### 3.6.4 What moves to the edges
+
+Lay stream; these change the hash.
+
+1. **Edge slots** (`compose.rs::slots` splits into `edge_slots` and `field_slots`).
+   - **Edge flags.** For region `r`, a free tile is a `Ground` tile of `r`. Flag a free tile
+     toward direction `d` when one of its tiles 1 to 1 + `compose.edge_band` steps along `d`
+     (`edge_band` defaults to 1) is:
+     - a coast edge: a `Void` or `Liquid` tile, or off the grid;
+     - a border edge: land of another region.
+
+     A road, plaza or bridge tile is not an edge.
+   - **Search.** The histogram search of `largest()` stays, capped at `SLOT_CAP`, with the minimum
+     `SLOT_MIN`. A crop is eligible when one of its north, east or west sides has at least
+     `edge_share` (0.75) of its tiles flagged toward that side, using the integer test
+     4 × flagged ≥ 3 × side length. **A composition never backs onto the south edge**: that edge
+     stands between the camera and the fight, as in rooms.
+   - **Choice.** Take the largest eligible crop. Ties go to a coast edge before a border edge, then
+     north before east before west, then the first one found. `Slot.back` is that side's outward
+     axis, and `Slot.edge` records coast or border.
+   - Spend the slot plus a one-tile margin, **plus a `slot_clear` band (8 u, 2 tiles) on its three
+     open sides**, so no later piece pinches the floor in front of a composition.
+   - Stop after `theme.comps` edge slots, or when no crop is eligible.
+   - **Fields.** `field_slots` then cuts open fields from the remaining free tiles with today's
+     `largest()`, until `compose.slots` (5) slots in total.
+   - **Composition.** Only edge slots take compositions, from the theme's `districts` pool, never
+     repeating in a region. A failed stamp turns its slot into a field. `Frame::of(rect, back, …)`
+     already turns a composition's back toward the edge. Most compositions sub-frame with `outward`
+     0.6–0.8 (channels 0.3), which pushes them toward that back, so the strip behind a court, hall
+     or yard is at most about `edge_band` tiles + `PAD` wide.
+2. **Passes are keep-outs.** Just before the region loop, `build()` pushes `(pass.at,
+   compose.pass_clear)` (10 u) for every `g.passes` into `b.keep`. This comes after `wall()` and
+   `pass_arch()`, which the keep-outs must not refuse. So no composition, story or anchor pinches a
+   pass, and no corridor beside a barrier closes.
+3. **Story on the frame** (region step e, new form). Up to `theme.story` clusters (default 1) per
+   region, on the lay stream after the slots.
+   - **Candidates:** tiles of `r` with a pit tile, or a barrier-wall border, within one tile, and
+     outside every composition's `slot_clear` band. Candidates are tried in a seeded order, at most
+     40 tries.
+   - **Placement:** the recipe stands at the tile centre + 1 u toward that edge. It needs
+     `off_lanes(.., road_clear)`.
+   - **Tall recipes** (the foundry chimney at 6–8 u, the chainyard anchor post at 4.5–6 u, the
+     colonnade arch) stand only where that edge lies north of the tile. Elsewhere the slag-heap
+     recipe is used.
+   - A story is skipped when it would push the region's interior cover past `theme.cover`.
+4. **Coast anchors** (new step `frame(g, b)`, after the regions, on `root.fork(2000 + r)`). Colliding
+   frame pieces only (the visual frame is in §3.6.5):
+   - **Framed runs.** Walk each connected void shoreline of region `r`, ordered by BFS steps from its
+     lowest tile index. A shore tile is a land tile of `r` with a `Void` 4-neighbour; liquid banks
+     are excluded because rivers keep their hot banks clean. Framed runs of `frame_run` (8–24 u)
+     alternate with gaps until `theme.frame` (default 0.5) of the shore length is framed.
+   - **Unframed zones.** A run never comes within:
+     - `frame_gap` (10 u) of a `Road`, `Bridge` or `Plaza` tile or a pass;
+     - a POI plaza + 5 u;
+     - 16 u of the Landing.
+   - **Anchors.** At most one per `coast_anchor_every` (12 u) of framed shore. Each is a `Boulder`
+     of r 0.8–1.4 whose centre stands at the shore tile centre + outward × 1.4, so it reaches at most
+     2 u inland and overhangs the lip. It is placed through `unmasked()`, with `fits()` (lanes, LANE
+     spacing) and a `Ground` centre tile. Anchors make nooks along the coast without narrowing the
+     walkable band by more than 2 u.
+   - Open region borders get nothing colliding beyond their pass arch. The ground tint blend marks
+     them.
+5. **Barrier walls become broken runs** (`compose.rs::wall`). Tile faces facing region `b` merge into
+   straight runs, one per direction and line.
+   - A run is laid as blocks of up to 2 faces (≈ 8.2 u, a hair of overlap), heights 2.4–4.0 u (was
+     one 4.2 u block of 3–5 u per face). Each block has a 20 % chance of being a low ruined course of
+     1.2–1.8 u.
+   - Where a run turns (the staircase step), one square corner pier (half 0.8, height of its taller
+     neighbour + 0.6) replaces the overlapping block ends.
+   - Rubble lies only at run ends and at the pass breach.
+   - The barrier still holds: blocks touch within `TOUCH`, and roads breach it under the pass arch.
+   - This takes about half the blocks off, and the step reads as a buttressed corner instead of
+     stacked slabs. `Ridge` barriers are unchanged.
+6. **Passes are the doors** (`pass_arch`). An arch over each road crossing of a region border, with
+   these chances:
+   - walls and ridges: always;
+   - open borders: `compose.pass_arches` (default 1.0, was 0.6);
+   - over a bridge: never.
+
+   On its own dress fork, each pass arch gets a brazier pair on the road shoulder just outside its
+   piers.
+
+#### 3.6.5 What becomes visual-only
+
+**A new visual variant in `crates/gf_content/src/schema.rs`.** A Boulder with no obstacle would
+break the `is_solid()` contract ("solid decor dresses an obstacle"), so the frame gets its own
+variant:
+
+```rust
+/// Visual (biome maps): framing mass that never blocks. `Lip`: a rock or ruin fragment on the cliff
+/// lip, past the walkable edge. `Backdrop`: a tall silhouette rising from the void beyond a far
+/// (north, east or west) shore. `Foreground`: a low dark shape in the void off a camera-side
+/// (south) shore.
+Scenery {
+    at: Vec2,
+    radius: f32,
+    height: f32,
+    #[serde(default)] kind: SceneryKind,
+    #[serde(default)] rot: Rot16,
+    #[serde(default)] variant: u8,
+},
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum SceneryKind { #[default] Lip, Backdrop, Foreground }
+```
+
+* `is_solid()` is false. `anchor()` returns `at`. `covers()` is false.
+* `preview.rs` draws and counts it ("SCENERY").
+* `world.rs::gallery` gets a row.
+* `envkit.rs` renders it, reskinned by `AbyssKind`:
+  - **Lip:** Cinder slag and basalt chunks (1 in 3 with an ember seam), and toppled forge blocks.
+    ≤ 300 vertices each.
+  - **Backdrop:** a basalt spire, a ruined chimney stack or the stump of a colossal column. Dark
+    top, base rim-lit by the abyss glow. ≤ 900 vertices each.
+  - **Foreground:** a low humped rock, near-black with an ink hull and no rim light. ≤ 300
+    vertices each.
+  - The heroes' x-ray silhouette already reads through a foreground shape, so no fade shader is
+    needed.
+
+**The visual frame** is laid by `frame()` on `root.fork(2100 + r)` over the same framed runs as the
+coast anchors. All pieces are `decal`s over the void, never over a road, bridge or plaza tile.
+
+| Piece | Where | Size | Spacing |
+|---|---|---|---|
+| Lip | 1–2 per framed shore tile, at tile centre + outward × 2.3–3.6 u, ± 1.5 u along the shore | r 0.8–1.8, h 0.6–2.6 | — |
+| Backdrop, north shores (outward y ≥ 0.7) | 5–11 u out, only where the 3 × 3 tiles around it are `Void` | h 9–16 | ≥ 8 u apart |
+| Backdrop, east and west shores (\|outward x\| ≥ 0.7) | 5–9 u out | h 6–10 | ≥ 10 u apart |
+| Foreground, south shores (outward y ≤ −0.7) | 3–6 u out | h 1.5–5; it hides at most ~3.5 u of the lip | ≥ 6 u apart |
+
+**Decor policy on biome maps.**
+
+| Kind | Stays colliding (purposeful) | Goes |
+|---|---|---|
+| Pillar | Composition colonnades (≥ 5.5 u spacing, back row plus at most one side row), anvil and crucible chain posts, chainyard story posts | Stump pairs, satellites, field ruins, road silhouettes, spring stones |
+| Wall | Barrier runs, composition walls, lair rims, reliquary plinths, the sealed gate, foundry story chimneys (north frame only), plinth anchors | Top-up plinths and chimneys |
+| Boulder | Ridge barriers, coast anchors, field anchors, slag-heap stories | Satellites, top-up singles |
+| FallenColumn | At most one per composition, column anchors, the foundry story's fallen courses | Top-up copies, field copies |
+| Arch | One per road pass (with its brazier pair), colonnade stories | Clearing entry arches |
+| Landmarks, Channel | All: at most one per composition, hub or POI. Channels are terrain. | — |
+
+The visual props follow the same policy:
+
+* **Brazier:** road braziers 30–40 u apart (unchanged), pass pairs, clearing rings, hubs,
+  composition mouths, lit vignettes and light gaps. Nowhere else.
+* **Banner:** on walls and composition backs, flanking a POI or hub back piece, or in a vignette
+  against a wall.
+* **Chains:** only between set-piece posts.
+* **Clutter and BrokenAnvil:** in vignettes, compositions and clearings, on plinth anchors, or within
+  3.5 u of a kept solid.
+* **Rubble:** only within 1.5 u of a `Wall` or `Arch` (bases and breaches), in vignettes, and under a
+  fallen lintel.
+* **Overgrowth:** only as a vignette base on Cinder maps; ash drifts are paint. Verdant maps (phase 4)
+  keep grass at the edges.
+* **Waymark:** unchanged.
+
+#### 3.6.6 Vignettes
+
+A vignette is a small set of props backed against something solid. They are laid by a new
+`vignettes(g, b)` step on `root.fork(2200 + r)`, after `frame()`, and they are dress only.
+
+**Candidate backs**, per region, in this order. Within each group they are sorted by integer key,
+and candidates whose open side faces south come first, so the props stand in front of their back
+piece as the camera sees it:
+
+* a composition's two inner back corners, 1.5 u off its back wall, open side `−back`;
+* the midpoint of each barrier run face on this region's side;
+* the land point 2.5 u inland of each framed shore run's middle tile;
+* 2.5 u beside each story cluster, open side toward the region site.
+
+**Acceptance.** A candidate is accepted when all of these hold:
+
+* it is on `Ground`;
+* it is ≥ road half-width + 1.5 u off every road;
+* it is outside every POI plaza + 2 u and every approach arc;
+* it is ≥ `LANDING_R` + 6 u from the Landing;
+* it is ≥ `vignette_spacing` (18 u) from other vignettes;
+* its fixed 45 × 28 u grid cell (origin `−half`) holds fewer than 2 vignettes;
+* the region holds fewer than ⌈land area / `vignette_area`⌉ (2,000 u²) vignettes.
+
+**Content.** 3–6 props within 2.5–4 u, all on the open side:
+
+* 1–2 `Clutter` (Urns, Crates, Ingots, WeaponRack);
+* 0–1 `BrokenAnvil`;
+* 1 `Rubble` at the back piece's base;
+* 0–1 `Banner`, only against a wall or composition;
+* with 60 % chance, a `Brazier` (a lit vignette).
+
+No Shards or Offerings, because gold and cyan belong to the objectives.
+
+#### 3.6.7 Floor paint instead of meshes
+
+The client changes are shader-only (`floor.wesl`) plus parameter packing in `world.rs`. They reuse
+the existing `FloorParams` slots, so `materials.rs` does not change.
+
+1. **Debris skirt.** In map mode, `floor.wesl` computes the footing distance before the bare-ground
+   block.
+   - Within 0.5–2.2 u of a footing, the pebble drift rises to 1 and the pebble threshold drops from
+     0.84 to 0.70.
+   - The rubble that used to be meshes becomes painted scree around each solid.
+   - Fewer solids free the 32 footing slots per chunk for the ones that remain.
+2. **Ash drifts replace Overgrowth.** This is data: `RegionTheme.ground.ash` rises to:
+   - slag flats 0.2;
+   - foundry 0.25;
+   - colonnade 0.15;
+   - chainyard 0.2;
+   - dunes stay at 0.9.
+
+   The shader already paints `recipe.y` drifts.
+3. **Cobble islands.** `Paving { variant: 3 }` (broken paving) is laid on the dress streams, and the
+   existing paving path paints it (12 per chunk). Islands go:
+   - one in each open field (§3.6.3);
+   - one at each composition's open mouth, half 3–5 × 2–3 u;
+   - along road shoulders every 40–60 u on alternating sides, 2–4 u off the edge, half 2–3.5 u, on
+     `root.fork(2400 + k)`.
+
+   Islands keep ≥ 14 u apart, so a chunk never overflows.
+4. **Hot fissures only near heat.** In map mode, `Builder.fissure()` returns early unless its start
+   lies within `compose.heat_reach` (9 u) of heat:
+   - a `Crucible`, `GreatAnvil` or `Channel` solid;
+   - a `Liquid` tile (`TileMask`);
+   - a POI heart (seeded into a `Builder.heat` list at `build()`).
+
+   Compositions lay their heat piece before their veins, so their fissures survive. Open ground
+   shows the shader's existing cold, scorched cracked earth.
+5. **Cooler dusk.** In map mode, the falloff away from roads and clearings goes from
+   `mix(0.84, 1.0, near_way)` to `mix(0.78, 1.0, near_way)`, with a 0.2 lean toward `fp.cool`. On
+   maps, `world.rs` lowers the fissure glow `p.accent.w` from 1.3 to 1.0, so floor glow stays under
+   the orange enemies.
+
+#### 3.6.8 Light pools
+
+**Rules** (all reported by the §3.6.1 readout):
+
+* Every screen with ≥ 60 % land has a warm pool.
+* **Coverage.** Warm pools cover 15–35 % of a screen's land (median). A pool is:
+  - land within 7 u of a brazier;
+  - within 10 u of a great brazier or crucible;
+  - within 3 u of a liquid tile;
+  - or a POI plaza.
+* **Placement.** At least 70 % of non-road flames stand within 4 u of a composition, barrier, story
+  or frame solid, or inside a POI plaza + 2 u.
+* **Budget.** At most 6 flames per screen outside clearings (p90), which is what the 16-light pool
+  can cover.
+
+**How the generator meets them:**
+
+1. **Light gaps** (new step, `root.fork(2300)`, after the vignettes). Lattice points run every
+   11 × 7 u over land. Each point needs a warm source inside the `light_box` (30 × 18 u) centred on
+   it. Every 45 × 28 u screen contains one whole such box, so every screen gets a pool. Points
+   without one are visited in a seeded order, and each tries, inside its box:
+   1. an unlit vignette, which gets its brazier;
+   2. else a brazier 1.2 u off the nearest composition, barrier, story or coast-anchor solid, on the
+      side facing the point;
+   3. else a brazier on the nearest road shoulder;
+   4. else nothing, and the metric reports it.
+2. **POI key lights** (`world.rs`). One `Flame { power: 1.8, range: 14 }`, 2 u above each POI heart,
+   in the flame colour. It is pushed after `soften_clusters`, so the brazier ring never dims it.
+   It is the brightest light on its screen, ≥ 1.5× a road brazier.
+3. **Objective hues.** Gold (Anvil, Reliquary) and cyan (Vein) never appear on decoration.
+4. **Value ladder.** The floor stays under the characters (§7.2): the dusk and fissure changes in
+   §3.6.7 only lower it.
+
+#### 3.6.9 Data
+
+These are tuning fields with serde defaults. **The defaults are the new composition**, so the golden
+fixture and the phase-4 EA maps inherit it.
+
+```rust
+pub struct RegionTheme {
+    /* key, name, weight, districts, tint, map_color, open, camp_pool, names, ground: unchanged */
+    /// Share of the region's open fields left bare; every other field holds one kiting anchor.
+    pub fields: f32,                              // 0..=1 (meaning changed: was "share of slots left open")
+    /// Ceiling on colliding cover of the region's interior land: anchors and story clusters that
+    /// would push past it are skipped.
+    pub cover: f32,                               // 0..=0.08 (meaning changed: was the top-up target)
+    /// Compositions per region, on edge slots only.
+    #[serde(default = "two")] pub comps: u8,      // 2
+    /// Story clusters per region, on the frame band.
+    #[serde(default = "one")] pub story: u8,      // 1
+    /// Share of the region's void shore that is framed (lip, anchors, silhouettes).
+    #[serde(default = "half")] pub frame: f32,    // 0.5
+}
+
+/// `ExpeditionDef.compose` (the struct is `#[serde(default)]`, so templates may omit it).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ComposeDef {
+    pub slots: u8,                 // 5: slots per region, edge slots first, then open fields (was const SLOTS)
+    pub edge_band: u8,             // 1 tile: an edge slot's back lies this close to the coast or a border
+    pub edge_share: f32,           // 0.75: share of the back side's tiles that must touch the edge
+    pub slot_clear: f32,           // 8.0 u of free floor kept on a composition's open sides
+    pub pass_clear: f32,           // 10.0 u: compositions, stories and anchors keep off passes
+    pub road_clear: f32,           // 4.0 u: nothing colliding within road half-width + this (Builder.lane_pad)
+    pub anchor_radius: (f32, f32), // (1.6, 2.6): a boulder anchor's radius
+    pub anchor_clear: f32,         // 8.0 u of obstacle-free floor around a field anchor
+    pub pass_arches: f32,          // 1.0: chance of an arch at an open-border pass (walls, ridges: always)
+    pub entry_arches: bool,        // false: arches where roads enter POI clearings
+    pub road_silhouettes: f32,     // 0.0: chance per 22–28 u road slot of a tall shoulder piece
+    pub frame_run: (f32, f32),     // (8.0, 24.0) u: framed runs of shore
+    pub frame_gap: f32,            // 10.0 u: shore left unframed around roads, bridges, passes (plazas +5 u)
+    pub coast_anchor_every: f32,   // 12.0 u of framed shore per colliding coast anchor, at most
+    pub vignette_area: f32,        // 2000.0 u² of land per vignette, at most
+    pub vignette_spacing: f32,     // 18.0 u between vignettes
+    pub heat_reach: f32,           // 9.0 u: glowing fissures only this close to heat
+    pub light_box: (f32, f32),     // (30.0, 18.0) u: every land lattice point (11 × 7 u) has a warm source in this box
+}
+```
+
+**Cinder values** in `rooms.ron`. `fields` keeps today's values: under the new meaning they still
+rank the themes from open to dense.
+
+| Theme | `fields` | `cover` (ceiling) | `comps` | `story` | `frame` | `ground.ash` |
+|---|---|---|---|---|---|---|
+| slag_flats | 0.6 | 0.035 → 0.010 | 1 | 1 | 0.5 | 0.0 → 0.2 |
+| foundry_ruins | 0.2 | 0.07 → 0.022 | 2 | 1 | 0.55 | 0.1 → 0.25 |
+| colonnade_of_oaths | 0.25 | 0.07 → 0.018 | 2 | 1 | 0.5 | 0.0 → 0.15 |
+| cinder_dunes | 0.75 | 0.03 → 0.010 | 1 | 1 | 0.45 | 0.9 |
+| chainyard | 0.3 | 0.07 → 0.018 | 2 | 1 | 0.55 | 0.0 → 0.2 |
+
+`barriers`, `roads`, `coast`, the POI quotas and `landmarks` are unchanged.
+
+**`validate.rs`** checks:
+
+* `comps ≤ compose.slots`, and `story ≤ 3`;
+* `frame` is in 0..=1;
+* `slots` is in 1..=8, `edge_band ≤ 2`, and `edge_share` is in 0.5..=1;
+* `slot_clear ≥ LANE`;
+* `anchor_radius.0 ≤ anchor_radius.1 ≤ 3.0`, and `frame_run.0 ≤ frame_run.1`;
+* `vignette_area ≥ 500`;
+* `light_box` is at least 8 u on each side and at most (34, 21), so a screen still contains a whole
+  box.
+
+#### 3.6.10 The EA rooms (`procgen::generate`, per room until phase 4)
+
+The same principles apply at room scale. A room is 80–104 × 54–68 u, about 2 × 2 screens. Its
+guarantees stay:
+
+* the spawn, plaza and gate keep-outs, and the lanes;
+* `arenas_are_horde_sized_and_open` passes, including ≥ 15 obstacles in every Combat seed;
+* sealed floor is 0.00 for heroes and ≤ 0.01 % for elites;
+* no obstacle is undressed.
+
+**Before** (`layout-stats --seeds 20`, all four biomes):
+
+* block 4.3–4.9 % (Treasure 3.5–3.8 %);
+* open (free floor ≥ 5 u from any obstacle) 42–46 % (Anvil 38–43 %);
+* Combat rooms hold 58–75 obstacles;
+* squeezes per room: Cinder 23, Verdant 35, Spire and Unmaking 1–4.
+
+**Changes:**
+
+1. **Step 4, the top-up.** `cover_target` goes down:
+   - Combat and Elite: 0.050 → 0.032;
+   - Anvil: 0.044 → 0.028;
+   - others: 0.031 → 0.022.
+
+   The composition-skirt branch (40 % of candidates) goes, so every top-up ruin stands in the north
+   and flank rim band (RIM + 2 to RIM + 7 u in), which is the room's frame. Satellites go from 1–2
+   to 0–1. The south edge stays open, because it stands between the camera and the fight.
+2. **`field()`, `anchor()` and `court()`** take the map behaviour. Their `b.mask.is_some()` gates
+   from §3.6.3 go, leaving one code path. In rooms the field's anchor chance is 0.7. `lane_pad` and
+   the fissure heat rule stay map-only.
+3. **`dress_floor()`.** Base dressing lies only at `Wall` bases (rubble). Verdant keeps its cover
+   patches, because grass is its identity. The fissures seeping in from the rim are unchanged.
+4. **Unchanged:** `dress_rim()`, `dress_heart()`, `frame_plaza()`, `arches()` and `colossus()`. They
+   are the room's frame, its lights and its meaningful pieces.
+
+**Targets** (`layout-stats --seeds 40`, means per biome and kind):
+
+* block ≤ 3.4 % for Combat, Elite and Anvil;
+* open ≥ 52 %;
+* squeezes at most half of before;
+* sealed and undressed as above;
+* ≥ 15 obstacles in every Combat seed (the existing test).
+
+If a biome's rooms cannot meet the open target with composition cover alone, the rim band takes
+more. The interior never does.
+
+The phase-4 EA **maps** inherit §3.6 through the `RegionTheme` and `ComposeDef` defaults. Each
+biome picks its own `Scenery` reskin, and Verdant keeps grass at its edges.
+
+#### 3.6.11 Determinism, streams and the hash
+
+* **Rules.** Every new step follows §3.1:
+  - integer `GfRng` draws;
+  - `+ − × ÷ √` only;
+  - integer sort keys;
+  - `qv` on every obstacle coordinate and on new decor too (decor is not hashed, but peers should
+    look alike).
+* **Shore order and outward directions** come from tile BFS steps and sums of axis neighbours,
+  normalized with `√`.
+* **New forks** use bases ≥ 2000, clear of today's forks (all below 1200):
+
+  | Fork | Stream | Use |
+  |---|---|---|
+  | `2000 + r` | lay | coast anchors |
+  | `2100 + r` | dress | visual frame |
+  | `2200 + r` | dress | vignettes |
+  | `2300` | dress | light gaps |
+  | `2400 + k` | dress | road-shoulder paving |
+
+  The story and the field anchors stay on the region's lay stream `100 + r`. Changing one region's
+  pieces never shifts another region.
+* **The hash.** `MapLayout.hash` covers obstacles, pits, POIs, the spawn and the gate, never decor.
+  - Every lay-stream change above moves it: re-pin `cinder_expedition_seed_7_golden_hash` once, in
+    the commit that lands them.
+  - The dress-stream steps (Scenery, vignettes, light gaps, paving, pass braziers, spring rings,
+    floor dressing, fissure heat) leave it alone.
+  - POI sites are placed before composition, so they do not move and the `--start-at` spots stay
+    comparable. Camps may shift.
+* **Guarantees kept.**
+  - Reachability: the BFS and repair run unchanged; fewer obstacles only help.
+  - 0 repairs, 0 relaxed, every POI placed.
+  - Lanes, and the spawn, plaza and gate keep-outs.
+  - `every_peer_rebuilds_the_hosts_procedural_arenas`.
+
+#### 3.6.12 Work order and acceptance
+
+**Concurrency.** Other workflows own these files, and nothing in §3.6 edits them:
+
+* the UI workflow: `crates/gf_client/src/{hud, ui, offscreen, theme, uikit}.rs` and `assets/ui/`;
+* the model-integration workflow: `crates/gf_client/src/{scene, palette, materials, models, anim,
+  vfx}.rs`;
+* the art agents: `art/` and `assets/models/`.
+
+The floor paint uses existing `FloorParams` slots, `Scenery` renders in `envkit.rs`, and key lights
+live in `world.rs`. If a floor parameter ever becomes unavoidable, the `materials.rs` change must be
+minimal and additive, and reported.
+
+**Every commit:**
+
+* `cargo fmt`, then `cargo clippy --workspace --all-targets --release -- -D warnings`;
+* `cargo test -p gf_content` (the full workspace for steps A and E);
+* explicit pathspecs, no push.
+* No new tests: the golden hash is re-pinned, never added to.
+
+| Step | Files | Work | Proof |
+|---|---|---|---|
+| 0. Readout | `tools/gf_tools/src/preview.rs` | The §3.6.1 metrics as a second `layout-stats --maps` table (per map, plus the mean row), report-only. Record the before table (map seeds 1–8 and run maps 3 / 7 / 11). | The before numbers are within ±10 % of §3.6.2. Otherwise, the tool's numbers become the recorded baseline and the targets stay. |
+| A. Lay rules | `worldgen/{compose, tiles, mod}.rs`, `procgen.rs` (map mode), `schema.rs` (theme fields, `ComposeDef`), `validate.rs`, `rooms.ron` (the Cinder values), `preview.rs` (gates on) | §3.6.3–3.6.4. Re-pin the golden hash. | Every gate in §3.6.2 passes on `layout-stats --maps --seeds 8`: 0 repairs, 0 relaxed, all POIs. |
+| B. Frame and dressing | `schema.rs` (`Scenery`), `compose.rs` (`frame`, `vignettes`, light gaps, paving, pass braziers, floor dressing), `procgen.rs` (`fissure` heat), `envkit.rs`, `world.rs` (gallery, key lights, `accent.w`), `shaders/floor.wesl`, `preview.rs` (`Scenery` legend) | §3.6.5–3.6.8. The hash does not move. | The report rows of §3.6.2 hold. |
+| C. Pacing | `assets/content/rooms.ron` (`seals_required`, `threat`), §2.2 of this doc | The bot run below, then retune. | Victory in the band. |
+| D. Look | — | The before/after previews and screenshots below; send the user the 2–3 best pairs. | By eye. |
+| E. EA rooms | `procgen.rs` (rooms), `tools/gf_tools/src/preview.rs` if a column is needed | §3.6.10 | Room targets, `preview-sheet` before/after, the `--phase ea` run. |
+
+**Acceptance checks.**
+
+1. **Previews**, before and after, of the maps the game plays for run seeds 7, 3 and 11:
+
+   ```text
+   cargo run --release -p gf_tools -- preview-room cinder_expedition 3047268829 shots/dc_after_map_run7.png --scale 2
+   cargo run --release -p gf_tools -- preview-room cinder_expedition 2298633409 shots/dc_after_map_run3.png --scale 2
+   cargo run --release -p gf_tools -- preview-room cinder_expedition 3195035749 shots/dc_after_map_run11.png --scale 2
+   ```
+
+   Compare them against `shots/dc_before_map_run{3,7,11}.png`, and against the audit's 150 × 100 u
+   foundry and shrine crops at scale 6. Look at every image.
+2. **Readout.** Paste the `layout-stats --maps --seeds 8` composition table (all gates green) and
+   the per-kind table of §3.6.2 (run maps 3 / 7 / 11, before → after) into the step-A and step-B
+   commit bodies.
+3. **In game**, at the same spots as the audit's `dc_before_*` shots. Copy the release exe and run
+   the copy, never `target/release` itself:
+
+   ```text
+   <copy> --autoplay --bots 3 --seed 7 --window 1600x900 --screenshot shots/dc_after_<spot>.png <extra flags>
+   ```
+
+   with these extra flags:
+
+   | Spot | Extra flags |
+   |---|---|
+   | landing | `--screenshot-after 8 --shots 2 --shot-interval 12 --exit-after 24` (no `--start-at`) |
+   | roadleg | `--screenshot-after 30 --shots 2 --shot-interval 10 --exit-after 44` |
+   | road | `--start-at spring` |
+   | anvil, lair, shrine, warlord, gate | `--start-at <kind>` |
+   | horde300 | `--horde 300 --fps` |
+
+   Unless listed, a spot uses `--screenshot-after 15 --shots 3 --shot-interval 6 --exit-after 40`.
+   Look at every image. A minimized window writes 1 × 1 px images: re-run those.
+4. **Pacing.** One `--bot-run --seed 7` (a copy of the release exe) must end in **Victory** with the
+   Cinder stage in **6–10 sim-min**. Aim for 6.3–8.5 sim-min to keep margin on both sides.
+   - **Before:** 367.2 s (6.12 min). The audit's data-only declutter already fell below the band:
+     `cover` 0 gave 327.5 s.
+   - **Retune ladder**, one rung at a time, re-running after each:
+     1. `seals_required` 7 → 8 (6 → 7 added ≈ 42 s in phase 2; 14 Seals on offer still satisfy
+        `≥ required + 2`);
+     2. then all `threat` `hp_mult` rows +10 %;
+     3. if the stage goes over 9 min, step back.
+   - Update §2.2 (the seals note and the table) to the result.
+5. **Frame rate and build.** From the `--horde 300 --fps` run (the audit measured the before on an
+   RTX 4070 laptop):
+
+   | Measure | Before | After |
+   |---|---|---|
+   | Mean fps at `--horde 300` | 90–105 | no lower |
+   | Worst frame | 18.6 ms | ≤ 20 ms |
+   | World build | 113–154 ms | ≤ 150 ms (§7.2) |
+   | Vertices | 2.03 M | ≤ 2.03 M |
+   | Draws | 827 | ≤ 827 |
+   | Lights (flames) | 296 | reported |
+
+   `GF_ENV_STATS=1` prints the per-variant vertex cost. `Scenery` must stay ≤ 300 k vertices per
+   map.
+6. **EA rooms** (step E):
+   - `preview-sheet shots/dc_rooms_{before,after}_<biome>.png --biome <biome> --seeds 6` for
+     `cinder_wastes`, `verdant_ruin`, `hollow_spire` and `the_unmaking`;
+   - the `layout-stats --seeds 40` table against §3.6.10;
+   - `cargo test --workspace`;
+   - `--bot-run --phase ea --seed 7`, once before step E and once after: Victory, comparing the
+     report's `rooms[]` clear times. Retune a biome's `encounter` data in `rooms.ron` only if its
+     rooms move by more than 15 %.
 
 ---
 
@@ -449,15 +1193,21 @@ pub struct ExpeditionDef {
     pub boss_hp_mult: f32,                 // 1.35 = today's boss after 7 rooms (hp_growth_per_room 0.05 × 7)
     pub threat_start_minute: f32,          // 0 / 4 / 7 / 9
     pub threat: Vec<ThreatKey>,            // { minute, density, rate, elite_chance, hp_mult }
+    pub compose: ComposeDef,               // §3.6.9: slots, edge band, clearances, frame, vignettes, light
 }
 pub struct RegionTheme {
     pub key: String, pub name: String, pub weight: f32,
-    pub districts: Vec<(DistrictKind, f32)>,   // room-grammar composition pool for this region's slots
-    pub fields: f32,                           // share of slots left open (0..=1)
-    pub cover: f32,                            // floor-cover target of the top-up (0.0..=0.08)
+    pub districts: Vec<(DistrictKind, f32)>,   // room-grammar composition pool for this region's edge slots
+    pub fields: f32,                           // share of open fields left bare; the rest hold one anchor (0..=1)
+    pub cover: f32,                            // ceiling on interior colliding cover (0.0..=0.08)
     pub tint: String, pub map_color: String,   // "#RRGGBB": floor vertex tint, minimap land colour
     #[serde(default)] pub open: bool,          // may host the Landing
     #[serde(default)] pub camp_pool: Vec<WeightedKey>,
+    #[serde(default)] pub names: Vec<String>,  // banner names the regions of this theme take in turn
+    #[serde(default)] pub ground: GroundRecipe, // { paving, ash }: floor paint (presentation only)
+    #[serde(default = "two")] pub comps: u8,   // compositions per region, edge slots only (§3.6.4)
+    #[serde(default = "one")] pub story: u8,   // story clusters per region, on the frame band
+    #[serde(default = "half")] pub frame: f32, // share of the void shore that is framed (§3.6.5)
 }
 pub enum BarrierKind { Chasm, River, Wall, Ridge }
 pub enum MapMark { Statue, GreatBrazier, SealedGate, Tree, SpiralStair, InvertedColumn, Rift, Crystal,
@@ -484,7 +1234,11 @@ pub enum TileKind { Void, Ground, Road, Plaza, Bridge, Liquid }
 `Decor` gains one variant in phase 1 and uses it in phase 4:
 `FallenWeapon { at: Vec2, radius: f32, height: f32, rot: Rot16, variant: u8 }`. It is solid, and the
 variants are 0 sword, 1 hammer, 2 spear, 3 bow, 4 cannon. `is_solid`, `anchor` and `covers` extend
-accordingly. Everything else reuses the existing vocabulary.
+accordingly.
+
+The composition pass adds a second variant, `Scenery { at, radius, height, kind: SceneryKind, rot,
+variant }`, with `SceneryKind { Lip, Backdrop, Foreground }`. It is visual framing on the cliff lip
+and in the void, and it never blocks (§3.6.5). Everything else reuses the existing vocabulary.
 
 `GameTuning` gains `expedition: ExpeditionTuning` (all `#[serde(default)]`). The block below is its
 game.ron form with the defaults:
@@ -547,7 +1301,8 @@ Anvil hold time, radius and forge window stay in the existing `anvil` block. `Ca
     its own block.
   - Existing rooms stay: boss arenas, QA rooms, and legacy door sequences until a biome flips.
 
-  Cinder example (threat rows as in §2.5):
+  Cinder example (threat rows as in §2.5). It shows the composition values of §3.6.9;
+  `names`, `ground` and `camp_pool` are left out:
 
   ```ron
   (
@@ -558,26 +1313,28 @@ Anvil hold time, radius and forge window stay in the existing `anvil` block. `Ca
       expedition: (
           size: (432.0, 272.0), regions: (5, 3), start_theme: "slag_flats",
           themes: [
-              (key: "slag_flats", name: "The Slag Flats", weight: 1.3, open: true, fields: 0.6, cover: 0.025,
-               districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)], tint: "#3A2418", map_color: "#5A3A28"),
-              (key: "foundry_ruins", name: "Foundry Ruins", weight: 1.0, fields: 0.2, cover: 0.055,
-               districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)], tint: "#2E1E17", map_color: "#4A3226"),
-              (key: "colonnade_of_oaths", name: "Colonnade of Oaths", weight: 0.9, fields: 0.25, cover: 0.05,
-               districts: [(ColonnadeCourt, 1.5), (ForgeHall, 0.4)], tint: "#34261E", map_color: "#56443A"),
-              (key: "cinder_dunes", name: "Cinder Dunes", weight: 0.8, open: true, fields: 0.75, cover: 0.02,
-               districts: [(SlagChannel, 0.6)], tint: "#2A1E1A", map_color: "#3E302A"),
-              (key: "chainyard", name: "The Chainyard", weight: 0.7, fields: 0.3, cover: 0.045,
-               districts: [(CrucibleYard, 1.4), (ForgeHall, 0.6)], tint: "#301C14", map_color: "#4E2E22"),
+              (key: "slag_flats", name: "The Slag Flats", weight: 1.3, open: true, fields: 0.6, cover: 0.010,
+               comps: 1, districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)], tint: "#737173", map_color: "#3C2A24"),
+              (key: "foundry_ruins", name: "Foundry Ruins", weight: 1.0, fields: 0.2, cover: 0.022, frame: 0.55,
+               districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)], tint: "#7A7777", map_color: "#4A403C"),
+              (key: "colonnade_of_oaths", name: "Colonnade of Oaths", weight: 0.9, fields: 0.25, cover: 0.018,
+               districts: [(ColonnadeCourt, 1.5), (ForgeHall, 0.4)], tint: "#8B867D", map_color: "#6E6252"),
+              (key: "cinder_dunes", name: "Cinder Dunes", weight: 0.8, open: true, fields: 0.75, cover: 0.010,
+               comps: 1, frame: 0.45, districts: [(SlagChannel, 0.6)], tint: "#8E8C8B", map_color: "#66625E"),
+              (key: "chainyard", name: "The Chainyard", weight: 0.7, fields: 0.3, cover: 0.018, frame: 0.55,
+               districts: [(CrucibleYard, 1.4), (ForgeHall, 0.6)], tint: "#8B796E", map_color: "#6A3826"),
           ],
-          coast: (depth: 2, amp: 3, period: 6),
+          compose: (),   // §3.6.9 defaults
+          coast: (depth: 2, amp: 6, period: 10),
           barriers: (chance: 0.45, kinds: [(River, 0.30), (Wall, 0.15)]),
           roads: (width: 6.0, loop_chance: 0.3, pass_width: 8.0),
           pois: [(kind: Anvil, count: 3, seals: 1), (kind: Warlord, count: 1, seals: 2), (kind: Lair, count: 2, seals: 1),
                  (kind: Shrine, count: 3, seals: 1), (kind: Reliquary, count: 2, seals: 1), (kind: Vein, count: 2, seals: 1),
                  (kind: Spring, count: 3, seals: 0)],          // Watchfire quota added in phase 3
           camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
-          landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8), (SealedGate, 0.5)],
-          seals_required: 7, gate_requires_warlord: true, gate_force_minute: 12.0, boss_hp_mult: 1.35,
+          landmarks: [(FallenWeapon, 1.2), (GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.5), (GreatBrazier, 0.7)],
+          seals_required: 7,   // the §3.6.12 pacing check may raise it to 8
+          gate_requires_warlord: true, gate_force_minute: 12.0, boss_hp_mult: 1.35,
           threat_start_minute: 0.0,
           threat: [ /* §2.5 */ ],
       ),
@@ -596,6 +1353,8 @@ Anvil hold time, radius and forge window stay in the existing `anvil` block. `Ca
   - `regions` each in 2..=8, with cells ≥ 48 u.
   - Themes non-empty, weights > 0, `start_theme` exists and is `open`, colours are hex, `camp_pool`
     keys are the biome's swarm/elite enemies, district weights > 0.
+  - Composition knobs (§3.6.9): `fields` in 0..=1, `cover` in 0..=0.08, `comps ≤ compose.slots`,
+    `story ≤ 3`, `frame` in 0..=1, plus the `ComposeDef` ranges listed there.
   - Quotas: anvils ≥ 2 (the slice's "≥ 2 anvils"). Exactly one Warlord quota if
     `gate_requires_warlord`, and `biome.minibosses` non-empty. Shrines ≤ gods with
     `phase ≤ max(template.phase, P1)`. `Σ seals × count ≥ seals_required + 2`. No `Gate` quota (the
@@ -608,8 +1367,11 @@ Anvil hold time, radius and forge window stay in the existing `anvil` block. `Ca
 * **Biomes.** A sequence containing `Fixed(Expedition)` needs that template in the biome, and the boss
   room exists.
 * **Tools only**, never at load: `gf-content layout-stats --maps --seeds 8` generates every shipped
-  template × 8 seeds and fails on repairs > 0 for POIs or the gate, `relaxed > 0`, or gen time
-  > 400 ms in debug.
+  template × 8 seeds. It fails on:
+  - repairs > 0 for POIs or the gate;
+  - `relaxed > 0`;
+  - gen time > 400 ms in debug;
+  - any composition gate of §3.6.2, once step A of §3.6.12 has landed.
 
 ---
 
@@ -912,7 +1674,9 @@ pub struct SnapshotPacket { /* existing */ pub fog: Option<Vec<u8>> } // RLE exp
   - It covers the grammar's whole vocabulary: walls by `WallStyle`, boulders, statues, colossus heads,
     fallen columns and trees, great anvil, crucible, great brazier, sealed gate, arches, trees,
     crystals, spiral stairs, inverted columns, rifts, channels, bridges, pools, paving, inlays, ground
-    cover, roots, rubble, clutter, banners, chains, debris, and `FallenWeapon` in phase 4.
+    cover, roots, rubble, clutter, banners, chains, debris, and `FallenWeapon` in phase 4. The
+    composition pass adds `Scenery`: lip fragments, backdrop silhouettes and foreground shapes
+    (§3.6.5).
   - Solid decor replaces the greybox for the obstacles it `covers`, and undressed obstacles keep the
     greybox.
   - Rooms use the same kit, which retires the `_ => {}` arm in `scene.rs`. If a room env kit lands
@@ -939,9 +1703,15 @@ pub struct SnapshotPacket { /* existing */ pub fog: Option<Vec<u8>> } // RLE exp
   - Per chunk: ≤ 48 lava cracks intersecting it (`FLOOR_CRACKS`, unchanged), roads intersecting it as
     worn paths (`FLOOR_PATHS` 6 → 8), and `plazas: [Vec4; 4]` (x, z, radius, style) for POI hearts.
   - The shader multiplies its painted albedo by the vertex colour (`@if(VERTEX_COLORS)`).
+  - The composition pass (§3.6.7) adds, with no new uniforms:
+    - painted scree around every footing, which replaces the rubble meshes;
+    - a cooler dusk away from the roads and clearings;
+    - a lower fissure glow on maps (`accent.w` 1.0);
+    - cobble islands laid as `Paving` variant 3.
 * **Lights.** Brazier flames are merged glow meshes (bloom). A pool of **16 `PointLight`s** is
   re-assigned every 0.25 s to the braziers nearest the camera focus. The key light's shadow cascade is
-  capped at 60 u.
+  capped at 60 u. Each POI heart adds an unsoftened key flame (power 1.8, range 14), so the
+  objective is the brightest light on its screen (§3.6.8).
 * **Grand monuments** are ordinary decor, just large. Their tall silhouettes stand above the fog layer.
 
 ### 7.3 Fog of war (`fog.rs`, new, phase 3)
@@ -1128,6 +1898,23 @@ After 2.0 lands, `protocol.rs`, `components.rs`, `resources.rs`, `lib.rs` and `s
 | **2E Content** | `assets/content/{rooms.ron, game.ron, biomes.ron}` | The `cinder_expedition` template and the `expedition` block. **Flip Cinder's sequence last**, once 2A–2D are green. |
 | **2F Client world** | `gf_client/src/{world.rs (new), envkit.rs (new), terrain.rs, materials.rs, palette.rs, shaders/floor.wesl}`; `scene.rs` (`rebuild_room` branch and the decor match only) | §7.1–7.2: chunks, merged meshes, the env kit for the full `Decor` vocabulary, land, cliffs, liquid, bridges, abyss, per-chunk floor, pooled lights. |
 
+### Composition pass (§3.6): after phase 2, before the phase 3 lanes
+
+One agent at a time, in the steps of §3.6.12 (0 readout, A lay rules, B frame and dressing,
+C pacing, D look, E EA rooms). Each step is its own commit.
+
+**Owned files:**
+
+* `gf_content/src/worldgen/{compose, tiles, mod}.rs`;
+* `gf_content/src/{procgen, schema, validate}.rs`;
+* `assets/content/rooms.ron` (the Cinder block);
+* `tools/gf_tools/src/preview.rs`;
+* `gf_client/src/{envkit, world}.rs` and `shaders/floor.wesl`.
+
+It never edits the files the UI and model-integration workflows hold (§3.6.12). Phase 3 needs none
+of these files except 3G's `rooms.ron` quota line, so 3G lands after step C. Phase 4's 4A takes
+over `compose.rs` from the final state of the pass.
+
 ### Phase 3: Co-op on a big map and exploration UX (no protocol change)
 
 | Lane | Owns | Work |
@@ -1172,6 +1959,7 @@ bot run:
 |---|---|
 | 1 | `cargo run --release -- --stress 400 --bots 4`: p99 no worse than before (0.97 ms dev). `cargo run -p gf_tools -- preview-sheet shots/rooms_after.png --biome cinder_wastes` is identical to the pre-phase sheet. |
 | 2 | `cargo run -p gf_tools -- preview-room cinder_expedition 7 shots/cinder_map_7.png --scale 2` reads as a place (roads, regions, compositions, coast, rivers and bridges, POIs, camps). `layout-stats --maps --seeds 8` shows 0 repairs and 0 relaxations. **`cargo run --release -- --bot-run --seed 7` ends in Victory**: the report shows the Cinder stage at 6–10 sim-min, seals ≥ 6, the warlord done, and p99 tick in budget. `cargo run --release -- --autoplay --bots 3 --screenshot shots/p2_map.png --shots 6 --shot-interval 20` shows the map rendering. |
+| §3.6 | `layout-stats --maps --seeds 8` passes every composition gate of §3.6.2, with 0 repairs and 0 relaxed. Before/after previews of run maps 3, 7 and 11, and before/after screenshots at the same `--start-at` spots, show open, painted ground framed at the edges. `--bot-run --seed 7` ends in Victory with the Cinder stage at 6–10 sim-min. `--horde 300 --fps` is no slower. The EA rooms meet §3.6.10. |
 | 3 | `cargo run --release -- --bot-run --bots 4 --bot-split --seed 7`: Victory. The WAN soak `--bot-run --bots 4 --rtt 100 --loss 0.02 --minutes 5` meets the §6.2 gates. Screenshots show fog, the minimap, beacons, the tracker and a surge banner. |
 | 4 | `cargo run --release -- --bot-run --phase ea --seed 7`: Victory across 3 map biomes. One preview image and one in-game screenshot per biome. |
 | 5 | `--autoplay --bots 3 --horde 400 --fps` holds ≥ 55 fps on the GTX 950. |
@@ -1209,8 +1997,15 @@ bot run:
    agreement. Mitigations: the golden hash in CI on both OSes, the runtime `layout_hash` check, and
    review against §3.1.
 3. **Composition at scale.** The room grammar was tuned for 90 × 60 u rooms. Stamped into region
-   slots it may repeat or crowd. Mitigations: per-region no-repeat, theme `fields` and `cover`, and
-   preview contact sheets before any content flips.
+   slots it repeated and crowded, which the user saw: pillars and walls everywhere. §3.6 answers
+   with edge slots, no fill, a visual frame, painted detail and measured gates in `layout-stats`.
+   Three risks remain:
+   - **Pacing:** fewer blockers let the horde flow and shots fly, so the pacing check and retune
+     ladder are part of the pass.
+   - **Pinches:** a composition backed onto a barrier could pinch a corridor. The `slot_clear` band
+     and the pass keep-outs prevent it, and the reachability BFS and 0-repairs gate prove it.
+   - **Emptiness:** an over-cleared region could read as empty. The frame-mass and barren-screen
+     rows of §3.6.2 catch it.
 4. **Pathing.** A flow-field or bridge bug strands the horde. Far cull with refund keeps pressure up.
    Bots have the watchdog and the forced gate.
 5. **Interest-management baselines** under loss could make entities pop. The WAN soak in phase 3 is
