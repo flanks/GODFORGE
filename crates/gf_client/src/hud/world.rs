@@ -373,7 +373,12 @@ fn clear_of_hud(mut p: Vec2, size: Vec2, rects: &HudRects, view_size: Vec2) -> V
         }
         p.y -= 16.0;
     }
-    p.x = p.x.clamp(size.x / 2.0 + 8.0, view_size.x - size.x / 2.0 - 8.0);
+    // A minimized window reports a zero viewport: keep the plate where it is rather than clamp
+    // into an empty range.
+    let (lo, hi) = (size.x / 2.0 + 8.0, view_size.x - size.x / 2.0 - 8.0);
+    if lo <= hi {
+        p.x = p.x.clamp(lo, hi);
+    }
     p.y = p.y.max(size.y + 8.0);
     p
 }
