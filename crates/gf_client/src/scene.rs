@@ -276,6 +276,10 @@ pub struct Corpse {
     /// Swarms fade to ash in their clip: the contact shadow goes with them.
     pub swarm: bool,
     shadow: Option<Entity>,
+    /// The model, and whether the killing blow's flash has been taken off it yet.
+    model: Option<Entity>,
+    hot: bool,
+    dressed: bool,
 }
 
 /// How long a sinking corpse takes to go under (s).
@@ -532,6 +536,9 @@ fn sync_entities(
                 depth: v.radius * 2.0 + 0.5,
                 swarm: v.radius < 0.8,
                 shadow: v.parts[2],
+                model: v.model,
+                hot: v.hot,
+                dressed: false,
             })
         });
         match corpse {
@@ -655,18 +662,32 @@ fn sync_enemy_models(
 }
 
 /// Corpses stand for their death clip, then sink and go.
+#[allow(clippy::too_many_arguments)]
 fn tick_corpses(
     mut commands: Commands,
     time: Res<Time>,
+    pal: Res<Palette>,
+    stds: Res<Assets<StandardMaterial>>,
+    mut toons: ResMut<Assets<ToonMaterial>>,
+    mut skins: ResMut<SkinCache>,
     mut index: ResMut<SceneIndex>,
     mut q: Query<(&mut Corpse, &mut Transform)>,
     mut vis: Query<&mut Visibility>,
+    mut models: Query<&mut ModelParts>,
 ) {
     let dt = time.delta_secs();
     index.corpses.retain(|&e| {
         let Ok((mut c, mut tf)) = q.get_mut(e) else { return false };
         c.age += dt;
         tf.scale = Vec3::ONE;
+        // The killing blow flashes it for a moment; the death plays in its own paint.
+        if !c.dressed && c.age >= FLASH_TIME {
+            c.dressed = true;
+            if let Some(mut parts) = c.model.and_then(|m| models.get_mut(m).ok()) {
+                let skin = Skin::Foe { tint: FoeTint::Base, hot: c.hot };
+                models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
+            }
+        }
         if c.hold.is_infinite() && c.age > CORPSE_MAX {
             c.hold = c.age;
         }
