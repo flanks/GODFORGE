@@ -47,7 +47,9 @@ CLIENT OPTIONS
   --window <W>x<H>  --no-vsync  --no-damage-numbers  --no-shake  --no-shadows
   --fps                        log FPS, mean/worst frame time and enemy count once a second
   --horde <n>                  QA: hold n enemies on the field (look and frame time at peak horde)
-  --ui-shot kit|icons          QA: open a UI board for screenshots (the widget kit, every icon)
+  --ui-shot kit|icons|cards    QA: open a UI board for screenshots (the widget kit, every icon)
+  --ui-shot forge|boon|end|defeat|help|doors
+                               QA: force a panel open with sample data for screenshots
   --hud-off                    QA: hide every UI node (clean plates for mockups)
   --hud-scale <0.85-1.15>      HUD size multiplier (default 1)
 

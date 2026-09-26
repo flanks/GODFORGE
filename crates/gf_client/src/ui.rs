@@ -1,76 +1,166 @@
-//! Interactive panels: the Forge (equip / fuse / reroll / salvage with a live DPS preview), god
-//! boon offers, door choice (a touch-friendly alternative to walking into a door) and the
-//! end-of-run screen. Every button carries a [`UiAction`]; one global `Activate` observer turns
-//! clicks into the same reliable `PlayerAction`s the bots send.
+//! # Panels (UI_STYLE §7): the Forge drawer, the boon spread, the end of the run, help, the door
+//! panel and tooltips, all built from the kit ([`crate::uikit`]).
 //!
-//! The preview runs `gf_core::forge::apply_action` on a copy of the build — the exact function the
-//! host applies — so what the panel promises is what the anvil does.
+//! * Every button carries a [`UiAction`]; one global `On<Activate>` observer turns clicks, pad
+//!   presses and keys into the same reliable `PlayerAction`s the bots send.
+//! * The Forge previews run `gf_core::forge::apply_action` on a copy of the build (the function the
+//!   host applies), so what the drawer promises is what the anvil does.
+//! * Panels rebuild only when their content changes; hover, selection, the heat ring and the
+//!   camera framing update in place (§7.1 "Behaviour fix", §11.10).
+//! * [`PanelState`], [`BoonSpread`] and [`PanelFraming`] are public so the HUD can hide the
+//!   Tracker, the Arsenal and the boon chip under a panel and the camera can ease aside.
+//!
+//! | Module | Panel |
+//! |---|---|
+//! | [`forge`] | the Forge drawer at a Hot anvil (Tab) |
+//! | [`boons`] | the boon spread (Tab from the chip, or on its own when the hero is safe) |
+//! | [`end`] | victory and defeat |
+//! | [`help`] | the help tome (H) |
+//! | [`doors`] | the legacy door panel (`--room`, boss transitions) |
+//! | [`tips`] | hover tooltips |
+//! | [`qa`] | `--ui-shot forge|boon|end|defeat|help|doors`: sample data for screenshots |
 
-use crate::input::InputState;
+mod boons;
+mod doors;
+mod end;
+mod forge;
+mod help;
+mod qa;
+mod tips;
+
+pub use boons::BoonSpread;
+pub use forge::{BagFilter, ForgeSelection};
+pub use tips::Tip;
+
+use crate::input::{Device, InputState, Settings};
 use crate::net::{Link, Prediction, start_link};
-use crate::palette::{element_color, hex, rarity_color};
-use crate::scene::{SceneIndex, door_label};
-use crate::{ClientConfig, ClientSet, Connect, UiFonts};
-use gf_content::{BoonKind, ContentDb};
-use gf_core::forge::{ForgeAction, ForgeWallet, PartBag, PartCatalog, PartInstance, Slot, WeaponBuild, apply_action};
-use gf_core::ids::PartId;
-use gf_core::rarity::Rarity;
-use gf_core::weapon::{DpsEnv, compile, estimate_dps};
-use gf_engine::bevy::ui::InteractionDisabled;
-use gf_engine::client::{Activate, Hovered, UiButton, button, is_hovered, text, text_in};
+use crate::palette::element_color;
+use crate::scene::SceneIndex;
+use crate::theme::{HudScale, Ty};
+use crate::{ClientConfig, ClientSet, Connect};
+use gf_core::damage::DamageType;
+use gf_core::forge::ForgeAction;
+use gf_engine::client::{Activate, Hovered, InputFocus, InteractionDisabled, UiButton};
 use gf_engine::prelude::*;
 use gf_net::*;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
-const INK: Color = Color::srgba(0.05, 0.035, 0.03, 0.92);
-const EDGE: Color = Color::srgba(0.78, 0.6, 0.32, 0.7);
-const PARCHMENT: Color = Color::srgb(0.96, 0.9, 0.78);
-const DIM: Color = Color::srgb(0.66, 0.6, 0.52);
-const BTN: Color = Color::srgb(0.2, 0.13, 0.08);
-const BTN_HOVER: Color = Color::srgb(0.36, 0.24, 0.12);
-const BTN_OFF: Color = Color::srgb(0.12, 0.1, 0.09);
+// ───────────────────────────── shared state ─────────────────────────────
+
+/// Which panels are open this frame. The HUD hides the Tracker, the Arsenal and the boon chip
+/// under the Forge drawer and the Tracker under the boon spread (§7.1, §7.2).
+#[derive(Resource, Default, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PanelState {
+    pub forge: bool,
+    pub boons: bool,
+    pub doors: bool,
+    pub end: bool,
+    pub help: bool,
+}
+
+impl PanelState {
+    /// A panel that owns the pad (D-pad focus, South to activate, §7.6).
+    pub fn captures_pad(&self) -> bool {
+        self.forge || self.boons || self.end || self.help || self.doors
+    }
+}
+
+/// PanelFraming (§7.1, §7.2): the camera's look offset while a panel is open, in fractions of the
+/// window height. `x > 0` moves the view right, so the hero sits left of centre (the Forge);
+/// `y > 0` moves the hero down (the boon spread). Eased over 350 ms (cubic out); `camera.rs` adds
+/// `current` to its target.
+#[derive(Resource, Default, Clone, Copy, Debug)]
+pub struct PanelFraming {
+    pub target: Vec2,
+    pub current: Vec2,
+    from: Vec2,
+    t: f32,
+}
 
 /// What a button does.
 #[derive(Component, Clone, Copy, Debug, PartialEq)]
 pub enum UiAction {
+    /// A reliable player action, sent as is (boon picks, door choices).
     Player(PlayerAction),
+    /// A Forge action. With `confirm`, the first press arms the button and the second one sends
+    /// it (fuse, reroll, salvage of Rare or better; §7.1).
+    Forge {
+        action: ForgeAction,
+        confirm: bool,
+    },
+    /// Select a bag card (it drives the detail pane and the preview).
+    SelectPart(u32),
+    /// A bag filter chip.
+    Filter(BagFilter),
     CloseForge,
+    /// Close the boon spread; the offer waits on the chip.
+    BoonLater,
     Restart,
     Quit,
+    /// A help footer switch.
+    Toggle(help::Switch),
+    CloseHelp,
 }
 
-#[derive(Component, Clone, Copy, PartialEq, Eq, Debug)]
-enum Panel {
+/// Focusable with the pad's D-pad while its panel is on top (§7.6).
+#[derive(Component, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Nav(pub PanelKind);
+
+/// The panels, top-most last.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum PanelKind {
+    Doors,
     Forge,
     Boons,
-    Doors,
     End,
+    Help,
 }
 
-/// The forge panel's wallet + cooldown line, refreshed in place every frame.
+/// A panel surface that swallows the pointer: hovering it stops the weapon from firing.
 #[derive(Component)]
-struct ForgeTimer;
+struct CapturesPointer;
 
-fn wallet_line(wallet: &ForgeWallet, time_left: f32) -> String {
-    format!(
-        "Godshards {} · Charges {} · Free {} · cools in {:.0}s",
-        wallet.godshards, wallet.charges, wallet.free_actions, time_left
-    )
+/// A fixed-size panel canvas scaled down to fit small windows. `pivot` (−0.5..0.5 from the
+/// centre) is the point that stays put; `pad` is the total margin kept free on each axis.
+#[derive(Component, Clone, Copy, Debug)]
+struct Fit {
+    size: Vec2,
+    pivot: Vec2,
+    pad: Vec2,
 }
 
-fn update_forge_timer(link: Res<Link>, mut q: Query<&mut Text, With<ForgeTimer>>) {
-    let Some(w) = link.latest.as_deref() else { return };
-    let line = wallet_line(&w.private.wallet, w.private.anvil.map_or(0.0, |a| a.time_left));
-    for mut t in &mut q {
-        if t.0 != line {
-            t.0 = line.clone();
+/// A number that counts up to its value (DPS 400 ms, end stats 0.8 s; §10).
+#[derive(Component, Clone, Copy, Debug)]
+struct CountUp {
+    from: f64,
+    to: f64,
+    t: f32,
+    dur: f32,
+    delay: f32,
+    fmt: NumFmt,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum NumFmt {
+    /// `1,284`
+    Thousands,
+    /// `+312`
+    Signed,
+    /// `64%`
+    Percent,
+    /// `21:48`
+    Clock,
+}
+
+impl NumFmt {
+    fn format(self, v: f64) -> String {
+        match self {
+            NumFmt::Thousands => thousands(v.round() as u64),
+            NumFmt::Signed => format!("+{}", thousands(v.round().max(0.0) as u64)),
+            NumFmt::Percent => format!("{:.0}%", v),
+            NumFmt::Clock => clock(v as f32),
         }
     }
-}
-
-#[derive(Resource, Default)]
-struct PanelKeys {
-    keys: [Option<u64>; 4],
 }
 
 #[derive(Resource, Default)]
@@ -79,57 +169,338 @@ struct UiRequests {
     quit: bool,
 }
 
+/// The world the panels show: the live snapshot, or the QA sample under `--ui-shot`.
+#[derive(Resource, Default)]
+pub(crate) struct PanelWorld {
+    qa: Option<WorldSnapshot>,
+    shot: qa::Shot,
+}
+
+impl PanelWorld {
+    fn get<'a>(&'a self, link: &'a Link) -> Option<&'a WorldSnapshot> {
+        self.qa.as_ref().or(link.latest.as_deref())
+    }
+}
+
+fn me_in(w: &WorldSnapshot, slot: Option<u8>) -> Option<&PlayerView> {
+    let slot = slot?;
+    w.players.iter().find(|p| p.slot == slot)
+}
+
 pub fn build(app: &mut App) {
-    app.init_resource::<PanelKeys>()
-        .init_resource::<UiRequests>()
+    app.init_resource::<UiRequests>()
+        .init_resource::<PanelState>()
+        .init_resource::<PanelFraming>()
+        .init_resource::<PanelWorld>()
+        .init_resource::<InputFocus>()
         .add_observer(on_activate)
-        .add_systems(Update, (toggle_forge, ui_capture).chain().in_set(ClientSet::Net))
         .add_systems(
             Update,
-            (rebuild_panels, update_forge_timer, style_buttons, apply_requests).chain().in_set(ClientSet::Presentation),
+            (qa::fill, update_state, boons::auto_open, panel_keys, pad_nav, ui_capture).chain().in_set(ClientSet::Net),
+        )
+        .add_systems(
+            Update,
+            (
+                forge::sync,
+                boons::sync,
+                doors::sync,
+                end::sync,
+                help::sync,
+                tips::sync,
+                (framing, fit_panels, count_up),
+                apply_requests,
+            )
+                .chain()
+                .in_set(ClientSet::Presentation),
         );
+    forge::build(app);
+    boons::build(app);
+    qa::build(app);
 }
 
-fn toggle_forge(keys: Res<ButtonInput<KeyCode>>, link: Res<Link>, mut input: ResMut<InputState>) {
-    let at_anvil = link.latest.as_ref().is_some_and(|w| w.private.at_anvil);
-    if keys.just_pressed(KeyCode::Tab) && at_anvil {
-        input.forge_open = !input.forge_open;
+// ───────────────────────────── state, keys, focus ─────────────────────────────
+
+fn update_state(
+    link: Res<Link>,
+    pw: Res<PanelWorld>,
+    input: Res<InputState>,
+    settings: Res<Settings>,
+    spread: Res<BoonSpread>,
+    mut state: ResMut<PanelState>,
+) {
+    let w = pw.get(&link);
+    let end = w.is_some_and(|w| matches!(w.run.phase, RunPhase::Victory | RunPhase::Defeat));
+    let next = PanelState {
+        forge: !end && forge::is_open(&pw, &input, w),
+        boons: !end && spread.open && w.is_some_and(|w| !w.private.boon_offer.is_empty()),
+        doors: !end && w.is_some_and(doors::has_doors),
+        end,
+        help: settings.help,
+    };
+    if *state != next {
+        *state = next;
     }
-    if keys.just_pressed(KeyCode::Escape) || !at_anvil {
+}
+
+/// Panel keys (§7.6): Tab / View opens the pending choice (the Forge at a hot anvil, else the
+/// boon spread) and closes it; Esc closes; 1–4 pick a boon; X / West rerolls; Enter / Esc on the
+/// end screen. While a panel is up it owns the pad's D-pad and South / West.
+#[allow(clippy::too_many_arguments)]
+fn panel_keys(
+    keys: Res<ButtonInput<KeyCode>>,
+    pads: Query<&Gamepad>,
+    link: Res<Link>,
+    pw: Res<PanelWorld>,
+    state: Res<PanelState>,
+    mut input: ResMut<InputState>,
+    mut spread: ResMut<BoonSpread>,
+    mut settings: ResMut<Settings>,
+    mut req: ResMut<UiRequests>,
+) {
+    let w = pw.get(&link);
+    let at_anvil = w.is_some_and(|w| w.private.at_anvil);
+    let offers = w.map_or(0, |w| w.private.boon_offer.len());
+    let rerolls = w.map_or(0, |w| w.private.boon_rerolls);
+    let pad = |b: GamepadButton| pads.iter().any(|p| p.just_pressed(b));
+    let tab = keys.just_pressed(KeyCode::Tab) || pad(GamepadButton::Select);
+    let esc = keys.just_pressed(KeyCode::Escape);
+
+    if state.end {
+        if keys.just_pressed(KeyCode::Enter) || keys.just_pressed(KeyCode::NumpadEnter) {
+            req.restart = true;
+        } else if esc {
+            req.quit = true;
+        }
+    } else if esc && settings.help {
+        settings.help = false;
+    } else if tab || esc {
+        if input.forge_open {
+            input.forge_open = false;
+        } else if spread.open {
+            spread.later(w);
+        } else if tab && at_anvil {
+            input.forge_open = true;
+        } else if tab && offers > 0 {
+            spread.open = true;
+        }
+    }
+    if !at_anvil {
         input.forge_open = false;
     }
+    if state.boons && spread.open {
+        for (i, k) in [KeyCode::Digit1, KeyCode::Digit2, KeyCode::Digit3, KeyCode::Digit4].into_iter().enumerate() {
+            if keys.just_pressed(k) && i < offers {
+                input.actions.push(PlayerAction::PickBoon(i as u8));
+            }
+        }
+        if (keys.just_pressed(KeyCode::KeyX) || pad(GamepadButton::West)) && rerolls > 0 {
+            input.actions.push(PlayerAction::RerollBoons);
+        }
+    }
+    let capture = state.captures_pad();
+    if input.panel_pad_capture != capture {
+        input.panel_pad_capture = capture;
+    }
 }
 
-fn ui_capture(buttons: Query<&Hovered, With<UiButton>>, mut input: ResMut<InputState>) {
-    input.ui_captures = buttons.iter().any(is_hovered);
+/// Pad focus (§7.6): the D-pad walks the focusable buttons of the top panel by screen position,
+/// South activates the focused one. The kit draws pad focus as hover. Keyboard and mouse clear
+/// it, so Space and Enter never press a panel button by accident.
+#[allow(clippy::too_many_arguments)]
+fn pad_nav(
+    mut commands: Commands,
+    pads: Query<&Gamepad>,
+    input: Res<InputState>,
+    state: Res<PanelState>,
+    navs: Query<(Entity, &Nav, &UiGlobalTransform, &ComputedNode, &InheritedVisibility, Has<InteractionDisabled>)>,
+    mut focus: ResMut<InputFocus>,
+) {
+    let top = [
+        (state.help, PanelKind::Help),
+        (state.end, PanelKind::End),
+        (state.boons, PanelKind::Boons),
+        (state.forge, PanelKind::Forge),
+        (state.doors, PanelKind::Doors),
+    ]
+    .into_iter()
+    .find_map(|(open, k)| open.then_some(k));
+    let (Some(top), Device::Gamepad) = (top, input.device) else {
+        if focus.get().is_some() {
+            focus.clear();
+        }
+        return;
+    };
+    let items: Vec<(Entity, Vec2, bool)> = navs
+        .iter()
+        .filter(|(_, n, _, node, vis, _)| n.0 == top && vis.get() && node.size().x > 0.0)
+        .map(|(e, _, tf, _, _, disabled)| (e, tf.translation, disabled))
+        .collect();
+    if items.is_empty() {
+        return;
+    }
+    let current = focus.get().and_then(|f| items.iter().find(|(e, ..)| *e == f).copied());
+    let Some((cur, at, disabled)) = current else {
+        // First focus: the middle item of the panel's first row (the middle boon card, EQUIP).
+        let mut sorted = items.clone();
+        sorted.sort_by(|a, b| (a.1.y, a.1.x).partial_cmp(&(b.1.y, b.1.x)).unwrap_or(std::cmp::Ordering::Equal));
+        let first_row: Vec<_> = sorted.iter().filter(|i| (i.1.y - sorted[0].1.y).abs() < 20.0).collect();
+        *focus = InputFocus::from_entity(first_row[first_row.len() / 2].0);
+        return;
+    };
+    let pad = |b: GamepadButton| pads.iter().any(|p| p.just_pressed(b));
+    let dir = if pad(GamepadButton::DPadUp) {
+        Some(Vec2::NEG_Y)
+    } else if pad(GamepadButton::DPadDown) {
+        Some(Vec2::Y)
+    } else if pad(GamepadButton::DPadLeft) {
+        Some(Vec2::NEG_X)
+    } else if pad(GamepadButton::DPadRight) {
+        Some(Vec2::X)
+    } else {
+        None
+    };
+    if let Some(d) = dir {
+        // The nearest item in the pressed direction, favouring those straight ahead.
+        let best = items
+            .iter()
+            .filter(|(e, ..)| *e != cur)
+            .filter_map(|(e, p, _)| {
+                let v = *p - at;
+                let ahead = v.dot(d);
+                (ahead > 4.0).then(|| (*e, ahead + (v - d * ahead).length() * 2.5))
+            })
+            .min_by(|a, b| a.1.total_cmp(&b.1));
+        if let Some((e, _)) = best {
+            *focus = InputFocus::from_entity(e);
+        }
+    }
+    if pad(GamepadButton::South) && !disabled {
+        commands.trigger(Activate { entity: cur });
+    }
 }
 
+/// Hovering a button or a panel surface stops the weapon from firing.
+fn ui_capture(
+    buttons: Query<&Hovered, With<UiButton>>,
+    surfaces: Query<&Hovered, With<CapturesPointer>>,
+    mut input: ResMut<InputState>,
+) {
+    let capture = buttons.iter().chain(surfaces.iter()).any(|h| h.get());
+    if input.ui_captures != capture {
+        input.ui_captures = capture;
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
 fn on_activate(
     ev: On<Activate>,
     actions: Query<&UiAction>,
+    disabled: Query<(), With<InteractionDisabled>>,
+    time: Res<Time>,
     mut input: ResMut<InputState>,
     mut req: ResMut<UiRequests>,
+    mut sel: ResMut<ForgeSelection>,
+    mut spread: ResMut<BoonSpread>,
+    mut settings: ResMut<Settings>,
+    mut hud_scale: ResMut<HudScale>,
+    link: Res<Link>,
+    pw: Res<PanelWorld>,
 ) {
     let Ok(action) = actions.get(ev.entity) else { return };
+    if disabled.contains(ev.entity) {
+        return;
+    }
     match *action {
         UiAction::Player(a) => input.actions.push(a),
+        UiAction::Forge { action, confirm } => {
+            if confirm && sel.armed != Some(action) {
+                sel.arm(action, time.elapsed_secs());
+            } else {
+                sel.disarm();
+                input.actions.push(PlayerAction::Forge(action));
+            }
+        }
+        UiAction::SelectPart(uid) => {
+            if sel.selected != Some(uid) {
+                sel.selected = Some(uid);
+                sel.disarm();
+            }
+        }
+        UiAction::Filter(f) => {
+            sel.filter = f;
+            sel.disarm();
+        }
         UiAction::CloseForge => input.forge_open = false,
+        UiAction::BoonLater => spread.later(pw.get(&link)),
         UiAction::Restart => req.restart = true,
         UiAction::Quit => req.quit = true,
+        UiAction::Toggle(s) => help::toggle(s, &mut settings, &mut hud_scale),
+        UiAction::CloseHelp => settings.help = false,
     }
 }
 
-fn style_buttons(
-    mut q: Query<(&Hovered, &mut BackgroundColor, Has<InteractionDisabled>), (With<UiButton>, Changed<Hovered>)>,
+// ───────────────────────────── motion helpers ─────────────────────────────
+
+/// Ease the camera framing toward the open panel's offset (§7.1: 420 px right for the Forge,
+/// §7.2: 200 px down for the boon spread; 350 ms, cubic out).
+fn framing(time: Res<Time>, state: Res<PanelState>, mut f: ResMut<PanelFraming>) {
+    let target = if state.end {
+        Vec2::ZERO
+    } else if state.forge {
+        Vec2::new(420.0 / 1080.0, 0.0)
+    } else if state.boons {
+        Vec2::new(0.0, 200.0 / 1080.0)
+    } else {
+        Vec2::ZERO
+    };
+    if f.target != target {
+        f.from = f.current;
+        f.target = target;
+        f.t = 0.0;
+    }
+    if f.t < 1.0 {
+        f.t = (f.t + time.delta_secs() / 0.35).min(1.0);
+        let k = 1.0 - (1.0 - f.t).powi(3);
+        f.current = f.from + (f.target - f.from) * k;
+    }
+}
+
+/// Scale fixed-size canvases down to fit the window (logical px after UiScale).
+fn fit_panels(
+    windows: Query<&Window, With<gf_engine::client::PrimaryWindow>>,
+    scale: Res<UiScale>,
+    mut q: Query<(&Fit, &mut UiTransform)>,
 ) {
-    for (h, mut bg, disabled) in &mut q {
-        bg.0 = if disabled {
-            BTN_OFF
-        } else if is_hovered(h) {
-            BTN_HOVER
-        } else {
-            BTN
-        };
+    let Ok(w) = windows.single() else { return };
+    let logical = Vec2::new(w.width(), w.height()) / scale.0.max(0.01);
+    for (fit, mut tf) in &mut q {
+        let k = ((logical.x - fit.pad.x) / fit.size.x).min((logical.y - fit.pad.y) / fit.size.y).clamp(0.3, 1.0);
+        let shift = fit.pivot * fit.size * (1.0 - k);
+        let translation = Val2::px(shift.x, shift.y);
+        if (tf.scale.x - k).abs() > 1e-3 || tf.translation != translation {
+            tf.scale = Vec2::splat(k);
+            tf.translation = translation;
+        }
+    }
+}
+
+fn count_up(
+    mut commands: Commands,
+    time: Res<Time>,
+    settings: Res<Settings>,
+    mut q: Query<(Entity, &mut CountUp, &mut Text)>,
+) {
+    for (e, mut c, mut text) in &mut q {
+        c.t += time.delta_secs();
+        let raw = if settings.reduced_motion { 1.0 } else { ((c.t - c.delay) / c.dur.max(1e-3)).clamp(0.0, 1.0) };
+        let k = 1.0 - (1.0 - raw as f64).powi(3);
+        let s = c.fmt.format(c.from + (c.to - c.from) * k);
+        if text.0 != s {
+            text.0 = s;
+        }
+        if raw >= 1.0 {
+            commands.entity(e).remove::<CountUp>();
+        }
     }
 }
 
@@ -141,7 +512,7 @@ fn apply_requests(
     mut link: ResMut<Link>,
     mut pred: ResMut<Prediction>,
     mut index: ResMut<SceneIndex>,
-    mut keys: ResMut<PanelKeys>,
+    mut sel: ResMut<ForgeSelection>,
     mut exits: MessageWriter<AppExit>,
 ) {
     if req.quit {
@@ -158,485 +529,134 @@ fn apply_requests(
         *link = start_link(&cfg);
         *pred = Prediction::default();
         index.reset(&mut commands);
-        *keys = PanelKeys::default();
+        *sel = ForgeSelection::default();
     }
 }
 
-// ───────────────────────────── panel building ─────────────────────────────
+// ───────────────────────────── shared helpers ─────────────────────────────
 
-fn key_of(parts: impl std::fmt::Debug) -> u64 {
+fn key_of(parts: impl Hash) -> u64 {
+    // Callers hash a `format!("{:?}")` of the content they show.
     let mut h = DefaultHasher::new();
-    format!("{parts:?}").hash(&mut h);
+    parts.hash(&mut h);
     h.finish()
 }
 
-fn node_button(p: &mut ChildSpawnerCommands, label: impl Into<String>, action: UiAction, enabled: bool) {
-    let mut e = p.spawn((
-        button(
-            Node {
-                padding: UiRect::axes(Val::Px(10.0), Val::Px(6.0)),
-                min_height: Val::Px(40.0),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                border: UiRect::all(Val::Px(1.0)),
-                border_radius: BorderRadius::all(Val::Px(5.0)),
-                ..default()
-            },
-            if enabled { BTN } else { BTN_OFF },
-            EDGE,
-        ),
-        action,
-    ));
-    if !enabled {
-        e.insert(InteractionDisabled);
-    }
-    let label = label.into();
-    e.with_children(|b| {
-        b.spawn(text(label, 14.0, if enabled { PARCHMENT } else { DIM }));
-    });
-}
-
-fn panel_root(commands: &mut Commands, which: Panel, node: Node) -> Entity {
-    commands
-        .spawn((
-            which,
-            Node {
-                padding: UiRect::all(Val::Px(12.0)),
-                border: UiRect::all(Val::Px(1.0)),
-                border_radius: BorderRadius::all(Val::Px(8.0)),
-                flex_direction: FlexDirection::Column,
-                row_gap: Val::Px(6.0),
-                ..node
-            },
-            BackgroundColor(INK),
-            BorderColor::all(EDGE),
-            GlobalZIndex(10),
-        ))
-        .id()
-}
-
-#[allow(clippy::too_many_arguments)]
-fn rebuild_panels(
-    mut commands: Commands,
-    cfg: Res<ClientConfig>,
-    link: Res<Link>,
-    input: Res<InputState>,
-    fonts: Res<UiFonts>,
-    mut keys: ResMut<PanelKeys>,
-    panels: Query<(Entity, &Panel)>,
-) {
-    let display = &fonts.display;
-    let db = &cfg.content;
-    let world = link.latest.as_deref();
-    let me = link.me();
-    let wanted: [Option<u64>; 4] = [
-        match (world, me) {
-            (Some(w), Some(p)) if input.forge_open && w.private.at_anvil => {
-                let t = w.private.anvil.map_or(0, |a| a.time_left as u32);
-                Some(key_of((&w.private.bag, &w.private.wallet, &p.weapon, t)))
-            }
-            _ => None,
-        },
-        match world {
-            Some(w) if !w.private.boon_offer.is_empty() => {
-                Some(key_of((&w.private.boon_offer, w.private.boon_rerolls)))
-            }
-            _ => None,
-        },
-        match world {
-            Some(w) if w.run.phase == RunPhase::Cleared => {
-                let doors: Vec<_> =
-                    w.entities.iter().filter(|e| matches!(e.kind, EntityKind::Door { .. })).map(|e| e.kind).collect();
-                (!doors.is_empty()).then(|| key_of(doors))
-            }
-            _ => None,
-        },
-        match world {
-            Some(w) if matches!(w.run.phase, RunPhase::Victory | RunPhase::Defeat) => {
-                Some(key_of((w.run.phase, w.run.kills)))
-            }
-            _ => None,
-        },
-    ];
-    for (i, which) in [Panel::Forge, Panel::Boons, Panel::Doors, Panel::End].into_iter().enumerate() {
-        if keys.keys[i] == wanted[i] {
-            continue;
+/// `1284` → `1,284`.
+pub(crate) fn thousands(n: u64) -> String {
+    let s = n.to_string();
+    let mut out = String::with_capacity(s.len() + s.len() / 3);
+    for (i, c) in s.chars().enumerate() {
+        if i > 0 && (s.len() - i).is_multiple_of(3) {
+            out.push(',');
         }
-        keys.keys[i] = wanted[i];
-        for (e, p) in &panels {
-            if *p == which {
-                commands.entity(e).despawn();
-            }
-        }
-        if wanted[i].is_none() {
-            continue;
-        }
-        let (Some(w), Some(p)) = (world, me) else { continue };
-        match which {
-            Panel::Forge => forge_panel(&mut commands, db, w, p, display),
-            Panel::Boons => boon_panel(&mut commands, db, w, display),
-            Panel::Doors => door_panel(&mut commands, db, w, display),
-            Panel::End => end_panel(&mut commands, db, &link, w, display),
-        }
+        out.push(c);
+    }
+    out
+}
+
+/// Seconds → `21:48` (or `1:02:03`).
+pub(crate) fn clock(secs: f32) -> String {
+    let s = secs.max(0.0) as u32;
+    if s >= 3600 {
+        format!("{}:{:02}:{:02}", s / 3600, s / 60 % 60, s % 60)
+    } else {
+        format!("{}:{:02}", s / 60, s % 60)
     }
 }
 
-/// Content-backed catalog for forge previews (reroll is random, so it previews nothing).
-struct PreviewCatalog<'a>(&'a ContentDb);
-
-impl PartCatalog for PreviewCatalog<'_> {
-    fn slot_of(&self, part: PartId) -> Option<Slot> {
-        self.0.part_slot(part)
-    }
-    fn reroll_pick(&mut self, _slot: Slot, _exclude: PartId) -> Option<PartId> {
-        None
-    }
-    fn salvage_value(&self, rarity: Rarity) -> u32 {
-        self.0.game.rarity.salvage_shards[rarity.index()]
-    }
-}
-
-fn build_dps(db: &ContentDb, build: &WeaponBuild) -> f32 {
-    let chassis = db.chassis_def(build.chassis);
-    let mut mods = chassis.mods.clone();
-    for (_, part) in build.equipped() {
-        mods.extend(db.part_mods(part.part, part.rarity));
-    }
-    let profile = compile(&chassis.stats, &mods);
-    let env = DpsEnv { status: db.game.status.clone(), ..default() };
-    estimate_dps(&profile, &env).single_target
-}
-
-/// Preview an anvil action on copies: Ok(new DPS) or the error the host would return.
-fn preview(
-    db: &ContentDb,
-    action: ForgeAction,
-    build: &WeaponBuild,
-    bag: &PartBag,
-    wallet: &ForgeWallet,
-) -> Result<f32, String> {
-    let (mut b, mut g, mut w) = (build.clone(), bag.clone(), *wallet);
-    let mut uid = 0;
-    apply_action(action, &mut b, &mut g, &mut w, &db.game.forge, &mut PreviewCatalog(db), &mut uid)
-        .map_err(|e| e.to_string())?;
-    Ok(build_dps(db, &b))
-}
-
-fn part_line(db: &ContentDb, part: PartInstance) -> (String, String, Color) {
-    let def = db.parts.try_get(part.part.0);
-    let name = def.map_or("?".to_string(), |d| d.name.clone());
-    let slot = db.part_slot(part.part).map_or("?", |s| s.name());
+/// A full-window root node for a panel layer at `z`.
+fn layer(z: i32) -> impl Bundle {
     (
-        format!("{name} · {} {slot}", part.rarity.name()),
-        def.map_or(String::new(), |d| d.desc.clone()),
-        rarity_color(part.rarity),
+        Node {
+            position_type: PositionType::Absolute,
+            left: px(0.0),
+            top: px(0.0),
+            width: percent(100.0),
+            height: percent(100.0),
+            ..default()
+        },
+        GlobalZIndex(z),
+        gf_engine::client::Pickable::IGNORE,
     )
 }
 
-fn delta(before: f32, after: f32) -> String {
-    let pct = (after / before.max(1e-3) - 1.0) * 100.0;
-    if pct.abs() < 0.5 { "±0%".into() } else { format!("{pct:+.0}%") }
+/// The element a rules-text keyword names (status keywords count as their element, §3.4).
+fn keyword_element(word: &str) -> Option<Option<DamageType>> {
+    let w = word.to_ascii_lowercase();
+    let starts = |p: &[&str]| p.iter().any(|k| w.starts_with(k));
+    Some(if starts(&["burn", "flame", "ignite", "scorch"]) {
+        Some(DamageType::Flame)
+    } else if starts(&["shock", "storm", "lightning"]) {
+        Some(DamageType::Storm)
+    } else if starts(&["curse", "void"]) {
+        Some(DamageType::Void)
+    } else if starts(&["bleed", "kinetic"]) {
+        Some(DamageType::Kinetic)
+    } else if starts(&["plague", "poison", "blight"]) {
+        Some(DamageType::Plague)
+    } else if starts(&["radiant", "smite"]) {
+        Some(DamageType::Radiant)
+    } else if starts(&["doom", "root", "mark", "execute", "crit"]) {
+        None
+    } else {
+        return None;
+    })
 }
 
-fn forge_panel(commands: &mut Commands, db: &ContentDb, w: &WorldSnapshot, p: &PlayerView, display: &Handle<Font>) {
-    let root = panel_root(
-        commands,
-        Panel::Forge,
-        Node {
-            position_type: PositionType::Absolute,
-            right: Val::Px(14.0),
-            top: Val::Px(120.0),
-            width: Val::Px(470.0),
-            max_height: Val::Percent(78.0),
-            overflow: Overflow::clip_y(),
-            ..default()
-        },
-    );
-    let wallet = w.private.wallet;
-    let bag = &w.private.bag;
-    let rules = &db.game.forge;
-    let now = build_dps(db, &p.weapon);
-    let chassis = db.chassis.try_get(p.weapon.chassis.0).map_or("?", |c| c.name.as_str());
-    let time_left = w.private.anvil.map_or(0.0, |a| a.time_left);
-    let prof = gf_sim::bot::weapon_for(db, p);
-    let recipes: Vec<String> = db
-        .recipes
-        .enumerate()
-        .filter(|(id, _)| {
-            db.recipe_ingredients
-                .get(*id as usize)
-                .is_some_and(|ings| gf_core::forge::recipe_satisfied(ings, &p.weapon, prof.element))
-        })
-        .map(|(_, r)| r.name.clone())
-        .collect();
-    commands.entity(root).with_children(|c| {
-        c.spawn(Node {
-            flex_direction: FlexDirection::Row,
-            justify_content: JustifyContent::SpaceBetween,
-            align_items: AlignItems::Center,
-            ..default()
-        })
-        .with_children(|row| {
-            row.spawn(text_in(format!("THE FORGE — {chassis}"), 21.0, hex("#FFC940"), display));
-            node_button(row, "Close [Tab]", UiAction::CloseForge, true);
-        });
-        c.spawn((ForgeTimer, text(wallet_line(&wallet, time_left), 13.0, DIM)));
-        c.spawn(text(
-            format!("Estimated DPS {now:.0} · {}", gf_core::weapon::describe(&prof).join(" · ")),
-            13.0,
-            element_color(prof.element),
-        ));
-        if !recipes.is_empty() {
-            c.spawn(text(format!("Named combo active: {}", recipes.join(", ")), 13.0, hex("#FFB82E")));
+/// Rules text as rich spans (§7.2): numbers in `ichor`, element and status keywords in their hue,
+/// other keywords bold, the rest `base`. Punctuation stays glued to its word.
+fn rules_spans(text: &str, base: Color) -> Vec<(Ty, String, Color)> {
+    use crate::theme::tok;
+    let mut out: Vec<(Ty, String, Color)> = Vec::new();
+    let push = |out: &mut Vec<(Ty, String, Color)>, ty: Ty, s: &str, c: Color| {
+        if let Some(last) = out.last_mut()
+            && last.0 == ty
+            && last.2 == c
+        {
+            last.1.push_str(s);
+            return;
         }
-        c.spawn(text("— Equipped —", 14.0, PARCHMENT));
-        for slot in Slot::ALL {
-            let locked = rules.locked_slots.contains(&slot);
-            c.spawn(Node {
-                flex_direction: FlexDirection::Row,
-                justify_content: JustifyContent::SpaceBetween,
-                align_items: AlignItems::Center,
-                column_gap: Val::Px(8.0),
-                ..default()
-            })
-            .with_children(|row| match p.weapon.get(slot) {
-                Some(part) => {
-                    let (name, desc, color) = part_line(db, part);
-                    row.spawn(Node { flex_direction: FlexDirection::Column, width: Val::Px(300.0), ..default() })
-                        .with_children(|col| {
-                            col.spawn(text(name, 14.0, color));
-                            col.spawn(text(desc, 11.0, DIM));
-                        });
-                    if locked {
-                        row.spawn(text("locked", 12.0, DIM));
-                    } else {
-                        let cost = if wallet.free_actions > 0 {
-                            "free".to_string()
-                        } else {
-                            format!("{}◆", rules.reroll_cost)
-                        };
-                        let ok =
-                            wallet.free_actions > 0 || (wallet.charges > 0 && wallet.godshards >= rules.reroll_cost);
-                        node_button(
-                            row,
-                            format!("Reroll · {cost}"),
-                            UiAction::Player(PlayerAction::Forge(ForgeAction::Reroll { slot })),
-                            ok,
-                        );
-                    }
-                }
-                None => {
-                    row.spawn(text(format!("{}: — empty —", slot.name()), 14.0, DIM));
-                }
-            });
+        out.push((ty, s.to_string(), c));
+    };
+    for (i, word) in text.split(' ').enumerate() {
+        if i > 0 {
+            push(&mut out, Ty::Body, " ", base);
         }
-        c.spawn(text(format!("— Bag ({}/{}) —", bag.items.len(), bag.capacity), 14.0, PARCHMENT));
-        if bag.items.is_empty() {
-            c.spawn(text("Kill elites and open caches to find parts.", 12.0, DIM));
+        let lead = word.len() - word.trim_start_matches(['(', '"']).len();
+        let core_end = word.trim_end_matches([',', '.', ';', ':', '!', '?', ')', '"']).len().max(lead);
+        let (pre, core, post) = (&word[..lead], &word[lead..core_end], &word[core_end..]);
+        push(&mut out, Ty::Body, pre, base);
+        if core.chars().any(|c| c.is_ascii_digit()) {
+            push(&mut out, Ty::Strong, core, tok::ICHOR);
+        } else if let Some(el) = keyword_element(core) {
+            let c = el.map_or(tok::PARCH, element_color);
+            push(&mut out, Ty::Strong, core, c);
+        } else {
+            push(&mut out, Ty::Body, core, base);
         }
-        for part in &bag.items {
-            let (name, desc, color) = part_line(db, *part);
-            let uid = part.uid;
-            let equip = preview(db, ForgeAction::Equip { uid }, &p.weapon, bag, &wallet);
-            let fuse = preview(db, ForgeAction::Fuse { uid }, &p.weapon, bag, &wallet);
-            let salvage = db.game.rarity.salvage_shards[part.rarity.index()];
-            c.spawn(Node {
-                flex_direction: FlexDirection::Column,
-                row_gap: Val::Px(3.0),
-                margin: UiRect::top(Val::Px(4.0)),
-                ..default()
-            })
-            .with_children(|col| {
-                col.spawn(text(name, 14.0, color));
-                col.spawn(text(desc, 11.0, DIM));
-                col.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(6.0), ..default() })
-                    .with_children(|row| {
-                        match &equip {
-                            Ok(dps) => node_button(
-                                row,
-                                format!("Equip {}", delta(now, *dps)),
-                                UiAction::Player(PlayerAction::Forge(ForgeAction::Equip { uid })),
-                                true,
-                            ),
-                            Err(e) => node_button(
-                                row,
-                                format!("Equip ({e})"),
-                                UiAction::Player(PlayerAction::Forge(ForgeAction::Equip { uid })),
-                                false,
-                            ),
-                        }
-                        match &fuse {
-                            Ok(dps) => node_button(
-                                row,
-                                format!("Fuse {}", delta(now, *dps)),
-                                UiAction::Player(PlayerAction::Forge(ForgeAction::Fuse { uid })),
-                                true,
-                            ),
-                            Err(_) => node_button(
-                                row,
-                                "Fuse",
-                                UiAction::Player(PlayerAction::Forge(ForgeAction::Fuse { uid })),
-                                false,
-                            ),
-                        }
-                        node_button(
-                            row,
-                            format!("Salvage +{salvage}◆"),
-                            UiAction::Player(PlayerAction::Forge(ForgeAction::Salvage { uid })),
-                            true,
-                        );
-                    });
-            });
-        }
-    });
+        push(&mut out, Ty::Body, post, base);
+    }
+    out.retain(|s| !s.1.is_empty());
+    out
 }
 
-fn boon_panel(commands: &mut Commands, db: &ContentDb, w: &WorldSnapshot, display: &Handle<Font>) {
-    let root = panel_root(
-        commands,
-        Panel::Boons,
-        Node {
-            position_type: PositionType::Absolute,
-            left: Val::Percent(50.0),
-            top: Val::Percent(24.0),
-            margin: UiRect::left(Val::Px(-400.0)),
-            width: Val::Px(800.0),
-            align_items: AlignItems::Center,
-            ..default()
-        },
-    );
-    commands.entity(root).with_children(|c| {
-        c.spawn(text_in("The gods answer — choose a boon", 22.0, hex("#FFC940"), display));
-        c.spawn(Node { flex_direction: FlexDirection::Row, column_gap: Val::Px(12.0), ..default() }).with_children(
-            |row| {
-                for (i, offer) in w.private.boon_offer.iter().enumerate() {
-                    let def = db.boons.try_get(offer.boon);
-                    let gods: Vec<&gf_content::GodDef> =
-                        def.map_or(Vec::new(), |d| d.gods.iter().filter_map(|g| db.gods.by_key(g)).collect());
-                    let god_color = gods.first().map_or(hex("#FFC940"), |g| hex(&g.color));
-                    let kind = def.map_or("", |d| match d.kind {
-                        BoonKind::Standard => "",
-                        BoonKind::Legendary => " · LEGENDARY",
-                        BoonKind::Duo => " · DUO",
-                        BoonKind::Team => " · TEAM",
-                    });
-                    let god_names = gods.iter().map(|g| g.name.as_str()).collect::<Vec<_>>().join(" & ");
-                    row.spawn((
-                        button(
-                            Node {
-                                width: Val::Px(240.0),
-                                min_height: Val::Px(170.0),
-                                padding: UiRect::all(Val::Px(10.0)),
-                                flex_direction: FlexDirection::Column,
-                                row_gap: Val::Px(6.0),
-                                border: UiRect::all(Val::Px(2.0)),
-                                border_radius: BorderRadius::all(Val::Px(8.0)),
-                                ..default()
-                            },
-                            BTN,
-                            god_color,
-                        ),
-                        UiAction::Player(PlayerAction::PickBoon(i as u8)),
-                    ))
-                    .with_children(|card| {
-                        card.spawn(text(format!("{god_names}{kind}"), 12.0, god_color));
-                        card.spawn(text_in(
-                            def.map_or("?", |d| d.name.as_str()),
-                            18.0,
-                            rarity_color(offer.rarity),
-                            display,
-                        ));
-                        card.spawn(text(offer.rarity.name(), 11.0, rarity_color(offer.rarity)));
-                        card.spawn(text(def.map_or("", |d| d.desc.as_str()), 12.0, PARCHMENT));
-                    });
-                }
-            },
-        );
-        if w.private.boon_rerolls > 0 {
-            node_button(
-                c,
-                format!("Reroll offer ({} left)", w.private.boon_rerolls),
-                UiAction::Player(PlayerAction::RerollBoons),
-                true,
-            );
-        }
-    });
+/// Spawn [`rules_spans`] as one wrapped rich text.
+fn rules_text(
+    p: &mut ChildSpawnerCommands,
+    kit: &crate::uikit::UiKit,
+    size: f32,
+    text: &str,
+    base: Color,
+    max_width: f32,
+    justify: Justify,
+) -> Entity {
+    let spans = rules_spans(text, base);
+    let refs: Vec<(Ty, &str, Color)> = spans.iter().map(|(t, s, c)| (*t, s.as_str(), *c)).collect();
+    crate::uikit::rich(p, kit, size, &refs, Some(max_width), justify)
 }
 
-fn door_panel(commands: &mut Commands, db: &ContentDb, w: &WorldSnapshot, display: &Handle<Font>) {
-    let root = panel_root(
-        commands,
-        Panel::Doors,
-        Node { position_type: PositionType::Absolute, left: Val::Px(14.0), bottom: Val::Px(120.0), ..default() },
-    );
-    let mut doors: Vec<(u8, DoorReward)> = w
-        .entities
-        .iter()
-        .filter_map(|e| match e.kind {
-            EntityKind::Door { reward, index } => Some((index, reward)),
-            _ => None,
-        })
-        .collect();
-    doors.sort_by_key(|(i, _)| *i);
-    commands.entity(root).with_children(|c| {
-        c.spawn(text_in("Choose the next chamber", 16.0, hex("#FFC940"), display));
-        for (index, reward) in doors {
-            node_button(c, door_label(db, reward), UiAction::Player(PlayerAction::ChooseDoor(index)), true);
-        }
-    });
-}
-
-fn end_panel(commands: &mut Commands, db: &ContentDb, link: &Link, w: &WorldSnapshot, display: &Handle<Font>) {
-    let victory = w.run.phase == RunPhase::Victory;
-    let root = panel_root(
-        commands,
-        Panel::End,
-        Node {
-            position_type: PositionType::Absolute,
-            left: Val::Percent(50.0),
-            top: Val::Percent(26.0),
-            margin: UiRect::left(Val::Px(-260.0)),
-            width: Val::Px(520.0),
-            align_items: AlignItems::Center,
-            ..default()
-        },
-    );
-    let mins = (w.run.time / 60.0) as u32;
-    let secs = w.run.time as u32 % 60;
-    commands.entity(root).with_children(|c| {
-        c.spawn(text_in(
-            if victory { "VICTORY" } else { "DEFEAT" },
-            44.0,
-            if victory { hex("#FFC940") } else { hex("#FF6A5A") },
-            display,
-        ));
-        c.spawn(text(
-            format!(
-                "Rooms cleared {} · Kills {} · Time {mins}:{secs:02} · Ember earned {}",
-                w.run.depth, w.run.kills, w.run.ember
-            ),
-            15.0,
-            PARCHMENT,
-        ));
-        for p in &w.players {
-            let name =
-                link.roster.iter().find(|r| r.slot == p.slot).map_or(format!("P{}", p.slot + 1), |r| r.name.clone());
-            let ch = db.characters.try_get(p.character).map_or("?", |c| c.name.as_str());
-            c.spawn(text(
-                format!("P{} {name} ({ch}) — {} kills · {:.0} damage", p.slot + 1, p.kills, p.damage),
-                13.0,
-                DIM,
-            ));
-        }
-        c.spawn(Node {
-            flex_direction: FlexDirection::Row,
-            column_gap: Val::Px(12.0),
-            margin: UiRect::top(Val::Px(8.0)),
-            ..default()
-        })
-        .with_children(|row| {
-            node_button(row, "Forge again", UiAction::Restart, true);
-            node_button(row, "Quit", UiAction::Quit, true);
-        });
-    });
+/// A god's text colour: the secondary for the red gods, so red never sits beside white (§3.4).
+fn god_text_color(key: &str, primary: Color, secondary: Color) -> Color {
+    if matches!(key, "pyra" | "umbra_rex") { secondary } else { primary }
 }
