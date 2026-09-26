@@ -1188,7 +1188,7 @@
                     cover: 0.035,
                     districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)],
                     // Black glassy slag, orange seams.
-                    tint: "#696669",
+                    tint: "#737173",
                     map_color: "#3C2A24",
                     names: ["The Slag Flats", "The Glass Wastes", "Clinker Plain", "The Cooling Fields"],
                     ground: (paving: -0.2, ash: 0.0),
@@ -1202,7 +1202,7 @@
                     cover: 0.07,
                     districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)],
                     // Soot brick and iron plate.
-                    tint: "#767373",
+                    tint: "#7A7777",
                     map_color: "#4A403C",
                     names: ["Foundry Ruins", "The Dead Furnaces", "Bellows Hall", "The Cold Smelteries", "Ingot Row"],
                     ground: (paving: 0.25, ash: 0.1),
@@ -1218,7 +1218,7 @@
                     // Pale marble and gold.
                     tint: "#8B867D",
                     map_color: "#6E6252",
-                    names: ["Colonnade of Oaths", "The Oathbound Walk", "Hall of Vows"],
+                    names: ["Colonnade of Oaths", "The Oathbound Walk", "Hall of Vows", "The Pledge Stones", "Court of the Sworn"],
                     ground: (paving: 0.4, ash: 0.0),
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "cinderling", weight: 0.6), (key: "emberwisp", weight: 0.4)],
                 ),
@@ -1247,7 +1247,7 @@
                     // Rust red, scrap and chains.
                     tint: "#8B796E",
                     map_color: "#6A3826",
-                    names: ["The Chainyard", "Rust Gallows", "The Anchor Pits"],
+                    names: ["The Chainyard", "Rust Gallows", "The Anchor Pits", "The Shackle Rows"],
                     ground: (paving: -0.05, ash: 0.0),
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "slagspitter", weight: 0.5), (key: "cinderling", weight: 0.5)],
                 ),
@@ -1270,9 +1270,10 @@
                 (kind: Spring, count: 3, seals: 0),
             ],
             camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
-            // Grand monuments for regions without a major POI (phase 4 adds FallenWeapon). No
-            // SealedGate: a second sealed gate reads as the real Boss Gate.
-            landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8)],
+            // Grand monuments for regions without a major POI: the skyline. The Fallen Arms (a
+            // colossal god-weapon, 14–20 u tall) arrive early from phase 4 so every map has tall
+            // silhouettes. No SealedGate: a second sealed gate reads as the real Boss Gate.
+            landmarks: [(FallenWeapon, 1.2), (GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.5), (GreatBrazier, 0.7)],
             seals_required: 7,
             gate_requires_warlord: true,
             gate_force_minute: 12.0,

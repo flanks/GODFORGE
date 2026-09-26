@@ -408,6 +408,7 @@ fn decor_key(d: &Decor, p: &Palette) -> (&'static str, Rgb) {
         Decor::Clutter { .. } => ("CLUTTER", hex("#D8A868")),
         Decor::Banner { .. } => ("BANNER", hex("#D04040")),
         Decor::Chains { .. } => ("CHAINS", hex("#6A6A74")),
+        Decor::Waymark { .. } => ("WAYMARK", hex("#F0C860")),
         Decor::Debris { .. } => ("FLOATING DEBRIS", hex("#B0A8C8")),
     }
 }
@@ -670,6 +671,11 @@ fn draw_decor(cv: &mut Canvas, v: &View, d: &Decor, p: &Palette, i: usize) {
             segment(cv, v, at - d * 0.55, at + d * 0.55, 0.06, hex("#F0C860"), 1.0);
         }
         Decor::Chains { from, to, .. } => dashed(cv, v, from, to, 0.07, 0.3, col, 1.0),
+        Decor::Waymark { at, rot, .. } => {
+            let d = rot16_dir(rot);
+            circle(cv, v, at, 0.35, col, 1.0);
+            segment(cv, v, at, at + d * 1.3, 0.18, col, 1.0);
+        }
         Decor::Debris { at, radius, .. } => {
             circle(cv, v, at + Vec2::new(0.4, -0.4), radius, INK, 0.25);
             circle(cv, v, at, radius, col, 0.85);

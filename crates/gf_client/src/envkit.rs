@@ -16,8 +16,9 @@
 
 use crate::camera::w3;
 use crate::materials::{AbyssKind, BiomeLook};
-use crate::palette::{hdr, hex, lighten, mix};
+use crate::palette::{hdr, hex, lighten, mix, poi_kind_color};
 use gf_content::schema::{ClutterKind, Decor, MapLayout, RimEdge, RimStyle, TileKind, WallStyle, rot16_dir};
+use gf_core::poi::PoiKind;
 use gf_engine::client::triangle_mesh;
 use gf_engine::prelude::*;
 use std::collections::BTreeMap;
@@ -1128,6 +1129,7 @@ pub fn decor(env: &mut Env, ctx: &Ctx, d: &Decor) {
         }
         Decor::Banner { at, height, rot, god } => banner(env, ctx, at, height, rot16_dir(rot), god),
         Decor::Chains { from, to, height } => chains(env, c, w3(from, height), w3(to, height), 0.12),
+        Decor::Waymark { at, rot, kind } => waymark(env, c, at, rot16_dir(rot), kind),
         Decor::Debris { at, radius, height, variant } => debris(env, c, at, radius, height, variant),
     }
 }
@@ -2062,6 +2064,28 @@ fn great_anvil(env: &mut Env, c: &Colors, at: Vec2, r: f32, horn: Vec2) {
             Paint::new(Key::Glow, hdr(c.gold, 1.6)),
         );
     }
+    // A god's hammer stands on its head behind the anvil, the haft raised to the sky: the tall
+    // mark that finds a great forge from across the map (the fixed camera sees heights, not plans).
+    let foot = base + rot * Vec3::new(-0.7 * s, 0.0, -s);
+    let head = Vec3::new(0.55 * s, 0.45 * s, 0.42 * s);
+    let tilt = rot * Quat::from_rotation_x(0.08) * Quat::from_rotation_z(0.06);
+    env.block(foot + Vec3::Y * head.y, tilt, head, 0.06, dark_iron);
+    env.block(
+        foot + Vec3::Y * (head.y * 2.0 + 0.04),
+        tilt,
+        Vec3::new(head.x * 0.8, 0.06, head.z * 0.8),
+        0.02,
+        Paint::new(Key::Metal, c.bronze).ink(INK_S),
+    );
+    let haft = 3.4 * r;
+    let root = foot + Vec3::Y * (head.y * 2.0);
+    env.cylinder(root, tilt, 0.17 * s, 0.14 * s, haft, 8, Paint::new(Key::Metal, lighten(c.bronze, 0.8)).ink(INK));
+    let up = tilt * Vec3::Y;
+    for k in 0..3 {
+        let at = root + up * (haft * (0.72 + 0.07 * k as f32));
+        env.cylinder(at, tilt, 0.2 * s, 0.2 * s, 0.12 * s, 8, Paint::new(Key::Metal, c.gold).ink(INK_S));
+    }
+    env.ball(root + up * (haft + 0.12 * s), tilt, Vec3::splat(0.26 * s), 8, Paint::new(Key::Metal, c.gold).ink(INK_S));
     env.flames.push(Flame { at: base + Vec3::Y * (y0 + 1.6 * s), color: c.molten, power: 0.8, range: 9.0 });
 }
 
@@ -3434,6 +3458,48 @@ fn banner(env: &mut Env, ctx: &Ctx, at: Vec2, height: f32, facing: Vec2, god: u8
     let cy = len * 0.45;
     let s = w * 0.45;
     env.sheet([q(0.0, cy + s), q(s, cy), q(0.0, cy - s), q(-s, cy)], [e; 4], Key::Glow);
+}
+
+/// A waymark: a stone post with an iron cap, a pennant in the colour of the objective the road
+/// leads to streaming along the road (`along`), and a glowing lamp of the same colour on top that
+/// reads from across the screen.
+fn waymark(env: &mut Env, c: &Colors, at: Vec2, along: Vec2, kind: PoiKind) {
+    let col = poi_kind_color(kind);
+    let mut v = Vr::new(at, 91);
+    let base = w3(at, 0.0);
+    let h = 3.6 + v.r(-0.2, 0.3);
+    let stone = Paint::new(Key::Stone, vary(c.stone, v.f(), 0.06)).ink(INK_S);
+    let iron = Paint::new(Key::Metal, c.iron).ink(INK_S);
+    // Stepped foot, square post, cap.
+    env.block(base + Vec3::Y * 0.14, Quat::IDENTITY, Vec3::new(0.48, 0.14, 0.48), 0.04, stone);
+    env.block(
+        base + Vec3::Y * (0.28 + h * 0.5),
+        Quat::from_rotation_y(v.r(-0.1, 0.1)),
+        Vec3::new(0.17, h * 0.5, 0.17),
+        0.03,
+        stone,
+    );
+    env.block(base + Vec3::Y * (h + 0.34), Quat::IDENTITY, Vec3::new(0.26, 0.07, 0.26), 0.02, iron);
+    // The pennant: a long swallow-tailed flag from the top of the post, streaming along the road.
+    let d = Vec3::new(along.x, 0.0, -along.y).normalize_or(Vec3::X);
+    let top = base + Vec3::Y * (h + 0.1);
+    let len = 1.9;
+    let drop = 0.75;
+    let (light, dark) = (lin(col), lin(lighten(col, 0.55)));
+    let p = |s: f32, y: f32| top + d * s - Vec3::Y * y;
+    env.sheet(
+        [p(0.12, 0.0), p(len, 0.18), p(len * 0.78, drop * 0.5), p(0.12, drop)],
+        [light, light, dark, dark],
+        Key::Cloth,
+    );
+    env.sheet(
+        [p(len * 0.78, drop * 0.5), p(len, 0.18), p(len * 1.02, drop * 0.95), p(0.12, drop)],
+        [dark, light, dark, dark],
+        Key::Cloth,
+    );
+    // The lamp.
+    let glow = Paint::new(Key::Glow, hdr(col, 2.4));
+    env.ball(base + Vec3::Y * (h + 0.62), Quat::IDENTITY, Vec3::splat(0.22), 8, glow);
 }
 
 /// A sagging chain of links from `a` to `b` (world); `sag` as a fraction of the length.

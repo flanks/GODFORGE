@@ -1566,6 +1566,10 @@ pub enum Decor {
     },
     /// Visual: chain (or vine garland / star-string) strung between two points `height` above the floor.
     Chains { from: Vec2, to: Vec2, height: f32 },
+    /// Visual (biome maps): a waymark where a road leaves a crossroads or a clearing: a post whose
+    /// pennant, in the colour of the objective the road leads to (`kind`), points along the road
+    /// (`rot`), so every junction says where its ways go.
+    Waymark { at: Vec2, rot: Rot16, kind: PoiKind },
     /// Visual: a floating fragment of `radius` hovering `height` above the floor (bobbing, casts a
     /// shadow).
     Debris {
@@ -1615,6 +1619,7 @@ impl Decor {
             | Decor::Bridge { from, to, .. }
             | Decor::Arch { from, to, .. }
             | Decor::Chains { from, to, .. } => (from + to) * 0.5,
+            Decor::Waymark { at, .. } => at,
             Decor::BrokenAnvil { at, .. }
             | Decor::Brazier { at }
             | Decor::Pillar { at, .. }

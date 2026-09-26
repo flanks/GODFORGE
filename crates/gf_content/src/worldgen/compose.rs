@@ -10,15 +10,17 @@
 //!    the hub's grand monument, up to four slots cut from open ground and filled from the theme's
 //!    composition pool (never repeating, a `fields` share left open), a density top-up at the slot
 //!    skirts up to the theme's `cover`, and floor dressing.
-//! 4. **Dressing** (visual only): braziers along the roads, bridge decks, clearing hearts, hubs and
-//!    the Landing.
+//! 4. **Dressing**: braziers along the roads (30–40 u apart, so the dark between their pools
+//!    survives), a tall standing piece every ~25 u along each road (the frame always has a
+//!    vertical), waymarks where roads leave a crossroads (a pennant in the colour of the objective
+//!    the road leads to), bridge decks, clearing hearts, hubs and the Landing.
 
 use super::barriers::road_dir;
 use super::tiles::{self, land_box};
 use super::{Gen, HUB_R, LANDING_R};
 use crate::procgen::{
-    Biome, Builder, CELL, Frame, PAD, Rect, TileMask, arch, bounds, extent, field, monument, point_seg, q, qv, rot_of,
-    ruin, stamp,
+    Biome, Builder, CELL, Frame, PAD, Rect, TileMask, arch, boulder, bounds, extent, field, monument, monument_at,
+    point_seg, q, qv, rot_of, ruin, satellite, stamp,
 };
 use crate::schema::*;
 use gf_core::movement::Obstacle;
@@ -74,6 +76,8 @@ pub(crate) fn build(g: &mut Gen) -> Built {
         region(g, &mut b, r, &steps, &mut districts);
     }
     dress_roads(g, &mut b);
+    road_silhouettes(g, &mut b);
+    waymarks(g, &mut b);
     for k in 0..g.pois.len() {
         dress_clearing(g, &mut b, k);
     }
@@ -201,6 +205,100 @@ fn clearing(g: &Gen, b: &mut Builder, k: usize) {
                 if force(g, b, &[o], dec, Some(at)) {
                     break;
                 }
+            }
+        }
+        PoiKind::Shrine => {
+            // The shrine's god stands behind the ring, facing it.
+            let d = open_dir(&ways, false);
+            let (r, height) = (q(b.rl(1.0, 1.2)), q(b.rd(4.4, 5.4)));
+            let god = p.site.god.unwrap_or(0);
+            for extra in [1.4f32, 2.2] {
+                let c = qv(at + d * (radius + r + extra));
+                let o = Obstacle::Circle { center: c, radius: r };
+                let statue = Decor::Statue { at: c, radius: r, height, rot: rot_of(-d), god, variant: 1 };
+                if force(g, b, &[o], statue, Some(at)) {
+                    break;
+                }
+            }
+        }
+        PoiKind::Anvil => {
+            // Two chain posts flank the anvil ring; the chains hang over it (dressing).
+            let e = open_dir(&ways, true);
+            let side = Vec2::new(-e.y, e.x);
+            let r = q(b.rl(0.5, 0.6));
+            let height = q(b.rd(4.2, 5.0));
+            let posts = [qv(at + side * (radius + 1.6)), qv(at - side * (radius + 1.6))];
+            let pieces: Vec<Obstacle> = posts.iter().map(|&c| Obstacle::Circle { center: c, radius: r }).collect();
+            if pieces.iter().all(|o| open_ground(g, b, o, Some(at))) {
+                let grp = b.group();
+                let placed = unmasked(b, |b| {
+                    b.solid(grp, &pieces[..1], Decor::Pillar { at: posts[0], radius: r, height })
+                        && b.solid(grp, &pieces[1..], Decor::Pillar { at: posts[1], radius: r, height })
+                });
+                if placed {
+                    b.decal(Decor::Chains { from: posts[0], to: posts[1], height: q(height - 0.3) });
+                }
+            }
+        }
+        PoiKind::Reliquary => {
+            // Relic plinths around the ring, clear of the ways in.
+            for i in 0..4u8 {
+                let d = rot16_dir(i * 4 + 2);
+                if ways.iter().any(|w| w.dot(d) > 0.75) {
+                    continue;
+                }
+                let c = qv(at + d * (radius + 1.7));
+                let half = qv(Vec2::splat(b.rl(0.55, 0.7)));
+                let (height, variant) = (q(b.rd(0.9, 1.4)), b.vd(4));
+                let o = Obstacle::Box { center: c, half };
+                force(g, b, &[o], Decor::Wall { at: c, half, height, style: WallStyle::Plinth, variant }, Some(at));
+            }
+        }
+        PoiKind::Vein => {
+            // The lode breaks the ground: a crystal cluster at the rim, clear of the ways in.
+            let base = b.vd(16);
+            for i in 0..3u8 {
+                let d = rot16_dir(base.wrapping_add(i * 5));
+                if ways.iter().any(|w| w.dot(d) > 0.75) {
+                    continue;
+                }
+                let r = q(b.rl(0.7, 1.0));
+                let c = qv(at + d * (radius + r + 0.9));
+                let (height, variant) = (q(b.rd(2.6, 4.0)), b.vd(4));
+                let o = Obstacle::Circle { center: c, radius: r };
+                force(g, b, &[o], Decor::Crystal { at: c, radius: r, height, rot: rot_of(d), variant }, Some(at));
+            }
+        }
+        PoiKind::Lair => {
+            // Broken walls at the den's rim.
+            let base = b.vd(16);
+            for i in 0..4u8 {
+                let d = rot16_dir(base.wrapping_add(i * 4 + 1));
+                if ways.iter().any(|w| w.dot(d) > 0.7) {
+                    continue;
+                }
+                let c = qv(at + d * (plaza - 2.2));
+                let long = b.rl(1.6, 2.4);
+                let half = qv(if d.x.abs() > d.y.abs() { Vec2::new(0.55, long) } else { Vec2::new(long, 0.55) });
+                let (height, variant) = (q(b.rd(1.6, 3.2)), b.vd(4));
+                let o = Obstacle::Box { center: c, half };
+                if force(g, b, &[o], Decor::Wall { at: c, half, height, style: WallStyle::Ruin, variant }, Some(at)) {
+                    b.rubble(c - d * 1.6, 0.6, 1.1);
+                }
+            }
+        }
+        PoiKind::Spring => {
+            // Four low standing stones mark the basin.
+            for i in 0..4u8 {
+                let d = rot16_dir(i * 4 + 2);
+                if ways.iter().any(|w| w.dot(d) > 0.75) {
+                    continue;
+                }
+                let r = q(b.rl(0.32, 0.4));
+                let c = qv(at + d * (radius + 1.0));
+                let height = q(b.rd(1.3, 1.9));
+                let o = Obstacle::Circle { center: c, radius: r };
+                force(g, b, &[o], Decor::Pillar { at: c, radius: r, height }, Some(at));
             }
         }
         _ => {}
@@ -419,14 +517,54 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
     let theme = g.x.themes.get(g.regions[r].theme as usize).cloned();
     let covered0 = b.covered;
 
-    // d) The hub's grand monument, facing the Landing (the skyline greets arrivals).
+    // d) The hub's grand monument, facing the Landing (the skyline greets arrivals). It stands at
+    //    the hub's rim on an open side, leaning north: seen by the fixed camera its height then
+    //    rises away from the crossroads instead of hanging over the ways and the fights there. A
+    //    hub with no such room keeps a low great brazier on its site instead.
     if let Some(mark) = g.regions[r].landmark {
         let site = g.regions[r].site;
+        let ways = ways_out(&all_lanes, site, HUB_R + 4.0);
+        // Sides by openness (the nearest way's alignment), leaning north; integer sort keys.
+        let mut sides: Vec<(i32, u8)> = (0..16u8)
+            .map(|k| {
+                let d = rot16_dir(k);
+                let worst = ways.iter().map(|w| d.dot(*w)).fold(-1.0f32, f32::max);
+                (((worst - 0.6 * d.y) * 1024.0).round() as i32, k)
+            })
+            .collect();
+        sides.sort_unstable();
         let rot = rot_of(g.landing - site);
         let (o, d) = monument(b, mark, site, rot, true);
-        if !force(g, b, &[o], d, Some(site)) {
-            g.trace(|| format!("region {r}: no room for its {mark:?} at {site}"));
-            g.regions[r].landmark = None;
+        let mut placed = false;
+        'sides: for &(_, k) in sides.iter().take(4) {
+            let side = rot16_dir(k);
+            // A grand statue stands half as tall again (its head clears the screen edge from well
+            // beyond it); a fallen god-weapon leans out, away from the hub.
+            let d = match d {
+                Decor::Statue { at, radius, height, rot, god, variant } => {
+                    Decor::Statue { at, radius, height: q(height * 1.5), rot, god, variant }
+                }
+                Decor::FallenWeapon { at, radius, height, variant, .. } => {
+                    Decor::FallenWeapon { at, radius, height: q(height * 0.7), rot: rot_of(side), variant }
+                }
+                other => other,
+            };
+            for reach in [0.75f32, 0.6] {
+                let (o, d) = monument_at(o, d, site + side * (HUB_R * reach), decor_rot(&d, rot));
+                if force(g, b, &[o], d, Some(site)) {
+                    placed = true;
+                    break 'sides;
+                }
+            }
+        }
+        if !placed {
+            let (o, d) = monument(b, MapMark::GreatBrazier, site, rot, true);
+            if force(g, b, &[o], d, Some(site)) {
+                g.regions[r].landmark = Some(MapMark::GreatBrazier);
+            } else {
+                g.trace(|| format!("region {r}: no room for its {mark:?} at {site}"));
+                g.regions[r].landmark = None;
+            }
         }
     }
 
@@ -505,7 +643,10 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
             continue;
         }
         let sat = b.lay.range_u32(1, 3);
-        ruin(b, at, sat);
+        let key = theme.as_ref().map_or("", |t| t.key.as_str());
+        if !(b.lay.chance(0.5) && story(b, at, key)) {
+            ruin(b, at, sat);
+        }
     }
 
     // f) Floor dressing: fissures, ground cover, rubble and bones on open ground.
@@ -541,8 +682,8 @@ fn region(g: &mut Gen, b: &mut Builder, r: usize, steps: &[u16], districts: &mut
 
 // ───────────────────────────── dressing ─────────────────────────────
 
-/// Braziers along every road, 16–22 u apart on alternating sides; bridge decks with fire at their
-/// heads.
+/// Braziers along every road, 30–40 u apart on alternating sides (pools of warm light with dusk
+/// between them); bridge decks with fire at their heads.
 fn dress_roads(g: &Gen, b: &mut Builder) {
     let lanes = g.lanes();
     for (k, l) in lanes.iter().enumerate() {
@@ -553,12 +694,12 @@ fn dress_roads(g: &Gen, b: &mut Builder) {
         }
         let dir = (l.to - l.from) / len;
         let n = Vec2::new(-dir.y, dir.x);
-        let mut s = b.rd(4.0, 12.0);
+        let mut s = b.rd(6.0, 16.0);
         let mut side = if b.dress.chance(0.5) { 1.0 } else { -1.0 };
         while s < len - 3.0 {
             b.brazier(l.from + dir * s + n * (side * (l.width * 0.5 + 1.3)));
             side = -side;
-            s += b.rd(16.0, 22.0);
+            s += b.rd(30.0, 40.0);
         }
     }
     for (k, deck) in g.bridges.iter().enumerate() {
@@ -570,6 +711,177 @@ fn dress_roads(g: &Gen, b: &mut Builder) {
             b.brazier(end + dir * (s * 1.2) + n);
             b.brazier(end + dir * (s * 1.2) - n);
         }
+    }
+}
+
+/// A tall standing piece every 22–28 u along each road, off its shoulder on alternating sides:
+/// a column, or in the forge biome now and then a chimney stack. Seen from the fixed camera they
+/// give the ground a vertical rhythm and a silhouette at the screen edge.
+fn road_silhouettes(g: &Gen, b: &mut Builder) {
+    for (k, l) in g.lanes().iter().enumerate() {
+        b.lay = g.root.fork(1000 + k as u64);
+        b.dress = g.root.fork(1100 + k as u64);
+        let len = l.from.distance(l.to);
+        if len < 14.0 {
+            continue;
+        }
+        let dir = (l.to - l.from) / len;
+        let n = Vec2::new(-dir.y, dir.x);
+        let mut s = b.rl(8.0, 14.0);
+        let mut side = if b.lay.chance(0.5) { 1.0 } else { -1.0 };
+        while s < len - 6.0 {
+            for try_side in [side, -side] {
+                let at = l.from + dir * s + n * (try_side * (l.width * 0.5 + b.rl(2.4, 3.4)));
+                let grp = b.group();
+                let chimney = b.biome == Biome::Cinder && b.lay.chance(0.3);
+                let placed = if chimney {
+                    let half = Vec2::splat(b.rl(0.7, 0.9));
+                    let (height, variant) = (q(b.rd(6.5, 8.5)), b.vd(4));
+                    let style = WallStyle::Forge;
+                    b.block(grp, at, half, |at, half| Decor::Wall { at, half, height, style, variant })
+                } else {
+                    let r = b.rl(0.55, 0.75);
+                    let height = q(b.rd(5.5, 8.0));
+                    b.circle(grp, at, r, |at, radius| Decor::Pillar { at, radius, height })
+                };
+                if placed {
+                    let off = dir * b.rd(1.2, 2.0);
+                    b.rubble(at + off, 0.5, 0.9);
+                    break;
+                }
+            }
+            side = -side;
+            s += b.rl(22.0, 28.0);
+        }
+    }
+}
+
+/// The facing a monument decor carries (for moving it with [`monument_at`]).
+fn decor_rot(d: &Decor, fallback: Rot16) -> Rot16 {
+    match *d {
+        Decor::Statue { rot, .. }
+        | Decor::ColossusHead { rot, .. }
+        | Decor::GreatAnvil { rot, .. }
+        | Decor::Crystal { rot, .. }
+        | Decor::SpiralStair { rot, .. }
+        | Decor::FallenWeapon { rot, .. } => rot,
+        Decor::Rift { rot, .. } => rot.wrapping_sub(4),
+        _ => fallback,
+    }
+}
+
+/// What a road leading into region `r` is for: the region's major POI, else its first Seal POI.
+fn destination(g: &Gen, r: usize) -> Option<PoiKind> {
+    if let Some(m) = g.regions[r].major {
+        return Some(g.pois[m].site.kind);
+    }
+    g.pois.iter().find(|p| p.site.region as usize == r && p.site.seals > 0).map(|p| p.site.kind)
+}
+
+/// A waymark at each end of every road, just outside the crossroads it leaves (its hub or POI
+/// clearing), its pennant in the colour of what waits at the road's other end.
+fn waymarks(g: &Gen, b: &mut Builder) {
+    let width = q(g.x.roads.width);
+    for (k, road) in g.roads.iter().enumerate() {
+        let (Some(first), Some(last)) = (road.lanes.first(), road.lanes.last()) else { continue };
+        for (end, from, toward, dest) in [(road.a, first.from, first.to, road.b), (road.b, last.to, last.from, road.a)]
+        {
+            let Some(kind) = destination(g, dest) else { continue };
+            let reg = &g.regions[end];
+            let clear = match reg.major {
+                Some(m) => g.pois[m].plaza,
+                None if reg.landmark.is_some() => HUB_R,
+                None => 4.0,
+            };
+            let len = from.distance(toward);
+            if len < 1.0 {
+                continue;
+            }
+            let dir = (toward - from) / len;
+            // Walk out along the lane until clear of the crossroads.
+            let mut s = 0.0;
+            while s < len && (from + dir * s).distance(reg.site) < clear + 2.5 {
+                s += 1.0;
+            }
+            if s >= len {
+                continue;
+            }
+            let n = Vec2::new(-dir.y, dir.x);
+            let side = if k % 2 == 0 { 1.0 } else { -1.0 };
+            let at = qv(from + dir * s + n * (side * (width * 0.5 + 0.9)));
+            b.decal(Decor::Waymark { at, rot: rot_of(dir), kind });
+        }
+    }
+}
+
+/// A story cluster for a region's density top-up (instead of the generic ruin), by theme: slag
+/// heaps on the flats and dunes, a collapsed chimney in the foundries, a chained anchor post in
+/// the chainyard, a broken standing arch in the colonnades. False when it did not fit.
+fn story(b: &mut Builder, at: Vec2, theme: &str) -> bool {
+    let g = b.group();
+    match theme {
+        "slag_flats" | "cinder_dunes" => {
+            if !boulder(b, g, at, 1.5, 2.3) {
+                return false;
+            }
+            let main = b.obstacles.last().map_or((at, 1.5), |o| {
+                let (c, e) = extent(o);
+                (c, e.max_element())
+            });
+            for _ in 0..2 {
+                satellite(b, g, main);
+            }
+            let d = rot16_dir(b.vd(16));
+            let segs = b.dress.range_u32(2, 4);
+            let width = b.rd(0.3, 0.45);
+            b.fissure(at + d * (main.1 + 0.6), d, segs, width);
+            true
+        }
+        "foundry_ruins" => {
+            let half = Vec2::splat(b.rl(0.8, 1.0));
+            let (height, variant) = (q(b.rd(6.0, 8.0)), b.vd(4));
+            let style = WallStyle::Forge;
+            if !b.block(g, at, half, |at, half| Decor::Wall { at, half, height, style, variant }) {
+                return false;
+            }
+            // Its fallen upper courses lie beside it.
+            let d = rot16_dir(b.lay.range_u32(0, 16) as u8);
+            let r = q(b.rl(0.55, 0.7));
+            let from = at + d * (half.x + r + 0.6);
+            let len = b.rl(3.0, 4.5);
+            b.chain(g, from, from + d * len, r, r, |from, to| Decor::FallenColumn { from, to, radius: r });
+            b.rubble(at - d * 1.8, 0.7, 1.2);
+            true
+        }
+        "chainyard" => {
+            let r = q(b.rl(0.55, 0.7));
+            let height = q(b.rd(4.5, 6.0));
+            if !b.circle(g, at, r, |at, radius| Decor::Pillar { at, radius, height }) {
+                return false;
+            }
+            // Chains run from the anchor post to two stakes.
+            for k in 0..2u32 {
+                let d = rot16_dir(b.vd(16));
+                let stake = qv(at + d * b.rd(3.0, 4.2));
+                let sr = 0.3;
+                let sh = q(b.rd(1.1, 1.5));
+                if b.circle(g, stake, sr, |at, radius| Decor::Pillar { at, radius, height: sh }) {
+                    b.decal(Decor::Chains { from: qv(at), to: stake, height: q(sh - 0.1) });
+                }
+                if k == 0 {
+                    let off = rot16_dir(b.vd(16)) * 2.0;
+                    b.clutter(at + off, 0.6, 1.0, Some(ClutterKind::WeaponRack));
+                }
+            }
+            true
+        }
+        "colonnade_of_oaths" => {
+            let d = rot16_dir(b.lay.range_u32(0, 8) as u8 * 2);
+            let pier = b.rl(0.6, 0.75);
+            let span = b.rl(2.6, 3.4);
+            arch(b, at - d * span, at + d * span, pier)
+        }
+        _ => false,
     }
 }
 
