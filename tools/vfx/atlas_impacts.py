@@ -398,6 +398,7 @@ def build():
         a.put(k % 8, k // 8, cell)
     for row, n in enumerate((4, 5, 7, 9)):
         a.seq(f"star{n}", row, 8, fps=30, pivot=(0.5, 0.5), frame_times_60=STAR_TIMES, radius_in_cell=0.78,
+              ink_backing_frames=[0, 1, 2, 3, 4],
               intended={4: "crit / radiant hits, small precise hits", 5: "plain hits (0.3-0.6 m)",
                         7: "the layered-burst blast star at R", 9: "big blasts, elites, boss hits"}[n])
     a.save(fps=30)

@@ -860,7 +860,14 @@
       11,
       14
      ],
-     "radius_in_cell": 0.78
+     "radius_in_cell": 0.78,
+     "ink_backing_frames": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
     },
     {
      "name": "star5",
@@ -884,7 +891,14 @@
       11,
       14
      ],
-     "radius_in_cell": 0.78
+     "radius_in_cell": 0.78,
+     "ink_backing_frames": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
     },
     {
      "name": "star7",
@@ -908,7 +922,14 @@
       11,
       14
      ],
-     "radius_in_cell": 0.78
+     "radius_in_cell": 0.78,
+     "ink_backing_frames": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
     },
     {
      "name": "star9",
@@ -932,7 +953,14 @@
       11,
       14
      ],
-     "radius_in_cell": 0.78
+     "radius_in_cell": 0.78,
+     "ink_backing_frames": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ]
     }
    ]
   },

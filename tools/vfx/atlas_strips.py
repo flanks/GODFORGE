@@ -322,8 +322,9 @@ def smear_cell(i, seed, h=128):
             poly = tongue_poly(base, hh, ww, ph, lean=-0.75 * rng.uniform(0.7, 1.2), curl=0.5, tip_curl=0.7)
             m = c.ragged(c.polys([poly]), 0.8, 0.4)
             c.paint(m, V_DEEP if t < 0.3 else V_BODY, order=0.4)
-            c.paint(c.polys([tongue_poly(base, hh * 0.5, ww * 0.42, ph + 0.3, lean=-0.75)]) & m,
-                    V_LIGHT if t > 0.35 else V_BODY, order=0.6)
+            if rng.random() < 0.6:
+                c.paint(c.polys([tongue_poly(base, hh * 0.42, ww * 0.34, ph + 0.3, lean=-0.75)]) & m,
+                        V_LIGHT if t > 0.4 else V_BODY, order=0.6)
             x += W * rng.uniform(0.1, 0.17)
         c.paint(band & (vv + jn > 0.28) & (u + jn * 0.3 > 0.3), V_BODY, order=0.45)
         c.paint(band & (vv + jn > 0.44) & (u + jn * 0.3 > 0.55), V_LIGHT, order=0.65)
