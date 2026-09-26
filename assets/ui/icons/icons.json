@@ -1,0 +1,3062 @@
+{
+ "version": 1,
+ "size": 128,
+ "generator": "tools/ui/make_icons.py",
+ "note": "Masters are 128x128 straight-alpha RGBA. Tint and frame are applied by the UI; rarity is never baked in except rarity/gem_*.",
+ "icons": {
+  "aim/assisted": {
+   "file": "aim/assisted.png",
+   "category": "aim",
+   "meaning": "ASSISTED aim: a magnetism cone pulls your shots on",
+   "tint": "#D9B56C"
+  },
+  "aim/auto": {
+   "file": "aim/auto.png",
+   "category": "aim",
+   "meaning": "AUTO aim: the weapon picks and fires (a reticle with an orbit arrow)",
+   "tint": "#D9B56C"
+  },
+  "aim/bias_balanced": {
+   "file": "aim/bias_balanced.png",
+   "category": "aim",
+   "meaning": "Target bias: Balanced",
+   "tint": "#D9B56C"
+  },
+  "aim/bias_lowest_hp": {
+   "file": "aim/bias_lowest_hp.png",
+   "category": "aim",
+   "meaning": "Target bias: Lowest HP (finish the wounded)",
+   "tint": "#D9B56C"
+  },
+  "aim/bias_nearest": {
+   "file": "aim/bias_nearest.png",
+   "category": "aim",
+   "meaning": "Target bias: Nearest (the closest target first)",
+   "tint": "#D9B56C"
+  },
+  "aim/bias_pinned": {
+   "file": "aim/bias_pinned.png",
+   "category": "aim",
+   "meaning": "Target bias: Pinned (your pinged target)",
+   "tint": "#D9B56C"
+  },
+  "aim/bias_strongest": {
+   "file": "aim/bias_strongest.png",
+   "category": "aim",
+   "meaning": "Target bias: Strongest (elites and bosses first)",
+   "tint": "#D9B56C"
+  },
+  "aim/manual": {
+   "file": "aim/manual.png",
+   "category": "aim",
+   "meaning": "MANUAL aim: you aim; precision earns Deadeye (a fine reticle)",
+   "tint": "#D9B56C"
+  },
+  "boon_kind/duo": {
+   "file": "boon_kind/duo.png",
+   "category": "boon_kind",
+   "meaning": "Duo boon: two gods at once (a split lozenge)",
+   "tint": "#D9B56C"
+  },
+  "boon_kind/legendary": {
+   "file": "boon_kind/legendary.png",
+   "category": "boon_kind",
+   "meaning": "Legendary boon (a crown)",
+   "tint": "#D9B56C"
+  },
+  "boon_kind/team": {
+   "file": "boon_kind/team.png",
+   "category": "boon_kind",
+   "meaning": "Team boon: every player gains it (a four-link chain in chrome gold, never player colours)",
+   "tint": "#D9B56C"
+  },
+  "boons/aeon_ageless_flame": {
+   "file": "boons/aeon_ageless_flame.png",
+   "category": "boons",
+   "meaning": "Ageless Flame (Standard boon, Aeon): Hits have a 10% chance to Burn, and your weapon's Burns last 6 s. Icon: a flame in a dial.",
+   "tint": "#D6D1C1",
+   "motif": "a flame in a dial"
+  },
+  "boons/aeon_echoing_instant": {
+   "file": "boons/aeon_echoing_instant.png",
+   "category": "boons",
+   "meaning": "Echoing Instant (Standard boon, Aeon): Every 4th shot repeats itself at 50% damage. Icon: an echoing shot and a dial.",
+   "tint": "#D6D1C1",
+   "motif": "an echoing shot and a dial"
+  },
+  "boons/aeon_eternal_recurrence": {
+   "file": "boons/aeon_eternal_recurrence.png",
+   "category": "boons",
+   "meaning": "Eternal Recurrence (Legendary boon, Aeon): Every 3rd shot happens again at full damage. Icon: a returning circle.",
+   "tint": "#D6D1C1",
+   "motif": "a returning circle"
+  },
+  "boons/aeon_heavy_hours": {
+   "file": "boons/aeon_heavy_hours.png",
+   "category": "boons",
+   "meaning": "Heavy Hours (Standard boon, Aeon): Shots carry the weight of ages: +25% damage, but 15% slower projectiles. Icon: an hourglass with a weight.",
+   "tint": "#D6D1C1",
+   "motif": "an hourglass with a weight"
+  },
+  "boons/aeon_quickened_hours": {
+   "file": "boons/aeon_quickened_hours.png",
+   "category": "boons",
+   "meaning": "Quickened Hours (Standard boon, Aeon): Actives recover 20% faster; +8% ultimate charge. Icon: a dial with racing hands.",
+   "tint": "#D6D1C1",
+   "motif": "a dial with racing hands"
+  },
+  "boons/aeon_rewinding_ward": {
+   "file": "boons/aeon_rewinding_ward.png",
+   "category": "boons",
+   "meaning": "Rewinding Ward (Standard boon, Aeon): +25 shield that winds itself back after 4 s unharmed; actives recover 5% faster. Icon: a ward that winds back.",
+   "tint": "#D6D1C1",
+   "motif": "a ward that winds back"
+  },
+  "boons/aeon_shattered_moment": {
+   "file": "boons/aeon_shattered_moment.png",
+   "category": "boons",
+   "meaning": "Shattered Moment (Standard boon, Aeon): Ultimates shatter time into a wide rift (18 damage per second for 6 s). Icon: a shattered dial.",
+   "tint": "#D6D1C1",
+   "motif": "a shattered dial"
+  },
+  "boons/aeon_stilled_sands": {
+   "file": "boons/aeon_stilled_sands.png",
+   "category": "boons",
+   "meaning": "Stilled Sands (Standard boon, Aeon): Shots leave trails of stilled time that slow enemies by 40%. Icon: stilled sands.",
+   "tint": "#D6D1C1",
+   "motif": "stilled sands"
+  },
+  "boons/aeon_stutterstep": {
+   "file": "boons/aeon_stutterstep.png",
+   "category": "boons",
+   "meaning": "Stutterstep (Standard boon, Aeon): Dashing stops time around you (20 damage and a brief Root); dashes recharge 10% faster. Icon: a dash held in pause.",
+   "tint": "#D6D1C1",
+   "motif": "a dash held in pause"
+  },
+  "boons/aeon_turning_hands": {
+   "file": "boons/aeon_turning_hands.png",
+   "category": "boons",
+   "meaning": "Turning Hands (Standard boon, Aeon): Two clock-hands orbit you, cutting enemies for 35% weapon damage. Icon: orbiting clock hands.",
+   "tint": "#D6D1C1",
+   "motif": "orbiting clock hands"
+  },
+  "boons/aeon_unclosing_wounds": {
+   "file": "boons/aeon_unclosing_wounds.png",
+   "category": "boons",
+   "meaning": "Unclosing Wounds (Standard boon, Aeon): Hits have a 10% chance to Bleed, and your weapon's Bleeds last 8 s. Icon: drops in a turning-back arrow.",
+   "tint": "#D6D1C1",
+   "motif": "drops in a turning-back arrow"
+  },
+  "boons/aeon_wound_spring": {
+   "file": "boons/aeon_wound_spring.png",
+   "category": "boons",
+   "meaning": "Wound Spring (Standard boon, Aeon): Charge weapons charge 20% faster; +8% fire rate. Icon: a wound spring.",
+   "tint": "#D6D1C1",
+   "motif": "a wound spring"
+  },
+  "boons/amber_tomb": {
+   "file": "boons/amber_tomb.png",
+   "category": "boons",
+   "meaning": "Amber Tomb (Duo boon, Aeon & Gaiaa): Hits have a 25% chance to seal enemies in amber (Root for 3 s); +25% damage to Rooted enemies. Icon: a figure sealed in amber.",
+   "tint": "#D6D1C1",
+   "motif": "a figure sealed in amber"
+  },
+  "boons/blaze_of_ruin": {
+   "file": "boons/blaze_of_ruin.png",
+   "category": "boons",
+   "meaning": "Blaze of Ruin (Duo boon, Pyra & Umbra-Rex): +30% damage while below 40% HP; kills have a 30% chance to explode for 120% weapon damage. Icon: a cracked heart bursting.",
+   "tint": "#F4C86A",
+   "motif": "a cracked heart bursting"
+  },
+  "boons/bond_of_the_forge": {
+   "file": "boons/bond_of_the_forge.png",
+   "category": "boons",
+   "meaning": "Bond of the Forge (Team boon, every player): +1 dash charge for all. Icon: dash chevrons over a chain.",
+   "tint": "#D9B56C",
+   "motif": "dash chevrons over a chain"
+  },
+  "boons/choir_of_anvils": {
+   "file": "boons/choir_of_anvils.png",
+   "category": "boons",
+   "meaning": "Choir of Anvils (Team boon, every player): Every player's ultimate charges 15% faster and actives recover 10% faster. Icon: a singing anvil.",
+   "tint": "#D9B56C",
+   "motif": "a singing anvil"
+  },
+  "boons/covenant_of_blood": {
+   "file": "boons/covenant_of_blood.png",
+   "category": "boons",
+   "meaning": "Covenant of Blood (Duo boon, Gaiaa & Umbra-Rex): Heal for 4% of damage dealt; +25% damage while below 50% HP. Icon: a drop in a thorn ring.",
+   "tint": "#92B268",
+   "motif": "a drop in a thorn ring"
+  },
+  "boons/day_of_reckoning": {
+   "file": "boons/day_of_reckoning.png",
+   "category": "boons",
+   "meaning": "Day of Reckoning (Duo boon, Seraphel & Umbra-Rex): Every hit adds Doom (7 stacks burst for 300% weapon damage); hits have a 30% chance to Mark. Icon: a skull in the sun.",
+   "tint": "#F4D483",
+   "motif": "a skull in the sun"
+  },
+  "boons/doomsday_clock": {
+   "file": "boons/doomsday_clock.png",
+   "category": "boons",
+   "meaning": "Doomsday Clock (Duo boon, Aeon & Umbra-Rex): Every hit adds Doom; at 5 stacks the target bursts for 250% weapon damage; +10% fire rate. Icon: a clock with a skull.",
+   "tint": "#D6D1C1",
+   "motif": "a clock with a skull"
+  },
+  "boons/dusk_verdict": {
+   "file": "boons/dusk_verdict.png",
+   "category": "boons",
+   "meaning": "Dusk Verdict (Duo boon, Nyctia & Seraphel): +30% damage to Marked enemies; +40% crit damage. Icon: a half-dark moon over the mark.",
+   "tint": "#AB80C3",
+   "motif": "a half-dark moon over the mark"
+  },
+  "boons/funeral_pyre": {
+   "file": "boons/funeral_pyre.png",
+   "category": "boons",
+   "meaning": "Funeral Pyre (Duo boon, Pyra & Nyctia): Hits execute non-boss enemies below 15% HP; kills have a 40% chance to erupt for 100% weapon damage. Icon: a funeral pyre.",
+   "tint": "#F4C86A",
+   "motif": "a funeral pyre"
+  },
+  "boons/gaiaa_bedrock": {
+   "file": "boons/gaiaa_bedrock.png",
+   "category": "boons",
+   "meaning": "Bedrock (Standard boon, Gaiaa): +60 max HP, at the cost of 4% move speed. Icon: bedrock under a heart.",
+   "tint": "#92B268",
+   "motif": "bedrock under a heart"
+  },
+  "boons/gaiaa_bloodroot": {
+   "file": "boons/gaiaa_bloodroot.png",
+   "category": "boons",
+   "meaning": "Bloodroot (Standard boon, Gaiaa): Heal for 3% of the damage you deal. Icon: a drop feeding roots.",
+   "tint": "#92B268",
+   "motif": "a drop feeding roots"
+  },
+  "boons/gaiaa_crush_the_bound": {
+   "file": "boons/gaiaa_crush_the_bound.png",
+   "category": "boons",
+   "meaning": "Crush the Bound (Standard boon, Gaiaa): +30% damage to Rooted enemies. Icon: a blade through roots.",
+   "tint": "#92B268",
+   "motif": "a blade through roots"
+  },
+  "boons/gaiaa_deep_marrow": {
+   "file": "boons/gaiaa_deep_marrow.png",
+   "category": "boons",
+   "meaning": "Deep Marrow (Standard boon, Gaiaa): +20 max HP; regenerate 1.5 HP per second. Icon: a bone and a heart.",
+   "tint": "#92B268",
+   "motif": "a bone and a heart"
+  },
+  "boons/gaiaa_earthen_might": {
+   "file": "boons/gaiaa_earthen_might.png",
+   "category": "boons",
+   "meaning": "Earthen Might (Standard boon, Gaiaa): Actives deal +20% damage; take 5% less damage. Icon: an ability tile with a fist.",
+   "tint": "#92B268",
+   "motif": "an ability tile with a fist"
+  },
+  "boons/gaiaa_granite_skin": {
+   "file": "boons/gaiaa_granite_skin.png",
+   "category": "boons",
+   "meaning": "Granite Skin (Standard boon, Gaiaa): Take 12% less damage. Icon: a granite plate.",
+   "tint": "#92B268",
+   "motif": "a granite plate"
+  },
+  "boons/gaiaa_grasping_stone": {
+   "file": "boons/gaiaa_grasping_stone.png",
+   "category": "boons",
+   "meaning": "Grasping Stone (Standard boon, Gaiaa): +10% damage; hits have a 15% chance to Root enemies for 1.5 s. Icon: a hand rising from the ground.",
+   "tint": "#92B268",
+   "motif": "a hand rising from the ground"
+  },
+  "boons/gaiaa_landslide": {
+   "file": "boons/gaiaa_landslide.png",
+   "category": "boons",
+   "meaning": "Landslide (Standard boon, Gaiaa): +12% damage; +35% knockback. Icon: a landslide.",
+   "tint": "#92B268",
+   "motif": "a landslide"
+  },
+  "boons/gaiaa_sanguine_thorns": {
+   "file": "boons/gaiaa_sanguine_thorns.png",
+   "category": "boons",
+   "meaning": "Sanguine Thorns (Standard boon, Gaiaa): Hits have a 20% chance to Bleed; heal for 1.5% of damage dealt. Icon: a thorned vine and a drop.",
+   "tint": "#92B268",
+   "motif": "a thorned vine and a drop"
+  },
+  "boons/gaiaa_tectonic_wrath": {
+   "file": "boons/gaiaa_tectonic_wrath.png",
+   "category": "boons",
+   "meaning": "Tectonic Wrath (Standard boon, Gaiaa): Ultimates split the ground into grinding stone (25 damage per second for 4 s). Icon: grinding plates.",
+   "tint": "#92B268",
+   "motif": "grinding plates"
+  },
+  "boons/gaiaa_tremor_step": {
+   "file": "boons/gaiaa_tremor_step.png",
+   "category": "boons",
+   "meaning": "Tremor Step (Standard boon, Gaiaa): Dashing sends out a tremor that deals 30 damage and Roots enemies. Icon: a quaking step.",
+   "tint": "#92B268",
+   "motif": "a quaking step"
+  },
+  "boons/gaiaa_unbroken_mountain": {
+   "file": "boons/gaiaa_unbroken_mountain.png",
+   "category": "boons",
+   "meaning": "The Unbroken Mountain (Legendary boon, Gaiaa): Take 20% less damage, gain 80 max HP and heal for 3% of damage dealt. Icon: a mountain under a shield.",
+   "tint": "#92B268",
+   "motif": "a mountain under a shield"
+  },
+  "boons/hallowed_bulwark": {
+   "file": "boons/hallowed_bulwark.png",
+   "category": "boons",
+   "meaning": "Hallowed Bulwark (Duo boon, Gaiaa & Seraphel): +50 shield; take 12% less damage. Icon: a haloed stone plate.",
+   "tint": "#92B268",
+   "motif": "a haloed stone plate"
+  },
+  "boons/morwenn_barnacle_hide": {
+   "file": "boons/morwenn_barnacle_hide.png",
+   "category": "boons",
+   "meaning": "Barnacle Hide (Standard boon, Morwenn): Take 7% less damage; regenerate 1 HP per second. Icon: a ribbed shell.",
+   "tint": "#79B79D",
+   "motif": "a ribbed shell"
+  },
+  "boons/morwenn_black_tide": {
+   "file": "boons/morwenn_black_tide.png",
+   "category": "boons",
+   "meaning": "The Black Tide (Legendary boon, Morwenn): Every impact floods the ground with cursing brine (50% weapon damage per second); +20% area. Icon: a black wave with a hex eye.",
+   "tint": "#79B79D",
+   "motif": "a black wave with a hex eye"
+  },
+  "boons/morwenn_brackish_pools": {
+   "file": "boons/morwenn_brackish_pools.png",
+   "category": "boons",
+   "meaning": "Brackish Pools (Standard boon, Morwenn): Impacts leave toxic pools that deal 30% weapon damage per second. Icon: a brackish pool.",
+   "tint": "#79B79D",
+   "motif": "a brackish pool"
+  },
+  "boons/morwenn_brinestep": {
+   "file": "boons/morwenn_brinestep.png",
+   "category": "boons",
+   "meaning": "Brinestep (Standard boon, Morwenn): Dashing throws off a wave of brine that deals 20 damage and Curses enemies. Icon: a dash riding a wave.",
+   "tint": "#79B79D",
+   "motif": "a dash riding a wave"
+  },
+  "boons/morwenn_contagion": {
+   "file": "boons/morwenn_contagion.png",
+   "category": "boons",
+   "meaning": "Contagion (Standard boon, Morwenn): Hits leap to 1 nearby enemy at 50% damage; hits have a 15% chance to Curse. Icon: linked spores and a hex eye.",
+   "tint": "#79B79D",
+   "motif": "linked spores and a hex eye"
+  },
+  "boons/morwenn_deluge": {
+   "file": "boons/morwenn_deluge.png",
+   "category": "boons",
+   "meaning": "Deluge (Standard boon, Morwenn): Ultimates flood the area with a plague tide (20 damage per second for 5 s). Icon: a deluge.",
+   "tint": "#79B79D",
+   "motif": "a deluge"
+  },
+  "boons/morwenn_dragged_under": {
+   "file": "boons/morwenn_dragged_under.png",
+   "category": "boons",
+   "meaning": "Dragged Under (Standard boon, Morwenn): +20% damage to Cursed enemies. Icon: a tentacle dragging under.",
+   "tint": "#79B79D",
+   "motif": "a tentacle dragging under"
+  },
+  "boons/morwenn_drowning_gyre": {
+   "file": "boons/morwenn_drowning_gyre.png",
+   "category": "boons",
+   "meaning": "Drowning Gyre (Standard boon, Morwenn): Impacts open small whirlpools that drag enemies together. Icon: a whirlpool.",
+   "tint": "#79B79D",
+   "motif": "a whirlpool"
+  },
+  "boons/morwenn_plague_wake": {
+   "file": "boons/morwenn_plague_wake.png",
+   "category": "boons",
+   "meaning": "Plague Wake (Standard boon, Morwenn): Shots leave a festering wake that deals 30% weapon damage per second and slows 20%. Icon: a festering wake.",
+   "tint": "#79B79D",
+   "motif": "a festering wake"
+  },
+  "boons/morwenn_spreading_blight": {
+   "file": "boons/morwenn_spreading_blight.png",
+   "category": "boons",
+   "meaning": "Spreading Blight (Standard boon, Morwenn): On first hit, shots burst into 2 blighted droplets at 40% damage. Icon: a drop splitting in two.",
+   "tint": "#79B79D",
+   "motif": "a drop splitting in two"
+  },
+  "boons/morwenn_witchs_brine": {
+   "file": "boons/morwenn_witchs_brine.png",
+   "category": "boons",
+   "meaning": "Witch's Brine (Standard boon, Morwenn): +10% damage; hits have a 20% chance to Curse. Icon: a bubbling cauldron.",
+   "tint": "#79B79D",
+   "motif": "a bubbling cauldron"
+  },
+  "boons/morwenn_wreckers_haul": {
+   "file": "boons/morwenn_wreckers_haul.png",
+   "category": "boons",
+   "meaning": "Wrecker's Haul (Standard boon, Morwenn): The sea gives up its wrecks: +40% pickup radius and better part rarity. Icon: an anchor.",
+   "tint": "#79B79D",
+   "motif": "an anchor"
+  },
+  "boons/nyctia_ambuscade": {
+   "file": "boons/nyctia_ambuscade.png",
+   "category": "boons",
+   "meaning": "Ambuscade (Standard boon, Nyctia): +30% damage to enemies at full HP; +5% crit chance. Icon: a dagger from the dark of the moon.",
+   "tint": "#AB80C3",
+   "motif": "a dagger from the dark of the moon"
+  },
+  "boons/nyctia_assassins_vow": {
+   "file": "boons/nyctia_assassins_vow.png",
+   "category": "boons",
+   "meaning": "Assassin's Vow (Standard boon, Nyctia): +20% damage against elites and bosses; +25% crit damage. Icon: a dagger through a crown.",
+   "tint": "#AB80C3",
+   "motif": "a dagger through a crown"
+  },
+  "boons/nyctia_dark_of_the_moon": {
+   "file": "boons/nyctia_dark_of_the_moon.png",
+   "category": "boons",
+   "meaning": "Dark of the Moon (Standard boon, Nyctia): +15% ultimate charge; actives deal +15% damage. Icon: a darkened moon.",
+   "tint": "#AB80C3",
+   "motif": "a darkened moon"
+  },
+  "boons/nyctia_hunting_shadows": {
+   "file": "boons/nyctia_hunting_shadows.png",
+   "category": "boons",
+   "meaning": "Hunting Shadows (Standard boon, Nyctia): Shots curve toward their prey; +5% crit chance. Icon: a hunting shot under a crescent.",
+   "tint": "#AB80C3",
+   "motif": "a hunting shot under a crescent"
+  },
+  "boons/nyctia_keen_darkness": {
+   "file": "boons/nyctia_keen_darkness.png",
+   "category": "boons",
+   "meaning": "Keen Darkness (Standard boon, Nyctia): +8% crit chance; +8% fire rate. Icon: a keen eye and a spark.",
+   "tint": "#AB80C3",
+   "motif": "a keen eye and a spark"
+  },
+  "boons/nyctia_kiss_of_silence": {
+   "file": "boons/nyctia_kiss_of_silence.png",
+   "category": "boons",
+   "meaning": "Kiss of Silence (Legendary boon, Nyctia): Hits kill non-boss enemies below 20% HP; +50% crit damage. Icon: sealed lips over a blade.",
+   "tint": "#AB80C3",
+   "motif": "sealed lips over a blade"
+  },
+  "boons/nyctia_nightshroud": {
+   "file": "boons/nyctia_nightshroud.png",
+   "category": "boons",
+   "meaning": "Nightshroud (Standard boon, Nyctia): Wrapped in smoke: +1 dash charge; take 5% less damage. Icon: a night shroud.",
+   "tint": "#AB80C3",
+   "motif": "a night shroud"
+  },
+  "boons/nyctia_quietus": {
+   "file": "boons/nyctia_quietus.png",
+   "category": "boons",
+   "meaning": "Quietus (Standard boon, Nyctia): Hits kill non-boss enemies below 10% HP. Icon: a quiet blade.",
+   "tint": "#AB80C3",
+   "motif": "a quiet blade"
+  },
+  "boons/nyctia_serrated_shadow": {
+   "file": "boons/nyctia_serrated_shadow.png",
+   "category": "boons",
+   "meaning": "Serrated Shadow (Standard boon, Nyctia): Hits have a 25% chance to Bleed; +15% crit damage. Icon: a serrated blade and a drop.",
+   "tint": "#AB80C3",
+   "motif": "a serrated blade and a drop"
+  },
+  "boons/nyctia_shade_twin": {
+   "file": "boons/nyctia_shade_twin.png",
+   "category": "boons",
+   "meaning": "Shade Twin (Standard boon, Nyctia): Crits have a 20% chance to call a shadow double that fires your weapon at 30% power for 4 s. Icon: a shadow double.",
+   "tint": "#AB80C3",
+   "motif": "a shadow double"
+  },
+  "boons/nyctia_umbral_edge": {
+   "file": "boons/nyctia_umbral_edge.png",
+   "category": "boons",
+   "meaning": "Umbral Edge (Standard boon, Nyctia): Strike from the dark. Icon: a blade and a crit spark.",
+   "tint": "#AB80C3",
+   "motif": "a blade and a crit spark"
+  },
+  "boons/nyctia_veil_of_knives": {
+   "file": "boons/nyctia_veil_of_knives.png",
+   "category": "boons",
+   "meaning": "Veil of Knives (Standard boon, Nyctia): Dashing bursts into knife-filled smoke that deals 25 damage and makes enemies Bleed. Icon: knives in smoke.",
+   "tint": "#AB80C3",
+   "motif": "knives in smoke"
+  },
+  "boons/pitchfire": {
+   "file": "boons/pitchfire.png",
+   "category": "boons",
+   "meaning": "Pitchfire (Duo boon, Pyra & Morwenn): Impacts spill burning pitch: pools deal 40% weapon damage per second and ignite; +15% area. Icon: burning pitch.",
+   "tint": "#F4C86A",
+   "motif": "burning pitch"
+  },
+  "boons/pyra_blastfire_rounds": {
+   "file": "boons/pyra_blastfire_rounds.png",
+   "category": "boons",
+   "meaning": "Blastfire Rounds (Standard boon, Pyra): Shots explode on impact, dealing 35% of the hit to everything nearby. Icon: a blastfire burst.",
+   "tint": "#F4C86A",
+   "motif": "a blastfire burst"
+  },
+  "boons/pyra_cauterize": {
+   "file": "boons/pyra_cauterize.png",
+   "category": "boons",
+   "meaning": "Cauterize (Standard boon, Pyra): Your wounds sear shut: regenerate 2 HP per second. Icon: a seared heart.",
+   "tint": "#F4C86A",
+   "motif": "a seared heart"
+  },
+  "boons/pyra_cinder_bloom": {
+   "file": "boons/pyra_cinder_bloom.png",
+   "category": "boons",
+   "meaning": "Cinder Bloom (Standard boon, Pyra): Kills have a 25% chance to burst into flame for 70% weapon damage. Icon: a skull blooming into flame.",
+   "tint": "#F4C86A",
+   "motif": "a skull blooming into flame"
+  },
+  "boons/pyra_conflagration": {
+   "file": "boons/pyra_conflagration.png",
+   "category": "boons",
+   "meaning": "Conflagration (Standard boon, Pyra): Hits have a 30% chance to Burn, and your weapon's Burns land 2 stacks at once. Icon: twin flames.",
+   "tint": "#F4C86A",
+   "motif": "twin flames"
+  },
+  "boons/pyra_flarestep": {
+   "file": "boons/pyra_flarestep.png",
+   "category": "boons",
+   "meaning": "Flarestep (Standard boon, Pyra): Dashing releases a fire nova that deals 30 damage and sets enemies Burning. Icon: a dash bursting into a fire ring.",
+   "tint": "#F4C86A",
+   "motif": "a dash bursting into a fire ring"
+  },
+  "boons/pyra_furnace_rite": {
+   "file": "boons/pyra_furnace_rite.png",
+   "category": "boons",
+   "meaning": "Furnace Rite (Standard boon, Pyra): Your actives burn hotter: +30% active damage. Icon: an ability tile aflame.",
+   "tint": "#F4C86A",
+   "motif": "an ability tile aflame"
+  },
+  "boons/pyra_kindling_volley": {
+   "file": "boons/pyra_kindling_volley.png",
+   "category": "boons",
+   "meaning": "Kindling Volley (Standard boon, Pyra): +12% fire rate; hits have a 20% chance to Burn. Icon: a kindled volley.",
+   "tint": "#F4C86A",
+   "motif": "a kindled volley"
+  },
+  "boons/pyra_pyre_eternal": {
+   "file": "boons/pyra_pyre_eternal.png",
+   "category": "boons",
+   "meaning": "Pyre Eternal (Legendary boon, Pyra): Every death feeds the pyre. Icon: an eternal pyre.",
+   "tint": "#F4C86A",
+   "motif": "an eternal pyre"
+  },
+  "boons/pyra_roaring_pyre": {
+   "file": "boons/pyra_roaring_pyre.png",
+   "category": "boons",
+   "meaning": "Roaring Pyre (Standard boon, Pyra): Every explosion, pool and well your weapon creates is 25% wider. Icon: a flame in widening rings.",
+   "tint": "#F4C86A",
+   "motif": "a flame in widening rings"
+  },
+  "boons/pyra_scorched_heavens": {
+   "file": "boons/pyra_scorched_heavens.png",
+   "category": "boons",
+   "meaning": "Scorched Heavens (Standard boon, Pyra): +12% ultimate charge; ultimates leave burning ground (25 damage per second for 4 s). Icon: flame over scorched ground.",
+   "tint": "#F4C86A",
+   "motif": "flame over scorched ground"
+  },
+  "boons/pyra_searing_brand": {
+   "file": "boons/pyra_searing_brand.png",
+   "category": "boons",
+   "meaning": "Searing Brand (Standard boon, Pyra): +5% damage, and +20% more against Burning enemies. Icon: a searing brand.",
+   "tint": "#F4C86A",
+   "motif": "a searing brand"
+  },
+  "boons/pyra_wrathful_strike": {
+   "file": "boons/pyra_wrathful_strike.png",
+   "category": "boons",
+   "meaning": "Wrathful Strike (Standard boon, Pyra): Your weapon strikes with Pyra's fury. Icon: a flaming sword.",
+   "tint": "#F4C86A",
+   "motif": "a flaming sword"
+  },
+  "boons/seraphel_aegis_of_law": {
+   "file": "boons/seraphel_aegis_of_law.png",
+   "category": "boons",
+   "meaning": "Aegis of Law (Standard boon, Seraphel): Gain a 40-point shield that recharges after 4 s unharmed. Icon: a shield bearing scales.",
+   "tint": "#F4D483",
+   "motif": "a shield bearing scales"
+  },
+  "boons/seraphel_condemning_writ": {
+   "file": "boons/seraphel_condemning_writ.png",
+   "category": "boons",
+   "meaning": "Condemning Writ (Standard boon, Seraphel): +10% damage; hits have a 25% chance to Mark. Icon: a writ bearing the mark.",
+   "tint": "#F4D483",
+   "motif": "a writ bearing the mark"
+  },
+  "boons/seraphel_consecrated_ground": {
+   "file": "boons/seraphel_consecrated_ground.png",
+   "category": "boons",
+   "meaning": "Consecrated Ground (Standard boon, Seraphel): Ultimates consecrate the ground (30 damage per second for 4 s). Icon: a sun over consecrated ground.",
+   "tint": "#F4D483",
+   "motif": "a sun over consecrated ground"
+  },
+  "boons/seraphel_guiding_light": {
+   "file": "boons/seraphel_guiding_light.png",
+   "category": "boons",
+   "meaning": "Guiding Light (Standard boon, Seraphel): +15% weapon range; +30% pickup radius. Icon: a lantern.",
+   "tint": "#F4D483",
+   "motif": "a lantern"
+  },
+  "boons/seraphel_judgment_absolute": {
+   "file": "boons/seraphel_judgment_absolute.png",
+   "category": "boons",
+   "meaning": "Judgment Absolute (Legendary boon, Seraphel): Every hit Marks its target; +25% damage to Marked enemies. Icon: the mark inside a sun.",
+   "tint": "#F4D483",
+   "motif": "the mark inside a sun"
+  },
+  "boons/seraphel_lance_of_dawn": {
+   "file": "boons/seraphel_lance_of_dawn.png",
+   "category": "boons",
+   "meaning": "Lance of Dawn (Standard boon, Seraphel): Shots pierce 1 enemy and fly 20% faster. Icon: a lance of dawn.",
+   "tint": "#F4D483",
+   "motif": "a lance of dawn"
+  },
+  "boons/seraphel_litany_of_light": {
+   "file": "boons/seraphel_litany_of_light.png",
+   "category": "boons",
+   "meaning": "Litany of Light (Standard boon, Seraphel): Actives deal +20% damage; +10% ultimate charge. Icon: a book under a sun.",
+   "tint": "#F4D483",
+   "motif": "a book under a sun"
+  },
+  "boons/seraphel_radiant_mantle": {
+   "file": "boons/seraphel_radiant_mantle.png",
+   "category": "boons",
+   "meaning": "Radiant Mantle (Standard boon, Seraphel): +20 shield; regenerate 1 HP per second. Icon: a haloed mantle.",
+   "tint": "#F4D483",
+   "motif": "a haloed mantle"
+  },
+  "boons/seraphel_rebuke": {
+   "file": "boons/seraphel_rebuke.png",
+   "category": "boons",
+   "meaning": "Rebuke (Standard boon, Seraphel): Shots drive the unworthy back (+40% knockback); take 6% less damage. Icon: a raised palm.",
+   "tint": "#F4D483",
+   "motif": "a raised palm"
+  },
+  "boons/seraphel_sanctified_step": {
+   "file": "boons/seraphel_sanctified_step.png",
+   "category": "boons",
+   "meaning": "Sanctified Step (Standard boon, Seraphel): Dashing flares with holy light that deals 25 damage and Marks enemies. Icon: a dash flaring in a holy ring.",
+   "tint": "#F4D483",
+   "motif": "a dash flaring in a holy ring"
+  },
+  "boons/seraphel_sentence_passed": {
+   "file": "boons/seraphel_sentence_passed.png",
+   "category": "boons",
+   "meaning": "Sentence Passed (Standard boon, Seraphel): +25% damage to Marked enemies. Icon: a blade through the mark.",
+   "tint": "#F4D483",
+   "motif": "a blade through the mark"
+  },
+  "boons/seraphel_smite_the_mighty": {
+   "file": "boons/seraphel_smite_the_mighty.png",
+   "category": "boons",
+   "meaning": "Smite the Mighty (Standard boon, Seraphel): +25% damage against elites and bosses. Icon: a beam striking a crown.",
+   "tint": "#F4D483",
+   "motif": "a beam striking a crown"
+  },
+  "boons/silent_thunder": {
+   "file": "boons/silent_thunder.png",
+   "category": "boons",
+   "meaning": "Silent Thunder (Duo boon, Zephyros & Nyctia): +12% crit chance; +30% damage to Shocked enemies. Icon: a crescent and a bolt.",
+   "tint": "#8AD4D4",
+   "motif": "a crescent and a bolt"
+  },
+  "boons/sky_tribunal": {
+   "file": "boons/sky_tribunal.png",
+   "category": "boons",
+   "meaning": "Sky Tribunal (Duo boon, Zephyros & Seraphel): Hits arc to 2 more enemies at 70% damage per jump; hits have a 30% chance to Mark. Icon: scales with a bolt.",
+   "tint": "#8AD4D4",
+   "motif": "scales with a bolt"
+  },
+  "boons/spoils_of_the_shatterlands": {
+   "file": "boons/spoils_of_the_shatterlands.png",
+   "category": "boons",
+   "meaning": "Spoils of the Shatterlands (Team boon, every player): +30% pickup radius and better part rarity for every player. Icon: a magnet drawing shards.",
+   "tint": "#D9B56C",
+   "motif": "a magnet drawing shards"
+  },
+  "boons/stormwhirl": {
+   "file": "boons/stormwhirl.png",
+   "category": "boons",
+   "meaning": "Stormwhirl (Duo boon, Zephyros & Morwenn): Impacts spin up crackling whirlpools that drag enemies together; hits have a 30% chance to Shock. Icon: a whirlpool with a bolt.",
+   "tint": "#8AD4D4",
+   "motif": "a whirlpool with a bolt"
+  },
+  "boons/sunken_roots": {
+   "file": "boons/sunken_roots.png",
+   "category": "boons",
+   "meaning": "Sunken Roots (Duo boon, Gaiaa & Morwenn): Impacts leave sucking mire that Roots enemies inside; heal for 2% of damage dealt. Icon: roots under water.",
+   "tint": "#92B268",
+   "motif": "roots under water"
+  },
+  "boons/thousand_cuts": {
+   "file": "boons/thousand_cuts.png",
+   "category": "boons",
+   "meaning": "A Thousand Cuts (Duo boon, Nyctia & Aeon): Hits have a 30% chance to Bleed; your weapon's Bleeds land 2 stacks and last 6 s; +25% damage to Bleeding enemies. Icon: a thousand cuts.",
+   "tint": "#AB80C3",
+   "motif": "a thousand cuts"
+  },
+  "boons/thunderburn": {
+   "file": "boons/thunderburn.png",
+   "category": "boons",
+   "meaning": "Thunderburn (Duo boon, Pyra & Zephyros): Shock triggers burn. Icon: a bolt and a flame.",
+   "tint": "#F4C86A",
+   "motif": "a bolt and a flame"
+  },
+  "boons/tide_of_ages": {
+   "file": "boons/tide_of_ages.png",
+   "category": "boons",
+   "meaning": "Tide of Ages (Duo boon, Aeon & Morwenn): Hits have a 30% chance to apply 2 Curse stacks lasting 6 s; shots leave an undertow that slows 45%. Icon: a wave and an hourglass.",
+   "tint": "#D6D1C1",
+   "motif": "a wave and an hourglass"
+  },
+  "boons/umbra_rex_ashen_scar": {
+   "file": "boons/umbra_rex_ashen_scar.png",
+   "category": "boons",
+   "meaning": "Ashen Scar (Standard boon, Umbra-Rex): Ultimates leave a smoldering scar of ruin (30 damage per second for 5 s). Icon: a void over a scar.",
+   "tint": "#F4975F",
+   "motif": "a void over a scar"
+  },
+  "boons/umbra_rex_brink_of_ruin": {
+   "file": "boons/umbra_rex_brink_of_ruin.png",
+   "category": "boons",
+   "meaning": "Brink of Ruin (Standard boon, Umbra-Rex): +35% damage while below 40% HP. Icon: a cracked heart with an ember.",
+   "tint": "#F4975F",
+   "motif": "a cracked heart with an ember"
+  },
+  "boons/umbra_rex_cinder_oath": {
+   "file": "boons/umbra_rex_cinder_oath.png",
+   "category": "boons",
+   "meaning": "Cinder Oath (Standard boon, Umbra-Rex): Trade 40 max HP for a 50-point shield. Icon: a shield with a flame.",
+   "tint": "#F4975F",
+   "motif": "a shield with a flame"
+  },
+  "boons/umbra_rex_harbinger": {
+   "file": "boons/umbra_rex_harbinger.png",
+   "category": "boons",
+   "meaning": "Harbinger (Standard boon, Umbra-Rex): Sacrifice 20 max HP: actives deal +35% damage. Icon: a raven.",
+   "tint": "#F4975F",
+   "motif": "a raven"
+  },
+  "boons/umbra_rex_kings_tithe": {
+   "file": "boons/umbra_rex_kings_tithe.png",
+   "category": "boons",
+   "meaning": "King's Tithe (Standard boon, Umbra-Rex): Kills have a 5% chance to drop an extra Godshard; better part rarity. Icon: a crown and coins.",
+   "tint": "#F4975F",
+   "motif": "a crown and coins"
+  },
+  "boons/umbra_rex_last_crown": {
+   "file": "boons/umbra_rex_last_crown.png",
+   "category": "boons",
+   "meaning": "The Last Crown (Legendary boon, Umbra-Rex): +50% damage while below 50% HP; every hit adds Doom, bursting at 6 stacks for 300% weapon damage. Icon: the broken crown.",
+   "tint": "#F4975F",
+   "motif": "the broken crown"
+  },
+  "boons/umbra_rex_pound_of_flesh": {
+   "file": "boons/umbra_rex_pound_of_flesh.png",
+   "category": "boons",
+   "meaning": "Pound of Flesh (Standard boon, Umbra-Rex): Sacrifice 40 max HP for +30% damage. Icon: a blade in a heart.",
+   "tint": "#F4975F",
+   "motif": "a blade in a heart"
+  },
+  "boons/umbra_rex_ruinstep": {
+   "file": "boons/umbra_rex_ruinstep.png",
+   "category": "boons",
+   "meaning": "Ruinstep (Standard boon, Umbra-Rex): Dashing collapses the ground behind you for 35 damage. Icon: a step that breaks the ground.",
+   "tint": "#F4975F",
+   "motif": "a step that breaks the ground"
+  },
+  "boons/umbra_rex_spite_of_the_dying": {
+   "file": "boons/umbra_rex_spite_of_the_dying.png",
+   "category": "boons",
+   "meaning": "Spite of the Dying (Standard boon, Umbra-Rex): Heal for 2% of damage dealt; +20% damage while below 30% HP. Icon: a skull and a drop.",
+   "tint": "#F4975F",
+   "motif": "a skull and a drop"
+  },
+  "boons/umbra_rex_tolling_doom": {
+   "file": "boons/umbra_rex_tolling_doom.png",
+   "category": "boons",
+   "meaning": "Tolling Doom (Standard boon, Umbra-Rex): Every hit adds Doom; at 10 stacks the target bursts for 300% weapon damage. Icon: a tolling bell.",
+   "tint": "#F4975F",
+   "motif": "a tolling bell"
+  },
+  "boons/umbra_rex_tyrants_haste": {
+   "file": "boons/umbra_rex_tyrants_haste.png",
+   "category": "boons",
+   "meaning": "Tyrant's Haste (Standard boon, Umbra-Rex): +25% fire rate, but take 10% more damage. Icon: crowned shots.",
+   "tint": "#F4975F",
+   "motif": "crowned shots"
+  },
+  "boons/umbra_rex_weight_of_the_end": {
+   "file": "boons/umbra_rex_weight_of_the_end.png",
+   "category": "boons",
+   "meaning": "Weight of the End (Standard boon, Umbra-Rex): Every hit adds Doom; at 6 stacks the target bursts for 150% weapon damage. Icon: an hourglass with a skull.",
+   "tint": "#F4975F",
+   "motif": "an hourglass with a skull"
+  },
+  "boons/wall_of_halos": {
+   "file": "boons/wall_of_halos.png",
+   "category": "boons",
+   "meaning": "Wall of Halos (Team boon, Seraphel): +30 shield for every player. Icon: four haloed figures.",
+   "tint": "#F4D483",
+   "motif": "four haloed figures"
+  },
+  "boons/zephyros_galvanize": {
+   "file": "boons/zephyros_galvanize.png",
+   "category": "boons",
+   "meaning": "Galvanize (Standard boon, Zephyros): Actives recover 20% faster and deal +10% damage. Icon: an ability tile charged.",
+   "tint": "#8AD4D4",
+   "motif": "an ability tile charged"
+  },
+  "boons/zephyros_ionized_air": {
+   "file": "boons/zephyros_ionized_air.png",
+   "category": "boons",
+   "meaning": "Ionized Air (Standard boon, Zephyros): +25% damage to Shocked enemies. Icon: a blade through a bolt.",
+   "tint": "#8AD4D4",
+   "motif": "a blade through a bolt"
+  },
+  "boons/zephyros_leaping_arc": {
+   "file": "boons/zephyros_leaping_arc.png",
+   "category": "boons",
+   "meaning": "Leaping Arc (Standard boon, Zephyros): Hits arc to 2 more enemies; each jump deals half the damage of the last. Icon: an arc leaping between foes.",
+   "tint": "#8AD4D4",
+   "motif": "an arc leaping between foes"
+  },
+  "boons/zephyros_quickening_gale": {
+   "file": "boons/zephyros_quickening_gale.png",
+   "category": "boons",
+   "meaning": "Quickening Gale (Standard boon, Zephyros): +15% fire rate; +15% projectile speed. Icon: a shot on a gale.",
+   "tint": "#8AD4D4",
+   "motif": "a shot on a gale"
+  },
+  "boons/zephyros_rebounding_gale": {
+   "file": "boons/zephyros_rebounding_gale.png",
+   "category": "boons",
+   "meaning": "Rebounding Gale (Standard boon, Zephyros): Shots rebound to 1 more target; +10% projectile speed. Icon: a gust-borne rebound.",
+   "tint": "#8AD4D4",
+   "motif": "a gust-borne rebound"
+  },
+  "boons/zephyros_skystride": {
+   "file": "boons/zephyros_skystride.png",
+   "category": "boons",
+   "meaning": "Skystride (Standard boon, Zephyros): Dashing cracks a thunderclap that deals 25 damage and Shocks enemies. Icon: a dash cracking into a thunder ring.",
+   "tint": "#8AD4D4",
+   "motif": "a dash cracking into a thunder ring"
+  },
+  "boons/zephyros_stormbrand": {
+   "file": "boons/zephyros_stormbrand.png",
+   "category": "boons",
+   "meaning": "Stormbrand (Standard boon, Zephyros): +15% damage; hits have a 25% chance to Shock. Icon: a blade branded with a bolt.",
+   "tint": "#8AD4D4",
+   "motif": "a blade branded with a bolt"
+  },
+  "boons/zephyros_stormcalm": {
+   "file": "boons/zephyros_stormcalm.png",
+   "category": "boons",
+   "meaning": "Stormcalm (Standard boon, Zephyros): Calm at the center of the storm: take 8% less damage; +5% move speed. Icon: the calm eye of a storm.",
+   "tint": "#8AD4D4",
+   "motif": "the calm eye of a storm"
+  },
+  "boons/zephyros_tailwind": {
+   "file": "boons/zephyros_tailwind.png",
+   "category": "boons",
+   "meaning": "Tailwind (Standard boon, Zephyros): Zephyros pushes at your back. Icon: a winged boot.",
+   "tint": "#8AD4D4",
+   "motif": "a winged boot"
+  },
+  "boons/zephyros_thousandfold_thunder": {
+   "file": "boons/zephyros_thousandfold_thunder.png",
+   "category": "boons",
+   "meaning": "Thousandfold Thunder (Legendary boon, Zephyros): Hits arc to 4 more enemies, losing only 15% per jump; hits have a 40% chance to Shock. Icon: branching lightning.",
+   "tint": "#8AD4D4",
+   "motif": "branching lightning"
+  },
+  "boons/zephyros_thunderhead": {
+   "file": "boons/zephyros_thunderhead.png",
+   "category": "boons",
+   "meaning": "Thunderhead (Standard boon, Zephyros): Ultimates leave a crackling storm cell (35 damage per second for 3 s). Icon: a thunderhead over the ground.",
+   "tint": "#8AD4D4",
+   "motif": "a thunderhead over the ground"
+  },
+  "boons/zephyros_updraft": {
+   "file": "boons/zephyros_updraft.png",
+   "category": "boons",
+   "meaning": "Updraft (Standard boon, Zephyros): Dashes recharge 20% faster; +5% move speed. Icon: an updraft.",
+   "tint": "#8AD4D4",
+   "motif": "an updraft"
+  },
+  "chassis/anvil_gauntlets": {
+   "file": "chassis/anvil_gauntlets.png",
+   "category": "chassis",
+   "meaning": "Anvil Gauntlets (chassis): Short-range shotgun-fists. Punching is the build.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/bellowfire_projector": {
+   "file": "chassis/bellowfire_projector.png",
+   "category": "chassis",
+   "meaning": "Bellowfire Projector (chassis): A forge-bellows that breathes the furnace at the world.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/chorus_harp": {
+   "file": "chassis/chorus_harp.png",
+   "category": "chassis",
+   "meaning": "Chorus Harp (chassis): Notes that find their audience.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/coinshooter": {
+   "file": "chassis/coinshooter.png",
+   "category": "chassis",
+   "meaning": "Coinshooter (chassis): Dual ricochet pistols. Every shot pays twice.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/colossus_cannon": {
+   "file": "chassis/colossus_cannon.png",
+   "category": "chassis",
+   "meaning": "Colossus Cannon (chassis): Siege artillery for one. Shells burst on impact, knocking the horde back.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/dawnbreaker_carbine": {
+   "file": "chassis/dawnbreaker_carbine.png",
+   "category": "chassis",
+   "meaning": "Dawnbreaker Carbine (chassis): Law delivered at 4.5 verdicts per second.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/echoing_greatbow": {
+   "file": "chassis/echoing_greatbow.png",
+   "category": "chassis",
+   "meaning": "Echoing Greatbow (chassis): Three arrows. Each remembers the others.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/epochal_sundial": {
+   "file": "chassis/epochal_sundial.png",
+   "category": "chassis",
+   "meaning": "Epochal Sundial (chassis): Shadows that cut. The hour hand is a blade.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/godsbane_rifle": {
+   "file": "chassis/godsbane_rifle.png",
+   "category": "chassis",
+   "meaning": "Godsbane Rifle (chassis): The rifle that killed a god. It remembers.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/gravemaw_mortar": {
+   "file": "chassis/gravemaw_mortar.png",
+   "category": "chassis",
+   "meaning": "Gravemaw Mortar (chassis): Lobs shells that swallow crowds whole.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/huntmother_javelins": {
+   "file": "chassis/huntmother_javelins.png",
+   "category": "chassis",
+   "meaning": "Huntmother Javelins (chassis): Barbed javelins from a mother who hunts gods.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/longstrider_rail": {
+   "file": "chassis/longstrider_rail.png",
+   "category": "chassis",
+   "meaning": "Longstrider Rail (chassis): High-zoom railgun. Deletes what it can see.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/orrery_discs": {
+   "file": "chassis/orrery_discs.png",
+   "category": "chassis",
+   "meaning": "Orrery Discs (chassis): Spinning planetary blades that orbit from foe to foe.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/pendulum_repeater": {
+   "file": "chassis/pendulum_repeater.png",
+   "category": "chassis",
+   "meaning": "Pendulum Repeater (chassis): Fire rate accelerates the longer the trigger is held.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/plaguebloom_sprayer": {
+   "file": "chassis/plaguebloom_sprayer.png",
+   "category": "chassis",
+   "meaning": "Plaguebloom Sprayer (chassis): A pressurised fog of the end of things.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/seraph_lance": {
+   "file": "chassis/seraph_lance.png",
+   "category": "chassis",
+   "meaning": "Seraph Lance (chassis): A spear of law that never has to be thrown.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/serpent_smg": {
+   "file": "chassis/serpent_smg.png",
+   "category": "chassis",
+   "meaning": "Serpent SMG (chassis): A hissing stream of needles. Never stops talking.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/stormlash": {
+   "file": "chassis/stormlash.png",
+   "category": "chassis",
+   "meaning": "Stormlash (chassis): A whip of captured lightning that leaps between the damned.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/sunspike_shotgun": {
+   "file": "chassis/sunspike_shotgun.png",
+   "category": "chassis",
+   "meaning": "Sunspike Shotgun (chassis): A fistful of sunlight at arm's length.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/thundercoil_launcher": {
+   "file": "chassis/thundercoil_launcher.png",
+   "category": "chassis",
+   "meaning": "Thundercoil Launcher (chassis): Coiled lightning orbs that crackle on impact.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/tidecaller_harpoon": {
+   "file": "chassis/tidecaller_harpoon.png",
+   "category": "chassis",
+   "meaning": "Tidecaller Harpoon (chassis): A drowned god's harpoon. It pulls what it pierces.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/titanfall_hammer": {
+   "file": "chassis/titanfall_hammer.png",
+   "category": "chassis",
+   "meaning": "Titanfall Hammer (chassis): The last hammer of the last smith.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/voidheart_singularity": {
+   "file": "chassis/voidheart_singularity.png",
+   "category": "chassis",
+   "meaning": "Voidheart Singularity (chassis): A heart that collapses whatever it touches.",
+   "tint": "#E6CFA0"
+  },
+  "chassis/wraith_bow": {
+   "file": "chassis/wraith_bow.png",
+   "category": "chassis",
+   "meaning": "Wraith Bow (chassis): Draw to charge; loose hex-bolts that pass through the living.",
+   "tint": "#E6CFA0"
+  },
+  "currency/boon_reroll": {
+   "file": "currency/boon_reroll.png",
+   "category": "currency",
+   "meaning": "Boon reroll (a die)",
+   "tint": "#E6CFA0"
+  },
+  "currency/ember": {
+   "file": "currency/ember.png",
+   "category": "currency",
+   "meaning": "Ember: the meta currency (a glowing coal)",
+   "tint": "#E6CFA0"
+  },
+  "currency/forge_charge": {
+   "file": "currency/forge_charge.png",
+   "category": "currency",
+   "meaning": "Forge charge: one anvil action while the anvil is Hot (a hammer)",
+   "tint": "#E6CFA0"
+  },
+  "currency/free_action": {
+   "file": "currency/free_action.png",
+   "category": "currency",
+   "meaning": "Free anvil action (a spark over a hammer)",
+   "tint": "#E6CFA0"
+  },
+  "currency/godshard": {
+   "file": "currency/godshard.png",
+   "category": "currency",
+   "meaning": "Godshard: the run's forge currency",
+   "tint": "#E6CFA0"
+  },
+  "currency/seal": {
+   "file": "currency/seal.png",
+   "category": "currency",
+   "meaning": "Seal: claimed at a POI; enough of them open the Boss Gate (a stamp with an anvil)",
+   "tint": "#E6CFA0"
+  },
+  "elements/flame": {
+   "file": "elements/flame.png",
+   "category": "elements",
+   "meaning": "The Flame element",
+   "tint": "#FF7A1A"
+  },
+  "elements/kinetic": {
+   "file": "elements/kinetic.png",
+   "category": "elements",
+   "meaning": "The Kinetic element",
+   "tint": "#F4E3C1"
+  },
+  "elements/plague": {
+   "file": "elements/plague.png",
+   "category": "elements",
+   "meaning": "The Plague element",
+   "tint": "#86E03A"
+  },
+  "elements/radiant": {
+   "file": "elements/radiant.png",
+   "category": "elements",
+   "meaning": "The Radiant element",
+   "tint": "#FFE27A"
+  },
+  "elements/storm": {
+   "file": "elements/storm.png",
+   "category": "elements",
+   "meaning": "The Storm element",
+   "tint": "#3FD8FF"
+  },
+  "elements/void": {
+   "file": "elements/void.png",
+   "category": "elements",
+   "meaning": "The Void element",
+   "tint": "#A45CFF"
+  },
+  "gods/aeon": {
+   "file": "gods/aeon.png",
+   "category": "gods",
+   "meaning": "Aeon (Time, Fate): a ring dial with hands",
+   "tint": "#C9D2DC"
+  },
+  "gods/gaiaa": {
+   "file": "gods/gaiaa.png",
+   "category": "gods",
+   "meaning": "Gaiaa (Stone, Blood): a faceted heart-stone with roots",
+   "tint": "#4E9A3A"
+  },
+  "gods/morwenn": {
+   "file": "gods/morwenn.png",
+   "category": "gods",
+   "meaning": "Morwenn (Sea, Plague): a wave and a drop",
+   "tint": "#1FA39A"
+  },
+  "gods/nyctia": {
+   "file": "gods/nyctia.png",
+   "category": "gods",
+   "meaning": "Nyctia (Shadow, Silence): a crescent and a veiled dagger",
+   "tint": "#7B3FE0"
+  },
+  "gods/pyra": {
+   "file": "gods/pyra.png",
+   "category": "gods",
+   "meaning": "Pyra (Flame, Wrath): a crowned flame with wrath-horns",
+   "tint": "#E0312B"
+  },
+  "gods/seraphel": {
+   "file": "gods/seraphel.png",
+   "category": "gods",
+   "meaning": "Seraphel (Light, Law): a halo over scales",
+   "tint": "#FFD86B"
+  },
+  "gods/umbra_rex": {
+   "file": "gods/umbra_rex.png",
+   "category": "gods",
+   "meaning": "Umbra-Rex (Ruin, End): a broken crown over a closed eye",
+   "tint": "#8E1B1B"
+  },
+  "gods/zephyros": {
+   "file": "gods/zephyros.png",
+   "category": "gods",
+   "meaning": "Zephyros (Storm, Sky): a bolt in gust curls",
+   "tint": "#3FD8FF"
+  },
+  "input/mouse_lmb": {
+   "file": "input/mouse_lmb.png",
+   "category": "input",
+   "meaning": "Mouse left button (the lit part)",
+   "tint": "#D9B56C"
+  },
+  "input/mouse_mmb": {
+   "file": "input/mouse_mmb.png",
+   "category": "input",
+   "meaning": "Mouse middle button (wheel press) (the lit part)",
+   "tint": "#D9B56C"
+  },
+  "input/mouse_rmb": {
+   "file": "input/mouse_rmb.png",
+   "category": "input",
+   "meaning": "Mouse right button (the lit part)",
+   "tint": "#D9B56C"
+  },
+  "input/mouse_wheel": {
+   "file": "input/mouse_wheel.png",
+   "category": "input",
+   "meaning": "Mouse wheel scroll (the lit wheel with up and down arrows)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_dpad_down": {
+   "file": "input/pad_dpad_down.png",
+   "category": "input",
+   "meaning": "Gamepad d-pad down (the lit arm)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_dpad_left": {
+   "file": "input/pad_dpad_left.png",
+   "category": "input",
+   "meaning": "Gamepad d-pad left (the lit arm)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_dpad_right": {
+   "file": "input/pad_dpad_right.png",
+   "category": "input",
+   "meaning": "Gamepad d-pad right (the lit arm)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_dpad_up": {
+   "file": "input/pad_dpad_up.png",
+   "category": "input",
+   "meaning": "Gamepad d-pad up (the lit arm)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_east": {
+   "file": "input/pad_east.png",
+   "category": "input",
+   "meaning": "Gamepad east face button (a lit stud in the east position; no colours, no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_lb": {
+   "file": "input/pad_lb.png",
+   "category": "input",
+   "meaning": "Gamepad left bumper (the shape leans to its side; no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_ls": {
+   "file": "input/pad_ls.png",
+   "category": "input",
+   "meaning": "Gamepad left stick (the lit dot below marks the side)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_ls_click": {
+   "file": "input/pad_ls_click.png",
+   "category": "input",
+   "meaning": "Gamepad left stick press (a press chevron; the lit dot marks the side)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_lt": {
+   "file": "input/pad_lt.png",
+   "category": "input",
+   "meaning": "Gamepad left trigger (the shape leans to its side; no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_menu": {
+   "file": "input/pad_menu.png",
+   "category": "input",
+   "meaning": "Gamepad menu button (a small centre pill with three lines)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_north": {
+   "file": "input/pad_north.png",
+   "category": "input",
+   "meaning": "Gamepad north face button (a lit stud in the north position; no colours, no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_rb": {
+   "file": "input/pad_rb.png",
+   "category": "input",
+   "meaning": "Gamepad right bumper (the shape leans to its side; no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_rs": {
+   "file": "input/pad_rs.png",
+   "category": "input",
+   "meaning": "Gamepad right stick (the lit dot below marks the side)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_rs_click": {
+   "file": "input/pad_rs_click.png",
+   "category": "input",
+   "meaning": "Gamepad right stick press (a press chevron; the lit dot marks the side)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_rt": {
+   "file": "input/pad_rt.png",
+   "category": "input",
+   "meaning": "Gamepad right trigger (the shape leans to its side; no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_south": {
+   "file": "input/pad_south.png",
+   "category": "input",
+   "meaning": "Gamepad south face button (a lit stud in the south position; no colours, no letters)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_view": {
+   "file": "input/pad_view.png",
+   "category": "input",
+   "meaning": "Gamepad view button (a small centre pill with a window mark; no trademark glyph)",
+   "tint": "#D9B56C"
+  },
+  "input/pad_west": {
+   "file": "input/pad_west.png",
+   "category": "input",
+   "meaning": "Gamepad west face button (a lit stud in the west position; no colours, no letters)",
+   "tint": "#D9B56C"
+  },
+  "kits/brax_e": {
+   "file": "kits/brax_e.png",
+   "category": "kits",
+   "meaning": "Brax E: Furnace Rush. Charge through a horde line, dragging enemies with you. Icon: a charging shoulder with drag lines.",
+   "tint": "#D9B56C",
+   "motif": "a charging shoulder with drag lines"
+  },
+  "kits/brax_passive": {
+   "file": "kits/brax_passive.png",
+   "category": "kits",
+   "meaning": "Brax passive: Heat Gauge. Sustained fire builds Heat; at max, attacks ignite and stagger, and Brax takes reduced burn damage. Icon: a flame thermometer.",
+   "tint": "#D9B56C",
+   "motif": "a flame thermometer"
+  },
+  "kits/brax_q": {
+   "file": "kits/brax_q.png",
+   "category": "kits",
+   "meaning": "Brax Q: Cinder Uppercut. Launch enemies skyward; the follow-up slam spawns flame geysers. Icon: a rising fist over a flame geyser.",
+   "tint": "#D9B56C",
+   "motif": "a rising fist over a flame geyser"
+  },
+  "kits/brax_r": {
+   "file": "kits/brax_r.png",
+   "category": "kits",
+   "meaning": "Brax R (ultimate): Meltdown. 8s of molten fists: strikes emit shockwaves that copy your Mechanism. Icon: two dripping molten fists.",
+   "tint": "#D9B56C",
+   "motif": "two dripping molten fists"
+  },
+  "kits/epoch_e": {
+   "file": "kits/epoch_e.png",
+   "category": "kits",
+   "meaning": "Epoch E: Rewind Wounds. Revert the last 3s of damage taken by you or the most-hurt ally nearby. Icon: a turning-back arrow around a heart.",
+   "tint": "#D9B56C",
+   "motif": "a turning-back arrow around a heart"
+  },
+  "kits/epoch_passive": {
+   "file": "kits/epoch_passive.png",
+   "category": "kits",
+   "meaning": "Epoch passive: Borrowed Time. Cooldowns tick 40% faster while moving. Icon: an hourglass with a stride arrow.",
+   "tint": "#D9B56C",
+   "motif": "an hourglass with a stride arrow"
+  },
+  "kits/epoch_q": {
+   "file": "kits/epoch_q.png",
+   "category": "kits",
+   "meaning": "Epoch Q: Still Field. Bubble that slows enemies and projectiles inside. Icon: a bubble of paused motes.",
+   "tint": "#D9B56C",
+   "motif": "a bubble of paused motes"
+  },
+  "kits/epoch_r": {
+   "file": "kits/epoch_r.png",
+   "category": "kits",
+   "meaning": "Epoch R (ultimate): Stolen Second. Freeze enemies for 2s; when time resumes, every ally's cooldowns reset. Icon: a clock with its wedge pulled away.",
+   "tint": "#D9B56C",
+   "motif": "a clock with its wedge pulled away"
+  },
+  "kits/fenra_e": {
+   "file": "kits/fenra_e.png",
+   "category": "kits",
+   "meaning": "Fenra E: Den Call. Summon a howl that roots nearby enemies. Icon: a howling wolf over roots.",
+   "tint": "#D9B56C",
+   "motif": "a howling wolf over roots"
+  },
+  "kits/fenra_passive": {
+   "file": "kits/fenra_passive.png",
+   "category": "kits",
+   "meaning": "Fenra passive: Pack Bond. Your Chimera-pup copies your current Mechanism. Icon: a paw and a gear.",
+   "tint": "#D9B56C",
+   "motif": "a paw and a gear"
+  },
+  "kits/fenra_q": {
+   "file": "kits/fenra_q.png",
+   "category": "kits",
+   "meaning": "Fenra Q: Sic 'Em. Send the pup to maul a target. Icon: the pup pouncing.",
+   "tint": "#D9B56C",
+   "motif": "the pup pouncing"
+  },
+  "kits/fenra_r": {
+   "file": "kits/fenra_r.png",
+   "category": "kits",
+   "meaning": "Fenra R (ultimate): Wild Hunt. The pup grows colossal for 8s. Icon: a snarling wolf over a small one.",
+   "tint": "#D9B56C",
+   "motif": "a snarling wolf over a small one"
+  },
+  "kits/kael_e": {
+   "file": "kits/kael_e.png",
+   "category": "kits",
+   "meaning": "Kael E: Shadow Roll. Roll with i-frames; your next 3 shots pierce. Icon: a crescent rolling with afterimages.",
+   "tint": "#D9B56C",
+   "motif": "a crescent rolling with afterimages"
+  },
+  "kits/kael_passive": {
+   "file": "kits/kael_passive.png",
+   "category": "kits",
+   "meaning": "Kael passive: Ghost Step. Each kill grants a short dash refresh + stacking crit chance (decays). Icon: a footprint with a ghost trail.",
+   "tint": "#D9B56C",
+   "motif": "a footprint with a ghost trail"
+  },
+  "kits/kael_q": {
+   "file": "kits/kael_q.png",
+   "category": "kits",
+   "meaning": "Kael Q: Fan of Blades. Spectral shotgun burst that Marks; crits on Marked enemies below 15% HP execute. Icon: three blades fanned from one grip.",
+   "tint": "#D9B56C",
+   "motif": "three blades fanned from one grip"
+  },
+  "kits/kael_r": {
+   "file": "kits/kael_r.png",
+   "category": "kits",
+   "meaning": "Kael R (ultimate): Bullet Ballet. 6s of infinite dash and twin spectral pistols copying your Mechanism. Icon: twin pistols spinning back to back.",
+   "tint": "#D9B56C",
+   "motif": "twin pistols spinning back to back"
+  },
+  "kits/lyra_e": {
+   "file": "kits/lyra_e.png",
+   "category": "kits",
+   "meaning": "Lyra E: Dirge. Enemies nearby are cursed. Icon: a falling note over a hex eye.",
+   "tint": "#D9B56C",
+   "motif": "a falling note over a hex eye"
+  },
+  "kits/lyra_passive": {
+   "file": "kits/lyra_passive.png",
+   "category": "kits",
+   "meaning": "Lyra passive: Crescendo. Damage auras scale with ally kill-streaks. Icon: a swelling hairpin under a note.",
+   "tint": "#D9B56C",
+   "motif": "a swelling hairpin under a note"
+  },
+  "kits/lyra_q": {
+   "file": "kits/lyra_q.png",
+   "category": "kits",
+   "meaning": "Lyra Q: Hymn of Haste. Allies gain fire rate. Icon: a winged note.",
+   "tint": "#D9B56C",
+   "motif": "a winged note"
+  },
+  "kits/lyra_r": {
+   "file": "kits/lyra_r.png",
+   "category": "kits",
+   "meaning": "Lyra R (ultimate): Last Chorus. Every ally's damage is amplified for 8s. Icon: a lyre in ringing arcs.",
+   "tint": "#D9B56C",
+   "motif": "a lyre in ringing arcs"
+  },
+  "kits/mirren_e": {
+   "file": "kits/mirren_e.png",
+   "category": "kits",
+   "meaning": "Mirren E: Snatch. Teleport-strike an elite and steal its momentum. Icon: a hand closing on a gem.",
+   "tint": "#D9B56C",
+   "motif": "a hand closing on a gem"
+  },
+  "kits/mirren_passive": {
+   "file": "kits/mirren_passive.png",
+   "category": "kits",
+   "meaning": "Mirren passive: Fortune's Favor. +25% part drop quality; chance to duplicate forged parts. Icon: a coin with fox ears.",
+   "tint": "#D9B56C",
+   "motif": "a coin with fox ears"
+  },
+  "kits/mirren_q": {
+   "file": "kits/mirren_q.png",
+   "category": "kits",
+   "meaning": "Mirren Q: Gilded Decoy. Taunting clone that explodes into coins and shrapnel. Icon: a fox mask bursting into coins.",
+   "tint": "#D9B56C",
+   "motif": "a fox mask bursting into coins"
+  },
+  "kits/mirren_r": {
+   "file": "kits/mirren_r.png",
+   "category": "kits",
+   "meaning": "Mirren R (ultimate): Grand Heist. 6s where every kill drops bonus loot. Icon: a sack spilling coins.",
+   "tint": "#D9B56C",
+   "motif": "a sack spilling coins"
+  },
+  "kits/ossian_e": {
+   "file": "kits/ossian_e.png",
+   "category": "kits",
+   "meaning": "Ossian E: Skyhook Mortar. Arcing lob that splits into bomblets on landing. Icon: an arcing shell splitting into bomblets.",
+   "tint": "#D9B56C",
+   "motif": "an arcing shell splitting into bomblets"
+  },
+  "kits/ossian_passive": {
+   "file": "kits/ossian_passive.png",
+   "category": "kits",
+   "meaning": "Ossian passive: Marked Quarry. Damage stacks on a single target; switching targets resets. +30% damage to full-HP enemies. Icon: a reticle on a stag skull.",
+   "tint": "#D9B56C",
+   "motif": "a reticle on a stag skull"
+  },
+  "kits/ossian_q": {
+   "file": "kits/ossian_q.png",
+   "category": "kits",
+   "meaning": "Ossian Q: Piercing Comet. Charge shot that penetrates every enemy and wall in a line. Icon: a comet punching through a wall.",
+   "tint": "#D9B56C",
+   "motif": "a comet punching through a wall"
+  },
+  "kits/ossian_r": {
+   "file": "kits/ossian_r.png",
+   "category": "kits",
+   "meaning": "Ossian R (ultimate): Rain of the Hunt. 5s of auto-crits on every Marked enemy, anywhere on screen. Icon: arrows falling on marks.",
+   "tint": "#D9B56C",
+   "motif": "arrows falling on marks"
+  },
+  "kits/selene_e": {
+   "file": "kits/selene_e.png",
+   "category": "kits",
+   "meaning": "Selene E: Blink. Teleport through enemies, leaving a storm trail. Icon: a figure dissolving into shards behind a bolt.",
+   "tint": "#D9B56C",
+   "motif": "a figure dissolving into shards behind a bolt"
+  },
+  "kits/selene_passive": {
+   "file": "kits/selene_passive.png",
+   "category": "kits",
+   "meaning": "Selene passive: Static Charge. Movement builds charge; next Active deals bonus damage and chains. Icon: a bolt in a charging ring.",
+   "tint": "#D9B56C",
+   "motif": "a bolt in a charging ring"
+  },
+  "kits/selene_q": {
+   "file": "kits/selene_q.png",
+   "category": "kits",
+   "meaning": "Selene Q: Arc Nova. Chain-lightning burst that scales with your weapon's fire rate. Icon: a ring of bolts around a charged core.",
+   "tint": "#D9B56C",
+   "motif": "a ring of bolts around a charged core"
+  },
+  "kits/selene_r": {
+   "file": "kits/selene_r.png",
+   "category": "kits",
+   "meaning": "Selene R (ultimate): Heaven's Verdict. Call a moving thunderstorm front that supercharges every ally's projectiles inside it. Icon: a storm cloud over three bolts.",
+   "tint": "#D9B56C",
+   "motif": "a storm cloud over three bolts"
+  },
+  "kits/seraph_e": {
+   "file": "kits/seraph_e.png",
+   "category": "kits",
+   "meaning": "Seraph E: Smite. A beam of judgement. Icon: a beam striking the ground.",
+   "tint": "#D9B56C",
+   "motif": "a beam striking the ground"
+  },
+  "kits/seraph_passive": {
+   "file": "kits/seraph_passive.png",
+   "category": "kits",
+   "meaning": "Seraph passive: Judgement Marks. Marked enemies pay out bonus damage when allies strike them. Icon: the scales and the mark.",
+   "tint": "#D9B56C",
+   "motif": "the scales and the mark"
+  },
+  "kits/seraph_q": {
+   "file": "kits/seraph_q.png",
+   "category": "kits",
+   "meaning": "Seraph Q: Aegis. Shield allies in a radius. Icon: a shield under a ward dome.",
+   "tint": "#D9B56C",
+   "motif": "a shield under a ward dome"
+  },
+  "kits/seraph_r": {
+   "file": "kits/seraph_r.png",
+   "category": "kits",
+   "meaning": "Seraph R (ultimate): Verdict. Mark every enemy on screen. Icon: a gavel over marks.",
+   "tint": "#D9B56C",
+   "motif": "a gavel over marks"
+  },
+  "kits/thessaly_e": {
+   "file": "kits/thessaly_e.png",
+   "category": "kits",
+   "meaning": "Thessaly E: Binding Hex. Root field; enemies killed inside drop extra parts. Icon: a hex eye in a rune circle bound by a chain.",
+   "tint": "#D9B56C",
+   "motif": "a hex eye in a rune circle bound by a chain"
+  },
+  "kits/thessaly_passive": {
+   "file": "kits/thessaly_passive.png",
+   "category": "kits",
+   "meaning": "Thessaly passive: Curse Weaver. Debuffed enemies take +25% damage from all allies. Icon: a spindle and a hex eye.",
+   "tint": "#D9B56C",
+   "motif": "a spindle and a hex eye"
+  },
+  "kits/thessaly_q": {
+   "file": "kits/thessaly_q.png",
+   "category": "kits",
+   "meaning": "Thessaly Q: Forge Turret. Deploy a turret copying your weapon's Core + Mechanism at 40% power. Icon: a tripod turret.",
+   "tint": "#D9B56C",
+   "motif": "a tripod turret"
+  },
+  "kits/thessaly_r": {
+   "file": "kits/thessaly_r.png",
+   "category": "kits",
+   "meaning": "Thessaly R (ultimate): Sabbath of Sparks. Turrets and Echoes surge; allies gain lifesteal against cursed targets. Icon: a candle in a ring of sparks.",
+   "tint": "#D9B56C",
+   "motif": "a candle in a ring of sparks"
+  },
+  "kits/valdris_e": {
+   "file": "kits/valdris_e.png",
+   "category": "kits",
+   "meaning": "Valdris E: Siege Stance. Plant yourself: fire rate +120%, incoming damage −40%, enemies target you. Icon: a planted tower shield with rising chevrons.",
+   "tint": "#D9B56C",
+   "motif": "a planted tower shield with rising chevrons"
+  },
+  "kits/valdris_passive": {
+   "file": "kits/valdris_passive.png",
+   "category": "kits",
+   "meaning": "Valdris passive: Reforged Flesh. Damage taken converts to Armor (max 50% mitigation). When armor breaks, emits a shockwave taunt. Icon: armour plates over a heart.",
+   "tint": "#D9B56C",
+   "motif": "armour plates over a heart"
+  },
+  "kits/valdris_q": {
+   "file": "kits/valdris_q.png",
+   "category": "kits",
+   "meaning": "Valdris Q: Bulwark Slam. Leap-slam: stun everything you land on and raise a forge barricade that blocks projectiles. Icon: a fist driving into the ground behind a raised barricade.",
+   "tint": "#D9B56C",
+   "motif": "a fist driving into the ground behind a raised barricade"
+  },
+  "kits/valdris_r": {
+   "file": "kits/valdris_r.png",
+   "category": "kits",
+   "meaning": "Valdris R (ultimate): Mountainfall. Become a colossal anvil-avatar for 8s: every shot is an exploding boulder, ground pounds chain. Icon: a peak crowned by an anvil, a boulder falling.",
+   "tint": "#D9B56C",
+   "motif": "a peak crowned by an anvil, a boulder falling"
+  },
+  "kits/vex_e": {
+   "file": "kits/vex_e.png",
+   "category": "kits",
+   "meaning": "Vex E: Miasma Step. Dash leaves a toxic cloud. Icon: a footprint leaving a toxic cloud.",
+   "tint": "#D9B56C",
+   "motif": "a footprint leaving a toxic cloud"
+  },
+  "kits/vex_passive": {
+   "file": "kits/vex_passive.png",
+   "category": "kits",
+   "meaning": "Vex passive: Transmute. Corpses become bombs. Icon: a skull with a lit fuse.",
+   "tint": "#D9B56C",
+   "motif": "a skull with a lit fuse"
+  },
+  "kits/vex_q": {
+   "file": "kits/vex_q.png",
+   "category": "kits",
+   "meaning": "Vex Q: Bottle Toss. Lob a spreading plague flask. Icon: a flask arcing to a splash.",
+   "tint": "#D9B56C",
+   "motif": "a flask arcing to a splash"
+  },
+  "kits/vex_r": {
+   "file": "kits/vex_r.png",
+   "category": "kits",
+   "meaning": "Vex R (ultimate): Red Death. Every corpse detonates for 6s. Icon: a skull in a burst.",
+   "tint": "#D9B56C",
+   "motif": "a skull in a burst"
+  },
+  "parts/barbcore": {
+   "file": "parts/barbcore.png",
+   "category": "parts",
+   "meaning": "Barbcore (Core): Barbed needles that catch and tear. Running only makes it worse. Icon: a barbed needle.",
+   "tint": "#F4E3C1",
+   "motif": "a barbed needle"
+  },
+  "parts/blightcore": {
+   "file": "parts/blightcore.png",
+   "category": "parts",
+   "meaning": "Blightcore (Core): Sickness that leaps from body to body. Nobody is patient zero twice. Icon: linked spores.",
+   "tint": "#86E03A",
+   "motif": "linked spores"
+  },
+  "parts/cairncore": {
+   "file": "parts/cairncore.png",
+   "category": "parts",
+   "meaning": "Cairncore (Core): Hurls grave-cairn stones that pin the living to the earth. Icon: a cairn of stones.",
+   "tint": "#F4E3C1",
+   "motif": "a cairn of stones"
+  },
+  "parts/dawncore": {
+   "file": "parts/dawncore.png",
+   "category": "parts",
+   "meaning": "Dawncore (Core): Judgement shards that mark the guilty. Icon: the mark lozenge.",
+   "tint": "#FFE27A",
+   "motif": "the mark lozenge"
+  },
+  "parts/embercore": {
+   "file": "parts/embercore.png",
+   "category": "parts",
+   "meaning": "Embercore (Core): Fire bolts that set the horde alight. Icon: a flame.",
+   "tint": "#FF7A1A",
+   "motif": "a flame"
+  },
+  "parts/gildcore": {
+   "file": "parts/gildcore.png",
+   "category": "parts",
+   "meaning": "Gildcore (Core): Blessed gold. It always finds its way back into circulation. Icon: a coin with a rebound.",
+   "tint": "#FFE27A",
+   "motif": "a coin with a rebound"
+  },
+  "parts/gloamcore": {
+   "file": "parts/gloamcore.png",
+   "category": "parts",
+   "meaning": "Gloamcore (Core): Dusk-blades that pass through the living as if they were already ghosts. Icon: a dusk blade crescent.",
+   "tint": "#A45CFF",
+   "motif": "a dusk blade crescent"
+  },
+  "parts/halocore": {
+   "file": "parts/halocore.png",
+   "category": "parts",
+   "meaning": "Halocore (Core): Small haloes that go looking for the guilty. Icon: a halo with a seeking arc.",
+   "tint": "#FFE27A",
+   "motif": "a halo with a seeking arc"
+  },
+  "parts/hexcore": {
+   "file": "parts/hexcore.png",
+   "category": "parts",
+   "meaning": "Hexcore (Core): Hex-needles that make the damned more damnable. Icon: a hex eye.",
+   "tint": "#A45CFF",
+   "motif": "a hex eye"
+  },
+  "parts/ironcore": {
+   "file": "parts/ironcore.png",
+   "category": "parts",
+   "meaning": "Ironcore (Core): Honest metal. Goes through the first one. Icon: a slug.",
+   "tint": "#F4E3C1",
+   "motif": "a slug"
+  },
+  "parts/kilncore": {
+   "file": "parts/kilncore.png",
+   "category": "parts",
+   "meaning": "Kilncore (Core): Globes of liquid forge-fire that pool and keep on burning. Icon: a flame over a burning pool.",
+   "tint": "#FF7A1A",
+   "motif": "a flame over a burning pool"
+  },
+  "parts/mech_arc_relay": {
+   "file": "parts/mech_arc_relay.png",
+   "category": "parts",
+   "meaning": "Arc Relay (Mechanism): A conductor coil: every hit arcs on to two more. Icon: a conductor coil.",
+   "tint": "#E6CFA0",
+   "motif": "a conductor coil"
+  },
+  "parts/mech_beam_sweep": {
+   "file": "parts/mech_beam_sweep.png",
+   "category": "parts",
+   "meaning": "Beam Sweep (Mechanism): Converts the weapon into a sweeping beam. Icon: a sweeping beam.",
+   "tint": "#E6CFA0",
+   "motif": "a sweeping beam"
+  },
+  "parts/mech_bounce_fork": {
+   "file": "parts/mech_bounce_fork.png",
+   "category": "parts",
+   "meaning": "Bounce-Fork (Mechanism): On first hit the shot splits into two forks. Icon: a shot splitting in two.",
+   "tint": "#E6CFA0",
+   "motif": "a shot splitting in two"
+  },
+  "parts/mech_carrion_drift": {
+   "file": "parts/mech_carrion_drift.png",
+   "category": "parts",
+   "meaning": "Carrion Drift (Mechanism): Slow shots that circle like crows until they find meat. Icon: a circling crow.",
+   "tint": "#E6CFA0",
+   "motif": "a circling crow"
+  },
+  "parts/mech_choke_bore": {
+   "file": "parts/mech_choke_bore.png",
+   "category": "parts",
+   "meaning": "Choke Bore (Mechanism): Tightens every spread and sends it further. Icon: a funnel narrowing the spread.",
+   "tint": "#E6CFA0",
+   "motif": "a funnel narrowing the spread"
+  },
+  "parts/mech_chorus_lattice": {
+   "file": "parts/mech_chorus_lattice.png",
+   "category": "parts",
+   "meaning": "Chorus Lattice (Mechanism): Every other shot is sung back by a choir that died with its gods. Icon: two sung notes.",
+   "tint": "#E6CFA0",
+   "motif": "two sung notes"
+  },
+  "parts/mech_cleaving_fork": {
+   "file": "parts/mech_cleaving_fork.png",
+   "category": "parts",
+   "meaning": "Cleaving Fork (Mechanism): On first hit the shot cleaves into three. Icon: a shot cleaving in three.",
+   "tint": "#E6CFA0",
+   "motif": "a shot cleaving in three"
+  },
+  "parts/mech_compass_rose": {
+   "file": "parts/mech_compass_rose.png",
+   "category": "parts",
+   "meaning": "Compass Rose (Mechanism): Every shot erupts in a full circle, pointing everywhere at once. Icon: a compass rose.",
+   "tint": "#E6CFA0",
+   "motif": "a compass rose"
+  },
+  "parts/mech_deep_draw": {
+   "file": "parts/mech_deep_draw.png",
+   "category": "parts",
+   "meaning": "Deep Draw (Mechanism): Hold longer. Hit harder. Go through. Icon: a deep draw piercing a bar.",
+   "tint": "#E6CFA0",
+   "motif": "a deep draw piercing a bar"
+  },
+  "parts/mech_gatling_hymn": {
+   "file": "parts/mech_gatling_hymn.png",
+   "category": "parts",
+   "meaning": "Gatling Hymn (Mechanism): A hymn with one very fast verse. Icon: a spinning barrel cluster.",
+   "tint": "#E6CFA0",
+   "motif": "a spinning barrel cluster"
+  },
+  "parts/mech_heavy_hand": {
+   "file": "parts/mech_heavy_hand.png",
+   "category": "parts",
+   "meaning": "Heavy Hand (Mechanism): Fewer shots. Each lands like a verdict, and every blast grows to match. Icon: a fist driving down.",
+   "tint": "#E6CFA0",
+   "motif": "a fist driving down"
+  },
+  "parts/mech_homing_shards": {
+   "file": "parts/mech_homing_shards.png",
+   "category": "parts",
+   "meaning": "Homing Shards (Mechanism): Projectiles hunt their own targets. Icon: a curving shot finding a reticle.",
+   "tint": "#E6CFA0",
+   "motif": "a curving shot finding a reticle"
+  },
+  "parts/mech_hydra_volley": {
+   "file": "parts/mech_hydra_volley.png",
+   "category": "parts",
+   "meaning": "Hydra Volley (Mechanism): Three more heads on every shot. Each one bites. Icon: three hydra heads.",
+   "tint": "#E6CFA0",
+   "motif": "three hydra heads"
+  },
+  "parts/mech_impaler": {
+   "file": "parts/mech_impaler.png",
+   "category": "parts",
+   "meaning": "Impaler (Mechanism): Skewers four in a row. Knockback all but vanishes, so the line holds still. Icon: a skewer through four.",
+   "tint": "#E6CFA0",
+   "motif": "a skewer through four"
+  },
+  "parts/mech_lancet_drive": {
+   "file": "parts/mech_lancet_drive.png",
+   "category": "parts",
+   "meaning": "Lancet Drive (Mechanism): Shots pierce three enemies and fly faster. Icon: a shot through three bars.",
+   "tint": "#E6CFA0",
+   "motif": "a shot through three bars"
+  },
+  "parts/mech_multishot": {
+   "file": "parts/mech_multishot.png",
+   "category": "parts",
+   "meaning": "Multishot (Mechanism): Two more projectiles per shot. Icon: three fanned arrows.",
+   "tint": "#E6CFA0",
+   "motif": "three fanned arrows"
+  },
+  "parts/mech_needle_ray": {
+   "file": "parts/mech_needle_ray.png",
+   "category": "parts",
+   "meaning": "Needle Ray (Mechanism): Converts the weapon into a thin, far-reaching ray. Icon: a thin far ray.",
+   "tint": "#E6CFA0",
+   "motif": "a thin far ray"
+  },
+  "parts/mech_overclock": {
+   "file": "parts/mech_overclock.png",
+   "category": "parts",
+   "meaning": "Overclock (Mechanism): Faster. Hotter. Slightly less precise. Icon: a racing gear.",
+   "tint": "#E6CFA0",
+   "motif": "a racing gear"
+  },
+  "parts/mech_packhunt_volley": {
+   "file": "parts/mech_packhunt_volley.png",
+   "category": "parts",
+   "meaning": "Packhunt Volley (Mechanism): Shots run as a pack: they spread, circle and go for the throat. Icon: shots running as a pack.",
+   "tint": "#E6CFA0",
+   "motif": "shots running as a pack"
+  },
+  "parts/mech_quickdraw_string": {
+   "file": "parts/mech_quickdraw_string.png",
+   "category": "parts",
+   "meaning": "Quickdraw String (Mechanism): Charge weapons draw in half the time. Everything else just shoots a little faster. Icon: a fast-drawn bow.",
+   "tint": "#E6CFA0",
+   "motif": "a fast-drawn bow"
+  },
+  "parts/mech_railspike": {
+   "file": "parts/mech_railspike.png",
+   "category": "parts",
+   "meaning": "Railspike (Mechanism): Hypervelocity spikes. Slow to load, impossible to dodge. Icon: a hypervelocity spike.",
+   "tint": "#E6CFA0",
+   "motif": "a hypervelocity spike"
+  },
+  "parts/mech_razor_halo": {
+   "file": "parts/mech_razor_halo.png",
+   "category": "parts",
+   "meaning": "Razor Halo (Mechanism): Five razors spin tight around you. Hugging you is now a mistake. Icon: a halo of razors.",
+   "tint": "#E6CFA0",
+   "motif": "a halo of razors"
+  },
+  "parts/mech_resounding_vault": {
+   "file": "parts/mech_resounding_vault.png",
+   "category": "parts",
+   "meaning": "Resounding Vault (Mechanism): Every third shot rings out twice. Icon: a ringing bell.",
+   "tint": "#E6CFA0",
+   "motif": "a ringing bell"
+  },
+  "parts/mech_ricochet": {
+   "file": "parts/mech_ricochet.png",
+   "category": "parts",
+   "meaning": "Ricochet (Mechanism): Shots bounce to a new target after every hit. Icon: a bouncing path.",
+   "tint": "#E6CFA0",
+   "motif": "a bouncing path"
+  },
+  "parts/mech_ricochet_rosary": {
+   "file": "parts/mech_ricochet_rosary.png",
+   "category": "parts",
+   "meaning": "Ricochet Rosary (Mechanism): Three bounces per shot, a prayer bead for each. Icon: rosary beads on a bouncing path.",
+   "tint": "#E6CFA0",
+   "motif": "rosary beads on a bouncing path"
+  },
+  "parts/mech_sawblade_orbit": {
+   "file": "parts/mech_sawblade_orbit.png",
+   "category": "parts",
+   "meaning": "Sawblade Orbit (Mechanism): Three forge-sawblades orbit you and shred anything close. Icon: three orbiting sawblades.",
+   "tint": "#E6CFA0",
+   "motif": "three orbiting sawblades"
+  },
+  "parts/mech_scatterburst": {
+   "file": "parts/mech_scatterburst.png",
+   "category": "parts",
+   "meaning": "Scatterburst (Mechanism): A wide fan of five projectiles at close range. Icon: a wide fan of pellets.",
+   "tint": "#E6CFA0",
+   "motif": "a wide fan of pellets"
+  },
+  "parts/mech_seeker_swarm": {
+   "file": "parts/mech_seeker_swarm.png",
+   "category": "parts",
+   "meaning": "Seeker Swarm (Mechanism): Shots scatter wide, then turn and hunt. Icon: shots that part and turn.",
+   "tint": "#E6CFA0",
+   "motif": "shots that part and turn"
+  },
+  "parts/mech_skipstone": {
+   "file": "parts/mech_skipstone.png",
+   "category": "parts",
+   "meaning": "Skipstone (Mechanism): Quick shots that skip once off the first thing they hit. Icon: a skipping stone.",
+   "tint": "#E6CFA0",
+   "motif": "a skipping stone"
+  },
+  "parts/mech_split_carom": {
+   "file": "parts/mech_split_carom.png",
+   "category": "parts",
+   "meaning": "Split Carom (Mechanism): Bounces once, then splits. Geometry weeps. Icon: a bounce that splits.",
+   "tint": "#E6CFA0",
+   "motif": "a bounce that splits"
+  },
+  "parts/mech_sundering_payload": {
+   "file": "parts/mech_sundering_payload.png",
+   "category": "parts",
+   "meaning": "Sundering Payload (Mechanism): Every shot carries a charge of godfire that bursts on impact. Icon: a bursting shell.",
+   "tint": "#E6CFA0",
+   "motif": "a bursting shell"
+  },
+  "parts/mech_titans_exhale": {
+   "file": "parts/mech_titans_exhale.png",
+   "category": "parts",
+   "meaning": "Titan's Exhale (Mechanism): Converts the weapon into a short, wide gout of force. Icon: a short wide gout.",
+   "tint": "#E6CFA0",
+   "motif": "a short wide gout"
+  },
+  "parts/mech_tuning_fork": {
+   "file": "parts/mech_tuning_fork.png",
+   "category": "parts",
+   "meaning": "Tuning Fork (Mechanism): Two narrow tines ring on through the line at near-full strength. Icon: a ringing tuning fork.",
+   "tint": "#E6CFA0",
+   "motif": "a ringing tuning fork"
+  },
+  "parts/mech_twin_barrel": {
+   "file": "parts/mech_twin_barrel.png",
+   "category": "parts",
+   "meaning": "Twin Barrel (Mechanism): A second barrel, welded on by a smith who hated waiting. Icon: twin barrels.",
+   "tint": "#E6CFA0",
+   "motif": "twin barrels"
+  },
+  "parts/mech_whirling_anvils": {
+   "file": "parts/mech_whirling_anvils.png",
+   "category": "parts",
+   "meaning": "Whirling Anvils (Mechanism): Two anvils swing around you on chains of light. They are heavy. So are you. Icon: two anvils on chains.",
+   "tint": "#E6CFA0",
+   "motif": "two anvils on chains"
+  },
+  "parts/miasmacore": {
+   "file": "parts/miasmacore.png",
+   "category": "parts",
+   "meaning": "Miasmacore (Core): Globes that weep a slowing fog behind them. Icon: a globe weeping fog.",
+   "tint": "#86E03A",
+   "motif": "a globe weeping fog"
+  },
+  "parts/plaguecore": {
+   "file": "parts/plaguecore.png",
+   "category": "parts",
+   "meaning": "Plaguecore (Core): Slow globes that burst into festering pools. Icon: a drop over a festering pool.",
+   "tint": "#86E03A",
+   "motif": "a drop over a festering pool"
+  },
+  "parts/relic_anvil_plate": {
+   "file": "parts/relic_anvil_plate.png",
+   "category": "parts",
+   "meaning": "Anvil Plate (Relic): Take 15% less damage. Move like you are wearing an anvil, because you are. Icon: a breastplate stamped with an anvil.",
+   "tint": "#E6CFA0",
+   "motif": "a breastplate stamped with an anvil"
+  },
+  "parts/relic_ashen_covenant": {
+   "file": "parts/relic_ashen_covenant.png",
+   "category": "parts",
+   "meaning": "Ashen Covenant (Relic): +35% damage to burning enemies. Pyra keeps her promises. Icon: a blade through a flame.",
+   "tint": "#E6CFA0",
+   "motif": "a blade through a flame"
+  },
+  "parts/relic_beating_stone": {
+   "file": "parts/relic_beating_stone.png",
+   "category": "parts",
+   "meaning": "Beating Stone (Relic): +50 max health and slow regeneration. It beats when you forget to. Icon: a beating stone heart.",
+   "tint": "#E6CFA0",
+   "motif": "a beating stone heart"
+  },
+  "parts/relic_bloodletter": {
+   "file": "parts/relic_bloodletter.png",
+   "category": "parts",
+   "meaning": "Bloodletter (Relic): Hits open wounds that bleed harder while enemies run. Icon: a lancet and drops.",
+   "tint": "#E6CFA0",
+   "motif": "a lancet and drops"
+  },
+  "parts/relic_brink_coin": {
+   "file": "parts/relic_brink_coin.png",
+   "category": "parts",
+   "meaning": "Coin of the Brink (Relic): +60% damage below 30% health, and 30 less health to get you there sooner. Icon: a cracked coin with a skull.",
+   "tint": "#E6CFA0",
+   "motif": "a cracked coin with a skull"
+  },
+  "parts/relic_cindertread": {
+   "file": "parts/relic_cindertread.png",
+   "category": "parts",
+   "meaning": "Cindertread (Relic): Every dash kicks up a burst of burning cinders. Icon: a boot kicking cinders.",
+   "tint": "#E6CFA0",
+   "motif": "a boot kicking cinders"
+  },
+  "parts/relic_coal_tongue_brand": {
+   "file": "parts/relic_coal_tongue_brand.png",
+   "category": "parts",
+   "meaning": "Coal-Tongue Brand (Relic): Rarely catches. When it does, it catches twice. Icon: a branding iron with a flame.",
+   "tint": "#E6CFA0",
+   "motif": "a branding iron with a flame"
+  },
+  "parts/relic_crooked_knucklebone": {
+   "file": "parts/relic_crooked_knucklebone.png",
+   "category": "parts",
+   "meaning": "Crooked Knucklebone (Relic): Crits come often and land softer. The bones are crooked in your favour. Icon: a crooked knucklebone.",
+   "tint": "#E6CFA0",
+   "motif": "a crooked knucklebone"
+  },
+  "parts/relic_doomstack": {
+   "file": "parts/relic_doomstack.png",
+   "category": "parts",
+   "meaning": "Doomstack (Relic): Every hit stacks doom; eight stacks burst for heavy damage. Icon: doom stacks under a star.",
+   "tint": "#E6CFA0",
+   "motif": "doom stacks under a star"
+  },
+  "parts/relic_dying_star": {
+   "file": "parts/relic_dying_star.png",
+   "category": "parts",
+   "meaning": "Dying Star (Relic): Now and then a kill collapses into a dying star and takes the whole crowd with it. Icon: a star collapsing inward.",
+   "tint": "#E6CFA0",
+   "motif": "a star collapsing inward"
+  },
+  "parts/relic_ember_of_ruin": {
+   "file": "parts/relic_ember_of_ruin.png",
+   "category": "parts",
+   "meaning": "Ember of Ruin (Relic): +45% damage while below 40% health. Umbra-Rex approves of your choices. Icon: a cracked heart with an ember.",
+   "tint": "#E6CFA0",
+   "motif": "a cracked heart with an ember"
+  },
+  "parts/relic_epitaph_engine": {
+   "file": "parts/relic_epitaph_engine.png",
+   "category": "parts",
+   "meaning": "Epitaph Engine (Relic): Twelve hits write the epitaph. The last one reads it aloud. Icon: a gravestone tallying.",
+   "tint": "#E6CFA0",
+   "motif": "a gravestone tallying"
+  },
+  "parts/relic_executioners_seal": {
+   "file": "parts/relic_executioners_seal.png",
+   "category": "parts",
+   "meaning": "Executioner's Seal (Relic): Hits kill non-boss enemies below 12% health. Icon: a headsman's axe on a seal.",
+   "tint": "#E6CFA0",
+   "motif": "a headsman's axe on a seal"
+  },
+  "parts/relic_frostwake": {
+   "file": "parts/relic_frostwake.png",
+   "category": "parts",
+   "meaning": "Frostwake (Relic): Projectiles leave chilling trails that slow the horde. Icon: a slowing wake.",
+   "tint": "#E6CFA0",
+   "motif": "a slowing wake"
+  },
+  "parts/relic_funeral_bell": {
+   "file": "parts/relic_funeral_bell.png",
+   "category": "parts",
+   "meaning": "Funeral Bell (Relic): Every fifth hit tolls the bell. Small bursts, but it never stops ringing. Icon: a funeral bell.",
+   "tint": "#E6CFA0",
+   "motif": "a funeral bell"
+  },
+  "parts/relic_giantsbane": {
+   "file": "parts/relic_giantsbane.png",
+   "category": "parts",
+   "meaning": "Giantsbane (Relic): +35% damage against elites and bosses. Icon: a horned helm split by a sword.",
+   "tint": "#E6CFA0",
+   "motif": "a horned helm split by a sword"
+  },
+  "parts/relic_gilded_aegis": {
+   "file": "parts/relic_gilded_aegis.png",
+   "category": "parts",
+   "meaning": "Gilded Aegis (Relic): A regenerating shield of beaten god-gold. Icon: a round shield with a sun boss.",
+   "tint": "#E6CFA0",
+   "motif": "a round shield with a sun boss"
+  },
+  "parts/relic_greedstone": {
+   "file": "parts/relic_greedstone.png",
+   "category": "parts",
+   "meaning": "Greedstone (Relic): Godshards fall like rain. Better parts too. Icon: a stone shedding coins.",
+   "tint": "#E6CFA0",
+   "motif": "a stone shedding coins"
+  },
+  "parts/relic_gyrestone": {
+   "file": "parts/relic_gyrestone.png",
+   "category": "parts",
+   "meaning": "Gyrestone (Relic): Every blast, well, pool and burst you make grows by a third. Icon: a spiral stone in widening rings.",
+   "tint": "#E6CFA0",
+   "motif": "a spiral stone in widening rings"
+  },
+  "parts/relic_headsmans_hood": {
+   "file": "parts/relic_headsmans_hood.png",
+   "category": "parts",
+   "meaning": "Headsman's Hood (Relic): +90% crit damage. Take your time. Aim for the neck. Icon: a headsman's hood.",
+   "tint": "#E6CFA0",
+   "motif": "a headsman's hood"
+  },
+  "parts/relic_heirs_oath": {
+   "file": "parts/relic_heirs_oath.png",
+   "category": "parts",
+   "meaning": "Heir's Oath (Relic): An oath of law: shield the faithful, mark the guilty. Icon: a shield bearing the mark.",
+   "tint": "#E6CFA0",
+   "motif": "a shield bearing the mark"
+  },
+  "parts/relic_hexnail": {
+   "file": "parts/relic_hexnail.png",
+   "category": "parts",
+   "meaning": "Hexnail (Relic): A coffin nail. Every hit drives the curse a little deeper. Icon: a coffin nail under a hex eye.",
+   "tint": "#E6CFA0",
+   "motif": "a coffin nail under a hex eye"
+  },
+  "parts/relic_hound9_spares": {
+   "file": "parts/relic_hound9_spares.png",
+   "category": "parts",
+   "meaning": "Hound-9's Spare Parts (Relic): Crits often spawn tiny, short-lived turrets. Hound-9 would like them back. Icon: little turrets and a spare gear.",
+   "tint": "#E6CFA0",
+   "motif": "little turrets and a spare gear"
+  },
+  "parts/relic_huntmothers_fang": {
+   "file": "parts/relic_huntmothers_fang.png",
+   "category": "parts",
+   "meaning": "Huntmother's Fang (Relic): A fang from something that hunted gods. It still knows the big ones. Icon: a great fang.",
+   "tint": "#E6CFA0",
+   "motif": "a great fang"
+  },
+  "parts/relic_ichor_chalice": {
+   "file": "parts/relic_ichor_chalice.png",
+   "category": "parts",
+   "meaning": "Ichor Chalice (Relic): A cup of god-blood. +30 max health and a steady trickle of healing. Icon: a chalice of god-blood.",
+   "tint": "#E6CFA0",
+   "motif": "a chalice of god-blood"
+  },
+  "parts/relic_last_chorus_bell": {
+   "file": "parts/relic_last_chorus_bell.png",
+   "category": "parts",
+   "meaning": "Bell of the Last Chorus (Relic): It rings for gods who are not coming back. Every fourth shot rings with it. Icon: a bell and a note.",
+   "tint": "#E6CFA0",
+   "motif": "a bell and a note"
+  },
+  "parts/relic_ledger_of_sins": {
+   "file": "parts/relic_ledger_of_sins.png",
+   "category": "parts",
+   "meaning": "Ledger of Sins (Relic): +30% damage to cursed enemies. Every sin is itemised. Icon: an open ledger with a hex eye.",
+   "tint": "#E6CFA0",
+   "motif": "an open ledger with a hex eye"
+  },
+  "parts/relic_leech_crown": {
+   "file": "parts/relic_leech_crown.png",
+   "category": "parts",
+   "meaning": "Leech Crown (Relic): Drink deep: 6% lifesteal, but you take 12% more damage. Icon: a dripping crown.",
+   "tint": "#E6CFA0",
+   "motif": "a dripping crown"
+  },
+  "parts/relic_misericorde": {
+   "file": "parts/relic_misericorde.png",
+   "category": "parts",
+   "meaning": "Misericorde (Relic): The mercy blade ends anything below 15% health. It hates starting fights. Icon: a mercy blade.",
+   "tint": "#E6CFA0",
+   "motif": "a mercy blade"
+  },
+  "parts/relic_nyctian_eye": {
+   "file": "parts/relic_nyctian_eye.png",
+   "category": "parts",
+   "meaning": "Nyctian Eye (Relic): See the weak point. Hit it. Icon: an eye with a lozenge pupil.",
+   "tint": "#E6CFA0",
+   "motif": "an eye with a lozenge pupil"
+  },
+  "parts/relic_opening_verse": {
+   "file": "parts/relic_opening_verse.png",
+   "category": "parts",
+   "meaning": "Opening Verse (Relic): +45% damage to enemies at full health. Make an entrance. Icon: an arrow in a whole target.",
+   "tint": "#E6CFA0",
+   "motif": "an arrow in a whole target"
+  },
+  "parts/relic_pinning_stake": {
+   "file": "parts/relic_pinning_stake.png",
+   "category": "parts",
+   "meaning": "Pinning Stake (Relic): +50% damage to rooted enemies. Hold still, this will only hurt a lot. Icon: a stake driven into roots.",
+   "tint": "#E6CFA0",
+   "motif": "a stake driven into roots"
+  },
+  "parts/relic_pyre_lung": {
+   "file": "parts/relic_pyre_lung.png",
+   "category": "parts",
+   "meaning": "Pyre Lung (Relic): Half of all kills cough out a small, hot burst. Icon: lungs with a flame.",
+   "tint": "#E6CFA0",
+   "motif": "lungs with a flame"
+  },
+  "parts/relic_quarry_brand": {
+   "file": "parts/relic_quarry_brand.png",
+   "category": "parts",
+   "meaning": "Quarry Brand (Relic): Brands your quarry. Hits against the Marked find the weak point. Icon: a branding iron with the mark.",
+   "tint": "#E6CFA0",
+   "motif": "a branding iron with the mark"
+  },
+  "parts/relic_razorwake": {
+   "file": "parts/relic_razorwake.png",
+   "category": "parts",
+   "meaning": "Razorwake (Relic): Projectiles leave a wake of razor-light that cuts whatever crosses it. Icon: a razor and its wake.",
+   "tint": "#E6CFA0",
+   "motif": "a razor and its wake"
+  },
+  "parts/relic_reapers_tithe": {
+   "file": "parts/relic_reapers_tithe.png",
+   "category": "parts",
+   "meaning": "Reaper's Tithe (Relic): Finishes enemies below 8% health and takes a godshard for the trouble. Icon: a scythe taking a shard.",
+   "tint": "#E6CFA0",
+   "motif": "a scythe taking a shard"
+  },
+  "parts/relic_reddeath_alembic": {
+   "file": "parts/relic_reddeath_alembic.png",
+   "category": "parts",
+   "meaning": "Reddeath Alembic (Relic): Distils the recently dead into something far more useful: bombs. Icon: an alembic with a skull.",
+   "tint": "#E6CFA0",
+   "motif": "an alembic with a skull"
+  },
+  "parts/relic_rootbinders_knot": {
+   "file": "parts/relic_rootbinders_knot.png",
+   "category": "parts",
+   "meaning": "Rootbinder's Knot (Relic): Hits can bind enemies to the ground. Knockback softens so they stay put. Icon: roots bound by a ring.",
+   "tint": "#E6CFA0",
+   "motif": "roots bound by a ring"
+  },
+  "parts/relic_salt_the_wound": {
+   "file": "parts/relic_salt_the_wound.png",
+   "category": "parts",
+   "meaning": "Salt the Wound (Relic): +25% damage to bleeding enemies, and a sip of whatever spills. Icon: a blade through blood drops.",
+   "tint": "#E6CFA0",
+   "motif": "a blade through blood drops"
+  },
+  "parts/relic_scale_of_judgement": {
+   "file": "parts/relic_scale_of_judgement.png",
+   "category": "parts",
+   "meaning": "Scale of Judgement (Relic): +35% damage to Marked enemies. The scale only ever tips one way. Icon: scales tipping on the mark.",
+   "tint": "#E6CFA0",
+   "motif": "scales tipping on the mark"
+  },
+  "parts/relic_sentry_seed": {
+   "file": "parts/relic_sentry_seed.png",
+   "category": "parts",
+   "meaning": "Sentry Seed (Relic): Crits rarely plant a sturdy forge-sentry that fights on for six seconds. Icon: a seed sprouting a turret.",
+   "tint": "#E6CFA0",
+   "motif": "a seed sprouting a turret"
+  },
+  "parts/relic_splitspawn": {
+   "file": "parts/relic_splitspawn.png",
+   "category": "parts",
+   "meaning": "Splitspawn (Relic): Critical hits can spawn a short-lived turret. Icon: a turret sprung from a crit.",
+   "tint": "#E6CFA0",
+   "motif": "a turret sprung from a crit"
+  },
+  "parts/relic_stormcatcher": {
+   "file": "parts/relic_stormcatcher.png",
+   "category": "parts",
+   "meaning": "Stormcatcher (Relic): +35% damage to shocked enemies. The storm always knows where to go. Icon: a lightning rod.",
+   "tint": "#E6CFA0",
+   "motif": "a lightning rod"
+  },
+  "parts/relic_stormglass_phial": {
+   "file": "parts/relic_stormglass_phial.png",
+   "category": "parts",
+   "meaning": "Stormglass Phial (Relic): Bottled thunder. Hits build static that discharges in bursts. Icon: a phial holding a bolt.",
+   "tint": "#E6CFA0",
+   "motif": "a phial holding a bolt"
+  },
+  "parts/relic_tarpit_heart": {
+   "file": "parts/relic_tarpit_heart.png",
+   "category": "parts",
+   "meaning": "Tarpit Heart (Relic): Impacts leave pitch pools that hold the horde fast. Icon: a heart sinking in pitch.",
+   "tint": "#E6CFA0",
+   "motif": "a heart sinking in pitch"
+  },
+  "parts/relic_titanbreaker_wedge": {
+   "file": "parts/relic_titanbreaker_wedge.png",
+   "category": "parts",
+   "meaning": "Titanbreaker Wedge (Relic): +60% damage to elites and bosses, at the expense of the small fry. Icon: a wedge splitting a boulder.",
+   "tint": "#E6CFA0",
+   "motif": "a wedge splitting a boulder"
+  },
+  "parts/relic_vampire": {
+   "file": "parts/relic_vampire.png",
+   "category": "parts",
+   "meaning": "Vampire (Relic): Return 4% of damage dealt as health. Icon: a fanged drop.",
+   "tint": "#E6CFA0",
+   "motif": "a fanged drop"
+  },
+  "parts/relic_volatile_heart": {
+   "file": "parts/relic_volatile_heart.png",
+   "category": "parts",
+   "meaning": "Volatile Heart (Relic): Kills sometimes detonate. Icon: a spiked, bursting heart.",
+   "tint": "#E6CFA0",
+   "motif": "a spiked, bursting heart"
+  },
+  "parts/shrapnelcore": {
+   "file": "parts/shrapnelcore.png",
+   "category": "parts",
+   "meaning": "Shrapnelcore (Core): On first hit every shot bursts into three shards of dead-god iron. Icon: a shot bursting into shards.",
+   "tint": "#F4E3C1",
+   "motif": "a shot bursting into shards"
+  },
+  "parts/sigil_anvilheart": {
+   "file": "parts/sigil_anvilheart.png",
+   "category": "parts",
+   "meaning": "Sigil of the Anvilheart (Sigil): Gaiaa's stone beats in your chest. Icon: a heart stamped with an anvil.",
+   "tint": "#E6CFA0",
+   "motif": "a heart stamped with an anvil"
+  },
+  "parts/sigil_borrowed_hour": {
+   "file": "parts/sigil_borrowed_hour.png",
+   "category": "parts",
+   "meaning": "Sigil of the Borrowed Hour (Sigil): Time runs faster for you. Icon: an hourglass and a stride arrow.",
+   "tint": "#E6CFA0",
+   "motif": "an hourglass and a stride arrow"
+  },
+  "parts/sigil_bound_souls": {
+   "file": "parts/sigil_bound_souls.png",
+   "category": "parts",
+   "meaning": "Sigil of Bound Souls (Sigil): Where your shots land the ground itself curses. Icon: a hex eye over a pool.",
+   "tint": "#E6CFA0",
+   "motif": "a hex eye over a pool"
+  },
+  "parts/sigil_cadence": {
+   "file": "parts/sigil_cadence.png",
+   "category": "parts",
+   "meaning": "Sigil of Cadence (Sigil): Every 4th shot echoes. Icon: three beats and a spark.",
+   "tint": "#E6CFA0",
+   "motif": "three beats and a spark"
+  },
+  "parts/sigil_colossal_echo": {
+   "file": "parts/sigil_colossal_echo.png",
+   "category": "parts",
+   "meaning": "Sigil of the Colossal Echo (Sigil): Ults leave burning ground. Icon: a flame over scarred ground.",
+   "tint": "#E6CFA0",
+   "motif": "a flame over scarred ground"
+  },
+  "parts/sigil_far_sight": {
+   "file": "parts/sigil_far_sight.png",
+   "category": "parts",
+   "meaning": "Sigil of Far Sight (Sigil): See further. Strike sooner. Icon: an eye and a long arrow.",
+   "tint": "#E6CFA0",
+   "motif": "an eye and a long arrow"
+  },
+  "parts/sigil_furnace_heart": {
+   "file": "parts/sigil_furnace_heart.png",
+   "category": "parts",
+   "meaning": "Sigil of the Furnace Heart (Sigil): Everything you touch catches. Icon: a heart with a flame.",
+   "tint": "#E6CFA0",
+   "motif": "a heart with a flame"
+  },
+  "parts/sigil_ghostlight": {
+   "file": "parts/sigil_ghostlight.png",
+   "category": "parts",
+   "meaning": "Sigil of Ghostlight (Sigil): One more step between worlds. Icon: dash chevrons.",
+   "tint": "#E6CFA0",
+   "motif": "dash chevrons"
+  },
+  "parts/sigil_gilded_tongue": {
+   "file": "parts/sigil_gilded_tongue.png",
+   "category": "parts",
+   "meaning": "Sigil of the Gilded Tongue (Sigil): Fortune listens when you talk. Icon: a four-leaf charm.",
+   "tint": "#E6CFA0",
+   "motif": "a four-leaf charm"
+  },
+  "parts/sigil_hexlace": {
+   "file": "parts/sigil_hexlace.png",
+   "category": "parts",
+   "meaning": "Sigil of Hexlace (Sigil): Every hit laces a curse. Icon: laced threads over a hex eye.",
+   "tint": "#E6CFA0",
+   "motif": "laced threads over a hex eye"
+  },
+  "parts/sigil_huntmark": {
+   "file": "parts/sigil_huntmark.png",
+   "category": "parts",
+   "meaning": "Sigil of the Huntmark (Sigil): The hunt-god chooses your quarry. Icon: an antler and the mark.",
+   "tint": "#E6CFA0",
+   "motif": "an antler and the mark"
+  },
+  "parts/sigil_iron_knuckle": {
+   "file": "parts/sigil_iron_knuckle.png",
+   "category": "parts",
+   "meaning": "Sigil of the Iron Knuckle (Sigil): Hit them so hard they remember it next run. Icon: a fist.",
+   "tint": "#E6CFA0",
+   "motif": "a fist"
+  },
+  "parts/sigil_loaded_dice": {
+   "file": "parts/sigil_loaded_dice.png",
+   "category": "parts",
+   "meaning": "Sigil of Loaded Dice (Sigil): Fate owes you one. Icon: a die.",
+   "tint": "#E6CFA0",
+   "motif": "a die"
+  },
+  "parts/sigil_meltpoint": {
+   "file": "parts/sigil_meltpoint.png",
+   "category": "parts",
+   "meaning": "Sigil of Meltpoint (Sigil): +25% damage to burning enemies. Icon: a melting drop over a flame.",
+   "tint": "#E6CFA0",
+   "motif": "a melting drop over a flame"
+  },
+  "parts/sigil_nightfall": {
+   "file": "parts/sigil_nightfall.png",
+   "category": "parts",
+   "meaning": "Sigil of Nightfall (Sigil): Nyctia guides the killing blow. Icon: a crescent and a spark.",
+   "tint": "#E6CFA0",
+   "motif": "a crescent and a spark"
+  },
+  "parts/sigil_patient_death": {
+   "file": "parts/sigil_patient_death.png",
+   "category": "parts",
+   "meaning": "Sigil of Patient Death (Sigil): The first hit is the one that matters. Icon: an hourglass and a blade.",
+   "tint": "#E6CFA0",
+   "motif": "an hourglass and a blade"
+  },
+  "parts/sigil_pickpocket": {
+   "file": "parts/sigil_pickpocket.png",
+   "category": "parts",
+   "meaning": "Sigil of the Pickpocket (Sigil): The dead don't need godshards. Icon: a hand lifting a shard.",
+   "tint": "#E6CFA0",
+   "motif": "a hand lifting a shard"
+  },
+  "parts/sigil_quaking_step": {
+   "file": "parts/sigil_quaking_step.png",
+   "category": "parts",
+   "meaning": "Sigil of the Quaking Step (Sigil): Every dash lands like an earthquake. Icon: a quaking footprint.",
+   "tint": "#E6CFA0",
+   "motif": "a quaking footprint"
+  },
+  "parts/sigil_second_hand": {
+   "file": "parts/sigil_second_hand.png",
+   "category": "parts",
+   "meaning": "Sigil of the Second Hand (Sigil): Every 5th shot happens twice. Icon: a clock and a spark.",
+   "tint": "#E6CFA0",
+   "motif": "a clock and a spark"
+  },
+  "parts/sigil_silent_edge": {
+   "file": "parts/sigil_silent_edge.png",
+   "category": "parts",
+   "meaning": "Sigil of the Silent Edge (Sigil): The wounded simply stop. Icon: a quiet dagger.",
+   "tint": "#E6CFA0",
+   "motif": "a quiet dagger"
+  },
+  "parts/sigil_skyrender": {
+   "file": "parts/sigil_skyrender.png",
+   "category": "parts",
+   "meaning": "Sigil of the Skyrender (Sigil): The storm never waits. Icon: a wing.",
+   "tint": "#E6CFA0",
+   "motif": "a wing"
+  },
+  "parts/sigil_slow_rot": {
+   "file": "parts/sigil_slow_rot.png",
+   "category": "parts",
+   "meaning": "Sigil of Slow Rot (Sigil): Your shots age the world they pass through. Icon: a wilting stem.",
+   "tint": "#E6CFA0",
+   "motif": "a wilting stem"
+  },
+  "parts/sigil_static_bloom": {
+   "file": "parts/sigil_static_bloom.png",
+   "category": "parts",
+   "meaning": "Sigil of Static Bloom (Sigil): Hits build shock that discharges in bursts. Icon: a bloom of bolts.",
+   "tint": "#E6CFA0",
+   "motif": "a bloom of bolts"
+  },
+  "parts/sigil_tinkers_grace": {
+   "file": "parts/sigil_tinkers_grace.png",
+   "category": "parts",
+   "meaning": "Sigil of Tinker's Grace (Sigil): Your contraptions are always ready. Icon: a gear and an hourglass.",
+   "tint": "#E6CFA0",
+   "motif": "a gear and an hourglass"
+  },
+  "parts/slagcore": {
+   "file": "parts/slagcore.png",
+   "category": "parts",
+   "meaning": "Slagcore (Core): Molten slag that bursts where it lands. The Slag King's leftovers. Icon: a molten burst.",
+   "tint": "#FF7A1A",
+   "motif": "a molten burst"
+  },
+  "parts/squallcore": {
+   "file": "parts/squallcore.png",
+   "category": "parts",
+   "meaning": "Squallcore (Core): Lightning that splits the moment it finds flesh. Icon: a forked bolt.",
+   "tint": "#3FD8FF",
+   "motif": "a forked bolt"
+  },
+  "parts/stormcore": {
+   "file": "parts/stormcore.png",
+   "category": "parts",
+   "meaning": "Stormcore (Core): Chain arcs leap between the damned. Icon: a bolt.",
+   "tint": "#3FD8FF",
+   "motif": "a bolt"
+  },
+  "parts/tempestcore": {
+   "file": "parts/tempestcore.png",
+   "category": "parts",
+   "meaning": "Tempestcore (Core): Fast bolts that fill the damned with static until they burst. Icon: a bolt with static sparks.",
+   "tint": "#3FD8FF",
+   "motif": "a bolt with static sparks"
+  },
+  "parts/unmadecore": {
+   "file": "parts/unmadecore.png",
+   "category": "parts",
+   "meaning": "Unmadecore (Core): A splinter pried from the Unmaking. It will not stay one thing for long. Icon: a splinter breaking apart.",
+   "tint": "#A45CFF",
+   "motif": "a splinter breaking apart"
+  },
+  "parts/verdictcore": {
+   "file": "parts/verdictcore.png",
+   "category": "parts",
+   "meaning": "Verdictcore (Core): Radiant slugs that strike the Marked like a final ruling. Icon: a slug in a mark.",
+   "tint": "#FFE27A",
+   "motif": "a slug in a mark"
+  },
+  "parts/vitriolcore": {
+   "file": "parts/vitriolcore.png",
+   "category": "parts",
+   "meaning": "Vitriolcore (Core): Alchemical globes that shatter, splash and linger. Vex's favourite solvent. Icon: a cracked flask.",
+   "tint": "#86E03A",
+   "motif": "a cracked flask"
+  },
+  "parts/voidcore": {
+   "file": "parts/voidcore.png",
+   "category": "parts",
+   "meaning": "Voidcore (Core): Impacts open gravity wells that drag enemies together. Icon: a gravity spiral.",
+   "tint": "#A45CFF",
+   "motif": "a gravity spiral"
+  },
+  "parts/wickcore": {
+   "file": "parts/wickcore.png",
+   "category": "parts",
+   "meaning": "Wickcore (Core): Every shot drags a burning fuse behind it. The floor remembers. Icon: a lit fuse.",
+   "tint": "#FF7A1A",
+   "motif": "a lit fuse"
+  },
+  "poi/anvil": {
+   "file": "poi/anvil.png",
+   "category": "poi",
+   "meaning": "Anvil: hold the ring, then forge",
+   "tint": "#E6CFA0"
+  },
+  "poi/camp": {
+   "file": "poi/camp.png",
+   "category": "poi",
+   "meaning": "Camp: crossed spears over embers",
+   "tint": "#E6CFA0"
+  },
+  "poi/gate": {
+   "file": "poi/gate.png",
+   "category": "poi",
+   "meaning": "Boss Gate: sealed until enough Seals (an arch with seal sockets)",
+   "tint": "#E6CFA0"
+  },
+  "poi/lair": {
+   "file": "poi/lair.png",
+   "category": "poi",
+   "meaning": "Lair: a den of elites (a clawed cave maw)",
+   "tint": "#E6CFA0"
+  },
+  "poi/reliquary": {
+   "file": "poi/reliquary.png",
+   "category": "poi",
+   "meaning": "Reliquary: hold the ring for a cache of parts (a chest)",
+   "tint": "#E6CFA0"
+  },
+  "poi/shrine": {
+   "file": "poi/shrine.png",
+   "category": "poi",
+   "meaning": "Shrine: hold the ring for a boon (an altar flame; the UI tints it with the god)",
+   "tint": "#E6CFA0"
+  },
+  "poi/spring": {
+   "file": "poi/spring.png",
+   "category": "poi",
+   "meaning": "Spring: a healing spring, once per player (a basin and a rising drop)",
+   "tint": "#E6CFA0"
+  },
+  "poi/vein": {
+   "file": "poi/vein.png",
+   "category": "poi",
+   "meaning": "Vein: hold the ring for godshards (a crystal cluster)",
+   "tint": "#E6CFA0"
+  },
+  "poi/warlord": {
+   "file": "poi/warlord.png",
+   "category": "poi",
+   "meaning": "Warlord: the biome mini-boss (a crowned skull)",
+   "tint": "#FF7A5A"
+  },
+  "poi/watchfire": {
+   "file": "poi/watchfire.png",
+   "category": "poi",
+   "meaning": "Watchfire: touch to reveal the map around it (a pyre)",
+   "tint": "#E6CFA0"
+  },
+  "portraits/brax": {
+   "file": "portraits/brax.png",
+   "category": "portraits",
+   "meaning": "Brax, The Furnace-Born: bust crest (bull neck, bald head and a furnace-grate jaw)",
+   "tint": "#B08A52"
+  },
+  "portraits/epoch": {
+   "file": "portraits/epoch.png",
+   "category": "portraits",
+   "meaning": "Epoch, The Unwound: bust crest (clock halo and a crown of clock hands)",
+   "tint": "#B08A52"
+  },
+  "portraits/fenra": {
+   "file": "portraits/fenra.png",
+   "category": "portraits",
+   "meaning": "Fenra, The Huntmother: bust crest (wolf-pelt headdress, braids and a fur mantle)",
+   "tint": "#B08A52"
+  },
+  "portraits/kael": {
+   "file": "portraits/kael.png",
+   "category": "portraits",
+   "meaning": "Kael, The Wraithshot: bust crest (pointed hood, masked face and eye glints)",
+   "tint": "#B08A52"
+  },
+  "portraits/lyra": {
+   "file": "portraits/lyra.png",
+   "category": "portraits",
+   "meaning": "Lyra, of the Last Chorus: bust crest (laurel wreath, long hair and a small lyre)",
+   "tint": "#B08A52"
+  },
+  "portraits/mirren": {
+   "file": "portraits/mirren.png",
+   "category": "portraits",
+   "meaning": "Mirren, The Gilded Fox: bust crest (fox mask with tall ears and a coin earring)",
+   "tint": "#B08A52"
+  },
+  "portraits/ossian": {
+   "file": "portraits/ossian.png",
+   "category": "portraits",
+   "meaning": "Ossian, The Far-Struck: bust crest (hooded archer crowned with stag antlers)",
+   "tint": "#B08A52"
+  },
+  "portraits/selene": {
+   "file": "portraits/selene.png",
+   "category": "portraits",
+   "meaning": "Selene, The Stormcaller: bust crest (circlet, flowing hair and a storm orb)",
+   "tint": "#B08A52"
+  },
+  "portraits/seraph": {
+   "file": "portraits/seraph.png",
+   "category": "portraits",
+   "meaning": "Seraph, Heir of Law: bust crest (winged helm with a T-visor and a halo)",
+   "tint": "#B08A52"
+  },
+  "portraits/thessaly": {
+   "file": "portraits/thessaly.png",
+   "category": "portraits",
+   "meaning": "Thessaly, The Hexweaver: bust crest (wide-brimmed witch hat, veil and spindle)",
+   "tint": "#B08A52"
+  },
+  "portraits/valdris": {
+   "file": "portraits/valdris.png",
+   "category": "portraits",
+   "meaning": "Valdris, The Anvil-Born: bust crest (horned great-helm and pauldrons)",
+   "tint": "#B08A52"
+  },
+  "portraits/vex": {
+   "file": "portraits/vex.png",
+   "category": "portraits",
+   "meaning": "Vex, The Reddeath: bust crest (goggled beak mask, hood and standing collar)",
+   "tint": "#B08A52"
+  },
+  "rarity/gem_common": {
+   "file": "rarity/gem_common.png",
+   "category": "rarity",
+   "meaning": "Common rarity gem: a round cabochon in its rarity colour (the only icon with a baked colour)",
+   "tint": "#CFC6B4"
+  },
+  "rarity/gem_epic": {
+   "file": "rarity/gem_epic.png",
+   "category": "rarity",
+   "meaning": "Epic rarity gem: a hexagon step-cut in its rarity colour (the only icon with a baked colour)",
+   "tint": "#B865FF"
+  },
+  "rarity/gem_godforged": {
+   "file": "rarity/gem_godforged.png",
+   "category": "rarity",
+   "meaning": "Godforged rarity gem: a eight-point star in its rarity colour (the only icon with a baked colour)",
+   "tint": "#FFB82E"
+  },
+  "rarity/gem_rare": {
+   "file": "rarity/gem_rare.png",
+   "category": "rarity",
+   "meaning": "Rare rarity gem: a lozenge in its rarity colour (the only icon with a baked colour)",
+   "tint": "#4FA3FF"
+  },
+  "run/boon_queued": {
+   "file": "run/boon_queued.png",
+   "category": "run",
+   "meaning": "Boon waiting (an arched boon card with a spark)",
+   "tint": "#D9B56C"
+  },
+  "run/explored": {
+   "file": "run/explored.png",
+   "category": "run",
+   "meaning": "Explored (a compass)",
+   "tint": "#D9B56C"
+  },
+  "run/gate_open": {
+   "file": "run/gate_open.png",
+   "category": "run",
+   "meaning": "Boss Gate open",
+   "tint": "#D9B56C"
+  },
+  "run/gate_sealed": {
+   "file": "run/gate_sealed.png",
+   "category": "run",
+   "meaning": "Boss Gate sealed",
+   "tint": "#D9B56C"
+  },
+  "run/gathering": {
+   "file": "run/gathering.png",
+   "category": "run",
+   "meaning": "Gathering at the gate (four pips converging)",
+   "tint": "#D9B56C"
+  },
+  "run/hourglass": {
+   "file": "run/hourglass.png",
+   "category": "run",
+   "meaning": "Run timer (an hourglass)",
+   "tint": "#D9B56C"
+  },
+  "run/kills": {
+   "file": "run/kills.png",
+   "category": "run",
+   "meaning": "Kills (a skull)",
+   "tint": "#D9B56C"
+  },
+  "run/named_combo": {
+   "file": "run/named_combo.png",
+   "category": "run",
+   "meaning": "Named combo formed (a seal with a star)",
+   "tint": "#D9B56C"
+  },
+  "run/surge": {
+   "file": "run/surge.png",
+   "category": "run",
+   "meaning": "Surge: the horde floods in (a war horn with arrows)",
+   "tint": "#D9B56C"
+  },
+  "run/threat": {
+   "file": "run/threat.png",
+   "category": "run",
+   "meaning": "Threat level (a chevron)",
+   "tint": "#D9B56C"
+  },
+  "run/warlord_slain": {
+   "file": "run/warlord_slain.png",
+   "category": "run",
+   "meaning": "Warlord slain (the crowned skull, struck through)",
+   "tint": "#FF7A5A"
+  },
+  "slots/core": {
+   "file": "slots/core.png",
+   "category": "slots",
+   "meaning": "Core slot (ghost glyph for an empty socket): an orb held in claws",
+   "tint": "#E6CFA0"
+  },
+  "slots/mechanism": {
+   "file": "slots/mechanism.png",
+   "category": "slots",
+   "meaning": "Mechanism slot (ghost glyph): a gear",
+   "tint": "#E6CFA0"
+  },
+  "slots/relic": {
+   "file": "slots/relic.png",
+   "category": "slots",
+   "meaning": "Relic slot (ghost glyph): an amulet with an eye",
+   "tint": "#E6CFA0"
+  },
+  "slots/sigil": {
+   "file": "slots/sigil.png",
+   "category": "slots",
+   "meaning": "Sigil slot (ghost glyph): a seal ring with a rune",
+   "tint": "#E6CFA0"
+  },
+  "states/armor_break": {
+   "file": "states/armor_break.png",
+   "category": "states",
+   "meaning": "Armour broken (a split breastplate)",
+   "tint": "#C9D0D6"
+  },
+  "states/deadeye": {
+   "file": "states/deadeye.png",
+   "category": "states",
+   "meaning": "Deadeye: MANUAL aim precision stacks (an eye in a reticle)",
+   "tint": "#D9B56C"
+  },
+  "states/doom": {
+   "file": "states/doom.png",
+   "category": "states",
+   "meaning": "Doom: stacks that burst at a count (an hourglass with a tally)",
+   "tint": "#D9B56C"
+  },
+  "states/downed": {
+   "file": "states/downed.png",
+   "category": "states",
+   "meaning": "Downed: an ally waits to be revived (a skull)",
+   "tint": "#E6CFA0"
+  },
+  "states/forge_aegis": {
+   "file": "states/forge_aegis.png",
+   "category": "states",
+   "meaning": "Forge Aegis: protected while forging (an anvil under a ward dome)",
+   "tint": "#D9B56C"
+  },
+  "states/infinite_dash": {
+   "file": "states/infinite_dash.png",
+   "category": "states",
+   "meaning": "Infinite dash (a lemniscate)",
+   "tint": "#D9B56C"
+  },
+  "states/invulnerable": {
+   "file": "states/invulnerable.png",
+   "category": "states",
+   "meaning": "Invulnerable (a shield with a star)",
+   "tint": "#D9B56C"
+  },
+  "states/low_hp": {
+   "file": "states/low_hp.png",
+   "category": "states",
+   "meaning": "Low health (a cracked heart)",
+   "tint": "#D9B56C"
+  },
+  "states/overdrive_active": {
+   "file": "states/overdrive_active.png",
+   "category": "states",
+   "meaning": "Team Overdrive active (the Overdrive star in a blaze)",
+   "tint": "#D9B56C"
+  },
+  "states/reforging": {
+   "file": "states/reforging.png",
+   "category": "states",
+   "meaning": "Reforging: the Forge is rebuilding you (an anvil in a turning ring)",
+   "tint": "#D9B56C"
+  },
+  "states/rekindle": {
+   "file": "states/rekindle.png",
+   "category": "states",
+   "meaning": "Rekindle: a solo self-revive (a relit candle)",
+   "tint": "#D9B56C"
+  },
+  "states/slow": {
+   "file": "states/slow.png",
+   "category": "states",
+   "meaning": "Slowed (a snail)",
+   "tint": "#D9B56C"
+  },
+  "states/stun": {
+   "file": "states/stun.png",
+   "category": "states",
+   "meaning": "Stunned: stars circling",
+   "tint": "#D9B56C"
+  },
+  "states/taunt": {
+   "file": "states/taunt.png",
+   "category": "states",
+   "meaning": "Taunting: enemies target you (chevrons closing on a crest)",
+   "tint": "#D9B56C"
+  },
+  "states/tether": {
+   "file": "states/tether.png",
+   "category": "states",
+   "meaning": "Soul tether: reviving an ally (a flame held in a hand)",
+   "tint": "#FFC873"
+  },
+  "states/ward": {
+   "file": "states/ward.png",
+   "category": "states",
+   "meaning": "Ward: a shield that soaks damage (a hatched ward disc)",
+   "tint": "#DCE6EA"
+  },
+  "status/bleed": {
+   "file": "status/bleed.png",
+   "category": "status",
+   "meaning": "Bleed: Kinetic damage over time that ticks harder while moving",
+   "tint": "#F4E3C1"
+  },
+  "status/burn": {
+   "file": "status/burn.png",
+   "category": "status",
+   "meaning": "Burn: Flame damage over time",
+   "tint": "#FF7A1A"
+  },
+  "status/curse": {
+   "file": "status/curse.png",
+   "category": "status",
+   "meaning": "Curse: the target takes more damage from every source (a hex eye)",
+   "tint": "#A45CFF"
+  },
+  "status/mark": {
+   "file": "status/mark.png",
+   "category": "status",
+   "meaning": "Mark: hits against the target gain crit chance (a crosshair lozenge)",
+   "tint": "#D9B56C"
+  },
+  "status/root": {
+   "file": "status/root.png",
+   "category": "status",
+   "meaning": "Root: the target cannot move",
+   "tint": "#D9B56C"
+  },
+  "status/shock": {
+   "file": "status/shock.png",
+   "category": "status",
+   "meaning": "Shock: stacks discharge Storm damage and stun",
+   "tint": "#3FD8FF"
+  },
+  "team/mvp": {
+   "file": "team/mvp.png",
+   "category": "team",
+   "meaning": "MVP (a radiant spark in a wreath)",
+   "tint": "#D9B56C"
+  },
+  "team/overdrive": {
+   "file": "team/overdrive.png",
+   "category": "team",
+   "meaning": "Team Overdrive (the star emblem; also stamped in the V hex)",
+   "tint": "#D9B56C"
+  },
+  "team/ping": {
+   "file": "team/ping.png",
+   "category": "team",
+   "meaning": "Ping (a pin with a ripple)",
+   "tint": "#D9B56C"
+  },
+  "team/ult_ready": {
+   "file": "team/ult_ready.png",
+   "category": "team",
+   "meaning": "Ultimate ready (a full molten ring with a rising spark)",
+   "tint": "#D9B56C"
+  },
+  "ui/arrowhead": {
+   "file": "ui/arrowhead.png",
+   "category": "ui",
+   "meaning": "Edge-pin nub (an arrowhead pointing up)",
+   "tint": "#D9B56C"
+  },
+  "ui/back": {
+   "file": "ui/back.png",
+   "category": "ui",
+   "meaning": "Back (a curved arrow)",
+   "tint": "#D9B56C"
+  },
+  "ui/bearing": {
+   "file": "ui/bearing.png",
+   "category": "ui",
+   "meaning": "Bearing to an objective (a chevron, rotated by the UI)",
+   "tint": "#D9B56C"
+  },
+  "ui/check": {
+   "file": "ui/check.png",
+   "category": "ui",
+   "meaning": "Done / ready (a check mark)",
+   "tint": "#D9B56C"
+  },
+  "ui/close": {
+   "file": "ui/close.png",
+   "category": "ui",
+   "meaning": "Close (a cross)",
+   "tint": "#D9B56C"
+  },
+  "ui/confirm": {
+   "file": "ui/confirm.png",
+   "category": "ui",
+   "meaning": "Confirm (a check in a lozenge)",
+   "tint": "#D9B56C"
+  },
+  "ui/delta_down": {
+   "file": "ui/delta_down.png",
+   "category": "ui",
+   "meaning": "A loss (a down-chevron; the UI colours it loss)",
+   "tint": "#D9B56C"
+  },
+  "ui/delta_up": {
+   "file": "ui/delta_up.png",
+   "category": "ui",
+   "meaning": "A gain (an up-chevron; the UI colours it ichor)",
+   "tint": "#D9B56C"
+  },
+  "ui/equip": {
+   "file": "ui/equip.png",
+   "category": "ui",
+   "meaning": "Equip (an arrow into a socket)",
+   "tint": "#D9B56C"
+  },
+  "ui/filter": {
+   "file": "ui/filter.png",
+   "category": "ui",
+   "meaning": "Filter / sort (a funnel)",
+   "tint": "#D9B56C"
+  },
+  "ui/fuse": {
+   "file": "ui/fuse.png",
+   "category": "ui",
+   "meaning": "Fuse two parts (two lozenges merging into one)",
+   "tint": "#D9B56C"
+  },
+  "ui/help": {
+   "file": "ui/help.png",
+   "category": "ui",
+   "meaning": "Help (an open tome)",
+   "tint": "#D9B56C"
+  },
+  "ui/info": {
+   "file": "ui/info.png",
+   "category": "ui",
+   "meaning": "Information (a lozenge dot over a stem, no letter)",
+   "tint": "#D9B56C"
+  },
+  "ui/lock": {
+   "file": "ui/lock.png",
+   "category": "ui",
+   "meaning": "Locked",
+   "tint": "#D9B56C"
+  },
+  "ui/map": {
+   "file": "ui/map.png",
+   "category": "ui",
+   "meaning": "Map (a folded chart with a route)",
+   "tint": "#D9B56C"
+  },
+  "ui/new": {
+   "file": "ui/new.png",
+   "category": "ui",
+   "meaning": "New (a four-point spark with a dot)",
+   "tint": "#D9B56C"
+  },
+  "ui/pause": {
+   "file": "ui/pause.png",
+   "category": "ui",
+   "meaning": "Paused / contested (two bars)",
+   "tint": "#D9B56C"
+  },
+  "ui/reroll": {
+   "file": "ui/reroll.png",
+   "category": "ui",
+   "meaning": "Reroll (a turning arrow)",
+   "tint": "#D9B56C"
+  },
+  "ui/salvage": {
+   "file": "ui/salvage.png",
+   "category": "ui",
+   "meaning": "Salvage a part (a shard split by a hammer blow)",
+   "tint": "#D9B56C"
+  },
+  "ui/settings": {
+   "file": "ui/settings.png",
+   "category": "ui",
+   "meaning": "Settings (a gear)",
+   "tint": "#D9B56C"
+  },
+  "ui/spark4": {
+   "file": "ui/spark4.png",
+   "category": "ui",
+   "meaning": "A four-point spark (crit spark, ready gleam)",
+   "tint": "#D9B56C"
+  },
+  "ui/upgrade": {
+   "file": "ui/upgrade.png",
+   "category": "ui",
+   "meaning": "Upgrade (a double up-chevron)",
+   "tint": "#D9B56C"
+  }
+ }
+}
