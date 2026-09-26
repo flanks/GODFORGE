@@ -1,10 +1,40 @@
 # GODFORGE: Open Biomes (NIMRODS-style exploration)
 
-> **Status: decided, 2026-09-25.** This is the single design for replacing the Hades-style room run
-> with one huge generated map per biome. It merges two competing proposals (see §1) and is written
-> against the code at `c0bddae` (the room-scale layout grammar merge). Implementation agents execute
-> it phase by phase (§10) without re-deciding anything. Every number here is a data default in
-> `assets/content/*.ron` and is tuned from bot telemetry, not changed in code.
+> **Status: decided, 2026-09-25. Phases 1 and 2 are done (2026-09-26); phase 3 is next.** This is
+> the single design for replacing the Hades-style room run with one huge generated map per biome.
+> It merges two competing proposals (see §1) and is written against the code at `c0bddae` (the
+> room-scale layout grammar merge). Implementation agents execute it phase by phase (§10) without
+> re-deciding anything. Every number here is a data default in `assets/content/*.ron` and is tuned
+> from bot telemetry, not changed in code.
+>
+> **Progress.**
+> * **Phase 1 (done):** 1A collision index and pits (`55b6b63`), 1B map-scale bot nav (`23333c8`),
+>   1C schema, worldgen stub and previews (`9c3c435`).
+> * **Phase 2 (done):** step 2.0 protocol v3 (`4e77e6f`), lanes 2A–2F (`dae3374`, `dccf911`,
+>   `7ce1937`, `165ad4e`, `7a37331`, `ca93cda`), and Cinder flipped to its map with 7 Seals
+>   (`cc7d736`). `layout-stats --maps --seeds 8`: 0 repairs, 0 relaxed.
+> * **Post-phase-2 art and readability pass (done):** an art critique of the Cinder map (3.5/10)
+>   was acted on in `2f47f8f`…`1c41630`. It pulled a few later items forward, so the phase 3 and 4
+>   lanes should build on them instead of redoing them:
+>   - 3F: off-screen markers already show the Boss Gate and the 3 nearest Seal POIs (pool 16); every
+>     incomplete Seal POI keeps a dim 40 u beacon (bright while live); the "room x/y" banner is
+>     the stage line on maps; the region banner shows the name of each region entered; the
+>     arsenal is a slim strip that fades over fights; toasts live on a left rail (2 lines); ally
+>     tags show names only when hurt; heroes show an x-ray silhouette through whatever hides them;
+>     at most 10 ally ground fields draw at once; each POI kind has a stand-in silhouette at its
+>     heart (altar, chest, crystal lode, basin, pyre, skull stakes, war totem, seal pedestal).
+>     Still open for 3F: POIs where an ally is present, pings and surges in the marker priority,
+>     the final `poi_visuals.rs` models, the fade, emerge.
+>   - 4A: POI set pieces (shrine statue, anvil chain posts, reliquary plinths, vein crystals, lair
+>     walls, spring stones), waymarks at crossroads (`Decor::Waymark`, the objective's colour), a
+>     tall piece every ~25 u along roads, theme story clusters in the density top-up, road braziers
+>     30–40 u apart, hub monuments on the hub's north rim.
+>   - 4B / 4C: `FallenWeapon` joins Cinder's landmarks (0.7× height); region themes gained
+>     `names` (a pool the regions of one theme take in turn) and `ground` (paving offset, ash
+>     drifts) for the floor; the rim-lit coast lip, hot river banks and thick bridge decks landed.
+>   - 2A follow-up: river and chasm bands take one integer chamfer pass (45° reaches, not L
+>     shapes). The golden hash is `0xca3521382f4a6edd` (re-pinned for the new dressing streams
+>     and the chamfer).
 
 ## 0. The decision in one page
 
@@ -1060,7 +1090,7 @@ The rules for every phase:
 * `procgen.rs` belongs to the layout-grammar work. This plan touches it only in 1C (§3.4), and must
   keep room layouts identical.
 
-### Phase 1: Scale foundations (no gameplay change)
+### Phase 1: Scale foundations (no gameplay change) — done
 
 | Lane | Owns | Work |
 |---|---|---|
@@ -1068,7 +1098,7 @@ The rules for every phase:
 | **1B Bot scale** | `gf_sim/src/{nav.rs, bot.rs}` | AABB rasterization (+ pits) in `NavGrid::new`, the A* expansion cap, the process-wide `MapCache` (keyed like `RoomCache`), whiskers and occluders via `arena.occluders`. |
 | **1C Content scaffold** | `gf_core/src/{poi.rs (new), lib.rs}`; `gf_content/src/{schema.rs, validate.rs (except 1A's line), lib.rs, worldgen/mod.rs (new, stub)}`; `procgen.rs` (§3.4 only); `tools/gf_tools/src/{main.rs, preview.rs}`; `gf_client/src/hud.rs` (the `RoomKind` arm only) | `PoiKind`/`PoiState`. The schema of §4.2 (`Expedition`, `ExpeditionDef`, `MapLayout`, `ExpeditionTuning` with defaults, `Decor::FallenWeapon`, `RoomDef::expedition/map`). Validation §4.4. Builder index, mask and `pub(crate)`. A `worldgen::generate` stub that returns a flat map (the Landing only). `preview-room` draws `MapLayout` (tiles, roads, POIs, camps), and `layout-stats --maps`. |
 
-### Phase 2: The Cinder map, end to end (bots finish the slice on it)
+### Phase 2: The Cinder map, end to end (bots finish the slice on it) — done
 
 **2.0 Serial, one agent, first.** It owns these files:
 

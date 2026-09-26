@@ -22,8 +22,18 @@ of war, a minimap, POIs that grant Seals, a mandatory Warlord, a Boss Gate into 
 arena). The design is settled and split into five phases with file-owned parallel lanes (§10) and a
 per-phase proof (§11). It replaces requests 2 and 3 in §2 below. §3a (procedural arenas) and §3b (NPR
 materials) are already done (`e24c83e`, `69fa94b`, `63d2f3d`); the room layout grammar (`c0bddae`) is
-what the map generator composes regions from. Start with phase 1. The EA run-length target (§13
-there) needs the user's sign-off.
+what the map generator composes regions from.
+
+**Phases 1 and 2 are done** (Cinder Wastes plays on its biome map; `cc7d736` flipped it), and a
+post-phase-2 art and readability pass (`2f47f8f`…`1c41630`) acted on the Cinder map critique:
+objective markers and beacons, a dusk value ladder, per-kind POI set pieces and silhouettes,
+waymarks, region ground recipes, name pools and the region banner, rim-lit coasts, molten rivers,
+chamfered barriers, x-ray hero silhouettes, the slim HUD. OPEN_WORLD.md's status
+block lists which phase 3/4 items that pass already delivered. **Start with phase 3.** The EA
+run-length target (§13 there) needs the user's sign-off.
+
+QA helpers added by the pass: `GF_CAM_AT="x,y"` pins the camera to a sim point (coast and set-piece
+captures), and `--fps` (or the H help overlay) shows the net stats line.
 
 ## 1. Where the project stands
 
