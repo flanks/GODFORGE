@@ -1378,7 +1378,9 @@ fn tint_entities(
         m.0 = match tint {
             Tint::Base => base,
             Tint::Flash => pal.toon(&mut toons, Color::srgb(1.0, 0.96, 0.9), Look::Hot),
-            Tint::SoftFlash => pal.toon(&mut toons, lighten(mix(v.color, hex("#FFE6C0"), 0.3), 1.12), Look::Smolder),
+            // Big bodies take a lot of hits: a slight warm lift reads as impact without washing
+            // out the silhouette.
+            Tint::SoftFlash => pal.toon(&mut toons, lighten(mix(v.color, hex("#FFE6C0"), 0.18), 1.06), Look::Foe),
             Tint::Warn => pal.toon(&mut toons, mix(v.color, danger, 0.7), Look::Hot),
             Tint::Frozen => pal.toon(&mut toons, mix(v.color, hex("#BFE8FF"), 0.6), Look::Smolder),
             Tint::Stunned => pal.toon(&mut toons, mix(v.color, hex("#FFE27A"), 0.45), Look::Smolder),

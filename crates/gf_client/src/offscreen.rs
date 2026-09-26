@@ -87,12 +87,19 @@ fn spawn_pool(mut commands: Commands) {
     }
 }
 
-/// Move a pin out of the HUD panels (vitals top left, party top right, run banner top centre,
-/// the arsenal bottom centre, aim bottom left, stats bottom right): straight down out of a top
-/// panel, straight up out of a bottom one. Logical pixels, matching `hud.rs`.
+/// Move a pin out of the HUD panels, keeping it on its edge where it can: along the top edge off
+/// the run banner, along the bottom edge off the arsenal strip; down a side edge out of the vitals
+/// and party panels, up it out of the aim and stats panels. Logical pixels, matching `hud.rs`.
 fn clear_of_hud(p: Vec2, size: Vec2) -> Vec2 {
     let cx = size.x * 0.5;
-    // (min x, min y, max x, max y) of each panel, padded.
+    let mut q = p;
+    if q.y <= MARGIN + 1.0 && (q.x - cx).abs() < 312.0 {
+        q.x = if q.x < cx { cx - 312.0 } else { cx + 312.0 };
+    }
+    if q.y >= size.y - MARGIN - 1.0 && (q.x - cx).abs() < 382.0 {
+        q.x = if q.x < cx { cx - 382.0 } else { cx + 382.0 };
+    }
+    // (min x, min y, max x, max y) of each corner panel, padded.
     let panels = [
         (0.0, 0.0, 440.0, 176.0),
         (size.x - 300.0, 0.0, size.x, 146.0),
@@ -101,7 +108,6 @@ fn clear_of_hud(p: Vec2, size: Vec2) -> Vec2 {
         (0.0, size.y - 100.0, 400.0, size.y),
         (size.x - 320.0, size.y - 70.0, size.x, size.y),
     ];
-    let mut q = p;
     for (x0, y0, x1, y1) in panels {
         if q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1 {
             q.y = if y0 <= 0.0 { y1 + 12.0 } else { y0 - 30.0 };
@@ -258,15 +264,12 @@ fn update_indicators(
                 if tc.0 != color {
                     tc.0 = color;
                 }
-                // Keep the label on screen: it hangs inward from pins on the right edge, and below
-                // the arrow except on the bottom edge (so pins stacked down a side never overprint).
-                let (left, right) = if pin.x > size.x * 0.7 {
-                    (Val::Auto, Val::Px(-10.0))
-                } else if pin.x < size.x * 0.3 {
-                    (Val::Px(-10.0), Val::Auto)
-                } else {
-                    (Val::Px(-40.0), Val::Auto)
-                };
+                // The label hangs away from the screen centre (off the HUD banner and strip) unless
+                // that runs it off the screen, and below the arrow except on the bottom edge (so
+                // pins stacked down a side never overprint).
+                let left_half = pin.x < size.x * 0.5;
+                let hang_left = if left_half { pin.x > 200.0 } else { pin.x > size.x - 200.0 };
+                let (left, right) = if hang_left { (Val::Auto, Val::Px(-10.0)) } else { (Val::Px(-10.0), Val::Auto) };
                 let (top, bottom) = if pin.y > size.y - MARGIN - 40.0 {
                     (Val::Auto, Val::Px(14.0))
                 } else {
