@@ -225,3 +225,64 @@ pub fn rgba_image(width: u32, height: u32, data: Vec<u8>, repeat: bool) -> Image
     }
     image
 }
+
+// ───────────────────────────── UI kit adapters (UI_STYLE §11) ─────────────────────────────
+// Added for the UI kit (`gf_client::{theme, uikit}`). Add-only: new UI needs go below.
+
+pub use bevy::image::{ImageSampler, ImageSamplerDescriptor};
+pub use bevy::input_focus::{AutoFocus, tab_navigation::TabIndex};
+pub use bevy::picking::Pickable;
+pub use bevy::text::{FontFeatureTag, FontFeatures, LetterSpacing, LineHeight};
+pub use bevy::ui::{InteractionDisabled, Pressed};
+pub use bevy::ui_render::prelude::{MaterialNode, UiMaterial, UiMaterialPlugin};
+
+/// Install extra font faces (each file one face) and return their handles in order. Unlike
+/// [`install_fonts`] this never touches the default font. Pair the handles in a
+/// `FontSource::List` so parley falls back per glyph cluster (a stray ◆ still renders).
+pub fn install_font_faces(app: &mut App, faces: &[&'static [u8]]) -> Vec<Handle<Font>> {
+    let mut fonts = app.world_mut().resource_mut::<Assets<Font>>();
+    faces.iter().map(|bytes| fonts.add(Font::from_bytes(bytes.to_vec()))).collect()
+}
+
+/// Decode an embedded PNG to straight-alpha RGBA8 (width, height, pixels). `None` if the bytes
+/// are not a PNG the engine can read.
+pub fn decode_png_rgba(bytes: &[u8]) -> Option<(u32, u32, Vec<u8>)> {
+    use bevy::asset::RenderAssetUsages;
+    use bevy::image::{CompressedImageFormats, ImageType};
+    use bevy::render::render_resource::TextureFormat;
+    let image = Image::from_buffer(
+        bytes,
+        ImageType::Extension("png"),
+        CompressedImageFormats::NONE,
+        true,
+        ImageSampler::Default,
+        RenderAssetUsages::MAIN_WORLD,
+    )
+    .ok()?;
+    if image.texture_descriptor.format != TextureFormat::Rgba8UnormSrgb {
+        return None;
+    }
+    let (w, h) = (image.width(), image.height());
+    Some((w, h, image.data?))
+}
+
+/// A UI texture from straight-alpha sRGB RGBA8 pixels: linear filtering, clamped edges, and no
+/// CPU copy kept once it is on the GPU (UI art never changes after upload).
+pub fn ui_image(width: u32, height: u32, rgba: Vec<u8>) -> Image {
+    use bevy::asset::RenderAssetUsages;
+    use bevy::render::render_resource::{Extent3d, TextureDimension, TextureFormat};
+    let mut image = Image::new(
+        Extent3d { width, height, depth_or_array_layers: 1 },
+        TextureDimension::D2,
+        rgba,
+        TextureFormat::Rgba8UnormSrgb,
+        RenderAssetUsages::RENDER_WORLD,
+    );
+    image.sampler = ImageSampler::linear();
+    image
+}
+
+/// The primary window's physical height and scale factor (for `UiScale` by window height).
+pub fn window_physical_height(window: &Window) -> (f32, f32) {
+    (window.resolution.physical_height() as f32, window.resolution.scale_factor())
+}
