@@ -1,0 +1,393 @@
+{
+ "hero": "valdris",
+ "file": "art/characters/valdris/work/gltf_check/valdris_anim.glb (local scratch)",
+ "bytes": 16904360,
+ "extensionsRequired": [],
+ "animations": 34,
+ "clips": {
+  "valdris_armor_break": {
+   "channels": 348,
+   "duration_s": 1.06667,
+   "samples": 33,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_backpedal@loop": {
+   "channels": 348,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_bulwark_slam": {
+   "channels": 348,
+   "duration_s": 1.66667,
+   "samples": 51,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_dash": {
+   "channels": 348,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_dash_recover": {
+   "channels": 348,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_death": {
+   "channels": 348,
+   "duration_s": 1.86667,
+   "samples": 57,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_downed@loop": {
+   "channels": 348,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_fire_charge@loop": {
+   "channels": 348,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_fire_heavy": {
+   "channels": 348,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_fire_light": {
+   "channels": 348,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_forge_hammer@loop": {
+   "channels": 348,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_get_up": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_hit_heavy": {
+   "channels": 348,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_hit_light": {
+   "channels": 348,
+   "duration_s": 0.4,
+   "samples": 13,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_idle@loop": {
+   "channels": 348,
+   "duration_s": 4.0,
+   "samples": 121,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_idle_combat@loop": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_idle_signature@loop": {
+   "channels": 348,
+   "duration_s": 5.0,
+   "samples": 151,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_interact": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_knockdown": {
+   "channels": 348,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_mountainfall@loop": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_mountainfall_pound": {
+   "channels": 348,
+   "duration_s": 1.1,
+   "samples": 34,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "valdris_mountainfall_start": {
+   "channels": 348,
+   "duration_s": 1.53333,
+   "samples": 47,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_ping": {
+   "channels": 348,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "valdris_reforge_in": {
+   "channels": 348,
+   "duration_s": 1.53333,
+   "samples": 47,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_revive": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_run@loop": {
+   "channels": 348,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_siege_fire": {
+   "channels": 348,
+   "duration_s": 0.16667,
+   "samples": 6,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "valdris_siege_stance@loop": {
+   "channels": 348,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_siege_stance_enter": {
+   "channels": 348,
+   "duration_s": 0.86667,
+   "samples": 27,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_siege_stance_exit": {
+   "channels": 348,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_strafe_left@loop": {
+   "channels": 348,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_strafe_right@loop": {
+   "channels": 348,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "valdris_victory": {
+   "channels": 348,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "valdris_walk@loop": {
+   "channels": 348,
+   "duration_s": 0.93333,
+   "samples": 29,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  }
+ },
+ "missing": [],
+ "unexpected": [],
+ "twist_bones_animated_in": 34,
+ "failures": [],
+ "ok": true
+}

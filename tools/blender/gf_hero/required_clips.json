@@ -41,6 +41,18 @@
    {"clip": "meltdown_start", "loop": false, "layer": "full", "kit": "ultimate Meltdown (cast)"},
    {"clip": "meltdown", "loop": true, "layer": "full", "kit": "ultimate Meltdown (stance while the buff lasts)"},
    {"clip": "heat_vent", "loop": false, "layer": "upper", "kit": "passive Heat Gauge at max"}
+  ],
+  "valdris": [
+   {"clip": "idle_signature", "loop": true, "layer": "full", "kit": "signature idle"},
+   {"clip": "bulwark_slam", "loop": false, "layer": "full", "kit": "active1 Bulwark Slam (leap, Nova on landing, Barricade)"},
+   {"clip": "siege_stance_enter", "loop": false, "layer": "full", "kit": "active2 Siege Stance (plant)"},
+   {"clip": "siege_stance", "loop": true, "layer": "full", "kit": "active2 Siege Stance (rooted brace while it lasts)"},
+   {"clip": "siege_stance_exit", "loop": false, "layer": "full", "kit": "active2 Siege Stance (unplant)"},
+   {"clip": "siege_fire", "loop": false, "layer": "upper", "kit": "colossus_cannon shot during Siege Stance (over siege_stance)"},
+   {"clip": "mountainfall_start", "loop": false, "layer": "full", "kit": "ultimate Mountainfall (cast)"},
+   {"clip": "mountainfall", "loop": true, "layer": "full", "kit": "ultimate Mountainfall (avatar stance while it lasts)"},
+   {"clip": "mountainfall_pound", "loop": false, "layer": "upper", "kit": "ultimate Mountainfall ground pound every 1.1 s (over mountainfall)"},
+   {"clip": "armor_break", "loop": false, "layer": "upper", "kit": "passive Reforged Flesh (Armor breaks: shockwave + taunt)"}
   ]
  }
 }

@@ -715,10 +715,122 @@
    }
   },
   "4_animation": {
-   "status": "not_started",
-   "human_signoff_required": false,
-   "outputs": [],
-   "notes": "The shared clip set on GF_Hero_v1 plus Valdris's unique set (proposal in brief.md section 8). Mixamo/ActorCore seeds are prototyping stand-ins only."
+   "status": "done",
+   "human_signoff_required": true,
+   "outputs": [
+    "art/characters/valdris/production/valdris_anim.blend (Git LFS)",
+    "art/characters/valdris/reports/anim_report.md",
+    "art/characters/valdris/reports/anim/clips.json",
+    "art/characters/valdris/reports/anim/cloth.json",
+    "art/characters/valdris/reports/anim/render_checks.json",
+    "art/characters/valdris/reports/anim/gltf_check.json",
+    "art/characters/valdris/reports/anim/<clip>.png (one contact sheet per clip, 34 sheets)",
+    "art/characters/valdris/reports/anim/anim_board_{1,2,3}.png"
+   ],
+   "notes": "Made by AI: the 24 shared GF_Hero_v1 clips re-posed for his plate and his 10 kit clips (brief.md section 8), baked on the stage-3 rig with the cloth pass, every frame audited; reports/anim_report.md has the clip table, the sim-state mapping and the open issues. No Mixamo / ActorCore seeds were used.",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s4_valdris_run.py; no animator, no Mixamo / ActorCore seeds",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "skeleton": "GF_Hero_v1 v1 + his 53 x_ extras (docs/art/GF_HERO_SKELETON.md section 8: the clip library, naming and rules)",
+   "tools": [
+    "tools/blender/gf_hero/s4_valdris_run.py",
+    "tools/blender/gf_hero/s4_valdris.py",
+    "tools/blender/gf_hero/s4_valdris_cloth.py",
+    "tools/blender/gf_hero/s4_valdris_render.py",
+    "tools/blender/gf_hero/s4_valdris_sheets.py",
+    "tools/blender/gf_hero/s4_anim.py (shared; gained the optional hero hooks: shared_clips, KEEPOUT_LOOSE_PARTS, KEEPOUT_OWN_BONES, Clip.extra_keyed / base)",
+    "tools/blender/gf_hero/s4lib.py (shared; Rig.keyed skips x_ extras, Clip.extra_keyed / base)",
+    "tools/blender/gf_hero/s4_gltf_check.py (shared, unchanged)",
+    "tools/blender/gf_hero/check_clips.py (shared, unchanged)",
+    "tools/blender/gf_hero/required_clips.json (the valdris block)"
+   ],
+   "metrics": {
+    "clips": 34,
+    "shared_clips": 24,
+    "unique_clips": 10,
+    "loops": 13,
+    "fps": 30,
+    "frames_total": 1254,
+    "loop_seams_closed": 13,
+    "foot_slide_max_mm": 0.0,
+    "sole_slip_per_contact_max_mm": 50.3,
+    "wrist_swing_max_deg": 0.0,
+    "ik_miss_max_mm": 29.6,
+    "elbow_flexion_max_deg": {
+     "L": 101.0,
+     "R": 61.0
+    },
+    "knee_flexion_max_deg": 149.3,
+    "keepout_push_max_mm": 138.2,
+    "keepout_residual_verts_max": 3,
+    "solver_vs_blender_max_error": 1.0328128010728036e-06,
+    "audited_frames": 1288,
+    "plate_clipping_max_verts": 389,
+    "plate_clipping_median_of_clip_medians": 128.0,
+    "cannon_poke_max": 29,
+    "cannon_cuts_max": 44,
+    "cloth_inside_max": {
+     "cape": 51,
+     "loincloth": 41,
+     "braids": 17
+    },
+    "lowest_solid_vertex_mm": -40.3,
+    "lowest_cloth_vertex_mm": -69.2,
+    "pelvis_drift_max_mm": 584.9,
+    "design_speed_run_mps": 5.6,
+    "design_speed_walk_mps": 1.698,
+    "cloth_keyed_bones": 44,
+    "gltf_animations": 34,
+    "gltf_check_ok": true,
+    "gltf_bytes": 16904360
+   },
+   "items": {
+    "shared_clip_set": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_valdris.py (shared_clips)"
+     ],
+     "notes": "the 24 GF_Hero_v1 shared clips (names, loops, layers, events and timing structure of s4_clips.py) re-posed inside his stage-3 ranges"
+    },
+    "valdris_unique_clips": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_valdris.py (unique_clips)"
+     ],
+     "notes": "10 clips: idle_signature@loop, bulwark_slam, siege_stance_enter, siege_stance@loop, siege_stance_exit, siege_fire, mountainfall_start, mountainfall@loop, mountainfall_pound, armor_break"
+    },
+    "cloth_pass": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_valdris_cloth.py",
+      "art/characters/valdris/reports/anim/cloth.json"
+     ],
+     "notes": "the cape, loincloth and braid chains keyed in every clip (lagged hang, drag, cleared out of the plates every frame)"
+    },
+    "baked_clips_and_checks": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/production/valdris_anim.blend",
+      "art/characters/valdris/reports/anim/clips.json",
+      "art/characters/valdris/reports/anim/render_checks.json",
+      "art/characters/valdris/reports/anim/gltf_check.json"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made clips (contact sheets in reports/anim/, findings in reports/anim_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "5_export_validate": {
    "status": "not_started",
@@ -764,6 +876,11 @@
   {
    "gate": "stage 5: final Hades-II bar",
    "state": "not_started"
+  },
+  {
+   "gate": "stage 4: the user's visual approval of the AI-made clips (no animator, 2026-09-25)",
+   "state": "pending_human",
+   "via": "art/characters/valdris/reports/anim/ + reports/anim_report.md"
   }
  ]
 }

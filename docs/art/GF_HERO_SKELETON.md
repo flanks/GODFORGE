@@ -449,6 +449,25 @@ width, hip yaw (strafe), lift, heel roll and a ground-speed-matched swing.
 offset by the hero's leg and arm length, and `characters.csv` gives the move speed. The hero only writes
 `s4_<key>.py` with its unique clips.
 
+*Additive note (Valdris, stage 4, 2026-09-26).* A hero whose armour limits its joints poses the shared set itself:
+- **`s4_<key>.shared_clips(K)`** (optional). When the hero module defines it, `s4_anim.py` bakes it instead of
+  `s4_clips.shared_clips(K)`. It must return the same 24 clips with the same names, loop flags and layers (the baker
+  asserts it against `s4_contract.SHARED_CLIPS`). Valdris keeps the library's clips, events and timing structure and
+  re-poses every key inside his measured ranges (`art/characters/valdris/reports/anim_report.md`): Brax's guard folds
+  the elbows to 93-102°, where Valdris's cannon cuff enters his upper-arm plate.
+- **`s4lib.Rig.keyed` skips the `x_` extras**, as §2 requires; a hero without extras keys exactly what it did.
+  `Clip(extra_keyed=[...])` names the `x_` bones a unique clip keys on top of their drives (Valdris's
+  `x_pauldron_L/R` for overhead arms). `Clip(base="<clip>")` records the clip whose frame 0 an upper-layer kit clip
+  starts and ends on when it is not `idle_combat` (Valdris's `siege_fire` over `siege_stance`, `mountainfall_pound`
+  over `mountainfall`); both show in `clips.json` only when set.
+- **The arm keep-out** takes `s4_<key>.KEEPOUT_LOOSE_PARTS` (hanging parts that never block an arm) and
+  `KEEPOUT_OWN_BONES[side]` (extra bones whose vertices never block that arm, such as helpers the solver does not
+  evaluate).
+- **A per-hero cloth pass** may key the hero's cloth chains in every clip of that hero after the bake (Valdris:
+  `s4_valdris_cloth.py`: lagged hang, drag against the design travel, cleared out of the plates every frame). It is a
+  secondary-motion layer on `x_` cloth chains only; the shared library still never keys an `x_` bone, and an engine
+  spring may replace those channels later.
+
 ## 9. The shipped file (stage 5)
 
 `tools/blender/gf_hero/export_glb.py` writes `assets/models/characters/<key>.glb` from the stage-4 file

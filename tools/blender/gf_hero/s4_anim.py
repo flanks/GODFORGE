@@ -53,13 +53,23 @@ def move_speed(key):
     raise SystemExit("no characters.csv row for %s" % key)
 
 
+try:
+    HERO = __import__("s4_%s" % KEY)
+except ImportError:
+    HERO = None
+
+
 def library(K):
     import s4_clips
-    clips = s4_clips.shared_clips(K)
-    try:
-        mod = __import__("s4_%s" % KEY)
-        clips += mod.unique_clips(K)
-    except ImportError:
+    # a hero whose armour limits its joint ranges (Valdris) bakes the shared set from its own module:
+    # s4_<key>.shared_clips(K), the same clip names, loop flags and layers (asserted against s4_contract below)
+    if HERO is not None and hasattr(HERO, "shared_clips"):
+        clips = HERO.shared_clips(K)
+    else:
+        clips = s4_clips.shared_clips(K)
+    if HERO is not None:
+        clips += HERO.unique_clips(K)
+    else:
         log("no unique clip module s4_%s.py" % KEY)
     return clips
 
@@ -77,8 +87,10 @@ rig = L.Rig(arm)
 solver = L.Solver(rig, K)
 
 
-# parts that hang and swing (stage-2 part names): not obstacles for the arm keep-out
-LOOSE_CLOTH = {"SKIRT_PLATES", "SKIRT_CLOTH", "SASH"}
+# parts that hang and swing (stage-2 part names): not obstacles for the arm keep-out; a hero module may add its own
+# (s4_<key>.KEEPOUT_LOOSE_PARTS) and name extra bones whose vertices never block an arm (KEEPOUT_OWN_BONES[side])
+LOOSE_CLOTH = {"SKIRT_PLATES", "SKIRT_CLOTH", "SASH"} | set(getattr(HERO, "KEEPOUT_LOOSE_PARTS", ()))
+OWN_EXTRA = getattr(HERO, "KEEPOUT_OWN_BONES", {})
 
 
 def build_keepout():
@@ -114,7 +126,8 @@ def build_keepout():
         if upper:
             out |= {"upperarm_" + s, "upperarm_twist_" + s}
         return out
-    own = {s: np.isin(dom, list(arm_set(s) | arm_set("R" if s == "L" else "L", upper=False))) for s in ("L", "R")}
+    own = {s: np.isin(dom, list(arm_set(s) | arm_set("R" if s == "L" else "L", upper=False) | set(OWN_EXTRA.get(s, ()))))
+           for s in ("L", "R")}
 
     def radial_map(pts, dy=0.02, nth=36):
         cx, cz = float(np.median(pts[:, 0])), float(np.median(pts[:, 2]))
@@ -359,7 +372,7 @@ for clip in CLIPS:
     t = time.time()
     frames = L.bake(solver, clip)
     name = clip.action_name(KEY)
-    act, eul = L.write_action(bpy, arm, name, frames, rig.keyed, clip.loop)
+    act, eul = L.write_action(bpy, arm, name, frames, rig.keyed + clip.extra_keyed, clip.loop)
     for mk, fr_ in sorted(clip.events.items(), key=lambda kv: kv[1]):
         act.pose_markers.new(mk).frame = int(fr_)
     # the solver against Blender's own evaluation
@@ -377,6 +390,10 @@ for clip in CLIPS:
             "purpose": clip.purpose, "maps_to": clip.maps_to, "events": clip.events, "notes": clip.notes,
             "design_speed_mps": clip.speed, "travel_mps": list(clip.travel), "key_frames": clip.key_frames(),
             "slide_exempt": clip.slide_exempt, "metrics": m}
+    if clip.extra_keyed:
+        info["extra_keyed"] = clip.extra_keyed
+    if clip.base:
+        info["base"] = clip.base
     report["clips"][clip.clip] = info
     tracks.append((name, act))
     log("%-24s %3d f %s slide %5.1f mm seam %s wrist %.2f elbow %s miss %.1f mm keep-out %s left %s (%.1fs)" % (

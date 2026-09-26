@@ -156,7 +156,7 @@ the runners read `COMFY_PY`). Review renders use Cycles on the CPU or Workbench,
 | 1 review | `<blender> -b -P tools/blender/gf_hero/render_blockout.py -- <glb> art/characters/<key>/work/renders/<stem> <stem>`, then `<comfy-python> tools/comfy/blockout_sheets.py <renders> <reports/blockout> <concept> <mask> <stems...> --selected <stem>` and `python tools/comfy/art_manifest.py <key> --selected <glb>` | review sheets, `manifest.json` |
 | 2 production mesh | `python tools/blender/gf_hero/run_stage2.py <key>` (armoured variant: `python tools/blender/gf_hero/s2_valdris_run.py`) | `production/<key>_stage2.blend`, `textures/`, the signature weapon pack, `reports/stage2/` |
 | 3 rig | `python tools/blender/gf_hero/run_stage3.py <key>` (armoured variant: `python tools/blender/gf_hero/s3_valdris_run.py`) | `production/<key>_rig.blend`, `work/<key>_landmarks.json`, `reports/stage3/` |
-| 4 animation | `python tools/blender/gf_hero/run_stage4.py <key>` | `production/<key>_anim.blend`, `reports/anim/` |
+| 4 animation | `python tools/blender/gf_hero/run_stage4.py <key>` (armoured variant: `python tools/blender/gf_hero/s4_valdris_run.py`) | `production/<key>_anim.blend`, `reports/anim/` |
 | 5 export & validate | `python tools/blender/gf_hero/run_stage5.py <key>` | `assets/models/characters/<key>.glb` + `.meta.json`, `assets/models/weapons/<chassis>.glb` + `.meta.json`, `reports/export_report.json`, `reports/stage5/` |
 | 5 gate only (CI) | `python tools/blender/gf_hero/validate_glb.py assets/models/characters/*.glb [--blender <blender>] [--json <report>]` | exit 1 on any error |
 | CI (stdlib) | `python tools/comfy/check_art.py`, `python tools/blender/gf_hero/check_skeleton.py`, `python tools/blender/gf_hero/check_clips.py` | the `.github/workflows/art.yml` jobs |
@@ -387,6 +387,26 @@ Weapon fire stays procedural (recoil, aim, hit-stop); the fire and strike clips 
 start and end on the `idle_combat` reference pose. Aim offsets are not authored: at the 55° top-down camera the hero
 turns to the aim, and the torso-versus-legs split is covered by the strafe and backpedal clips. Brax's results:
 `art/characters/brax/reports/anim_report.md`.
+
+**Valdris (2026-09-26), the armoured variant.** His plate rules out most of the library's arm and foot keys (his cannon
+elbow is clean to about 30°, his arms live between −45° and +30° of elevation, his sabaton's instep lame rides the
+shin and its sole is one rigid plate past the ball), so his module poses the shared set itself through the new
+default-off hooks of `s4_anim.py`, and a cloth pass and his own audit follow the bake:
+
+```sh
+python tools/blender/gf_hero/s4_valdris_run.py            # [--from <step>] [--only <step>], about 12 min, CPU only
+```
+
+| Step | Script | What it adds |
+|---|---|---|
+| anim | `s4_anim.py` + `s4_valdris.py` | `shared_clips(K)`: the 24 shared clips (same names, loops, layers, events, timing) re-posed in his vocabulary: arms as upper-arm / forearm directions inside his ranges, interpolated by direction; planted feet with upright shins (the pelvis solved through s4lib's own leg IK); feet that roll about the sole's front and rear edges and, in the air, hang in line with the shins; a wider, heavier gait; one knee down built, not solved. `unique_clips(K)`: his 10 kit clips. `KEEPOUT_LOOSE_PARTS` / `KEEPOUT_OWN_BONES` for the arm keep-out |
+| cloth | `s4_valdris_cloth.py` | the cape, loincloth and braid chains keyed in every clip: a lagged hang under the apparent gravity at the pin, drag against the design travel, cleared out of the plates and the ground every frame (the stage-3 clear step), smoothed so it never pops |
+| render | `s4_valdris_render.py` | the key-frame renders, and the stage-3 measures on EVERY frame: plate clipping, the cannon's poke-through and cuts, cloth inside a plate, the ground, sole slip |
+| sheets | `s4_valdris_sheets.py` | a sheet per clip and the game-size boards next to the concept |
+| gltf_check, contract | `s4_gltf_check.py`, `check_clips.py` (shared, unchanged) | as for Brax |
+
+Results and findings: `art/characters/valdris/reports/anim_report.md`. The hooks are default-off, and Brax's stage-4
+outputs are byte-identical with them (`art/characters/valdris/reports/anim/brax_regression.json`).
 
 ### Stage 5: export & validate (implemented; made by AI, 2026-09-25)
 

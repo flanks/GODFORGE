@@ -186,8 +186,12 @@ class Rig:
             visit(n)
         twist = set(R.twist_bone_names())
         socks = set(R.SOCKET_NAMES)
-        # the bones a clip keys: everything but root, the driven twist bones and the sockets
-        self.keyed = [n for n in self.order if n != "root" and n not in twist and n not in socks]
+        # the bones a clip keys: everything but root, the driven twist bones, the sockets and the per-hero x_ extras
+        # (docs/art/GF_HERO_SKELETON.md section 2: shared clips never key x_ bones; a unique clip names the x_ bones it
+        # keys in Clip.extra_keyed, and a hero's cloth pass may bake its cloth chains). A hero without extras (Brax)
+        # keys exactly the bones it always did.
+        self.keyed = [n for n in self.order if n != "root" and n not in twist and n not in socks and not n.startswith("x_")]
+        self.extras = [n for n in self.order if n.startswith("x_")]
         # lowerarm-local effector of the fist (the middle knuckle, i.e. hand tail with the wrist straight)
         self.fist_eff = {}
         for s in ("L", "R"):
@@ -788,7 +792,7 @@ class Clip:
 
     def __init__(self, clip, length, keys=None, fn=None, loop=False, layer="full", weapon="fist", travel=(0.0, 0.0),
                  purpose="", maps_to="", events=None, speed=None, notes="", render_frames=None, family="shared",
-                 slide_exempt=False, grounded=True):
+                 slide_exempt=False, grounded=True, extra_keyed=None, base=None):
         self.clip = clip
         self.length = int(length)
         self.keys = keys
@@ -806,6 +810,11 @@ class Clip:
         self.family = family
         self.slide_exempt = slide_exempt
         self.grounded = grounded
+        # x_ extras this (unique) clip keys on top of their drives, e.g. a plate hero's pauldron helpers for an overhead
+        # swing (docs/art/GF_HERO_SKELETON.md section 2); empty for every shared clip
+        self.extra_keyed = list(extra_keyed or [])
+        # the clip whose frame 0 an upper-layer clip starts and ends on (None: idle_combat, the contract default)
+        self.base = base
 
     def action_name(self, key):
         return "%s_%s%s" % (key, self.clip, "@loop" if self.loop else "")

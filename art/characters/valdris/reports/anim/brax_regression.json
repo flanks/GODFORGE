@@ -1,0 +1,21 @@
+{
+ "_doc": "Brax regression check for the backwards-compatible stage-4 changes Valdris made to the shared tools/blender/gf_hero/s4lib.py (Rig.keyed skips x_ extras; Clip.extra_keyed / base) and s4_anim.py (the optional hero hooks shared_clips, KEEPOUT_LOOSE_PARTS, KEEPOUT_OWN_BONES; per-clip extra_keyed / base written to clips.json only when set). Brax's stage-4 anim and glTF-check steps were run twice in a scratch copy of the repository (nothing under art/characters/brax/ was written): once with the HEAD scripts (git show HEAD:...), once with the changed ones, on the same inputs (his production/brax_rig.blend, work/brax_landmarks.json, content/sheets/characters.csv).",
+ "date": "2026-09-26",
+ "head": "tools/blender/gf_hero at HEAD (unchanged from 139c655 to c427250)",
+ "changed_files": [
+  "tools/blender/gf_hero/s4lib.py",
+  "tools/blender/gf_hero/s4_anim.py",
+  "tools/blender/gf_hero/required_clips.json (a new 'valdris' block; read only by validate_glb.py at stage 5)"
+ ],
+ "results": {
+  "reports/anim/clips.json": "identical (ignoring 'seconds'): the same 34 clips, keyed bones, metrics and solver error",
+  "reports/anim/gltf_check.json": "identical (ignoring 'seconds')",
+  "work/gltf_check/brax_anim.glb": {
+   "head_sha256": "cfba1ff0a3d9e91f771f75df7d0f5ae6a0becef14643339ab13d980ee8ab36a1",
+   "changed_sha256": "cfba1ff0a3d9e91f771f75df7d0f5ae6a0becef14643339ab13d980ee8ab36a1",
+   "byte_identical": true,
+   "note": "the scratch copy carries no texture files, so this GLB is smaller than the committed report's; both runs saw the same inputs"
+  }
+ },
+ "verdict": "Brax's stage-4 outputs are byte-identical with the changed shared scripts: he has no x_ extras (so Rig.keyed is unchanged), s4_brax.py defines no shared_clips / KEEPOUT_* hooks, and his clips set no extra_keyed or base."
+}
