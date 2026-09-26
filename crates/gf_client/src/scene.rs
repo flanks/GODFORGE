@@ -794,53 +794,30 @@ pub fn door_label(db: &ContentDb, reward: DoorReward) -> String {
     }
 }
 
-fn source_slot(owner: u8) -> Option<u8> {
-    (owner < 12).then_some(owner % 4)
-}
-
 fn spawn_visual(
     kit: &mut Kit,
     db: &ContentDb,
     map: Option<&MapLayout>,
     e: &EntityView,
     me: Option<u8>,
-    ally_alpha: f32,
+    _ally_alpha: f32,
 ) -> Entity {
     let pos = e.pos.to_vec2();
     let parent = kit.commands.spawn((Transform::from_translation(w3(pos, 0.0)), Visibility::default())).id();
     let mut v = match e.kind {
         EntityKind::Enemy { def } => spawn_enemy(kit, db, parent, e, def),
-        EntityKind::Projectile { style, element, owner, radius_q } => {
+        EntityKind::Projectile { element, radius_q, .. } => {
+            // The body, trail and accents are the weapon's (`arms::shots::dress` on a carrier
+            // child): painted billboards and packed meshes per style, never a sphere.
             let r = (radius_q as f32 / 32.0).max(0.07) * 1.5;
-            let c = element_color(element);
-            let mine = me.is_some() && source_slot(owner) == me;
-            let mat =
-                if mine { kit.mat(c, Look::Glow) } else { kit.mat(hdr(c, 2.0).with_alpha(ally_alpha), Look::Decal) };
-            use gf_core::weapon::ProjectileStyle as S;
-            let stretch = match style {
-                S::Bolt | S::Arrow | S::Needle | S::Slug => 2.6,
-                S::Shard | S::Pellet | S::Blade => 1.7,
-                _ => 1.0,
-            };
-            let mesh = if r > 0.3 { kit.pal.sphere.clone() } else { kit.pal.low_sphere.clone() };
-            let body = kit.child(parent, &mesh, mat, Transform::from_scale(Vec3::new(r, r, r * stretch)));
             kit.commands.entity(parent).insert(NotShadowCaster);
-            kit.commands.entity(body).insert(NotShadowCaster);
-            let mut v = Visual::new(e, c, r, PROJECTILE_HEIGHT);
-            v.body = Some(body);
-            v
+            Visual::new(e, element_color(element), r, PROJECTILE_HEIGHT)
         }
         EntityKind::EnemyShot { radius_q } => {
+            // A magenta-cored teardrop on the danger layer (`arms`, `FxSprite::enemy_shot`).
             let r = (radius_q as f32 / 32.0).max(0.1) * 1.3;
-            let danger = kit.pal.danger;
-            let shell = kit.mat(hdr(danger, 1.4).with_alpha(0.5), Look::Decal);
-            let core = kit.mat(hex("#FF5AA8"), Look::Glow);
-            let sphere = kit.pal.low_sphere.clone();
-            kit.child(parent, &sphere, shell, Transform::from_scale(Vec3::splat(r * 1.35)));
-            let body = kit.child(parent, &sphere, core, Transform::from_scale(Vec3::splat(r * 0.75)));
-            let mut v = Visual::new(e, danger, r, 0.8);
-            v.body = Some(body);
-            v
+            kit.commands.entity(parent).insert(NotShadowCaster);
+            Visual::new(e, kit.pal.danger, r, 0.8)
         }
         EntityKind::Telegraph { shape, .. } => spawn_telegraph(kit, parent, e, shape),
         EntityKind::Hazard { kind, element, radius_q } => {
@@ -1011,10 +988,12 @@ fn spawn_visual(
             v
         }
         EntityKind::Blade { owner } => {
+            // The disc and its circular smear are the weapon's (`arms`); the owner's P-colour
+            // shows as a thin rim only (VFX_STYLE §9 "Orbit").
             let c = kit.pal.player(owner);
             let glow = kit.mat(hdr(c, 1.2), Look::Glow);
             let cube = kit.pal.cube.clone();
-            let body = kit.child(parent, &cube, glow, Transform::from_scale(Vec3::new(1.0, 0.05, 0.2)));
+            let body = kit.child(parent, &cube, glow, Transform::from_scale(Vec3::new(0.95, 0.02, 0.05)));
             let mut v = Visual::new(e, c, 0.5, 0.8);
             v.body = Some(body);
             v

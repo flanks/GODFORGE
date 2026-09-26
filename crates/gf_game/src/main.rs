@@ -52,6 +52,10 @@ CLIENT OPTIONS
                                QA: force a panel open with sample data for screenshots
   --hud-off                    QA: hide every UI node (clean plates for mockups)
   --hud-scale <0.85-1.15>      HUD size multiplier (default 1)
+  --vfx-gallery                QA: every VFX primitive and recipe in a labelled grid, re-fired every
+                               2.4 s (env GF_VFX_FREEZE=<s>, GF_VFX_ZOOM=<view height>, GF_VFX_CELL=<i>)
+  --vfx-bench [scale]          QA: hold 2000 particles, 200 trails and 50 smears (x scale) and log
+                               their CPU build time and GPU pass times once a second
 
 HEADLESS OPTIONS
   --bots <n>  --rtt <ms>  --loss <0..1>
