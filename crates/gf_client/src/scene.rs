@@ -308,6 +308,41 @@ const CORPSE_SINK: f32 = 0.9;
 /// A corpse whose animation never started goes after this long (s).
 const CORPSE_MAX: f32 = 6.0;
 
+/// The solid footprint of every anvil on the field (centre, half extents on the sim plane),
+/// refreshed each frame. The sim lets bodies walk through an anvil; the client stands a hero at its
+/// edge to forge and keeps the horde's bodies out of the iron (presentation only).
+#[derive(Resource, Default)]
+pub struct AnvilBlocks(pub Vec<(Vec2, Vec2)>);
+
+impl AnvilBlocks {
+    /// `p` pushed out of every footprint grown by `pad`, through its nearest side.
+    pub fn push_out(&self, p: Vec2, pad: f32) -> Vec2 {
+        let mut p = p;
+        for (c, half) in &self.0 {
+            let d = p - *c;
+            let (hx, hy) = (half.x + pad, half.y + pad);
+            if d.x.abs() >= hx || d.y.abs() >= hy {
+                continue;
+            }
+            if hx - d.x.abs() < hy - d.y.abs() {
+                p.x = c.x + hx * if d.x < 0.0 { -1.0 } else { 1.0 };
+            } else {
+                p.y = c.y + hy * if d.y < 0.0 { -1.0 } else { 1.0 };
+            }
+        }
+        p
+    }
+
+    /// The centre of the nearest anvil within `reach` of `p`.
+    pub fn nearest(&self, p: Vec2, reach: f32) -> Option<Vec2> {
+        self.0
+            .iter()
+            .map(|(c, _)| *c)
+            .filter(|c| c.distance(p) < reach)
+            .min_by(|a, b| a.distance_squared(p).total_cmp(&b.distance_squared(p)))
+    }
+}
+
 /// Recently slain enemies (a kill and its removal may arrive a snapshot apart).
 #[derive(Resource, Default)]
 struct RecentKills(HashMap<NetId, f32>);
@@ -325,6 +360,7 @@ fn setup_xray(mut commands: Commands, pal: Res<Palette>, mut xrays: ResMut<Asset
 pub fn build(app: &mut App) {
     app.init_resource::<SceneIndex>()
         .init_resource::<RecentKills>()
+        .init_resource::<AnvilBlocks>()
         .add_systems(Startup, (spawn_markers, setup_xray))
         .add_systems(
             Update,
@@ -1564,6 +1600,7 @@ fn animate_entities(
     time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
+    blocks: Res<AnvilBlocks>,
     mut q: Query<(&mut Visual, &mut Transform)>,
     mut parts: Query<&mut Transform, Without<Visual>>,
 ) {
@@ -1601,7 +1638,13 @@ fn animate_entities(
                 // A horde spawn rises out of the ground.
                 v.rise = (v.rise - dt / emerge).max(0.0);
                 let sunk = v.rise * v.rise * (v.radius * 2.5 + 0.4);
-                tf.translation = w3(v.shown, v.lift + bob - sunk);
+                // Small bodies are shouldered out of an anvil's iron (the sim walks them through it).
+                let at = if v.radius < 1.2 && !blocks.0.is_empty() {
+                    blocks.push_out(v.shown, v.radius * 0.8)
+                } else {
+                    v.shown
+                };
+                tf.translation = w3(at, v.lift + bob - sunk);
                 // Turn toward the facing instead of snapping (Swarmer jitter, quantized angles).
                 let want = v.face_override.unwrap_or(v.facing);
                 let k = if v.radius > 1.5 {
@@ -1795,11 +1838,13 @@ fn animate_anvils(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     room: Res<CurrentRoom>,
+    mut blocks: ResMut<AnvilBlocks>,
     q: Query<&Visual>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<Visual>>,
 ) {
     let t = time.elapsed_secs();
     let me = link.me().map(|p| p.mover.pos);
+    blocks.0.clear();
     // A shaft is translucent and drawn after the bodies: a hero standing behind it (up the screen
     // from its foot, in its column) would show through a pillar of light. The shaft goes while one
     // does.
@@ -1819,6 +1864,8 @@ fn animate_anvils(
         let here = me.is_some_and(|m| m.distance(v.pos) < v.radius + 7.0) || covers;
         let (ring_on, fill_on, glow_on, dim_on, bright_on) = match v.kind {
             EntityKind::Anvil => {
+                // The legacy room anvil: the iron and its horn (see `spawn_anvil`).
+                blocks.0.push((v.pos, Vec2::new(0.95, 0.6)));
                 let s = AnvilState::from_u8(v.status);
                 (s != AnvilState::Spent, s == AnvilState::Kindling, s == AnvilState::Hot, false, false)
             }
@@ -1826,6 +1873,10 @@ fn animate_anvils(
                 let s = PoiState::from_u8(v.status);
                 let site = room.def.map.as_ref().and_then(|m| m.pois.get(index as usize));
                 let anvil = site.map(|p| p.kind) == Some(PoiKind::Anvil);
+                if anvil {
+                    // A map anvil stands on a stepped plinth (4.4 × 3.4 m).
+                    blocks.0.push((v.pos, Vec2::new(2.2, 1.7)));
+                }
                 let live = matches!(s, PoiState::Hot | PoiState::Open | PoiState::Gathering)
                     || (!anvil && s == PoiState::Active);
                 let objective = site.is_some_and(|p| p.seals > 0 || p.kind == PoiKind::Gate);

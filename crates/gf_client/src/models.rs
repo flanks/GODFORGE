@@ -422,6 +422,14 @@ fn prepare_models(
                     graph.add_clip(handle.clone(), 1.0, base)
                 };
                 let duration = clips.get(handle).map_or(1.0, AnimationClip::duration);
+                // A hero's full-body one-shots also get an upper-body copy (`<clip>@upper`): a
+                // move cut short by a dash finishes its payoff on the arms while the legs dash.
+                if *kind == ModelKind::Character && !m.upper && !m.looping {
+                    let node = graph.add_clip_with_mask(handle.clone(), 1 << LOWER_BODY_GROUP, 1.0, graph.root);
+                    let meta = ClipMeta { upper: true, ..m.clone() };
+                    lib.insert(format!("{short}@upper"), AnimClip { node, duration, meta });
+                    layered = true;
+                }
                 lib.insert(short, AnimClip { node, duration, meta: m });
             }
             ClipLib { graph: graphs.add(graph), clips: lib, layered }
