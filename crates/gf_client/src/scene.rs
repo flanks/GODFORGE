@@ -38,6 +38,9 @@ const XRAY_TOWARD_LENS: f32 = 1.25;
 /// Hit flash length and the shortest time between two flashes of one body.
 const FLASH_TIME: f32 = 0.07;
 const FLASH_COOLDOWN: f32 = 0.2;
+/// A big body changes status tint at most this often (s): a boss under burn, shock and a stun
+/// must not strobe through its colours.
+const BIG_TINT_HOLD: f32 = 0.5;
 /// POI beacon shaft height: tall enough that, seen by the fixed 55° camera, a shaft standing up
 /// to ~28 u beyond the bottom edge of the view still reaches into it.
 const BEACON_H: f32 = 40.0;
@@ -103,6 +106,9 @@ pub struct Visual {
     /// incomplete objective), bright beacon (a live one). Enemies: [_, elite ring, contact shadow, _, _].
     parts: [Option<Entity>; 5],
     tint: Tint,
+    /// When the tint last changed (s of age): a big body's status tints change at most every
+    /// [`BIG_TINT_HOLD`] s.
+    tint_at: f32,
     base_mat: Option<Handle<ToonMaterial>>,
     /// Seconds since this proxy appeared.
     pub age: f32,
@@ -130,6 +136,14 @@ pub struct Visual {
 }
 
 impl Visual {
+    /// A boss, an elite or a body over 1 m of radius: softer flashes, a narrow rim, statuses on
+    /// the rim only.
+    pub fn big(&self) -> bool {
+        self.flags.intersects(EntityFlags::BOSS | EntityFlags::ELITE) || self.radius > 1.0
+    }
+}
+
+impl Visual {
     fn new(e: &EntityView, color: Color, radius: f32, lift: f32) -> Self {
         let pos = e.pos.to_vec2();
         let mut v = Visual {
@@ -151,6 +165,7 @@ impl Visual {
             body: None,
             parts: [None; 5],
             tint: Tint::Base,
+            tint_at: 0.0,
             base_mat: None,
             age: 0.0,
             shown_facing: 0.0,
@@ -279,6 +294,8 @@ pub struct Corpse {
     pub depth: f32,
     /// Swarms fade to ash in their clip: the contact shadow goes with them.
     pub swarm: bool,
+    /// Painted with the big-body skin.
+    big: bool,
     shadow: Option<Entity>,
     /// The model, and whether the killing blow's flash has been taken off it yet.
     model: Option<Entity>,
@@ -290,6 +307,41 @@ pub struct Corpse {
 const CORPSE_SINK: f32 = 0.9;
 /// A corpse whose animation never started goes after this long (s).
 const CORPSE_MAX: f32 = 6.0;
+
+/// The solid footprint of every anvil on the field (centre, half extents on the sim plane),
+/// refreshed each frame. The sim lets bodies walk through an anvil; the client stands a hero at its
+/// edge to forge and keeps the horde's bodies out of the iron (presentation only).
+#[derive(Resource, Default)]
+pub struct AnvilBlocks(pub Vec<(Vec2, Vec2)>);
+
+impl AnvilBlocks {
+    /// `p` pushed out of every footprint grown by `pad`, through its nearest side.
+    pub fn push_out(&self, p: Vec2, pad: f32) -> Vec2 {
+        let mut p = p;
+        for (c, half) in &self.0 {
+            let d = p - *c;
+            let (hx, hy) = (half.x + pad, half.y + pad);
+            if d.x.abs() >= hx || d.y.abs() >= hy {
+                continue;
+            }
+            if hx - d.x.abs() < hy - d.y.abs() {
+                p.x = c.x + hx * if d.x < 0.0 { -1.0 } else { 1.0 };
+            } else {
+                p.y = c.y + hy * if d.y < 0.0 { -1.0 } else { 1.0 };
+            }
+        }
+        p
+    }
+
+    /// The centre of the nearest anvil within `reach` of `p`.
+    pub fn nearest(&self, p: Vec2, reach: f32) -> Option<Vec2> {
+        self.0
+            .iter()
+            .map(|(c, _)| *c)
+            .filter(|c| c.distance(p) < reach)
+            .min_by(|a, b| a.distance_squared(p).total_cmp(&b.distance_squared(p)))
+    }
+}
 
 /// Recently slain enemies (a kill and its removal may arrive a snapshot apart).
 #[derive(Resource, Default)]
@@ -308,6 +360,7 @@ fn setup_xray(mut commands: Commands, pal: Res<Palette>, mut xrays: ResMut<Asset
 pub fn build(app: &mut App) {
     app.init_resource::<SceneIndex>()
         .init_resource::<RecentKills>()
+        .init_resource::<AnvilBlocks>()
         .add_systems(Startup, (spawn_markers, setup_xray))
         .add_systems(
             Update,
@@ -539,6 +592,7 @@ fn sync_entities(
                 hold: f32::INFINITY,
                 depth: v.radius * 2.0 + 0.5,
                 swarm: v.radius < 0.8,
+                big: v.big(),
                 shadow: v.parts[2],
                 model: v.model,
                 hot: v.hot,
@@ -640,7 +694,7 @@ fn sync_enemy_models(
                         rotation: Quat::from_rotation_y(std::f32::consts::PI),
                         scale: Vec3::splat(s),
                     };
-                    let e = models::spawn_model(&mut commands, ent, &model, Skin::FOE, tf);
+                    let e = models::spawn_model(&mut commands, ent, &model, Skin::foe(v.big()), tf);
                     // A summoned add pops from its ember (`spawn`) when there is one.
                     let fresh = v.age < 0.35;
                     commands.entity(e).insert(EnemyAnim::new(ent, v.id, d, db, fresh));
@@ -688,7 +742,7 @@ fn tick_corpses(
         if !c.dressed && c.age >= FLASH_TIME {
             c.dressed = true;
             if let Some(mut parts) = c.model.and_then(|m| models.get_mut(m).ok()) {
-                let skin = Skin::Foe { tint: FoeTint::Base, hot: c.hot };
+                let skin = Skin::Foe { tint: FoeTint::Base, hot: c.hot, big: c.big };
                 models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
             }
         }
@@ -1546,6 +1600,7 @@ fn animate_entities(
     time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
+    blocks: Res<AnvilBlocks>,
     mut q: Query<(&mut Visual, &mut Transform)>,
     mut parts: Query<&mut Transform, Without<Visual>>,
 ) {
@@ -1583,7 +1638,13 @@ fn animate_entities(
                 // A horde spawn rises out of the ground.
                 v.rise = (v.rise - dt / emerge).max(0.0);
                 let sunk = v.rise * v.rise * (v.radius * 2.5 + 0.4);
-                tf.translation = w3(v.shown, v.lift + bob - sunk);
+                // Small bodies are shouldered out of an anvil's iron (the sim walks them through it).
+                let at = if v.radius < 1.2 && !blocks.0.is_empty() {
+                    blocks.push_out(v.shown, v.radius * 0.8)
+                } else {
+                    v.shown
+                };
+                tf.translation = w3(at, v.lift + bob - sunk);
                 // Turn toward the facing instead of snapping (Swarmer jitter, quantized angles).
                 let want = v.face_override.unwrap_or(v.facing);
                 let k = if v.radius > 1.5 {
@@ -1706,8 +1767,10 @@ fn tint_entities(
         if !matches!(v.kind, EntityKind::Enemy { .. }) {
             continue;
         }
-        let big = v.flags.intersects(EntityFlags::BOSS | EntityFlags::ELITE) || v.radius > 1.0;
-        let tint = if v.flash > 0.0 {
+        let big = v.big();
+        // The flash and the wind-up blink outrank a status; a big body only swaps statuses every
+        // `BIG_TINT_HOLD` s (its status reads on the rim and in motes, not as a repaint).
+        let mut tint = if v.flash > 0.0 {
             if big { Tint::SoftFlash } else { Tint::Flash }
         } else if blink && v.flags.intersects(EntityFlags::WINDUP | EntityFlags::PRIMED | EntityFlags::CHARGING) {
             Tint::Warn
@@ -1720,6 +1783,13 @@ fn tint_entities(
         } else {
             Tint::Base
         };
+        let status = |t: Tint| matches!(t, Tint::Frozen | Tint::Stunned | Tint::Status(_) | Tint::Base);
+        if big && tint != v.tint && status(tint) && status(v.tint) && v.age - v.tint_at < BIG_TINT_HOLD {
+            tint = v.tint;
+        }
+        if tint != v.tint {
+            v.tint_at = v.age;
+        }
         // An authored model swaps between a few cached tints of its own painted material.
         if v.model_shown {
             let foe = match tint {
@@ -1732,7 +1802,7 @@ fn tint_entities(
                 Tint::Status(b) => FoeTint::Status(b),
             };
             if let Some(mut parts) = v.model.and_then(|m| models.get_mut(m).ok()) {
-                let skin = Skin::Foe { tint: foe, hot: v.hot };
+                let skin = Skin::Foe { tint: foe, hot: v.hot, big };
                 models::reskin(&mut commands, &mut parts, skin, &mut skins, &stds, &mut toons, &pal);
             }
             v.tint = tint;
@@ -1768,11 +1838,13 @@ fn animate_anvils(
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     room: Res<CurrentRoom>,
+    mut blocks: ResMut<AnvilBlocks>,
     q: Query<&Visual>,
     mut parts: Query<(&mut Transform, &mut Visibility), Without<Visual>>,
 ) {
     let t = time.elapsed_secs();
     let me = link.me().map(|p| p.mover.pos);
+    blocks.0.clear();
     // A shaft is translucent and drawn after the bodies: a hero standing behind it (up the screen
     // from its foot, in its column) would show through a pillar of light. The shaft goes while one
     // does.
@@ -1792,6 +1864,8 @@ fn animate_anvils(
         let here = me.is_some_and(|m| m.distance(v.pos) < v.radius + 7.0) || covers;
         let (ring_on, fill_on, glow_on, dim_on, bright_on) = match v.kind {
             EntityKind::Anvil => {
+                // The legacy room anvil: the iron and its horn (see `spawn_anvil`).
+                blocks.0.push((v.pos, Vec2::new(0.95, 0.6)));
                 let s = AnvilState::from_u8(v.status);
                 (s != AnvilState::Spent, s == AnvilState::Kindling, s == AnvilState::Hot, false, false)
             }
@@ -1799,6 +1873,10 @@ fn animate_anvils(
                 let s = PoiState::from_u8(v.status);
                 let site = room.def.map.as_ref().and_then(|m| m.pois.get(index as usize));
                 let anvil = site.map(|p| p.kind) == Some(PoiKind::Anvil);
+                if anvil {
+                    // A map anvil stands on a stepped plinth (4.4 × 3.4 m).
+                    blocks.0.push((v.pos, Vec2::new(2.2, 1.7)));
+                }
                 let live = matches!(s, PoiState::Hot | PoiState::Open | PoiState::Gathering)
                     || (!anvil && s == PoiState::Active);
                 let objective = site.is_some_and(|p| p.seals > 0 || p.kind == PoiKind::Gate);

@@ -115,7 +115,10 @@ fn band(v: f32, steps: f32) -> f32 {
     return (floor(s) + smoothstep(0.3, 0.7, fract(s))) / steps;
 }
 
-fn magma(w: vec2<f32>, d: f32, t: f32, near: f32, bank: f32) -> vec3<f32> {
+/// `map` is 1 under a biome map (the platform box is map-sized): the sea there is seen through
+/// bays and chasms right beside the play space, so it keeps to the bottom of the value ladder,
+/// mostly dark cooled crust with thin, dim channels (the cliffs' own heat marks the edge).
+fn magma(w: vec2<f32>, d: f32, t: f32, near: f32, bank: f32, map: f32) -> vec3<f32> {
     let sc = ab.flow.y;
     let q = w * sc + ab.shape.w * 0.37;
     // Domain warp: the whole sea creeps and folds.
@@ -124,7 +127,7 @@ fn magma(w: vec2<f32>, d: f32, t: f32, near: f32, bank: f32) -> vec3<f32> {
     // Liquid channels between cooled crust islands; the lava licks right up to the cliff feet.
     let m = fbm(p * 0.55 + vec2(t * 0.01, 0.0));
     // `mid.a` raises the molten share (surface rivers); banks run hotter still.
-    let level = 0.36 + 0.06 * near + 0.22 * exp(-d / 0.6) + ab.mid.a + 0.2 * bank;
+    let level = 0.36 + 0.06 * near + 0.22 * exp(-d / 0.6) * (1.0 - map) + ab.mid.a + 0.2 * bank - 0.1 * map;
     let liquid = 1.0 - smoothstep(level - 0.015, level + 0.015, m);
     // The hottest line is where the crust meets the liquid.
     let rim = 1.0 - smoothstep(0.0, 0.028, abs(m - level - 0.02));
@@ -133,13 +136,13 @@ fn magma(w: vec2<f32>, d: f32, t: f32, near: f32, bank: f32) -> vec3<f32> {
     let crack = 1.0 - smoothstep(0.012, 0.05, c.d2 - c.d1);
     let brush = fbm(vec2(p.x * 2.2, p.y * 0.7) + 11.0);
     let interior = smoothstep(level, level + 0.16, m);
-    var crust = mix(ab.deep.rgb, ab.mid.rgb, band(0.25 + 0.75 * brush, 3.0));
+    var crust = mix(ab.deep.rgb, ab.mid.rgb, band(0.25 + 0.75 * brush, 3.0) * (1.0 - 0.4 * map));
     crust *= 1.0 - 0.5 * interior;
     // Liquid: slow streaks drawn along the flow.
     let streak = fbm(vec2(p.x * 1.4 - t * 0.05, p.y * 4.2));
     let pulse = 0.82 + 0.18 * sin(t * 0.8 + m * 20.0);
     // Far from the cliffs the channels cool and dim; the heat lives at the cliff feet.
-    let heat = 0.45 + 0.55 * near;
+    let heat = (0.45 + 0.55 * near) * (1.0 - 0.45 * map);
     let lava = ab.glow.rgb * ab.glow.a * (0.3 + 0.4 * streak) * pulse * heat;
     var col = mix(crust, lava, liquid);
     col += ab.glow.rgb * ab.glow.a * crack * (1.0 - liquid) * (0.06 + 0.22 * (1.0 - interior)) * pulse * heat;
@@ -247,7 +250,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
         @if(VERTEX_COLORS) {
             bank = in.color.r;
         }
-        col = magma(w, d, t, near, bank);
+        col = magma(w, d, t, near, bank, select(0.0, 1.0, ab.shape.x > 120.0));
     }
 
     // Haze bank at the cliffs: brushy, drifting.

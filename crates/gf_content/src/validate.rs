@@ -665,6 +665,9 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
         if t.districts.iter().any(|(_, w)| !finite_positive(*w)) {
             err(format!("theme `{}`: district weights must be positive", t.key));
         }
+        if t.marks.iter().any(|(_, w)| !finite_positive(*w)) || !(0.0..=1.0).contains(&t.ground.glass) {
+            err(format!("theme `{}`: mark weights must be positive and ground.glass within 0..=1", t.key));
+        }
         if !(0.0..=1.0).contains(&t.fields) || !(0.0..=0.08).contains(&t.cover) {
             err(format!("theme `{}`: fields must be within 0..=1 and cover within 0..=0.08", t.key));
         }
@@ -777,6 +780,16 @@ fn validate_expedition(r: &mut Report, db: &ContentDb, room: &RoomDef, x: &Exped
     }
     if !(8.0..=34.0).contains(&k.light_box.0) || !(8.0..=21.0).contains(&k.light_box.1) {
         err("compose: light_box must be 8..=34 × 8..=21 u (a 45 × 28 u screen holds a whole box)".into());
+    }
+    if k.mark_spacing < 0.0 || !(k.mark_size.0 > 0.0 && k.mark_size.0 <= k.mark_size.1 && k.mark_size.1 <= 8.0) {
+        err("compose: mark_spacing ≥ 0 and 0 < mark_size.0 ≤ mark_size.1 ≤ 8 (paint slots per chunk)".into());
+    }
+    if !(0.0..=1.0).contains(&k.seam)
+        || !(k.seam_run.0 > 0.0 && k.seam_run.0 <= k.seam_run.1)
+        || k.seam_gap < 0.0
+        || k.seam_pass_clear < 0.0
+    {
+        err("compose: seam within 0..=1, 0 < seam_run.0 ≤ seam_run.1, seam_gap and seam_pass_clear ≥ 0".into());
     }
     if !finite_positive(x.gate_force_minute) || !finite_positive(x.boss_hp_mult) || x.threat_start_minute < 0.0 {
         err("gate_force_minute and boss_hp_mult must be positive, threat_start_minute ≥ 0".into());

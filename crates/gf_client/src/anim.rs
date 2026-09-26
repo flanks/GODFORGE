@@ -20,7 +20,7 @@ use crate::input::InputState;
 use crate::models::{HeroGear, Model, ModelParts};
 use crate::net::{Link, Prediction};
 use crate::palette::yaw;
-use crate::scene::{Corpse, SceneIndex, Visual};
+use crate::scene::{AnvilBlocks, Corpse, SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
 use gf_content::EnemyClass;
 use gf_core::aim::AimMode;
@@ -200,6 +200,12 @@ impl Animator {
 
     /// Play an upper-layer one-shot over the base (restarting it if it already plays).
     pub fn play_upper(&mut self, player: &mut AnimationPlayer, name: &str, speed: f32) -> bool {
+        self.play_upper_at(player, name, speed, 0.0)
+    }
+
+    /// [`Animator::play_upper`] from `seek` s into the clip (a full-body move finishing on the
+    /// upper body once the legs are taken: its `<clip>@upper` copy).
+    pub fn play_upper_at(&mut self, player: &mut AnimationPlayer, name: &str, speed: f32, seek: f32) -> bool {
         let Some(clip) = self.model.clip(name) else { return false };
         if !clip.meta.upper {
             return false;
@@ -226,6 +232,9 @@ impl Animator {
             a.repeat();
         } else {
             a.set_repeat(RepeatAnimation::Never);
+        }
+        if seek > 0.0 {
+            a.set_seek_time(seek);
         }
         true
     }
@@ -366,6 +375,9 @@ struct OneShot {
     /// Moving after this long (s) hands the body back to locomotion (the sim never roots a cast,
     /// so a long clip would otherwise slide).
     cancel_after: Option<f32>,
+    /// Cut short by a dash or by moving on, the move finishes on the upper body (its
+    /// `<clip>@upper` copy) so its payoff (the uppercut's slam, the ultimate's clash) still lands.
+    tail: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -516,6 +528,13 @@ pub struct HeroAnim {
     avatar: bool,
     next_pound: f32,
     victory: bool,
+    /// Melee: the next strike of the predicted swing cadence, and until when it runs.
+    swing_next: f32,
+    swing_until: f32,
+    /// Seconds the hero has stood still with the forge open (the hammer waits for 0.3 s).
+    forge_hold: f32,
+    /// Where the model stands off the sim position (sim metres): out of an anvil's iron.
+    offset: Vec2,
     /// Last logged base clip (the `--anim-log` clip-state log).
     logged: String,
 }
@@ -543,6 +562,10 @@ impl HeroAnim {
             avatar: false,
             next_pound: f32::INFINITY,
             victory: false,
+            swing_next: 0.0,
+            swing_until: 0.0,
+            forge_hold: 0.0,
+            offset: Vec2::ZERO,
             logged: String::new(),
         }
     }
@@ -589,6 +612,16 @@ fn shot(an: &Animator, clip: &'static str) -> OneShot {
         face_travel: false,
         speed: 1.0,
         cancel_after: Some(0.25),
+        tail: false,
+    }
+}
+
+/// A cut one-shot finishes on the upper body from where it was (see [`OneShot::tail`]).
+fn finish_on_upper(an: &mut Animator, ap: &mut AnimationPlayer, s: &OneShot, t: f32, log: bool, ha: &HeroAnim) {
+    let at = s.seek + t * s.speed;
+    let name = format!("{}@upper", s.clip);
+    if s.tail && at < clip_len(an, s.clip) - 0.1 && an.play_upper_at(ap, &name, s.speed, at) {
+        ha.log_event(log, &name);
     }
 }
 
@@ -623,7 +656,7 @@ fn gallery_step(
     from: usize,
 ) {
     let Some(lib) = an.model.anim.as_ref() else { return };
-    let mut names: Vec<String> = lib.clips.keys().cloned().collect();
+    let mut names: Vec<String> = lib.clips.keys().filter(|n| !n.contains('@')).cloned().collect();
     names.sort();
     // Then the layering: upper-body clips over locomotion (`base+upper`).
     for (base, upper) in GALLERY_LAYERED {
@@ -674,6 +707,7 @@ fn drive_heroes(
     input: Res<InputState>,
     log: Res<AnimLog>,
     gallery: Res<AnimGallery>,
+    blocks: Res<AnvilBlocks>,
     visuals: Query<&Visual>,
     mut heroes: Query<(&mut HeroAnim, &ModelParts, &mut HeroGear, &mut Transform)>,
     mut animators: Query<(&mut Animator, &mut AnimationPlayer)>,
@@ -780,6 +814,7 @@ fn drive_heroes(
                                 exclusive: true,
                                 face: Some(aim),
                                 cancel_after: Some(cancel),
+                                tail: true,
                                 ..shot(an, clip)
                             };
                             an.clear_upper();
@@ -806,11 +841,40 @@ fn drive_heroes(
                 _ => {}
             }
         }
-        // Melee strikes carry no Shot event: a snapshot with the swing flag set is one strike.
-        if fire == FireKind::Melee && p.firing && world.tick != ha.last_tick {
-            ha.last_combat = now;
-            if alive && !ha.exclusive() {
-                fire_clip(ha, an, ap, p, fire, fire_rate, now, log.0);
+        // Melee strikes carry no Shot event, and the swing flag is up for a single sim tick
+        // (snapshots miss most of them). The client keeps the weapon's cadence while the hero is
+        // swinging: a caught flag, a hit of its own or a foe in its reach keeps it going, and the
+        // evidence re-phases it.
+        if fire == FireKind::Melee {
+            let interval = 1.0 / fire_rate.max(0.5);
+            let flagged = p.firing && world.tick != ha.last_tick;
+            let landed =
+                link.fresh_events.iter().any(|e| matches!(*e, GameEvent::Hit { source, .. } if source == ha.slot));
+            let reach = chassis.map_or(2.5, |c| c.stats.range) + 0.4;
+            let ahead = Vec2::from_angle(aim);
+            let in_reach = alive
+                && visuals.iter().any(|v| {
+                    if !matches!(v.kind, EntityKind::Enemy { .. }) {
+                        return false;
+                    }
+                    let d = v.shown - p.mover.pos;
+                    let r = d.length();
+                    r < reach + v.radius && (r < 0.5 + v.radius || d.dot(ahead) > 0.5 * r)
+                });
+            if flagged || landed || in_reach {
+                ha.swing_until = now + interval * 1.25;
+            }
+            let due = if flagged || landed {
+                now >= ha.swing_next - interval * 0.5
+            } else {
+                now < ha.swing_until && now >= ha.swing_next
+            };
+            if due {
+                ha.swing_next = now + interval;
+                ha.last_combat = now;
+                if alive && !ha.exclusive() {
+                    fire_clip(ha, an, ap, p, fire, fire_rate, now, log.0);
+                }
             }
         }
         ha.last_tick = world.tick;
@@ -844,7 +908,16 @@ fn drive_heroes(
             ha.next_pound = f32::INFINITY;
             if avatar && alive {
                 if let Some([start, _]) = ha.kit.avatar {
-                    let s = OneShot { exclusive: true, cancel_after: Some(0.5), ..shot(an, start) };
+                    // Held through its payoff (Meltdown's clash, Mountainfall's stomp), then
+                    // finished on the upper body if the hero moves on.
+                    let payoff =
+                        an.model.clip(start).and_then(|c| c.meta.events.iter().map(|(_, t)| *t).reduce(f32::max));
+                    let s = OneShot {
+                        exclusive: true,
+                        cancel_after: Some(payoff.map_or(0.9, |t| t + 0.05)),
+                        tail: true,
+                        ..shot(an, start)
+                    };
                     an.clear_upper();
                     ha.interrupt(an, s);
                 }
@@ -877,7 +950,9 @@ fn drive_heroes(
         if dashing && !ha.dashing {
             an.clear_upper();
             ha.queue.clear();
-            ha.current = None;
+            if let Some((s, start)) = ha.current.take() {
+                finish_on_upper(an, ap, &s, now - start, log.0, ha);
+            }
             ha.dashing = an.set_base(ap, "dash", 1.0, 0.05, true);
         } else if !dashing && ha.dashing {
             ha.dashing = false;
@@ -894,6 +969,10 @@ fn drive_heroes(
             let moved = s.cancel_after.is_some_and(|c| t >= c && speed > STAND_SPEED * 2.0);
             let over = s.hold && ((s.clip == "victory" && !victory) || (s.clip == "death" && life != Life::Downed));
             if (done && !s.hold) || moved || over {
+                if moved && !done {
+                    let s = s.clone();
+                    finish_on_upper(an, ap, &s, t, log.0, ha);
+                }
                 ha.current = None;
             }
         }
@@ -906,6 +985,9 @@ fn drive_heroes(
 
         // ── base ──
         let moving = speed > if ha.gait.is_some() { STAND_SPEED * 0.6 } else { STAND_SPEED };
+        // The forge: standing still at an anvil with its window open for a moment.
+        let anvil = blocks.nearest(p.mover.pos, 6.0);
+        ha.forge_hold = if p.forge_open && anvil.is_some() && speed < 0.6 { ha.forge_hold + dt } else { 0.0 };
         let mut facing = aim;
         let mut idle = false;
         let (clip, rate): (&str, f32) = if ha.dashing {
@@ -927,7 +1009,12 @@ fn drive_heroes(
             ("downed", 1.0)
         } else if let Some([_, hold, _, _]) = ha.kit.stance.filter(|_| stance) {
             (hold, 1.0)
-        } else if p.forge_open && !moving && an.has("forge_hammer") {
+        } else if ha.forge_hold > 0.3 && an.has("forge_hammer") {
+            // Hammering the anvil it stands at (the model stands at the iron's edge, below).
+            if let Some(c) = anvil {
+                let d = c - (p.mover.pos + ha.offset);
+                facing = d.y.atan2(d.x);
+            }
             ("forge_hammer", 1.0)
         } else if moving {
             let rel = wrap(heading - ha.facing.unwrap_or(aim));
@@ -993,6 +1080,12 @@ fn drive_heroes(
         let k = if ha.dashing { 30.0 } else { 14.0 };
         *f = wrap(*f + wrap(facing - *f) * (1.0 - (-k * dt).exp()));
         tf.rotation = yaw(*f) * Quat::from_rotation_y(PI);
+
+        // ── standing room: the sim walks heroes into an anvil's iron; the model stands at its edge ──
+        let want = blocks.push_out(p.mover.pos, p.radius.max(0.35)) - p.mover.pos;
+        ha.offset += (want - ha.offset) * (1.0 - (-12.0 * dt).exp());
+        let scale = p.scale.max(0.2);
+        tf.translation = Vec3::new(ha.offset.x / scale, 0.0, -ha.offset.y / scale);
 
         // ── gauntlet variants ──
         if let Some(open) = an.hands_open(ap)

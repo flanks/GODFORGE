@@ -3749,18 +3749,20 @@ fn scenery(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, kind: SceneryKin
     let base = w3(at, 0.0);
     match kind {
         SceneryKind::Lip => {
-            let chunk = mix(c.rock, c.dark, 0.3);
+            // Darker than the floor it frames (the play space owns the value), never grey dice.
+            let chunk = mix(c.rock, c.dark, 0.5);
             if c.abyss == AbyssKind::Chaos {
                 // A shard of the unmade floor, leaning out over the drop.
                 let lean = yaw * Quat::from_rotation_x(v.r(0.3, 0.7));
                 env.crystal_spike(base - Vec3::Y * 0.4, lean, r * 0.45, h, r * 0.4, 5, {
                     Paint::new(Key::Stone, vary(c.stone, v.f(), 0.1)).ink(INK_S)
                 });
-            } else if variant % 4 == 2 {
-                // A toppled block of masonry, half over the edge.
+            } else if variant % 4 == 2 && c.abyss != AbyssKind::Magma {
+                // A toppled block of masonry, half over the edge (the magma shores keep to slag
+                // and basalt: a row of cut blocks read as dice).
                 let tilt = yaw * Quat::from_rotation_z(v.r(0.15, 0.45)) * Quat::from_rotation_x(v.r(-0.25, 0.25));
                 let half = Vec3::new(r * 0.85, (h * 0.42).max(0.28), r * 0.55);
-                let stone = mix(c.stone, c.dark, 0.45);
+                let stone = mix(c.stone, c.dark, 0.6);
                 env.block(base + Vec3::Y * (half.y * 0.55 - 0.3), tilt, half, 0.06, {
                     Paint::new(Key::Stone, vary(stone, v.f(), 0.08)).ink(INK_S)
                 });
@@ -3846,6 +3848,79 @@ fn scenery(env: &mut Env, c: &Colors, at: Vec2, r: f32, h: f32, kind: SceneryKin
                         let p0 = base + Vec3::Y * (FRAME_FOOT + seg * 0.6) + side * r * 0.95;
                         let p1 = base + Vec3::Y * (FRAME_FOOT + seg * 1.8) + side * r * 0.8 + lean * 0.2;
                         env.tube(&[p0, p1], &[0.09, 0.03], 4, Paint::new(Key::Glow, hdr(c.molten, 0.55)));
+                    }
+                }
+            }
+        }
+        SceneryKind::Seam => {
+            // A low course along an open region border, never above the knee: the edge of a
+            // place drawn in mass, walkable over. Its long side runs along `facing`.
+            let along = Quat::from_rotation_y(facing.y.atan2(facing.x) + v.r(-0.15, 0.15));
+            let masonry = mix(c.stone, c.dark, 0.3);
+            let second = variant >= 4;
+            match variant % 4 {
+                2 => {
+                    // A slag berm: a long low mound of dark clinker, now and then an ember seam.
+                    let n = if second { 2 } else { 1 };
+                    for k in 0..n {
+                        let off = if n == 2 { (k as f32 - 0.5) * r * 0.9 } else { 0.0 };
+                        let at = base + along * Vec3::new(off, 0.0, v.r(-0.2, 0.2));
+                        let rr = Vec3::new(r * if n == 2 { 0.6 } else { 1.0 }, h * 0.75, r * 0.42);
+                        let col = vary(mix(c.rock, c.dark, 0.25), v.f(), 0.1);
+                        env.rock_coarse(at + Vec3::Y * (rr.y * 0.35 - 0.12), along, rr, v.seed + k, 0.45, {
+                            Paint::new(Key::Rock, col).ink(INK_S)
+                        });
+                    }
+                    if c.abyss == AbyssKind::Magma && v.f() < 0.3 {
+                        let d = along * Vec3::X;
+                        let p0 = base + d * v.r(-r * 0.5, r * 0.5) + Vec3::Y * (h * 0.45);
+                        env.tube(&[p0 - d * 0.35, p0 + d * 0.35], &[0.04, 0.02], 4, {
+                            Paint::new(Key::Glow, hdr(c.molten, 0.45))
+                        });
+                    }
+                }
+                3 => {
+                    // A scrap heap: a clinker mound with iron bars and a grate lying across it.
+                    let rr = Vec3::new(r * 0.7, h * 0.55, r * 0.5);
+                    env.rock_coarse(base + Vec3::Y * (rr.y * 0.3 - 0.1), along, rr, v.seed, 0.45, {
+                        Paint::new(Key::Rock, vary(mix(c.rock, c.dark, 0.25), v.f(), 0.1)).ink(INK_S)
+                    });
+                    let bars = if second { 2 } else { 3 };
+                    for k in 0..bars {
+                        let spin =
+                            along * Quat::from_rotation_y(v.r(-0.5, 0.5)) * Quat::from_rotation_z(v.r(-0.25, 0.25));
+                        let at = base
+                            + along * Vec3::new(v.r(-r * 0.6, r * 0.6), h * 0.35 + k as f32 * 0.06, v.r(-0.4, 0.4));
+                        env.block(at, spin, Vec3::new(r * v.r(0.5, 0.8), 0.05, 0.06), 0.0, {
+                            Paint::new(Key::Metal, vary(c.iron, v.f(), 0.12)).ink(INK_S)
+                        });
+                    }
+                    if second {
+                        let tilt = along * Quat::from_rotation_x(v.r(0.2, 0.45));
+                        let at = base + along * Vec3::new(v.r(-0.3, 0.3), h * 0.3, r * 0.3);
+                        env.block(at, tilt, Vec3::new(r * 0.45, 0.04, r * 0.3), 0.0, {
+                            Paint::new(Key::Metal, lighten(c.iron, 0.8)).ink(INK_S)
+                        });
+                    }
+                }
+                _ => {
+                    // A ruined wall course: its lowest blocks still in line, the top broken, a
+                    // block or two tumbled off it (the second form is tumbled more).
+                    let lean = if second { v.r(0.08, 0.2) } else { v.r(-0.05, 0.05) };
+                    let tilt = along * Quat::from_rotation_x(lean);
+                    let half = Vec3::new(r * 0.9, h * 0.5, v.r(0.36, 0.46));
+                    let mark = env.mark();
+                    env.block(base + Vec3::Y * (half.y - 0.08), tilt, half, 0.05, {
+                        Paint::new(Key::Stone, vary(masonry, v.f(), 0.08)).ink(INK_S)
+                    });
+                    jag_top(env, mark, h - 0.08 + 0.0, (h * 0.35).min(0.3), v.seed);
+                    for k in 0..(1 + v.i(2)) {
+                        let s = v.r(0.18, 0.3);
+                        let off = along * Vec3::new(v.r(-r, r), 0.0, v.sign() * v.r(0.6, 1.0));
+                        let spin = Quat::from_rotation_y(v.r(0.0, TAU)) * Quat::from_rotation_x(v.r(-0.4, 0.4));
+                        env.block(base + off + Vec3::Y * (s * 0.4), spin, Vec3::new(s * 1.4, s * 0.8, s), 0.03, {
+                            Paint::new(Key::Stone, vary(masonry, v.f() + k as f32 * 0.1, 0.1)).ink(INK_S)
+                        });
                     }
                 }
             }

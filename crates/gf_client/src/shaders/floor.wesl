@@ -634,8 +634,14 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let pebble_r = 0.1 + 0.2 * hash21(pebble.id + 5.0);
     // Stones gather in drifts (under walls, around rubble, along the shoulders) instead of an even
     // polka-dot scatter.
-    let drift = max(smoothstep(0.5, 0.72, fbm(w * 0.12 + seed * 1.1 + vec2(2.0, 7.0)) + shoulder * 0.25), skirt);
-    let is_pebble = step(mix(0.84, 0.7, skirt), pick) * select(1.0, drift, map_mode);
+    // Maps: scree also gathers where the ground falls away (the cliff lip) and along the seams of
+    // open region borders (both lower the vertex alpha).
+    var edge_scree = 0.0;
+    @if(VERTEX_COLORS) {
+        edge_scree = select(0.0, 1.0 - smoothstep(0.45, 0.85, in.color.a), map_mode);
+    }
+    let drift = max(max(smoothstep(0.5, 0.72, fbm(w * 0.12 + seed * 1.1 + vec2(2.0, 7.0)) + shoulder * 0.25), skirt), edge_scree);
+    let is_pebble = step(mix(0.84, 0.66, max(skirt, edge_scree)), pick) * select(1.0, drift, map_mode);
     let pebbles = (1.0 - smoothstep(pebble_r - 0.04, pebble_r, pebble.d1)) * is_pebble;
     let pebble_rim = (1.0 - smoothstep(pebble_r, pebble_r + 0.06, pebble.d1)) * is_pebble;
     ground = mix(ground, fp.mortar.rgb * 0.35, pebble_rim * select(0.8, 0.4, map_mode));
@@ -733,7 +739,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
                         let band = floor(ring_e * 2.6);
                         let shard = hash21(vec2(floor(k5), band) + c);
                         let across = min(s5, 1.0 - s5) * (TAU / 5.0) * length(l);
-                        let crack_w = 0.05 + 0.1 * (1.0 - e);
+                        let crack_w = 0.04 + 0.07 * (1.0 - e);
                         let spokes = (1.0 - smoothstep(crack_w, crack_w + 0.05, across)) * step(0.18, e)
                             * (1.0 - smoothstep(0.8, 1.0, e));
                         let ringf = fract(ring_e * 2.6);
@@ -741,7 +747,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
                             * step(ring_e, 0.95) * step(0.35, hash21(vec2(floor(k5 * 2.0), band) + c));
                         let inside = 1.0 - smoothstep(0.85, 1.05, e);
                         color *= 1.0 - inside * ((1.0 - smoothstep(0.1, 0.5, e)) * 0.35 + (shard - 0.5) * 0.3);
-                        color = mix(color, fp.mortar.rgb * 0.35, clamp(spokes + rings, 0.0, 1.0) * 0.8 * inside);
+                        color = mix(color, fp.mortar.rgb * 0.45, clamp(spokes + rings, 0.0, 1.0) * 0.6 * inside);
                         let sc = voronoi(w * 2.2 + c);
                         let chip = step(0.6, hash21(sc.id + c)) * (1.0 - smoothstep(0.2, 0.28, sc.d1))
                             * (1.0 - smoothstep(0.6, 1.1, e)) * step(0.15, e);
