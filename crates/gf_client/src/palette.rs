@@ -329,6 +329,18 @@ pub fn element_color(e: DamageType) -> Color {
     }
 }
 
+/// The tint of an enemy's status bit (burn, shock, void, plague, bleed, …).
+pub fn status_color(bit: u8) -> Color {
+    match bit {
+        0 => element_color(DamageType::Flame),
+        1 => element_color(DamageType::Storm),
+        2 => element_color(DamageType::Void),
+        3 => hex("#7BAE4A"),
+        4 => hex("#E0312B"),
+        _ => hex("#FFC940"),
+    }
+}
+
 /// The colour of a POI kind: beacons, markers, waymark pennants (a shrine takes its god's colour
 /// where the god is known, see `scene::poi_color`).
 pub fn poi_kind_color(kind: gf_core::poi::PoiKind) -> Color {

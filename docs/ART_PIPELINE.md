@@ -63,9 +63,10 @@ these violations:
 * **Keys.** A hero's asset key is its `CharacterDef.key` from `content/sheets/characters.csv`
   (`brax`). Chassis and enemies use `ChassisDef.key` and `EnemyDef.shape` in the same way.
 * **One file per hero.** Stage 5 writes `assets/models/characters/<key>.glb`
-  (`assets/models/{kind}/{key}.glb`). `gf_client::palette` gains a `Handle<Scene>` lookup by key
-  and **falls back to the greybox primitive when the file is missing**, so content can land before
-  art. The art track only produces files. It never edits `crates/`.
+  (`assets/models/{kind}/{key}.glb`). `gf_client::models` looks the file up by key and
+  **falls back to the greybox primitive when the file is missing** (or still loading, or under `--greybox`), so content
+  can land before art; docs/CLIENT_MODELS.md has how the client loads, paints, attaches and animates it. The art track
+  only produces files. It never edits `crates/`.
 * **Scale and framing.** 1 unit = 1 m. A hero stands 2.0 to 2.3 m tall (Brax: 2.2 m proposed),
   with the origin on the ground between the feet. glTF is Y-up and its assets face +Z; the client
   applies the facing when it wires the scene in. Heroes are seen from a fixed 55°

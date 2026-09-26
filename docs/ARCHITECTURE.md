@@ -142,9 +142,8 @@ Per-weapon quirks (beam sweep, charge-to-lock) are fields in the weapon profile.
 
 ## 7. Presentation language (§12)
 
-The greybox primitives are placeholders. Swapping in glTF scenes touches only
-`gf_client::palette` (the mesh/material cache) and the per-kind spawners in `scene.rs`. The
-colour and readability rules are final:
+Authored glTF models replace the greybox primitives wherever a file exists (§9). The primitives stay
+as the fallback. The colour and readability rules are final:
 
 * Element hues: Kinetic bone-brass, Flame orange, Storm cyan, Void violet, Plague green, Radiant gold.
 * Rarity: Common parchment → Rare blue → Epic violet → **Godforged gold**. Rare+ loot gets a light beam.
@@ -184,14 +183,43 @@ Mobile tiers reuse the same knobs with different values: a separate tuning pass,
 
 ## 9. Art pipeline hook (Blender 5.x → glTF)
 
-Asset keys already exist in content: `EnemyDef.shape`, `CharacterDef.skins`, `ChassisDef.key`.
-The production path is:
+The hook is live: Brax, Valdris, seven weapon chassis and the eleven Cinder Wastes enemies play as authored,
+animated GLBs. docs/CLIENT_MODELS.md has the details; the contracts are docs/art/GF_HERO_SKELETON.md,
+docs/art/WEAPONS.md and docs/art/ENEMIES.md.
 
-1. `blender -b -P tools/blender/export.py` (CI) exports `assets/models/{kind}/{key}.glb` (meshopt), with
-   animations named `{char}_{clip}@loop` on the master skeleton.
-2. `gf_client::palette` gains a `Handle<Scene>` lookup by key. When the file is missing it falls back to the
-   current greybox primitive, so content can land before art does.
-3. Weapon fire, recoil, aim offsets and hit flinches stay procedural in `scene.rs`, so they don't multiply authored clips.
+1. **Files.** The art track exports `assets/models/{characters,weapons,enemies}/<key>.glb` plus a
+   `<key>.meta.json` sidecar (clip loop / layer / design speed / event frames, sockets, variant sets,
+   `move_cycle_m`, boss phases). Keys are `CharacterDef.key`, `ChassisDef.key` and `EnemyDef.key`; clips are
+   `{char}_{clip}` (`@loop` for loops) on the master skeletons `GF_Hero_v1` and `GF_Swarm_v1` (elites and bosses
+   have their own rigs).
+2. **Asset root.** `gf_engine::client::find_asset_dir()` roots Bevy's asset server: `GODFORGE_ASSETS`, then
+   `./assets`, then `assets/` beside the exe or its parents, then the repo's `assets/` from compile time. A packaged
+   build ships `assets/` beside `godforge.exe`.
+3. **Lookup and fallback** (`gf_client::models`). `Models::get(kind, key)` reads the sidecar, starts the glTF
+   load and answers `None` until the file and its dependencies are in. The proxy keeps its greybox while a
+   file is missing, loading or failed, and always under `--greybox` / `GODFORGE_GREYBOX=1`. Once the model
+   is up, the greybox body hides. Gameplay reads stay: rings, chevrons, shields, auras, tethers, telegraphs,
+   name plates and x-ray. The sim never sees any of this.
+4. **Materials.** Every glTF material becomes a `ToonMaterial` (`toon_from_standard`), cached per (source
+   material, skin): `Hero(slot)` has the player-colour rim, `Ghost(slot)` is used while downed, `Gear(slot)` is
+   for weapons, and `Foe{tint, hot}` has the warm red rim. Hit flash, wind-up blink, frozen, stunned and status
+   tints are a few cached variants per enemy look, so a flashing horde still batches. Skinned meshes use the toon
+   shader's painted ink edge instead of the inverted hull.
+5. **Sockets.** The equipped chassis spawns as an identity child of the skeleton's `weapon_R` bone. A gauntlet
+   pair re-parents its offhand to `weapon_L`. A chassis without a model keeps the greybox gun. Shots flash at
+   the weapon's `muzzle` node.
+6. **Animation** (`gf_client::anim`). There is one `AnimationGraph` per asset: full-body clips form the base,
+   and upper-body clips sit beside it with everything below `spine_01` masked out, so a hero fires while
+   running.
+   * `HeroAnim` picks run, walk, strafe, backpedal or idle from the velocity versus the facing, at speed ÷
+     design speed. One-shots and kit clips come from `GameEvent`s. Stance and avatar loops follow the
+     `PlayerFlags`. Downed, revive, reforge_in, forge_hammer and victory follow the life and run state.
+   * `EnemyAnim` plays move or idle by speed, and windup / attack from WINDUP, PRIMED and CHARGING plus the
+     enemy's telegraphs. Hits flinch on throttled `Hit` events, spawn plays on EMERGING, and death plays on a
+     lingering corpse proxy. Boss phases follow the HP fraction, and boss attacks are matched from their
+     telegraphs.
+   * Off-screen swarm enemies stop evaluating their skeletons; `GODFORGE_ENEMY_LOD=0` turns this off.
+7. Recoil, aim offsets and the left hand's IK to `grip_L` stay procedural, and are still to do.
 
 ## 10. Testing
 
@@ -214,4 +242,5 @@ The production path is:
 * Meta hub (Altar of Ember, character trees), Echo drones and barks: fully authored and validated
   as data, but not yet wired into systems. Their P2 hooks are `gf_content::{AltarNode, TreeNode, EchoTuning, BarkDef}`.
 * Audio.
-* Authored glTF art (see §9).
+* Authored glTF art for Selene, Kael, Thessaly, the remaining chassis and the other biomes' enemies. These
+  keep the greybox until their files land (§9).

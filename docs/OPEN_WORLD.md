@@ -1,7 +1,7 @@
 # GODFORGE: Open Biomes (NIMRODS-style exploration)
 
-> **Status: decided, 2026-09-25. Phases 1 and 2 are done (2026-09-26). The composition pass
-> (§3.6) comes next, then phase 3.** This is the single design for replacing the Hades-style room
+> **Status: decided, 2026-09-25. Phases 1 and 2 are done (2026-09-26), and so is the composition
+> pass (§3.6, 2026-09-26) apart from its on-hold checks. Phase 3 comes next.** This is the single design for replacing the Hades-style room
 > run with one huge generated map per biome.
 > It merges two competing proposals (see §1) and is written against the code at `c0bddae` (the
 > room-scale layout grammar merge). Implementation agents execute it phase by phase (§10) without
@@ -39,11 +39,16 @@
 >   - 2A follow-up: river and chasm bands take one integer chamfer pass (45° reaches, not L
 >     shapes). The golden hash is `0xca3521382f4a6edd` (re-pinned for the new dressing streams
 >     and the chamfer).
-> * **Composition pass (specified 2026-09-26 in §3.6; next, before the phase 3 lanes):** the user
->   found the map cluttered with pillars and walls and pointed at Hades II. The density top-up
->   goes. Compositions back onto the coast and region borders, the shore gets a mostly visual
->   frame, open fields keep at most one kiting anchor, and floor detail becomes paint. The EA room
->   grammar follows the same rules. Targets are in §3.6.2 and acceptance in §3.6.12.
+> * **Composition pass (specified 2026-09-26 in §3.6; implemented 2026-09-26):** the user found the
+>   map cluttered with pillars and walls and pointed at Hades II. The density top-up is gone.
+>   Compositions back onto the coast and region borders, the shore has a mostly visual frame
+>   (`Decor::Scenery`), open fields keep at most one kiting anchor, and floor detail is paint. The EA
+>   room grammar follows the same rules. `layout-stats --maps --seeds 8` meets every §3.6.2 gate
+>   but one (the smallest region's clear disk is r 14.0 on map seed 3, against r 15): 371 shapes,
+>   2.1 % cover, 1.5 % interior cover, clusters per screen 2 / 5.4, median clearance 7.8 u, r 10
+>   share 88 %. Cinder's `seals_required` took retune rung 1 (7 → 8). **On hold** by the user's
+>   request while the pass landed: the tests, the golden-hash re-pin, clippy, the seed-7 bot run
+>   (§3.6.12 #4) and the frame-rate sweep (#5). They are the pass's open checks.
 
 ## 0. The decision in one page
 
@@ -143,16 +148,18 @@ hotspots, but its answers are too thin for AAA maps and split co-op:
 
 | Biome | Phase | Size (u) | Screens | Regions | Anvil / Warlord / Lair / Shrine / Reliquary / Vein | Spring / Watchfire | Seals avail / req | Gate force | Camps | Target (humans) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Cinder Wastes | P0/P1 | 432 × 272 | 9.6 × 9.7 | 5 × 3 | 3 / 1 / 2 / 3 / 2 / 2 | 3 / 4 | 14 / 7 | 12:00 | ~29 | 8–10 min + boss 2–3 |
+| Cinder Wastes | P0/P1 | 432 × 272 | 9.6 × 9.7 | 5 × 3 | 3 / 1 / 2 / 3 / 2 / 2 | 3 / 4 | 14 / 8 | 12:00 | ~29 | 8–10 min + boss 2–3 |
 | Verdant Ruin | EA | 448 × 280 | 10 × 10 | 5 × 3 | 3 / 1 / 3 / 3 / 2 / 2 | 3 / 4 | 15 / 7 | 13:00 | ~31 | 9–11 + 3 |
 | Hollow Spire | EA | 448 × 288 | 10 × 10.3 | 5 × 4 | 3 / 1 / 3 / 3 / 3 / 2 | 3 / 4 | 16 / 7 | 13:00 | ~32 | 9–11 + 3 |
 | The Unmaking | V1 | 480 × 304 | 10.7 × 10.9 | 6 × 4 | 4 / 1 / 3 / 3 / 3 / 3 | 3 / 4 | 18 / 8 | 14:00 | ~36 | 10–12 + 3–4 |
 
-* **Cinder's `seals_required` is 7**, raised from 6 by the phase-2 bot run: with 6 the seed-7 bot
-  cleared the map in 5.4 sim-min, under the 6–10 band of §11, because the Warlord and the boss die
-  in seconds to bot builds. With 7 it takes 6.1 sim-min (367.2 s). The composition pass (§3.6)
-  opens the map and speeds the run up, so its pacing check (§3.6.12) retunes this number or the
-  threat rows. Record the result here.
+* **Cinder's `seals_required` is 8.** The phase-2 bot run raised it from 6 to 7: with 6 the seed-7
+  bot cleared the map in 5.4 sim-min, under the 6–10 band of §11, because the Warlord and the boss
+  die in seconds to bot builds; with 7 it took 6.1 sim-min (367.2 s). The composition pass (§3.6)
+  opens the map and speeds the run up (a data-only declutter already fell to 327.5 s), so it takes
+  the first rung of the §3.6.12 ladder: 7 → 8 (6 → 7 added about 42 s). **Not yet measured:** the
+  bot run was on hold when the pass landed. The next `--bot-run --seed 7` confirms the band; if it
+  still falls short, the next rung is all `threat` `hp_mult` rows +10 %, and past 9 min step back.
 * **Slice** (Cinder plus boss): 10–13 min for humans, 7–9 for bots. Acceptance #5 ("finish run 1 or
   die at boss 1 within 25 min") holds.
 * **EA run** (3 biomes): 33–40 min for humans, 25–30 for bots. This is the top of NEXT_SESSION's 20–35
@@ -1898,10 +1905,12 @@ After 2.0 lands, `protocol.rs`, `components.rs`, `resources.rs`, `lib.rs` and `s
 | **2E Content** | `assets/content/{rooms.ron, game.ron, biomes.ron}` | The `cinder_expedition` template and the `expedition` block. **Flip Cinder's sequence last**, once 2A–2D are green. |
 | **2F Client world** | `gf_client/src/{world.rs (new), envkit.rs (new), terrain.rs, materials.rs, palette.rs, shaders/floor.wesl}`; `scene.rs` (`rebuild_room` branch and the decor match only) | §7.1–7.2: chunks, merged meshes, the env kit for the full `Decor` vocabulary, land, cliffs, liquid, bridges, abyss, per-chunk floor, pooled lights. |
 
-### Composition pass (§3.6): after phase 2, before the phase 3 lanes
+### Composition pass (§3.6): after phase 2, before the phase 3 lanes — done
 
 One agent at a time, in the steps of §3.6.12 (0 readout, A lay rules, B frame and dressing,
-C pacing, D look, E EA rooms). Each step is its own commit.
+C pacing, D look, E EA rooms). Landed 2026-09-26 as three commits (generator, content, tools and
+the scenery kit; the floor paint and key lights; the pacing rung). Open: the on-hold checks (tests,
+golden hash, clippy, bot run, frame rate).
 
 **Owned files:**
 
