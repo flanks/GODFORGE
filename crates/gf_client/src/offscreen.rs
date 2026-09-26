@@ -1,119 +1,136 @@
-//! Off-screen indicators for NIMRODS-scale arenas: the camera stays on the local player, so
-//! allies, doors, the anvil, pings and (on biome maps) the objectives outside the view get an
-//! arrow pinned to the screen edge (colour-coded, labelled, with distance).
+//! Edge pins (UI_STYLE §6.13): the camera stays on the local player, so allies, doors, the
+//! anvil, pings and (on biome maps) the gate and the nearest objectives outside the view get a
+//! gilt medallion pinned 40 px inside the screen edge, with an outward nub aimed at them, the
+//! distance and (for the top three) a name.
 //!
-//! On a map the view covers under 1 % of the ground, so the objectives always point the way: the
-//! Boss Gate, and the three nearest Seal POIs still to do.
+//! Priority: a downed ally > the open gate > a POI with an ally at it > allies > pings > the
+//! three nearest incomplete objectives. Pins slide along their edge out of every `HudRects`
+//! rect (critically damped) and fade in over 150 ms. Red-white is only for the downed ally.
 
 use crate::camera::{MainCamera, w3};
+use crate::hud::{player_name, to_ui, ui_viewport};
 use crate::net::{CurrentRoom, Link};
-use crate::palette::hex;
-use crate::scene::{SceneIndex, door_label, poi_color, poi_label};
+use crate::scene::{PlayerRig, SceneIndex, door_label, poi_label};
+use crate::theme::{HudRects, Ty, tok, z};
+use crate::uikit::{self, UiIcon, UiKit, ik};
 use crate::{ClientConfig, ClientSet};
-use gf_engine::client::text;
+use gf_core::poi::{PoiKind, PoiState};
+use gf_core::revive::LifeState;
+use gf_engine::client::Pickable;
 use gf_engine::prelude::*;
 use gf_net::*;
 
 /// Pool size: allies (3) + doors (3) + anvil + pings + the gate and three objectives.
 const POOL: usize = 16;
-/// Seal POIs still to do that get a marker (nearest first).
+/// Seal POIs still to do that get a pin (nearest first).
 const OBJECTIVES: usize = 3;
 /// Seconds a ping stays tracked.
 const PING_LIFE: f32 = 5.0;
-/// Inset from the screen edge (px).
-const MARGIN: f32 = 34.0;
+/// Pin centres sit this far inside the screen edge (UI px).
+const MARGIN: f32 = 40.0;
 /// Pins closer than this (px, per axis) to an earlier pin slide along their edge.
-const SPREAD: Vec2 = Vec2::new(120.0, 44.0);
-
-#[derive(Component)]
-struct Indicator;
-
-#[derive(Component)]
-struct IndicatorArrow;
-
-#[derive(Component)]
-struct IndicatorText;
+const SPREAD: Vec2 = Vec2::new(110.0, 58.0);
 
 /// Recent pings (world position, slot, seconds left).
 #[derive(Resource, Default)]
 struct Pings(Vec<(Vec2, u8, f32)>);
 
+/// One pooled pin and its motion state.
+struct Pin {
+    root: Entity,
+    glyph: Entity,
+    gilt: Entity,
+    tint: Entity,
+    inner: Entity,
+    label: Entity,
+    dist: Entity,
+    name: Entity,
+    key: Option<String>,
+    pos: Vec2,
+    age: f32,
+}
+
+#[derive(Resource, Default)]
+struct PinPool(Vec<Pin>);
+
 pub fn build(app: &mut App) {
     app.init_resource::<Pings>()
+        .init_resource::<PinPool>()
         .add_systems(Startup, spawn_pool)
-        .add_systems(Update, update_indicators.in_set(ClientSet::Presentation));
+        .add_systems(Update, update_pins.in_set(ClientSet::Presentation));
 }
 
-fn spawn_pool(mut commands: Commands) {
-    for _ in 0..POOL {
-        commands
-            .spawn((
-                Indicator,
-                Node {
-                    position_type: PositionType::Absolute,
-                    width: Val::Px(0.0),
-                    height: Val::Px(0.0),
-                    display: Display::None,
-                    ..default()
-                },
-                GlobalZIndex(5),
-            ))
-            .with_children(|p| {
-                p.spawn((
-                    IndicatorArrow,
-                    Node {
-                        position_type: PositionType::Absolute,
-                        left: Val::Px(-11.0),
-                        top: Val::Px(-14.0),
-                        ..default()
-                    },
-                    text("▲", 22.0, Color::WHITE),
-                    TextShadow::default(),
-                    UiTransform::IDENTITY,
-                ));
-                p.spawn((
-                    IndicatorText,
-                    Node {
-                        position_type: PositionType::Absolute,
-                        left: Val::Px(-40.0),
-                        top: Val::Px(12.0),
-                        ..default()
-                    },
-                    text("", 13.0, Color::WHITE),
-                    TextLayout::no_wrap(),
-                    TextShadow::default(),
-                ));
-            });
-    }
-}
-
-/// Move a pin out of the HUD panels, keeping it on its edge where it can: along the top edge off
-/// the run banner, along the bottom edge off the arsenal strip; down a side edge out of the vitals
-/// and party panels, up it out of the aim and stats panels. Logical pixels, matching `hud.rs`.
-fn clear_of_hud(p: Vec2, size: Vec2) -> Vec2 {
-    let cx = size.x * 0.5;
-    let mut q = p;
-    if q.y <= MARGIN + 1.0 && (q.x - cx).abs() < 312.0 {
-        q.x = if q.x < cx { cx - 312.0 } else { cx + 312.0 };
-    }
-    if q.y >= size.y - MARGIN - 1.0 && (q.x - cx).abs() < 382.0 {
-        q.x = if q.x < cx { cx - 382.0 } else { cx + 382.0 };
-    }
-    // (min x, min y, max x, max y) of each corner panel, padded.
-    let panels = [
-        (0.0, 0.0, 440.0, 176.0),
-        (size.x - 300.0, 0.0, size.x, 146.0),
-        (cx - 300.0, 0.0, cx + 300.0, 96.0),
-        (cx - 370.0, size.y - 124.0, cx + 370.0, size.y),
-        (0.0, size.y - 100.0, 400.0, size.y),
-        (size.x - 320.0, size.y - 70.0, size.x, size.y),
-    ];
-    for (x0, y0, x1, y1) in panels {
-        if q.x >= x0 && q.x <= x1 && q.y >= y0 && q.y <= y1 {
-            q.y = if y0 <= 0.0 { y1 + 12.0 } else { y0 - 30.0 };
+fn spawn_pool(mut commands: Commands, kit: Res<UiKit>, mut pool: ResMut<PinPool>) {
+    let kit = &*kit;
+    commands.spawn((uikit::fill(), GlobalZIndex(z::PINS), Pickable::IGNORE)).with_children(|c| {
+        for _ in 0..POOL {
+            let ph = Entity::PLACEHOLDER;
+            let mut p = Pin {
+                root: ph,
+                glyph: ph,
+                gilt: ph,
+                tint: ph,
+                inner: ph,
+                label: ph,
+                dist: ph,
+                name: ph,
+                key: None,
+                pos: Vec2::ZERO,
+                age: 0.0,
+            };
+            p.root = c
+                .spawn((Node { display: Display::None, ..uikit::abs(0.0, 0.0, 34.0, 34.0) }, Pickable::IGNORE))
+                .with_children(|r| {
+                    r.spawn((uikit::fill(), kit.tex("markers/pin_disc@2x.png"), Pickable::IGNORE));
+                    p.inner = r
+                        .spawn((
+                            Node {
+                                border: UiRect::all(px(1.5)),
+                                border_radius: BorderRadius::MAX,
+                                display: Display::None,
+                                ..uikit::inset(3.0)
+                            },
+                            BorderColor::all(tok::DANGER_WHITE),
+                            Pickable::IGNORE,
+                        ))
+                        .id();
+                    p.glyph =
+                        r.spawn((uikit::centered(24.0, 24.0), uikit::icon_bundle("poi/gate", 24.0, tok::BONE))).id();
+                    p.gilt = r
+                        .spawn((
+                            uikit::centered(56.0, 56.0),
+                            kit.tex("markers/pin_frame_gilt@2x.png"),
+                            UiTransform::default(),
+                            Pickable::IGNORE,
+                        ))
+                        .id();
+                    p.tint = r
+                        .spawn((
+                            Node { display: Display::None, ..uikit::centered(56.0, 56.0) },
+                            kit.tex_tinted("markers/pin_frame_tint@2x.png", Color::WHITE),
+                            UiTransform::default(),
+                            Pickable::IGNORE,
+                        ))
+                        .id();
+                    p.label = r
+                        .spawn((
+                            Node {
+                                position_type: PositionType::Absolute,
+                                flex_direction: FlexDirection::Column,
+                                ..default()
+                            },
+                            Pickable::IGNORE,
+                        ))
+                        .with_children(|l| {
+                            p.dist = l.spawn(kit.text_px(Ty::Num, 14.0, "", tok::PARCH)).id();
+                            p.name = l.spawn(kit.text_px(Ty::BodyS, 14.0, "", tok::PARCH_DIM)).id();
+                        })
+                        .id();
+                })
+                .id();
+            pool.0.push(p);
         }
-    }
-    q
+    });
 }
 
 /// Where an off-screen point pins to the viewport edge, and the arrow rotation (clockwise from
@@ -130,24 +147,68 @@ pub fn edge_pin(p: Vec2, size: Vec2, margin: f32) -> Option<(Vec2, f32)> {
     Some((c + d * t, d.x.atan2(-d.y)))
 }
 
+/// Slide a pin along its edge to the nearest spot outside every HUD rect and clear of the pins
+/// already placed (alternating either way in 12 px steps).
+fn place_on_edge(ideal: Vec2, size: Vec2, rects: &HudRects, placed: &[Vec2]) -> Vec2 {
+    let along_x = ideal.y <= MARGIN + 1.0 || ideal.y >= size.y - MARGIN - 1.0;
+    let free = |q: Vec2| {
+        q.x >= MARGIN - 1.0
+            && q.x <= size.x - MARGIN + 1.0
+            && q.y >= MARGIN - 1.0
+            && q.y <= size.y - MARGIN + 1.0
+            && !rects.rects.iter().any(|r| r.inflate(26.0).contains(q))
+            && !placed.iter().any(|p| (p.x - q.x).abs() < SPREAD.x && (p.y - q.y).abs() < SPREAD.y)
+    };
+    let step = if along_x { Vec2::new(12.0, 0.0) } else { Vec2::new(0.0, 12.0) };
+    for k in 0..160 {
+        for sign in [1.0, -1.0] {
+            let q = ideal + step * k as f32 * sign;
+            if free(q) {
+                return q;
+            }
+            if k == 0 {
+                break;
+            }
+        }
+    }
+    ideal
+}
+
+/// What a pin shows.
+struct Target {
+    at: Vec3,
+    key: String,
+    glyph: String,
+    glyph_tint: Color,
+    ring: Option<Color>,
+    downed: bool,
+    name: String,
+}
+
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
-fn update_indicators(
+fn update_pins(
     time: Res<Time>,
     cfg: Res<ClientConfig>,
     link: Res<Link>,
     room: Res<CurrentRoom>,
     index: Res<SceneIndex>,
+    rects: Res<HudRects>,
+    scale: Res<UiScale>,
     mut pings: ResMut<Pings>,
+    mut pool: ResMut<PinPool>,
     cameras: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
-    rigs: Query<&crate::scene::PlayerRig>,
-    mut roots: Query<(&mut Node, &Children), (With<Indicator>, Without<IndicatorText>)>,
-    mut arrows: Query<(&mut UiTransform, &mut TextColor), (With<IndicatorArrow>, Without<IndicatorText>)>,
-    mut labels: Query<
-        (&mut Node, &mut Text, &mut TextColor),
-        (With<IndicatorText>, Without<IndicatorArrow>, Without<Indicator>),
-    >,
+    rigs: Query<&PlayerRig>,
+    (mut nodes, mut images, mut icons, mut tfs, mut texts, mut borders): (
+        Query<&mut Node>,
+        Query<&mut ImageNode>,
+        Query<&mut UiIcon>,
+        Query<&mut UiTransform>,
+        Query<(&mut Text, &mut TextColor)>,
+        Query<&mut BorderColor>,
+    ),
 ) {
     let dt = time.delta_secs();
+    let now = time.elapsed_secs();
     for ev in &link.fresh_events {
         if let GameEvent::Ping { slot, pos, .. } = *ev {
             pings.0.push((pos.to_vec2(), slot, PING_LIFE));
@@ -158,40 +219,94 @@ fn update_indicators(
         *life > 0.0
     });
     let (Ok((camera, cam_tf)), Some(world)) = (cameras.single(), link.latest.as_deref()) else { return };
-    let Some(size) = camera.logical_viewport_size() else { return };
+    let s = scale.0;
+    let Some(size) = ui_viewport(camera, s) else { return };
     let db = &cfg.content;
     let me = link.me().map(|p| p.mover.pos);
-    let pulse = 0.75 + 0.25 * (time.elapsed_secs() * 5.0).sin();
+    let pos = |slot: u8, fallback: Vec2| {
+        index.players[slot as usize].and_then(|e| rigs.get(e).ok()).map_or(fallback, |r| r.shown)
+    };
+    let pc = |slot: u8| crate::theme::player_color(db, slot as usize);
 
-    // (world point, colour, label)
-    let mut targets: Vec<(Vec3, Color, String)> = Vec::new();
+    // Targets in priority order.
+    let mut downed = Vec::new();
+    let mut gate_open = Vec::new();
+    let mut shared = Vec::new();
+    let mut allies = Vec::new();
+    let mut pinged = Vec::new();
+    let mut todo: Vec<(f32, Target)> = Vec::new();
     for p in &world.players {
         if Some(p.slot) == link.slot {
             continue;
         }
-        let pos = index.players[p.slot as usize].and_then(|e| rigs.get(e).ok()).map_or(p.mover.pos, |r| r.shown);
-        let c = hex(&db.game.player_colors[p.slot as usize % 4]);
-        let tag = if matches!(p.life, gf_core::revive::LifeState::Downed { .. }) { " ✚ DOWN" } else { "" };
-        targets.push((w3(pos, 1.0), c, format!("P{}{tag}", p.slot + 1)));
+        let at = pos(p.slot, p.mover.pos);
+        let name = player_name(&link, p.slot);
+        match p.life {
+            LifeState::Downed { remaining, .. } => downed.push(Target {
+                at: w3(at, 1.0),
+                key: format!("down{}", p.slot),
+                glyph: "states/downed".into(),
+                glyph_tint: tok::DANGER_WHITE,
+                ring: Some(tok::DANGER),
+                downed: true,
+                name: format!("{name} · revive · {:.0} s", remaining.ceil()),
+            }),
+            _ => {
+                let ch = db.characters.try_get(p.character).map_or("valdris".to_string(), |c| c.key.clone());
+                allies.push(Target {
+                    at: w3(at, 1.0),
+                    key: format!("ally{}", p.slot),
+                    glyph: ik::portrait(&ch),
+                    glyph_tint: Color::WHITE,
+                    ring: Some(pc(p.slot)),
+                    downed: false,
+                    name,
+                });
+            }
+        }
+    }
+    for (i, (at, slot, _)) in pings.0.iter().enumerate() {
+        pinged.push(Target {
+            at: w3(*at, 0.5),
+            key: format!("ping{i}"),
+            glyph: "team/ping".into(),
+            glyph_tint: pc(*slot),
+            ring: Some(pc(*slot)),
+            downed: false,
+            name: format!("{}'s ping", player_name(&link, *slot)),
+        });
     }
     for e in &world.entities {
         match e.kind {
-            EntityKind::Door { reward, .. } => {
-                targets.push((w3(e.pos.to_vec2(), 1.5), hex("#FFE3A3"), door_label(db, reward)))
-            }
-            EntityKind::Anvil if AnvilState::from_u8(e.status) != AnvilState::Spent => {
-                targets.push((w3(e.pos.to_vec2(), 1.0), hex("#FFC940"), "Anvil".into()))
-            }
+            EntityKind::Door { reward, index } => todo.push((
+                me.map_or(0.0, |m| m.distance(e.pos.to_vec2())) - 1000.0,
+                Target {
+                    at: w3(e.pos.to_vec2(), 1.5),
+                    key: format!("door{index}"),
+                    glyph: "run/gate_open".into(),
+                    glyph_tint: tok::BONE,
+                    ring: None,
+                    downed: false,
+                    name: door_label(db, reward),
+                },
+            )),
+            EntityKind::Anvil if AnvilState::from_u8(e.status) != AnvilState::Spent => todo.push((
+                -2000.0,
+                Target {
+                    at: w3(e.pos.to_vec2(), 1.0),
+                    key: "anvil".into(),
+                    glyph: "poi/anvil".into(),
+                    glyph_tint: tok::BONE,
+                    ring: None,
+                    downed: false,
+                    name: "Anvil".into(),
+                },
+            )),
             _ => {}
         }
     }
-    for (pos, slot, _) in &pings.0 {
-        targets.push((w3(*pos, 0.5), hex(&db.game.player_colors[*slot as usize % 4]), "!".into()));
-    }
-    // Biome maps: the gate always, then the nearest Seal POIs still to do.
     if let Some(map) = room.def.map.as_deref() {
         let from = me.unwrap_or(room.def.player_spawn);
-        let mut todo: Vec<(f32, Vec3, Color, String)> = Vec::new();
         for e in &world.entities {
             let EntityKind::Poi { index } = e.kind else { continue };
             let Some(site) = map.pois.get(index as usize) else { continue };
@@ -199,90 +314,187 @@ fn update_indicators(
             if state == PoiState::Done {
                 continue;
             }
-            let c = poi_color(db, site.god, site.kind);
-            let at = w3(site.at, 1.0);
+            let tint = crate::hud::poi_glyph_tint(db, site);
+            let label = poi_label(db, site);
+            let base = Target {
+                at: w3(site.at, 1.0),
+                key: format!("poi{index}"),
+                glyph: ik::poi(site.kind),
+                glyph_tint: tint,
+                ring: None,
+                downed: false,
+                name: label.clone(),
+            };
             if site.kind == PoiKind::Gate {
-                let label = match (&world.run.stage, state) {
-                    (_, PoiState::Open | PoiState::Gathering) => "BOSS GATE OPEN".to_string(),
-                    (Some(st), _) => format!("Boss Gate {}/{}", st.seals, st.required),
-                    (None, _) => poi_label(db, site),
-                };
-                targets.push((at, c, label));
-            } else if site.seals > 0 {
-                let live = matches!(state, PoiState::Active | PoiState::Hot);
-                let tag = if live { " ◆" } else { "" };
-                todo.push((site.at.distance(from), at, c, format!("{}{tag}", poi_label(db, site))));
+                if matches!(state, PoiState::Open | PoiState::Gathering) {
+                    gate_open.push(Target {
+                        glyph: "run/gate_open".into(),
+                        glyph_tint: tok::GOLD_LT,
+                        name: "Boss Gate · open".into(),
+                        ..base
+                    });
+                } else {
+                    let name = world.run.stage.map_or(label, |st| format!("Boss Gate · {}/{}", st.seals, st.required));
+                    todo.push((-500.0, Target { name, ..base }));
+                }
+                continue;
+            }
+            // A live POI with an ally at it: "P2 · Anvil 45%".
+            let live = matches!(state, PoiState::Active | PoiState::Hot);
+            let ally = world
+                .players
+                .iter()
+                .filter(|p| Some(p.slot) != link.slot)
+                .find(|p| p.mover.pos.distance(site.at) <= site.radius + 1.0);
+            if live && let Some(a) = ally {
+                let pct = gf_net::quant::u8_to_frac(e.hp) * 100.0;
+                shared.push(Target { name: format!("P{} · {label} {pct:.0}%", a.slot + 1), ..base });
+                continue;
+            }
+            if site.seals > 0 {
+                todo.push((site.at.distance(from), base));
             }
         }
-        todo.sort_by(|a, b| a.0.total_cmp(&b.0));
-        targets.extend(todo.into_iter().take(OBJECTIVES).map(|(_, at, c, s)| (at, c, s)));
+    }
+    todo.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let mut n_poi = 0;
+    let objectives: Vec<Target> = todo
+        .into_iter()
+        .filter(|(d, _)| {
+            // Doors, the anvil and the sealed gate always; then the three nearest objectives.
+            if *d < 0.0 {
+                return true;
+            }
+            n_poi += 1;
+            n_poi <= OBJECTIVES
+        })
+        .map(|(_, t)| t)
+        .collect();
+    let targets = downed.into_iter().chain(gate_open).chain(shared).chain(allies).chain(pinged).chain(objectives);
+
+    // Place: edge pin, off the HUD rects, and off earlier pins along the edge.
+    let mut placed: Vec<(Vec2, f32, Target, Option<f32>)> = Vec::new();
+    for t in targets {
+        let Some(screen) = to_ui(camera, cam_tf, t.at, s) else { continue };
+        let Some((pin, angle)) = edge_pin(screen, size, MARGIN) else { continue };
+        let taken: Vec<Vec2> = placed.iter().map(|p| p.0).collect();
+        let pin = place_on_edge(pin, size, &rects, &taken);
+        // Re-aim the nub from where the pin ended up.
+        let angle = {
+            let d = screen - pin;
+            if d.length_squared() > 1.0 { d.x.atan2(-d.y) } else { angle }
+        };
+        let dist = me.map(|m| m.distance(Vec2::new(t.at.x, -t.at.z)));
+        placed.push((pin, angle, t, dist));
     }
 
-    // Pins in priority order; a pin landing on an earlier one slides along its edge.
-    let mut placed: Vec<(Vec2, f32, Color, String, Option<f32>)> = Vec::new();
-    for (at, c, s) in targets {
-        let Some(screen) = gf_engine::client::world_to_screen(camera, cam_tf, at) else { continue };
-        let Some((pin, angle)) = edge_pin(screen, size, MARGIN) else { continue };
-        let mut pin = clear_of_hud(pin, size);
-        let along_x = pin.y <= MARGIN + 1.0 || pin.y >= size.y - MARGIN - 1.0;
-        let step = if along_x { Vec2::new(SPREAD.x, 0.0) } else { Vec2::new(0.0, SPREAD.y) };
-        let toward_centre = if along_x { (size.x * 0.5 - pin.x).signum() } else { (size.y * 0.5 - pin.y).signum() };
-        for _ in 0..6 {
-            let clash = placed.iter().any(|(q, ..)| (q.x - pin.x).abs() < SPREAD.x && (q.y - pin.y).abs() < SPREAD.y);
-            if !clash {
-                break;
+    let mut it = placed.into_iter().enumerate();
+    let pulse = 0.55 + 0.45 * (now * std::f32::consts::TAU / 0.8).sin().abs();
+    for p in pool.0.iter_mut() {
+        let Some((rank, (target_pos, angle, t, dist))) = it.next() else {
+            if let Ok(mut n) = nodes.get_mut(p.root)
+                && n.display != Display::None
+            {
+                n.display = Display::None;
             }
-            pin += step * toward_centre;
-        }
-        let dist = me.map(|m| m.distance(Vec2::new(at.x, -at.z)));
-        placed.push((pin, angle, c, s, dist));
-    }
-    let mut pins = placed.into_iter();
-    for (mut node, children) in &mut roots {
-        let Some((pin, angle, color, label, dist)) = pins.next() else {
-            if node.display != Display::None {
-                node.display = Display::None;
-            }
+            p.key = None;
             continue;
         };
-        node.display = Display::Flex;
-        node.left = Val::Px(pin.x);
-        node.top = Val::Px(pin.y);
-        for child in children.iter() {
-            if let Ok((mut tf, mut tc)) = arrows.get_mut(child) {
+        // A new target snaps and fades in; the same one slides (critically damped, ~12 Hz).
+        if p.key.as_deref() != Some(t.key.as_str()) {
+            p.key = Some(t.key.clone());
+            p.pos = target_pos;
+            p.age = 0.0;
+        } else {
+            p.pos += (target_pos - p.pos) * (1.0 - (-dt * 12.0).exp());
+            p.age += dt;
+        }
+        let a = (p.age / 0.15).min(1.0);
+        if let Ok(mut n) = nodes.get_mut(p.root) {
+            n.display = Display::Flex;
+            let (l, top) = (Val::Px((p.pos.x - 17.0).round()), Val::Px((p.pos.y - 17.0).round()));
+            if n.left != l {
+                n.left = l;
+            }
+            if n.top != top {
+                n.top = top;
+            }
+        }
+        if let Ok(mut i) = icons.get_mut(p.glyph)
+            && i.key != t.glyph
+        {
+            i.key = t.glyph.clone();
+        }
+        let set_tint = |images: &mut Query<&mut ImageNode>, e: Entity, c: Color| {
+            if let Ok(mut i) = images.get_mut(e)
+                && i.color != c
+            {
+                i.color = c;
+            }
+        };
+        set_tint(&mut images, p.glyph, t.glyph_tint.with_alpha(a));
+        let show = |nodes: &mut Query<&mut Node>, e: Entity, on: bool| {
+            if let Ok(mut n) = nodes.get_mut(e) {
+                let d = if on { Display::Flex } else { Display::None };
+                if n.display != d {
+                    n.display = d;
+                }
+            }
+        };
+        show(&mut nodes, p.gilt, t.ring.is_none());
+        show(&mut nodes, p.tint, t.ring.is_some());
+        show(&mut nodes, p.inner, t.downed);
+        set_tint(&mut images, p.gilt, Color::WHITE.with_alpha(a));
+        if let Some(ring) = t.ring {
+            set_tint(&mut images, p.tint, ring.with_alpha(a * if t.downed { pulse } else { 1.0 }));
+        }
+        if t.downed
+            && let Ok(mut b) = borders.get_mut(p.inner)
+        {
+            *b = BorderColor::all(tok::DANGER_WHITE.with_alpha(a * pulse));
+        }
+        for e in [p.gilt, p.tint] {
+            if let Ok(mut tf) = tfs.get_mut(e)
+                && (tf.rotation.as_radians() - angle).abs() > 1e-3
+            {
                 tf.rotation = Rot2::radians(angle);
-                tc.0 = color.with_alpha(pulse);
             }
-            if let Ok((mut label_node, mut t, mut tc)) = labels.get_mut(child) {
-                let s = match dist {
-                    Some(d) => format!("{label} · {d:.0}m"),
-                    None => label.clone(),
-                };
-                if t.0 != s {
-                    t.0 = s;
-                }
-                if tc.0 != color {
-                    tc.0 = color;
-                }
-                // The label hangs away from the screen centre (off the HUD banner and strip) unless
-                // that runs it off the screen, and below the arrow except on the bottom edge (so
-                // pins stacked down a side never overprint).
-                let left_half = pin.x < size.x * 0.5;
-                let hang_left = if left_half { pin.x > 200.0 } else { pin.x > size.x - 200.0 };
-                let (left, right) = if hang_left { (Val::Auto, Val::Px(-10.0)) } else { (Val::Px(-10.0), Val::Auto) };
-                let (top, bottom) = if pin.y > size.y - MARGIN - 40.0 {
-                    (Val::Auto, Val::Px(14.0))
-                } else {
-                    (Val::Px(12.0), Val::Auto)
-                };
-                if (label_node.left, label_node.right, label_node.top, label_node.bottom) != (left, right, top, bottom)
-                {
-                    label_node.left = left;
-                    label_node.right = right;
-                    label_node.top = top;
-                    label_node.bottom = bottom;
-                }
+        }
+        // The label hangs 30 px inward: right of a left-edge pin, left of a right-edge pin,
+        // under a top-edge pin, over a bottom-edge pin.
+        let (left, right, top, bottom, align) = if p.pos.x <= MARGIN + 1.0 {
+            (Val::Px(34.0 + 12.0), Val::Auto, Val::Px(0.0), Val::Auto, AlignItems::FlexStart)
+        } else if p.pos.x >= size.x - MARGIN - 1.0 {
+            (Val::Auto, Val::Px(34.0 + 12.0), Val::Px(0.0), Val::Auto, AlignItems::FlexEnd)
+        } else if p.pos.y <= size.y * 0.5 {
+            (Val::Px(-40.0), Val::Auto, Val::Px(34.0 + 8.0), Val::Auto, AlignItems::Center)
+        } else {
+            (Val::Px(-40.0), Val::Auto, Val::Auto, Val::Px(34.0 + 8.0), AlignItems::Center)
+        };
+        if let Ok(mut n) = nodes.get_mut(p.label)
+            && (n.left, n.right, n.top, n.bottom, n.align_items) != (left, right, top, bottom, align)
+        {
+            n.left = left;
+            n.right = right;
+            n.top = top;
+            n.bottom = bottom;
+            n.align_items = align;
+            n.width = if align == AlignItems::Center { px(114.0) } else { Val::Auto };
+        }
+        let d = dist.map_or(String::new(), |d| format!("{d:.0} m"));
+        if let Ok((mut tx, mut c)) = texts.get_mut(p.dist) {
+            if tx.0 != d {
+                tx.0 = d;
             }
+            c.0 = if t.downed { tok::DANGER_WHITE.with_alpha(a) } else { tok::PARCH.with_alpha(a) };
+        }
+        // Names only for the top three priorities.
+        let name = if rank < 3 { t.name.clone() } else { String::new() };
+        if let Ok((mut tx, mut c)) = texts.get_mut(p.name) {
+            if tx.0 != name {
+                tx.0 = name;
+            }
+            c.0 = tok::PARCH_DIM.with_alpha(a);
         }
     }
 }
