@@ -173,6 +173,12 @@ colour and readability rules are final:
   `include_bytes!` (`assets/fonts`), and Alegreya Sans Medium replaces Bevy's default font. The
   colour tokens and the closed type ramp live in `gf_client::theme`; the widgets, their motion and
   the embedded UI art in `gf_client::uikit` (spec: `docs/art/UI_STYLE.md`).
+* Panels (`gf_client::ui`, UI_STYLE §7): the Forge drawer at a hot anvil, the boon spread on
+  god-tinted niche cards, the end screen (victory and defeat), the help tome, the door panel and
+  hover tooltips. They rebuild only when their content changes; hover, selection and heat update in
+  place. The Forge previews run `gf_core::forge::apply_action` on a copy of the build, so the DPS
+  delta it shows is what the host will apply. An open panel eases the camera aside
+  (`PanelFraming`) so the hero stays in view.
 
 ## 8. Performance and LOD budgets
 
