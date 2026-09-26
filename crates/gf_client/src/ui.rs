@@ -63,6 +63,12 @@ impl PanelState {
     pub fn captures_pad(&self) -> bool {
         self.forge || self.boons || self.end || self.help || self.doors
     }
+
+    /// A panel that owns the view (the Forge, the boon spread, the end screen, the help tome):
+    /// edge pins, the callout lane and the region banner wait until it closes.
+    pub fn covers_view(&self) -> bool {
+        self.forge || self.boons || self.end || self.help
+    }
 }
 
 /// PanelFraming (§7.1, §7.2): the camera's look offset while a panel is open, in fractions of the

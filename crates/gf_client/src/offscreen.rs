@@ -372,9 +372,8 @@ fn update_pins(
         .map(|(_, t)| t)
         .collect();
     let targets = downed.into_iter().chain(gate_open).chain(shared).chain(allies).chain(pinged).chain(objectives);
-    // A full panel (the Forge, the boon spread, the end screen, the help tome) owns the screen:
-    // pins would sit on its frame and title, so they wait until it closes.
-    let covered = panels.forge || panels.boons || panels.end || panels.help;
+    // A panel that owns the view would have pins on its frame and title: they wait until it closes.
+    let covered = panels.covers_view();
     let targets = targets.filter(|_| !covered);
 
     // Place: edge pin, off the HUD rects, and off earlier pins along the edge.

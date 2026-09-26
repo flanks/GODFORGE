@@ -511,6 +511,7 @@ pub(super) fn callouts(
     link: Res<Link>,
     kit: Res<UiKit>,
     settings: Res<crate::input::Settings>,
+    panels: Res<crate::ui::PanelState>,
     mut t: ResMut<Top>,
     mut ui: Ui,
 ) {
@@ -580,7 +581,8 @@ pub(super) fn callouts(
         ui.show(root, false);
         return;
     }
-    ui.show(root, true);
+    // The lane keeps timing but stays hidden under a panel that owns the view (its title band).
+    ui.show(root, !panels.covers_view());
     // 1.3 → 1.0 over 160 ms (back-out), alpha in over 100 ms; hold; rise 12 px and fade 300 ms.
     let calm = settings.reduced_motion;
     let k = (age / CALL_IN).min(1.0);
@@ -629,7 +631,7 @@ pub(super) fn region_banner(
     link: Res<Link>,
     room: Res<CurrentRoom>,
     kit: Res<UiKit>,
-    focus: Res<super::HudFocus>,
+    panels: Res<crate::ui::PanelState>,
     mut t: ResMut<Top>,
     mut ui: Ui,
 ) {
@@ -669,9 +671,9 @@ pub(super) fn region_banner(
         t.banner_t = 0.0;
     }
     t.banner_t += time.delta_secs();
-    // Suppressed while the boss bar shows, and under the Forge drawer and the boon spread, whose
-    // titles sit in the same band.
-    let on = t.banner_t < BANNER_LIFE && t.boss_t < 0.0 && !focus.forge_drawer && !focus.boon_spread;
+    // Suppressed while the boss bar shows, and under a panel that owns the view (its title sits in
+    // the same band).
+    let on = t.banner_t < BANNER_LIFE && t.boss_t < 0.0 && !panels.covers_view();
     ui.show(root, on);
     if on {
         let a = (t.banner_t / 0.35).min(1.0) * (1.0 - ((t.banner_t - (BANNER_LIFE - 1.0)) / 1.0).clamp(0.0, 1.0));
