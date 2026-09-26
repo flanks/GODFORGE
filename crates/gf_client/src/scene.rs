@@ -202,6 +202,7 @@ pub fn build(app: &mut App) {
             sync_entities,
             hit_flash,
             animate_entities,
+            cap_ally_fields,
             tint_entities,
             animate_anvils,
             sync_players,
@@ -1299,6 +1300,33 @@ fn animate_entities(
                 }
             }
             _ => tf.translation = w3(v.shown, v.lift),
+        }
+    }
+}
+
+/// Ally ground fields drawn at once: at 4P peak the players' zones could cover a third of the
+/// screen; the nearest ones to the local player stay, the rest hide (presentation only).
+const ALLY_FIELD_CAP: usize = 10;
+
+fn cap_ally_fields(link: Res<Link>, mut q: Query<(&Visual, &mut Visibility)>) {
+    let me = link.me().map_or(Vec2::ZERO, |p| p.mover.pos);
+    let ally_field = |v: &Visual| matches!(v.kind, EntityKind::Hazard { .. }) && v.flags.contains(EntityFlags::ALLY);
+    let mut near: Vec<f32> =
+        q.iter().filter(|(v, _)| ally_field(v)).map(|(v, _)| v.shown.distance_squared(me)).collect();
+    // Past the cap, only fields as near as the cap-th nearest one stay.
+    let cut = if near.len() > ALLY_FIELD_CAP {
+        near.sort_by(|a, b| a.total_cmp(b));
+        near[ALLY_FIELD_CAP - 1]
+    } else {
+        f32::INFINITY
+    };
+    for (v, mut vis) in &mut q {
+        if !ally_field(v) {
+            continue;
+        }
+        let want = if v.shown.distance_squared(me) <= cut { Visibility::Inherited } else { Visibility::Hidden };
+        if *vis != want {
+            *vis = want;
         }
     }
 }

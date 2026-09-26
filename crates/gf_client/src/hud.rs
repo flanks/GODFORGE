@@ -83,6 +83,18 @@ struct ToastList;
 #[derive(Component)]
 struct ArsenalStrip;
 
+/// The region banner ("THE SLAG FLATS") shown when the local player crosses into a region.
+#[derive(Component)]
+struct RegionBanner;
+
+/// Which region of the current map the local player last stood in, and the banner's clock.
+#[derive(Resource, Default)]
+struct RegionWatch {
+    generation: u32,
+    region: Option<u8>,
+    shown: f32,
+}
+
 #[derive(Component)]
 struct Toast {
     life: f32,
@@ -107,9 +119,9 @@ const LABEL_POOL: usize = 12;
 const BAR_POOL: usize = 16;
 
 pub fn build(app: &mut App) {
-    app.add_systems(Startup, spawn_hud).add_systems(
+    app.init_resource::<RegionWatch>().add_systems(Startup, spawn_hud).add_systems(
         Update,
-        (update_labels, update_bars, update_party, toasts, world_labels, touch_overlay, fade_arsenal)
+        (update_labels, update_bars, update_party, toasts, world_labels, touch_overlay, fade_arsenal, region_banner)
             .in_set(ClientSet::Presentation),
     );
 }
@@ -228,6 +240,20 @@ fn spawn_hud(mut commands: Commands, fonts: Res<UiFonts>) {
                 bar(p, Bar::Boss, 520.0, 14.0, hex("#C0262B"));
             });
         });
+    // Top-centre, under the run banner: the region name when the player crosses into one.
+    commands.spawn((
+        RegionBanner,
+        Node {
+            position_type: PositionType::Absolute,
+            top: Val::Px(104.0),
+            width: Val::Percent(100.0),
+            justify_content: JustifyContent::Center,
+            ..default()
+        },
+        text_in("", 30.0, hex("#F4E3C1").with_alpha(0.0), &display),
+        TextLayout::justify(Justify::Center),
+        TextShadow { offset: Vec2::new(2.0, 2.0), color: Color::srgba(0.0, 0.0, 0.0, 0.0) },
+    ));
     // Left rail under the vitals: event toasts (off the top-centre action).
     commands.spawn((
         ToastList,
@@ -1002,6 +1028,43 @@ fn world_labels(
             None => node.display = Display::None,
         }
     }
+}
+
+/// The region banner: when the local player crosses into another region of a biome map, its
+/// name ("THE GLASS WASTES", from the theme's name pool) fades in under the run banner for a few
+/// seconds.
+fn region_banner(
+    time: Res<Time>,
+    link: Res<Link>,
+    room: Res<CurrentRoom>,
+    mut watch: ResMut<RegionWatch>,
+    mut banner: Query<(&mut Text, &mut TextColor, &mut TextShadow), With<RegionBanner>>,
+) {
+    let Ok((mut text, mut color, mut shadow)) = banner.single_mut() else { return };
+    if watch.generation != room.generation {
+        *watch = RegionWatch { generation: room.generation, ..default() };
+    }
+    let here = room.def.map.as_deref().zip(link.me()).and_then(|(map, me)| {
+        let (x, y) = map.tiles.tile_of(me.mover.pos)?;
+        let r = *map.tiles.region.get(map.tiles.index(x, y))?;
+        let reg = map.regions.get(r as usize)?;
+        let theme = room.def.expedition.as_ref()?.themes.get(reg.theme as usize)?;
+        Some((r, theme.region_name(reg.name).to_uppercase()))
+    });
+    let on_map = here.is_some();
+    if let Some((r, name)) = here
+        && watch.region != Some(r)
+    {
+        watch.region = Some(r);
+        watch.shown = 0.0;
+        text.0 = name;
+    }
+    watch.shown += time.delta_secs();
+    // In over 0.4 s, hold, out over 1 s (3.5 s in all).
+    let t = watch.shown;
+    let a = if on_map { (t / 0.4).min(1.0) * (1.0 - ((t - 2.5) / 1.0).clamp(0.0, 1.0)) } else { 0.0 };
+    color.0 = color.0.with_alpha(a);
+    shadow.color = shadow.color.with_alpha(0.85 * a);
 }
 
 /// Fade the arsenal strip while enemies (or allies) stand behind it on screen.
