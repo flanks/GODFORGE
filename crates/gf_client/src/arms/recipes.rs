@@ -885,14 +885,15 @@ pub fn beam(
             fx.light(to - dir * 1.5 + Vec3::Y * 0.3, Ramp::Flame.light(), 60_000.0, 5.0, 0.05, owner);
         }
         "seraph_lance" => {
-            // A hard straight ray: halo arcs slide along it, a cross flares at the prism.
-            fx.beam(key, from, to, width, Ramp::Radiant, owner);
+            // A hard straight ray: halo arcs slide along it, a cross flares at the prism (in the
+            // weapon's element: a Plaguecore lance burns green).
+            fx.beam(key, from, to, width, ramp, owner);
             for i in 0..3 {
                 let s = ((t * 9.0 + i as f32 * len / 3.0) % len).max(0.3);
                 let frame = ((t * 20.0) as u16 + i) % 8;
                 fx.sprite(seq::RADIANT_HALO_ARCS.nth(frame), from + dir * s)
                     .radius(width * 1.1)
-                    .ramp(Ramp::Radiant)
+                    .ramp(ramp)
                     .rot(FRAC_PI_2 * (i % 2) as f32)
                     .play(Play::Frame(0))
                     .pull(0.5)
@@ -903,7 +904,7 @@ pub fn beam(
             let snap = ((t * 6.0) as u32 % 2) as f32 * FRAC_PI_2 * 0.5;
             fx.sprite(seq::RADIANT_CROSS_FLARE.nth(((t * 30.0) as u16) % 4), from)
                 .radius(0.55)
-                .ramp(Ramp::Radiant)
+                .ramp(ramp)
                 .rot(snap)
                 .play(Play::Frame(0))
                 .pull(0.6)
@@ -914,9 +915,9 @@ pub fn beam(
             while acc[0] >= 1.0 {
                 acc[0] -= 1.0;
                 let rot = ((t * 6.0) as u32 % 8) as f32 * PI / 8.0;
-                fx.decal_seq(Glyph::Hexagram.seq(), to, 0.8, rot, Ramp::Radiant, 0.6, owner);
+                fx.decal_seq(Glyph::Hexagram.seq(), to, 0.8, rot, ramp, 0.6, owner);
             }
-            fx.light(to + Vec3::Y * 0.3, Ramp::Radiant.light(), 50_000.0, 4.0, 0.05, owner);
+            fx.light(to + Vec3::Y * 0.3, ramp.light(), 50_000.0, 4.0, 0.05, owner);
         }
         "plaguebloom_sprayer" => {
             // A fog cone of globules: a sickly mist band marks the true width.
