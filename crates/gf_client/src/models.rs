@@ -19,10 +19,13 @@
 
 use crate::ClientSet;
 use crate::anim::{Animator, lower_body_targets};
-use crate::materials::{ToonMaterial, ToonStyle, toon_from_standard};
-use crate::palette::{Palette, hdr, hex, status_color};
+use crate::materials::{InkHull, ToonMaterial, ToonStyle, toon_from_standard};
+use crate::palette::{Palette, hdr, hex, mix, status_color};
 use gf_engine::bevy::animation::{AnimationTargetId, graph::AnimationNodeIndex};
+use gf_engine::bevy::camera::visibility::NoFrustumCulling;
+use gf_engine::bevy::mesh::skinning::SkinnedMesh;
 use gf_engine::bevy::world_serialization::WorldInstanceReady;
+use gf_engine::client::{NotShadowCaster, NotShadowReceiver, SystemParam};
 use gf_engine::prelude::*;
 use serde_json::Value;
 use std::collections::{HashMap, HashSet};
@@ -468,9 +471,23 @@ pub enum FoeTint {
     Status(u8),
 }
 
-/// Toon materials made from glTF materials, per (source, skin).
+/// Toon materials made from glTF materials, per (source, skin), and the heroes' ink hulls.
 #[derive(Resource, Default)]
-pub struct SkinCache(HashMap<(AssetId<StandardMaterial>, Skin), Handle<ToonMaterial>>);
+pub struct SkinCache {
+    toons: HashMap<(AssetId<StandardMaterial>, Skin), Handle<ToonMaterial>>,
+    /// The dark ink hull every hero and weapon shares, and each slot's halo hull.
+    ink: Option<Handle<InkHull>>,
+    halos: [Option<Handle<InkHull>>; 4],
+}
+
+/// Width (m) of a hero's ink contour: about 2 px at the default zoom (22 m of view over 900 px).
+pub const INK_WIDTH: f32 = 0.05;
+/// Width (m) of the halo around the ink, in the player's colour: about 1 px beyond it.
+pub const HALO_WIDTH: f32 = 0.078;
+/// How far (m) the halo hull sits behind the ink hull (so the ink stays on top of it).
+const HALO_PUSH: f32 = 0.35;
+/// The contour's ink (a warm near-black, the greybox hulls' family).
+const HULL_INK: &str = "#140A10";
 
 impl SkinCache {
     pub fn get(
@@ -482,14 +499,38 @@ impl SkinCache {
         pal: &Palette,
     ) -> Option<Handle<ToonMaterial>> {
         let key = (source.id(), skin);
-        if let Some(h) = self.0.get(&key) {
+        if let Some(h) = self.toons.get(&key) {
             return Some(h.clone());
         }
         let std = stds.get(source)?;
         let h = toons.add(skin_material(std, skin, pal));
-        self.0.insert(key, h.clone());
+        self.toons.insert(key, h.clone());
         Some(h)
     }
+
+    /// The (ink, halo) hull materials of a hero in `slot`.
+    pub fn hulls(
+        &mut self,
+        slot: u8,
+        hulls: &mut Assets<InkHull>,
+        pal: &Palette,
+    ) -> (Handle<InkHull>, Handle<InkHull>) {
+        let ink = self.ink.get_or_insert_with(|| hulls.add(InkHull::new(hex(HULL_INK), INK_WIDTH, 0.0))).clone();
+        let halo = self.halos[slot as usize % 4]
+            .get_or_insert_with(|| hulls.add(InkHull::new(hdr(pal.player(slot), 1.5), HALO_WIDTH, HALO_PUSH)))
+            .clone();
+        (ink, halo)
+    }
+}
+
+/// The material stores and caches a glTF skin swap needs.
+#[derive(SystemParam)]
+pub struct SkinPaint<'w> {
+    pub stds: Res<'w, Assets<StandardMaterial>>,
+    pub toons: ResMut<'w, Assets<ToonMaterial>>,
+    pub hulls: ResMut<'w, Assets<InkHull>>,
+    pub cache: ResMut<'w, SkinCache>,
+    pub pal: Res<'w, Palette>,
 }
 
 /// A glTF material in the game's toon look.
@@ -500,12 +541,14 @@ fn skin_material(std: &StandardMaterial, skin: Skin, pal: &Palette) -> ToonMater
     base.metallic = base.metallic.min(0.2);
     match skin {
         Skin::Hero(slot) => {
-            // The painted ink edge closes the silhouette (a skinned mesh cannot take the greybox's
-            // inverted hull). A sculpted body has far more silhouette than a capsule, so the
-            // player-colour rim is narrower than the greybox's or it would outline every plate.
+            // The ink hull (`spawn_hulls`) closes the silhouette; the painted ink edge darkens the
+            // grazing faces inside it. The rim is the player's colour pushed toward white: a pure
+            // P1 gold vanished into Brax's embers and Valdris's gilt, a pale gold-white edge
+            // lifts any painted body off the warm Cinder ground.
             let style = ToonStyle {
-                rim_strength: 0.8,
-                rim_width: 0.3,
+                rim: hdr(mix(pal.player(slot), Color::WHITE, 0.45), 2.6),
+                rim_strength: 1.3,
+                rim_width: 0.45,
                 ink_width: 0.16,
                 ink: 0.55,
                 lift: 0.4,
@@ -694,17 +737,14 @@ fn on_instance_ready(
     instances: Query<(&ModelInstance, Option<&WeaponOf>)>,
     children: Query<&Children>,
     names: Query<&Name>,
-    std_meshes: Query<&MeshMaterial3d<StandardMaterial>>,
+    std_meshes: Query<(&MeshMaterial3d<StandardMaterial>, &Mesh3d, Option<&SkinnedMesh>)>,
     targets: Query<(&AnimationTargetId, Option<&ChildOf>)>,
     mut players: Query<&mut AnimationPlayer>,
     hero_parts: Query<&ModelParts>,
     mut gears: Query<&mut HeroGear>,
-    stds: Res<Assets<StandardMaterial>>,
-    mut toons: ResMut<Assets<ToonMaterial>>,
-    mut cache: ResMut<SkinCache>,
+    mut paint: SkinPaint,
     mut graphs: ResMut<Assets<AnimationGraph>>,
     mut masked: ResMut<MaskedGraphs>,
-    pal: Res<Palette>,
 ) {
     let root = ev.entity;
     let Ok((inst, weapon_of)) = instances.get(root) else { return };
@@ -716,13 +756,37 @@ fn on_instance_ready(
         if players.contains(e) && parts.player.is_none() {
             parts.player = Some(e);
         }
-        if let Ok(m) = std_meshes.get(e) {
+        if let Ok((m, _, _)) = std_meshes.get(e) {
             parts.meshes.push((e, m.0.clone()));
         }
     }
+    let SkinPaint { stds, toons, hulls, cache, pal } = &mut paint;
     for (e, source) in &parts.meshes {
-        if let Some(toon) = cache.get(source, inst.skin, &stds, &mut toons, &pal) {
+        if let Some(toon) = cache.get(source, inst.skin, stds, toons, pal) {
             commands.entity(*e).remove::<MeshMaterial3d<StandardMaterial>>().insert(MeshMaterial3d(toon));
+        }
+    }
+    // Heroes and their weapons wear the ink contour (and the halo in the player's colour).
+    if let Skin::Hero(slot) | Skin::Gear(slot) = inst.skin {
+        let (ink, halo) = cache.hulls(slot, hulls, pal);
+        for (e, _) in &parts.meshes {
+            let Ok((_, mesh, skinned)) = std_meshes.get(*e) else { continue };
+            for m in [&ink, &halo] {
+                // A child of the mesh: it shows and hides with it (the gauntlets' fist / open
+                // swap), and a rigid part inherits its transform (a skinned one follows its joints).
+                let mut hull = commands.spawn((
+                    Mesh3d(mesh.0.clone()),
+                    MeshMaterial3d(m.clone()),
+                    Transform::IDENTITY,
+                    NotShadowCaster,
+                    NotShadowReceiver,
+                    NoFrustumCulling,
+                    ChildOf(*e),
+                ));
+                if let Some(s) = skinned {
+                    hull.insert(s.clone());
+                }
+            }
         }
     }
     if let (Some(lib), Some(player_e)) = (inst.model.anim.as_ref(), parts.player) {

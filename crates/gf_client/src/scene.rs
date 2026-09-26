@@ -49,6 +49,10 @@ const GOLD: &str = "#FFC940";
 const BRONZE: &str = "#7E5E36";
 const IRON: &str = "#3B3633";
 const INK: &str = "#140C08";
+/// The fill light over each hero: a warm white, strong enough to lift the body one painted band
+/// over the ground it stands on.
+const HERO_FILL: &str = "#FFEFD8";
+const HERO_FILL_LM: f32 = 160_000.0;
 
 #[derive(Component)]
 pub struct RoomGeometry;
@@ -1761,6 +1765,7 @@ fn tint_entities(
 /// dim beacon shaft, turned bright while it is live, so the map always shows where to go.
 fn animate_anvils(
     time: Res<Time>,
+    cfg: Res<ClientConfig>,
     link: Res<Link>,
     room: Res<CurrentRoom>,
     q: Query<&Visual>,
@@ -1768,9 +1773,23 @@ fn animate_anvils(
 ) {
     let t = time.elapsed_secs();
     let me = link.me().map(|p| p.mover.pos);
+    // A shaft is translucent and drawn after the bodies: a hero standing behind it (up the screen
+    // from its foot, in its column) would show through a pillar of light. The shaft goes while one
+    // does.
+    let cam = &cfg.content.game.camera;
+    let (yaw, pitch) = (cam.yaw_deg.to_radians(), cam.pitch_deg.to_radians().max(0.2));
+    let away = Vec2::new(-yaw.sin(), yaw.cos());
+    let reach = BEACON_H / pitch.tan() + 2.5;
+    let heroes: Vec<Vec2> =
+        link.latest.as_deref().map_or(Vec::new(), |w| w.players.iter().map(|p| p.mover.pos).collect());
     for v in &q {
         // Standing at a POI, its beacon would only wall off the screen.
-        let here = me.is_some_and(|m| m.distance(v.pos) < v.radius + 7.0);
+        let covers = heroes.iter().any(|h| {
+            let d = *h - v.pos;
+            let along = d.dot(away);
+            along > -1.0 && along < reach && d.perp_dot(away).abs() < 1.4
+        });
+        let here = me.is_some_and(|m| m.distance(v.pos) < v.radius + 7.0) || covers;
         let (ring_on, fill_on, glow_on, dim_on, bright_on) = match v.kind {
             EntityKind::Anvil => {
                 let s = AnvilState::from_u8(v.status);
@@ -1843,8 +1862,10 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XR
     let gold = kit.mat(hex(GOLD), Look::Metal);
     let brass = kit.mat(hex("#B8A27A"), Look::Metal);
     let muzzle = kit.mat(element_color(gf_core::damage::DamageType::Kinetic), Look::Glow);
-    let ring_mat = kit.mat(hdr(pc, 2.4).with_alpha(0.95), Look::Decal);
-    let chevron_mat = kit.mat(hdr(pc, 2.0).with_alpha(0.6), Look::Decal);
+    // The ring and the aim tick sit under the body at about half strength: they find the hero in
+    // a crowd without painting over the model (the contour and the rim carry the silhouette).
+    let ring_mat = kit.mat(hdr(pc, 1.5).with_alpha(0.55), Look::Decal);
+    let chevron_mat = kit.mat(hdr(pc, 1.4).with_alpha(0.45), Look::Decal);
     let shield_mat = kit.mat(hdr(hex("#BFEFFF"), 1.2).with_alpha(0.16), Look::Ghost);
     let aura_mat = kit.mat(hdr(hex(GOLD), 2.5).with_alpha(0.5), Look::Decal);
     let tether_mat = kit.mat(hdr(pc, 2.5).with_alpha(0.8), Look::Decal);
@@ -1857,14 +1878,38 @@ fn spawn_rig(kit: &mut Kit, db: &ContentDb, p: &PlayerView, xray_mat: &Handle<XR
     );
     let chevron_mesh = kit.pal.sector(kit.meshes, 50);
     kit.shadow(root, r * 1.3, 0.0);
-    let ring_tf = Transform { translation: Vec3::Y * 0.03, rotation: flat(FRAC_PI_2), scale: Vec3::splat(r * 2.3) };
+    let ring_r = r * 2.3;
+    let ring_tf = Transform { translation: Vec3::Y * 0.03, rotation: flat(FRAC_PI_2), scale: Vec3::splat(ring_r) };
     kit.child(root, &ring, ring_mat, ring_tf);
-    let chevron = kit.child(
-        root,
+    // The aim tick: a small arrowhead just outside the ring (a wedge from the feet covered the
+    // body), on a pivot the rig turns to the aim.
+    let chevron =
+        kit.commands.spawn((Transform::from_translation(Vec3::Y * 0.035), Visibility::default(), ChildOf(root))).id();
+    let tick = kit.child(
+        chevron,
         &chevron_mesh,
         chevron_mat,
-        Transform { translation: Vec3::Y * 0.035, scale: Vec3::splat(r * 3.4), ..default() },
+        Transform {
+            translation: Vec3::new(0.0, ring_r + 0.42, 0.0),
+            rotation: Quat::from_rotation_z(PI),
+            scale: Vec3::splat(0.46),
+        },
     );
+    kit.commands.entity(tick).insert(NotShadowCaster);
+    // A soft fill light rides above each hero (no shadows): the painted body sits a band above
+    // the dusk ground and the horde around it, the way a Hades hero carries their own light.
+    kit.commands.spawn((
+        PointLight {
+            color: hex(HERO_FILL),
+            intensity: HERO_FILL_LM,
+            range: 4.0,
+            radius: 0.3,
+            shadow_maps_enabled: false,
+            ..default()
+        },
+        Transform::from_xyz(0.0, 2.5, 1.1),
+        ChildOf(root),
+    ));
     let body = kit.child(
         root,
         &capsule,
