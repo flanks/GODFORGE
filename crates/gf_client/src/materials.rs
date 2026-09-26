@@ -244,6 +244,8 @@ pub const FLOOR_INLAYS: usize = 12;
 pub const FLOOR_PAVING: usize = 12;
 /// Holes cut into a floor (channels and pools sink below it).
 pub const FLOOR_HOLES: usize = 8;
+/// Solid footprints a map chunk darkens the ground under (soot and contact shade).
+pub const FLOOR_FOOTINGS: usize = 32;
 
 /// GPU layout of `FloorParams` in `floor.wesl` (field order matters).
 #[derive(Clone, Copy, Debug, ShaderType, Reflect)]
@@ -264,7 +266,7 @@ pub struct FloorParams {
     pub shape: Vec4,
     /// x = paint seed, y = moss / growth, z = vein sparkle, w = path count.
     pub style: Vec4,
-    /// x = fissure count, yz = key light direction (world xz, toward the light), w = unused.
+    /// x = fissure count, yz = key light direction (world xz, toward the light), w = footing count.
     pub misc: Vec4,
     /// x = inlay count, y = paving count, z = hole count, w = 1 on biome maps (no rim soot).
     pub counts: Vec4,
@@ -287,6 +289,8 @@ pub struct FloorParams {
     pub paving_v: [Vec4; FLOOR_PAVING / 4],
     /// Holes: (min x, min z, max x, max z) in world xz.
     pub holes: [Vec4; FLOOR_HOLES],
+    /// Footings: (centre x, centre z, half x, half z) in world xz.
+    pub footings: [Vec4; FLOOR_FOOTINGS],
 }
 
 #[derive(Asset, AsBindGroup, Reflect, Clone, Debug)]

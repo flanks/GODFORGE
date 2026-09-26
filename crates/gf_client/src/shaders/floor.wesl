@@ -44,7 +44,7 @@ struct FloorParams {
     shape: vec4<f32>,
     /// x = paint seed, y = moss amount, z = vein sparkle, w = path count
     style: vec4<f32>,
-    /// x = fissure segment count, yz = key light direction (world xz, toward the light), w = unused
+    /// x = fissure segment count, yz = key light direction (world xz, toward the light), w = footing count
     misc: vec4<f32>,
     /// x = inlay count, y = paving count, z = hole count, w = 1 on biome maps
     counts: vec4<f32>,
@@ -66,6 +66,8 @@ struct FloorParams {
     paving_v: array<vec4<f32>, 3>,
     /// holes: (min x, min z, max x, max z)
     holes: array<vec4<f32>, 8>,
+    /// footings of solid pieces: (centre x, centre z, half x, half z); half z < 0 = a circle of radius half x
+    footings: array<vec4<f32>, 32>,
 }
 
 @group(constants::MATERIAL_BIND_GROUP) @binding(100) var<uniform> fp: FloorParams;
@@ -234,6 +236,14 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let half = fp.shape.xy;
     let light_xz = fp.misc.yz;
     let map_mode = fp.counts.w > 0.5;
+    // Biome maps: the region's ground recipe rides on the first UV set (interpolated, so region
+    // borders blend): x = paving coverage offset, y = ash drifts.
+    var recipe = vec2(0.0);
+    @if(VERTEX_UVS_A) {
+        if map_mode {
+            recipe = in.uv;
+        }
+    }
 
     // ── large-scale fields ──
     let macro_v = fbm(w * 0.04 + seed);                        // slow value drift
@@ -244,6 +254,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // Worn paths (rooms) and roads (maps).
     var path_d = 99.0;
     var road = 0.0;
+    var shoulder = 0.0;
     let n_paths = i32(fp.style.w);
     for (var i = 0; i < 8; i++) {
         if i < n_paths {
@@ -252,7 +263,12 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
             let d = seg_dist(w, s.xy, s.zw);
             if pw > 0.0 {
                 let hw = pw * 0.5;
-                road = max(road, 1.0 - smoothstep(hw - 0.9, hw + 0.5, d + wobble * 0.35));
+                // Map roads: a hand-laid edge that wanders (not a ruler line), paving thinning out
+                // over the shoulder.
+                let edge = select(d + wobble * 0.35, d + wobble * 1.05, map_mode);
+                let fade = select(0.5, 1.6, map_mode);
+                road = max(road, 1.0 - smoothstep(hw - 0.9, hw + fade, edge));
+                shoulder = max(shoulder, 1.0 - smoothstep(hw, hw + 3.0, edge));
                 path_d = min(path_d, max(d - hw + 1.5, 0.0));
             } else {
                 path_d = min(path_d, d);
@@ -283,6 +299,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let n_inlays = i32(fp.counts.x);
     var plaza_c = vec2(0.0);
     var plaza_r = 0.0;
+    var plaza_pat = 0;
     var mosaic = false;
     let curb_w = 0.75;
     for (var i = 0; i < 12; i++) {
@@ -293,6 +310,18 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
                 plaza_c = a.xy;
                 plaza_r = a.z;
                 mosaic = v == 0;
+                // A clearing's paver pattern (its kind): 0 courses, 1 arena, 2 vault, 3 broken.
+                plaza_pat = select(0, i32(a.w + 0.5), v == 5);
+            }
+        }
+    }
+    // Distance past the rim of the nearest clearing (biome maps: POI clearings are lit pools).
+    var clearing_d = 99.0;
+    for (var i = 0; i < 12; i++) {
+        if i < n_inlays {
+            let a = fp.inlays[i];
+            if i32(fp.inlays_c[i].w + 0.5) == 5 {
+                clearing_d = min(clearing_d, length(w - a.xy) - a.z);
             }
         }
     }
@@ -332,26 +361,36 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
         st.id = vec2(0.52, 0.48);
         st.offset = rp;
         st.present = 1.0;
+    } else if plaza_r > 0.0 && r < plaza_r && plaza_pat == 2 {
+        region = 1;
+        // A vault floor: square flags laid on the diagonal.
+        let dq = vec2(rp.x + rp.y, rp.y - rp.x) * 0.70710678;
+        st = rect_stone(dq + vec2(40.0), vec2(1.15, 1.15), seed + plaza_c * 0.01);
     } else if plaza_r > 0.0 && r < plaza_r {
         region = 1;
-        // Concentric courses of cut pavers.
-        let course_w = 1.2;
+        // Concentric courses of cut pavers; an arena lays wide courses with aligned radial joints
+        // (a sundial of spokes), a lair's pavers are torn up.
+        let arena = plaza_pat == 1;
+        let course_w = select(1.2, 1.9, arena);
         let rr = (r - inner_r) / course_w;
         let k = floor(rr);
         let r_mid = inner_r + (k + 0.5) * course_w;
-        let count = max(8.0, floor(TAU * r_mid / (fp.shape.z * 1.1)));
-        let aa = ang / TAU * count + hash21(vec2(k, 3.0)) * count;
+        let count = select(max(8.0, floor(TAU * r_mid / (fp.shape.z * 1.1))), 16.0 * max(1.0, floor(r_mid / 5.0)), arena);
+        let aa = ang / TAU * count + select(hash21(vec2(k, 3.0)) * count, 0.0, arena);
         let j = floor(aa);
         let fr = fract(rr);
         let fa = fract(aa);
         let arc = TAU * r_mid / count;
         st.edge = min(min(fr, 1.0 - fr) * course_w, min(fa, 1.0 - fa) * arc);
         st.id = vec2(hash21(vec2(k, j) + seed + plaza_c), hash21(vec2(j, k) + seed + vec2(9.1, 2.3)));
+        if arena && k - 2.0 * floor(k * 0.5) > 0.5 {
+            st.id.x *= 0.45;
+        }
         let radial = rp / max(r, 1.0e-3);
         let tangent = vec2(-radial.y, radial.x);
         st.offset = radial * (fr - 0.5) * course_w + tangent * (fa - 0.5) * arc;
-        // A few pavers have lifted out near the outer courses.
-        st.present = 1.0 - step(0.93, st.id.x) * step(1.0, k);
+        // A few pavers have lifted out near the outer courses (most of them in a lair).
+        st.present = 1.0 - step(select(0.93, 0.55, plaza_pat == 3), st.id.x) * step(1.0, k);
     } else if plaza_r > 0.0 && r < plaza_r + curb_w {
         region = 2;
         let count = floor(TAU * (plaza_r + curb_w * 0.5) / 2.4);
@@ -409,7 +448,8 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
         let centre = w - st.offset;
         let edge_c = min(half.x - abs(centre.x), half.y - abs(centre.y));
         let rim_drop = select((1.0 - smoothstep(-1.0, 7.0, edge_c)) * 0.25, 0.0, map_mode);
-        let cover = fbm(centre * 0.055 + seed * 2.3) + (fp.dirt.a - 0.5) * 0.6 + worn * 0.12 + road * 0.9 - rim_drop;
+        let cover = fbm(centre * 0.055 + seed * 2.3) + (fp.dirt.a + recipe.x - 0.5) * 0.6 + worn * 0.12 + road * 0.9
+            + shoulder * 0.22 - rim_drop;
         st.present = step(0.45, cover + (st.id.x - 0.5) * 0.2);
     }
 
@@ -437,12 +477,16 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     }
 
     // Worn paths and roads: lighter, smoother, dustier stone.
-    let polished = fp.stone.rgb * 1.16 * (0.94 + 0.12 * strokes) + vec3(0.006);
-    stone = mix(stone, polished, worn * 0.55);
+    // Worn paths (rooms) polish lighter; map roads read by their laid texture and a warmer hue,
+    // not by brightness (the characters own the top of the value range).
+    let polish = select(fp.stone.rgb * 1.16 + vec3(0.006), fp.stone.rgb * vec3(1.08, 1.0, 0.86), map_mode);
+    let polished = polish * (0.94 + 0.12 * strokes);
+    stone = mix(stone, polished, worn * select(0.55, 0.45, map_mode));
 
     // Painted bevel: the lip facing the key light catches it, the far lip falls into shadow.
     let off_n = st.offset / max(length(st.offset), 1.0e-3);
-    let gap_w = mix(0.018, 0.032, 1.0 - worn) * select(1.0, 1.1, region == 0) * select(1.0, 0.7, pave == 2);
+    let gap_w = mix(0.018, 0.032, 1.0 - worn) * select(1.0, 1.1, region == 0) * select(1.0, 0.7, pave == 2)
+        * select(1.0, 0.75, map_mode);
     let lip = 1.0 - smoothstep(gap_w, gap_w + 0.17, st.edge);
     let facing = dot(off_n, light_xz);
     stone *= 1.0 + lip * (0.4 * max(facing, 0.0) - 0.28 * max(-facing, 0.0));
@@ -472,24 +516,32 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let terr = fbm(w * 0.055 + seed * 0.3 + vec2(11.0, 4.0));
     let mid_n = fbm2(w * 0.4 + seed);
     var ground = fp.dirt.rgb * (0.72 + 0.5 * dirt_n) * (0.86 + 0.28 * mid_n);
-    let ash = smoothstep(0.52, 0.72, terr);
+    let ash = max(smoothstep(0.52, 0.72, terr), recipe.y * smoothstep(0.2, 0.55, terr));
     ground = mix(ground, vec3(luma(ground)) * 1.55 + fp.cool.rgb * 0.02, ash * 0.55);
+    // Ash country (Cinder Dunes): wind ripples drawn across the drifts.
+    let ripple_p = w.x * 0.8 + w.y * 1.9 + (fbm2(w * 0.18 + seed) - 0.5) * 6.0;
+    let ripples = smoothstep(0.55, 0.95, sin(ripple_p * 2.2) * 0.5 + 0.5) * recipe.y * ash;
+    ground = mix(ground, ground * 0.72, ripples * 0.6);
     let scorch = smoothstep(0.42, 0.24, terr);
     ground = mix(ground, ground * vec3(0.62, 0.52, 0.5), scorch * 0.6);
     // Brush drags across the ground (a painter's texture, not noise).
     let drag = fbm(vec2(w.x * 0.9 + w.y * 0.35, w.y * 2.6 - w.x * 0.2) + seed * 1.3);
     ground *= 0.9 + 0.2 * drag;
     let ce = voronoi(w * 0.75 + seed * 1.7);
-    let crack_mask = smoothstep(0.5, 0.66, fbm(w * 0.11 + seed * 2.0 + vec2(3.0, 9.0)));
+    // Cracked earth only where the ground is scorched (maps), so it reads as a burn, not a tiling.
+    let crack_mask = smoothstep(0.5, 0.66, fbm(w * 0.11 + seed * 2.0 + vec2(3.0, 9.0))) * select(1.0, scorch, map_mode);
     let earth_cracks = (1.0 - smoothstep(0.015, 0.06, ce.d2 - ce.d1)) * crack_mask;
     ground = mix(ground, fp.mortar.rgb * 0.45, earth_cracks * 0.75);
     let pebble = voronoi(w * 1.25 + seed);
     let pick = hash21(pebble.id);
     let pebble_r = 0.1 + 0.2 * hash21(pebble.id + 5.0);
-    let is_pebble = step(0.84, pick);
+    // Stones gather in drifts (under walls, around rubble, along the shoulders) instead of an even
+    // polka-dot scatter.
+    let drift = smoothstep(0.5, 0.72, fbm(w * 0.12 + seed * 1.1 + vec2(2.0, 7.0)) + shoulder * 0.25);
+    let is_pebble = step(0.84, pick) * select(1.0, drift, map_mode);
     let pebbles = (1.0 - smoothstep(pebble_r - 0.04, pebble_r, pebble.d1)) * is_pebble;
     let pebble_rim = (1.0 - smoothstep(pebble_r, pebble_r + 0.06, pebble.d1)) * is_pebble;
-    ground = mix(ground, fp.mortar.rgb * 0.35, pebble_rim * 0.8);
+    ground = mix(ground, fp.mortar.rgb * 0.35, pebble_rim * select(0.8, 0.4, map_mode));
     let pebble_lit = 0.75 + 0.5 * max(dot(normalize(-pebble.r + vec2(1.0e-4)), light_xz), 0.0);
     ground = mix(ground, fp.stone.rgb * (0.55 + 0.4 * hash21(pebble.id + 1.0)) * pebble_lit, pebbles);
     let grit = hash21(floor(w * 14.0) + seed);
@@ -498,7 +550,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     ground *= 0.6 + 0.4 * smoothstep(0.0, 0.6, st.edge + 0.15);
 
     var color = stone * mix(0.72, 1.0, ao);
-    color = mix(color, fp.mortar.rgb * 0.3, max(gap, max(crack, shard_gap * 0.9)));
+    color = mix(color, fp.mortar.rgb * select(0.3, 0.55, map_mode), max(gap, max(crack, shard_gap * 0.9)));
     color = mix(ground, color, st.present);
 
     // ── gold mosaic at a plaza's heart ──
@@ -605,6 +657,28 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     }
     let grime = smoothstep(0.55, 0.8, fbm(w * 0.2 + seed + vec2(5.0, 1.0))) * (1.0 - worn);
     color = mix(color, fp.mortar.rgb, grime * 0.4);
+    // Biome maps: the ways (roads and clearings) are lit pools; the country between them falls
+    // off into dusk, so paths read at a glance and the frame gets its darks.
+    if map_mode {
+        let near_way = max(1.0 - smoothstep(1.5, 13.0, path_d), 1.0 - smoothstep(1.0, 10.0, clearing_d));
+        color *= mix(0.8, 1.0, near_way);
+    }
+    // Soot and contact shade under the solid pieces (they sit in the ground, not on it).
+    let n_foot = i32(fp.misc.w);
+    var foot = 0.0;
+    for (var i = 0; i < 32; i++) {
+        if i < n_foot {
+            let f = fp.footings[i];
+            var d = 0.0;
+            if f.w < 0.0 {
+                d = length(w - f.xy) - f.z;
+            } else {
+                d = length(max(abs(w - f.xy) - f.zw, vec2(0.0)));
+            }
+            foot = max(foot, 1.0 - smoothstep(-0.2, 1.5 + (fbm2(w * 0.9) - 0.5) * 0.8, d));
+        }
+    }
+    color = mix(color, color * 0.45, foot * 0.8);
 
     // Region tint (biome maps): a hue lean carried on vertex colours; alpha is the distance inland,
     // so the ground darkens toward cliffs and banks.
@@ -615,7 +689,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     let heat = fp.shape.w;
     let core = 1.0 - smoothstep(0.12, 0.38, rift);
     let lips = 1.0 - smoothstep(0.3, 1.3, rift);
-    let halo = 1.0 - smoothstep(0.8, 4.5, rift);
+    let halo = 1.0 - smoothstep(0.8, select(4.5, 2.6, map_mode), rift);
     let flow = 0.65 + 0.35 * sin(t * 1.3 - rift_len * 1.7 + noise2(w * 0.7) * 5.0);
     // Scorched, broken lips; the stone around a rift is darker and cracked.
     color = mix(color, fp.mortar.rgb * 0.22, clamp(lips * 0.85 + core, 0.0, 1.0) * (1.0 - gold_mask));
@@ -623,7 +697,7 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // The white-hot centre of the rift.
     glow += vec3(1.0, 0.85, 0.55) * fp.accent.a * 0.5 * heat * (1.0 - smoothstep(0.0, 0.14, rift)) * flow;
     // Heat halo: warms the stone around it (lit by the rift).
-    color += fp.accent.rgb * (0.02 + 0.13 * heat) * halo * (1.0 - core);
+    color += fp.accent.rgb * (0.02 + select(0.13, 0.07, map_mode) * heat) * halo * (1.0 - core);
 
     // ── veins (Spire starlit marble, Unmaking seams) ──
     let vein_f = fbm(w * 0.45 + seed * 1.9);
@@ -654,8 +728,8 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> Fragment
     // Cool, saturated shadow bands.
     let darkness = clamp(-stepped * 0.3, 0.0, 1.0);
     let l = luma(toon);
-    toon = max(vec3(l) + (toon - vec3(l)) * (1.0 + 0.5 * darkness), vec3(0.0));
-    toon = mix(toon, toon * fp.cool.rgb * 2.0, 0.22 * darkness);
+    toon = max(vec3(l) + (toon - vec3(l)) * (1.0 + 0.25 * darkness), vec3(0.0));
+    toon = mix(toon, toon * fp.cool.rgb * 2.0, 0.12 * darkness);
     let final_color = mix(lit.rgb, toon, 0.7) + glow;
 
     var out: FragmentOutput;

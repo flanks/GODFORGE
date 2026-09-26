@@ -1118,7 +1118,8 @@ fn render_map(db: &ContentDb, room: &RoomDef, map: &MapLayout, s: f32, labels: b
             }
         }
         for (r, reg) in map.regions.iter().enumerate() {
-            let name = theme_of(r as u8).map_or_else(|| format!("REGION {r}"), |t| t.name.to_ascii_uppercase());
+            let name = theme_of(r as u8)
+                .map_or_else(|| format!("REGION {r}"), |t| t.region_name(reg.name).to_ascii_uppercase());
             let dy = if reg.landmark.is_some() { -(9 + 8 * ls) } else { -3 * ls };
             centred(&mut cv, reg.site, dy, &name, TEXT);
             if let Some(m) = reg.landmark {

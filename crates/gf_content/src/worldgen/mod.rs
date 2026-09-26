@@ -295,7 +295,22 @@ pub fn generate(db: &ContentDb, t: &RoomDef, seed: u32) -> RoomDef {
     let hash = layout_hash(&obstacles, &pits, &pois, g.landing, gate);
     let mut roads = g.lanes();
     roads.retain(|l| l.from != l.to);
-    let regions = g.regions.iter().map(|r| Region { theme: r.theme, site: r.site, landmark: r.landmark }).collect();
+    // Region names: the regions of one theme take its name pool in turn, from a seed-picked
+    // start (a pure hash: no generation stream moves).
+    let mut taken = vec![0u8; g.x.themes.len().max(1)];
+    let regions = g
+        .regions
+        .iter()
+        .map(|r| {
+            let t = r.theme as usize;
+            let k = taken.get(t).copied().unwrap_or(0);
+            if let Some(n) = taken.get_mut(t) {
+                *n = n.wrapping_add(1);
+            }
+            let start = (seed.wrapping_mul(0x9E37_79B9) ^ (t as u32).wrapping_mul(0x85EB_CA6B)) >> 24;
+            Region { theme: r.theme, site: r.site, landmark: r.landmark, name: (start as u8).wrapping_add(k) }
+        })
+        .collect();
     let map = MapLayout {
         seed,
         hash,

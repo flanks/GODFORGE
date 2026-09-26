@@ -1176,6 +1176,8 @@
             // compositions), `fields` of them stay open killing ground, `cover` tops up ruins.
             // Camps draw their pack from `camp_pool` (one enemy kind per camp, 6–12 strong; bombers
             // stay out of camps, a dozen sleeping kindlejacks is a wipe, not a fight).
+            // `tint` multiplies the ground (#808080 = unchanged: hue *and* value), `ground` paints
+            // it (paving offset, ash drifts), and the regions of one theme take `names` in turn.
             themes: [
                 (
                     key: "slag_flats",
@@ -1183,10 +1185,13 @@
                     weight: 1.3,
                     open: true,
                     fields: 0.6,
-                    cover: 0.025,
+                    cover: 0.035,
                     districts: [(SlagChannel, 1.0), (CrucibleYard, 0.6)],
-                    tint: "#3A2418",
-                    map_color: "#5A3A28",
+                    // Black glassy slag, orange seams.
+                    tint: "#696669",
+                    map_color: "#3C2A24",
+                    names: ["The Slag Flats", "The Glass Wastes", "Clinker Plain", "The Cooling Fields"],
+                    ground: (paving: -0.2, ash: 0.0),
                     camp_pool: [(key: "cinderling", weight: 1.0), (key: "emberwisp", weight: 0.6), (key: "slagspitter", weight: 0.3)],
                 ),
                 (
@@ -1194,10 +1199,13 @@
                     name: "Foundry Ruins",
                     weight: 1.0,
                     fields: 0.2,
-                    cover: 0.055,
+                    cover: 0.07,
                     districts: [(ForgeHall, 1.4), (CrucibleYard, 0.8), (ColonnadeCourt, 0.5)],
-                    tint: "#2E1E17",
-                    map_color: "#4A3226",
+                    // Soot brick and iron plate.
+                    tint: "#767373",
+                    map_color: "#4A403C",
+                    names: ["Foundry Ruins", "The Dead Furnaces", "Bellows Hall", "The Cold Smelteries", "Ingot Row"],
+                    ground: (paving: 0.25, ash: 0.1),
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "cinderling", weight: 0.7), (key: "slagspitter", weight: 0.4)],
                 ),
                 (
@@ -1205,10 +1213,13 @@
                     name: "Colonnade of Oaths",
                     weight: 0.9,
                     fields: 0.25,
-                    cover: 0.05,
+                    cover: 0.07,
                     districts: [(ColonnadeCourt, 1.5), (ForgeHall, 0.4)],
-                    tint: "#34261E",
-                    map_color: "#56443A",
+                    // Pale marble and gold.
+                    tint: "#8B867D",
+                    map_color: "#6E6252",
+                    names: ["Colonnade of Oaths", "The Oathbound Walk", "Hall of Vows"],
+                    ground: (paving: 0.4, ash: 0.0),
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "cinderling", weight: 0.6), (key: "emberwisp", weight: 0.4)],
                 ),
                 (
@@ -1217,10 +1228,13 @@
                     weight: 0.8,
                     open: true,
                     fields: 0.75,
-                    cover: 0.02,
+                    cover: 0.03,
                     districts: [(SlagChannel, 0.6)],
-                    tint: "#2A1E1A",
-                    map_color: "#3E302A",
+                    // Pale grey ash in wind ripples.
+                    tint: "#8E8C8B",
+                    map_color: "#66625E",
+                    names: ["Cinder Dunes", "The Ash Sea", "Grey Drifts", "The Smoke Barrows"],
+                    ground: (paving: -0.35, ash: 0.9),
                     camp_pool: [(key: "ashrunner", weight: 1.0), (key: "clinker", weight: 0.8), (key: "emberwisp", weight: 0.5)],
                 ),
                 (
@@ -1228,15 +1242,19 @@
                     name: "The Chainyard",
                     weight: 0.7,
                     fields: 0.3,
-                    cover: 0.045,
+                    cover: 0.07,
                     districts: [(CrucibleYard, 1.4), (ForgeHall, 0.6)],
-                    tint: "#301C14",
-                    map_color: "#4E2E22",
+                    // Rust red, scrap and chains.
+                    tint: "#8B796E",
+                    map_color: "#6A3826",
+                    names: ["The Chainyard", "Rust Gallows", "The Anchor Pits"],
+                    ground: (paving: -0.05, ash: 0.0),
                     camp_pool: [(key: "clinker", weight: 1.0), (key: "slagspitter", weight: 0.5), (key: "cinderling", weight: 0.5)],
                 ),
             ],
-            // Coast in tiles (4 u): bays and headlands up to ~20 u deep.
-            coast: (depth: 2, amp: 3, period: 6),
+            // Coast in tiles (4 u): bays and headlands up to ~32 u deep, long enough to read as a
+            // shoreline, not a notched rectangle.
+            coast: (depth: 2, amp: 6, period: 10),
             // Slag rivers (pits, bridged at the road passes) and forge walls (breached at the passes).
             barriers: (chance: 0.45, kinds: [(River, 0.30), (Wall, 0.15)]),
             roads: (width: 6.0, loop_chance: 0.3, pass_width: 8.0),
@@ -1252,8 +1270,9 @@
                 (kind: Spring, count: 3, seals: 0),
             ],
             camps: (per_area: 4000.0, pack: (6, 12), elite_chance: 0.2, shards: (8, 15)),
-            // Grand monuments for regions without a major POI (phase 4 adds FallenWeapon).
-            landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8), (SealedGate, 0.5)],
+            // Grand monuments for regions without a major POI (phase 4 adds FallenWeapon). No
+            // SealedGate: a second sealed gate reads as the real Boss Gate.
+            landmarks: [(GreatAnvil, 1.0), (Statue, 1.0), (ColossusHead, 0.8), (GreatBrazier, 0.8)],
             seals_required: 7,
             gate_requires_warlord: true,
             gate_force_minute: 12.0,

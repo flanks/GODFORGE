@@ -20,10 +20,10 @@ use crate::ClientSet;
 use crate::camera::{KEY_LIGHT_FROM, KeyLight, Shake, w3};
 use crate::envkit::{self, CHUNK, Colors, Ctx, Env, Flame, Key, MeshBuf, Paint, h01, lin};
 use crate::materials::{
-    ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_HOLES, FLOOR_INLAYS, FLOOR_PATHS, FLOOR_PAVING,
-    Floor, FloorMaterial, FloorParams, ToonMaterial, ToonStyle, toon, toon_from_standard,
+    ABYSS_Y, Abyss, AbyssMaterial, BiomeLook, FLOOR_CRACKS, FLOOR_FOOTINGS, FLOOR_HOLES, FLOOR_INLAYS, FLOOR_PATHS,
+    FLOOR_PAVING, Floor, FloorMaterial, FloorParams, ToonMaterial, ToonStyle, toon, toon_from_standard,
 };
-use crate::palette::{Palette, hex, mix};
+use crate::palette::{Palette, hex, lighten, mix};
 use crate::scene::RoomGeometry;
 use crate::terrain;
 use gf_content::schema::{Decor, MapLayout, TileKind};
@@ -749,43 +749,47 @@ fn land_field(map: &MapLayout, mask: &[Ground]) -> Field {
     Field { origin: t.origin, w, h, f }
 }
 
-/// Region tint per tile, as a vertex-colour multiplier around 1 (hue shift, not darkening).
-fn tile_tints(map: &MapLayout, room: &RoomDef) -> Vec<Vec3> {
+/// Linear value of the neutral region tint (`#808080`): a tint is a multiplier relative to it.
+const TINT_NEUTRAL: f32 = 0.2158;
+
+/// Region look per tile: the tint as a vertex-colour multiplier (`#808080` = 1: hue *and* value,
+/// so black slag and pale ash read apart) and the theme's ground recipe (paving offset, ash).
+fn tile_looks(map: &MapLayout, room: &RoomDef) -> Vec<(Vec3, Vec2)> {
     let themes = room.expedition.as_ref().map(|x| &x.themes);
-    let tints: Vec<Vec3> = map
+    let looks: Vec<(Vec3, Vec2)> = map
         .regions
         .iter()
         .map(|r| {
-            let hexs = themes.and_then(|t| t.get(r.theme as usize)).map(|t| t.tint.as_str()).unwrap_or("#808080");
-            let l = hex(hexs).to_linear();
-            let v = Vec3::new(l.red, l.green, l.blue);
-            let m = (v.x + v.y + v.z) / 3.0;
-            let n = if m > 1e-4 { v / m } else { Vec3::ONE };
-            Vec3::ONE.lerp(n, 0.16).clamp(Vec3::splat(0.8), Vec3::splat(1.25))
+            let theme = themes.and_then(|t| t.get(r.theme as usize));
+            let l = hex(theme.map_or("#808080", |t| t.tint.as_str())).to_linear();
+            let v = Vec3::new(l.red, l.green, l.blue) / TINT_NEUTRAL;
+            let recipe = theme.map_or(Vec2::ZERO, |t| Vec2::new(t.ground.paving, t.ground.ash));
+            (v.clamp(Vec3::splat(0.3), Vec3::splat(1.6)), recipe)
         })
         .collect();
-    map.tiles.region.iter().map(|&r| tints.get(r as usize).copied().unwrap_or(Vec3::ONE)).collect()
+    map.tiles.region.iter().map(|&r| looks.get(r as usize).copied().unwrap_or((Vec3::ONE, Vec2::ZERO))).collect()
 }
 
 fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLayout, room: &RoomDef, c: &Colors) {
     let t0 = std::time::Instant::now();
     let mask = ground_mask(map, room);
     let field = land_field(map, &mask);
-    let tints = tile_tints(map, room);
+    let looks = tile_looks(map, room);
     let t = &map.tiles;
-    let tint_at = |p: Vec2| {
-        // Bilinear over tile centres.
+    // Bilinear over tile centres: (vertex colour, ground recipe as the first UV set).
+    let look_at = |p: Vec2| -> ([f32; 4], [f32; 2]) {
         let q = (p - t.origin) / t.size - Vec2::splat(0.5);
         let (x0, y0) = (q.x.floor(), q.y.floor());
         let (fx, fy) = (q.x - x0, q.y - y0);
         let at = |x: f32, y: f32| {
             let (x, y) = ((x as i32).clamp(0, t.w as i32 - 1), (y as i32).clamp(0, t.h as i32 - 1));
-            tints[t.index(x as u16, y as u16)]
+            looks[t.index(x as u16, y as u16)]
         };
-        let a = at(x0, y0).lerp(at(x0 + 1.0, y0), fx);
-        let b = at(x0, y0 + 1.0).lerp(at(x0 + 1.0, y0 + 1.0), fx);
-        let v = a.lerp(b, fy);
-        [v.x, v.y, v.z, 1.0]
+        let lerp = |a: (Vec3, Vec2), b: (Vec3, Vec2), k: f32| (a.0.lerp(b.0, k), a.1.lerp(b.1, k));
+        let a = lerp(at(x0, y0), at(x0 + 1.0, y0), fx);
+        let b = lerp(at(x0, y0 + 1.0), at(x0 + 1.0, y0 + 1.0), fx);
+        let (v, r) = lerp(a, b, fy);
+        ([v.x, v.y, v.z, 1.0], [r.x, r.y])
     };
     let pit_at = |p: Vec2| -> Ground {
         match t.tile_of(p) {
@@ -882,9 +886,9 @@ fn land(env: &mut Env, floors: &mut BTreeMap<u32, (MeshBuf, Rect)>, map: &MapLay
                 if s.0 != chunk {
                     // Alpha carries how far inland the vertex is (0 on the shore, 1 from 3 u in):
                     // the floor darkens toward cliffs and banks.
-                    let mut col = tint_at(*p);
+                    let (mut col, recipe) = look_at(*p);
                     col[3] = (-f / 3.0).clamp(0.0, 1.0);
-                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, [p.x * 0.1, -p.y * 0.1], col));
+                    *s = (chunk, buf.vert(w3(*p, 0.0), Vec3::Y, recipe, col));
                 }
                 idx[k] = s.1;
             }
@@ -1059,6 +1063,7 @@ pub fn floor_base(look: &BiomeLook, seed: u32) -> FloorParams {
         paving: [Vec4::ZERO; FLOOR_PAVING],
         paving_v: [Vec4::ZERO; FLOOR_PAVING / 4],
         holes: [Vec4::ZERO; FLOOR_HOLES],
+        footings: [Vec4::ZERO; FLOOR_FOOTINGS],
     }
 }
 
@@ -1139,10 +1144,18 @@ fn map_floor_params(
     p.shape.x = room.half_extents.x;
     p.shape.y = room.half_extents.y;
     p.counts.w = 1.0;
+    // The ground is the bottom of the value ladder on a map (characters > telegraphs > POIs >
+    // props > ground > abyss): darker stone and earth, low paving contrast, hand-sized slabs.
     // Open country is bare ground with old paving in patches; roads and clearings are paved.
-    p.dirt.w = 0.14;
-    p.stone.w = 0.26;
-    // POI clearings: a paved disc with a curb (inlay variant 5), first so they win the slots.
+    p.stone = lin4(lighten(look.stone(), 0.7), 0.2);
+    p.dirt = lin4(lighten(look.dirt(), 0.8), 0.14);
+    p.shape.z = 1.05;
+    // Fissures glow, but under the characters.
+    if look.cracks >= 1.0 {
+        p.accent.w = 1.3;
+    }
+    // POI clearings, first so they win the slots: the Anvil's gold mosaic (variant 0), every other
+    // kind a paved disc with a curb (variant 5) laid in its kind's pattern (the rotation slot).
     let mut ni = 0;
     for poi in &map.pois {
         let plaza = db.game.expedition.poi(poi.kind).map_or(poi.radius + 3.0, |t| t.plaza).max(poi.radius);
@@ -1151,8 +1164,15 @@ fn map_floor_params(
         if ni < FLOOR_INLAYS && lo.x <= rect.max.x && hi.x >= rect.min.x && lo.y <= rect.max.y && hi.y >= rect.min.y {
             let a = w3(poi.at, 0.0);
             let col = if poi.kind == PoiKind::Gate { hex("#F4E3C1") } else { hex("#C9A24E") };
-            p.inlays[ni] = Vec4::new(a.x, a.z, plaza, 0.0);
-            p.inlays_c[ni] = lin4(col, 5.0);
+            let (variant, pattern) = match poi.kind {
+                PoiKind::Anvil => (0.0, 0.0),
+                PoiKind::Warlord | PoiKind::Gate => (5.0, 1.0),
+                PoiKind::Reliquary | PoiKind::Vein | PoiKind::Spring => (5.0, 2.0),
+                PoiKind::Lair => (5.0, 3.0),
+                PoiKind::Shrine | PoiKind::Watchfire => (5.0, 0.0),
+            };
+            p.inlays[ni] = Vec4::new(a.x, a.z, plaza, pattern);
+            p.inlays_c[ni] = lin4(col, variant);
             ni += 1;
         }
     }
@@ -1172,5 +1192,36 @@ fn map_floor_params(
     p.style.w = n as f32;
     let grown = Rect::from_corners(rect.min - Vec2::splat(2.0), rect.max + Vec2::splat(2.0));
     paint_decor(&mut p, db, &room.decor, Some(grown));
+    paint_footings(&mut p, &room.obstacles, grown);
     p
+}
+
+/// Soot and contact darkness under the solid pieces standing on a chunk (largest first), so
+/// props sit in the ground instead of on it.
+fn paint_footings(p: &mut FloorParams, obstacles: &[Obstacle], area: Rect) {
+    let mut near: Vec<(f32, Vec4)> = obstacles
+        .iter()
+        .filter_map(|o| {
+            let (c, h) = match *o {
+                Obstacle::Circle { center, radius } => (center, Vec2::splat(radius)),
+                Obstacle::Box { center, half } => (center, half),
+            };
+            let m = h * 1.6;
+            let (lo, hi) = (c - m, c + m);
+            let touches = lo.x <= area.max.x && hi.x >= area.min.x && lo.y <= area.max.y && hi.y >= area.min.y;
+            let a = w3(c, 0.0);
+            // A circle travels as (x, z, radius, −1).
+            let v = match *o {
+                Obstacle::Circle { radius, .. } => Vec4::new(a.x, a.z, radius, -1.0),
+                Obstacle::Box { .. } => Vec4::new(a.x, a.z, h.x, h.y),
+            };
+            touches.then_some((h.x * h.y, v))
+        })
+        .collect();
+    near.sort_by(|a, b| b.0.total_cmp(&a.0));
+    let n = near.len().min(FLOOR_FOOTINGS);
+    for (i, (_, v)) in near.into_iter().take(n).enumerate() {
+        p.footings[i] = v;
+    }
+    p.misc.w = n as f32;
 }

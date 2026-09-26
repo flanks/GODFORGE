@@ -1914,6 +1914,33 @@ pub struct RegionTheme {
     /// Camp packs in this region (the biome's swarm when empty).
     #[serde(default)]
     pub camp_pool: Vec<WeightedKey>,
+    /// Names the regions of this theme take on one map, in turn (`name` when empty), so a map
+    /// with four slag flats never shows the same banner twice.
+    #[serde(default)]
+    pub names: Vec<String>,
+    /// How the region's open ground is painted (presentation only: generation never reads it).
+    #[serde(default)]
+    pub ground: GroundRecipe,
+}
+
+impl RegionTheme {
+    /// The name of the `k`-th region of this theme on a map.
+    pub fn region_name(&self, k: u8) -> &str {
+        match self.names.len() {
+            0 => &self.name,
+            n => &self.names[k as usize % n],
+        }
+    }
+}
+
+/// A region theme's ground paint (the client blends it across region borders).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
+pub struct GroundRecipe {
+    /// Paving coverage offset: −0.5 bare earth … +0.5 fully paved.
+    pub paving: f32,
+    /// Ash drifts with wind ripples (0..=1).
+    pub ash: f32,
 }
 
 /// The coastline: void tiles eaten in from the map rectangle (tile units).
@@ -2164,6 +2191,8 @@ pub struct Region {
     pub site: Vec2,
     /// The grand monument standing at the site, if any.
     pub landmark: Option<MapMark>,
+    /// Which of its theme's names this region carries ([`RegionTheme::region_name`]).
+    pub name: u8,
 }
 
 /// Where a road crosses a barrier: a bridge over a pit or a breach in a wall (a chokepoint).
