@@ -489,3 +489,8 @@ GF_Hero_v1          the scene's only root: the armature node (Bevy's animation t
 - The gate is `tools/blender/gf_hero/validate_glb.py` (standard library, CI job `hero-glb`, with a Blender re-import
   smoke test). The clips it requires are listed in `tools/blender/gf_hero/required_clips.json`: the shared set of §8,
   which must equal `s4_contract.SHARED_CLIPS`, plus each hero's unique block.
+- **A weapon without an `offhand` node** (a sleeve weapon on one arm, such as Valdris's colossus_cannon from the weapon
+  track) is attached as the identity child of `weapon_R` only; `weapon_L` stays free and the left hand is the hero's
+  own. The weapon has no fist / open variants, so the sidecar's `clip_info.<clip>.weapon_variant` is null; the hero's
+  own finger poses (keyed in the clips) are listed as `clip_info.<clip>.hand_pose` for reference. The re-import smoke
+  test attaches such a weapon the same way (Valdris, 2026-09-26; docs/ART_PIPELINE.md §5 "Stage 5").

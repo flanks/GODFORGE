@@ -22,7 +22,10 @@
      Blender pose bone (converted to +Y up) within 1e-4;
   5. the sidecar <key>.meta.json {skeleton, clips, clip_info (frames, loop, layer, events, design speed, weapon variant
      swaps), sockets, tris, textures, weapon, status: ai_final_pending_user_approval, sha256}, then the gate again with
-     the sidecar; the report goes to art/characters/<key>/reports/export_report.json (section "hero").
+     the sidecar; the report goes to art/characters/<key>/reports/export_report.json (section "hero"). When the
+     default weapon's GLB has no offhand node and no _fist_ / _open_ variants (a sleeve weapon such as Valdris's
+     colossus_cannon, built by the weapon track), clip_info.<clip>.weapon_variant is null, the hands' fist / open
+     frames move to clip_info.<clip>.hand_pose, and weapon.attach says it rides weapon_R alone.
 --weapon <chassis>: the stage-2 weapon file (open + fist variants per hand, authored in the socket grip frame) ->
   assets/models/weapons/<chassis>.glb + .meta.json in the docs/art/WEAPONS.md layout: root <chassis> = the right grip
   frame; <chassis>_fist_R / <chassis>_open_R, grip_R, muzzle, glow_core under it; offhand (the left pair, re-parented by
@@ -326,6 +329,12 @@ def export_hero():
     # ---- sidecar ----
     wkey = (status.get("signature_weapon") or {}).get("chassis")
     wglb = "assets/models/weapons/%s.glb" % wkey if wkey else None
+    # the weapon's layout, when its GLB is there: a sleeve weapon without an offhand node or hand variants (Valdris's
+    # colossus_cannon, built by the weapon track) rides weapon_R alone, and the hands' fist / open poses are the hero's
+    # own keyed fingers, not weapon swaps (Brax's anvil_gauntlets have both, so his sidecar is unchanged)
+    wnames = V.Glb(os.path.join(ROOT, wglb)).names if wglb and os.path.isfile(os.path.join(ROOT, wglb)) else None
+    sleeve_only = wnames is not None and "offhand" not in wnames and not any(
+        n.endswith(("_fist_R", "_open_R", "_fist_L", "_open_L")) for n in wnames)
     clip_info = {}
     for clip in man["order"]:
         c = man["clips"][clip]
@@ -338,6 +347,9 @@ def export_hero():
             "slide_exempt": c.get("slide_exempt", False),
             "weapon_variant": c.get("metrics", {}).get("weapon_variant"),
             "maps_to": c.get("maps_to"), "purpose": c.get("purpose")}
+        if sleeve_only:
+            clip_info[c["action"]]["hand_pose"] = clip_info[c["action"]]["weapon_variant"]
+            clip_info[c["action"]]["weapon_variant"] = None
     meta = {
         "kind": "character", "key": KEY, "name": status.get("name"),
         "skeleton": "%s v%d" % (R.RIG_NAME, R.CONTRACT_VERSION), "armature": R.RIG_NAME,
@@ -367,6 +379,13 @@ def export_hero():
         "built": TODAY,
         "validation": {"ok": False, "errors": [], "warnings": []},
     }
+    if sleeve_only:
+        meta["playback"]["weapon_variant"] = (
+            "clip_info.<clip>.weapon_variant is null: %s has no hand variants, so nothing swaps. The fist / open hand "
+            "poses are the hero's own keyed fingers; clip_info.<clip>.hand_pose lists them per hand for reference" % wkey)
+        meta["weapon"]["attach"] = ("weapon scene = identity child of weapon_R (a sleeve weapon: the right forearm lies in "
+                                    "its sleeve, the fist on its inner handle); it has no offhand node, the left hand is "
+                                    "the hero's own")
     meta_p = os.path.join(out_dir, "%s.meta.json" % KEY)
     rep = V.validate_hero(glb, meta=meta, spec=spec)
     errs = errors + rep["errors"]

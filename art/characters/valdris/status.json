@@ -53,6 +53,14 @@
    "polish_note": "2026-09-26 stage-2 polish: the orchestrator asked for massive arms rather than thin ones; where the sleeve is too narrow it is noted for the weapon owner instead of slimming the arm."
   }
  ],
+ "signature_weapon": {
+  "chassis": "colossus_cannon",
+  "path": "art/weapons/colossus_cannon/",
+  "status": "art/weapons/colossus_cannon/status.json",
+  "glb": "assets/models/weapons/colossus_cannon.glb",
+  "built_by": "the weapon track (tools/blender/gf_assets, art/weapons/colossus_cannon/source/colossus_cannon_build.py), not the gf_hero chain: stage 5 attaches the shipped GLB and never re-exports it",
+  "sockets": "weapon_R on GF_Hero_v1 (decisions[weapons_separate_arms]): the weapon scene is an identity child of weapon_R; a sleeve weapon with no offhand node, his left hand is his own plate gauntlet"
+ },
  "stages": {
   "0_concept_reference": {
    "status": "done",
@@ -833,10 +841,121 @@
    }
   },
   "5_export_validate": {
-   "status": "not_started",
+   "status": "done",
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated headless Blender 5.2 chain tools/blender/gf_hero/run_stage5.py (the shared exporter and gate Brax's track built); no human step",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator). Content over tests: the validators and the review renders are the quality gate.",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "Headless Blender CI writes assets/models/characters/valdris.glb, uncompressed (bevy_gltf 0.20 supports no Draco, meshopt or quantisation). The user applies the final visual approval."
+   "outputs": [
+    "assets/models/characters/valdris.glb (Git LFS)",
+    "assets/models/characters/valdris.meta.json",
+    "art/characters/valdris/reports/export_report.json",
+    "art/characters/valdris/reports/stage5/export_review.png",
+    "art/characters/valdris/reports/stage5/valdris_board.png",
+    "art/characters/valdris/reports/stage5/brax_regression.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage5.py (shared; gained the optional 'board' step)",
+    "tools/blender/gf_hero/export_glb.py (shared; the sidecar's sleeve-weapon branch)",
+    "tools/blender/gf_hero/validate_glb.py (shared, unchanged)",
+    "tools/blender/gf_hero/smoke_import.py (shared; the per-hero hook and the sleeve weapon without an offhand node)",
+    "tools/blender/gf_hero/s5_sheets.py (shared; a line for a weapon the chain did not build)",
+    "tools/blender/gf_hero/required_clips.json (shared, unchanged: the valdris block from stage 4)",
+    "tools/blender/gf_hero/s5_valdris.py",
+    "tools/blender/gf_hero/s5_valdris_sheets.py"
+   ],
+   "metrics": {
+    "glb_bytes": 16889700,
+    "glb_sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+    "tris": 24958,
+    "tris_budget": [
+     15000,
+     25000
+    ],
+    "joints": 116,
+    "extra_bones": 53,
+    "meshes": 1,
+    "materials": 1,
+    "double_sided": false,
+    "textures_px": {
+     "emissive": 2048,
+     "normal": 2048,
+     "base_color": 2048
+    },
+    "clips": 34,
+    "required_clips_missing": 0,
+    "vertices_exported": 23838,
+    "unweighted_vertices": 0,
+    "weight_sum_max_error": 1.341104507446289e-07,
+    "max_influences": 4,
+    "vertex_colour_sets": 0,
+    "extensions_required": [],
+    "extensions_used": [
+     "KHR_materials_emissive_strength"
+    ],
+    "bind_pose_max_error": 1.9143350184471735e-06,
+    "source_fidelity_max_error": 4.4775674075278604e-05,
+    "blender_reimport_clip_pose_max_error": 2.6524066925048828e-05,
+    "blender_reimport_clips_played": 34,
+    "weapon_attach_rest_error": 1.5435514200135003e-07,
+    "weapon_follow_fire_heavy_f6_error": 5.364418029785156e-07,
+    "height_m": 2.3339,
+    "validation_errors": 0,
+    "validation_warnings": [
+     "rest height 2.33 m outside the hero range (2.0, 2.3)"
+    ],
+    "deterministic_reexport": true,
+    "weapon_glb": "assets/models/weapons/colossus_cannon.glb (weapon track, not re-exported)",
+    "weapon_glb_sha256": "b1c49e3905add3167727461aa2284cd2cdcfc7656ef99891069e68b81306f786",
+    "brax_outputs_unchanged": true
+   },
+   "notes": "valdris.glb: glTF binary, +Y up, faces +Z, uncompressed (bevy_gltf 0.20 loads no Draco / meshopt / quantisation), GF_Hero_v1 (63 contract joints incl. the 4 sockets) + his 53 x_ extras (armour helpers, cape / loincloth / beard chains) = 116 joints, ONE skinned mesh valdris_mesh (the 12 parts joined: one draw call; every part closed, so M_valdris is single-sided, with 2048 base colour / emissive / normal PNGs, tangents, no vertex colours), 34 clips named valdris_<clip>[@loop] sampled at 30 fps with the helpers and cloth baked. Gate: validate_glb.py (stdlib, CI job hero-glb) + the Blender 5.2 re-import (every clip one frame) + source fidelity against the .blend: 0 errors, one warning (rest height 2.33 m to the pauldron tops, over the 2.0-2.3 m hero range; stage 2 measured the same). The sidecar valdris.meta.json carries the clip events, design speeds, sockets and status ai_final_pending_user_approval; the colossus_cannon (the weapon track's shipped GLB, arm-mounted, no offhand node, no variants) is its default weapon, attached as the identity child of weapon_R; clip_info.weapon_variant is null and his own finger poses are clip_info.hand_pose. Re-export is byte-identical. The shared-tool changes are default-off and Brax's stage-5 outputs are unchanged (reports/stage5/brax_regression.json). The Bevy-side import test comes with the engine integration.",
+   "items": {
+    "glb_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "assets/models/characters/valdris.glb",
+      "assets/models/characters/valdris.meta.json"
+     ]
+    },
+    "validation": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/reports/export_report.json"
+     ],
+     "notes": "0 errors, 1 warning (rest height 2.33 m) on valdris.glb; CI job hero-glb runs the same gate with the Blender re-import on every assets/models/characters/*.glb"
+    },
+    "blender_reimport_smoke_test": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/valdris/reports/stage5/export_review.png",
+      "art/characters/valdris/reports/stage5/valdris_board.png"
+     ],
+     "notes": "34 clips played one frame each (pose error 2.7e-5); the colossus_cannon attached on the imported weapon_R (1.5e-7) and following it through fire_heavy f6 (5.4e-7)"
+    },
+    "weapon_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "notes": "not part of this stage: the colossus_cannon is the weapon track's file (art/weapons/colossus_cannon/, tools/blender/gf_assets); stage 5 attaches the shipped assets/models/weapons/colossus_cannon.glb unchanged"
+    },
+    "bevy_import_test": {
+     "status": "not_started",
+     "human_signoff_required": false,
+     "notes": "a Rust test that loads valdris.glb through bevy_gltf, spawns #Scene0 and plays each clip; it comes with the engine integration (crates/, the engine agent)"
+    },
+    "user_final_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the shipped files: the Hades-II bar (reports/stage5/valdris_board.png and export_review.png, and the stage 2-4 sheets). Record signed_off_by / signed_off_on on this item and on the stage; only then may final be true."
+    }
+   }
   }
  },
  "human_gates": [
@@ -874,8 +993,9 @@
    "via": "art/characters/valdris/reports/stage3/ and reports/rig_report.md"
   },
   {
-   "gate": "stage 5: final Hades-II bar",
-   "state": "not_started"
+   "gate": "stage 5: the user's final visual approval of the shipped files (the Hades-II bar)",
+   "state": "pending_human",
+   "via": "art/characters/valdris/reports/stage5/valdris_board.png + export_review.png + reports/export_report.json (and the stage 2-4 sheets)"
   },
   {
    "gate": "stage 4: the user's visual approval of the AI-made clips (no animator, 2026-09-25)",

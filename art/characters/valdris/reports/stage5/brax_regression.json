@@ -1,0 +1,41 @@
+{
+ "_doc": "Brax regression check for the backwards-compatible stage-5 changes Valdris made to the shared tools/blender/gf_hero/ stage-5 scripts. Brax's whole stage-5 chain (run_stage5.py brax: weapon, export, reimport with the review renders, sheet, validate) was run twice in a scratch copy of the repository with his committed inputs (production/brax_anim.blend, textures/, reports/anim/clips.json, work/brax_landmarks.json, status.json, art/weapons/anvil_gauntlets/{status.json, production/, textures/}, tools/blender/gf_assets/ read only): once with the HEAD scripts (git archive HEAD tools/blender/gf_hero), once with the changed ones. Nothing under art/characters/brax/, art/weapons/ or assets/models/ of the repository was written.",
+ "date": "2026-09-26",
+ "head": "tools/blender/gf_hero at d2f0afe",
+ "changed_files": [
+  "tools/blender/gf_hero/smoke_import.py (optional per-hero hook s5_<key>.py: REVIEW_SHOTS, ATTACH_FOLLOW, CLOSEUP, defaults = Brax's old values; a weapon GLB without an offhand node rides weapon_R alone; meshes without a _fist_ / _open_ suffix on such a weapon are 'fixed', always shown; the follow-check key is attach_<clip>_f<frame>_error, which is still attach_jab_r_f3_error for Brax)",
+  "tools/blender/gf_hero/export_glb.py (sidecar only: when the default weapon GLB has no offhand node and no hand variants, clip_info.<clip>.weapon_variant is null, the fist / open frames move to hand_pose, and weapon.attach / playback.weapon_variant say so)",
+  "tools/blender/gf_hero/s5_sheets.py (a header line for a weapon the gf_hero chain did not build, only when the report has no 'weapons' section)",
+  "tools/blender/gf_hero/run_stage5.py (an optional 'board' step running s5_<key>_sheets.py when the hero has one; skipped for Brax)"
+ ],
+ "new_files": [
+  "tools/blender/gf_hero/s5_valdris.py",
+  "tools/blender/gf_hero/s5_valdris_sheets.py"
+ ],
+ "results": {
+  "assets/models/characters/brax.glb": {
+   "committed_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
+   "head_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
+   "changed_sha256": "6fca8890c1ff278c3cb5d1621f4c054f7fe0ad59a3e5b9d84c17e7abc1908e9a",
+   "byte_identical": true
+  },
+  "assets/models/characters/brax.meta.json": {
+   "committed_sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62",
+   "head_sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62",
+   "changed_sha256": "7f46fc1cbbfe54b28e1dd70e94955035d965ad3fe813c2a2152c6f8af4f86d62",
+   "byte_identical": true
+  },
+  "assets/models/weapons/anvil_gauntlets.glb": {
+   "committed_sha256": "325233983cb0a65ffc378227be7be3013e7ec05443ebab8c1ae0b61791558b78",
+   "head_sha256": "325233983cb0a65ffc378227be7be3013e7ec05443ebab8c1ae0b61791558b78",
+   "changed_sha256": "325233983cb0a65ffc378227be7be3013e7ec05443ebab8c1ae0b61791558b78",
+   "byte_identical": true
+  },
+  "assets/models/weapons/anvil_gauntlets.meta.json": "head and changed byte-identical (bfd88452...); both differ from the committed file only in 'built' (2026-09-25 -> the run date), which export_weapon writes and these changes do not touch",
+  "art/characters/brax/reports/export_report.json": "head and changed identical (ignoring 'seconds')",
+  "art/characters/brax/reports/stage5/export_review.png": "head and changed byte-identical (7c76b3c4...)",
+  "art/characters/brax/work/stage5_validate.json": "head and changed byte-identical (validate_glb --blender: OK, 0 errors, 0 warnings)",
+  "art/characters/brax/work/renders/stage5/*.png": "24 renders, pixel-identical (max channel difference 0); the PNG bytes differ only in Blender's embedded metadata"
+ },
+ "verdict": "Brax's stage-5 outputs are unchanged with the changed shared scripts: he has no s5_brax.py hook (the defaults are his old shots and follow clip), his anvil_gauntlets have an offhand node and fist / open variants (so neither the smoke test's new branch nor the sidecar's sleeve-weapon branch runs), his report has a 'weapons' section (so the sheet's new line never prints), and he has no s5_brax_sheets.py (the board step is skipped)."
+}

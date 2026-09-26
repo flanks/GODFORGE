@@ -12,6 +12,8 @@ Steps (each one a headless Blender run, ComfyUI's python for the PIL sheet, or p
   reimport  smoke_import.py                   fresh factory Blender: re-import, names, every clip one frame, the weapon
                                               on the sockets, review renders -> work/renders/stage5/ + export_report.json
   sheet     s5_sheets.py (PIL)                reports/stage5/export_review.png
+  board     s5_<key>_sheets.py (PIL)          optional per-hero board (skipped when the hero has no such script), e.g.
+                                              Valdris's shipped file next to his concept and blockout
   validate  validate_glb.py --blender         exactly what CI runs (stdlib gate + the Blender re-import)
 Inputs: production/<key>_anim.blend (stage 4), reports/anim/clips.json, work/<key>_landmarks.json, required_clips.json.
 About a minute on the dev machine (Cycles on the CPU for the few review renders; the GPU is shared).
@@ -28,7 +30,7 @@ BLENDER = os.environ.get("BLENDER", r"C:\Program Files\Blender Foundation\Blende
 # the PIL review sheets run in any Python with Pillow: $COMFY_PY, else the dev machine's ComfyUI env, else this Python
 COMFY_PY = os.environ.get("COMFY_PY") or next(
     (p for p in (r"D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\standalone-env\python.exe",) if os.path.isfile(p)), sys.executable)
-STEPS = ["weapon", "export", "reimport", "sheet", "validate"]
+STEPS = ["weapon", "export", "reimport", "sheet", "board", "validate"]
 
 
 def run(cmd, log_path):
@@ -67,6 +69,7 @@ def main(argv):
         "export": B + [os.path.join(A, "production", "%s_anim.blend" % key), "-P", os.path.join(G, "export_glb.py"), "--", "--key", key],
         "reimport": smoke,
         "sheet": [COMFY_PY, os.path.join(G, "s5_sheets.py"), key],
+        "board": [COMFY_PY, os.path.join(G, "s5_%s_sheets.py" % key)] if os.path.isfile(os.path.join(ROOT, G, "s5_%s_sheets.py" % key)) else None,
         "validate": [sys.executable, os.path.join(G, "validate_glb.py"), glb, "--blender", BLENDER,
                      "--json", os.path.join(W, "stage5_validate.json")],
     }
@@ -74,7 +77,7 @@ def main(argv):
     t0 = time.time()
     for st in todo:
         if cmds[st] is None:
-            print("[stage5] %s: skipped (no gf_hero-built signature weapon)" % st)
+            print("[stage5] %s: skipped (%s)" % (st, "no gf_hero-built signature weapon" if st == "weapon" else "no s5_%s_sheets.py" % key))
             continue
         print("[stage5] %s" % st)
         run(cmds[st], os.path.join(ROOT, W, "logs", "stage5_%s.log" % st))

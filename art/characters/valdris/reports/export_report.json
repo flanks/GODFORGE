@@ -1,0 +1,1623 @@
+{
+ "hero": "valdris",
+ "stage": "5_export_validate",
+ "updated": "2026-09-26",
+ "hero_export": {
+  "ok": true,
+  "errors": [],
+  "warnings": [
+   "rest height 2.33 m outside the hero range (2.0, 2.3)"
+  ],
+  "glb": "assets/models/characters/valdris.glb",
+  "meta": "assets/models/characters/valdris.meta.json",
+  "bytes": 16889700,
+  "sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+  "source_blend": "art/characters/valdris/production/valdris_anim.blend",
+  "export_settings": {
+   "export_format": "GLB",
+   "use_selection": true,
+   "export_yup": true,
+   "export_apply": false,
+   "export_texcoords": true,
+   "export_normals": true,
+   "export_tangents": true,
+   "export_materials": "EXPORT",
+   "export_image_format": "AUTO",
+   "export_vertex_color": "NONE",
+   "export_all_vertex_colors": false,
+   "export_active_vertex_color_when_no_material": false,
+   "export_attributes": false,
+   "export_cameras": false,
+   "export_lights": false,
+   "export_extras": false,
+   "export_morph": false,
+   "export_draco_mesh_compression_enable": false,
+   "export_meshopt_compression_enable": false,
+   "export_use_gltfpack": false,
+   "export_gpu_instances": false,
+   "export_leaf_bone": false,
+   "export_skins": true,
+   "export_influence_nb": 4,
+   "export_all_influences": false,
+   "export_def_bones": true,
+   "export_rest_position_armature": true,
+   "export_armature_object_remove": false,
+   "export_hierarchy_flatten_bones": false,
+   "export_animations": true,
+   "export_animation_mode": "NLA_TRACKS",
+   "export_force_sampling": true,
+   "export_frame_step": 1,
+   "export_optimize_animation_size": false,
+   "export_anim_single_armature": true,
+   "export_reset_pose_bones": true,
+   "export_anim_slide_to_zero": false,
+   "export_pointer_animation": false
+  },
+  "joined_mesh": {
+   "name": "valdris_mesh",
+   "verts": 12801,
+   "tris": 24958,
+   "double_sided": false
+  },
+  "blender_checks": {
+   "hierarchy_problems": [],
+   "parts": {
+    "BODY": {
+     "verts": 3953,
+     "tris": 7894,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "CUIRASS": {
+     "verts": 1080,
+     "tris": 2152,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "ANVIL": {
+     "verts": 183,
+     "tris": 354,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "PAULDRONS": {
+     "verts": 764,
+     "tris": 1408,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "ARMS": {
+     "verts": 1562,
+     "tris": 3108,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "GAUNTLETS": {
+     "verts": 1046,
+     "tris": 1924,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "LEGS": {
+     "verts": 1138,
+     "tris": 2228,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "SABATONS": {
+     "verts": 1000,
+     "tris": 1960,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "HIPS": {
+     "verts": 268,
+     "tris": 504,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "LOINCLOTH": {
+     "verts": 126,
+     "tris": 248,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "CAPE": {
+     "verts": 504,
+     "tris": 1000,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    },
+    "BEARD": {
+     "verts": 1177,
+     "tris": 2178,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_valdris"
+     ]
+    }
+   },
+   "tris": 24958,
+   "closed": true,
+   "material": {
+    "name": "M_valdris",
+    "images": [
+     {
+      "name": "valdris_basecolor.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\valdris_basecolor.png"
+     },
+     {
+      "name": "valdris_emissive.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\valdris_emissive.png"
+     },
+     {
+      "name": "valdris_normal.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "Non-Color",
+      "file": "//..\\textures\\valdris_normal.png"
+     }
+    ]
+   },
+   "nla_tracks": {
+    "hero_tracks": 34,
+    "missing_vs_clips_json": [],
+    "missing_vs_required_clips": [],
+    "not_exported": [
+     "GF_ValidationPoses"
+    ]
+   }
+  },
+  "source_fidelity": {
+   "frames_per_clip": "first, middle, last",
+   "joints": 116,
+   "max_error": 4.4775674075278604e-05,
+   "per_clip": {
+    "valdris_idle@loop": 8.455742205926153e-06,
+    "valdris_idle_combat@loop": 1.3270793698672012e-05,
+    "valdris_walk@loop": 1.3656289025942847e-05,
+    "valdris_run@loop": 2.7227716589667272e-05,
+    "valdris_strafe_left@loop": 2.4612583032879165e-05,
+    "valdris_strafe_right@loop": 2.4543917017338934e-05,
+    "valdris_backpedal@loop": 2.2555331425144765e-05,
+    "valdris_dash": 2.551157361396772e-05,
+    "valdris_dash_recover": 2.6464139938578435e-05,
+    "valdris_fire_light": 3.3662619221150325e-05,
+    "valdris_fire_heavy": 3.0908722275249656e-05,
+    "valdris_fire_charge@loop": 1.7257081725174928e-05,
+    "valdris_hit_light": 1.3598461793606909e-05,
+    "valdris_hit_heavy": 2.2049886794550666e-05,
+    "valdris_knockdown": 2.5943695647234755e-05,
+    "valdris_get_up": 4.4775674075278604e-05,
+    "valdris_death": 2.6442437141671604e-05,
+    "valdris_downed@loop": 1.611325642647543e-05,
+    "valdris_revive": 2.019660447616367e-05,
+    "valdris_reforge_in": 2.5840216696382257e-05,
+    "valdris_victory": 1.5065251480539388e-05,
+    "valdris_ping": 1.3270793698672012e-05,
+    "valdris_interact": 2.0883967218110477e-05,
+    "valdris_forge_hammer@loop": 1.9631381939611003e-05,
+    "valdris_idle_signature@loop": 7.876463828160318e-06,
+    "valdris_bulwark_slam": 2.5761393014356315e-05,
+    "valdris_siege_stance_enter": 2.4635570777031823e-05,
+    "valdris_siege_stance@loop": 2.3283380398142484e-05,
+    "valdris_siege_stance_exit": 2.3282203750030206e-05,
+    "valdris_siege_fire": 2.3282203750030206e-05,
+    "valdris_mountainfall_start": 1.846318441967032e-05,
+    "valdris_mountainfall@loop": 1.846318441967032e-05,
+    "valdris_mountainfall_pound": 1.846318441967032e-05,
+    "valdris_armor_break": 1.3271174026718846e-05
+   },
+   "ok": true
+  },
+  "validation": {
+   "file": "assets/models/characters/valdris.glb",
+   "key": "valdris",
+   "bytes": 16889700,
+   "sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+   "generator": "Khronos glTF Blender I/O v5.2.39",
+   "extensions_used": [
+    "KHR_materials_emissive_strength"
+   ],
+   "extensions_required": [],
+   "scene_roots": [
+    "GF_Hero_v1"
+   ],
+   "nodes": 118,
+   "joints": 116,
+   "extra_bones": [
+    "x_elbow_L",
+    "x_pauldron_L",
+    "x_elbow_R",
+    "x_pauldron_R",
+    "x_beard_1_01",
+    "x_beard_1_02",
+    "x_beard_2_01",
+    "x_beard_2_02",
+    "x_beard_3_01",
+    "x_beard_3_02",
+    "x_beard_4_01",
+    "x_beard_4_02",
+    "x_beard_5_01",
+    "x_beard_5_02",
+    "x_cape_C_01",
+    "x_cape_C_02",
+    "x_cape_C_03",
+    "x_cape_C_04",
+    "x_cape_C_05",
+    "x_cape_L1_01",
+    "x_cape_L1_02",
+    "x_cape_L1_03",
+    "x_cape_L1_04",
+    "x_cape_L1_05",
+    "x_cape_L2_01",
+    "x_cape_L2_02",
+    "x_cape_L2_03",
+    "x_cape_L2_04",
+    "x_cape_L2_05",
+    "x_cape_R1_01",
+    "x_cape_R1_02",
+    "x_cape_R1_03",
+    "x_cape_R1_04",
+    "x_cape_R1_05",
+    "x_cape_R2_01",
+    "x_cape_R2_02",
+    "x_cape_R2_03",
+    "x_cape_R2_04",
+    "x_cape_R2_05",
+    "x_knee_L",
+    "x_knee_R",
+    "x_fauld_01",
+    "x_loin_C_01",
+    "x_loin_C_02",
+    "x_loin_C_03",
+    "x_loin_L_01",
+    "x_loin_L_02",
+    "x_loin_L_03",
+    "x_loin_R_01",
+    "x_loin_R_02",
+    "x_loin_R_03",
+    "x_tasset_L",
+    "x_tasset_R"
+   ],
+   "bind_pose_max_error": 1.9143350184471735e-06,
+   "sockets": {
+    "weapon_R": {
+     "parent": "hand_R",
+     "translation": [
+      -0.99532,
+      1.78,
+      0.0
+     ],
+     "forward": [
+      -1.0,
+      -0.0,
+      -0.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "weapon_L": {
+     "parent": "hand_L",
+     "translation": [
+      0.99671,
+      1.78,
+      0.0
+     ],
+     "forward": [
+      1.0,
+      -0.0,
+      -0.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "head_top": {
+     "parent": "head",
+     "translation": [
+      0.0,
+      2.30562,
+      0.1
+     ],
+     "forward": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "chest_sigil": {
+     "parent": "spine_03",
+     "translation": [
+      -0.0,
+      1.515,
+      0.59928
+     ],
+     "forward": [
+      -0.0,
+      -0.03922,
+      0.99923
+     ],
+     "up": [
+      0.0,
+      0.99923,
+      0.03922
+     ],
+     "vs_landmarks": 6e-07
+    }
+   },
+   "tris": 24958,
+   "skin": {
+    "vertices": 23838,
+    "unweighted": 0,
+    "over_4": 0,
+    "not_normalized": 0,
+    "on_non_weight_bones": 0,
+    "bad_joint_index": 0,
+    "weight_sum_max_error": 1.341104507446289e-07
+   },
+   "bounds_m": {
+    "min": [
+     -1.1514,
+     0,
+     -0.623
+    ],
+    "max": [
+     1.1514,
+     2.3339,
+     0.648
+    ]
+   },
+   "height_m": 2.3339,
+   "materials": [
+    {
+     "name": "M_valdris",
+     "double_sided": false,
+     "emissive_strength": 3,
+     "textures": {
+      "base_color": true,
+      "emissive": true,
+      "normal": true
+     }
+    }
+   ],
+   "textures": [
+    {
+     "name": "valdris_emissive",
+     "role": "emissive",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 939356
+    },
+    {
+     "name": "valdris_normal",
+     "role": "normal",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 1124102
+    },
+    {
+     "name": "valdris_basecolor",
+     "role": "base_color",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 4384554
+    }
+   ],
+   "clips": [
+    "valdris_idle@loop",
+    "valdris_idle_combat@loop",
+    "valdris_walk@loop",
+    "valdris_run@loop",
+    "valdris_strafe_left@loop",
+    "valdris_strafe_right@loop",
+    "valdris_backpedal@loop",
+    "valdris_dash",
+    "valdris_dash_recover",
+    "valdris_fire_light",
+    "valdris_fire_heavy",
+    "valdris_fire_charge@loop",
+    "valdris_hit_light",
+    "valdris_hit_heavy",
+    "valdris_knockdown",
+    "valdris_get_up",
+    "valdris_death",
+    "valdris_downed@loop",
+    "valdris_revive",
+    "valdris_reforge_in",
+    "valdris_victory",
+    "valdris_ping",
+    "valdris_interact",
+    "valdris_forge_hammer@loop",
+    "valdris_idle_signature@loop",
+    "valdris_bulwark_slam",
+    "valdris_siege_stance_enter",
+    "valdris_siege_stance@loop",
+    "valdris_siege_stance_exit",
+    "valdris_siege_fire",
+    "valdris_mountainfall_start",
+    "valdris_mountainfall@loop",
+    "valdris_mountainfall_pound",
+    "valdris_armor_break"
+   ],
+   "clip_checks": {
+    "valdris_idle@loop": {
+     "channels": 348,
+     "duration_s": 4.0,
+     "samples": 121,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_idle_combat@loop": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_walk@loop": {
+     "channels": 348,
+     "duration_s": 0.93333,
+     "samples": 29,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_run@loop": {
+     "channels": 348,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_strafe_left@loop": {
+     "channels": 348,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_strafe_right@loop": {
+     "channels": 348,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_backpedal@loop": {
+     "channels": 348,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_dash": {
+     "channels": 348,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 116
+    },
+    "valdris_dash_recover": {
+     "channels": 348,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 116
+    },
+    "valdris_fire_light": {
+     "channels": 348,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 116
+    },
+    "valdris_fire_heavy": {
+     "channels": 348,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 116
+    },
+    "valdris_fire_charge@loop": {
+     "channels": 348,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_hit_light": {
+     "channels": 348,
+     "duration_s": 0.4,
+     "samples": 13,
+     "animated_joints": 116
+    },
+    "valdris_hit_heavy": {
+     "channels": 348,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 116
+    },
+    "valdris_knockdown": {
+     "channels": 348,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 116
+    },
+    "valdris_get_up": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116
+    },
+    "valdris_death": {
+     "channels": 348,
+     "duration_s": 1.86667,
+     "samples": 57,
+     "animated_joints": 116
+    },
+    "valdris_downed@loop": {
+     "channels": 348,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_revive": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116
+    },
+    "valdris_reforge_in": {
+     "channels": 348,
+     "duration_s": 1.53333,
+     "samples": 47,
+     "animated_joints": 116
+    },
+    "valdris_victory": {
+     "channels": 348,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 116
+    },
+    "valdris_ping": {
+     "channels": 348,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 116
+    },
+    "valdris_interact": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116
+    },
+    "valdris_forge_hammer@loop": {
+     "channels": 348,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_idle_signature@loop": {
+     "channels": 348,
+     "duration_s": 5.0,
+     "samples": 151,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_bulwark_slam": {
+     "channels": 348,
+     "duration_s": 1.66667,
+     "samples": 51,
+     "animated_joints": 116
+    },
+    "valdris_siege_stance_enter": {
+     "channels": 348,
+     "duration_s": 0.86667,
+     "samples": 27,
+     "animated_joints": 116
+    },
+    "valdris_siege_stance@loop": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_siege_stance_exit": {
+     "channels": 348,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 116
+    },
+    "valdris_siege_fire": {
+     "channels": 348,
+     "duration_s": 0.16667,
+     "samples": 6,
+     "animated_joints": 116
+    },
+    "valdris_mountainfall_start": {
+     "channels": 348,
+     "duration_s": 1.53333,
+     "samples": 47,
+     "animated_joints": 116
+    },
+    "valdris_mountainfall@loop": {
+     "channels": 348,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 116,
+     "loop_first_last_max_diff": 0.0
+    },
+    "valdris_mountainfall_pound": {
+     "channels": 348,
+     "duration_s": 1.1,
+     "samples": 34,
+     "animated_joints": 116
+    },
+    "valdris_armor_break": {
+     "channels": 348,
+     "duration_s": 1.06667,
+     "samples": 33,
+     "animated_joints": 116
+    }
+   },
+   "sidecar": "checked",
+   "weapon_attach": {
+    "weapon": "assets/models/weapons/colossus_cannon.glb",
+    "meshes": {
+     "colossus_cannon_mesh": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     }
+    }
+   },
+   "errors": [],
+   "warnings": [
+    "rest height 2.33 m outside the hero range (2.0, 2.3)"
+   ],
+   "ok": true
+  }
+ },
+ "ok": true,
+ "blender_reimport": {
+  "file": "assets/models/characters/valdris.glb",
+  "blender": "5.2.0 LTS",
+  "importer": [
+   "FINISHED"
+  ],
+  "hero_hook": "tools/blender/gf_hero/s5_valdris.py",
+  "objects": [
+   "GF_Hero_v1",
+   "valdris_mesh"
+  ],
+  "bones": 116,
+  "sockets": {
+   "weapon_R": true,
+   "weapon_L": true,
+   "head_top": true,
+   "chest_sigil": true
+  },
+  "meshes": {
+   "valdris_mesh": {
+    "verts": 23838,
+    "skinned": true,
+    "vertex_groups_not_bones": [],
+    "materials": [
+     "M_valdris"
+    ],
+    "uv_layers": [
+     "UVMap"
+    ]
+   }
+  },
+  "images": {
+   "valdris_basecolor": [
+    2048,
+    2048
+   ],
+   "valdris_emissive": [
+    2048,
+    2048
+   ],
+   "valdris_normal": [
+    2048,
+    2048
+   ]
+  },
+  "socket_axes_restored_vs_authoring": {
+   "weapon_R": 3.602100377975148e-07,
+   "weapon_L": 4.4890924755236483e-07,
+   "head_top": 1.8956551173232583e-07,
+   "chest_sigil": 4.0605664253234863e-07
+  },
+  "clips_played": 34,
+  "clip_pose_max_error": 2.6524066925048828e-05,
+  "clips": {
+   "valdris_idle@loop": {
+    "frame": 60,
+    "frame_range": [
+     0.0,
+     120.0
+    ],
+    "max_bone_error": 2.6345252990722656e-05,
+    "mesh": {
+     "min_z": -0.0112,
+     "extent": [
+      1.796,
+      1.284,
+      2.331
+     ]
+    }
+   },
+   "valdris_idle_combat@loop": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 2.4080276489257812e-05,
+    "mesh": {
+     "min_z": -0.0118,
+     "extent": [
+      1.599,
+      1.37,
+      2.318
+     ]
+    }
+   },
+   "valdris_walk@loop": {
+    "frame": 14,
+    "frame_range": [
+     0.0,
+     28.0
+    ],
+    "max_bone_error": 2.384185791015625e-05,
+    "mesh": {
+     "min_z": -0.0124,
+     "extent": [
+      1.812,
+      1.533,
+      2.305
+     ]
+    }
+   },
+   "valdris_run@loop": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 2.008676528930664e-05,
+    "mesh": {
+     "min_z": 0.0165,
+     "extent": [
+      1.524,
+      1.874,
+      2.263
+     ]
+    }
+   },
+   "valdris_strafe_left@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 1.4722347259521484e-05,
+    "mesh": {
+     "min_z": 0.0382,
+     "extent": [
+      2.15,
+      1.359,
+      2.229
+     ]
+    }
+   },
+   "valdris_strafe_right@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 1.800060272216797e-05,
+    "mesh": {
+     "min_z": 0.0382,
+     "extent": [
+      2.241,
+      1.467,
+      2.23
+     ]
+    }
+   },
+   "valdris_backpedal@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 2.1398067474365234e-05,
+    "mesh": {
+     "min_z": 0.0094,
+     "extent": [
+      1.607,
+      1.369,
+      2.233
+     ]
+    }
+   },
+   "valdris_dash": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 2.473592758178711e-05,
+    "mesh": {
+     "min_z": 0.0631,
+     "extent": [
+      1.753,
+      1.639,
+      2.099
+     ]
+    }
+   },
+   "valdris_dash_recover": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 1.8835067749023438e-05,
+    "mesh": {
+     "min_z": -0.0127,
+     "extent": [
+      1.549,
+      1.516,
+      2.209
+     ]
+    }
+   },
+   "valdris_fire_light": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 2.4259090423583984e-05,
+    "mesh": {
+     "min_z": -0.0119,
+     "extent": [
+      1.535,
+      1.261,
+      2.32
+     ]
+    }
+   },
+   "valdris_fire_heavy": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 2.2232532501220703e-05,
+    "mesh": {
+     "min_z": -0.0118,
+     "extent": [
+      1.585,
+      1.38,
+      2.261
+     ]
+    }
+   },
+   "valdris_fire_charge@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 2.1278858184814453e-05,
+    "mesh": {
+     "min_z": -0.0119,
+     "extent": [
+      1.566,
+      1.458,
+      2.259
+     ]
+    }
+   },
+   "valdris_hit_light": {
+    "frame": 6,
+    "frame_range": [
+     0.0,
+     12.0
+    ],
+    "max_bone_error": 2.384185791015625e-05,
+    "mesh": {
+     "min_z": -0.012,
+     "extent": [
+      1.546,
+      1.257,
+      2.318
+     ]
+    }
+   },
+   "valdris_hit_heavy": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 2.110004425048828e-05,
+    "mesh": {
+     "min_z": -0.0093,
+     "extent": [
+      1.542,
+      1.481,
+      2.128
+     ]
+    }
+   },
+   "valdris_knockdown": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 2.4497509002685547e-05,
+    "mesh": {
+     "min_z": -0.0188,
+     "extent": [
+      1.854,
+      2.0,
+      1.939
+     ]
+    }
+   },
+   "valdris_get_up": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 2.0205974578857422e-05,
+    "mesh": {
+     "min_z": -0.0121,
+     "extent": [
+      1.537,
+      1.45,
+      2.172
+     ]
+    }
+   },
+   "valdris_death": {
+    "frame": 28,
+    "frame_range": [
+     0.0,
+     56.0
+    ],
+    "max_bone_error": 2.491474151611328e-05,
+    "mesh": {
+     "min_z": -0.0189,
+     "extent": [
+      1.82,
+      2.0,
+      1.899
+     ]
+    }
+   },
+   "valdris_downed@loop": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 2.1338462829589844e-05,
+    "mesh": {
+     "min_z": 0.0249,
+     "extent": [
+      1.854,
+      1.759,
+      1.984
+     ]
+    }
+   },
+   "valdris_revive": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 1.913309097290039e-05,
+    "mesh": {
+     "min_z": -0.0141,
+     "extent": [
+      1.546,
+      1.331,
+      2.207
+     ]
+    }
+   },
+   "valdris_reforge_in": {
+    "frame": 23,
+    "frame_range": [
+     0.0,
+     46.0
+    ],
+    "max_bone_error": 2.3066997528076172e-05,
+    "mesh": {
+     "min_z": -0.0109,
+     "extent": [
+      2.037,
+      1.653,
+      2.257
+     ]
+    }
+   },
+   "valdris_victory": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 2.294778823852539e-05,
+    "mesh": {
+     "min_z": -0.0117,
+     "extent": [
+      1.774,
+      1.364,
+      2.315
+     ]
+    }
+   },
+   "valdris_ping": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 2.4080276489257812e-05,
+    "mesh": {
+     "min_z": -0.0118,
+     "extent": [
+      1.818,
+      1.359,
+      2.324
+     ]
+    }
+   },
+   "valdris_interact": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 1.9729137420654297e-05,
+    "mesh": {
+     "min_z": -0.021,
+     "extent": [
+      1.802,
+      1.412,
+      2.142
+     ]
+    }
+   },
+   "valdris_forge_hammer@loop": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 1.8835067749023438e-05,
+    "mesh": {
+     "min_z": -0.0178,
+     "extent": [
+      1.833,
+      1.396,
+      2.228
+     ]
+    }
+   },
+   "valdris_idle_signature@loop": {
+    "frame": 75,
+    "frame_range": [
+     0.0,
+     150.0
+    ],
+    "max_bone_error": 2.6524066925048828e-05,
+    "mesh": {
+     "min_z": -0.0072,
+     "extent": [
+      1.774,
+      1.324,
+      2.327
+     ]
+    }
+   },
+   "valdris_bulwark_slam": {
+    "frame": 25,
+    "frame_range": [
+     0.0,
+     50.0
+    ],
+    "max_bone_error": 2.5391578674316406e-05,
+    "mesh": {
+     "min_z": -0.0167,
+     "extent": [
+      2.254,
+      1.598,
+      1.994
+     ]
+    }
+   },
+   "valdris_siege_stance_enter": {
+    "frame": 13,
+    "frame_range": [
+     0.0,
+     26.0
+    ],
+    "max_bone_error": 2.396106719970703e-05,
+    "mesh": {
+     "min_z": -0.0001,
+     "extent": [
+      1.58,
+      1.435,
+      2.169
+     ]
+    }
+   },
+   "valdris_siege_stance@loop": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 2.2590160369873047e-05,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.708,
+      1.43,
+      2.132
+     ]
+    }
+   },
+   "valdris_siege_stance_exit": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 1.9669532775878906e-05,
+    "mesh": {
+     "min_z": -0.0059,
+     "extent": [
+      1.666,
+      1.216,
+      2.226
+     ]
+    }
+   },
+   "valdris_siege_fire": {
+    "frame": 3,
+    "frame_range": [
+     0.0,
+     5.0
+    ],
+    "max_bone_error": 2.2590160369873047e-05,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.719,
+      1.241,
+      2.134
+     ]
+    }
+   },
+   "valdris_mountainfall_start": {
+    "frame": 23,
+    "frame_range": [
+     0.0,
+     46.0
+    ],
+    "max_bone_error": 2.5272369384765625e-05,
+    "mesh": {
+     "min_z": -0.0089,
+     "extent": [
+      1.879,
+      1.568,
+      2.433
+     ]
+    }
+   },
+   "valdris_mountainfall@loop": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 2.002716064453125e-05,
+    "mesh": {
+     "min_z": -0.0089,
+     "extent": [
+      1.734,
+      1.4,
+      2.221
+     ]
+    }
+   },
+   "valdris_mountainfall_pound": {
+    "frame": 17,
+    "frame_range": [
+     0.0,
+     33.0
+    ],
+    "max_bone_error": 2.002716064453125e-05,
+    "mesh": {
+     "min_z": -0.0089,
+     "extent": [
+      1.815,
+      1.453,
+      2.153
+     ]
+    }
+   },
+   "valdris_armor_break": {
+    "frame": 16,
+    "frame_range": [
+     0.0,
+     32.0
+    ],
+    "max_bone_error": 2.491474151611328e-05,
+    "mesh": {
+     "min_z": -0.0106,
+     "extent": [
+      2.197,
+      1.593,
+      2.352
+     ]
+    }
+   }
+  },
+  "weapon": {
+   "file": "assets/models/weapons/colossus_cannon.glb",
+   "objects": [
+    "colossus_cannon",
+    "colossus_cannon_mesh",
+    "eject",
+    "glow_core",
+    "grip_L",
+    "grip_R",
+    "muzzle"
+   ],
+   "offhand": false,
+   "root_is_identity": true,
+   "attach_rest_error": 1.5435514200135003e-07,
+   "variants": {
+    "fist": [],
+    "open": []
+   },
+   "fixed": {
+    "R": [
+     "colossus_cannon_mesh"
+    ]
+   },
+   "attach_fire_heavy_f6_error": 5.364418029785156e-07
+  },
+  "review_renders": {
+   "dir": "art/characters/valdris/work/renders/stage5",
+   "shots": [
+    {
+     "shot": "idle_combat_f000",
+     "clip": "valdris_idle_combat@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "fire_heavy_f006",
+     "clip": "valdris_fire_heavy",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "bulwark_slam_f021",
+     "clip": "valdris_bulwark_slam",
+     "frame": 21,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "siege_stance_f000",
+     "clip": "valdris_siege_stance@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "run_f006",
+     "clip": "valdris_run@loop",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "mountainfall_pound_f015",
+     "clip": "valdris_mountainfall_pound",
+     "frame": 15,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    },
+    {
+     "shot": "ping_f014",
+     "clip": "valdris_ping",
+     "frame": 14,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "colossus_cannon_mesh"
+     }
+    }
+   ]
+  },
+  "errors": [],
+  "warnings": [],
+  "ok": true,
+  "seconds": 5.7
+ },
+ "review": {
+  "by": "AI (Claude), 2026-09-26, from reports/stage5/export_review.png and reports/stage5/valdris_board.png",
+  "judgement": [
+   "The shipped file is the stage-4 file: in all seven review shots the re-imported valdris.glb with the colossus_cannon on the imported weapon_R matches the stage-4 source render pose for pose (clip pose error <= 2.7e-5 m over all 34 clips); the textures from inside the GLB, the emissive seams and the single-sided material all read as in the source.",
+   "The cannon sits on the right forearm through every shot and rides weapon_R through the heavy shot (5.4e-7); nothing of the sleeve weapon is lost in the export.",
+   "At game size (160 px at 22 m, 1080p) he reads as the widest, heaviest body in the roster: the pauldron blocks, the cannon's glowing muzzle and the red cape; the head is the small dark knot of the concept.",
+   "Against the concept the gap is the stage-2 look, not the export: the plate edges carry a bright gold trim on every piece, so the armour reads boxier and busier than the concept's dark forged bronze; the anvil reads as a flat light-grey wedge where the concept's is dark iron; the cape is a plain red panel without the concept's tatters and emblem. These are for the user's final visual approval (the Hades-II bar), not fixable in stage 5."
+  ],
+  "not_checked": "No Bevy-side load: the Rust test that loads the GLB through bevy_gltf, spawns #Scene0 and plays each clip belongs to the engine integration (crates/). The review renders are the Cycles-CPU toon preview, not the game's shading."
+ },
+ "shared_tool_changes": {
+  "files": [
+   "tools/blender/gf_hero/smoke_import.py",
+   "tools/blender/gf_hero/export_glb.py",
+   "tools/blender/gf_hero/s5_sheets.py",
+   "tools/blender/gf_hero/run_stage5.py"
+  ],
+  "backwards_compatible": true,
+  "brax_regression": "art/characters/valdris/reports/stage5/brax_regression.json (brax.glb, brax.meta.json, anvil_gauntlets.glb, the export report and the review sheet byte-identical; renders pixel-identical)"
+ }
+}

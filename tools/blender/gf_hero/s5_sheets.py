@@ -82,6 +82,13 @@ def main():
         lines.append("weapon %s: %s, %s tris shown (fist pair), %d meshes (open + fist per hand), attached by identity on weapon_R / weapon_L (rest error %.1e)" % (
             w.get("glb"), "OK" if w.get("ok") else "FAILED", w.get("tris_shown_pair"), len(w.get("tris_per_mesh", {})),
             bi.get("weapon", {}).get("attach_rest_error", -1)))
+    bw = bi.get("weapon") or {}
+    if not wep and bw.get("file"):         # a weapon the gf_hero chain did not build (the weapon track's GLB, attached as shipped)
+        follow = [(k, v) for k, v in bw.items() if k.startswith("attach_") and k.endswith("_error") and k != "attach_rest_error"]
+        lines.append("weapon %s (the weapon track's shipped file, not re-exported): %s on weapon_R%s by identity, rest error %.1e%s" % (
+            bw["file"], ", ".join(m for v in (bw.get("fixed") or {}).values() for m in v) or "meshes",
+            "" if bw.get("offhand") is False else " / weapon_L", bw.get("attach_rest_error", -1),
+            "".join("; %s %.1e" % (k[len("attach_"):-len("_error")], v) for k, v in follow)))
     lines.append("columns: stage-4 source render (Blender file) | the shipped GLB, front 3/4 and side | client camera 55 deg at true 1080p pixels: yaw 0, yaw 90 (1x), yaw 0 at 3x nearest")
     y = 42
     for i, ln in enumerate(lines):

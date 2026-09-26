@@ -13,12 +13,18 @@ Factory settings, 30 fps, then Blender's own glTF importer (a second, independen
     exploded or collapsed);
   * --weapon: the weapon GLB is imported too and attached the way the client will (its root on weapon_R, its offhand
     node on weapon_L, both as identity children in glTF terms); the grip frames are compared with the GLB sockets.
+    A sleeve weapon without an offhand node (Valdris's colossus_cannon) rides weapon_R alone; its meshes without a
+    _fist_ / _open_ variant suffix are always shown.
 --render <dir>: review renders of the shipped files (the stage-2 textures from inside the GLBs through the Cycles CPU
   toon preview of s3lib, never EEVEE): six key poses as front three-quarter close-ups and the 55 deg client camera at
   true 1080p pixel size (22 m view height, 160 px), the weapon variant per hand as the hero sidecar says.
+Per-hero hook (optional): tools/blender/gf_hero/s5_<key>.py may set REVIEW_SHOTS [(clip, frame)], ATTACH_FOLLOW
+  (clip, frame) - the clip the weapon must ride weapon_R through - and CLOSEUP (aim point, ortho scale). Without it the
+  Brax defaults below apply.
 Writes the JSON report (--json, and section "blender_reimport" of --report); exits 1 on any error.
 The Bevy-side import (a Rust test that loads the GLB through bevy_gltf) comes with the engine integration.
 """
+import importlib.util
 import json
 import math
 import os
@@ -98,6 +104,19 @@ scene = bpy.context.scene
 scene.render.fps, scene.render.fps_base = V.FPS, 1.0
 g = V.Glb(GLB)
 key = os.path.splitext(os.path.basename(GLB))[0]
+# the defaults were written for Brax; a hero overrides them in its own s5_<key>.py (plain data)
+REVIEW_SHOTS = [("idle_combat@loop", 0), ("jab_r", 3), ("uppercut", 10), ("meltdown_start", 27), ("run@loop", 6), ("ping", 14)]
+ATTACH_FOLLOW = ("jab_r", 3)
+CLOSEUP = ((0.0, 0.0, 1.05), 2.9)        # close-up aim point and ortho scale (m)
+_hook = os.path.join(HERE, "s5_%s.py" % key)
+if os.path.isfile(_hook):
+    _spec = importlib.util.spec_from_file_location("s5_hero_hook", _hook)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+    REVIEW_SHOTS = list(getattr(_mod, "REVIEW_SHOTS", REVIEW_SHOTS))
+    ATTACH_FOLLOW = tuple(getattr(_mod, "ATTACH_FOLLOW", ATTACH_FOLLOW))
+    CLOSEUP = tuple(getattr(_mod, "CLOSEUP", CLOSEUP))
+    rep["hero_hook"] = V.relpath(_hook)
 meta_p = os.path.splitext(GLB)[0] + ".meta.json"
 meta = json.load(open(meta_p, encoding="utf-8")) if os.path.isfile(meta_p) else {}
 before = set(bpy.data.objects)
@@ -237,6 +256,7 @@ bpy.context.view_layer.update()
 
 # ---- the weapon, attached as the client will ------------------------------------------------------------------------------
 W_OPEN, W_FIST = {}, {}
+W_FIXED = {}          # side -> [mesh objects without a hand variant (a sleeve weapon), always shown]
 if WEAPON:
     wg = V.Glb(WEAPON)
     wkey = os.path.splitext(os.path.basename(WEAPON))[0]
@@ -244,16 +264,20 @@ if WEAPON:
     bpy.ops.import_scene.gltf(filepath=WEAPON, import_shading="NORMALS")
     wobjs = {o.name: o for o in bpy.data.objects if o not in before}
     wr = {"file": V.relpath(WEAPON), "objects": sorted(wobjs)}
-    need = [wkey, "grip_R", "offhand"]
+    has_off = "offhand" in wg.names       # a sleeve weapon may have none (it rides weapon_R alone)
+    need = [wkey, "grip_R", "offhand"] if has_off else [wkey, "grip_R"]
     for n in need:
         if n not in wobjs:
             E.append("weapon %s: no %s after import" % (wkey, n))
     if all(n in wobjs for n in need):
-        root, off = wobjs[wkey], wobjs["offhand"]
+        root, off = wobjs[wkey], wobjs.get("offhand") if has_off else None
+        pairs = (("weapon_R", root), ("weapon_L", off)) if has_off else (("weapon_R", root),)
+        if not has_off:
+            wr["offhand"] = False
         wr["root_is_identity"] = max(abs(root.matrix_world[r][c] - (1.0 if r == c else 0.0)) for r in range(4) for c in range(4)) < 1e-6
         if not wr["root_is_identity"]:
             E.append("weapon root %s is not at the identity after import" % wkey)
-        for s, ob in (("weapon_R", root), ("weapon_L", off)):
+        for s, ob in pairs:
             target = CI @ mat(gw_rest[gidx[s]]) @ C                 # the socket's glTF frame, in Blender axes
             ob.parent = arm
             ob.parent_type = "BONE"
@@ -263,27 +287,44 @@ if WEAPON:
         bpy.context.view_layer.update()
         # grip frames through the imported sockets vs the GLB sockets
         gerr = 0.0
-        for s, ob in (("weapon_R", root), ("weapon_L", off)):
+        for s, ob in pairs:
             target = CI @ mat(gw_rest[gidx[s]]) @ C
             gerr = max(gerr, max(abs(ob.matrix_world[r][c] - target[r][c]) for r in range(3) for c in range(4)))
         wr["attach_rest_error"] = gerr
+
+        def _side(o):
+            p = o.parent
+            while p is not None:
+                if p is off:
+                    return "L"
+                p = p.parent
+            return "R"
         for n, o in wobjs.items():
             if o.type == "MESH":
-                (W_FIST if "_fist_" in n else W_OPEN)[n[-1]] = o
+                if "_fist_" in n:
+                    W_FIST[n[-1]] = o
+                elif "_open_" in n or has_off:
+                    W_OPEN[n[-1]] = o
+                else:
+                    W_FIXED.setdefault(_side(o), []).append(o)
         wr["variants"] = {"fist": sorted(o.name for o in W_FIST.values()), "open": sorted(o.name for o in W_OPEN.values())}
+        if W_FIXED:
+            wr["fixed"] = {s: sorted(o.name for o in v) for s, v in sorted(W_FIXED.items())}
         # follow one clip: the grip must ride the socket (identity child) at the strike frame
-        act = bpy.data.actions.get("%s_jab_r" % key)
+        fclip, ff = ATTACH_FOLLOW
+        act = bpy.data.actions.get("%s_%s" % (key, fclip))
         if act is not None:
             arm.animation_data.action = act
             arm.animation_data.action_slot = act.slots[0]
-            scene.frame_set(3)
+            scene.frame_set(ff)
             bpy.context.view_layer.update()
             a = [x for x in anims if x["name"] == act.name][0]
-            gw = V.world_matrices(g, V.sample_animation(g, a, 3 / float(V.FPS)))
+            gw = V.world_matrices(g, V.sample_animation(g, a, ff / float(V.FPS)))
             target = CI @ mat(gw[gidx["weapon_R"]]) @ C
-            wr["attach_jab_r_f3_error"] = max(abs(root.matrix_world[r][c] - target[r][c]) for r in range(3) for c in range(4))
-            if wr["attach_jab_r_f3_error"] > 1e-4:
-                E.append("the weapon does not ride weapon_R during %s (%.2e)" % (act.name, wr["attach_jab_r_f3_error"]))
+            ek = "attach_%s_f%d_error" % (fclip.replace("@loop", ""), ff)
+            wr[ek] = max(abs(root.matrix_world[r][c] - target[r][c]) for r in range(3) for c in range(4))
+            if wr[ek] > 1e-4:
+                E.append("the weapon does not ride weapon_R during %s (%.2e)" % (act.name, wr[ek]))
             arm.animation_data.action = None
     rep["weapon"] = wr
     log("weapon %s attached: rest error %.1e" % (wkey, wr.get("attach_rest_error", -1)))
@@ -295,7 +336,7 @@ def review(out_dir):
     from s3lib import cycles_cpu, make_toon_cycles
     os.makedirs(out_dir, exist_ok=True)
     toon = {}
-    objs = skinned + list(W_FIST.values()) + list(W_OPEN.values())
+    objs = skinned + list(W_FIST.values()) + list(W_OPEN.values()) + [o for v in W_FIXED.values() for o in v]
     for o in objs:
         M = o.material_slots[0].material if o.material_slots else None
         if M is None:
@@ -337,7 +378,7 @@ def review(out_dir):
     scene.world.use_nodes = True
     scene.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.035, 0.035, 0.04, 1)
     info = meta.get("clip_info", {})
-    shots = [("idle_combat@loop", 0), ("jab_r", 3), ("uppercut", 10), ("meltdown_start", 27), ("run@loop", 6), ("ping", 14)]
+    shots = REVIEW_SHOTS
     done = []
     for clip, f in shots:
         name = "%s_%s" % (key, clip)
@@ -351,6 +392,10 @@ def review(out_dir):
         wv = (info.get(name) or {}).get("weapon_variant") or {}
         shown = {}
         for s in ("L", "R"):
+            if W_FIXED and s not in W_FIST and s not in W_OPEN:
+                # no hand variants on this side: the sleeve weapon's fixed mesh, or the hero's own hand
+                shown[s] = ", ".join(sorted(o.name for o in W_FIXED.get(s, []))) or "own hand"
+                continue
             v = wv.get(s, {"start": "fist", "swap_frames": []})
             fist = v["start"] == "fist"
             for sw in v["swap_frames"]:
@@ -367,7 +412,7 @@ def review(out_dir):
         for view, az_d, el_d in (("front", 28, 10), ("side", 100, 8)):
             az, el = math.radians(az_d), math.radians(el_d)
             d = Vector((math.sin(az) * math.cos(el), -math.cos(az) * math.cos(el), math.sin(el)))
-            aim_ortho(scene, (0.0, 0.0, 1.05), d, 2.9)
+            aim_ortho(scene, CLOSEUP[0], d, CLOSEUP[1])
             render_still(scene, os.path.join(out_dir, "%s_%s.png" % (tag, view)), 400, 480)
         grid.hide_render, floor.hide_render = True, False
         p = math.radians(55.0)

@@ -1,0 +1,1424 @@
+{
+ "kind": "character",
+ "key": "valdris",
+ "name": "Valdris, The Anvil-Born",
+ "skeleton": "GF_Hero_v1 v1",
+ "armature": "GF_Hero_v1",
+ "joints": 116,
+ "extra_bones": [
+  "x_elbow_L",
+  "x_pauldron_L",
+  "x_elbow_R",
+  "x_pauldron_R",
+  "x_beard_1_01",
+  "x_beard_1_02",
+  "x_beard_2_01",
+  "x_beard_2_02",
+  "x_beard_3_01",
+  "x_beard_3_02",
+  "x_beard_4_01",
+  "x_beard_4_02",
+  "x_beard_5_01",
+  "x_beard_5_02",
+  "x_cape_C_01",
+  "x_cape_C_02",
+  "x_cape_C_03",
+  "x_cape_C_04",
+  "x_cape_C_05",
+  "x_cape_L1_01",
+  "x_cape_L1_02",
+  "x_cape_L1_03",
+  "x_cape_L1_04",
+  "x_cape_L1_05",
+  "x_cape_L2_01",
+  "x_cape_L2_02",
+  "x_cape_L2_03",
+  "x_cape_L2_04",
+  "x_cape_L2_05",
+  "x_cape_R1_01",
+  "x_cape_R1_02",
+  "x_cape_R1_03",
+  "x_cape_R1_04",
+  "x_cape_R1_05",
+  "x_cape_R2_01",
+  "x_cape_R2_02",
+  "x_cape_R2_03",
+  "x_cape_R2_04",
+  "x_cape_R2_05",
+  "x_knee_L",
+  "x_knee_R",
+  "x_fauld_01",
+  "x_loin_C_01",
+  "x_loin_C_02",
+  "x_loin_C_03",
+  "x_loin_L_01",
+  "x_loin_L_02",
+  "x_loin_L_03",
+  "x_loin_R_01",
+  "x_loin_R_02",
+  "x_loin_R_03",
+  "x_tasset_L",
+  "x_tasset_R"
+ ],
+ "tris": 24958,
+ "tris_budget": [
+  15000,
+  25000
+ ],
+ "textures": [
+  {
+   "name": "valdris_emissive",
+   "role": "emissive",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 939356
+  },
+  {
+   "name": "valdris_normal",
+   "role": "normal",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 1124102
+  },
+  {
+   "name": "valdris_basecolor",
+   "role": "base_color",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 4384554
+  }
+ ],
+ "material": {
+  "name": "M_valdris",
+  "double_sided": false,
+  "emissive_strength": 3,
+  "textures": {
+   "base_color": true,
+   "emissive": true,
+   "normal": true
+  }
+ },
+ "sockets": {
+  "weapon_R": {
+   "parent": "hand_R",
+   "translation": [
+    -0.99532,
+    1.78,
+    0.0
+   ],
+   "forward": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "weapon_L": {
+   "parent": "hand_L",
+   "translation": [
+    0.99671,
+    1.78,
+    0.0
+   ],
+   "forward": [
+    1.0,
+    -0.0,
+    -0.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "head_top": {
+   "parent": "head",
+   "translation": [
+    0.0,
+    2.30562,
+    0.1
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "chest_sigil": {
+   "parent": "spine_03",
+   "translation": [
+    -0.0,
+    1.515,
+    0.59928
+   ],
+   "forward": [
+    -0.0,
+    -0.03922,
+    0.99923
+   ],
+   "up": [
+    0.0,
+    0.99923,
+    0.03922
+   ],
+   "vs_landmarks": 6e-07
+  }
+ },
+ "clips": [
+  "valdris_idle@loop",
+  "valdris_idle_combat@loop",
+  "valdris_walk@loop",
+  "valdris_run@loop",
+  "valdris_strafe_left@loop",
+  "valdris_strafe_right@loop",
+  "valdris_backpedal@loop",
+  "valdris_dash",
+  "valdris_dash_recover",
+  "valdris_fire_light",
+  "valdris_fire_heavy",
+  "valdris_fire_charge@loop",
+  "valdris_hit_light",
+  "valdris_hit_heavy",
+  "valdris_knockdown",
+  "valdris_get_up",
+  "valdris_death",
+  "valdris_downed@loop",
+  "valdris_revive",
+  "valdris_reforge_in",
+  "valdris_victory",
+  "valdris_ping",
+  "valdris_interact",
+  "valdris_forge_hammer@loop",
+  "valdris_idle_signature@loop",
+  "valdris_bulwark_slam",
+  "valdris_siege_stance_enter",
+  "valdris_siege_stance@loop",
+  "valdris_siege_stance_exit",
+  "valdris_siege_fire",
+  "valdris_mountainfall_start",
+  "valdris_mountainfall@loop",
+  "valdris_mountainfall_pound",
+  "valdris_armor_break"
+ ],
+ "clip_info": {
+  "valdris_idle@loop": {
+   "clip": "idle",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 120,
+   "duration_s": 4.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, out of combat (no enemy near, no attack for 2 s; hub)",
+   "purpose": "relaxed heavy stance: slow deep breaths lift the pauldrons, the weight rolls between the feet, a slow look around",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_idle_combat@loop": {
+   "clip": "idle_combat",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, in combat (enemies near or an attack in the last 2 s). Frame 0 is the reference pose of every upper-layer clip",
+   "purpose": "combat stance: planted wide, the cannon down the aim, a heavy breathing sink on the knees",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_walk@loop": {
+   "clip": "walk",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 28,
+   "duration_s": 0.93333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 1.698,
+   "travel_mps": [
+    0.0,
+    -1.6978974295450422
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving at under about 55 % of move speed (stick partly pushed, slows); playback rate = speed / 1.70 m/s",
+   "purpose": "heavy walk: a wide rolling gait, the weight dropping onto each sabaton, the cannon swinging low",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_run@loop": {
+   "clip": "run",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 5.6,
+   "travel_mps": [
+    0.0,
+    -5.6
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving within 45 deg of the aim at move speed; playback rate = speed / 5.6 m/s",
+   "purpose": "juggernaut run: low and heavy, the pelvis sinks on every footfall, the cannon held down the aim, the fist pumping",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_strafe_left@loop": {
+   "clip": "strafe_left",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 5.6,
+   "travel_mps": [
+    5.6,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the left of the aim; playback rate = speed / 5.6 m/s",
+   "purpose": "side run to his left: the hips open toward the travel, the chest and the cannon kept on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_strafe_right@loop": {
+   "clip": "strafe_right",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 5.6,
+   "travel_mps": [
+    -5.6,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the right of the aim; playback rate = speed / 5.6 m/s",
+   "purpose": "side run to his right (the chest and the cannon kept on the aim)",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_backpedal@loop": {
+   "clip": "backpedal",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 5.6,
+   "travel_mps": [
+    0.0,
+    5.6
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving more than 135 deg away from the aim; playback rate = speed / 5.6 m/s",
+   "purpose": "heavy backpedal: short driving steps, the weight forward over the cannon, the cannon on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_dash": {
+   "clip": "dash",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the 0.16 s dash (MoverState.dash_left > 0); the client faces the hero along the dash for its duration",
+   "purpose": "the dash burst: a low bull rush behind the anvil and both pauldrons, the cannon low and forward",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_dash_recover": {
+   "clip": "dash_recover",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "land": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the first 0.5 s after a dash ends when the hero is not moving on (else blend into locomotion)",
+   "purpose": "out of the dash: the lead sabaton slams down, the rear one after it, a heavy absorb on both knees",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_fire_light": {
+   "clip": "fire_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each primary shot of a light chassis (fire_rate >= 2/s): the colossus_cannon's 2.6 shots/s",
+   "purpose": "a cannon shot: the muzzle kicks up, the shoulder and chest take it, the weight settles back (recoil stays procedural)",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_fire_heavy": {
+   "clip": "fire_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 6,
+     "time_s": 0.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a heavy / charged release (fire_rate < 1/s, charge release, splash chassis)",
+   "purpose": "a heavy shot: brace into it, the cannon bucks up and drives the shoulder back, a slow settle",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_fire_charge@loop": {
+   "clip": "fire_charge",
+   "family": "shared",
+   "loop": true,
+   "layer": "upper",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "fire held on a Charge chassis (FireKind::Charge) until release (then fire_heavy)",
+   "purpose": "holding a charge: braced into the cannon, the fist clenched, the barrel trembling with stored power",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "open",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_hit_light": {
+   "clip": "hit_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 12,
+   "duration_s": 0.4,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a light hit (damage < 10 % max HP), layered over whatever plays",
+   "purpose": "a flinch: the chest and pauldrons rock back, the cannon knocked off the aim, absorbed at once",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_hit_heavy": {
+   "clip": "hit_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a heavy hit (damage >= 10 % max HP or a stun); interrupts upper-layer clips",
+   "purpose": "a big stagger: rocked back, the lead sabaton steps back, a deep absorb on both knees, stepping back in",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_knockdown": {
+   "clip": "knockdown",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "ground": {
+     "frame": 14,
+     "time_s": 0.46667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a knockback / launch strong enough to floor the hero (stun >= 0.8 s); holds its last frame until get_up",
+   "purpose": "floored: rocked back off the lead foot, a stagger step back, then crashing down onto one knee, propped on the cannon",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_get_up": {
+   "clip": "get_up",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "stand": {
+     "frame": 30,
+     "time_s": 1.0
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the knockdown's stun ends",
+   "purpose": "shoving up off the knee, the rear sabaton stamps forward under him, the lead foot resets, back into the stance",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_death": {
+   "clip": "death",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 56,
+   "duration_s": 1.86667,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "knee": {
+     "frame": 17,
+     "time_s": 0.56667
+    },
+    "slump": {
+     "frame": 32,
+     "time_s": 1.06667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed begins (GameEvent::Downed); holds its last frame, then downed@loop (wraith look)",
+   "purpose": "the fatal blow: rocked back, a knee gives and he crashes down onto it, then slumps over his knee and the cannon, a statue",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_downed@loop": {
+   "clip": "downed",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed (the Soul-Tether wraith; moves at 45 % speed with no gait, the client adds the ghost material)",
+   "purpose": "the wraith drift: slumped, floating off the ground, the cannon and the fist hanging, a slow heavy bob",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_revive": {
+   "clip": "revive",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "jolt": {
+     "frame": 6,
+     "time_s": 0.2
+    },
+    "land": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "an ally completes the Soul-Tether revive (Downed -> Alive)",
+   "purpose": "dragged back into the body: a jolt, the sabatons slam down, a deep crouch, up into the stance",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_reforge_in": {
+   "clip": "reforge_in",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 46,
+   "duration_s": 1.53333,
+   "fps": 30,
+   "events": {
+    "stand": {
+     "frame": 20,
+     "time_s": 0.66667
+    },
+    "flare": {
+     "frame": 26,
+     "time_s": 0.86667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Reforging ends: the hero reappears next to an ally",
+   "purpose": "forged anew: rises off one knee (propped on the cannon), stamps in and throws both arms wide as the seams flare",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_victory": {
+   "clip": "victory",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {
+    "roar": {
+     "frame": 17,
+     "time_s": 0.56667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the run is won (GameEvent victory / boss down, results screen); holds its last frame",
+   "purpose": "the roar: a crouch, then the cannon and the fist thrown up to the sky, chest out; holds the pose",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_ping": {
+   "clip": "ping",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {
+    "ping": {
+     "frame": 5,
+     "time_s": 0.16667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the ping / marker input (party callout)",
+   "purpose": "a ping: the left gauntlet thrusts out with the hand open, pointing ahead, the head follows",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": [
+      4,
+      16
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_interact": {
+   "clip": "interact",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "contact": {
+     "frame": 13,
+     "time_s": 0.43333
+    },
+    "release": {
+     "frame": 26,
+     "time_s": 0.86667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the interact input at an anvil / forge / shrine POI (PoiState use); 1.3 s",
+   "purpose": "work the anvil: a step in, lean over and press the plated fist down onto it, then step back",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_forge_hammer@loop": {
+   "clip": "forge_hammer",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "hammer_hit": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the forge / hub anvil upgrade (Forge screen open, hub idle at the anvil)",
+   "purpose": "hammering the anvil with the plated left fist, the cannon arm braced at his side",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_idle_signature@loop": {
+   "clip": "idle_signature",
+   "family": "valdris",
+   "loop": true,
+   "layer": "full",
+   "frames": 150,
+   "duration_s": 5.0,
+   "fps": 30,
+   "events": {
+    "vent": {
+     "frame": 24,
+     "time_s": 0.8
+    },
+    "flex": {
+     "frame": 100,
+     "time_s": 3.33333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive and idle for 6 s or more (out of combat); in the hub and the character select",
+   "purpose": "signature idle: a forge-deep breath vents the pauldron slots, he lifts the cannon to look down the barrel, flexes the fist",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": [
+      90,
+      97,
+      104,
+      109
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_bulwark_slam": {
+   "clip": "bulwark_slam",
+   "family": "valdris",
+   "loop": false,
+   "layer": "full",
+   "frames": 50,
+   "duration_s": 1.66667,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 8,
+     "time_s": 0.26667
+    },
+    "land": {
+     "frame": 21,
+     "time_s": 0.7
+    },
+    "barricade": {
+     "frame": 25,
+     "time_s": 0.83333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron valdris active1 Bulwark Slam: the 7 m / 0.45 s leap runs from 'launch' to 'land' (the sim moves the entity); Nova (r 3.4) on 'land', the forge Barricade on 'barricade'",
+   "purpose": "Bulwark Slam: a deep crouch, a heavy leap with both arms raised overhead, the cannon slammed down on landing",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_siege_stance_enter": {
+   "clip": "siege_stance_enter",
+   "family": "valdris",
+   "loop": false,
+   "layer": "full",
+   "frames": 26,
+   "duration_s": 0.86667,
+   "fps": 30,
+   "events": {
+    "stomp_l": {
+     "frame": 8,
+     "time_s": 0.26667
+    },
+    "anchor": {
+     "frame": 15,
+     "time_s": 0.5
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron valdris active2 Siege Stance cast: rooted from 'anchor' (the anchor VFX / ground glyph); then siege_stance@loop",
+   "purpose": "Siege Stance: two stamping steps out into a wide low brace, the fist planted on the knee, the cannon locked on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_siege_stance@loop": {
+   "clip": "siege_stance",
+   "family": "valdris",
+   "loop": true,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "replaces idle_combat and locomotion for the 6 s Siege Stance (rooted); siege_fire layers the shots over it",
+   "purpose": "the Siege Stance brace: rooted wide and low, the fist on the knee, heavy breaths, the cannon dead steady",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_siege_stance_exit": {
+   "clip": "siege_stance_exit",
+   "family": "valdris",
+   "loop": false,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "Siege Stance ends (6 s): back to idle_combat / locomotion",
+   "purpose": "out of the brace: he straightens and steps both sabatons back in under him",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_siege_fire": {
+   "clip": "siege_fire",
+   "family": "valdris",
+   "loop": false,
+   "layer": "upper",
+   "frames": 5,
+   "duration_s": 0.16667,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each shot during Siege Stance (5.7 shots/s = one per 5.3 frames), layered over siege_stance@loop; first and last frame are siege_stance frame 0",
+   "purpose": "a Siege Stance shot: a short hard kick of the cannon and the right shoulder, braced (recoil stays procedural)",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_mountainfall_start": {
+   "clip": "mountainfall_start",
+   "family": "valdris",
+   "loop": false,
+   "layer": "full",
+   "frames": 46,
+   "duration_s": 1.53333,
+   "fps": 30,
+   "events": {
+    "grow": {
+     "frame": 16,
+     "time_s": 0.53333
+    },
+    "stomp": {
+     "frame": 30,
+     "time_s": 1.0
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron valdris ultimate Mountainfall cast: the x1.8 scale ramps from 'grow', the first shockwave on 'stomp'; then mountainfall@loop",
+   "purpose": "Mountainfall: gathers low, steps wide and rises with both arms flung out and up as he grows, a ground-shaking stamp",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_mountainfall@loop": {
+   "clip": "mountainfall",
+   "family": "valdris",
+   "loop": true,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "replaces idle_combat while Mountainfall lasts (8 s, model scale x1.8); shots and mountainfall_pound layer on top",
+   "purpose": "the Mountainfall avatar stance: wider and lower, heavy slow breaths rolling the pauldrons, the cannon on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_mountainfall_pound": {
+   "clip": "mountainfall_pound",
+   "family": "valdris",
+   "loop": false,
+   "layer": "upper",
+   "frames": 33,
+   "duration_s": 1.1,
+   "fps": 30,
+   "events": {
+    "pound": {
+     "frame": 15,
+     "time_s": 0.5
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "every 1.1 s during Mountainfall (33 frames = 1.1 s): the pound (r 4.5) on 'pound'; upper layer over mountainfall@loop or locomotion, first and last frame are mountainfall frame 0",
+   "purpose": "the Mountainfall ground pound: both arms heaved overhead, then the cannon and the fist hammered down at the ground",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "valdris_armor_break": {
+   "clip": "armor_break",
+   "family": "valdris",
+   "loop": false,
+   "layer": "upper",
+   "frames": 32,
+   "duration_s": 1.06667,
+   "fps": 30,
+   "events": {
+    "break": {
+     "frame": 7,
+     "time_s": 0.23333
+    },
+    "roar": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the Reforged Flesh passive when the Armor breaks: the shockwave (r 5.0) and the 3 s taunt start on 'break'; upper layer over anything",
+   "purpose": "Reforged Flesh break: hunched against the blow, then the chest and both arms thrown open in a roar as the plates blast off",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  }
+ },
+ "playback": {
+  "fps": 30,
+  "naming": "<key>_<clip>, loops <key>_<clip>@loop (docs/art/GF_HERO_SKELETON.md section 8)",
+  "locomotion": "playback rate = ground speed / clip_info.design_speed_mps (walk, run, strafe_*, backpedal)",
+  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are valdris_idle_combat@loop frame 0",
+  "events": "glTF has no events: clip_info.<clip>.events gives the frame and time of each (30 fps)",
+  "weapon_variant": "clip_info.<clip>.weapon_variant is null: colossus_cannon has no hand variants, so nothing swaps. The fist / open hand poses are the hero's own keyed fingers; clip_info.<clip>.hand_pose lists them per hand for reference",
+  "in_place": "only pelvis translates; the entity moves in the sim"
+ },
+ "weapon": {
+  "default": "colossus_cannon",
+  "glb": "assets/models/weapons/colossus_cannon.glb",
+  "attach": "weapon scene = identity child of weapon_R (a sleeve weapon: the right forearm lies in its sleeve, the fist on its inner handle); it has no offhand node, the left hand is the hero's own"
+ },
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. The hero faces +Z, origin on the ground between the feet, rest pose = T-pose. Socket nodes: -Z = forward (grip +Y), +Y = up, +X = right; a weapon scene attaches as an identity child.",
+ "bounds_m": {
+  "min": [
+   -1.1514,
+   0,
+   -0.623
+  ],
+  "max": [
+   1.1514,
+   2.3339,
+   0.648
+  ]
+ },
+ "height_m": 2.3339,
+ "glb": "assets/models/characters/valdris.glb",
+ "glb_bytes": 16889700,
+ "glb_sha256": "e7fd6b4cc3af2c697b51bf671dee832cce577875091cf08559fd44f4e5f674d3",
+ "source_blend": "art/characters/valdris/production/valdris_anim.blend",
+ "build_script": "tools/blender/gf_hero/export_glb.py",
+ "pipeline": "docs/ART_PIPELINE.md stage 5",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-26",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": [
+   "rest height 2.33 m outside the hero range (2.0, 2.3)"
+  ],
+  "tool": "tools/blender/gf_hero/validate_glb.py",
+  "source_fidelity_max_error": 4.4775674075278604e-05
+ }
+}

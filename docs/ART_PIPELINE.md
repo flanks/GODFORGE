@@ -424,6 +424,7 @@ python tools/blender/gf_hero/run_stage5.py <key>          # [--from <step>] [--o
 | export | `export_glb.py --key <key>` | `production/<key>_anim.blend` → `assets/models/characters/<key>.glb` + `<key>.meta.json`: Blender-side checks, the export, the gate, source fidelity → `reports/export_report.json` |
 | reimport | `smoke_import.py` | a fresh factory-settings Blender re-imports the shipped files: names, every clip played one frame, the weapon on the sockets, review renders (`work/renders/stage5/`) |
 | sheet | `s5_sheets.py` (PIL) | `reports/stage5/export_review.png`: the stage-4 source next to the shipped file, and the client camera at true pixel size |
+| board | `s5_<key>_sheets.py` (PIL, optional) | a hero's own board, skipped when there is none (Valdris: the shipped file next to the concept and the blockout) |
 | validate | `validate_glb.py --blender` | exactly what CI runs |
 
 What each step runs, for use on its own:
@@ -490,9 +491,12 @@ on Blender's importer:
 - skinning;
 - one action per animation, each played one frame against the GLB's kinematics;
 - a sane mesh at every clip;
-- the weapon scene on `weapon_R` with its `offhand` on `weapon_L`.
+- the weapon scene on `weapon_R` with its `offhand` on `weapon_L` (a sleeve weapon without an `offhand` node, such as
+  the colossus_cannon, rides `weapon_R` alone).
 
-A new hero adds its unique clips to `required_clips.json`; everything else is generic.
+A new hero adds its unique clips to `required_clips.json`; everything else is generic. A hero may add
+`tools/blender/gf_hero/s5_<key>.py` (plain data: `REVIEW_SHOTS`, `ATTACH_FOLLOW`, `CLOSEUP`) when Brax's default review
+shots (`jab_r`, `uppercut`, `meltdown_start`) are not his clips.
 
 **CI.** The job `hero-glb` in `.github/workflows/art.yml` runs on changes to `assets/models/**` or `tools/blender/**`
 (the workflow's paths). It fetches the shipped models from Git LFS, downloads the newest Blender 5.2.x LTS for Linux
@@ -512,6 +516,28 @@ Brax's results (2026-09-25):
 - source fidelity 1.9e-5, Blender re-import 1.8e-6, bind pose 1.1e-6;
 - `anvil_gauntlets.glb`: 3.65 MB, 7,716 tris shown, 15,432 with both variants;
 - all of it in `art/characters/brax/reports/export_report.json` and `reports/stage5/export_review.png`.
+
+**Valdris (2026-09-26), the armoured variant.** The same command, the same exporter and gate: `python
+tools/blender/gf_hero/run_stage5.py valdris` (about 35 s). His signature weapon, the colossus_cannon, is the weapon
+track's file (`tools/blender/gf_assets`), so the weapon step is skipped and the shipped
+`assets/models/weapons/colossus_cannon.glb` is attached as it is. What his stage 5 added, all default-off for Brax:
+
+| Piece | Script | What it does |
+|---|---|---|
+| hook | `s5_valdris.py` | plain data for `smoke_import.py`: his seven review shots (the guard, the heavy shot, the Bulwark landing, the Siege brace, the run, the Mountainfall pound, the open-hand ping), the clip the cannon must ride `weapon_R` through (`fire_heavy` f6), a wider close-up for his 2.33 m |
+| sleeve weapon | `smoke_import.py`, `export_glb.py` (shared) | a weapon GLB without an `offhand` node rides `weapon_R` alone and its mesh is always shown; in the sidecar `clip_info.<clip>.weapon_variant` is null (the cannon has no variants) and the fist / open frames of his own gauntlet fingers are `hand_pose` |
+| board | `s5_valdris_sheets.py` | `reports/stage5/valdris_board.png`: the shipped file next to the concept, the turnaround and the blockout, and every review shot at game size |
+
+His results:
+- `valdris.glb`: 16.89 MB, 24,958 tris (the 25k budget), 116 joints (63 contract + 53 `x_` armour helpers and cloth
+  chains), one single-sided `M_valdris` with three 2048² PNGs, 34 clips; 0 errors, one warning: the rest height
+  2.33 m (the pauldron tops; his crown is 2.305 m) is over the 2.0-2.3 m hero range, as stage 2 measured;
+- source fidelity 4.5e-5, Blender re-import 2.7e-5 over all 34 clips, bind pose 1.9e-6; the cannon's rest attach
+  1.5e-7, and it rides `weapon_R` through the heavy shot to 5.4e-7;
+- re-exporting is byte-identical; Brax's stage-5 outputs are unchanged by the shared changes
+  (`art/characters/valdris/reports/stage5/brax_regression.json`);
+- all of it in `art/characters/valdris/reports/export_report.json`, `reports/stage5/export_review.png` and
+  `reports/stage5/valdris_board.png`.
 
 ## 6. Export format note (stage 5)
 
