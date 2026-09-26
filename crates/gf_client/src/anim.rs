@@ -920,10 +920,10 @@ fn drive_heroes(
                 facing = heading;
             }
             ("downed", 1.0)
-        } else if p.forge_open && !moving && an.has("forge_hammer") {
-            ("forge_hammer", 1.0)
         } else if let Some([_, hold, _, _]) = ha.kit.stance.filter(|_| stance) {
             (hold, 1.0)
+        } else if p.forge_open && !moving && an.has("forge_hammer") {
+            ("forge_hammer", 1.0)
         } else if moving {
             let rel = wrap(heading - ha.facing.unwrap_or(aim));
             let mut gait = Gait::pick(rel, ha.gait);

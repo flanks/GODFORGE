@@ -164,6 +164,13 @@ pub struct PlayerRig {
     no_model: bool,
 }
 
+impl PlayerRig {
+    /// The glTF hero under this rig (it carries `HeroGear` and `HeroAnim`), once spawned.
+    pub fn model(&self) -> Option<Entity> {
+        self.model
+    }
+}
+
 /// The model store and the glTF hero parts `sync_players` drives.
 #[derive(SystemParam)]
 pub struct HeroModels<'w, 's> {

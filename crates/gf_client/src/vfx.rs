@@ -5,14 +5,15 @@
 
 use crate::camera::{MainCamera, w3};
 use crate::input::Settings;
+use crate::models::HeroGear;
 use crate::net::Link;
 use crate::palette::{Look, Palette, element_color, flat, hdr, hex, mix};
-use crate::scene::{SceneIndex, Visual};
+use crate::scene::{PlayerRig, SceneIndex, Visual};
 use crate::{ClientConfig, ClientSet};
 use gf_content::VfxTier;
 use gf_core::damage::DamageType;
 use gf_core::ids::NetId;
-use gf_engine::client::{font_px, world_to_screen};
+use gf_engine::client::{NotShadowCaster, font_px, world_to_screen};
 use gf_engine::prelude::*;
 use gf_net::GameEvent;
 use gf_net::quant::QPos;
@@ -73,10 +74,59 @@ pub struct VfxState {
 pub fn build(app: &mut App) {
     app.init_resource::<VfxState>().add_systems(
         Update,
-        (choose_tier, spawn_from_events, update_particles, update_shockwaves, update_fades, update_numbers)
+        (
+            choose_tier,
+            spawn_from_events,
+            muzzle_flashes,
+            update_particles,
+            update_shockwaves,
+            update_fades,
+            update_numbers,
+        )
             .chain()
             .in_set(ClientSet::Presentation),
     );
+}
+
+/// A short flash where each shot leaves the weapon: the glTF weapon's `muzzle` node, else the
+/// greybox gun's muzzle on the aim pivot.
+fn muzzle_flashes(
+    mut commands: Commands,
+    link: Res<Link>,
+    index: Res<SceneIndex>,
+    rigs: Query<&PlayerRig>,
+    gears: Query<&HeroGear>,
+    muzzles: Query<&GlobalTransform>,
+    mut pal: ResMut<Palette>,
+    mut mats: ResMut<Assets<StandardMaterial>>,
+) {
+    let Some(world) = link.latest.as_deref() else { return };
+    for ev in &link.fresh_events {
+        let GameEvent::Shot { slot, dir, element } = *ev else { continue };
+        let Some(rig) = index.players.get(slot as usize).copied().flatten().and_then(|e| rigs.get(e).ok()) else {
+            continue;
+        };
+        let muzzle = rig
+            .model()
+            .and_then(|m| gears.get(m).ok())
+            .and_then(|g| g.muzzle.filter(|_| !g.greybox_gun))
+            .and_then(|m| muzzles.get(m).ok())
+            .map(|g| g.translation());
+        let at = muzzle.unwrap_or_else(|| {
+            let d = gf_net::quant::u16_to_dir(dir);
+            let height = world.players.iter().find(|p| p.slot == slot).map_or(0.0, |p| p.height);
+            w3(rig.shown + d * 1.05, 1.05 + height)
+        });
+        let mat = pal.mat(&mut mats, hdr(mix(element_color(element), Color::WHITE, 0.35), 2.2), Look::Additive);
+        let scale = Vec3::splat(0.2);
+        commands.spawn((
+            Fade { life: 0.07, max: 0.07, base_scale: scale, shrink_xz: false },
+            Mesh3d(pal.low_sphere.clone()),
+            MeshMaterial3d(mat),
+            Transform::from_translation(at).with_scale(scale),
+            NotShadowCaster,
+        ));
+    }
 }
 
 fn choose_tier(cfg: Res<ClientConfig>, index: Res<SceneIndex>, mut state: ResMut<VfxState>) {
