@@ -1,0 +1,3345 @@
+{
+ "version": 1,
+ "generator": "tools/vfx/build_all.py",
+ "spec": "docs/art/VFX_STYLE.md sections 3, 21 and 22",
+ "conventions": {
+  "packed_channels": {
+   "R": "shape mask as a signed distance field; 0.5 = edge; +-4 cell px -> 1.0 / 0.0",
+   "G": "value on the ramp: ink 0.06, deep 0.29, body 0.50, light 0.70, hot 0.93; band edges [0.18, 0.4, 0.6, 0.81]",
+   "B": "erosion order: visible while B > t (t = normalized age x erode); low = erodes first"
+  },
+  "color_space": "packed atlases, trails, smears and noise are linear data (load with is_srgb = false); ramps are sRGB colour with A = HDR gain / 4",
+  "premultiplied": "packed data is never premultiplied; the shader outputs premultiplied colour (AlphaMode::Premultiplied) and hot values (G > 0.80) fade to additive by G = 0.90",
+  "shader_reference": "tools/vfx/vfxlib.py shade(): coverage = smoothstep(0.5-w, 0.5+w, R) with w = fwidth(R) * 0.7; coverage *= smoothstep(t-0.05, t, B); rgb, gain = ramp(G); ink band alpha x 0.90; out = (rgb*gain*a, a*(1-add))",
+  "ramp_rows": {
+   "kinetic": 0,
+   "flame": 1,
+   "storm": 2,
+   "void": 3,
+   "plague": 4,
+   "radiant": 5,
+   "unmade": 6,
+   "godworks_gold": 7,
+   "godworks_ember": 8,
+   "enemy_shot": 9,
+   "zone_gold": 10,
+   "heal": 11,
+   "bleed": 12,
+   "time": 13,
+   "dust": 14,
+   "mono": 15
+  },
+  "band_gain": [
+   1.0,
+   1.0,
+   1.25,
+   1.6,
+   2.6
+  ],
+  "uv": "atlas cells: u right, v down (image rows); frame i of a sequence is cell (col0 + i, row)",
+  "pivot": "per sequence: the effect origin in cell-relative uv (0..1)",
+  "flipbook_timing": "fps is the playback rate; frame_times_60 (when present) lists the 60 fps frame each flipbook frame was painted at, so a front-loaded burst plays fast-in, slow-out at a constant fps",
+  "strips": "trails and smears: u = 0 at the tail (oldest end), 1 at the head (newest end); v = 0 inner / left edge, 1 outer / right edge; tileable_u rows repeat seamlessly along u",
+  "meshes": "glTF 2.0 binary, +Y up, forward = -Z (Transform::looking_to), metres; COLOR_0 carries the same packing (R = 1 mask, G = value band, B = erosion order); UV0 as documented per mesh",
+  "sizes": "radius_in_cell: the gameplay radius R as a fraction of the half cell; quad side = 2R / radius_in_cell"
+ },
+ "assets": [
+  {
+   "file": "atlas/vfx_bodies.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": 32,
+   "fps": null,
+   "intended": "billboard projectile bodies and charge cues (the meshes cover Shell, Arrow, Boulder, Coin, Blade, Javelin, Harpoon)",
+   "sequences": [
+    {
+     "name": "orb",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 12,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "Orb body (Thundercoil, Sundial); rotate so the rim faces the light",
+     "radius_in_cell": 0.6
+    },
+    {
+     "name": "globe",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 10,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.46
+     ],
+     "intended": "Globe body: void / plague / iron by ramp",
+     "radius_in_cell": 0.6
+    },
+    {
+     "name": "enemy_shot",
+     "row": 2,
+     "col0": 0,
+     "frames": 4,
+     "fps": 15,
+     "loop": true,
+     "pivot": [
+      0.6,
+      0.5
+     ],
+     "intended": "EnemyShot / boss Radial teardrop, head at +u; stretch 1.6x along velocity; never an element colour",
+     "ramp": "enemy_shot"
+    },
+    {
+     "name": "small_bodies",
+     "row": 2,
+     "col0": 4,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.6,
+      0.5
+     ],
+     "intended": "billboard bodies for small or distant projectiles, head at +u",
+     "names": [
+      "needle",
+      "pellet",
+      "bolt",
+      "slug"
+     ]
+    },
+    {
+     "name": "charge_core",
+     "row": 3,
+     "col0": 0,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "charge: ink dot -> body disc -> hot pin -> release glint (PlayerView.charge 0..1; the glint is 1 frame)"
+    },
+    {
+     "name": "charge_ring",
+     "row": 3,
+     "col0": 4,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "the broken charge ring tightening; the last frame flashes white at full charge"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_bolt_strips.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    1,
+    8
+   ],
+   "cell": [
+    1024,
+    64
+   ],
+   "frames": 8,
+   "fps": 30,
+   "intended": "lightning strips for chain hops, Arc Nova, Railshock / Judgment variants, storm strikes: stretch u between the two nodes",
+   "sequences": [
+    {
+     "name": "bolt",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": true,
+     "pivot": [
+      0.0,
+      0.5
+     ],
+     "intended": "",
+     "axis": "column",
+     "note": "frames run down the column (row = frame); swap 2 strips at 30 Hz for the strobe; strips 6-7 are thinner (branches, micro-arcs)",
+     "endpoints": [
+      [
+       0.006,
+       0.5
+      ],
+      [
+       0.994,
+       0.5
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_flame.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "the star breaks into rising, curling tongues; embers; soot (Flame explosions, Blightburn)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "flame",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_godworks.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "Fallen Godworks death: cold-gold flash, porcelain and bronze plates, falling gold sparks, the mask cracks last (use ramp 'godworks_gold')",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "godworks_gold",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_kinetic.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "petal star, lit smoke crown, brass shards, chunky sparks (Kinetic explosions, Shrapnel Blaze)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "kinetic",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_plague.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "the sac swells, splatters: droplets arc out and fall, spores drift (Plague explosions)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "plague",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_radiant.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "4-point cross, straight rays, broken halo arc, rising glints (Radiant explosions, Judgment)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "radiant",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_storm.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "thin angular strobing star, forked bolts, crackle remnants (Storm explosions, Arc Nova nodes)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "storm",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_unmade.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "Unmade death: white flash on ink, teal ichor splash, obsidian shards, ichor teardrops (use ramp 'unmade')",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "unmade",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_burst_void.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 24,
+   "intended": "implodes f0-4, flips out as an ink star with violet rims, the stain shrinks to a point; hex motes (Void explosions, Collapsing Star)",
+   "sequences": [
+    {
+     "name": "burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.56
+     ],
+     "intended": "",
+     "frame_times_60": [
+      0,
+      1.5,
+      3,
+      4.5,
+      6,
+      8,
+      10,
+      12.5,
+      15,
+      18,
+      21,
+      24.5,
+      28,
+      32,
+      36,
+      40
+     ],
+     "radius_in_cell": 0.55,
+     "ramp": "void",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_decals.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": null,
+   "intended": "ground decals in a ring buffer (never bloom; <= 0.9 gain): the crack cores hold low B so they cool and vanish first",
+   "sequences": [
+    {
+     "name": "decal",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "",
+     "names": [
+      "scorch_a",
+      "scorch_b",
+      "scorch_c",
+      "crack_star_a",
+      "crack_star_b",
+      "soot",
+      "burn_patch",
+      "ichor_stain_a",
+      "ichor_stain_b",
+      "plague_stain_a",
+      "plague_stain_b",
+      "ink_stain_a",
+      "ink_stain_b",
+      "rot_scar",
+      "crater",
+      "molten_gashes"
+     ],
+     "radius_in_cell": 0.72,
+     "plane": "ground",
+     "note": "one sprite per cell, row-major"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_flame_tongue.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    128,
+    256
+   ],
+   "frames": 32,
+   "fps": 12,
+   "intended": "flame tongues: burning ground, Flame impacts, Meltdown fists, burn status, geysers; base at the bottom centre",
+   "sequences": [
+    {
+     "name": "narrow",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 12,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.96
+     ],
+     "intended": "a single tall tongue (geysers, Meltdown fists)"
+    },
+    {
+     "name": "medium",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 12,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.96
+     ],
+     "intended": "burning ground, burn patches"
+    },
+    {
+     "name": "clump",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": 12,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.96
+     ],
+     "intended": "flame clusters (Flame impacts, Blightburn, fields)"
+    },
+    {
+     "name": "licks",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": 16,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.96
+     ],
+     "intended": "short licks: burn status, beam edge crackle"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_glyphs.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": null,
+   "intended": "sigils and god glyphs: decals under targets, turning Curse/Mark sigils, Binding Hex, boon pillars, Still Field dial",
+   "sequences": [
+    {
+     "name": "glyph",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "",
+     "names": [
+      "curse",
+      "mark",
+      "binding_hex",
+      "root_chain",
+      "hexagram",
+      "sun_wheel",
+      "clock_dial",
+      "bullseye",
+      "god_pyra",
+      "god_zephyros",
+      "god_nyctia",
+      "god_aeon",
+      "god_gaiaa",
+      "god_morwenn",
+      "god_seraphel",
+      "god_umbra_rex"
+     ],
+     "note": "one sprite per cell, row-major"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_impact_star.png",
+   "kind": "flipbook_packed",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 32,
+   "fps": 30,
+   "intended": "banded impact stars: plain hits, blasts, kills, impact frames (ink backing = the same frame drawn with value 0.06, 1.3x, rotated 5-8 deg)",
+   "sequences": [
+    {
+     "name": "star4",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "crit / radiant hits, small precise hits",
+     "frame_times_60": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      11,
+      14
+     ],
+     "radius_in_cell": 0.78
+    },
+    {
+     "name": "star5",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "plain hits (0.3-0.6 m)",
+     "frame_times_60": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      11,
+      14
+     ],
+     "radius_in_cell": 0.78
+    },
+    {
+     "name": "star7",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "the layered-burst blast star at R",
+     "frame_times_60": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      11,
+      14
+     ],
+     "radius_in_cell": 0.78
+    },
+    {
+     "name": "star9",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "big blasts, elites, boss hits",
+     "frame_times_60": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      11,
+      14
+     ],
+     "radius_in_cell": 0.78
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_muzzle_directional.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    128
+   ],
+   "frames": 16,
+   "fps": 60,
+   "intended": "long directional muzzle flashes, muzzle at u = 0.06, forward = +u",
+   "sequences": [
+    {
+     "name": "flicker3",
+     "row": 0,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.06,
+      0.5
+     ],
+     "intended": "rapid: serpent_smg, coinshooter (small), Bullet Ballet pistols"
+    },
+    {
+     "name": "spike",
+     "row": 1,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.05,
+      0.5
+     ],
+     "intended": "precise: godsbane_rifle long spike + side spikes + pressure-wave lines"
+    },
+    {
+     "name": "rail",
+     "row": 2,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.05,
+      0.5
+     ],
+     "intended": "longstrider_rail / Piercing Comet: parallel rail lines + white spike"
+    },
+    {
+     "name": "petal_bloom",
+     "row": 3,
+     "col0": 0,
+     "frames": 4,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.06,
+      0.5
+     ],
+     "intended": "plaguebloom_sprayer nozzle petals, tidecaller droplet spray"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_petal_flash.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 60,
+   "intended": "muzzle flashes, 4 frames: f0 core, f1 full, f2 break-up, f3 remnants (optional); forward = +u; rotate +-15 deg per shot",
+   "sequences": [
+    {
+     "name": "forward_fan",
+     "row": 0,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.3,
+      0.5
+     ],
+     "intended": "heavy: colossus_cannon (5 petals, 1.0 m), thundercoil (4), gravemaw belch, pendulum 2-4 petals"
+    },
+    {
+     "name": "sunburst",
+     "row": 1,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.18,
+      0.5
+     ],
+     "intended": "spread: sunspike_shotgun wedges across the spread"
+    },
+    {
+     "name": "cross",
+     "row": 2,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.42,
+      0.5
+     ],
+     "intended": "radiant cross: seraph_lance prism, dawnbreaker, coin ting, precision glint"
+    },
+    {
+     "name": "inward_star",
+     "row": 3,
+     "col0": 0,
+     "frames": 4,
+     "fps": 60,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "void: voidheart_singularity (points aim in f0-1, flip out f2), Collapsing Star / Void implosion cue"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_pips.png",
+   "kind": "flipbook_packed",
+   "size": [
+    512,
+    512
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": 16,
+   "fps": null,
+   "intended": "status pips at head_top and pickup glyphs",
+   "sequences": [
+    {
+     "name": "pip",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "",
+     "names": [
+      "burn",
+      "shock",
+      "curse",
+      "root",
+      "bleed",
+      "mark",
+      "stun",
+      "doom",
+      "note",
+      "heart",
+      "shard",
+      "part",
+      "coin",
+      "ping",
+      "heal",
+      "tick"
+     ],
+     "note": "one sprite per cell, row-major"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_plague.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": 32,
+   "fps": 15,
+   "intended": "Plague secondaries",
+   "sequences": [
+    {
+     "name": "bubble",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 15,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.6
+     ],
+     "intended": "bubble swells f0-4, pops f5, droplets fall"
+    },
+    {
+     "name": "drip",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 15,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.12
+     ],
+     "intended": "a drip forms under a surface and falls"
+    },
+    {
+     "name": "splat",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": 20,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.62
+     ],
+     "intended": "droplet lands: crown splash, puddle"
+    },
+    {
+     "name": "spores",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": 8,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "spore cloud drift loop"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_radiant.png",
+   "kind": "flipbook_packed",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 32,
+   "fps": 30,
+   "intended": "Radiant flares: rigid, straight, snapping",
+   "sequences": [
+    {
+     "name": "cross_flare",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "4-point cross glint: crits, Radiant hits, prism tip; snaps 15 deg at f3"
+    },
+    {
+     "name": "ray_fan",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 30,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "straight rays out and back: Radiant bursts, Judgment Bolt nodes"
+    },
+    {
+     "name": "halo_arcs",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": 20,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "broken halo arcs: Seraph Lance accents, Eclipse corona, Purge"
+    },
+    {
+     "name": "sunburst",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": 8,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "ground sunburst wedges: Solar Flare, Godforged loot base, recipe discovered",
+     "plane": "ground"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_smoke_puff.png",
+   "kind": "flipbook_packed",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 32,
+   "fps": null,
+   "intended": "smoke and dust puffs: explosion crowns, muzzle smoke, trails, dust walls; rotate so +v up faces the light (the blast core); cool the value with age",
+   "sequences": [
+    {
+     "name": "age0",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.53
+     ],
+     "intended": "young puff: dense, strong rim (f2-8)",
+     "variants": [
+      "round",
+      "wide",
+      "column",
+      "lean_left",
+      "lean_right",
+      "tight",
+      "billow",
+      "wisp"
+     ],
+     "radius_in_cell": 0.68
+    },
+    {
+     "name": "age1",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.53
+     ],
+     "intended": "grown (f8-16)",
+     "variants": [
+      "round",
+      "wide",
+      "column",
+      "lean_left",
+      "lean_right",
+      "tight",
+      "billow",
+      "wisp"
+     ],
+     "radius_in_cell": 0.68
+    },
+    {
+     "name": "age2",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.53
+     ],
+     "intended": "opening, rim cools (f16-28)",
+     "variants": [
+      "round",
+      "wide",
+      "column",
+      "lean_left",
+      "lean_right",
+      "tight",
+      "billow",
+      "wisp"
+     ],
+     "radius_in_cell": 0.68
+    },
+    {
+     "name": "age3",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.53
+     ],
+     "intended": "last wisps (f28-40)",
+     "variants": [
+      "round",
+      "wide",
+      "column",
+      "lean_left",
+      "lean_right",
+      "tight",
+      "billow",
+      "wisp"
+     ],
+     "radius_in_cell": 0.68
+    }
+   ],
+   "note": "a puff is one silhouette (column) played through its 4 ages (rows), or aged with B"
+  },
+  {
+   "file": "atlas/vfx_sparkfx.png",
+   "kind": "flipbook_packed",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 32,
+   "fps": 24,
+   "intended": "spark flipbooks",
+   "sequences": [
+    {
+     "name": "radial_burst",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "radial spark burst: impacts, kills, forge hammer strikes"
+    },
+    {
+     "name": "cone_spray",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": 24,
+     "loop": false,
+     "pivot": [
+      0.12,
+      0.5
+     ],
+     "intended": "sparks sprayed along a surface normal (+u): plated / boss hits, ricochet, pierce exit"
+    },
+    {
+     "name": "shower",
+     "row": 2,
+     "col0": 0,
+     "frames": 8,
+     "fps": 20,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.78
+     ],
+     "intended": "gold spark shower: forge actions, anvil, coin fountain, Sabbath of Sparks"
+    },
+    {
+     "name": "ember_drift",
+     "row": 3,
+     "col0": 0,
+     "frames": 8,
+     "fps": 10,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.9
+     ],
+     "intended": "ember and ash drift loop: heat columns, Meltdown, burning ground"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_sparks_shards.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    8,
+    4
+   ],
+   "cell": [
+    128,
+    128
+   ],
+   "frames": 32,
+   "fps": null,
+   "intended": "secondary particles, one sprite each",
+   "sequences": [
+    {
+     "name": "spark",
+     "row": 0,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.9,
+      0.5
+     ],
+     "intended": "spark streaks, head at +u (hot); stretch along velocity"
+    },
+    {
+     "name": "shard",
+     "row": 1,
+     "col0": 0,
+     "frames": 8,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "shard kites: shrapnel, obsidian, plate breaks, crystals"
+    },
+    {
+     "name": "teardrop",
+     "row": 2,
+     "col0": 0,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.62,
+      0.5
+     ],
+     "intended": "droplets: plague, ichor, bleed, water; head at +u"
+    },
+    {
+     "name": "coin",
+     "row": 2,
+     "col0": 4,
+     "frames": 4,
+     "fps": 15,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "coin spin: face, 3/4, edge, glint"
+    },
+    {
+     "name": "glint",
+     "row": 3,
+     "col0": 0,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "4-point glints: radiant motes, seeker glints, ting"
+    },
+    {
+     "name": "mote",
+     "row": 3,
+     "col0": 4,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "element motes: ember (flame), spore (plague), hex (void), ash flake (smoke)",
+     "names": [
+      "ember",
+      "spore",
+      "hex",
+      "ash"
+     ]
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_storm.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    4,
+    2
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 8,
+   "fps": null,
+   "intended": "Storm ground scorch and crackle",
+   "sequences": [
+    {
+     "name": "lichtenberg",
+     "row": 0,
+     "col0": 0,
+     "frames": 4,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "Lichtenberg scorch decals (2 s, cool the light core)",
+     "radius_in_cell": 0.88,
+     "plane": "ground"
+    },
+    {
+     "name": "crackle",
+     "row": 1,
+     "col0": 0,
+     "frames": 4,
+     "fps": 20,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "micro-arcs: Shock status, Storm edge crackle, Static Charge; swap at 20 Hz"
+    }
+   ]
+  },
+  {
+   "file": "atlas/vfx_void_swirl.png",
+   "kind": "flipbook_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    4,
+    4
+   ],
+   "cell": [
+    256,
+    256
+   ],
+   "frames": 16,
+   "fps": 16,
+   "intended": "Void spiral: GravityWell hazard, implosions, Eclipse, Gravity Chain nodes",
+   "sequences": [
+    {
+     "name": "swirl",
+     "row": 0,
+     "col0": 0,
+     "frames": 16,
+     "fps": 16,
+     "loop": true,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "",
+     "radius_in_cell": 0.88,
+     "plane": "ground",
+     "note": "frames run row-major across the 4x4 grid"
+    }
+   ]
+  },
+  {
+   "file": "meshes/vfx_arc_060.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 60 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 32,
+   "bounds_min": [
+    -0.5,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    0.5,
+    0,
+    -0.62
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arc_090.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 90 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 36,
+   "bounds_min": [
+    -0.707,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    0.707,
+    0,
+    -0.581
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arc_120.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 120 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 48,
+   "bounds_min": [
+    -0.866,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    0.866,
+    0,
+    -0.465
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arc_180.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 180 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 72,
+   "bounds_min": [
+    -1,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    1,
+    0,
+    0
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arc_270.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 270 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 108,
+   "bounds_min": [
+    -1,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    1,
+    0,
+    0.707
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arc_360.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "crescent smear strip, 360 deg sweep: melee strikes, slashes, spins, whips (texture smears/vfx_smears.png)",
+   "group": "smear",
+   "tris": 144,
+   "bounds_min": [
+    -1,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    1,
+    0,
+    1
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 tail .. 1 head along the sweep; v = 0 inner .. 1 outer",
+   "pivot": "the swing pivot (the character); outer radius 1 m, max width 0.36 m (scale to reach)",
+   "orient": "lies in the ground plane (XZ), centred on forward (-Z), sweeps counter-clockwise seen from above (from the right of forward to the left); mirror X for the other hand; rotate about X for overhead swings"
+  },
+  {
+   "file": "meshes/vfx_arrow.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Arrow (wraith_bow, echoing_greatbow): arrowhead, ink shaft, fletching",
+   "group": "body",
+   "tris": 22,
+   "bounds_min": [
+    -0.07,
+    -0.035,
+    -0.4
+   ],
+   "bounds_max": [
+    0.07,
+    0.07,
+    0.4
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "body centre, 0.8 m long",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_beam_cross.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "two crossed beam strips (XZ and YZ planes) for thick beams and loot beams",
+   "group": "beam",
+   "tris": 128,
+   "bounds_min": [
+    -0.5,
+    -0.5,
+    -1
+   ],
+   "bounds_max": [
+    0.5,
+    0.5,
+    0
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "as vfx_beam_ribbon",
+   "pivot": "the muzzle; 1 m long along -Z",
+   "orient": "axis along -Z"
+  },
+  {
+   "file": "meshes/vfx_beam_ribbon.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "beam strip: 32 segments for the wobble; texture trails rows beam_core / beam_body / loot_beam",
+   "group": "beam",
+   "tris": 64,
+   "bounds_min": [
+    -0.5,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    0.5,
+    0,
+    0
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0 at the muzzle .. 1 at the far end (scale u by length for tiling), v across",
+   "pivot": "the muzzle; 1 m long along -Z, 1 m wide along X (scale to len, width)",
+   "orient": "lies in the XZ plane; billboard it about its axis"
+  },
+  {
+   "file": "meshes/vfx_bolt.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Bolt (pendulum_repeater): a short thick crossbow-bolt kite, hot tip, ink shaft",
+   "group": "body",
+   "tris": 32,
+   "bounds_min": [
+    -0.075,
+    -0.075,
+    -0.25
+   ],
+   "bounds_max": [
+    0.075,
+    0.075,
+    0.25
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length (0 tail .. 1 tip)",
+   "pivot": "body centre, 0.5 m long",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_boulder_a.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Boulder (Mountainfall): faceted rock, three value planes, molten seams",
+   "group": "body",
+   "tris": 80,
+   "bounds_min": [
+    -0.302,
+    -0.294,
+    -0.34
+   ],
+   "bounds_max": [
+    0.369,
+    0.328,
+    0.285
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "spherical",
+   "pivot": "rock centre, ~0.6 m",
+   "orient": "any; tumble"
+  },
+  {
+   "file": "meshes/vfx_boulder_b.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Boulder variant b",
+   "group": "body",
+   "tris": 80,
+   "bounds_min": [
+    -0.298,
+    -0.275,
+    -0.339
+   ],
+   "bounds_max": [
+    0.364,
+    0.27,
+    0.316
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "spherical",
+   "pivot": "rock centre",
+   "orient": "any"
+  },
+  {
+   "file": "meshes/vfx_boulder_c.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Boulder variant c",
+   "group": "body",
+   "tris": 80,
+   "bounds_min": [
+    -0.304,
+    -0.291,
+    -0.282
+   ],
+   "bounds_max": [
+    0.286,
+    0.272,
+    0.269
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "spherical",
+   "pivot": "rock centre",
+   "orient": "any"
+  },
+  {
+   "file": "meshes/vfx_coin.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Coin (coinshooter, Grand Heist): a 12-sided coin; spin about its diameter",
+   "group": "body",
+   "tris": 48,
+   "bounds_min": [
+    -0.13,
+    -0.13,
+    -0.012
+   ],
+   "bounds_max": [
+    0.13,
+    0.13,
+    0.012
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "planar face mapping",
+   "pivot": "coin centre, radius 0.13 m",
+   "orient": "faces +-Z"
+  },
+  {
+   "file": "meshes/vfx_disc_blade.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Blade disc (orrery_discs, Orbit blades): a disc with 3 hooked blades; spin about Y",
+   "group": "body",
+   "tris": 72,
+   "bounds_min": [
+    -0.368,
+    -0.012,
+    -0.301
+   ],
+   "bounds_max": [
+    0.256,
+    0.012,
+    0.337
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "planar top view (u, v = x, z mapped to 0..1)",
+   "pivot": "disc centre, radius 0.36 m",
+   "orient": "lies in the XZ plane"
+  },
+  {
+   "file": "meshes/vfx_harpoon.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Harpoon (tidecaller_harpoon): barbed hooks, a rope ring at the back",
+   "group": "body",
+   "tris": 38,
+   "bounds_min": [
+    -0.075,
+    -0.045,
+    -0.6
+   ],
+   "bounds_max": [
+    0.075,
+    0.045,
+    0.62
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "body centre, 1.2 m long; rope anchor at +Z end",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_javelin.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Javelin (huntmother_javelins): a barbed shaft with a feather tail",
+   "group": "body",
+   "tris": 28,
+   "bounds_min": [
+    -0.075,
+    -0.06,
+    -0.7
+   ],
+   "bounds_max": [
+    0.075,
+    0.06,
+    0.7
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "body centre, 1.4 m long",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_needle.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Needle (serpent_smg): a hot sliver",
+   "group": "body",
+   "tris": 24,
+   "bounds_min": [
+    -0.03,
+    -0.026,
+    -0.275
+   ],
+   "bounds_max": [
+    0.03,
+    0.026,
+    0.275
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "body centre, 0.55 m long",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_pellet.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Pellet (sunspike_shotgun) and small generic bodies: a diamond",
+   "group": "body",
+   "tris": 8,
+   "bounds_min": [
+    -0.035,
+    -0.035,
+    -0.07
+   ],
+   "bounds_max": [
+    0.035,
+    0.035,
+    0.07
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "centre, 0.14 m",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_ring_crown.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "a curling crown lip: synergy shock fronts, the Overdrive and AnvilLit gold shock fronts, Stolen Second tick front",
+   "group": "ring",
+   "tris": 512,
+   "bounds_min": [
+    -1.06,
+    0,
+    -1.06
+   ],
+   "bounds_max": [
+    1.06,
+    0.24,
+    1.06
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0..1 round; v = 0 inner foot .. 1 lip",
+   "pivot": "ring centre; radius 0.85 -> 1.05 m, 0.24 m high",
+   "orient": "+Y up"
+  },
+  {
+   "file": "meshes/vfx_ring_flat.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "flat shock band on the ground: shock fronts, zone hems, charge rings",
+   "group": "ring",
+   "tris": 256,
+   "bounds_min": [
+    -1,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    1,
+    0,
+    1
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0..1 once round (multiply by the gap count, trails row accent_ring); v = 0 inner .. 1 outer",
+   "pivot": "ring centre; outer radius 1 m, inner 0.82 m",
+   "orient": "ground plane"
+  },
+  {
+   "file": "meshes/vfx_ring_wall.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "a dust wall leaning outward: the painterly shockwave front, Mountainfall / Bulwark Slam dust walls",
+   "group": "ring",
+   "tris": 384,
+   "bounds_min": [
+    -1,
+    0,
+    -1
+   ],
+   "bounds_max": [
+    1,
+    0.35,
+    1
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u = 0..1 round; v = 0 foot .. 1 top",
+   "pivot": "ring centre; foot radius 0.9 m, top 1.0 m at 0.35 m height",
+   "orient": "+Y up"
+  },
+  {
+   "file": "meshes/vfx_shard.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Shard (Style(Shard)): a crystal kite; spin 720 deg/s",
+   "group": "body",
+   "tris": 8,
+   "bounds_min": [
+    -0.055,
+    -0.045,
+    -0.21
+   ],
+   "bounds_max": [
+    0.06,
+    0.05,
+    0.21
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length",
+   "pivot": "body centre, 0.42 m long",
+   "orient": "tip at -Z"
+  },
+  {
+   "file": "meshes/vfx_shell.glb",
+   "kind": "mesh",
+   "frames": 1,
+   "fps": null,
+   "grid": null,
+   "intended": "Shell (colossus_cannon, Skyhook): brass capsule with a hot base; tumble 90 deg/s",
+   "group": "body",
+   "tris": 96,
+   "bounds_min": [
+    -0.085,
+    -0.085,
+    -0.23
+   ],
+   "bounds_max": [
+    0.085,
+    0.085,
+    0.23
+   ],
+   "attributes": [
+    "COLOR_0",
+    "NORMAL",
+    "POSITION",
+    "TEXCOORD_0"
+   ],
+   "uv": "u along the length (0 base .. 1 nose), v round",
+   "pivot": "body centre, 0.46 m long",
+   "orient": "nose at -Z"
+  },
+  {
+   "file": "noise/noise_brush_256.png",
+   "kind": "noise_tile",
+   "size": [
+    256,
+    256
+   ],
+   "grid": [
+    1,
+    1
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "dry-brush dissolve: bristle strokes along u; the tails of smears and trails break into streaks",
+   "tileable": true,
+   "channels": "L"
+  },
+  {
+   "file": "noise/noise_cells_256.png",
+   "kind": "noise_tile",
+   "size": [
+    256,
+    256
+   ],
+   "grid": [
+    1,
+    1
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "cellular: plague bubbles (R = F1), chaos glass cracks and dried stains (G = F2-F1 edges), per-cell flicker (B)",
+   "tileable": true,
+   "channels": "R=F1, G=F2-F1, B=cell random"
+  },
+  {
+   "file": "noise/noise_erode_256.png",
+   "kind": "noise_tile",
+   "size": [
+    256,
+    256
+   ],
+   "grid": [
+    1,
+    1
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "dissolve threshold: tiling fractal noise, uniform histogram (alpha = smoothstep(t-0.04, t, n))",
+   "tileable": true,
+   "channels": "L"
+  },
+  {
+   "file": "noise/noise_hex_256.png",
+   "kind": "noise_tile",
+   "size": [
+    256,
+    256
+   ],
+   "grid": [
+    1,
+    1
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "hex lattice: forge-shield ripples, Binding Hex, shield breaks (R = wall, G = centre distance, B = cell random)",
+   "tileable": true,
+   "channels": "R=edge, G=centre distance, B=cell random",
+   "note": "8 x 10 cells; the rows are squashed 8 % so the lattice tiles in a square"
+  },
+  {
+   "file": "noise/noise_streak_256.png",
+   "kind": "noise_tile",
+   "size": [
+    256,
+    256
+   ],
+   "grid": [
+    1,
+    1
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "brush streaks along u: multiply into the erosion threshold of smears, ribbons and beams; scroll along u",
+   "tileable": true,
+   "channels": "L"
+  },
+  {
+   "file": "ramps/vfx_ramps.png",
+   "kind": "ramp",
+   "size": [
+    256,
+    16
+   ],
+   "grid": [
+    1,
+    16
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "posterized element ramps: G (value) -> colour; sample at v = (row + 0.5) / 16",
+   "rows": [
+    {
+     "row": 0,
+     "key": "kinetic",
+     "label": "Kinetic bone-brass",
+     "tones": {
+      "ink": "#1A120C",
+      "deep": "#8A4A16",
+      "body": "#E3A64A",
+      "light": "#F4E3C1",
+      "hot": "#FFFBF0"
+     }
+    },
+    {
+     "row": 1,
+     "key": "flame",
+     "label": "Flame",
+     "tones": {
+      "ink": "#240A06",
+      "deep": "#A8300A",
+      "body": "#FF7A1A",
+      "light": "#FFC24B",
+      "hot": "#FFF3D6"
+     }
+    },
+    {
+     "row": 2,
+     "key": "storm",
+     "label": "Storm",
+     "tones": {
+      "ink": "#06101E",
+      "deep": "#1B4E9B",
+      "body": "#3FD8FF",
+      "light": "#BDF6FF",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 3,
+     "key": "void",
+     "label": "Void",
+     "tones": {
+      "ink": "#0C0416",
+      "deep": "#3B1675",
+      "body": "#A45CFF",
+      "light": "#E2CCFF",
+      "hot": "#FFF6FF"
+     }
+    },
+    {
+     "row": 4,
+     "key": "plague",
+     "label": "Plague",
+     "tones": {
+      "ink": "#0D1507",
+      "deep": "#3A6414",
+      "body": "#86E03A",
+      "light": "#D9FF8C",
+      "hot": "#F6FFE0"
+     }
+    },
+    {
+     "row": 5,
+     "key": "radiant",
+     "label": "Radiant",
+     "tones": {
+      "ink": "#241703",
+      "deep": "#B07A12",
+      "body": "#FFE27A",
+      "light": "#FFF3BE",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 6,
+     "key": "unmade",
+     "label": "Unmade ichor (enemy)",
+     "tones": {
+      "ink": "#07060A",
+      "deep": "#0D3B35",
+      "body": "#2FBFA8",
+      "light": "#8FF2D8",
+      "hot": "#B8FFE8"
+     }
+    },
+    {
+     "row": 7,
+     "key": "godworks_gold",
+     "label": "Godworks cold gold (enemy)",
+     "tones": {
+      "ink": "#1E1408",
+      "deep": "#5A4A20",
+      "body": "#D4B45A",
+      "light": "#F4E6B0",
+      "hot": "#FFF4D0"
+     }
+    },
+    {
+     "row": 8,
+     "key": "godworks_ember",
+     "label": "Godworks dead ember (enemy)",
+     "tones": {
+      "ink": "#2A0E08",
+      "deep": "#4A1A0C",
+      "body": "#8A3A1E",
+      "light": "#C8663A",
+      "hot": "#E08A50"
+     }
+    },
+    {
+     "row": 9,
+     "key": "enemy_shot",
+     "label": "Enemy shot (magenta core)",
+     "tones": {
+      "ink": "#1A0610",
+      "deep": "#7A1040",
+      "body": "#FF5AA8",
+      "light": "#FFC0E0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 10,
+     "key": "zone_gold",
+     "label": "Player zone hem (gold)",
+     "tones": {
+      "ink": "#241703",
+      "deep": "#8A6A20",
+      "body": "#FFC940",
+      "light": "#FFE6A0",
+      "hot": "#FFF8E0"
+     }
+    },
+    {
+     "row": 11,
+     "key": "heal",
+     "label": "Heal / revive",
+     "tones": {
+      "ink": "#1A1406",
+      "deep": "#6A5A20",
+      "body": "#FFE9A8",
+      "light": "#FFF4D0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 12,
+     "key": "bleed",
+     "label": "Bleed (crimson drips, never red-white)",
+     "tones": {
+      "ink": "#12040A",
+      "deep": "#4A0A16",
+      "body": "#8A1020",
+      "light": "#B8404E",
+      "hot": "#E07A84"
+     }
+    },
+    {
+     "row": 13,
+     "key": "time",
+     "label": "Time (Epoch, pale steel)",
+     "tones": {
+      "ink": "#0C1016",
+      "deep": "#3C5064",
+      "body": "#9FB6C8",
+      "light": "#DCE8F0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 14,
+     "key": "dust",
+     "label": "Dust / smoke / ash (neutral)",
+     "tones": {
+      "ink": "#141012",
+      "deep": "#3A3034",
+      "body": "#6E6064",
+      "light": "#B3A69C",
+      "hot": "#E8DED2"
+     }
+    },
+    {
+     "row": 15,
+     "key": "mono",
+     "label": "Mono ink-white (impact frames, execute)",
+     "tones": {
+      "ink": "#0C080C",
+      "deep": "#4A4448",
+      "body": "#B8B2B4",
+      "light": "#F2EEEC",
+      "hot": "#FFFFFF"
+     }
+    }
+   ],
+   "color_space": "RGB sRGB, A linear = HDR gain / 4",
+   "band_edges": [
+    0.18,
+    0.4,
+    0.6,
+    0.81
+   ]
+  },
+  {
+   "file": "ramps/vfx_ramps_smooth.png",
+   "kind": "ramp",
+   "size": [
+    256,
+    16
+   ],
+   "grid": [
+    1,
+    16
+   ],
+   "frames": 1,
+   "fps": null,
+   "intended": "smooth ramps: light spill, heat haze, soft smoke",
+   "rows": [
+    {
+     "row": 0,
+     "key": "kinetic",
+     "label": "Kinetic bone-brass",
+     "tones": {
+      "ink": "#1A120C",
+      "deep": "#8A4A16",
+      "body": "#E3A64A",
+      "light": "#F4E3C1",
+      "hot": "#FFFBF0"
+     }
+    },
+    {
+     "row": 1,
+     "key": "flame",
+     "label": "Flame",
+     "tones": {
+      "ink": "#240A06",
+      "deep": "#A8300A",
+      "body": "#FF7A1A",
+      "light": "#FFC24B",
+      "hot": "#FFF3D6"
+     }
+    },
+    {
+     "row": 2,
+     "key": "storm",
+     "label": "Storm",
+     "tones": {
+      "ink": "#06101E",
+      "deep": "#1B4E9B",
+      "body": "#3FD8FF",
+      "light": "#BDF6FF",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 3,
+     "key": "void",
+     "label": "Void",
+     "tones": {
+      "ink": "#0C0416",
+      "deep": "#3B1675",
+      "body": "#A45CFF",
+      "light": "#E2CCFF",
+      "hot": "#FFF6FF"
+     }
+    },
+    {
+     "row": 4,
+     "key": "plague",
+     "label": "Plague",
+     "tones": {
+      "ink": "#0D1507",
+      "deep": "#3A6414",
+      "body": "#86E03A",
+      "light": "#D9FF8C",
+      "hot": "#F6FFE0"
+     }
+    },
+    {
+     "row": 5,
+     "key": "radiant",
+     "label": "Radiant",
+     "tones": {
+      "ink": "#241703",
+      "deep": "#B07A12",
+      "body": "#FFE27A",
+      "light": "#FFF3BE",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 6,
+     "key": "unmade",
+     "label": "Unmade ichor (enemy)",
+     "tones": {
+      "ink": "#07060A",
+      "deep": "#0D3B35",
+      "body": "#2FBFA8",
+      "light": "#8FF2D8",
+      "hot": "#B8FFE8"
+     }
+    },
+    {
+     "row": 7,
+     "key": "godworks_gold",
+     "label": "Godworks cold gold (enemy)",
+     "tones": {
+      "ink": "#1E1408",
+      "deep": "#5A4A20",
+      "body": "#D4B45A",
+      "light": "#F4E6B0",
+      "hot": "#FFF4D0"
+     }
+    },
+    {
+     "row": 8,
+     "key": "godworks_ember",
+     "label": "Godworks dead ember (enemy)",
+     "tones": {
+      "ink": "#2A0E08",
+      "deep": "#4A1A0C",
+      "body": "#8A3A1E",
+      "light": "#C8663A",
+      "hot": "#E08A50"
+     }
+    },
+    {
+     "row": 9,
+     "key": "enemy_shot",
+     "label": "Enemy shot (magenta core)",
+     "tones": {
+      "ink": "#1A0610",
+      "deep": "#7A1040",
+      "body": "#FF5AA8",
+      "light": "#FFC0E0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 10,
+     "key": "zone_gold",
+     "label": "Player zone hem (gold)",
+     "tones": {
+      "ink": "#241703",
+      "deep": "#8A6A20",
+      "body": "#FFC940",
+      "light": "#FFE6A0",
+      "hot": "#FFF8E0"
+     }
+    },
+    {
+     "row": 11,
+     "key": "heal",
+     "label": "Heal / revive",
+     "tones": {
+      "ink": "#1A1406",
+      "deep": "#6A5A20",
+      "body": "#FFE9A8",
+      "light": "#FFF4D0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 12,
+     "key": "bleed",
+     "label": "Bleed (crimson drips, never red-white)",
+     "tones": {
+      "ink": "#12040A",
+      "deep": "#4A0A16",
+      "body": "#8A1020",
+      "light": "#B8404E",
+      "hot": "#E07A84"
+     }
+    },
+    {
+     "row": 13,
+     "key": "time",
+     "label": "Time (Epoch, pale steel)",
+     "tones": {
+      "ink": "#0C1016",
+      "deep": "#3C5064",
+      "body": "#9FB6C8",
+      "light": "#DCE8F0",
+      "hot": "#FFFFFF"
+     }
+    },
+    {
+     "row": 14,
+     "key": "dust",
+     "label": "Dust / smoke / ash (neutral)",
+     "tones": {
+      "ink": "#141012",
+      "deep": "#3A3034",
+      "body": "#6E6064",
+      "light": "#B3A69C",
+      "hot": "#E8DED2"
+     }
+    },
+    {
+     "row": 15,
+     "key": "mono",
+     "label": "Mono ink-white (impact frames, execute)",
+     "tones": {
+      "ink": "#0C080C",
+      "deep": "#4A4448",
+      "body": "#B8B2B4",
+      "light": "#F2EEEC",
+      "hot": "#FFFFFF"
+     }
+    }
+   ],
+   "color_space": "RGB sRGB, A linear = HDR gain / 4",
+   "band_edges": [
+    0.18,
+    0.4,
+    0.6,
+    0.81
+   ]
+  },
+  {
+   "file": "smears/vfx_smears.png",
+   "kind": "strip_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    1,
+    8
+   ],
+   "cell": [
+    1024,
+    128
+   ],
+   "frames": 8,
+   "fps": null,
+   "intended": "crescent smear strips: u = 0 tail .. 1 head along the sweep, v = 0 inner .. 1 outer edge; map onto meshes/vfx_arc_*.glb or Rust crescent strips",
+   "sequences": [
+    {
+     "name": "melee_heavy",
+     "row": 0,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "melee crescent: ink body, bright blade on the outer leading 60 %, dry-brush tail",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "slash_thin",
+     "row": 1,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "crit / execute / pierce slash: a thin bright cut over a wider ink cut",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "dash_drybrush",
+     "row": 2,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "dash, roll, recoil smear: a streaky dry-brush stroke",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "flame_smear",
+     "row": 3,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "Flame melee (Meltdown, Furnace Rush): tongues licking off the outer edge",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "void_smear",
+     "row": 4,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "Void smear (Shadow Roll, Kael): ink-dominant, violet rim, 2 afterimage echoes",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "storm_smear",
+     "row": 5,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "Storm smear (Stormlash, Blink): a jagged crackling outer edge",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "whip",
+     "row": 6,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "whip-crack / string snap: a thin tapered S line with a crack flash at the head",
+     "tileable_u": false,
+     "timing": "8 frames: f0-2 the blade leads, f3-5 the body holds, f6-8 the tail erodes (t = age)"
+    },
+    {
+     "name": "spin_disc",
+     "row": 7,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      1.0
+     ],
+     "intended": "spinning disc / orbit blade: one blade's circular smear per tile (map around a ring)",
+     "tileable_u": true,
+     "timing": null
+    }
+   ]
+  },
+  {
+   "file": "trails/vfx_bands.png",
+   "kind": "strip_packed",
+   "size": [
+    1024,
+    256
+   ],
+   "grid": [
+    1,
+    4
+   ],
+   "cell": [
+    1024,
+    64
+   ],
+   "frames": 4,
+   "fps": null,
+   "intended": "tileable ring bands for meshes/vfx_ring_*.glb (u round the ring, v across the profile)",
+   "sequences": [
+    {
+     "name": "dust_wall",
+     "row": 0,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "painterly dust wall riding the shock front (ring_wall), lit from the blast",
+     "tileable_u": true
+    },
+    {
+     "name": "shock_front",
+     "row": 1,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "bright broken shock band with speed ticks (ring_flat / ring_crown)",
+     "tileable_u": true
+    },
+    {
+     "name": "tick_ring",
+     "row": 2,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "Still Field: one tick per tile, repeat 12",
+     "tileable_u": true
+    },
+    {
+     "name": "hex_band",
+     "row": 3,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      0.5,
+      0.5
+     ],
+     "intended": "forge-shield hex ripple band",
+     "tileable_u": true
+    }
+   ]
+  },
+  {
+   "file": "trails/vfx_trails.png",
+   "kind": "strip_packed",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    1,
+    16
+   ],
+   "cell": [
+    1024,
+    64
+   ],
+   "frames": 16,
+   "fps": null,
+   "intended": "ribbon strip textures, u = 0 tail .. 1 head, v across; one row per trail kind",
+   "sequences": [
+    {
+     "name": "tracer",
+     "row": 0,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Slug: a hard straight 3-frame streak, white core in element rims",
+     "tileable_u": false
+    },
+    {
+     "name": "dry_brush",
+     "row": 1,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "generic trail: body band, the tail breaks into dry-brush streaks (Bolt, Pellet, homing)",
+     "tileable_u": false
+    },
+    {
+     "name": "ghost_smear",
+     "row": 2,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Arrow: a wide ghost smear, dark core, bright rims, wisps peeling off",
+     "tileable_u": false
+    },
+    {
+     "name": "smoke_trail",
+     "row": 3,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Shell: ink smoke puffs that grow and thin toward the tail",
+     "tileable_u": false
+    },
+    {
+     "name": "helix",
+     "row": 4,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Orb: 2 thin strands coiled round the flight path (Storm), the Sundial dial arc",
+     "tileable_u": false
+    },
+    {
+     "name": "dust_ribbon",
+     "row": 5,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Boulder: a ragged dust ribbon",
+     "tileable_u": false
+    },
+    {
+     "name": "zigzag",
+     "row": 6,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Coin: a thin gold zig-zag (kink it at ricochets)",
+     "tileable_u": false
+    },
+    {
+     "name": "flame_trail",
+     "row": 7,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Flame projectiles, Furnace Rush: licks trailing off the ribbon",
+     "tileable_u": false
+    },
+    {
+     "name": "drip_trail",
+     "row": 8,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Globe: droplets / ink drips falling off behind",
+     "tileable_u": false
+    },
+    {
+     "name": "glint_trail",
+     "row": 9,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Shard, homing seeker: a trail of 4-point glints",
+     "tileable_u": false
+    },
+    {
+     "name": "needle_streak",
+     "row": 10,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "Needle: a thin brass streak (the stream stitches into one line)",
+     "tileable_u": false
+    },
+    {
+     "name": "beam_core",
+     "row": 11,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "beam core: white-hot line with streak noise; scroll u at 6 m/s",
+     "tileable_u": true
+    },
+    {
+     "name": "beam_body",
+     "row": 12,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "beam body: element bands with a gentle wobble; scroll u",
+     "tileable_u": true
+    },
+    {
+     "name": "loot_beam",
+     "row": 13,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "loot beam: a tall thin ribbon with a bright core and rising motes (never tier-dropped)",
+     "tileable_u": true
+    },
+    {
+     "name": "tether_braid",
+     "row": 14,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "revive tether: a braided ribbon (P-colour tint in the shader)",
+     "tileable_u": true
+    },
+    {
+     "name": "accent_ring",
+     "row": 15,
+     "col0": 0,
+     "frames": 1,
+     "fps": null,
+     "loop": false,
+     "pivot": [
+      1.0,
+      0.5
+     ],
+     "intended": "broken accent ring band for ring meshes: one gap per tile, tapered ends",
+     "tileable_u": true
+    }
+   ]
+  }
+ ]
+}
