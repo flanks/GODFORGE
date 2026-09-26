@@ -2955,6 +2955,7 @@ dependencies = [
  "gf_net",
  "gf_sim",
  "glam",
+ "serde_json",
 ]
 
 [[package]]

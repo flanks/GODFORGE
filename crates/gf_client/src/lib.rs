@@ -5,11 +5,13 @@
 //! draws the HUD / forge UI. Even solo, the host sim runs on its own thread behind a loopback
 //! transport, so single-player and co-op share every code path (§20.3).
 
+pub mod anim;
 pub mod camera;
 pub mod envkit;
 pub mod hud;
 pub mod input;
 pub mod materials;
+pub mod models;
 pub mod net;
 pub mod offscreen;
 pub mod palette;
@@ -103,6 +105,8 @@ impl Plugin for ClientPlugin {
         palette::build(app);
         camera::build(app);
         scene::build(app);
+        models::build(app);
+        anim::build(app);
         world::build_plugin(app);
         vfx::build(app);
         hud::build(app);
