@@ -1,0 +1,313 @@
+{
+ "size": 2048,
+ "uv_body_regions": {
+  "head": 1040,
+  "ear_R": 78,
+  "foot_L": 303,
+  "sole_R": 44,
+  "sole_L": 44,
+  "foot_R": 303,
+  "torso": 474,
+  "arm_L": 185,
+  "handtop_L": 250,
+  "handpalm_L": 224,
+  "leg_L": 180,
+  "handpalm_R": 224,
+  "ear_L": 78,
+  "leg_R": 180,
+  "arm_R": 185,
+  "handtop_R": 250,
+  "eye_R": 60,
+  "eye_L": 60
+ },
+ "uv_body_cuts": {
+  "head": 10,
+  "torso": 20,
+  "arm_L": 19,
+  "leg_L": 20,
+  "foot_L": 4,
+  "arm_R": 19,
+  "leg_R": 20,
+  "foot_R": 4
+ },
+ "uv_copied": {},
+ "uv_hidden_faces_packed_small": 4392,
+ "texel_density_px_per_m": {
+  "BODY": {
+   "median": 180.0,
+   "p10": 46.2,
+   "p90": 481.7
+  },
+  "HAIR": {
+   "median": 146.4,
+   "p10": 135.7,
+   "p90": 481.0
+  },
+  "SCARF": {
+   "median": 448.4,
+   "p10": 139.5,
+   "p90": 486.5
+  },
+  "GEAR": {
+   "median": 436.5,
+   "p10": 132.2,
+   "p90": 484.7
+  },
+  "LOINCLOTH": {
+   "median": 463.3,
+   "p10": 139.7,
+   "p90": 478.5
+  },
+  "BOOTS": {
+   "median": 463.6,
+   "p10": 139.1,
+   "p90": 486.6
+  },
+  "COAT": {
+   "median": 460.6,
+   "p10": 139.2,
+   "p90": 484.4
+  },
+  "WISPS": {
+   "median": 467.5,
+   "p10": 436.3,
+   "p90": 523.1
+  },
+  "_all": {
+   "median": 431.0,
+   "p10": 130.3,
+   "p90": 486.0
+  }
+ },
+ "uv_zero_area_faces": {
+  "BODY": {
+   "count": 102,
+   "first": [
+    [
+     0.353,
+     -0.208,
+     0.043
+    ],
+    [
+     0.348,
+     -0.208,
+     0.043
+    ],
+    [
+     0.345,
+     -0.215,
+     0.036
+    ],
+    [
+     0.355,
+     -0.216,
+     0.038
+    ],
+    [
+     0.37,
+     -0.2,
+     0.032
+    ]
+   ]
+  }
+ },
+ "bake_device": "CPU",
+ "normal_tilt_filter": {
+  "deg": [
+   32,
+   52
+  ],
+  "texels_faded": 27472
+ },
+ "normal_bake": {
+  "texels_with_detail": 394487,
+  "valid_fraction_of_target_zones": 0.2767,
+  "blur_px": 1.5
+ },
+ "atlas_coverage": 0.4328,
+ "textures": {
+  "base_color": "art/characters/kael/textures/kael_basecolor.png",
+  "emissive": "art/characters/kael/textures/kael_emissive.png",
+  "normal": "art/characters/kael/textures/kael_normal.png"
+ },
+ "stats": {
+  "BODY": {
+   "name": "BODY",
+   "vertices": 3929,
+   "faces": 4162,
+   "triangles": 7846,
+   "quads": 3684,
+   "tri_faces": 478,
+   "ngons": 0,
+   "quad_ratio": 0.885,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 3,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "HAIR": {
+   "name": "HAIR",
+   "vertices": 1324,
+   "faces": 1494,
+   "triangles": 2408,
+   "quads": 914,
+   "tri_faces": 580,
+   "ngons": 0,
+   "quad_ratio": 0.612,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 60,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "SCARF": {
+   "name": "SCARF",
+   "vertices": 170,
+   "faces": 168,
+   "triangles": 336,
+   "quads": 168,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "GEAR": {
+   "name": "GEAR",
+   "vertices": 2196,
+   "faces": 2274,
+   "triangles": 4316,
+   "quads": 2042,
+   "tri_faces": 232,
+   "ngons": 0,
+   "quad_ratio": 0.898,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 34,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "LOINCLOTH": {
+   "name": "LOINCLOTH",
+   "vertices": 158,
+   "faces": 156,
+   "triangles": 312,
+   "quads": 156,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 1,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "BOOTS": {
+   "name": "BOOTS",
+   "vertices": 1736,
+   "faces": 1800,
+   "triangles": 3432,
+   "quads": 1632,
+   "tri_faces": 168,
+   "ngons": 0,
+   "quad_ratio": 0.907,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 24,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "COAT": {
+   "name": "COAT",
+   "vertices": 2348,
+   "faces": 2368,
+   "triangles": 4684,
+   "quads": 2316,
+   "tri_faces": 52,
+   "ngons": 0,
+   "quad_ratio": 0.978,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 7,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  },
+  "WISPS": {
+   "name": "WISPS",
+   "vertices": 400,
+   "faces": 390,
+   "triangles": 780,
+   "quads": 390,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 5,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_kael"
+   ]
+  }
+ },
+ "triangles_total": 24114,
+ "triangles_variants": {}
+}

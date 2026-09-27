@@ -1,0 +1,295 @@
+{
+ "hero": "kael",
+ "height_m": 2.1,
+ "height_rationale": "The brief (section 3) proposes 2.1 m: lean and agile, smaller than Brax (2.2 m) and Valdris (2.3 m), inside the roster range 2.0-2.3 m; the stage-1 blockout was normalised to 2.1 m to the tips of the swept hair. Collision radius 0.44.",
+ "units": "metres, Blender axes: Z up, hero faces -Y, +X = his left, feet on z = 0",
+ "source": "measured on art/characters/kael/work/kael_retopo_start.blend (REF_blockout = TRELLIS s202 at 2.1 m, moved by s2_kael_recentre.py so the body's centre line is on the origin: horizontal sections through the boots, knees, thighs, waist, chest, neck and head) and the approved front references/KAEL_front_approved.png (crown y=27 px, sole y=998 px, body centre x=752 px; 2.163 mm/px). The head, the arm lengths and the hands come from the concept (the blockout's face is soft and its fists are closed); the legs, the stance and the arm line come from the blockout.",
+ "concept_fig_px": [
+  27,
+  998,
+  752
+ ],
+ "recentre_offset_m": [
+  0.03,
+  0.225,
+  0.0
+ ],
+ "landmarks": {
+  "_doc": "MakeHuman (MPFB game_engine rig, T-posed) landmark -> Kael position; _l entries are mirrored to _r. The body is MakeHuman's own proportions scaled x0.913 (its height-1.0 macro stands 2.30 m) so its girths stay in proportion; then: the head scaled x0.9 about the chin and moved 6 cm back to the blockout's face (nose tip y -0.125, chin 1.85, skull 2.075 under the swept hair that reaches 2.10, eyes 1.964; concept eyes 1.952, chin 1.848); the arm line on the blockout's z 1.695 (concept 1.726; the blockout drives the sleeve normal bake) with a lean shoulder |x| 0.215, elbow 0.565 (the concept's right coat sleeve and its rolled cuff end at 0.61), wrist 0.89 (concept 0.88 / 0.93), fingertips 1.095; the legs on the blockout's wide A stance: knee |x| 0.235 at z 0.582, ankle 0.31 (blockout 0.25 / 0.34; concept outer boot to outer boot 0.84 m), feet splayed 10 degrees.",
+  "skull_top": [
+   0.0,
+   -0.02,
+   2.075
+  ],
+  "eye_l": [
+   0.0296,
+   -0.086,
+   1.964
+  ],
+  "nose_tip": [
+   0.0,
+   -0.129,
+   1.925
+  ],
+  "ear_l": [
+   0.088,
+   0.006,
+   1.959
+  ],
+  "skull_back": [
+   0.0,
+   0.091,
+   1.987
+  ],
+  "chin": [
+   0.0,
+   -0.111,
+   1.85
+  ],
+  "head.head": [
+   0.0,
+   0.002,
+   1.924
+  ],
+  "neck_01.head": [
+   0.0,
+   0.012,
+   1.815
+  ],
+  "spine_03.tail": [
+   0.0,
+   0.05,
+   1.59
+  ],
+  "spine_03.head": [
+   0.0,
+   0.022,
+   1.425
+  ],
+  "spine_02.head": [
+   0.0,
+   0.016,
+   1.345
+  ],
+  "spine_01.head": [
+   0.0,
+   0.027,
+   1.27
+  ],
+  "pelvis.head": [
+   0.0,
+   -0.006,
+   1.18
+  ],
+  "clavicle_l.head": [
+   0.026,
+   -0.022,
+   1.726
+  ],
+  "upperarm_l.head": [
+   0.215,
+   0.0,
+   1.695
+  ],
+  "lowerarm_l.head": [
+   0.565,
+   0.0,
+   1.695
+  ],
+  "hand_l.head": [
+   0.89,
+   0.0,
+   1.695
+  ],
+  "middle_03_l.tail": [
+   1.095,
+   0.004,
+   1.7
+  ],
+  "thigh_l.head": [
+   0.115,
+   0.004,
+   1.175
+  ],
+  "calf_l.head": [
+   0.235,
+   -0.03,
+   0.582
+  ],
+  "foot_l.head": [
+   0.31,
+   0.02,
+   0.09
+  ],
+  "ball_l.head": [
+   0.341,
+   -0.13,
+   0.012
+  ],
+  "toe_l": [
+   0.322,
+   -0.221,
+   0.016
+  ],
+  "heel_l": [
+   0.299,
+   0.094,
+   0.053
+  ]
+ },
+ "fit": {
+  "_doc": "Surface fit to REF_blockout (shared s2_body_fit.py): every band at weight 0, as for Valdris. Kael's body is the under-layer: the shirt, the trousers, the glove and the ghost arm are painted on it; the duster, the belts, the boots and the hair are separate meshes built around it. The blockout's torso is the coat and the bandolier, its shins are boots, its thighs carry the holster, the straps and the coat's front panels (a thigh fit pulled fins out of them), its head is a soft shell: the lean-athletic MakeHuman shape stays, set by the landmark warp.",
+  "arm_fit_max_abs_x": 0.25,
+  "arm_cut_abs_x": null,
+  "bands": [
+   {
+    "name": "body",
+    "z": [
+     0.0,
+     1.84
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "head",
+    "z": [
+     1.84,
+     2.3
+    ],
+    "weight": 0.0
+   }
+  ],
+  "rigid": {
+   "head": {
+    "z_min": 1.86,
+    "ramp": 0.04,
+    "mode": "landmarks_only",
+    "contain": 0.02,
+    "face_front_y": -0.04,
+    "keep_weight": 0.3
+   },
+   "feet": {
+    "z_max": 0.12,
+    "ramp": 0.04,
+    "inset": 0.004,
+    "mode": "landmarks_only"
+   }
+  },
+  "extra_loops": [
+   {
+    "_doc": "knee: one loop through the joint (calf head z 0.582) and one each side",
+    "z": 0.582,
+    "abs_x_min": 0.1
+   },
+   {
+    "z": 0.542,
+    "abs_x_min": 0.1
+   },
+   {
+    "z": 0.622,
+    "abs_x_min": 0.1
+   },
+   {
+    "_doc": "elbow: a loop through the joint (lowerarm head |x| 0.565) and one each side",
+    "axis": "x",
+    "abs_x": 0.565,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.535,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.595,
+    "z_min": 1.5
+   },
+   {
+    "_doc": "wrist: a loop through the joint (hand head |x| 0.89) and one just before it",
+    "axis": "x",
+    "abs_x": 0.89,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.865,
+    "z_min": 1.5
+   }
+  ],
+  "limb_radial": {
+   "_doc": "Lean duelist forearms, the same on both sides (the ghost arm is a proper arm: the same topology and size as the gun arm): the mean radius about the arm axis goes from 0.058 m above the elbow to 0.035 m at the wrist; the hands are scaled x1.05.",
+   "axis_y": 0.0,
+   "axis_z": 1.695,
+   "abs_x": [
+    0.44,
+    0.53,
+    0.61,
+    0.71,
+    0.81,
+    0.89
+   ],
+   "radius_m": [
+    0.058,
+    0.053,
+    0.052,
+    0.047,
+    0.04,
+    0.035
+   ],
+   "blend_from_abs_x": 0.44,
+   "hand_from_abs_x": 0.9,
+   "hand_scale": 1.05,
+   "smooth": {
+    "abs_x": [
+     0.44,
+     0.895
+    ],
+    "iters": 6,
+    "amount": 0.5
+   }
+  },
+  "hand_frame": {
+   "_doc": "weapon attach frame per hand (stage 3 adds weapon_L / weapon_R sockets here): origin = palm centre (mean of the hand vertices between the wrist joint and the knuckle line), +Y along the fingers, +Z out of the back of the hand, +X = Y x Z. serpent_smg rides weapon_R; the Bullet Ballet twin (VFX) weapon_L.",
+   "wrist_joint": "hand_l.head",
+   "knuckle_joint": "middle_01_l.head"
+  },
+  "grin": {
+   "_doc": "a faint knowing smirk (the concept): the mouth corners up a little, lips closed",
+   "open": 0.0,
+   "smile": 0.0025,
+   "widen": 0.03
+  }
+ },
+ "base": {
+  "_doc": "MPFB (tool only) macro sliders and CC0 MakeHuman targets applied before baking. Kael: a lean, athletic young man (not a brawler): moderate muscle, low weight; the face toward the concept's handsome, rugged gunslinger: a strong narrow jaw and chin (under the short chin beard), high cheekbones with hollow cheeks, the brows set a little forward and down (the smouldering look), a straight nose, the mouth corners slightly up.",
+  "macro": {
+   "gender": 1.0,
+   "age": 0.45,
+   "muscle": 0.9,
+   "weight": 0.5,
+   "proportions": 1.0,
+   "height": 1.0
+  },
+  "targets": {
+   "head-fat-decr": 0.8,
+   "head-rectangular": 0.35,
+   "chin-prominent-incr": 0.55,
+   "chin-bones-incr": 0.45,
+   "chin-height-incr": 0.2,
+   "eyebrows-trans-forward": 0.55,
+   "eyebrows-angle-down": 0.45,
+   "eyebrows-trans-down": 0.3,
+   "l-cheek-bones-incr": 0.65,
+   "r-cheek-bones-incr": 0.65,
+   "l-cheek-volume-decr": 0.7,
+   "r-cheek-volume-decr": 0.7,
+   "nose-scale-vert-incr": 0.2,
+   "nose-point-width-incr": 0.1,
+   "mouth-angles-up": 0.3,
+   "mouth-lowerlip-volume-decr": 0.2
+  }
+ },
+ "signature_weapon": "serpent_smg",
+ "_doc_signature_weapon": "built by the weapon track (assets/models/weapons/serpent_smg.glb); run_stage2.py's weapon steps are NOT used for Kael: s2_kael_run.py only attaches the GLB for the review renders"
+}

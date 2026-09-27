@@ -1,0 +1,1048 @@
+{
+ "parts": {
+  "HAIR": {
+   "name": "HAIR",
+   "vertices": 1324,
+   "faces": 1494,
+   "triangles": 2408,
+   "quads": 914,
+   "tri_faces": 580,
+   "ngons": 0,
+   "quad_ratio": 0.612,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 60,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "SCARF": {
+   "name": "SCARF",
+   "vertices": 170,
+   "faces": 168,
+   "triangles": 336,
+   "quads": 168,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "GEAR": {
+   "name": "GEAR",
+   "vertices": 2196,
+   "faces": 2274,
+   "triangles": 4316,
+   "quads": 2042,
+   "tri_faces": 232,
+   "ngons": 0,
+   "quad_ratio": 0.898,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 34,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "LOINCLOTH": {
+   "name": "LOINCLOTH",
+   "vertices": 158,
+   "faces": 156,
+   "triangles": 312,
+   "quads": 156,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 1,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "BOOTS": {
+   "name": "BOOTS",
+   "vertices": 1736,
+   "faces": 1800,
+   "triangles": 3432,
+   "quads": 1632,
+   "tri_faces": 168,
+   "ngons": 0,
+   "quad_ratio": 0.907,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 24,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "COAT": {
+   "name": "COAT",
+   "vertices": 2348,
+   "faces": 2368,
+   "triangles": 4684,
+   "quads": 2316,
+   "tri_faces": 52,
+   "ngons": 0,
+   "quad_ratio": 0.978,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 7,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "WISPS": {
+   "name": "WISPS",
+   "vertices": 400,
+   "faces": 390,
+   "triangles": 780,
+   "quads": 390,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 5,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  },
+  "BODY": {
+   "name": "BODY",
+   "vertices": 3929,
+   "faces": 4162,
+   "triangles": 7846,
+   "quads": 3684,
+   "tri_faces": 478,
+   "ngons": 0,
+   "quad_ratio": 0.885,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 3,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_cloth",
+    "Z_glove",
+    "Z_ghost",
+    "Z_coat",
+    "Z_lining",
+    "Z_coat_edge",
+    "Z_maroon",
+    "Z_leather",
+    "Z_boot",
+    "Z_bronze",
+    "Z_gem",
+    "Z_wisp",
+    "Z_cartridge"
+   ]
+  }
+ },
+ "pieces": {
+  "HAIR": [
+   "CHIN_BEARD -> head",
+   "CHIN_BEARD_LOCK -> head",
+   "HAIR -> head",
+   "HAIR_FRINGE -> head",
+   "HAIR_LOCK_0 -> head",
+   "HAIR_LOCK_1 -> head",
+   "HAIR_LOCK_10 -> head",
+   "HAIR_LOCK_11 -> head",
+   "HAIR_LOCK_12 -> head",
+   "HAIR_LOCK_13 -> head",
+   "HAIR_LOCK_14 -> head",
+   "HAIR_LOCK_15 -> head",
+   "HAIR_LOCK_16 -> head",
+   "HAIR_LOCK_17 -> head",
+   "HAIR_LOCK_18 -> head",
+   "HAIR_LOCK_19 -> head",
+   "HAIR_LOCK_2 -> head",
+   "HAIR_LOCK_20 -> head",
+   "HAIR_LOCK_21 -> head",
+   "HAIR_LOCK_22 -> head",
+   "HAIR_LOCK_23 -> head",
+   "HAIR_LOCK_24 -> head",
+   "HAIR_LOCK_25 -> head",
+   "HAIR_LOCK_26 -> head",
+   "HAIR_LOCK_27 -> head",
+   "HAIR_LOCK_28 -> head",
+   "HAIR_LOCK_29 -> head",
+   "HAIR_LOCK_3 -> head",
+   "HAIR_LOCK_30 -> head",
+   "HAIR_LOCK_31 -> head",
+   "HAIR_LOCK_32 -> head",
+   "HAIR_LOCK_33 -> head",
+   "HAIR_LOCK_34 -> head",
+   "HAIR_LOCK_35 -> head",
+   "HAIR_LOCK_36 -> head",
+   "HAIR_LOCK_37 -> head",
+   "HAIR_LOCK_38 -> head",
+   "HAIR_LOCK_39 -> head",
+   "HAIR_LOCK_4 -> head",
+   "HAIR_LOCK_40 -> head",
+   "HAIR_LOCK_41 -> head",
+   "HAIR_LOCK_42 -> head",
+   "HAIR_LOCK_43 -> head",
+   "HAIR_LOCK_44 -> head",
+   "HAIR_LOCK_45 -> head",
+   "HAIR_LOCK_46 -> head",
+   "HAIR_LOCK_47 -> head",
+   "HAIR_LOCK_48 -> head",
+   "HAIR_LOCK_49 -> head",
+   "HAIR_LOCK_5 -> head",
+   "HAIR_LOCK_50 -> head",
+   "HAIR_LOCK_51 -> head",
+   "HAIR_LOCK_6 -> head",
+   "HAIR_LOCK_7 -> head",
+   "HAIR_LOCK_8 -> head",
+   "HAIR_LOCK_9 -> head"
+  ],
+  "SCARF": [
+   "SCARF -> neck_01",
+   "SCARF_DRAPE -> spine_03"
+  ],
+  "GEAR": [
+   "BANDOLIER -> spine_03",
+   "BELT_LOWER -> pelvis",
+   "BELT_LOWER_BUCKLE -> pelvis",
+   "BELT_UPPER -> spine_01",
+   "BICEP_STRAP_L -> upperarm_l",
+   "BRACER_R -> lowerarm_r",
+   "BRACER_STRAP_R -> lowerarm_r",
+   "BUCKLE_GEM -> spine_01",
+   "CARTRIDGE -> spine_03",
+   "GLOVE_CUFF_R -> hand_r",
+   "HOLSTER -> thigh_r",
+   "POUCH -> pelvis",
+   "THIGH_STRAP_L -> thigh_l",
+   "THIGH_STRAP_R -> thigh_r",
+   "WRIST_STRAP_L -> lowerarm_l"
+  ],
+  "LOINCLOTH": [
+   "LOINCLOTH -> x_loin_C_01"
+  ],
+  "BOOTS": [
+   "BOOT_CUFF_L -> calf_l",
+   "BOOT_CUFF_R -> calf_r",
+   "BOOT_FOOT_L -> foot_l",
+   "BOOT_FOOT_R -> foot_r",
+   "BOOT_SHAFT_L -> calf_l",
+   "BOOT_SHAFT_R -> calf_r",
+   "BOOT_STRAP_L -> calf_l",
+   "BOOT_STRAP_R -> calf_r"
+  ],
+  "COAT": [
+   "COAT_COLLAR -> neck_01",
+   "COAT_CUFF_L -> upperarm_l",
+   "COAT_CUFF_R -> lowerarm_r",
+   "COAT_LAPEL_L -> spine_03",
+   "COAT_LAPEL_R -> spine_03",
+   "COAT_SKIRT_L -> x_coat_L_* (front / side / back chains by theta)",
+   "COAT_SKIRT_R -> x_coat_R_* (front / side / back chains by theta)",
+   "COAT_YOKE -> spine_03 (skinned: spine, clavicles, upper arms)"
+  ],
+  "WISPS": [
+   "WISP_1 -> x_wisp_1_01..03",
+   "WISP_2 -> x_wisp_2_01..03",
+   "WISP_3 -> x_wisp_3_01..03",
+   "WISP_4 -> x_wisp_4_01..03",
+   "WISP_5 -> x_wisp_5_01..03"
+  ]
+ },
+ "body_zones_faces": {
+  "skin": 1586,
+  "cloth": 1720,
+  "ghost": 614,
+  "glove": 122,
+  "eye": 120
+ },
+ "body_conform": {
+  "trouser_inflate_m": 0.01,
+  "foot_lift_m": 0.022
+ },
+ "hair": {
+  "shell_faces": 75,
+  "locks": 56,
+  "beard_faces": 8,
+  "beard_locks": 2,
+  "hair_verts_with_blockout_hit": 62,
+  "hair_verts": 96
+ },
+ "boot_foot": {
+  "length_m": 0.3601,
+  "axis": [
+   0.073,
+   -0.997,
+   0.0
+  ]
+ },
+ "coat_yoke": {
+  "body_faces": 378
+ },
+ "coat_skirt": {
+  "nu": 45,
+  "nv": 11,
+  "vent_from_z": 1.027,
+  "hem_z_min_max": [
+   0.3,
+   0.473
+  ],
+  "half_width_at_z": {
+   "1.07": 0.331,
+   "0.86": 0.419,
+   "0.65": 0.533,
+   "0.5": 0.59
+  },
+  "back_depth_at_hem": 0.448
+ },
+ "triangles_total": 24114,
+ "piece_table": [
+  {
+   "id": 0,
+   "name": "HAIR",
+   "bone": "head"
+  },
+  {
+   "id": 1,
+   "name": "HAIR_LOCK_0",
+   "bone": "head"
+  },
+  {
+   "id": 2,
+   "name": "HAIR_LOCK_1",
+   "bone": "head"
+  },
+  {
+   "id": 3,
+   "name": "HAIR_LOCK_2",
+   "bone": "head"
+  },
+  {
+   "id": 4,
+   "name": "HAIR_LOCK_3",
+   "bone": "head"
+  },
+  {
+   "id": 5,
+   "name": "HAIR_LOCK_4",
+   "bone": "head"
+  },
+  {
+   "id": 6,
+   "name": "HAIR_LOCK_5",
+   "bone": "head"
+  },
+  {
+   "id": 7,
+   "name": "HAIR_LOCK_6",
+   "bone": "head"
+  },
+  {
+   "id": 8,
+   "name": "HAIR_LOCK_7",
+   "bone": "head"
+  },
+  {
+   "id": 9,
+   "name": "HAIR_LOCK_8",
+   "bone": "head"
+  },
+  {
+   "id": 10,
+   "name": "HAIR_LOCK_9",
+   "bone": "head"
+  },
+  {
+   "id": 11,
+   "name": "HAIR_LOCK_10",
+   "bone": "head"
+  },
+  {
+   "id": 12,
+   "name": "HAIR_LOCK_11",
+   "bone": "head"
+  },
+  {
+   "id": 13,
+   "name": "HAIR_LOCK_12",
+   "bone": "head"
+  },
+  {
+   "id": 14,
+   "name": "HAIR_LOCK_13",
+   "bone": "head"
+  },
+  {
+   "id": 15,
+   "name": "HAIR_LOCK_14",
+   "bone": "head"
+  },
+  {
+   "id": 16,
+   "name": "HAIR_LOCK_15",
+   "bone": "head"
+  },
+  {
+   "id": 17,
+   "name": "HAIR_LOCK_16",
+   "bone": "head"
+  },
+  {
+   "id": 18,
+   "name": "HAIR_LOCK_17",
+   "bone": "head"
+  },
+  {
+   "id": 19,
+   "name": "HAIR_LOCK_18",
+   "bone": "head"
+  },
+  {
+   "id": 20,
+   "name": "HAIR_LOCK_19",
+   "bone": "head"
+  },
+  {
+   "id": 21,
+   "name": "HAIR_LOCK_20",
+   "bone": "head"
+  },
+  {
+   "id": 22,
+   "name": "HAIR_LOCK_21",
+   "bone": "head"
+  },
+  {
+   "id": 23,
+   "name": "HAIR_LOCK_22",
+   "bone": "head"
+  },
+  {
+   "id": 24,
+   "name": "HAIR_LOCK_23",
+   "bone": "head"
+  },
+  {
+   "id": 25,
+   "name": "HAIR_LOCK_24",
+   "bone": "head"
+  },
+  {
+   "id": 26,
+   "name": "HAIR_LOCK_25",
+   "bone": "head"
+  },
+  {
+   "id": 27,
+   "name": "HAIR_LOCK_26",
+   "bone": "head"
+  },
+  {
+   "id": 28,
+   "name": "HAIR_LOCK_27",
+   "bone": "head"
+  },
+  {
+   "id": 29,
+   "name": "HAIR_LOCK_28",
+   "bone": "head"
+  },
+  {
+   "id": 30,
+   "name": "HAIR_LOCK_29",
+   "bone": "head"
+  },
+  {
+   "id": 31,
+   "name": "HAIR_LOCK_30",
+   "bone": "head"
+  },
+  {
+   "id": 32,
+   "name": "HAIR_LOCK_31",
+   "bone": "head"
+  },
+  {
+   "id": 33,
+   "name": "HAIR_LOCK_32",
+   "bone": "head"
+  },
+  {
+   "id": 34,
+   "name": "HAIR_LOCK_33",
+   "bone": "head"
+  },
+  {
+   "id": 35,
+   "name": "HAIR_LOCK_34",
+   "bone": "head"
+  },
+  {
+   "id": 36,
+   "name": "HAIR_LOCK_35",
+   "bone": "head"
+  },
+  {
+   "id": 37,
+   "name": "HAIR_LOCK_36",
+   "bone": "head"
+  },
+  {
+   "id": 38,
+   "name": "HAIR_LOCK_37",
+   "bone": "head"
+  },
+  {
+   "id": 39,
+   "name": "HAIR_LOCK_38",
+   "bone": "head"
+  },
+  {
+   "id": 40,
+   "name": "HAIR_LOCK_39",
+   "bone": "head"
+  },
+  {
+   "id": 41,
+   "name": "HAIR_LOCK_40",
+   "bone": "head"
+  },
+  {
+   "id": 42,
+   "name": "HAIR_LOCK_41",
+   "bone": "head"
+  },
+  {
+   "id": 43,
+   "name": "HAIR_LOCK_42",
+   "bone": "head"
+  },
+  {
+   "id": 44,
+   "name": "HAIR_LOCK_43",
+   "bone": "head"
+  },
+  {
+   "id": 45,
+   "name": "HAIR_LOCK_44",
+   "bone": "head"
+  },
+  {
+   "id": 46,
+   "name": "HAIR_LOCK_45",
+   "bone": "head"
+  },
+  {
+   "id": 47,
+   "name": "HAIR_LOCK_46",
+   "bone": "head"
+  },
+  {
+   "id": 48,
+   "name": "HAIR_LOCK_47",
+   "bone": "head"
+  },
+  {
+   "id": 49,
+   "name": "HAIR_LOCK_48",
+   "bone": "head"
+  },
+  {
+   "id": 50,
+   "name": "HAIR_LOCK_49",
+   "bone": "head"
+  },
+  {
+   "id": 51,
+   "name": "HAIR_LOCK_50",
+   "bone": "head"
+  },
+  {
+   "id": 52,
+   "name": "HAIR_LOCK_51",
+   "bone": "head"
+  },
+  {
+   "id": 53,
+   "name": "HAIR_FRINGE",
+   "bone": "head"
+  },
+  {
+   "id": 54,
+   "name": "HAIR_FRINGE",
+   "bone": "head"
+  },
+  {
+   "id": 55,
+   "name": "HAIR_FRINGE",
+   "bone": "head"
+  },
+  {
+   "id": 56,
+   "name": "HAIR_FRINGE",
+   "bone": "head"
+  },
+  {
+   "id": 57,
+   "name": "CHIN_BEARD",
+   "bone": "head"
+  },
+  {
+   "id": 58,
+   "name": "CHIN_BEARD_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 59,
+   "name": "CHIN_BEARD_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 60,
+   "name": "SCARF",
+   "bone": "neck_01"
+  },
+  {
+   "id": 61,
+   "name": "SCARF_DRAPE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 62,
+   "name": "BELT_UPPER",
+   "bone": "spine_01"
+  },
+  {
+   "id": 63,
+   "name": "BUCKLE_GEM",
+   "bone": "spine_01"
+  },
+  {
+   "id": 64,
+   "name": "BELT_LOWER",
+   "bone": "pelvis"
+  },
+  {
+   "id": 65,
+   "name": "BELT_LOWER_BUCKLE",
+   "bone": "pelvis"
+  },
+  {
+   "id": 66,
+   "name": "BANDOLIER",
+   "bone": "spine_03"
+  },
+  {
+   "id": 67,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 68,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 69,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 70,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 71,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 72,
+   "name": "CARTRIDGE",
+   "bone": "spine_03"
+  },
+  {
+   "id": 73,
+   "name": "HOLSTER",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 74,
+   "name": "THIGH_STRAP_R",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 75,
+   "name": "THIGH_STRAP_R",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 76,
+   "name": "POUCH",
+   "bone": "pelvis"
+  },
+  {
+   "id": 77,
+   "name": "THIGH_STRAP_L",
+   "bone": "thigh_l"
+  },
+  {
+   "id": 78,
+   "name": "BRACER_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 79,
+   "name": "BRACER_STRAP_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 80,
+   "name": "BRACER_STRAP_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 81,
+   "name": "GLOVE_CUFF_R",
+   "bone": "hand_r"
+  },
+  {
+   "id": 82,
+   "name": "BICEP_STRAP_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 83,
+   "name": "WRIST_STRAP_L",
+   "bone": "lowerarm_l"
+  },
+  {
+   "id": 84,
+   "name": "LOINCLOTH",
+   "bone": "x_loin_C_01"
+  },
+  {
+   "id": 85,
+   "name": "BOOT_SHAFT_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 86,
+   "name": "BOOT_FOOT_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 87,
+   "name": "BOOT_CUFF_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 88,
+   "name": "BOOT_STRAP_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 89,
+   "name": "BOOT_STRAP_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 90,
+   "name": "BOOT_STRAP_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 91,
+   "name": "BOOT_SHAFT_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 92,
+   "name": "BOOT_FOOT_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 93,
+   "name": "BOOT_CUFF_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 94,
+   "name": "BOOT_STRAP_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 95,
+   "name": "BOOT_STRAP_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 96,
+   "name": "BOOT_STRAP_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 97,
+   "name": "COAT_YOKE",
+   "bone": "spine_03 (skinned: spine, clavicles, upper arms)"
+  },
+  {
+   "id": 98,
+   "name": "COAT_CUFF_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 99,
+   "name": "COAT_CUFF_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 100,
+   "name": "COAT_SKIRT_L",
+   "bone": "x_coat_L_* (front / side / back chains by theta)"
+  },
+  {
+   "id": 101,
+   "name": "COAT_SKIRT_R",
+   "bone": "x_coat_R_* (front / side / back chains by theta)"
+  },
+  {
+   "id": 102,
+   "name": "COAT_COLLAR",
+   "bone": "neck_01"
+  },
+  {
+   "id": 103,
+   "name": "COAT_LAPEL_L",
+   "bone": "spine_03"
+  },
+  {
+   "id": 104,
+   "name": "COAT_LAPEL_R",
+   "bone": "spine_03"
+  },
+  {
+   "id": 105,
+   "name": "WISP_1",
+   "bone": "x_wisp_1_01..03"
+  },
+  {
+   "id": 106,
+   "name": "WISP_2",
+   "bone": "x_wisp_2_01..03"
+  },
+  {
+   "id": 107,
+   "name": "WISP_3",
+   "bone": "x_wisp_3_01..03"
+  },
+  {
+   "id": 108,
+   "name": "WISP_4",
+   "bone": "x_wisp_4_01..03"
+  },
+  {
+   "id": 109,
+   "name": "WISP_5",
+   "bone": "x_wisp_5_01..03"
+  }
+ ],
+ "hand_frames": {
+  "L": {
+   "origin": [
+    0.9656,
+    -0.00048,
+    1.68288
+   ],
+   "x_axis": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "y_axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.89,
+   "knuckle_abs_x": 1.0007,
+   "hand_verts": 153
+  },
+  "R": {
+   "origin": [
+    -0.9656,
+    -0.00048,
+    1.68288
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.89,
+   "knuckle_abs_x": 1.0007,
+   "hand_verts": 153
+  }
+ }
+}

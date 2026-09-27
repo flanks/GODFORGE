@@ -1,0 +1,18 @@
+{
+ "glb": "kael.glb",
+ "bytes": 6510800,
+ "materials": [
+  {
+   "name": "M_kael",
+   "baseColorTexture": true,
+   "emissiveTexture": true,
+   "normalTexture": true,
+   "emissiveStrength": 3
+  }
+ ],
+ "primitives": 8,
+ "missing_tangents": 0,
+ "extensionsRequired": [],
+ "images": 3,
+ "ok": true
+}

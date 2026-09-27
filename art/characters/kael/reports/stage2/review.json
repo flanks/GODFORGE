@@ -1,0 +1,80 @@
+{
+ "source": "kael_stage2.blend",
+ "bounds_m": {
+  "min": [
+   -1.0938,
+   -0.3386,
+   0.0
+  ],
+  "max": [
+   1.0938,
+   0.5468,
+   2.1582
+  ]
+ },
+ "height_m": 2.1582,
+ "span_m": 2.1875,
+ "weapon": {
+  "glb": "serpent_smg.glb",
+  "attached_at": "hand_frames.R (identity)",
+  "frame": {
+   "origin": [
+    -0.9656,
+    -0.00048,
+    1.68288
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.89,
+   "knuckle_abs_x": 1.0007,
+   "hand_verts": 153
+  }
+ },
+ "ingame_px_bare_tpose": {
+  "22": {
+   "tall_px": 72.8,
+   "wide_px": 107.4
+  },
+  "28": {
+   "tall_px": 57.2,
+   "wide_px": 84.4
+  }
+ },
+ "ingame_px_armed_tpose": {
+  "22": {
+   "tall_px": 72.8,
+   "wide_px": 127.0
+  },
+  "28": {
+   "tall_px": 57.2,
+   "wide_px": 99.8
+  }
+ },
+ "ingame": {
+  "pitch_deg": 55.0,
+  "view_heights_m": [
+   22.0,
+   28.0
+  ],
+  "screen_px": 1080,
+  "renderer": "Cycles CPU emission toon"
+ },
+ "front_iou_vs_concept_bare_tpose": 0.5742,
+ "aspect_mesh_bare_tpose": 1.0144,
+ "front_iou_vs_concept_armed_tpose": 0.3922,
+ "aspect_mesh_armed_tpose": 1.2002,
+ "aspect_concept": 0.9794
+}

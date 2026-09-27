@@ -1,0 +1,535 @@
+{
+ "hero": "kael",
+ "_doc": "Every hand-set number of Kael's stage-2 parts (tools/blender/gf_hero/s2_kael_parts.py). Metres, Blender axes (Z up, he faces -Y, +X = his left). theta = the angle round the body axis: 0 = front, 90 = his left, 180 = back. Measured on the approved front (2.163 mm/px, crown y 27, sole y 998, centre x 752; z = (998 - y_px) x 0.002163) and on the recentred stage-1 blockout; the brief's section 3/4 callouts give the materials.",
+ "seed": 23,
+ "body": {
+  "_doc": "the under-layer body: the trousers get 1 cm of cloth volume on the thighs and knees; the soles of the feet are lifted 2.2 cm so the boot sole (z 0) has room under them. Zones: skin above neck_skin_z (head, neck) and on the right hand's fingers past glove_finger_abs_x; the fingerless glove on the right hand; the ghost flesh on the LEFT arm past ghost_abs_x (below the bicep strap, decisions[ghost_arm_side]); black cloth (shirt, trousers) elsewhere.",
+  "trouser_inflate": 0.01,
+  "trouser_z": [
+   0.56,
+   1.1
+  ],
+  "foot_lift": 0.022,
+  "foot_lift_z": 0.12,
+  "neck_skin_z": 1.772,
+  "glove_abs_x": [
+   0.868,
+   0.985
+  ],
+  "ghost_abs_x": 0.392
+ },
+ "hair": {
+  "_doc": "Brax's shell method: the body's own head quads above the hairline pushed out to the blockout's hair (ray hits, clipped to [min_off, max_off], smoothed), closed with a rim; plus chunky locks swept up and back (the concept's dark swept hair; the light streak over the ghost side is paint). phi = the angle round the head from the face (0) to the back (180), symmetric. The chin beard: a short goatee shell under the mouth (the concept), stubble is paint.",
+  "head_cy": 0.0,
+  "z_min": 1.84,
+  "max_dist": 0.09,
+  "dark_lum": 1.0,
+  "min_off": 0.012,
+  "max_off": 0.048,
+  "offset_smooth": 6,
+  "hairline": {
+   "phi": [
+    0,
+    30,
+    55,
+    75,
+    95,
+    115,
+    140,
+    165,
+    180
+   ],
+   "z": [
+    2.02,
+    2.012,
+    1.99,
+    1.968,
+    1.95,
+    1.93,
+    1.9,
+    1.878,
+    1.872
+   ]
+  },
+  "clumps": {
+   "_doc": "locks swept back along the scalp: length from the front hairline (x0.7 .. x1.3 front to back), lift = how far they rise off the scalp",
+   "count": 52,
+   "length": 0.12,
+   "width": 0.056,
+   "thick": 0.016,
+   "spacing": 0.021,
+   "z_min": 1.93,
+   "lift": 0.14
+  },
+  "fringe": {
+   "_doc": "three locks falling forward over the brow on his right (image left) and one over the ghost side",
+   "count": 4,
+   "length": 0.075,
+   "width": 0.03,
+   "thick": 0.014
+  },
+  "beard_phi_max": 30,
+  "beard_below_mouth": 0.008,
+  "beard_below_chin": 0.018,
+  "beard_min_off": 0.004,
+  "beard_max_off": 0.011,
+  "beard_clumps": {
+   "count": 2,
+   "length": 0.02,
+   "width": 0.02,
+   "thick": 0.012,
+   "spacing": 0.014
+  },
+  "_doc_dark_lum": "1.0: every blockout hit over the scalp counts as hair (the TRELLIS hair texture is lit and not reliably dark)"
+ },
+ "scarf": {
+  "_doc": "the black scarf wrapped round the neck inside the collar (concept), with a short drape on the chest",
+  "z": [
+   1.708,
+   1.8
+  ],
+  "segments": 20,
+  "out": 0.013,
+  "bulge": 0.006,
+  "drape": {
+   "z": [
+    1.745,
+    1.625
+   ],
+   "half_width": 0.055,
+   "clear": 0.007,
+   "thick": 0.006
+  }
+ },
+ "belts": {
+  "_doc": "upper belt with the oval bronze buckle and the ghost gem (concept y 350-375: z 1.35-1.40); the lower slung belt (z 1.26-1.31, lower on his right where the holster hangs) with a rectangular buckle on his right front",
+  "upper": {
+   "z": 1.37,
+   "h": 0.042,
+   "thick": 0.007,
+   "gap": 0.003,
+   "segments": 28
+  },
+  "buckle": {
+   "w": 0.078,
+   "h": 0.056,
+   "bar": 0.013,
+   "depth": 0.011,
+   "out": 0.01,
+   "gem_r": 0.015,
+   "gem_h": 0.012
+  },
+  "lower": {
+   "z": 1.284,
+   "slope": 0.14,
+   "h": 0.036,
+   "thick": 0.007,
+   "gap": 0.003,
+   "segments": 28,
+   "buckle_theta_deg": -38,
+   "buckle": {
+    "w": 0.042,
+    "h": 0.042,
+    "bar": 0.008,
+    "depth": 0.008
+   }
+  }
+ },
+ "bandolier": {
+  "_doc": "cartridge strap from his right shoulder across the chest to his left hip (concept: cartridges from (x -0.06, z 1.62) to (x 0.10, z 1.40)), under the coat except in its open front",
+  "from": [
+   -0.13,
+   0.0,
+   1.725
+  ],
+  "to": [
+   0.165,
+   0.0,
+   1.29
+  ],
+  "h": 0.046,
+  "thick": 0.006,
+  "gap": 0.004,
+  "segments": 44,
+  "cartridges": {
+   "count": 6,
+   "z": [
+    1.605,
+    1.425
+   ],
+   "r": 0.0085,
+   "len": 0.042,
+   "cap_len": 0.011,
+   "stand": 0.006
+  }
+ },
+ "holster": {
+  "_doc": "the long holster on his right thigh (concept x 630-660 px, y 440-610 px: z 0.84-1.21), empty (weapons are separate models), flat against the outer thigh, hanging from the lower belt; two thigh straps",
+  "z": [
+   1.245,
+   0.8
+  ],
+  "y": -0.02,
+  "width": [
+   0.082,
+   0.078,
+   0.07,
+   0.06,
+   0.046
+  ],
+  "thick": [
+   0.042,
+   0.04,
+   0.036,
+   0.032,
+   0.026
+  ],
+  "stations": [
+   1.245,
+   1.17,
+   1.0,
+   0.87,
+   0.815
+  ],
+  "gap": 0.005,
+  "straps_z": [
+   1.025,
+   0.885
+  ],
+  "strap": {
+   "h": 0.024,
+   "thick": 0.006,
+   "gap": 0.002
+  },
+  "theta_deg": 316,
+  "_doc_theta": "the holster sits on the front-outer face of the right thigh (theta 316: his right front), where the concept shows it in the coat's opening"
+ },
+ "pouch": {
+  "_doc": "the pouch on his left hip (concept x 835-865 px, y 370-410 px), on the lower belt",
+  "z": 1.235,
+  "y": -0.035,
+  "size": [
+   0.04,
+   0.075,
+   0.075
+  ],
+  "flap": 0.028
+ },
+ "left_thigh_strap": {
+  "z": 0.93,
+  "h": 0.026,
+  "thick": 0.006,
+  "gap": 0.002,
+  "buckle_theta_deg": 60,
+  "buckle": {
+   "w": 0.034,
+   "h": 0.03,
+   "bar": 0.007,
+   "depth": 0.007
+  }
+ },
+ "arms": {
+  "_doc": "right forearm: the leather bracer with two straps and the glove cuff; left (ghost) arm: the bicep strap just below the rolled sleeve and a wrist strap (concept)",
+  "bracer": {
+   "abs_x": [
+    0.665,
+    0.835
+   ],
+   "thick": 0.007,
+   "gap": 0.003,
+   "straps_abs_x": [
+    0.7,
+    0.8
+   ],
+   "strap": {
+    "h": 0.02,
+    "thick": 0.005
+   }
+  },
+  "glove_cuff": {
+   "abs_x": 0.874,
+   "h": 0.03,
+   "thick": 0.006,
+   "gap": 0.002
+  },
+  "bicep_strap": {
+   "abs_x": 0.412,
+   "h": 0.03,
+   "thick": 0.007,
+   "gap": 0.002
+  },
+  "wrist_strap": {
+   "abs_x": 0.858,
+   "h": 0.022,
+   "thick": 0.006,
+   "gap": 0.002
+  },
+  "segments": 16
+ },
+ "loin": {
+  "_doc": "the maroon torn cloth hanging from the lower belt between the legs to 27 % of his height (concept), draping over the most forward surface above it and hanging straight below",
+  "z": [
+   1.3,
+   0.585
+  ],
+  "half_width": [
+   0.1,
+   0.082
+  ],
+  "u": 7,
+  "v": 10,
+  "clear": 0.012,
+  "thick": 0.006,
+  "tear": [
+   0.03,
+   0.11
+  ],
+  "slits": 3
+ },
+ "boots": {
+  "_doc": "tall buckled boots: a shaft round the calf (the body's section + off), a lofted foot shell round the body's foot, a pointed flared knee cuff (concept y 700-780 px: z 0.47-0.64, pointed over the knee), three strap bands with buckles (the concept's overlapping strap plates)",
+  "shaft_z": [
+   0.125,
+   0.18,
+   0.25,
+   0.32,
+   0.39,
+   0.46,
+   0.52,
+   0.575
+  ],
+  "segments": 18,
+  "off": [
+   0.02,
+   0.018,
+   0.016,
+   0.016,
+   0.016,
+   0.016,
+   0.017,
+   0.018
+  ],
+  "rim": 0.008,
+  "foot": {
+   "margin_side": 0.013,
+   "margin_len": 0.022,
+   "margin_top": 0.014,
+   "heel_h": 0.15,
+   "ankle_h": 0.17,
+   "ball_h": 0.075,
+   "toe_h": 0.05,
+   "segments": 12
+  },
+  "cuff": {
+   "z_back": [
+    0.53,
+    0.63
+   ],
+   "z_front": [
+    0.52,
+    0.715
+   ],
+   "flare": 0.03,
+   "thick": 0.007,
+   "segments": 20
+  },
+  "straps": [
+   [
+    0.2,
+    6
+   ],
+   [
+    0.3,
+    -6
+   ],
+   [
+    0.4,
+    6
+   ]
+  ],
+  "strap": {
+   "h": 0.03,
+   "thick": 0.006,
+   "gap": 0.002,
+   "buckle": {
+    "w": 0.03,
+    "h": 0.028,
+    "bar": 0.006,
+    "depth": 0.007
+   }
+  }
+ },
+ "coat": {
+  "_doc": "The long duster (brief pillar 1). YOKE: the body's own quads from the waist cut up to the neck and out to the sleeve ends, pushed out along the normals (off) and given thickness (the lining inside, a worn rim on every edge), open at the front in a V (open_half_width by z) and round the neck; the right sleeve ends at the elbow (concept 0.61), the LEFT sleeve is rolled up above the ghost arm (0.37). SKIRT: from z_top (tucked inside the yoke's wall) to the torn hem: an A-line whose half-axes grow with the drop below the waist (sides, front, back: the concept's flare 0.84 / 1.01 m at 51 / 41 % of his height), never closer to the body, belts, holster, pouch, loin cloth and boots than clear; open at the front (theta_open), a centre back vent from vent_z, torn hem points (long / short tears, slits between the last rows). COLLAR: the high standing collar with two flared points framing the head (concept z 1.88). LAPELS: wide folded-back lapels along the opening. CUFFS: rolled cuffs at both sleeve ends.",
+  "thick": 0.008,
+  "yoke": {
+   "z_cut": 1.305,
+   "neck_r": 0.088,
+   "neck_z": 1.66,
+   "sleeve_end_abs_x": {
+    "R": 0.605,
+    "L": 0.372
+   },
+   "open_z": [
+    1.3,
+    1.45,
+    1.6,
+    1.7,
+    1.8
+   ],
+   "open_half_width": [
+    0.126,
+    0.116,
+    0.1,
+    0.086,
+    0.086
+   ],
+   "off_torso": 0.03,
+   "off_arm": 0.015,
+   "off_shoulder": 0.03,
+   "smooth": 6
+  },
+  "skirt": {
+   "z_top": 1.345,
+   "top_off": 0.026,
+   "nu": 45,
+   "nv": 11,
+   "a": [
+    0.19,
+    0.43
+   ],
+   "bf": [
+    0.155,
+    0.12
+   ],
+   "bb": [
+    0.14,
+    0.3
+   ],
+   "_doc_axes": "half-axis = v0 + v1 x (z_top - z): sides a, front bf, back bb",
+   "theta_open_deg": [
+    44,
+    62
+   ],
+   "hem": {
+    "front": 0.5,
+    "side": 0.46,
+    "back": 0.4
+   },
+   "tear_long": [
+    0.05,
+    0.16
+   ],
+   "tear_short": [
+    0.0,
+    0.045
+   ],
+   "clear": [
+    0.02,
+    0.03
+   ],
+   "vent_z": 0.98,
+   "slit_rows": 2,
+   "slit_every": 3
+  },
+  "collar": {
+   "theta_deg": [
+    37,
+    323
+   ],
+   "nu": 21,
+   "z_base": 1.7,
+   "base_out": 0.03,
+   "z_top": 1.872,
+   "tip_rise": 0.06,
+   "flare": 0.068,
+   "tip_flare": 0.07
+  },
+  "lapel": {
+   "z": [
+    1.405,
+    1.5,
+    1.58,
+    1.64,
+    1.68,
+    1.705,
+    1.725
+   ],
+   "width": [
+    0.016,
+    0.045,
+    0.07,
+    0.088,
+    0.092,
+    0.06,
+    0.03
+   ],
+   "lift_in": 0.009,
+   "lift_out": 0.004,
+   "thick": 0.006
+  },
+  "cuffs": {
+   "R": {
+    "abs_x": 0.588,
+    "h": 0.052,
+    "thick": 0.013
+   },
+   "L": {
+    "abs_x": 0.362,
+    "h": 0.046,
+    "thick": 0.013
+   },
+   "gap": 0.001,
+   "segments": 18
+  }
+ },
+ "wisps": {
+  "_doc": "the ghost-flame tatters (brief swatch 12): chunky emissive cloth tongues on the hem, two at each front corner and one at the back (off-centre), each for a 3-bone x_wisp chain; root = z above the local hem where the tongue starts on the coat, length = how far it falls past the hem, curl = how far its tip lifts outward",
+  "items": [
+   {
+    "theta_deg": 57,
+    "root": 0.14,
+    "length": 0.24,
+    "width": 0.12,
+    "curl": 0.138,
+    "flick": 0.035
+   },
+   {
+    "theta_deg": 84,
+    "root": 0.12,
+    "length": 0.2,
+    "width": 0.1,
+    "curl": 0.125,
+    "flick": -0.03
+   },
+   {
+    "theta_deg": 303,
+    "root": 0.14,
+    "length": 0.26,
+    "width": 0.12,
+    "curl": 0.15,
+    "flick": -0.035
+   },
+   {
+    "theta_deg": 276,
+    "root": 0.11,
+    "length": 0.19,
+    "width": 0.095,
+    "curl": 0.112,
+    "flick": 0.03
+   },
+   {
+    "theta_deg": 203,
+    "root": 0.12,
+    "length": 0.22,
+    "width": 0.11,
+    "curl": 0.125,
+    "flick": 0.03
+   }
+  ],
+  "rows": 8,
+  "cols": 5,
+  "thick": 0.005,
+  "stand_off": 0.006
+ }
+}

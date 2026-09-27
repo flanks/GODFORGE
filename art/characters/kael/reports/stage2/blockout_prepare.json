@@ -1,0 +1,81 @@
+{
+ "source": "art/characters/kael/source/kael_trellis2_s202.glb",
+ "height_m": 2.1,
+ "raw": {
+  "vertices_split": 502262,
+  "triangles": 691752
+ },
+ "scale_factor": 2.09888,
+ "weld": {
+  "verts_before": 502262,
+  "verts_after": 336817
+ },
+ "parts_kept": [
+  334146
+ ],
+ "parts_dropped": {
+  "count": 66,
+  "verts": 2671,
+  "largest": 608
+ },
+ "bounds_m": {
+  "min": [
+   -1.0487,
+   -0.4765,
+   0.0
+  ],
+  "max": [
+   1.0487,
+   0.4765,
+   2.1
+  ]
+ },
+ "span_over_height": 0.9988,
+ "stats": {
+  "name": "REF_blockout",
+  "vertices": 334146,
+  "faces": 685945,
+  "triangles": 685945,
+  "quads": 0,
+  "tri_faces": 685945,
+  "ngons": 0,
+  "quad_ratio": 0.0,
+  "boundary_edges": 712,
+  "nonmanifold_edges": 6126,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 1,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": [
+   "MAT_REF_blockout_trellis"
+  ]
+ },
+ "concept": {
+  "path": "art/characters/kael/references/KAEL_front_approved.png",
+  "m_per_px": 0.002163
+ },
+ "out": "art/characters/kael/work/kael_retopo_start.blend",
+ "recentre": {
+  "offset_m": [
+   0.03,
+   0.225,
+   0.0
+  ],
+  "why": "body centre line on the origin (s2_kael_recentre.py)",
+  "bounds_m": {
+   "min": [
+    -1.0187,
+    -0.2515,
+    0.0
+   ],
+   "max": [
+    1.0787,
+    0.7015,
+    2.1
+   ]
+  }
+ }
+}

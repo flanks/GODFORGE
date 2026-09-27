@@ -1,0 +1,225 @@
+{
+ "hero": "kael",
+ "_doc": "Texture stage settings for tools/blender/gf_hero/s2_texture.py (shared) with Kael's zones and painter (s2_kael_paint.py). Metres, Blender axes.",
+ "zones": [
+  "skin",
+  "hair",
+  "eye",
+  "cloth",
+  "glove",
+  "ghost",
+  "coat",
+  "lining",
+  "coat_edge",
+  "maroon",
+  "leather",
+  "boot",
+  "bronze",
+  "gem",
+  "wisp",
+  "cartridge"
+ ],
+ "_doc_zones": "must equal s2_kael_geom.ZONES (the material slot order of the parts)",
+ "painter": "s2_kael_paint",
+ "bake_device": "CPU",
+ "_doc_bake_device": "the GPU is shared with ComfyUI (the other hero's TRELLIS jobs): every bake runs on the CPU",
+ "sharp_angle_deg": 35,
+ "material_name": "M_kael",
+ "emission_strength": 3.0,
+ "texture_names": {
+  "base_color": "kael_basecolor",
+  "emissive": "kael_emissive",
+  "normal": "kael_normal"
+ },
+ "uv": {
+  "hidden_density": 0.3,
+  "margin_px": 4,
+  "hidden_reach": 0.045,
+  "_doc_hidden_reach": "the body lies 2-3 cm under the coat, the boots and the belts: faces that find another part within 4.5 cm along their normal are packed at 0.3 density",
+  "hidden_start": 0.004,
+  "body": {
+   "arm_x": 0.2,
+   "arm_min_z": 1.58,
+   "head_z_front": 1.8,
+   "head_z_back": 1.83,
+   "sole_z": 0.03,
+   "foot_z": 0.14,
+   "leg_z": 1.08,
+   "hand_x": 0.89
+  }
+ },
+ "size": 2048,
+ "objects": [
+  "BODY",
+  "HAIR",
+  "SCARF",
+  "GEAR",
+  "LOINCLOTH",
+  "BOOTS",
+  "COAT",
+  "WISPS"
+ ],
+ "body_object": "BODY",
+ "shell_objects": [],
+ "smart_objects": [
+  "HAIR",
+  "SCARF",
+  "GEAR",
+  "LOINCLOTH",
+  "BOOTS",
+  "COAT",
+  "WISPS"
+ ],
+ "shading": {
+  "_doc": "smooth = no sharp edges (the body); the cloth gets sharp edges only above 60 degrees (its folds stay smooth, the 90-degree rims of the solidified cloth stay crisp); the gear and the boots above 40 / 45",
+  "smooth": [
+   "BODY"
+  ],
+  "per_object_deg": {
+   "COAT": 60,
+   "LOINCLOTH": 60,
+   "SCARF": 60,
+   "WISPS": 60,
+   "HAIR": 60,
+   "GEAR": 40,
+   "BOOTS": 45
+  }
+ },
+ "hi_lo": [
+  {
+   "_doc": "tangent normals + cavity + AO from the stage-1 sculpt reference (never shipped) onto the coat, the boots, the gear, the hair and the loin cloth. valid_dist [full, none] (m): texels whose hit lies further than that from the low-poly surface fade to flat (the blockout's coat is thick and flares wider than this build's: the filter keeps its folds where the two agree); the tilt filter drops the rest of the bad hits. The body (shirt, trousers, the ghost arm) and the face take no blockout detail (its face is soft, its ghost arm baked as a pale mottled patch).",
+   "source": "REF",
+   "targets": [
+    "COAT",
+    "BOOTS",
+    "GEAR",
+    "HAIR",
+    "LOINCLOTH"
+   ],
+   "zones": [
+    "coat",
+    "boot",
+    "leather",
+    "hair",
+    "maroon"
+   ],
+   "cage": 0.04,
+   "max_ray": 0.08,
+   "valid_dist": [
+    0.012,
+    0.03
+   ],
+   "normal_strength": 0.65,
+   "blur_px": 1.5,
+   "cavity": true,
+   "cavity_smooth": 6,
+   "ao": true,
+   "ao_distance": 0.05,
+   "ao_samples": 8
+  }
+ ],
+ "normal_max_tilt_deg": [
+  32,
+  52
+ ],
+ "self_ao": {
+  "_doc": "Cycles AO of the assembled low-poly parts (distance m)",
+  "distance": 0.12,
+  "samples": 16
+ },
+ "paint": {
+  "_doc": "s2_kael_paint.py: palette.json's measured tones shade every zone; declared = the art-directed emissive hues (brief section 4: the ghost green leans teal-mint, brighter than the concept's sage #80B290, never the P4 ring green #5BE37D)",
+  "declared": {
+   "ghost_rim": "#2A8A74",
+   "ghost_hot": "#62E0B2",
+   "ghost_core": "#C4FFE6",
+   "hair_streak": "#8E8A86",
+   "scar": "#B8897A",
+   "iris_right": "#7A5A2E",
+   "sclera": "#D6CEC0",
+   "sole": "#1E1614",
+   "coat_edge": "#5A4A55",
+   "cartridge": "#4C4F48"
+  },
+  "coat_lift_top": 0.55,
+  "_doc_coat_lift_top": "up-facing coat faces (what the 55-degree camera sees) lift this far toward the coat's highlight tone (brief section 5: the ramp must lift the coat's lit faces)",
+  "hem_glow": {
+   "_doc": "the torn hem dissolving into ghost flame: skirt texels whose gf_mask R (0 at the hem .. 1 at 0.3 m above it) is under `range` take a teal tint and a soft emissive; strength = the emissive at the hem edge (x the material's 3.0)",
+   "range": [
+    0.0,
+    0.45
+   ],
+   "z_max": 1.0,
+   "tint": 0.45,
+   "strength": 0.28
+  },
+  "face_glow": {
+   "_doc": "green veins creeping from the glowing LEFT eye over the temple and the cheek (concept), emissive; radius = the reach round the eye (m), vein_freq per metre",
+   "radius": 0.075,
+   "vein_freq": 70.0,
+   "strength": 0.75,
+   "tint": 0.35
+  },
+  "ghost": {
+   "_doc": "the spectral left arm: mottled ghost flesh with a network of bright veins, emissive; vein_freq per metre; emit = the emissive level of the flesh (the veins go to 1)",
+   "vein_freq": 17.0,
+   "emit": 0.62,
+   "vein_emit": 1.0,
+   "warp": 0.05
+  },
+  "scar": {
+   "_doc": "over his right brow (concept): a segment in (x, z) on the forehead, half-width m",
+   "a": [
+    -0.052,
+    1.998
+   ],
+   "b": [
+    -0.022,
+    1.972
+   ],
+   "width": 0.0018
+  },
+  "hair_streak": {
+   "_doc": "the light grey streak over the ghost side (his left front): a stripe along the swept-back locks",
+   "x": [
+    0.016,
+    0.042
+   ],
+   "y_max": 0.07,
+   "z_min": 1.985,
+   "amount": 0.7
+  },
+  "stubble": {
+   "_doc": "the shaved jaw and chin: a cool dark overlay from below the cheekbones down to the jaw line, front half of the face only",
+   "below_eye": 0.045,
+   "to_below_eye": 0.128,
+   "y_max": -0.02,
+   "amount": 0.3
+  },
+  "ao": {
+   "self": {
+    "range": [
+     0.3,
+     0.95
+    ],
+    "strength": 0.5,
+    "skip": [
+     "skin"
+    ],
+    "_doc_skip": "the face and neck stay clean painted planes (the 16-sample AO speckled the neck under the collar)"
+   },
+   "hi": {
+    "range": [
+     0.25,
+     0.9
+    ],
+    "strength": 0.4
+   }
+  },
+  "wisp": {
+   "_doc": "the ghost-flame tatters: gf_mask R = 0 at the root (on the coat) .. 1 at the tip; emissive grows from root to tip with flame streaks",
+   "root_emit": 0.35,
+   "tip_emit": 1.0
+  }
+ }
+}

@@ -302,6 +302,23 @@ python tools/blender/gf_hero/s2_valdris_run.py            # [--from <step>] [--o
 Results and the stage-3 helper-bone plan: `art/characters/valdris/reports/stage2_production_mesh.md`. The shared
 scripts only gained default-preserving options, so Brax's chain is unchanged (§ "Shared tool changes" in that report).
 
+**Kael (2026-09-27), the cloth variant of the chain.** His body is visible cloth and a ghost arm under a long duster,
+so the shared steps run unchanged (every fit band at weight 0, the proportions from the landmark warp) and Kael steps
+make the rest; no shared script was edited:
+
+```sh
+python tools/blender/gf_hero/s2_kael_run.py              # [--from <step>] [--only <step>], about 2.5 min, CPU only
+```
+
+| Step | What |
+|---|---|
+| `s2_kael_recentre.py` | moves the sculpt reference so the body's centre line (not the bounding box: the duster trails 0.7 m behind him) stands on the origin |
+| `s2_kael_parts.py` + `s2_kael_geom.py` | the duster (yoke and sleeves from the body's own quads pushed out and given thickness, a flared skirt with a back vent and a torn hem, collar, lapels, cuffs), five emissive ghost-flame tatters for `x_wisp` chains, belts with the ghost gem, bandolier, holster, pouch, straps, bracer, boots, hair and chin beard; 110 closed pieces with suggested bones; the ghost arm is a zone of the body |
+| `s2_kael_paint.py` | the painter behind `s2_texture.py`'s hooks: violet coat with lifted tops and the hem dissolving into ghost flame, the teal-mint ghost arm veins, face veins, gem and tatters |
+| `s2_kael_review.py`, `s2_kael_sheets.py` | copies of Valdris's review (Cycles-CPU toon, never EEVEE) with serpent_smg on the right-hand frame, and the sheets |
+
+Results and the stage-3 plan: `art/characters/kael/reports/stage2_production_mesh.md`.
+
 ### Weapons (chassis models, user decision 2026-09-25)
 
 Weapons are **not part of hero bodies**. Every chassis has its own model, attached to hand sockets, so any

@@ -218,10 +218,104 @@
    "notes": "Done 2026-09-27. SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. TRELLIS.2 (Pixal3D pruned) at the user's character settings (700k faces, 4096 px), 3 seeds (101/202/303). Input: the approved front with the two revolvers and the diffuse ghost smoke cut out of birefnet's mask (decisions[stage1_input_cut]); birefnet itself kept the whole dark-on-dark figure (reports/blockout/input_maskcheck.png). s202 picked: the only seed with both hands right (gloved right fist with skin fingers, ghost left fist; s101 swaps the hand textures, s303 gloves the ghost hand and keeps a grip tunnel through the right fist), a solid violet-navy coat back torn into long points and clear of the legs, one main shell and the fewest non-manifold edges. Its face glow is baked as a pale patch: use the concept and s303's head for the face. Known defects (thick fused coat flaring wider than the concept, no emissive or ghost-flame tatters - authored in stage 2 -, soft face, baked lighting) in reports/blockout_report.md section 6. Review renders: Cycles CPU + Workbench (kael copies of the shared renderers; never EEVEE)."
   },
   "2_production_mesh": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "No human artist (user decision 2026-09-25): the AI chain makes it; the user's visual approval stays the gate."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s2_kael_run.py; no human artist",
+   "decision": "2026-09-25: no human artist for stage 2; the AI pipeline makes the production mesh at production quality (the user's decision).",
+   "outputs": [
+    "art/characters/kael/production/kael_stage2.blend (Git LFS)",
+    "art/characters/kael/textures/kael_basecolor.png (2048x2048 sRGB, Git LFS)",
+    "art/characters/kael/textures/kael_emissive.png (2048x2048 sRGB, Git LFS)",
+    "art/characters/kael/textures/kael_normal.png (2048x2048 Non-Color tangent-space, OpenGL +Y, baked from the s202 blockout, Git LFS)",
+    "art/characters/kael/stage2_fit.json",
+    "art/characters/kael/stage2_parts.json",
+    "art/characters/kael/stage2_texture.json",
+    "art/characters/kael/reports/stage2_production_mesh.md",
+    "art/characters/kael/reports/stage2/stage2_{vs_concept,turnaround,armed,ingame,closeups,wireframe,textures}.png",
+    "art/characters/kael/reports/stage2/{blockout_prepare,body_fit,parts,texture,gltf_check,review}.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/s2_kael_run.py",
+    "tools/blender/gf_hero/s2_prepare_blockout.py (shared, unchanged)",
+    "tools/blender/gf_hero/s2_kael_recentre.py",
+    "tools/blender/gf_hero/s2_body_base.py (shared, unchanged)",
+    "tools/blender/gf_hero/s2_body_fit.py (shared, unchanged)",
+    "tools/blender/gf_hero/s2_kael_parts.py",
+    "tools/blender/gf_hero/s2_kael_geom.py",
+    "tools/blender/gf_hero/s2_texture.py (shared, unchanged; zones / painter / bake_device hooks)",
+    "tools/blender/gf_hero/s2_kael_paint.py",
+    "tools/blender/gf_hero/s2_gltf_check.py (shared, unchanged)",
+    "tools/blender/gf_hero/s2_kael_review.py",
+    "tools/blender/gf_hero/s2_kael_sheets.py"
+   ],
+   "metrics": {
+    "triangles_total": 24114,
+    "triangles_per_part": {
+     "BODY": 7846,
+     "HAIR": 2408,
+     "SCARF": 336,
+     "GEAR": 4316,
+     "LOINCLOTH": 312,
+     "BOOTS": 3432,
+     "COAT": 4684,
+     "WISPS": 780
+    },
+    "pieces": 110,
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "height_m_crown": 2.1,
+    "height_m_hair_tips": 2.1582,
+    "span_m": 2.1875,
+    "texel_density_px_per_m_median_all_faces": 431.0,
+    "atlas_coverage": 0.4328,
+    "normal_bake": {
+     "texels_with_detail": 394487,
+     "valid_fraction_of_target_zones": 0.2767,
+     "tilt_filter_deg": [
+      32,
+      52
+     ]
+    },
+    "front_iou_vs_concept_bare_tpose": 0.5742,
+    "front_iou_vs_concept_armed_tpose": 0.3922,
+    "ingame_px_bare_tpose_22m_tall_wide": [
+     72.8,
+     107.4
+    ],
+    "ingame_px_bare_tpose_28m_tall_wide": [
+     57.2,
+     84.4
+    ],
+    "gltf_check_ok": true
+   },
+   "items": {
+    "production_mesh": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/kael/production/kael_stage2.blend"
+     ]
+    },
+    "uvs_and_npr_textures": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/kael/textures/kael_basecolor.png",
+      "art/characters/kael/textures/kael_emissive.png",
+      "art/characters/kael/textures/kael_normal.png"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made mesh and textures (sheets in reports/stage2/). Record it with approved_by / approved_on on this item."
+    }
+   },
+   "notes": "Production mesh made by the AI pipeline, not a stand-in (2026-09-27). The CC0 MakeHuman hm08 topology (MPFB as a tool only), a lean athletic macro, landmark-warped from MakeHuman's own proportions to 2.1 m: the concept's head, a lean shoulder, the blockout's arm line and wide A stance; knee / elbow / wrist loops, weapon attach frames at the palms. The body is the under-layer (skin, the fingerless glove, black shirt and trousers, and the emissive ghost flesh on his LEFT arm below the bicep strap, the same topology as the right arm). Built around it, all closed, 110 pieces with suggested bones: the violet duster (yoke and sleeves from the body's own quads, the left sleeve rolled up; a flared A-line skirt with a back vent and a torn hem; a high collar with two points; lapels; rolled cuffs), five emissive ghost-flame tatters on the hem for x_wisp chains, the scarf, the maroon loin cloth, belts with the oval buckle and the ghost gem, the bandolier with six cartridges, the holster on the right thigh, the pouch, straps and the bracer, tall buckled boots with pointed knee cuffs, the swept-back hair with a grey streak and a chin beard. Hands empty: serpent_smg (weapon track) rides the right hand frame in the review. One 2048 atlas: hand-painted NPR base colour from palette.json, an emissive map (ghost arm veins, eye and face veins, gem, tatters, the hem dissolving into ghost flame), a tangent normal map baked from the s202 blockout (hit-distance and tilt filtered). 24,114 triangles. Review sheets in reports/stage2/, findings and the stage-3 plan in reports/stage2_production_mesh.md. The remaining human gate is the user's visual approval (item user_visual_approval)."
   },
   "3_rig": {
    "status": "not_started",
