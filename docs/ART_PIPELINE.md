@@ -407,6 +407,15 @@ Results, the ranges stage 4 must keep, and the honest limits: `art/characters/va
 hooks are default-off, and Brax's stage-3 outputs are byte-identical with them
 (`art/characters/valdris/reports/stage3/brax_regression.json`).
 
+**Kael (2026-09-27), the duster variant.** An unarmoured hm08 body under a long coat: the shared scripts make the
+skeleton and weight the body unchanged, and Kael files add the cloth chains and the coat's weights:
+`python tools/blender/gf_hero/s3_kael_run.py` (landmarks, lm_kael, seed, skin, gltf_check, review, sheet; about 30 s
+plus the renders). `s3_kael_landmarks.py` places his 48 `x_` cloth bones on the stage-2 mesh (six `x_coat` chains down
+the skirt by angle, three `x_loin`, one `x_wisp` chain per ghost-flame tatter on the nearest coat column);
+`s3_kael_skin.py` is the `s3_skin.py` hook (yoke, lapels, gear and boots copy the body; the skirt on the `x_coat` grid
+with the back vent split; the tatters on the coat above their hem; serpent_smg.glb as a PREVIEW on `weapon_R`). No
+driven helpers and no shared script changed. Results: `art/characters/kael/reports/stage3_5_report.md`.
+
 ### Stage 4: animation (implemented; made by AI, 2026-09-25)
 
 No human animator and no Mixamo / ActorCore seeds: the clips are keyed in Python on GF_Hero_v1, Cascadeur-style
@@ -452,6 +461,15 @@ python tools/blender/gf_hero/s4_valdris_run.py            # [--from <step>] [--o
 Results and findings: `art/characters/valdris/reports/anim_report.md`. The hooks are default-off, and Brax's stage-4
 outputs are byte-identical with them (`art/characters/valdris/reports/anim/brax_regression.json`).
 
+**Kael (2026-09-27), the gunslinger variant.** His body limits nothing, so `s4_kael.shared_clips` builds the shared set
+with `s4_clips.shared_clips` itself and his hand vocabulary swapped in (the guard is a one-handed aim in hero space, the
+ghost hand hangs loose, the gun hand never opens), re-posing by hand only the clips where a brawler's fists meant
+something else (fire_light / heavy / charge, ping, interact, forge_hammer, reforge_in, death) and running the side runs
+and backpedal on shorter cycles for his 7.2 m/s; `unique_clips` adds his 8 kit clips (a real forward roll for the Shadow
+Roll). `s4_kael_cloth.py` is Valdris's cloth pass for a coat that hangs all round the legs (a drape per coat column, the
+tatters solved on the coat's solved chains): `python tools/blender/gf_hero/s4_kael_run.py` (anim, cloth, review, sheet,
+gltf_check; about 5 min). Results: `art/characters/kael/reports/stage3_5_report.md`.
+
 ### Stage 5: export & validate (implemented; made by AI, 2026-09-25)
 
 No human step: the export is headless Blender, and the quality gate is the validators and the review renders of the
@@ -481,6 +499,11 @@ What each step runs, for use on its own:
 <comfy-python> tools/blender/gf_hero/s5_sheets.py <key>
 python tools/blender/gf_hero/validate_glb.py assets/models/characters/<key>.glb --blender <blender> [--json <report.json>]
 ```
+
+**Kael (2026-09-27).** The shared chain as is, with his hook `s5_kael.py` (review shots, the follow clip) and one extra
+command after the export, `python tools/blender/gf_hero/s5_kael.py --sidecar`: `export_glb.py` words any default weapon
+without an offhand node as a sleeve weapon, and the serpent_smg is a hand-held gun. `kael.glb`: 111 joints, 32 clips,
+0 errors, 0 warnings.
 
 **The shipped hero file** (`assets/models/characters/<key>.glb`):
 - glTF binary, +Y up, 1 unit = 1 m, the hero faces +Z, rest pose = the T-pose; uncompressed (§6), PNG textures

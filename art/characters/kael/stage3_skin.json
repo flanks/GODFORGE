@@ -1,0 +1,76 @@
+{
+ "_doc": "Stage-3 rig and skinning inputs for Kael (tools/blender/gf_hero/s3_kael_run.py). Metres, Blender axes (Z up, faces -Y, +X = his left). Hand-edited; rerun python tools/blender/gf_hero/s3_kael_run.py after a change. body + parts follow the shared s3_skin.py format (Brax: art/characters/brax/stage3_skin.json; Kael's body is the same lean MakeHuman hm08 build); the coat, scarf, loin cloth and ghost-flame tatters use mode 'hook', weighted by tools/blender/gf_hero/s3_kael_skin.py from the 'rig' block below.",
+ "hook": {
+  "module": "s3_kael_skin",
+  "_doc": "s3_skin.py (shared) imports this module: part_weights() weights the COAT (yoke and lapels copy the body, cuffs rigid, the skirt on the x_coat grid, collar blended neck / chest), SCARF, LOINCLOTH (x_loin grid) and WISPS (the coat's weights above the hem, their x_wisp chain below); after_bind() imports the serpent_smg GLB onto weapon_R (PREVIEW, not exported)."
+ },
+ "body": {
+  "_doc": "BODY = the fitted MakeHuman hm08 under-layer (skin, glove, the ghost flesh of the left arm, shirt, trousers). seed = MakeHuman CC0 game_engine weights (exact per vertex, s3_mh_seed.py); heat_mix blends Blender's bone heat into the seed per region (0 = seed only). Numbers as Brax's (the same base mesh at a leaner build).",
+  "heat_mix": {
+   "_doc": "Torso and limbs half seed, half heat; the hands keep the seed (heat is unreliable on fingers); the head keeps most of the seed (face loops).",
+   "default": 0.5,
+   "regions": [{"bones": ["hand_L", "hand_R"], "radius": 0.15, "mix": 0.0}, {"bones": ["head"], "radius": 0.16, "mix": 0.2}]
+  },
+  "twist": {
+   "_doc": "share of a limb class moved onto its twist bone along the bone (t = 0 at the bone head, 1 at the tail).",
+   "upperarm_fade_end": 0.85,
+   "thigh_fade_end": 0.85,
+   "lowerarm_fade_start": 0.15
+  },
+  "joint_blend": [
+   {"name": "knee_L", "parent_class": ["thigh_L", "thigh_twist_L"], "child_class": ["shin_L"], "axis_bone": "shin_L", "half_width": 0.06, "offset": 0.0, "radius": 0.18, "outer_dir": [0, -1, 0], "offset_outer": 0.035},
+   {"name": "elbow_L", "parent_class": ["upperarm_L", "upperarm_twist_L"], "child_class": ["lowerarm_L", "lowerarm_twist_L"], "axis_bone": "lowerarm_L", "half_width": 0.05, "offset": 0.0, "radius": 0.15, "outer_dir": [0, 1, 0], "offset_outer": -0.025},
+   {"name": "knee_R", "parent_class": ["thigh_R", "thigh_twist_R"], "child_class": ["shin_R"], "axis_bone": "shin_R", "half_width": 0.06, "offset": 0.0, "radius": 0.18, "outer_dir": [0, -1, 0], "offset_outer": 0.035},
+   {"name": "elbow_R", "parent_class": ["upperarm_R", "upperarm_twist_R"], "child_class": ["lowerarm_R", "lowerarm_twist_R"], "axis_bone": "lowerarm_R", "half_width": 0.05, "offset": 0.0, "radius": 0.15, "outer_dir": [0, 1, 0], "offset_outer": -0.025}
+  ],
+  "smooth": [],
+  "spatial_smooth": [
+   {"name": "neck_jaw_fold", "bone": "neck", "radius": 0.12, "sigma": 0.014, "iters": 2},
+   {"name": "shoulder_L", "bone": "upperarm_twist_L", "radius": 0.15, "sigma": 0.022, "iters": 2},
+   {"name": "shoulder_R", "bone": "upperarm_twist_R", "radius": 0.15, "sigma": 0.022, "iters": 2},
+   {"name": "knee_L", "bone": "shin_L", "radius": 0.15, "sigma": 0.03, "iters": 3},
+   {"name": "knee_R", "bone": "shin_R", "radius": 0.15, "sigma": 0.03, "iters": 3}
+  ],
+  "_doc_fixes": "As Brax's (art/characters/brax/stage3_skin.json _doc_fixes): rest_relax first, then joint_blend, smooth, spatial_smooth; radii scaled to his leaner limbs (upper arm radius 0.045 m, thigh 0.075 m).",
+  "rest_relax": [
+   {"name": "extra_loops_onto_the_profile", "mode": "extra_loops_4pt", "_doc": "the stage-2 knee / elbow / wrist loops were inserted at edge midpoints after the fit; each loop vertex moves onto the 4-point subdivision curve of its longitudinal edge loop"}
+  ]
+ },
+ "parts": {
+  "_doc": "head: 100 % head. copy: the body's weights at the closest body point (belts, bandolier, straps, holster, bracer, boots: they lie on the body); rigid_below_diag_m makes small pieces (buckles, the gem, cartridges, the pouch) one row. hook: s3_kael_skin.part_weights.",
+  "HAIR": {"mode": "head"},
+  "BOOTS": {"mode": "copy", "rigid_below_diag_m": 0.06},
+  "GEAR": {"mode": "copy", "rigid_below_diag_m": 0.12},
+  "COAT": {"mode": "hook"},
+  "SCARF": {"mode": "hook"},
+  "LOINCLOTH": {"mode": "hook"},
+  "WISPS": {"mode": "hook"},
+  "hang": {"knee_z": 0.6, "follow_max": 0.85, "side_blend_m": 0.07, "_doc": "unused by Kael's parts (s3_skin.py reads it)"}
+ },
+ "rig": {
+  "_doc": "Kael's per-hero x_ extras (docs/art/GF_HERO_SKELETON.md section 2: leaf chains prefixed x_, deform, never keyed by the shared clips). All are CLOTH chains, keyed per clip by the stage-4 cloth pass (s4_kael_cloth.py); no driven helpers. s3_kael_landmarks.py places the joints on the stage-2 mesh.",
+  "coat": {
+   "_doc": "x_coat_<col>_01..04, parent pelvis: six chains down the duster's skirt (stage2_parts.json coat.skirt: an A-line from z 1.345 to the torn hem, open at the front, centre back vent from vent_z). Columns at theta (0 = his front, 90 = his left side, 180 = his back): LF / LS / LB on his left, RB / RS / RF on his right. Joints on the skirt's mid-surface at joints_z, the last one at the column's hem. Weights: across, linear between the two nearest columns (clamped at the front edges), the back pair (LB, RB) blend above the vent and split by side below it (a smooth change over split_band_m); along, hat functions centred on each bone's middle, the top row pinned to the body's own weights (the yoke copies the same body, so the skirt's tucked top stays in the yoke).",
+   "names": ["LF", "LS", "LB", "RB", "RS", "RF"],
+   "theta_deg": [72.0, 112.0, 152.0, 208.0, 248.0, 288.0],
+   "joints_z": [1.32, 1.12, 0.92, 0.72],
+   "hem_floor_z": 0.36,
+   "pin_top_z": 1.3,
+   "vent_z": 1.027,
+   "split_band_m": 0.12
+  },
+  "loin": {
+   "_doc": "x_loin_{R,C,L}_01..03, parent pelvis: three chains across the maroon loin cloth (stage2_parts.json loin: z 1.30 to 0.585, half-width 0.10 to 0.082) at u = -1, 0, 1 of 0.8 x the half-width, on the cloth's mid-surface; the same grid blend, the top row pinned to the pelvis at the lower belt.",
+   "columns_u": [-1.0, 0.0, 1.0],
+   "names": ["R", "C", "L"],
+   "joints_z": [1.27, 1.03, 0.8, 0.585],
+   "pin_top_z": 1.25
+  },
+  "wisps": {
+   "_doc": "x_wisp_<n>_01..03 (n = 1..5, stage2_parts.json wisps.items order), parent the last bone of the coat column nearest the tatter: three bones from the hem to the tip along the tatter's centre line. Weights: above the hem the coat's own grid weights (the root lies on the coat), below it hat functions along the chain, blended over band_m.",
+   "bones": 3,
+   "band_m": 0.04
+  },
+  "collar": {"_doc": "COAT_COLLAR rigid: spine_03 / neck (the standing collar turns part of a head turn); SCARF: the wrap the same, the drape on spine_03.", "row": {"spine_03": 0.6, "neck": 0.4}}
+ }
+}

@@ -1,0 +1,1453 @@
+{
+ "hero": "kael",
+ "stage": "5_export_validate",
+ "updated": "2026-09-27",
+ "hero_export": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "glb": "assets/models/characters/kael.glb",
+  "meta": "assets/models/characters/kael.meta.json",
+  "bytes": 13758644,
+  "sha256": "0c21e752b8d9562a29b0442696e4e25ff0407f21ed839d96f91acaf68fe45ef9",
+  "source_blend": "art/characters/kael/production/kael_anim.blend",
+  "export_settings": {
+   "export_format": "GLB",
+   "use_selection": true,
+   "export_yup": true,
+   "export_apply": false,
+   "export_texcoords": true,
+   "export_normals": true,
+   "export_tangents": true,
+   "export_materials": "EXPORT",
+   "export_image_format": "AUTO",
+   "export_vertex_color": "NONE",
+   "export_all_vertex_colors": false,
+   "export_active_vertex_color_when_no_material": false,
+   "export_attributes": false,
+   "export_cameras": false,
+   "export_lights": false,
+   "export_extras": false,
+   "export_morph": false,
+   "export_draco_mesh_compression_enable": false,
+   "export_meshopt_compression_enable": false,
+   "export_use_gltfpack": false,
+   "export_gpu_instances": false,
+   "export_leaf_bone": false,
+   "export_skins": true,
+   "export_influence_nb": 4,
+   "export_all_influences": false,
+   "export_def_bones": true,
+   "export_rest_position_armature": true,
+   "export_armature_object_remove": false,
+   "export_hierarchy_flatten_bones": false,
+   "export_animations": true,
+   "export_animation_mode": "NLA_TRACKS",
+   "export_force_sampling": true,
+   "export_frame_step": 1,
+   "export_optimize_animation_size": false,
+   "export_anim_single_armature": true,
+   "export_reset_pose_bones": true,
+   "export_anim_slide_to_zero": false,
+   "export_pointer_animation": false
+  },
+  "joined_mesh": {
+   "name": "kael_mesh",
+   "verts": 12261,
+   "tris": 24114,
+   "double_sided": false
+  },
+  "blender_checks": {
+   "hierarchy_problems": [],
+   "parts": {
+    "BODY": {
+     "verts": 3929,
+     "tris": 7846,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "HAIR": {
+     "verts": 1324,
+     "tris": 2408,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "SCARF": {
+     "verts": 170,
+     "tris": 336,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "GEAR": {
+     "verts": 2196,
+     "tris": 4316,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "LOINCLOTH": {
+     "verts": 158,
+     "tris": 312,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "BOOTS": {
+     "verts": 1736,
+     "tris": 3432,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "COAT": {
+     "verts": 2348,
+     "tris": 4684,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    },
+    "WISPS": {
+     "verts": 400,
+     "tris": 780,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_kael"
+     ]
+    }
+   },
+   "tris": 24114,
+   "closed": true,
+   "material": {
+    "name": "M_kael",
+    "images": [
+     {
+      "name": "kael_basecolor.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\kael_basecolor.png"
+     },
+     {
+      "name": "kael_emissive.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\kael_emissive.png"
+     },
+     {
+      "name": "kael_normal.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "Non-Color",
+      "file": "//..\\textures\\kael_normal.png"
+     }
+    ]
+   },
+   "nla_tracks": {
+    "hero_tracks": 32,
+    "missing_vs_clips_json": [],
+    "missing_vs_required_clips": [],
+    "not_exported": []
+   }
+  },
+  "source_fidelity": {
+   "frames_per_clip": "first, middle, last",
+   "joints": 111,
+   "max_error": 1.7686038526920633e-05,
+   "per_clip": {
+    "kael_idle@loop": 1.24538927823159e-06,
+    "kael_idle_combat@loop": 1.5871262763859917e-06,
+    "kael_walk@loop": 2.434353835623071e-06,
+    "kael_run@loop": 2.870665834570074e-06,
+    "kael_strafe_left@loop": 2.878716970688977e-06,
+    "kael_strafe_right@loop": 3.052589631402647e-06,
+    "kael_backpedal@loop": 1.7686038526920633e-05,
+    "kael_dash": 2.7483665727967566e-06,
+    "kael_dash_recover": 2.3508806261396398e-06,
+    "kael_fire_light": 1.6059958027822563e-06,
+    "kael_fire_heavy": 1.921177808283936e-06,
+    "kael_fire_charge@loop": 1.7468675032258907e-06,
+    "kael_hit_light": 1.659848080634574e-06,
+    "kael_hit_heavy": 2.106786392647164e-06,
+    "kael_knockdown": 2.5502086872242202e-06,
+    "kael_get_up": 2.6495190295627857e-06,
+    "kael_death": 2.707208151209173e-06,
+    "kael_downed@loop": 2.014643459169463e-06,
+    "kael_revive": 2.0546709856850143e-06,
+    "kael_reforge_in": 2.1894426409652112e-06,
+    "kael_victory": 1.793538633165781e-06,
+    "kael_ping": 1.6057386489215508e-06,
+    "kael_interact": 1.879524653206066e-06,
+    "kael_forge_hammer@loop": 2.4630792128908785e-06,
+    "kael_idle_signature@loop": 1.222043591486699e-06,
+    "kael_fan_of_blades": 1.8089541331603454e-06,
+    "kael_shadow_roll": 2.8590842195697075e-06,
+    "kael_ghost_step": 3.078955408852835e-06,
+    "kael_bullet_ballet_start": 1.7820817343611184e-06,
+    "kael_bullet_ballet@loop": 1.833176039023332e-06,
+    "kael_fire_twin": 1.8618206974740925e-06,
+    "kael_fire_r": 1.605738647245808e-06
+   },
+   "ok": true
+  },
+  "validation": {
+   "file": "assets/models/characters/kael.glb",
+   "key": "kael",
+   "bytes": 13758644,
+   "sha256": "0c21e752b8d9562a29b0442696e4e25ff0407f21ed839d96f91acaf68fe45ef9",
+   "generator": "Khronos glTF Blender I/O v5.2.39",
+   "extensions_used": [
+    "KHR_materials_emissive_strength"
+   ],
+   "extensions_required": [],
+   "scene_roots": [
+    "GF_Hero_v1"
+   ],
+   "nodes": 113,
+   "joints": 111,
+   "extra_bones": [
+    "x_coat_LB_01",
+    "x_coat_LB_02",
+    "x_coat_LB_03",
+    "x_coat_LB_04",
+    "x_coat_LF_01",
+    "x_coat_LF_02",
+    "x_coat_LF_03",
+    "x_coat_LF_04",
+    "x_wisp_1_01",
+    "x_wisp_1_02",
+    "x_wisp_1_03",
+    "x_wisp_2_01",
+    "x_wisp_2_02",
+    "x_wisp_2_03",
+    "x_coat_LS_01",
+    "x_coat_LS_02",
+    "x_coat_LS_03",
+    "x_coat_LS_04",
+    "x_coat_RB_01",
+    "x_coat_RB_02",
+    "x_coat_RB_03",
+    "x_coat_RB_04",
+    "x_wisp_5_01",
+    "x_wisp_5_02",
+    "x_wisp_5_03",
+    "x_coat_RF_01",
+    "x_coat_RF_02",
+    "x_coat_RF_03",
+    "x_coat_RF_04",
+    "x_wisp_3_01",
+    "x_wisp_3_02",
+    "x_wisp_3_03",
+    "x_wisp_4_01",
+    "x_wisp_4_02",
+    "x_wisp_4_03",
+    "x_coat_RS_01",
+    "x_coat_RS_02",
+    "x_coat_RS_03",
+    "x_coat_RS_04",
+    "x_loin_C_01",
+    "x_loin_C_02",
+    "x_loin_C_03",
+    "x_loin_L_01",
+    "x_loin_L_02",
+    "x_loin_L_03",
+    "x_loin_R_01",
+    "x_loin_R_02",
+    "x_loin_R_03"
+   ],
+   "bind_pose_max_error": 1.489213171804151e-06,
+   "sockets": {
+    "weapon_R": {
+     "parent": "hand_R",
+     "translation": [
+      -0.9656,
+      1.68288,
+      0.00048
+     ],
+     "forward": [
+      -1.0,
+      -0.0,
+      -0.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      -0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "weapon_L": {
+     "parent": "hand_L",
+     "translation": [
+      0.9656,
+      1.68288,
+      0.00048
+     ],
+     "forward": [
+      1.0,
+      0.0,
+      -0.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      -0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "head_top": {
+     "parent": "head",
+     "translation": [
+      -0.0,
+      2.15825,
+      -0.002
+     ],
+     "forward": [
+      0.0,
+      0.0,
+      1.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      -0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "chest_sigil": {
+     "parent": "spine_03",
+     "translation": [
+      -0.0,
+      1.659,
+      0.10668
+     ],
+     "forward": [
+      -0.0,
+      0.28951,
+      0.95718
+     ],
+     "up": [
+      -0.0,
+      0.95718,
+      -0.28951
+     ],
+     "vs_landmarks": 4.6e-06
+    }
+   },
+   "tris": 24114,
+   "skin": {
+    "vertices": 21857,
+    "unweighted": 0,
+    "over_4": 0,
+    "not_normalized": 0,
+    "on_non_weight_bones": 0,
+    "bad_joint_index": 0,
+    "weight_sum_max_error": 1.30385160446167e-07
+   },
+   "bounds_m": {
+    "min": [
+     -1.0938,
+     0,
+     -0.5468
+    ],
+    "max": [
+     1.0938,
+     2.1582,
+     0.3386
+    ]
+   },
+   "height_m": 2.1582,
+   "materials": [
+    {
+     "name": "M_kael",
+     "double_sided": false,
+     "emissive_strength": 3,
+     "textures": {
+      "base_color": true,
+      "emissive": true,
+      "normal": true
+     }
+    }
+   ],
+   "textures": [
+    {
+     "name": "kael_emissive",
+     "role": "emissive",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 659887
+    },
+    {
+     "name": "kael_normal",
+     "role": "normal",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 1402116
+    },
+    {
+     "name": "kael_basecolor",
+     "role": "base_color",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 3037228
+    }
+   ],
+   "clips": [
+    "kael_idle@loop",
+    "kael_idle_combat@loop",
+    "kael_walk@loop",
+    "kael_run@loop",
+    "kael_strafe_left@loop",
+    "kael_strafe_right@loop",
+    "kael_backpedal@loop",
+    "kael_dash",
+    "kael_dash_recover",
+    "kael_fire_light",
+    "kael_fire_heavy",
+    "kael_fire_charge@loop",
+    "kael_hit_light",
+    "kael_hit_heavy",
+    "kael_knockdown",
+    "kael_get_up",
+    "kael_death",
+    "kael_downed@loop",
+    "kael_revive",
+    "kael_reforge_in",
+    "kael_victory",
+    "kael_ping",
+    "kael_interact",
+    "kael_forge_hammer@loop",
+    "kael_idle_signature@loop",
+    "kael_fan_of_blades",
+    "kael_shadow_roll",
+    "kael_ghost_step",
+    "kael_bullet_ballet_start",
+    "kael_bullet_ballet@loop",
+    "kael_fire_twin",
+    "kael_fire_r"
+   ],
+   "clip_checks": {
+    "kael_idle@loop": {
+     "channels": 333,
+     "duration_s": 3.0,
+     "samples": 91,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_idle_combat@loop": {
+     "channels": 333,
+     "duration_s": 1.06667,
+     "samples": 33,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_walk@loop": {
+     "channels": 333,
+     "duration_s": 0.93333,
+     "samples": 29,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_run@loop": {
+     "channels": 333,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_strafe_left@loop": {
+     "channels": 333,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_strafe_right@loop": {
+     "channels": 333,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_backpedal@loop": {
+     "channels": 333,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_dash": {
+     "channels": 333,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 111
+    },
+    "kael_dash_recover": {
+     "channels": 333,
+     "duration_s": 0.46667,
+     "samples": 15,
+     "animated_joints": 111
+    },
+    "kael_fire_light": {
+     "channels": 333,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 111
+    },
+    "kael_fire_heavy": {
+     "channels": 333,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 111
+    },
+    "kael_fire_charge@loop": {
+     "channels": 333,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_hit_light": {
+     "channels": 333,
+     "duration_s": 0.4,
+     "samples": 13,
+     "animated_joints": 111
+    },
+    "kael_hit_heavy": {
+     "channels": 333,
+     "duration_s": 0.86667,
+     "samples": 27,
+     "animated_joints": 111
+    },
+    "kael_knockdown": {
+     "channels": 333,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 111
+    },
+    "kael_get_up": {
+     "channels": 333,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 111
+    },
+    "kael_death": {
+     "channels": 333,
+     "duration_s": 1.6,
+     "samples": 49,
+     "animated_joints": 111
+    },
+    "kael_downed@loop": {
+     "channels": 333,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_revive": {
+     "channels": 333,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 111
+    },
+    "kael_reforge_in": {
+     "channels": 333,
+     "duration_s": 1.5,
+     "samples": 46,
+     "animated_joints": 111
+    },
+    "kael_victory": {
+     "channels": 333,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 111
+    },
+    "kael_ping": {
+     "channels": 333,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 111
+    },
+    "kael_interact": {
+     "channels": 333,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 111
+    },
+    "kael_forge_hammer@loop": {
+     "channels": 333,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_idle_signature@loop": {
+     "channels": 333,
+     "duration_s": 4.0,
+     "samples": 121,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_fan_of_blades": {
+     "channels": 333,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 111
+    },
+    "kael_shadow_roll": {
+     "channels": 333,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 111
+    },
+    "kael_ghost_step": {
+     "channels": 333,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 111
+    },
+    "kael_bullet_ballet_start": {
+     "channels": 333,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 111
+    },
+    "kael_bullet_ballet@loop": {
+     "channels": 333,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 111,
+     "loop_first_last_max_diff": 0.0
+    },
+    "kael_fire_twin": {
+     "channels": 333,
+     "duration_s": 0.33333,
+     "samples": 11,
+     "animated_joints": 111
+    },
+    "kael_fire_r": {
+     "channels": 333,
+     "duration_s": 0.2,
+     "samples": 7,
+     "animated_joints": 111
+    }
+   },
+   "sidecar": "checked",
+   "weapon_attach": {
+    "weapon": "assets/models/weapons/serpent_smg.glb",
+    "meshes": {
+     "serpent_smg_mesh": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     }
+    }
+   },
+   "errors": [],
+   "warnings": [],
+   "ok": true
+  }
+ },
+ "ok": true,
+ "blender_reimport": {
+  "file": "assets/models/characters/kael.glb",
+  "blender": "5.2.0 LTS",
+  "importer": [
+   "FINISHED"
+  ],
+  "hero_hook": "tools/blender/gf_hero/s5_kael.py",
+  "objects": [
+   "GF_Hero_v1",
+   "kael_mesh"
+  ],
+  "bones": 111,
+  "sockets": {
+   "weapon_R": true,
+   "weapon_L": true,
+   "head_top": true,
+   "chest_sigil": true
+  },
+  "meshes": {
+   "kael_mesh": {
+    "verts": 21857,
+    "skinned": true,
+    "vertex_groups_not_bones": [],
+    "materials": [
+     "M_kael"
+    ],
+    "uv_layers": [
+     "UVMap"
+    ]
+   }
+  },
+  "images": {
+   "kael_basecolor": [
+    2048,
+    2048
+   ],
+   "kael_emissive": [
+    2048,
+    2048
+   ],
+   "kael_normal": [
+    2048,
+    2048
+   ]
+  },
+  "socket_axes_restored_vs_authoring": {
+   "weapon_R": 2.884307548356446e-07,
+   "weapon_L": 3.101530126059515e-07,
+   "head_top": 3.0755319357922417e-07,
+   "chest_sigil": 2.384185791015625e-07
+  },
+  "clips_played": 32,
+  "clip_pose_max_error": 5.9604644775390625e-06,
+  "clips": {
+   "kael_idle@loop": {
+    "frame": 45,
+    "frame_range": [
+     0.0,
+     90.0
+    ],
+    "max_bone_error": 3.3974647521972656e-06,
+    "mesh": {
+     "min_z": -0.0012,
+     "extent": [
+      1.762,
+      1.142,
+      2.148
+     ]
+    }
+   },
+   "kael_idle_combat@loop": {
+    "frame": 16,
+    "frame_range": [
+     0.0,
+     32.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.418,
+      1.46,
+      2.079
+     ]
+    }
+   },
+   "kael_walk@loop": {
+    "frame": 14,
+    "frame_range": [
+     0.0,
+     28.0
+    ],
+    "max_bone_error": 5.245208740234375e-06,
+    "mesh": {
+     "min_z": -0.0007,
+     "extent": [
+      1.616,
+      1.427,
+      2.057
+     ]
+    }
+   },
+   "kael_run@loop": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 5.9604644775390625e-06,
+    "mesh": {
+     "min_z": 0.0489,
+     "extent": [
+      1.524,
+      1.562,
+      1.973
+     ]
+    }
+   },
+   "kael_strafe_left@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 5.4836273193359375e-06,
+    "mesh": {
+     "min_z": 0.0305,
+     "extent": [
+      1.853,
+      1.686,
+      1.99
+     ]
+    }
+   },
+   "kael_strafe_right@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 5.4836273193359375e-06,
+    "mesh": {
+     "min_z": 0.0305,
+     "extent": [
+      1.324,
+      1.587,
+      1.99
+     ]
+    }
+   },
+   "kael_backpedal@loop": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 5.841255187988281e-06,
+    "mesh": {
+     "min_z": 0.034,
+     "extent": [
+      1.948,
+      1.647,
+      1.972
+     ]
+    }
+   },
+   "kael_dash": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 4.5299530029296875e-06,
+    "mesh": {
+     "min_z": 0.1392,
+     "extent": [
+      2.307,
+      1.81,
+      1.602
+     ]
+    }
+   },
+   "kael_dash_recover": {
+    "frame": 7,
+    "frame_range": [
+     0.0,
+     14.0
+    ],
+    "max_bone_error": 3.874301910400391e-06,
+    "mesh": {
+     "min_z": -0.0023,
+     "extent": [
+      1.846,
+      1.683,
+      1.96
+     ]
+    }
+   },
+   "kael_fire_light": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.479,
+      1.432,
+      2.077
+     ]
+    }
+   },
+   "kael_fire_heavy": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0022,
+     "extent": [
+      1.59,
+      1.408,
+      2.032
+     ]
+    }
+   },
+   "kael_fire_charge@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 3.5762786865234375e-06,
+    "mesh": {
+     "min_z": -0.0021,
+     "extent": [
+      1.666,
+      1.492,
+      2.04
+     ]
+    }
+   },
+   "kael_hit_light": {
+    "frame": 6,
+    "frame_range": [
+     0.0,
+     12.0
+    ],
+    "max_bone_error": 3.7550926208496094e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.479,
+      1.595,
+      2.068
+     ]
+    }
+   },
+   "kael_hit_heavy": {
+    "frame": 13,
+    "frame_range": [
+     0.0,
+     26.0
+    ],
+    "max_bone_error": 5.304813385009766e-06,
+    "mesh": {
+     "min_z": -0.0024,
+     "extent": [
+      1.979,
+      1.643,
+      1.818
+     ]
+    }
+   },
+   "kael_knockdown": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 4.589557647705078e-06,
+    "mesh": {
+     "min_z": 0.0155,
+     "extent": [
+      2.398,
+      2.151,
+      0.682
+     ]
+    }
+   },
+   "kael_get_up": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 5.662441253662109e-06,
+    "mesh": {
+     "min_z": -0.0023,
+     "extent": [
+      2.561,
+      1.734,
+      1.315
+     ]
+    }
+   },
+   "kael_death": {
+    "frame": 24,
+    "frame_range": [
+     0.0,
+     48.0
+    ],
+    "max_bone_error": 4.470348358154297e-06,
+    "mesh": {
+     "min_z": -0.0114,
+     "extent": [
+      2.373,
+      1.728,
+      1.412
+     ]
+    }
+   },
+   "kael_downed@loop": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 4.470348358154297e-06,
+    "mesh": {
+     "min_z": 0.0055,
+     "extent": [
+      2.071,
+      1.434,
+      1.51
+     ]
+    }
+   },
+   "kael_revive": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 5.304813385009766e-06,
+    "mesh": {
+     "min_z": -0.0023,
+     "extent": [
+      1.672,
+      1.419,
+      1.937
+     ]
+    }
+   },
+   "kael_reforge_in": {
+    "frame": 22,
+    "frame_range": [
+     0.0,
+     45.0
+    ],
+    "max_bone_error": 3.5762786865234375e-06,
+    "mesh": {
+     "min_z": -0.0014,
+     "extent": [
+      1.531,
+      1.369,
+      1.996
+     ]
+    }
+   },
+   "kael_victory": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 3.516674041748047e-06,
+    "mesh": {
+     "min_z": -0.0021,
+     "extent": [
+      1.542,
+      0.994,
+      2.3
+     ]
+    }
+   },
+   "kael_ping": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.61,
+      1.558,
+      2.069
+     ]
+    }
+   },
+   "kael_interact": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 3.874301910400391e-06,
+    "mesh": {
+     "min_z": -0.0021,
+     "extent": [
+      1.794,
+      1.364,
+      1.879
+     ]
+    }
+   },
+   "kael_forge_hammer@loop": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0021,
+     "extent": [
+      1.931,
+      1.295,
+      1.968
+     ]
+    }
+   },
+   "kael_idle_signature@loop": {
+    "frame": 60,
+    "frame_range": [
+     0.0,
+     120.0
+    ],
+    "max_bone_error": 3.516674041748047e-06,
+    "mesh": {
+     "min_z": -0.001,
+     "extent": [
+      1.782,
+      1.359,
+      2.149
+     ]
+    }
+   },
+   "kael_fan_of_blades": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 3.5762786865234375e-06,
+    "mesh": {
+     "min_z": -0.002,
+     "extent": [
+      1.602,
+      1.13,
+      2.057
+     ]
+    }
+   },
+   "kael_shadow_roll": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 4.410743713378906e-06,
+    "mesh": {
+     "min_z": -0.0022,
+     "extent": [
+      2.009,
+      1.355,
+      1.612
+     ]
+    }
+   },
+   "kael_ghost_step": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 4.947185516357422e-06,
+    "mesh": {
+     "min_z": 0.0006,
+     "extent": [
+      1.702,
+      1.455,
+      1.736
+     ]
+    }
+   },
+   "kael_bullet_ballet_start": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 3.4570693969726562e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.718,
+      1.06,
+      2.076
+     ]
+    }
+   },
+   "kael_bullet_ballet@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0043,
+     "extent": [
+      1.672,
+      1.491,
+      2.03
+     ]
+    }
+   },
+   "kael_fire_twin": {
+    "frame": 5,
+    "frame_range": [
+     0.0,
+     10.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0043,
+     "extent": [
+      1.664,
+      1.498,
+      2.03
+     ]
+    }
+   },
+   "kael_fire_r": {
+    "frame": 3,
+    "frame_range": [
+     0.0,
+     6.0
+    ],
+    "max_bone_error": 3.635883331298828e-06,
+    "mesh": {
+     "min_z": -0.0019,
+     "extent": [
+      1.455,
+      1.445,
+      2.078
+     ]
+    }
+   }
+  },
+  "weapon": {
+   "file": "assets/models/weapons/serpent_smg.glb",
+   "objects": [
+    "glow_core",
+    "grip_R",
+    "muzzle",
+    "serpent_smg",
+    "serpent_smg_mesh"
+   ],
+   "offhand": false,
+   "root_is_identity": true,
+   "attach_rest_error": 1.4598929531928206e-07,
+   "variants": {
+    "fist": [],
+    "open": []
+   },
+   "fixed": {
+    "R": [
+     "serpent_smg_mesh"
+    ]
+   },
+   "attach_fire_heavy_f9_error": 5.960464477539062e-07
+  },
+  "review_renders": {
+   "dir": "art/characters/kael/work/renders/stage5",
+   "shots": [
+    {
+     "shot": "idle_combat_f000",
+     "clip": "kael_idle_combat@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "fire_heavy_f009",
+     "clip": "kael_fire_heavy",
+     "frame": 9,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "fan_of_blades_f008",
+     "clip": "kael_fan_of_blades",
+     "frame": 8,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "shadow_roll_f006",
+     "clip": "kael_shadow_roll",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "run_f006",
+     "clip": "kael_run@loop",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "bullet_ballet_f000",
+     "clip": "kael_bullet_ballet@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    },
+    {
+     "shot": "idle_signature_f070",
+     "clip": "kael_idle_signature@loop",
+     "frame": 70,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "serpent_smg_mesh"
+     }
+    }
+   ]
+  },
+  "errors": [],
+  "warnings": [],
+  "ok": true,
+  "seconds": 5.3
+ }
+}

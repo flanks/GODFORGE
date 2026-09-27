@@ -318,22 +318,247 @@
    "notes": "Production mesh made by the AI pipeline, not a stand-in (2026-09-27). The CC0 MakeHuman hm08 topology (MPFB as a tool only), a lean athletic macro, landmark-warped from MakeHuman's own proportions to 2.1 m: the concept's head, a lean shoulder, the blockout's arm line and wide A stance; knee / elbow / wrist loops, weapon attach frames at the palms. The body is the under-layer (skin, the fingerless glove, black shirt and trousers, and the emissive ghost flesh on his LEFT arm below the bicep strap, the same topology as the right arm). Built around it, all closed, 110 pieces with suggested bones: the violet duster (yoke and sleeves from the body's own quads, the left sleeve rolled up; a flared A-line skirt with a back vent and a torn hem; a high collar with two points; lapels; rolled cuffs), five emissive ghost-flame tatters on the hem for x_wisp chains, the scarf, the maroon loin cloth, belts with the oval buckle and the ghost gem, the bandolier with six cartridges, the holster on the right thigh, the pouch, straps and the bracer, tall buckled boots with pointed knee cuffs, the swept-back hair with a grey streak and a chin beard. Hands empty: serpent_smg (weapon track) rides the right hand frame in the review. One 2048 atlas: hand-painted NPR base colour from palette.json, an emissive map (ghost arm veins, eye and face veins, gem, tatters, the hem dissolving into ghost flame), a tangent normal map baked from the s202 blockout (hit-distance and tilt filtered). 24,114 triangles. Review sheets in reports/stage2/, findings and the stage-3 plan in reports/stage2_production_mesh.md. The remaining human gate is the user's visual approval (item user_visual_approval)."
   },
   "3_rig": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "GF_Hero_v1 + x_ chains for the coat, the loin cloth and the ghost-flame tatters."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s3_kael_run.py; no human artist",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision).",
+   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md, tools/blender/gf_hero/gf_hero_rig.py; never forked) + 48 per-hero x_ cloth chain bones",
+   "outputs": [
+    "art/characters/kael/production/kael_rig.blend (Git LFS)",
+    "art/characters/kael/work/kael_landmarks.json (committed, git add -f)",
+    "art/characters/kael/stage3_skin.json",
+    "art/characters/kael/reports/stage3/{landmarks,skin,gltf_check}.json",
+    "art/characters/kael/reports/stage3/stage3_rig.png",
+    "art/characters/kael/reports/stage3_5_report.md"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/s3_kael_run.py",
+    "tools/blender/gf_hero/s3_landmarks.py (shared, unchanged)",
+    "tools/blender/gf_hero/s3_kael_landmarks.py",
+    "tools/blender/gf_hero/s3_mh_seed.py (shared, unchanged)",
+    "tools/blender/gf_hero/s3_skin.py (shared, unchanged: its optional hook)",
+    "tools/blender/gf_hero/s3_kael_skin.py",
+    "tools/blender/gf_hero/s3_gltf_check.py (shared, unchanged)",
+    "tools/blender/gf_hero/s4_kael_review.py --stage3",
+    "tools/blender/gf_hero/kael_review_sheets.py stage3"
+   ],
+   "metrics": {
+    "bones": 111,
+    "bones_by_group": {
+     "core": 23,
+     "twist": 6,
+     "fingers": 30,
+     "sockets": 4,
+     "extras": 48
+    },
+    "cloth_chains": {
+     "x_coat": "6 x 4 (LF, LS, LB, RB, RS, RF; parent pelvis)",
+     "x_loin": "3 x 3 (parent pelvis)",
+     "x_wisp": "5 x 3 (parent the nearest coat column's last bone)"
+    },
+    "driven_helpers": 0,
+    "weighted_objects": 8,
+    "unweighted_vertices": 0,
+    "max_influences": 4,
+    "weight_sum_error_max": 2.220446049250313e-16,
+    "gltf_joints": 111,
+    "gltf_check_ok": true,
+    "weapon_identity_attach": "serpent_smg.glb (the shipped file) on weapon_R: 3.6e-7 m (reports/stage3/gltf_check.json)",
+    "check_poses": "8 baked stage-4 frames with the cloth pass (reports/stage3/stage3_rig.png)"
+   },
+   "notes": "GF_Hero_v1 on the stage-2 mesh. Landmarks from the stage-2 fit (shared s3_landmarks.py: Kael is an unarmoured MakeHuman hm08 body, so every joint, finger and hand frame stands as derived), finished by s3_kael_landmarks.py with his 48 x_ cloth bones placed on the mesh itself: six x_coat chains down the duster's skirt (joints on the skirt's mid-surface at each column's angle, the last at the column's hem), three x_loin chains on the loin cloth, one x_wisp chain on each ghost-flame tatter (hem to tip, parented to the nearest coat column's last bone). BODY weighted as Brax's (MakeHuman CC0 seed + bone heat + twist split + joint fixes, radii for his leaner limbs); the coat's yoke and lapels, the gear and the boots copy the body at the nearest body point (the yoke is the body's own quads pushed out, so it bends with the skin under it); cuffs, buckles, the gem and cartridges rigid; the collar and scarf rigid on spine_03 / neck; the skirt on the x_coat grid (columns blended by angle, the back pair split below the vent, the tucked top pinned to the body's own weights); the tatters take the coat's weights above the hem and their chain below. The serpent_smg GLB (the weapon track's shipped file) rides weapon_R as a PREVIEW by the identity attach (3.6e-7 m in glTF). No driven helpers: every x_ bone is a cloth chain the stage-4 cloth pass keys. The user's visual approval is the remaining gate.",
+   "items": {
+    "rig_and_skin": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/kael/production/kael_rig.blend",
+      "art/characters/kael/work/kael_landmarks.json"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made rig and weights (reports/stage3/stage3_rig.png, reports/stage3_5_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "4_animation": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "The 24 shared clips + his unique set (brief.md section 8)."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s4_kael_run.py; no animator, no Mixamo / ActorCore seeds",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision).",
+   "skeleton": "GF_Hero_v1 v1 + his 48 x_ cloth bones (docs/art/GF_HERO_SKELETON.md section 8: the clip library, naming and rules)",
+   "outputs": [
+    "art/characters/kael/production/kael_anim.blend (Git LFS)",
+    "art/characters/kael/reports/anim/clips.json",
+    "art/characters/kael/reports/anim/cloth.json",
+    "art/characters/kael/reports/anim/gltf_check.json",
+    "art/characters/kael/reports/anim/anim_board.png"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/s4_kael_run.py",
+    "tools/blender/gf_hero/s4_anim.py (shared, unchanged: its shared_clips / KEEPOUT hooks)",
+    "tools/blender/gf_hero/s4_kael.py",
+    "tools/blender/gf_hero/s4_kael_cloth.py + s3_kael_cloth.py (a copy of Valdris's cloth library)",
+    "tools/blender/gf_hero/s4_kael_review.py --stage4",
+    "tools/blender/gf_hero/kael_review_sheets.py stage4",
+    "tools/blender/gf_hero/s4_gltf_check.py (shared, unchanged)",
+    "tools/blender/gf_hero/required_clips.json (the kael block, additive)"
+   ],
+   "metrics": {
+    "clips": 32,
+    "shared_clips": 24,
+    "unique_clips": 8,
+    "loops": 12,
+    "fps": 30,
+    "frames_total": 1005,
+    "loop_seams_closed": 12,
+    "foot_slide_max_mm": 8.0,
+    "ik_miss_max_mm": 34.4,
+    "elbow_flexion_max_deg": 145.9,
+    "knee_flexion_max_deg": 150.0,
+    "wrist_swing_max_deg": 0.0,
+    "keepout_residual_verts_max": 25,
+    "ground_penetration_min_mm": 0.0,
+    "solver_vs_blender_max_error": 7.839767001846972e-07,
+    "design_speed_run_mps": 7.2,
+    "design_speed_walk_mps": 1.84,
+    "cloth_keyed_bones": 48,
+    "cloth_inside_max": {
+     "coat": 430,
+     "loin": 72,
+     "wisps": 112
+    },
+    "cloth_inside_max_standing_clips": {
+     "coat": 44,
+     "loin": 72,
+     "wisps": 11
+    },
+    "gltf_animations": 32
+   },
+   "notes": "Made by AI: the 24 shared GF_Hero_v1 clips (s4_clips.py's own timing, foot work, pelvis and spine, scaled to his 1.106 m leg and 0.786 m arm) with Kael's hand vocabulary in place of Brax's fists: the guard is the one-handed aim (the serpent_smg down the aim line at shoulder height, in hero space so the chest's bounce never swings the muzzle), the ghost hand hangs low and loose, the gun hand never opens; the brawler-specific clips re-posed (fire_light / fire_heavy / fire_charge: a snap shot, a braced two-handed shot with the ghost hand under the gun, a held two-handed charge; ping with the ghost hand; interact and forge_hammer with the ghost hand; reforge_in with the ghost fist planted and a gun flourish; death with the gun arm flung clear), the side runs and backpedal on shorter cycles for his 7.2 m/s. His 8 kit clips (brief section 8): idle_signature@loop (the gun flourish, the ghost hand), fan_of_blades (upper layer: the ghost hand fans across the gun, 'burst'), shadow_roll (a real 360-degree forward roll, 'roll' / 'land'), ghost_step (the refreshed dash), bullet_ballet_start ('twin') and bullet_ballet@loop, fire_twin (upper layer over bullet_ballet@loop, 'shot_r' / 'shot_l'), fire_r (the rapid shot). The cloth pass keys the coat, loin and tatter chains in every clip (lagged hang under the apparent gravity, drag, draped over the legs, boots, holster and the low-held gun, cleared out of the body, smoothed; the tatters on the coat's solved chains). Every clip is inside the check_clips gates (read from clips.json). Findings in reports/stage3_5_report.md.",
+   "items": {
+    "shared_clip_set": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_kael.py (shared_clips)"
+     ]
+    },
+    "kael_unique_clips": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_kael.py (unique_clips)"
+     ],
+     "notes": "8 clips: idle_signature@loop, fan_of_blades, shadow_roll, ghost_step, bullet_ballet_start, bullet_ballet@loop, fire_twin, fire_r"
+    },
+    "cloth_pass": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_kael_cloth.py",
+      "art/characters/kael/reports/anim/cloth.json"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the AI-made clips (reports/anim/anim_board.png, reports/stage3_5_report.md). Record it with approved_by / approved_on on this item."
+    }
+   }
   },
   "5_export_validate": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "assets/models/characters/kael.glb + kael.meta.json."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the shared headless Blender 5.2 chain tools/blender/gf_hero/run_stage5.py (export, reimport, sheet); no human step",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision).",
+   "outputs": [
+    "assets/models/characters/kael.glb (Git LFS)",
+    "assets/models/characters/kael.meta.json",
+    "art/characters/kael/reports/export_report.json",
+    "art/characters/kael/reports/stage5/export_review.png"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage5.py (shared, unchanged; the weapon step skips: the weapon track built serpent_smg)",
+    "tools/blender/gf_hero/export_glb.py (shared, unchanged)",
+    "tools/blender/gf_hero/smoke_import.py (shared, unchanged) + its hook tools/blender/gf_hero/s5_kael.py",
+    "tools/blender/gf_hero/s5_sheets.py (shared, unchanged)",
+    "tools/blender/gf_hero/s5_kael.py --sidecar (the sidecar's weapon wording for a hand-held gun)",
+    "tools/blender/gf_hero/required_clips.json (the kael block)"
+   ],
+   "metrics": {
+    "glb_bytes": 13758644,
+    "glb_sha256": "0c21e752b8d9562a29b0442696e4e25ff0407f21ed839d96f91acaf68fe45ef9",
+    "tris": 24114,
+    "tris_budget": [
+     15000,
+     25000
+    ],
+    "joints": 111,
+    "extra_bones": 48,
+    "meshes": 1,
+    "materials": 1,
+    "double_sided": false,
+    "textures_px": {
+     "emissive": 2048,
+     "normal": 2048,
+     "base_color": 2048
+    },
+    "clips": 32,
+    "required_clips_missing": 0,
+    "extensions_required": [],
+    "extensions_used": [
+     "KHR_materials_emissive_strength"
+    ],
+    "bind_pose_max_error": 1.489213171804151e-06,
+    "source_fidelity_max_error": 1.7686038526920633e-05,
+    "blender_reimport_clip_pose_max_error": 5.9604644775390625e-06,
+    "blender_reimport_clips_played": 32,
+    "weapon_attach_rest_error": 1.4598929531928206e-07,
+    "weapon_follow_fire_heavy_f9_error": 5.960464477539062e-07,
+    "height_m": 2.1582,
+    "validation_errors": 0,
+    "validation_warnings": [],
+    "weapon_glb": "assets/models/weapons/serpent_smg.glb (weapon track, not re-exported)",
+    "weapon_glb_sha256": "15da15d720de5410b412b719938ea3f350b7b405e10134471fb96010b820ad7a"
+   },
+   "notes": "kael.glb: glTF binary, +Y up, faces +Z, uncompressed, GF_Hero_v1 (63 contract joints incl. the 4 sockets) + his 48 x_ cloth bones = 111 joints, ONE skinned mesh kael_mesh (the 8 parts joined; every part closed, so M_kael is single-sided) with 2048 base colour / emissive / normal PNGs and tangents, no vertex colours, 32 clips named kael_<clip>[@loop] at 30 fps with the cloth chains keyed. The export's own gate (validate_glb + source fidelity) and the fresh-Blender re-import (every clip one frame, the serpent_smg GLB on the imported weapon_R, followed through fire_heavy f9): 0 errors, 0 warnings. The sidecar kael.meta.json carries the clip events, design speeds, sockets, clip_info.kael_fire_twin.base = kael_bullet_ballet@loop and status ai_final_pending_user_approval; its weapon texts are set for a hand-held gun by s5_kael.py --sidecar (export_glb.py words any weapon without an offhand node as a sleeve weapon). The Bevy-side import test comes with the engine integration.",
+   "items": {
+    "glb_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "assets/models/characters/kael.glb",
+      "assets/models/characters/kael.meta.json"
+     ]
+    },
+    "blender_reimport_smoke_test": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/kael/reports/stage5/export_review.png"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the shipped hero. Record it with approved_by / approved_on on this item."
+    }
+   }
   }
  },
  "human_gates": [

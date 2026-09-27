@@ -1,0 +1,443 @@
+{
+ "hero": "kael",
+ "refinement": {
+  "wrist_L": {
+   "joint": [
+    0.89,
+    0.0,
+    1.695
+   ],
+   "ring_centroid_reported_only": [
+    0.89,
+    0.0051,
+    1.6838
+   ],
+   "ring_verts": 7,
+   "offset_m": 0.0123
+  },
+  "wrist_R": {
+   "joint": [
+    -0.89,
+    0.0,
+    1.695
+   ],
+   "ring_centroid_reported_only": [
+    -0.89,
+    0.0051,
+    1.6838
+   ],
+   "ring_verts": 7,
+   "offset_m": 0.0123
+  },
+  "thumb_L_01": {
+   "moved_m": 0.0
+  },
+  "thumb_L_02": {
+   "moved_m": 0.0091
+  },
+  "thumb_L_03": {
+   "moved_m": 0.0045
+  },
+  "thumb_L_tip": {
+   "moved_m": 0.0013
+  },
+  "thumb_L_radius_m": 0.0119,
+  "index_L_01": {
+   "moved_m": 0.0
+  },
+  "index_L_02": {
+   "moved_m": 0.0053
+  },
+  "index_L_03": {
+   "moved_m": 0.0017
+  },
+  "index_L_tip": {
+   "moved_m": 0.0034
+  },
+  "index_L_radius_m": 0.0096,
+  "middle_L_01": {
+   "moved_m": 0.0
+  },
+  "middle_L_02": {
+   "moved_m": 0.0037
+  },
+  "middle_L_03": {
+   "moved_m": 0.0045
+  },
+  "middle_L_tip": {
+   "moved_m": 0.0047
+  },
+  "middle_L_radius_m": 0.0099,
+  "ring_L_01": {
+   "moved_m": 0.0
+  },
+  "ring_L_02": {
+   "moved_m": 0.0039
+  },
+  "ring_L_03": {
+   "moved_m": 0.0021
+  },
+  "ring_L_tip": {
+   "moved_m": 0.0033
+  },
+  "ring_L_radius_m": 0.0091,
+  "pinky_L_01": {
+   "moved_m": 0.0
+  },
+  "pinky_L_02": {
+   "moved_m": 0.0043
+  },
+  "pinky_L_03": {
+   "moved_m": 0.0024
+  },
+  "pinky_L_tip": {
+   "moved_m": 0.0019
+  },
+  "pinky_L_radius_m": 0.008,
+  "thumb_R_01": {
+   "moved_m": 0.0
+  },
+  "thumb_R_02": {
+   "moved_m": 0.0091
+  },
+  "thumb_R_03": {
+   "moved_m": 0.0045
+  },
+  "thumb_R_tip": {
+   "moved_m": 0.0013
+  },
+  "thumb_R_radius_m": 0.0119,
+  "index_R_01": {
+   "moved_m": 0.0
+  },
+  "index_R_02": {
+   "moved_m": 0.0053
+  },
+  "index_R_03": {
+   "moved_m": 0.0017
+  },
+  "index_R_tip": {
+   "moved_m": 0.0034
+  },
+  "index_R_radius_m": 0.0096,
+  "middle_R_01": {
+   "moved_m": 0.0
+  },
+  "middle_R_02": {
+   "moved_m": 0.0037
+  },
+  "middle_R_03": {
+   "moved_m": 0.0045
+  },
+  "middle_R_tip": {
+   "moved_m": 0.0047
+  },
+  "middle_R_radius_m": 0.0099,
+  "ring_R_01": {
+   "moved_m": 0.0
+  },
+  "ring_R_02": {
+   "moved_m": 0.0039
+  },
+  "ring_R_03": {
+   "moved_m": 0.0021
+  },
+  "ring_R_tip": {
+   "moved_m": 0.0033
+  },
+  "ring_R_radius_m": 0.0091,
+  "pinky_R_01": {
+   "moved_m": 0.0
+  },
+  "pinky_R_02": {
+   "moved_m": 0.0043
+  },
+  "pinky_R_03": {
+   "moved_m": 0.0024
+  },
+  "pinky_R_tip": {
+   "moved_m": 0.0019
+  },
+  "pinky_R_radius_m": 0.008
+ },
+ "tps_joint_delta_m": {
+  "root": 0.0,
+  "root_tip": 0.0,
+  "pelvis": 0.0,
+  "spine_01": 0.0,
+  "spine_02": 0.0,
+  "spine_03": 0.0,
+  "neck": 0.0,
+  "head": 0.0,
+  "head_tip": 0.0,
+  "clavicle_L": 0.0,
+  "shoulder_L": 0.0,
+  "elbow_L": 0.0,
+  "wrist_L": 0.0,
+  "hip_L": 0.0,
+  "knee_L": 0.0,
+  "ankle_L": 0.0,
+  "ball_L": 0.0,
+  "toe_L_tip": 0.0,
+  "thumb_L_01": 0.0,
+  "thumb_L_02": 0.0091,
+  "thumb_L_03": 0.0045,
+  "thumb_L_tip": 0.0013,
+  "index_L_01": 0.0,
+  "index_L_02": 0.0053,
+  "index_L_03": 0.0017,
+  "index_L_tip": 0.0034,
+  "middle_L_01": 0.0,
+  "middle_L_02": 0.0037,
+  "middle_L_03": 0.0045,
+  "middle_L_tip": 0.0047,
+  "ring_L_01": 0.0,
+  "ring_L_02": 0.0039,
+  "ring_L_03": 0.0021,
+  "ring_L_tip": 0.0033,
+  "pinky_L_01": 0.0,
+  "pinky_L_02": 0.0043,
+  "pinky_L_03": 0.0024,
+  "pinky_L_tip": 0.0019,
+  "clavicle_R": 0.0,
+  "shoulder_R": 0.0,
+  "elbow_R": 0.0,
+  "wrist_R": 0.0,
+  "hip_R": 0.0,
+  "knee_R": 0.0,
+  "ankle_R": 0.0,
+  "ball_R": 0.0,
+  "toe_R_tip": 0.0,
+  "thumb_R_01": 0.0,
+  "thumb_R_02": 0.0091,
+  "thumb_R_03": 0.0045,
+  "thumb_R_tip": 0.0013,
+  "index_R_01": 0.0,
+  "index_R_02": 0.0053,
+  "index_R_03": 0.0017,
+  "index_R_tip": 0.0034,
+  "middle_R_01": 0.0,
+  "middle_R_02": 0.0037,
+  "middle_R_03": 0.0045,
+  "middle_R_tip": 0.0047,
+  "ring_R_01": 0.0,
+  "ring_R_02": 0.0039,
+  "ring_R_03": 0.0021,
+  "ring_R_tip": 0.0033,
+  "pinky_R_01": 0.0,
+  "pinky_R_02": 0.0043,
+  "pinky_R_03": 0.0024,
+  "pinky_R_tip": 0.0019
+ },
+ "core_bone_lengths_m": {
+  "root": 0.25,
+  "pelvis": 0.0959,
+  "spine_01": 0.0758,
+  "spine_02": 0.0802,
+  "spine_03": 0.3901,
+  "neck": 0.1095,
+  "head": 0.151,
+  "clavicle_L": 0.1928,
+  "upperarm_L": 0.35,
+  "lowerarm_L": 0.325,
+  "hand_L": 0.1112,
+  "clavicle_R": 0.1928,
+  "upperarm_R": 0.35,
+  "lowerarm_R": 0.325,
+  "hand_R": 0.1112,
+  "thigh_L": 0.606,
+  "shin_L": 0.5002,
+  "foot_L": 0.1719,
+  "toe_L": 0.0814,
+  "thigh_R": 0.606,
+  "shin_R": 0.5002,
+  "foot_R": 0.1719,
+  "toe_R": 0.0814
+ },
+ "sockets": {
+  "weapon_L": {
+   "origin": [
+    0.9656,
+    -0.00048,
+    1.68288
+   ],
+   "forward": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "up": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "source": "reports/stage2/body_fit.json hand_frames.L (the weapon authoring frame)"
+  },
+  "weapon_R": {
+   "origin": [
+    -0.9656,
+    -0.00048,
+    1.68288
+   ],
+   "forward": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "up": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "source": "reports/stage2/body_fit.json hand_frames.R (the weapon authoring frame)"
+  },
+  "head_top": {
+   "origin": [
+    0.0,
+    0.002,
+    2.15825
+   ],
+   "forward": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "up": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "source": "top of HAIR/BODY/BEARD above the head joint"
+  },
+  "chest_sigil": {
+   "origin": [
+    0.0,
+    -0.10668,
+    1.659
+   ],
+   "forward": [
+    0.0,
+    -0.95718,
+    0.28951
+   ],
+   "up": [
+    0.0,
+    0.28951,
+    0.95718
+   ],
+   "source": "BODY surface at x = 0, z = 1.659 (stage2_texture.json paint.sigil.centre_z)"
+  }
+ },
+ "height_m": 2.076,
+ "kael": {
+  "generated_by": "tools/blender/gf_hero/s3_kael_landmarks.py (after the shared s3_landmarks.py)",
+  "coat": {
+   "LF": {
+    "theta_deg": 72.0,
+    "hem_z": 0.4012,
+    "radius_m": [
+     0.1856,
+     0.263,
+     0.3499,
+     0.4099,
+     0.4905
+    ]
+   },
+   "LS": {
+    "theta_deg": 112.0,
+    "hem_z": 0.36,
+    "radius_m": [
+     0.1189,
+     0.27,
+     0.3503,
+     0.4426,
+     0.5668
+    ]
+   },
+   "LB": {
+    "theta_deg": 152.0,
+    "hem_z": 0.36,
+    "radius_m": [
+     0.0807,
+     0.2182,
+     0.2844,
+     0.3514,
+     0.4693
+    ]
+   },
+   "RB": {
+    "theta_deg": 208.0,
+    "hem_z": 0.36,
+    "radius_m": [
+     0.0808,
+     0.2152,
+     0.2788,
+     0.3449,
+     0.4754
+    ]
+   },
+   "RS": {
+    "theta_deg": 248.0,
+    "hem_z": 0.36,
+    "radius_m": [
+     0.1189,
+     0.2692,
+     0.3488,
+     0.423,
+     0.5622
+    ]
+   },
+   "RF": {
+    "theta_deg": 288.0,
+    "hem_z": 0.36,
+    "radius_m": [
+     0.1857,
+     0.2679,
+     0.3453,
+     0.4157,
+     0.5069
+    ]
+   }
+  },
+  "wisps": {
+   "WISP_1": {
+    "theta_deg": 59.1,
+    "hem_z": 0.4926,
+    "tip_z": 0.2975,
+    "parent_column": "LF"
+   },
+   "WISP_2": {
+    "theta_deg": 83.3,
+    "hem_z": 0.329,
+    "tip_z": 0.1728,
+    "parent_column": "LF"
+   },
+   "WISP_3": {
+    "theta_deg": 301.8,
+    "hem_z": 0.4807,
+    "tip_z": 0.2728,
+    "parent_column": "RF"
+   },
+   "WISP_4": {
+    "theta_deg": 277.4,
+    "hem_z": 0.3987,
+    "tip_z": 0.2454,
+    "parent_column": "RF"
+   },
+   "WISP_5": {
+    "theta_deg": 204.7,
+    "hem_z": 0.3683,
+    "tip_z": 0.1896,
+    "parent_column": "RB"
+   }
+  },
+  "extra_bones": {
+   "count": 48,
+   "chains": {
+    "coat": "6 x 4",
+    "loin": "3 x 3",
+    "wisps": "5 x 3"
+   }
+  }
+ }
+}

@@ -53,6 +53,16 @@
    {"clip": "mountainfall", "loop": true, "layer": "full", "kit": "ultimate Mountainfall (avatar stance while it lasts)"},
    {"clip": "mountainfall_pound", "loop": false, "layer": "upper", "kit": "ultimate Mountainfall ground pound every 1.1 s (over mountainfall)"},
    {"clip": "armor_break", "loop": false, "layer": "upper", "kit": "passive Reforged Flesh (Armor breaks: shockwave + taunt)"}
+  ],
+  "kael": [
+   {"clip": "idle_signature", "loop": true, "layer": "full", "kit": "signature idle (the gun flourish, the ghost hand)"},
+   {"clip": "fan_of_blades", "loop": false, "layer": "upper", "kit": "active1 Fan of Blades (spectral cone burst, Mark)"},
+   {"clip": "shadow_roll", "loop": false, "layer": "full", "kit": "active2 Shadow Roll (the roll with i-frames, recovery)"},
+   {"clip": "ghost_step", "loop": false, "layer": "full", "kit": "passive Ghost Step (the refreshed dash)"},
+   {"clip": "bullet_ballet_start", "loop": false, "layer": "full", "kit": "ultimate Bullet Ballet (cast: the spectral twin forms)"},
+   {"clip": "bullet_ballet", "loop": true, "layer": "full", "kit": "ultimate Bullet Ballet (twin-pistol stance while it lasts)"},
+   {"clip": "fire_twin", "loop": false, "layer": "upper", "kit": "Bullet Ballet twin shot (over bullet_ballet)"},
+   {"clip": "fire_r", "loop": false, "layer": "upper", "kit": "serpent_smg rapid shot"}
   ]
  }
 }

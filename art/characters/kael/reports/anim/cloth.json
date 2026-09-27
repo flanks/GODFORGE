@@ -1,0 +1,1044 @@
+{
+ "hero": "kael",
+ "doc": "blender -b -P tools/blender/gf_hero/s4_kael_cloth.py -- [--only clip,clip]",
+ "groups": {
+  "coat": {
+   "chains": [
+    [
+     "x_coat_LF_01",
+     "x_coat_LF_02",
+     "x_coat_LF_03",
+     "x_coat_LF_04"
+    ],
+    [
+     "x_coat_LS_01",
+     "x_coat_LS_02",
+     "x_coat_LS_03",
+     "x_coat_LS_04"
+    ],
+    [
+     "x_coat_LB_01",
+     "x_coat_LB_02",
+     "x_coat_LB_03",
+     "x_coat_LB_04"
+    ],
+    [
+     "x_coat_RB_01",
+     "x_coat_RB_02",
+     "x_coat_RB_03",
+     "x_coat_RB_04"
+    ],
+    [
+     "x_coat_RS_01",
+     "x_coat_RS_02",
+     "x_coat_RS_03",
+     "x_coat_RS_04"
+    ],
+    [
+     "x_coat_RF_01",
+     "x_coat_RF_02",
+     "x_coat_RF_03",
+     "x_coat_RF_04"
+    ]
+   ],
+   "dynamics": {
+    "f": [
+     1.9,
+     1.3
+    ],
+    "zeta": 0.55,
+    "drag": 1.0,
+    "acc": 0.5,
+    "cone": 50.0
+   }
+  },
+  "loin": {
+   "chains": [
+    [
+     "x_loin_R_01",
+     "x_loin_R_02",
+     "x_loin_R_03"
+    ],
+    [
+     "x_loin_C_01",
+     "x_loin_C_02",
+     "x_loin_C_03"
+    ],
+    [
+     "x_loin_L_01",
+     "x_loin_L_02",
+     "x_loin_L_03"
+    ]
+   ],
+   "dynamics": {
+    "f": [
+     3.0,
+     2.0
+    ],
+    "zeta": 0.6,
+    "drag": 0.8,
+    "acc": 0.5,
+    "cone": 45.0
+   }
+  },
+  "wisps": {
+   "chains": [
+    [
+     "x_wisp_1_01",
+     "x_wisp_1_02",
+     "x_wisp_1_03"
+    ],
+    [
+     "x_wisp_2_01",
+     "x_wisp_2_02",
+     "x_wisp_2_03"
+    ],
+    [
+     "x_wisp_3_01",
+     "x_wisp_3_02",
+     "x_wisp_3_03"
+    ],
+    [
+     "x_wisp_4_01",
+     "x_wisp_4_02",
+     "x_wisp_4_03"
+    ],
+    [
+     "x_wisp_5_01",
+     "x_wisp_5_02",
+     "x_wisp_5_03"
+    ]
+   ],
+   "dynamics": {
+    "f": [
+     3.2,
+     3.2
+    ],
+    "zeta": 0.45,
+    "drag": 1.1,
+    "acc": 0.6,
+    "cone": 60.0
+   }
+  }
+ },
+ "roll_gravity": {
+  "shadow_roll": 0.35
+ },
+ "clips": {
+  "idle": {
+   "action": "kael_idle@loop",
+   "frames": 90,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 11,
+     "deepest_mm": 58.3,
+     "frames_with_contact": 91,
+     "accel_max_deg_per_frame2": 4.97
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.9,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.05
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 13.34
+    }
+   },
+   "seconds": 16.2
+  },
+  "idle_combat": {
+   "action": "kael_idle_combat@loop",
+   "frames": 32,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 9.1,
+     "frames_with_contact": 17,
+     "accel_max_deg_per_frame2": 3.54
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.9,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 2.98
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 12.07
+    }
+   },
+   "seconds": 3.4
+  },
+  "walk": {
+   "action": "kael_walk@loop",
+   "frames": 28,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 57.6,
+     "frames_with_contact": 22,
+     "accel_max_deg_per_frame2": 6.72
+    },
+    "loin": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 132.8,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 10.63
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 12.02
+    }
+   },
+   "seconds": 5.4
+  },
+  "run": {
+   "action": "kael_run@loop",
+   "frames": 20,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 12,
+     "deepest_mm": 108.4,
+     "frames_with_contact": 14,
+     "accel_max_deg_per_frame2": 13.41
+    },
+    "loin": {
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 137.3,
+     "frames_with_contact": 15,
+     "accel_max_deg_per_frame2": 7.86
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 10.22
+    }
+   },
+   "seconds": 2.9
+  },
+  "strafe_left": {
+   "action": "kael_strafe_left@loop",
+   "frames": 18,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 7.2,
+     "frames_with_contact": 3,
+     "accel_max_deg_per_frame2": 10.72
+    },
+    "loin": {
+     "inside_gt3mm_max": 46,
+     "deepest_mm": 123.7,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 19.74
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 11.14
+    }
+   },
+   "seconds": 1.8
+  },
+  "strafe_right": {
+   "action": "kael_strafe_right@loop",
+   "frames": 18,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 376.2,
+     "frames_with_contact": 11,
+     "accel_max_deg_per_frame2": 8.23
+    },
+    "loin": {
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 150.7,
+     "frames_with_contact": 7,
+     "accel_max_deg_per_frame2": 14.71
+    },
+    "wisps": {
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 481.7,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 28.2
+    }
+   },
+   "seconds": 2.4
+  },
+  "backpedal": {
+   "action": "kael_backpedal@loop",
+   "frames": 16,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 248.0,
+     "frames_with_contact": 17,
+     "accel_max_deg_per_frame2": 5.95
+    },
+    "loin": {
+     "inside_gt3mm_max": 12,
+     "deepest_mm": 109.8,
+     "frames_with_contact": 13,
+     "accel_max_deg_per_frame2": 5.85
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 11.44
+    }
+   },
+   "seconds": 2.8
+  },
+  "dash": {
+   "action": "kael_dash",
+   "frames": 8,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 8,
+     "deepest_mm": 87.5,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 11.35
+    },
+    "loin": {
+     "inside_gt3mm_max": 72,
+     "deepest_mm": 173.2,
+     "frames_with_contact": 9,
+     "accel_max_deg_per_frame2": 5.4
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 33.38
+    }
+   },
+   "seconds": 1.9
+  },
+  "dash_recover": {
+   "action": "kael_dash_recover",
+   "frames": 14,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 44,
+     "deepest_mm": 109.2,
+     "frames_with_contact": 8,
+     "accel_max_deg_per_frame2": 13.37
+    },
+    "loin": {
+     "inside_gt3mm_max": 64,
+     "deepest_mm": 108.9,
+     "frames_with_contact": 7,
+     "accel_max_deg_per_frame2": 8.96
+    },
+    "wisps": {
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 19.9,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 14.96
+    }
+   },
+   "seconds": 2.0
+  },
+  "fire_light": {
+   "action": "kael_fire_light",
+   "frames": 8,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 20.4,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 5.19
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.23
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 21.59
+    }
+   },
+   "seconds": 1.2
+  },
+  "fire_heavy": {
+   "action": "kael_fire_heavy",
+   "frames": 16,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 2.9,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 2.54
+    },
+    "loin": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 59.5,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 3.4
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 16.07
+    }
+   },
+   "seconds": 2.0
+  },
+  "fire_charge": {
+   "action": "kael_fire_charge@loop",
+   "frames": 24,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.05
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.0
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.15
+    }
+   },
+   "seconds": 1.9
+  },
+  "hit_light": {
+   "action": "kael_hit_light",
+   "frames": 12,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 7.6,
+     "frames_with_contact": 4,
+     "accel_max_deg_per_frame2": 2.59
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 6.35
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 17.56
+    }
+   },
+   "seconds": 1.7
+  },
+  "hit_heavy": {
+   "action": "kael_hit_heavy",
+   "frames": 26,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 64.6,
+     "frames_with_contact": 11,
+     "accel_max_deg_per_frame2": 4.6
+    },
+    "loin": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 33.6,
+     "frames_with_contact": 2,
+     "accel_max_deg_per_frame2": 5.95
+    },
+    "wisps": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 4.3,
+     "frames_with_contact": 2,
+     "accel_max_deg_per_frame2": 30.89
+    }
+   },
+   "seconds": 2.9
+  },
+  "knockdown": {
+   "action": "kael_knockdown",
+   "frames": 30,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 73,
+     "deepest_mm": 120.9,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 165.2
+    },
+    "loin": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 22.0,
+     "frames_with_contact": 4,
+     "accel_max_deg_per_frame2": 127.13
+    },
+    "wisps": {
+     "inside_gt3mm_max": 16,
+     "deepest_mm": 34.3,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 206.36
+    }
+   },
+   "seconds": 4.6
+  },
+  "get_up": {
+   "action": "kael_get_up",
+   "frames": 36,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 430,
+     "deepest_mm": 390.5,
+     "frames_with_contact": 35,
+     "accel_max_deg_per_frame2": 40.58
+    },
+    "loin": {
+     "inside_gt3mm_max": 17,
+     "deepest_mm": 138.5,
+     "frames_with_contact": 25,
+     "accel_max_deg_per_frame2": 180.75
+    },
+    "wisps": {
+     "inside_gt3mm_max": 112,
+     "deepest_mm": 264.5,
+     "frames_with_contact": 12,
+     "accel_max_deg_per_frame2": 226.58
+    }
+   },
+   "seconds": 7.1
+  },
+  "death": {
+   "action": "kael_death",
+   "frames": 48,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 21,
+     "deepest_mm": 120.5,
+     "frames_with_contact": 28,
+     "accel_max_deg_per_frame2": 20.19
+    },
+    "loin": {
+     "inside_gt3mm_max": 33,
+     "deepest_mm": 104.2,
+     "frames_with_contact": 34,
+     "accel_max_deg_per_frame2": 176.75
+    },
+    "wisps": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 6.0,
+     "frames_with_contact": 2,
+     "accel_max_deg_per_frame2": 187.85
+    }
+   },
+   "seconds": 7.9
+  },
+  "downed": {
+   "action": "kael_downed@loop",
+   "frames": 60,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 40,
+     "deepest_mm": 122.6,
+     "frames_with_contact": 61,
+     "accel_max_deg_per_frame2": 9.89
+    },
+    "loin": {
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 36.2,
+     "frames_with_contact": 7,
+     "accel_max_deg_per_frame2": 8.29
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 18.88
+    }
+   },
+   "seconds": 11.9
+  },
+  "revive": {
+   "action": "kael_revive",
+   "frames": 40,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 12,
+     "deepest_mm": 272.5,
+     "frames_with_contact": 22,
+     "accel_max_deg_per_frame2": 8.39
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 7.42
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 31.0
+    }
+   },
+   "seconds": 5.6
+  },
+  "reforge_in": {
+   "action": "kael_reforge_in",
+   "frames": 45,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 14,
+     "deepest_mm": 289.8,
+     "frames_with_contact": 30,
+     "accel_max_deg_per_frame2": 23.25
+    },
+    "loin": {
+     "inside_gt3mm_max": 57,
+     "deepest_mm": 150.2,
+     "frames_with_contact": 27,
+     "accel_max_deg_per_frame2": 33.45
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 2.4,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 76.97
+    }
+   },
+   "seconds": 7.3
+  },
+  "victory": {
+   "action": "kael_victory",
+   "frames": 60,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 8.9,
+     "frames_with_contact": 14,
+     "accel_max_deg_per_frame2": 1.89
+    },
+    "loin": {
+     "inside_gt3mm_max": 2,
+     "deepest_mm": 30.1,
+     "frames_with_contact": 7,
+     "accel_max_deg_per_frame2": 4.07
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 11.88
+    }
+   },
+   "seconds": 6.0
+  },
+  "ping": {
+   "action": "kael_ping",
+   "frames": 20,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 3,
+     "deepest_mm": 5.6,
+     "frames_with_contact": 2,
+     "accel_max_deg_per_frame2": 3.04
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.0
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 13.88
+    }
+   },
+   "seconds": 2.3
+  },
+  "interact": {
+   "action": "kael_interact",
+   "frames": 40,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 7,
+     "deepest_mm": 34.2,
+     "frames_with_contact": 37,
+     "accel_max_deg_per_frame2": 4.9
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 6.33
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 10.71
+    }
+   },
+   "seconds": 6.7
+  },
+  "forge_hammer": {
+   "action": "kael_forge_hammer@loop",
+   "frames": 36,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 61.6,
+     "frames_with_contact": 37,
+     "accel_max_deg_per_frame2": 12.73
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 1.63
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 13.9
+    }
+   },
+   "seconds": 6.3
+  },
+  "idle_signature": {
+   "action": "kael_idle_signature@loop",
+   "frames": 120,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 14,
+     "deepest_mm": 76.1,
+     "frames_with_contact": 70,
+     "accel_max_deg_per_frame2": 5.58
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.1,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.06
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 11.07
+    }
+   },
+   "seconds": 16.1
+  },
+  "fan_of_blades": {
+   "action": "kael_fan_of_blades",
+   "frames": 30,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 4,
+     "deepest_mm": 63.0,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 19.52
+    },
+    "loin": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 3.5,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 1.88
+    },
+    "wisps": {
+     "inside_gt3mm_max": 11,
+     "deepest_mm": 8.7,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 18.34
+    }
+   },
+   "seconds": 4.9
+  },
+  "shadow_roll": {
+   "action": "kael_shadow_roll",
+   "frames": 24,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 34,
+     "deepest_mm": 106.6,
+     "frames_with_contact": 20,
+     "accel_max_deg_per_frame2": 109.36
+    },
+    "loin": {
+     "inside_gt3mm_max": 20,
+     "deepest_mm": 66.6,
+     "frames_with_contact": 6,
+     "accel_max_deg_per_frame2": 67.59
+    },
+    "wisps": {
+     "inside_gt3mm_max": 18,
+     "deepest_mm": 50.1,
+     "frames_with_contact": 5,
+     "accel_max_deg_per_frame2": 81.22
+    }
+   },
+   "seconds": 3.2
+  },
+  "ghost_step": {
+   "action": "kael_ghost_step",
+   "frames": 16,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 28,
+     "deepest_mm": 227.3,
+     "frames_with_contact": 15,
+     "accel_max_deg_per_frame2": 9.05
+    },
+    "loin": {
+     "inside_gt3mm_max": 9,
+     "deepest_mm": 124.1,
+     "frames_with_contact": 8,
+     "accel_max_deg_per_frame2": 11.41
+    },
+    "wisps": {
+     "inside_gt3mm_max": 6,
+     "deepest_mm": 19.9,
+     "frames_with_contact": 3,
+     "accel_max_deg_per_frame2": 169.53
+    }
+   },
+   "seconds": 2.9
+  },
+  "bullet_ballet_start": {
+   "action": "kael_bullet_ballet_start",
+   "frames": 30,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 5,
+     "deepest_mm": 48.0,
+     "frames_with_contact": 5,
+     "accel_max_deg_per_frame2": 3.5
+    },
+    "loin": {
+     "inside_gt3mm_max": 1,
+     "deepest_mm": 30.7,
+     "frames_with_contact": 1,
+     "accel_max_deg_per_frame2": 3.82
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 26.79
+    }
+   },
+   "seconds": 3.0
+  },
+  "bullet_ballet": {
+   "action": "kael_bullet_ballet@loop",
+   "frames": 24,
+   "loop": true,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.93
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 1.53
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 8.87
+    }
+   },
+   "seconds": 2.2
+  },
+  "fire_twin": {
+   "action": "kael_fire_twin",
+   "frames": 10,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 1.18
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.0
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 7.99
+    }
+   },
+   "seconds": 1.2
+  },
+  "fire_r": {
+   "action": "kael_fire_r",
+   "frames": 6,
+   "loop": false,
+   "keyed_bones": 48,
+   "groups": {
+    "coat": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 1.2,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 2.7
+    },
+    "loin": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 0.0
+    },
+    "wisps": {
+     "inside_gt3mm_max": 0,
+     "deepest_mm": 0.0,
+     "frames_with_contact": 0,
+     "accel_max_deg_per_frame2": 15.71
+    }
+   },
+   "seconds": 0.9
+  }
+ },
+ "cloth_keyed_bones": [
+  "x_coat_LF_01",
+  "x_coat_LF_02",
+  "x_coat_LF_03",
+  "x_coat_LF_04",
+  "x_coat_LS_01",
+  "x_coat_LS_02",
+  "x_coat_LS_03",
+  "x_coat_LS_04",
+  "x_coat_LB_01",
+  "x_coat_LB_02",
+  "x_coat_LB_03",
+  "x_coat_LB_04",
+  "x_coat_RB_01",
+  "x_coat_RB_02",
+  "x_coat_RB_03",
+  "x_coat_RB_04",
+  "x_coat_RS_01",
+  "x_coat_RS_02",
+  "x_coat_RS_03",
+  "x_coat_RS_04",
+  "x_coat_RF_01",
+  "x_coat_RF_02",
+  "x_coat_RF_03",
+  "x_coat_RF_04",
+  "x_loin_R_01",
+  "x_loin_R_02",
+  "x_loin_R_03",
+  "x_loin_C_01",
+  "x_loin_C_02",
+  "x_loin_C_03",
+  "x_loin_L_01",
+  "x_loin_L_02",
+  "x_loin_L_03",
+  "x_wisp_1_01",
+  "x_wisp_1_02",
+  "x_wisp_1_03",
+  "x_wisp_2_01",
+  "x_wisp_2_02",
+  "x_wisp_2_03",
+  "x_wisp_3_01",
+  "x_wisp_3_02",
+  "x_wisp_3_03",
+  "x_wisp_4_01",
+  "x_wisp_4_02",
+  "x_wisp_4_03",
+  "x_wisp_5_01",
+  "x_wisp_5_02",
+  "x_wisp_5_03"
+ ],
+ "seconds": 148.8
+}

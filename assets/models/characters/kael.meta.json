@@ -1,0 +1,1347 @@
+{
+ "kind": "character",
+ "key": "kael",
+ "name": "Kael, The Wraithshot",
+ "skeleton": "GF_Hero_v1 v1",
+ "armature": "GF_Hero_v1",
+ "joints": 111,
+ "extra_bones": [
+  "x_coat_LB_01",
+  "x_coat_LB_02",
+  "x_coat_LB_03",
+  "x_coat_LB_04",
+  "x_coat_LF_01",
+  "x_coat_LF_02",
+  "x_coat_LF_03",
+  "x_coat_LF_04",
+  "x_wisp_1_01",
+  "x_wisp_1_02",
+  "x_wisp_1_03",
+  "x_wisp_2_01",
+  "x_wisp_2_02",
+  "x_wisp_2_03",
+  "x_coat_LS_01",
+  "x_coat_LS_02",
+  "x_coat_LS_03",
+  "x_coat_LS_04",
+  "x_coat_RB_01",
+  "x_coat_RB_02",
+  "x_coat_RB_03",
+  "x_coat_RB_04",
+  "x_wisp_5_01",
+  "x_wisp_5_02",
+  "x_wisp_5_03",
+  "x_coat_RF_01",
+  "x_coat_RF_02",
+  "x_coat_RF_03",
+  "x_coat_RF_04",
+  "x_wisp_3_01",
+  "x_wisp_3_02",
+  "x_wisp_3_03",
+  "x_wisp_4_01",
+  "x_wisp_4_02",
+  "x_wisp_4_03",
+  "x_coat_RS_01",
+  "x_coat_RS_02",
+  "x_coat_RS_03",
+  "x_coat_RS_04",
+  "x_loin_C_01",
+  "x_loin_C_02",
+  "x_loin_C_03",
+  "x_loin_L_01",
+  "x_loin_L_02",
+  "x_loin_L_03",
+  "x_loin_R_01",
+  "x_loin_R_02",
+  "x_loin_R_03"
+ ],
+ "tris": 24114,
+ "tris_budget": [
+  15000,
+  25000
+ ],
+ "textures": [
+  {
+   "name": "kael_emissive",
+   "role": "emissive",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 659887
+  },
+  {
+   "name": "kael_normal",
+   "role": "normal",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 1402116
+  },
+  {
+   "name": "kael_basecolor",
+   "role": "base_color",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 3037228
+  }
+ ],
+ "material": {
+  "name": "M_kael",
+  "double_sided": false,
+  "emissive_strength": 3,
+  "textures": {
+   "base_color": true,
+   "emissive": true,
+   "normal": true
+  }
+ },
+ "sockets": {
+  "weapon_R": {
+   "parent": "hand_R",
+   "translation": [
+    -0.9656,
+    1.68288,
+    0.00048
+   ],
+   "forward": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "weapon_L": {
+   "parent": "hand_L",
+   "translation": [
+    0.9656,
+    1.68288,
+    0.00048
+   ],
+   "forward": [
+    1.0,
+    0.0,
+    -0.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "head_top": {
+   "parent": "head",
+   "translation": [
+    -0.0,
+    2.15825,
+    -0.002
+   ],
+   "forward": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "chest_sigil": {
+   "parent": "spine_03",
+   "translation": [
+    -0.0,
+    1.659,
+    0.10668
+   ],
+   "forward": [
+    -0.0,
+    0.28951,
+    0.95718
+   ],
+   "up": [
+    -0.0,
+    0.95718,
+    -0.28951
+   ],
+   "vs_landmarks": 4.6e-06
+  }
+ },
+ "clips": [
+  "kael_idle@loop",
+  "kael_idle_combat@loop",
+  "kael_walk@loop",
+  "kael_run@loop",
+  "kael_strafe_left@loop",
+  "kael_strafe_right@loop",
+  "kael_backpedal@loop",
+  "kael_dash",
+  "kael_dash_recover",
+  "kael_fire_light",
+  "kael_fire_heavy",
+  "kael_fire_charge@loop",
+  "kael_hit_light",
+  "kael_hit_heavy",
+  "kael_knockdown",
+  "kael_get_up",
+  "kael_death",
+  "kael_downed@loop",
+  "kael_revive",
+  "kael_reforge_in",
+  "kael_victory",
+  "kael_ping",
+  "kael_interact",
+  "kael_forge_hammer@loop",
+  "kael_idle_signature@loop",
+  "kael_fan_of_blades",
+  "kael_shadow_roll",
+  "kael_ghost_step",
+  "kael_bullet_ballet_start",
+  "kael_bullet_ballet@loop",
+  "kael_fire_twin",
+  "kael_fire_r"
+ ],
+ "clip_info": {
+  "kael_idle@loop": {
+   "clip": "idle",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 90,
+   "duration_s": 3.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, out of combat (no enemy near, no attack for 2 s; hub)",
+   "purpose": "relaxed breathing stance, weight drifting between the feet",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_idle_combat@loop": {
+   "clip": "idle_combat",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 32,
+   "duration_s": 1.06667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, in combat (enemies near or an attack in the last 2 s). Frame 0 is the reference pose of every upper-layer clip",
+   "purpose": "combat-ready stance: guard up, a light bounce on the knees",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_walk@loop": {
+   "clip": "walk",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 28,
+   "duration_s": 0.93333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 1.84,
+   "travel_mps": [
+    0.0,
+    -1.8396877122252662
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving at under about 55 % of move speed (stick partly pushed, slows); playback rate = speed / 1.84 m/s",
+   "purpose": "heavy walk, gauntlets swinging at the sides",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_run@loop": {
+   "clip": "run",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.2,
+   "travel_mps": [
+    0.0,
+    -7.2
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving within 45 deg of the aim at move speed; playback rate = speed / 7.2 m/s",
+   "purpose": "brawler run: forward lean, gauntlets pumping in front of the ribs",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_strafe_left@loop": {
+   "clip": "strafe_left",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.2,
+   "travel_mps": [
+    7.2,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the left of the aim; playback rate = speed / 7.2 m/s",
+   "purpose": "side run to the hero's left, hips opened toward the travel, chest and gun kept on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_strafe_right@loop": {
+   "clip": "strafe_right",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.2,
+   "travel_mps": [
+    -7.2,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the right of the aim; playback rate = speed / 7.2 m/s",
+   "purpose": "side run to the hero's right (the mirror of strafe_left)",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_backpedal@loop": {
+   "clip": "backpedal",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.2,
+   "travel_mps": [
+    0.0,
+    7.2
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving more than 135 deg away from the aim; playback rate = speed / 7.2 m/s",
+   "purpose": "backpedal on the balls of the feet, the gun on the aim, weight forward",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_dash": {
+   "clip": "dash",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the 0.16 s dash (MoverState.dash_left > 0); the client faces the hero along the dash for its duration",
+   "purpose": "the dash burst: a low shoulder-led lunge-glide, the lead gauntlet driving forward, the rear one trailing",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_dash_recover": {
+   "clip": "dash_recover",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 14,
+   "duration_s": 0.46667,
+   "fps": 30,
+   "events": {
+    "land": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the first 0.45 s after a dash ends when the hero is not moving on (else blend into locomotion)",
+   "purpose": "landing out of the dash: the lead foot plants, a heavy absorb, back to the guard",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_fire_light": {
+   "clip": "fire_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each primary shot of a light chassis (fire_rate >= 2/s); Kael's serpent_smg plays kael_fire_r",
+   "purpose": "a snap shot: the gun arm locks out down the aim line, the muzzle kicks up and settles",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_fire_heavy": {
+   "clip": "fire_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 7,
+     "time_s": 0.23333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a heavy / charged release (fire_rate < 1/s, charge release, splash chassis)",
+   "purpose": "a braced heavy shot: the ghost hand cups the gun hand, a load, the shot, a big muzzle kick into the chest",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_fire_charge@loop": {
+   "clip": "fire_charge",
+   "family": "shared",
+   "loop": true,
+   "layer": "upper",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "fire held on a Charge chassis (FireKind::Charge) until release (then fire_heavy)",
+   "purpose": "holding a charge: both hands on the gun, braced, the aim trembling",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_hit_light": {
+   "clip": "hit_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 12,
+   "duration_s": 0.4,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a light hit (damage < 10 % max HP), layered over whatever plays",
+   "purpose": "a flinch: head snaps, the guard is knocked back, absorb, recover",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_hit_heavy": {
+   "clip": "hit_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 26,
+   "duration_s": 0.86667,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a heavy hit (damage >= 10 % max HP or a stun); interrupts upper-layer clips",
+   "purpose": "a big stagger: blown back, the lead foot steps back, absorb low, step back in",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_knockdown": {
+   "clip": "knockdown",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "ground": {
+     "frame": 14,
+     "time_s": 0.46667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a knockback / launch strong enough to floor the hero (stun >= 0.8 s); holds its last frame until get_up",
+   "purpose": "blown off the feet: impact, a backward fall, the bounce, lying on the back",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_get_up": {
+   "clip": "get_up",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "stand": {
+     "frame": 30,
+     "time_s": 1.0
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the knockdown's stun ends",
+   "purpose": "from the back: sit up on the hands, roll onto one knee, push up into the guard",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_death": {
+   "clip": "death",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 48,
+   "duration_s": 1.6,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "knee": {
+     "frame": 20,
+     "time_s": 0.66667
+    },
+    "ground": {
+     "frame": 36,
+     "time_s": 1.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed begins (GameEvent::Downed); holds its last frame, then downed@loop (wraith look)",
+   "purpose": "the fatal blow: head snaps back, knees buckle to the ground, topples face down, the gun arm flung out",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_downed@loop": {
+   "clip": "downed",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed (the Soul-Tether wraith; moves at 45 % speed with no gait, the client adds the ghost material)",
+   "purpose": "the wraith drift: slumped, floating 0.35 m off the ground, limbs trailing, a slow bob",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_revive": {
+   "clip": "revive",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "jolt": {
+     "frame": 6,
+     "time_s": 0.2
+    },
+    "land": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "an ally completes the Soul-Tether revive (Downed -> Alive)",
+   "purpose": "pulled back into the body: a jolt, the feet slam down, crouch, rise into the guard",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_reforge_in": {
+   "clip": "reforge_in",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 45,
+   "duration_s": 1.5,
+   "fps": 30,
+   "events": {
+    "flourish": {
+     "frame": 28,
+     "time_s": 0.93333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Reforging ends: the hero reappears next to an ally",
+   "purpose": "forged anew: rises from a one-knee landing (the ghost fist planted), flips the gun up past his face, aims",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": [
+      16
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_victory": {
+   "clip": "victory",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {
+    "roar": {
+     "frame": 17,
+     "time_s": 0.56667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the run is won (GameEvent victory / boss down, results screen); holds its last frame",
+   "purpose": "the roar: a crouch, then one gauntlet thrust to the sky, chest out; holds the pose",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_ping": {
+   "clip": "ping",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {
+    "ping": {
+     "frame": 5,
+     "time_s": 0.16667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the ping / marker input (party callout)",
+   "purpose": "a ping: the ghost hand points along the aim, open, the head follows; the gun stays on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_interact": {
+   "clip": "interact",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "contact": {
+     "frame": 12,
+     "time_s": 0.4
+    },
+    "release": {
+     "frame": 26,
+     "time_s": 0.86667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the interact input at an anvil / forge / shrine POI (PoiState use); 1.3 s",
+   "purpose": "work the anvil: lean over and press the open ghost hand flat onto it, the gun held low, then straighten",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_forge_hammer@loop": {
+   "clip": "forge_hammer",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "hammer_hit": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the forge / hub anvil upgrade (Forge screen open, hub idle at the anvil)",
+   "purpose": "hammering the anvil with the ghost fist, the gun hand held low at his side",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_idle_signature@loop": {
+   "clip": "idle_signature",
+   "family": "kael",
+   "loop": true,
+   "layer": "full",
+   "frames": 120,
+   "duration_s": 4.0,
+   "fps": 30,
+   "events": {
+    "spin": {
+     "frame": 29,
+     "time_s": 0.96667
+    },
+    "grasp": {
+     "frame": 78,
+     "time_s": 2.6
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive and idle for 6 s or more (out of combat); in the hub and the character select",
+   "purpose": "signature idle: brings the serpent_smg up past his face, spins it on his hand, lowers it, then flexes the ghost hand in front of him and watches it glow",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": [
+      75,
+      80,
+      85,
+      91
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_fan_of_blades": {
+   "clip": "fan_of_blades",
+   "family": "kael",
+   "loop": false,
+   "layer": "upper",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "burst": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron kael active1 Fan of Blades (Cone 6.5 m, 70 deg, Mark) on 'burst'; upper layer, so it fires on the move",
+   "purpose": "Fan of Blades: the gun drops to the hip, the open ghost hand winds up high and fans across the gun's back; the spectral shotgun burst leaves the muzzle on the fan",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_shadow_roll": {
+   "clip": "shadow_roll",
+   "family": "kael",
+   "loop": false,
+   "layer": "full",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {
+    "roll": {
+     "frame": 2,
+     "time_s": 0.06667
+    },
+    "land": {
+     "frame": 10,
+     "time_s": 0.33333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron kael active2 Shadow Roll (Rush 5 m in 0.22 s, i-frames): the roll plays while the Rush moves (frames 2-9), then the recovery",
+   "purpose": "Shadow Roll: a low dive into a tight forward roll (the coat wraps), lands crouched with the gun already coming up, rises into the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_ghost_step": {
+   "clip": "ghost_step",
+   "family": "kael",
+   "loop": false,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "land": {
+     "frame": 10,
+     "time_s": 0.33333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the dash Ghost Step refreshes (passive dash_refund / a kill): plays instead of dash + dash_recover",
+   "purpose": "Ghost Step: the refreshed dash, a low gliding lean with the gun still on the aim and the ghost arm trailing behind, then a light landing back on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_bullet_ballet_start": {
+   "clip": "bullet_ballet_start",
+   "family": "kael",
+   "loop": false,
+   "layer": "full",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "twin": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "kits.ron kael ultimate Bullet Ballet cast: the twin pistol (VFX on weapon_L) appears on 'twin'",
+   "purpose": "Bullet Ballet: arms crossed low, then flung wide as the spectral twin forms in the ghost hand, both guns swing onto the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": [
+      3
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_bullet_ballet@loop": {
+   "clip": "bullet_ballet",
+   "family": "kael",
+   "loop": true,
+   "layer": "full",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "replaces idle_combat while the Bullet Ballet buff lasts (6 s); kael_fire_twin layers on top",
+   "purpose": "Bullet Ballet stance: both arms up down the aim, on the balls of the feet, a quick bounce and a sway",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "kael_fire_twin": {
+   "clip": "fire_twin",
+   "family": "kael",
+   "loop": false,
+   "layer": "upper",
+   "frames": 10,
+   "duration_s": 0.33333,
+   "fps": 30,
+   "events": {
+    "shot_r": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "shot_l": {
+     "frame": 4,
+     "time_s": 0.13333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each shot while Bullet Ballet lasts (the twin copies the Mechanism), layered over kael_bullet_ballet@loop",
+   "purpose": "the Bullet Ballet twin shot: the gun hand, then the spectral twin in the ghost hand, each kicks up",
+   "hand_pose": {
+    "L": {
+     "start": "fist",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   },
+   "base": "kael_bullet_ballet@loop"
+  },
+  "kael_fire_r": {
+   "clip": "fire_r",
+   "family": "kael",
+   "loop": false,
+   "layer": "upper",
+   "frames": 6,
+   "duration_s": 0.2,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each primary shot of the serpent_smg (rapid); the recoil shake stays procedural",
+   "purpose": "the serpent_smg's rapid shot: a short lock-out and a small muzzle kick, short enough for its fire rate",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  }
+ },
+ "playback": {
+  "fps": 30,
+  "naming": "<key>_<clip>, loops <key>_<clip>@loop (docs/art/GF_HERO_SKELETON.md section 8)",
+  "locomotion": "playback rate = ground speed / clip_info.design_speed_mps (walk, run, strafe_*, backpedal)",
+  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are kael_idle_combat@loop frame 0, except the clips whose clip_info.<clip>.base names another clip (kael_fire_twin): theirs are frame 0 of that clip",
+  "events": "glTF has no events: clip_info.<clip>.events gives the frame and time of each (30 fps)",
+  "weapon_variant": "clip_info.<clip>.weapon_variant is null: serpent_smg has no hand variants, so nothing swaps. The right hand stays curled round the grip in every clip; clip_info.<clip>.hand_pose lists each hand's fist / open state for reference",
+  "in_place": "only pelvis translates; the entity moves in the sim"
+ },
+ "weapon": {
+  "default": "serpent_smg",
+  "glb": "assets/models/weapons/serpent_smg.glb",
+  "attach": "weapon scene = identity child of weapon_R: the serpent_smg (one-handed, the weapon track's GLB) sits in the right fist, its grip_R on the palm frame; it has no offhand node. The left (ghost) hand is his own; the Bullet Ballet twin pistol is a VFX copy on weapon_L (kael_fire_twin fires it)"
+ },
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. The hero faces +Z, origin on the ground between the feet, rest pose = T-pose. Socket nodes: -Z = forward (grip +Y), +Y = up, +X = right; a weapon scene attaches as an identity child.",
+ "bounds_m": {
+  "min": [
+   -1.0938,
+   0,
+   -0.5468
+  ],
+  "max": [
+   1.0938,
+   2.1582,
+   0.3386
+  ]
+ },
+ "height_m": 2.1582,
+ "glb": "assets/models/characters/kael.glb",
+ "glb_bytes": 13758644,
+ "glb_sha256": "0c21e752b8d9562a29b0442696e4e25ff0407f21ed839d96f91acaf68fe45ef9",
+ "source_blend": "art/characters/kael/production/kael_anim.blend",
+ "build_script": "tools/blender/gf_hero/export_glb.py",
+ "pipeline": "docs/ART_PIPELINE.md stage 5",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-27",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "tool": "tools/blender/gf_hero/validate_glb.py",
+  "source_fidelity_max_error": 1.7686038526920633e-05
+ }
+}

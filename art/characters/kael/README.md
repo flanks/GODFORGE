@@ -16,10 +16,10 @@ user gives the final visual approval.
 |---|---|---|
 | 0 Concept & reference | **done** | The user supplied the approved T-pose front [`references/KAEL_front_approved.png`](references/KAEL_front_approved.png) (verbatim copy of `docs/media/playable_characters/KAEL, THE WRAITHSHOT.png`). Brief, measured palette, colour callouts and the game-scale check are made. Optional, not blocking: side, 3/4, back, expression and colour-script sheets (prompts in [`turnaround_prompts.md`](turnaround_prompts.md), each `pending_human`). For the user: the ghost arm is kept on his **left** arm as the concept paints it (`status.json` `decisions[ghost_arm_side]`) |
 | 1 Blockout (TRELLIS.2) | **done** (SCULPT REFERENCE ONLY) | Seeds s101/s202/s303 generated at 2.1 m from the approved front with the revolvers and the diffuse ghost smoke cut out of the mask ([`reports/blockout/input_edit.png`](reports/blockout/input_edit.png)); **s202 picked** as the stage-2 sculpt reference ([`reports/blockout_report.md`](reports/blockout_report.md), [`reports/blockout/blockout_selected.png`](reports/blockout/blockout_selected.png)): the only seed with both hands right (gloved right fist, ghost left fist), a solid coat back clear of the legs, the cleanest surface. Its GLB is in Git LFS; s101/s303 stay local (sha256 in `manifest.json`). Never shipped, never in `assets/models/`. For the face use the concept and s303's head |
-| 2 Production mesh | not started | the shared chain (`run_stage2.py`) with a `kael` variant for the coat, the ghost arm zone and the ghost-flame tatters |
-| 3 Rig | not started | GF_Hero_v1 + `x_` coat / tatter chains |
-| 4 Animation | not started | the 24 shared clips + his unique set (brief §8) |
-| 5 Export & validate | not started | `assets/models/characters/kael.glb` |
+| 2 Production mesh | **done** (made by AI) | The user's visual approval. 24,114 tris, 8 closed objects, one 2048 atlas; [`reports/stage2_production_mesh.md`](reports/stage2_production_mesh.md), sheets in [`reports/stage2/`](reports/stage2/) |
+| 3 Rig | **done** (made by AI) | The user's visual approval. GF_Hero_v1 + 48 `x_` cloth bones (coat 6 x 4, loin 3 x 3, tatters 5 x 3), serpent_smg on `weapon_R`; [`reports/stage3/stage3_rig.png`](reports/stage3/stage3_rig.png) |
+| 4 Animation | **done** (made by AI) | The user's visual approval. 24 shared clips re-posed for the gunslinger + 8 kit clips, cloth pass; [`reports/anim/anim_board.png`](reports/anim/anim_board.png) |
+| 5 Export & validate | **done** (made by AI) | The user's visual approval. [`assets/models/characters/kael.glb`](../../../assets/models/characters/kael.glb) + `.meta.json` (`ai_final_pending_user_approval`), 0 errors / 0 warnings; [`reports/stage5/export_review.png`](reports/stage5/export_review.png). Stages 3-5: [`reports/stage3_5_report.md`](reports/stage3_5_report.md) |
 
 ## Stage 0 files
 
@@ -50,3 +50,16 @@ Regenerate (with `<comfy-python>` = `D:\Comfy-Desktop\ComfyUI-Installs\ComfyUI\s
 | `source/kael_trellis2_s202.glb` (Git LFS) · `source/*.json` | The selected sculpt reference and the provenance of every seed (graph hash, patched inputs, seeds, timings, output sha256) |
 
 Every command is in [`reports/blockout_report.md`](reports/blockout_report.md) §9.
+
+## Stages 3-5 files
+
+| File | What it is |
+|---|---|
+| [`reports/stage3_5_report.md`](reports/stage3_5_report.md) | What stages 3-5 built, the numbers and the known limits |
+| [`stage3_skin.json`](stage3_skin.json) · `work/kael_landmarks.json` | Every hand-set number of the rig and skin (the cloth chains' columns, heights, blends); the GF_Hero_v1 landmark file |
+| `production/kael_rig.blend` · `production/kael_anim.blend` (Git LFS) | The rigged hero; the rig + one action / NLA track per clip, the cloth chains keyed |
+| [`reports/stage3/`](reports/stage3/) · [`reports/anim/`](reports/anim/) · [`reports/stage5/`](reports/stage5/) · [`reports/export_report.json`](reports/export_report.json) | Sheets and measured results |
+
+Regenerate: `python tools/blender/gf_hero/s3_kael_run.py`, `python tools/blender/gf_hero/s4_kael_run.py`, then
+`python tools/blender/gf_hero/run_stage5.py kael --only export`, `python tools/blender/gf_hero/s5_kael.py --sidecar`,
+`python tools/blender/gf_hero/run_stage5.py kael --only reimport` and `--only sheet`.

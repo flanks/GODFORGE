@@ -1,0 +1,366 @@
+{
+ "hero": "kael",
+ "file": "art/characters/kael/work/gltf_check/kael_anim.glb (local scratch)",
+ "bytes": 13768392,
+ "extensionsRequired": [],
+ "animations": 32,
+ "clips": {
+  "kael_backpedal@loop": {
+   "channels": 333,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_bullet_ballet@loop": {
+   "channels": 333,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_bullet_ballet_start": {
+   "channels": 333,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_dash": {
+   "channels": 333,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_dash_recover": {
+   "channels": 333,
+   "duration_s": 0.46667,
+   "samples": 15,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_death": {
+   "channels": 333,
+   "duration_s": 1.6,
+   "samples": 49,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_downed@loop": {
+   "channels": 333,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_fan_of_blades": {
+   "channels": 333,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_fire_charge@loop": {
+   "channels": 333,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_fire_heavy": {
+   "channels": 333,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_fire_light": {
+   "channels": 333,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "kael_fire_r": {
+   "channels": 333,
+   "duration_s": 0.2,
+   "samples": 7,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "kael_fire_twin": {
+   "channels": 333,
+   "duration_s": 0.33333,
+   "samples": 11,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "kael_forge_hammer@loop": {
+   "channels": 333,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_get_up": {
+   "channels": 333,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_ghost_step": {
+   "channels": 333,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_hit_heavy": {
+   "channels": 333,
+   "duration_s": 0.86667,
+   "samples": 27,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_hit_light": {
+   "channels": 333,
+   "duration_s": 0.4,
+   "samples": 13,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "kael_idle@loop": {
+   "channels": 333,
+   "duration_s": 3.0,
+   "samples": 91,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_idle_combat@loop": {
+   "channels": 333,
+   "duration_s": 1.06667,
+   "samples": 33,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_idle_signature@loop": {
+   "channels": 333,
+   "duration_s": 4.0,
+   "samples": 121,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_interact": {
+   "channels": 333,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_knockdown": {
+   "channels": 333,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_ping": {
+   "channels": 333,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "kael_reforge_in": {
+   "channels": 333,
+   "duration_s": 1.5,
+   "samples": 46,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_revive": {
+   "channels": 333,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_run@loop": {
+   "channels": 333,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_shadow_roll": {
+   "channels": 333,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_strafe_left@loop": {
+   "channels": 333,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_strafe_right@loop": {
+   "channels": 333,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "kael_victory": {
+   "channels": 333,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "kael_walk@loop": {
+   "channels": 333,
+   "duration_s": 0.93333,
+   "samples": 29,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  }
+ },
+ "missing": [],
+ "unexpected": [],
+ "twist_bones_animated_in": 32,
+ "failures": [],
+ "ok": true
+}
