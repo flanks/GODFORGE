@@ -33,7 +33,8 @@ block lists which phase 3/4 items that pass already delivered. **Start with phas
 run-length target (§13 there) needs the user's sign-off.
 
 QA helpers added by the pass: `GF_CAM_AT="x,y"` pins the camera to a sim point (coast and set-piece
-captures), and `--fps` (or F10, the debug strip) shows the net stats line and FPS.
+captures), and `--fps` (or F10, the debug strip) shows the net stats line and FPS. `GF_CAM_VIEW=<m>`
+overrides the view height (hero close-ups in play, e.g. 8).
 
 ## 1. Where the project stands
 
@@ -154,9 +155,12 @@ To do:
   - Ambient embers rising from the abyss.
   - `ColorGrading` on the camera (warmer highlights, richer saturation).
 * **Characters:**
-  - Per-character silhouettes from primitives: Valdris bulky with pauldrons and a cannon,
-    Selene slender with a floating storm orb, Kael cloaked with a bow.
-  - Weapon mesh by chassis family.
+  - Authored, animated heroes in play: Brax, Valdris, Kael and Selene (`assets/models/characters/*.glb`;
+    the client side is docs/CLIENT_MODELS.md). Each kit's unique clips follow its abilities
+    (`anim.rs` `kit_clips`): Kael's Fan of Blades, Shadow Roll, Ghost Step and Bullet Ballet (twin shots,
+    a Ghost Step on every dash); Selene's Arc Nova, Blink, Heaven's Verdict and Static Charge. Her
+    two-handed hold is in her clips (no engine IK yet). All four are pending the user's visual approval.
+  - Still greybox: Thessaly, Ossian and the other EA heroes; weapon meshes for the chassis without a GLB.
   - Walk bob/lean, dash afterimages, fire recoil.
 * **VFX:**
   - Projectile trails, muzzle flashes (budgeted).

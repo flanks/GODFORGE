@@ -25,7 +25,7 @@ use crate::{ClientConfig, ClientSet};
 use gf_content::EnemyClass;
 use gf_core::aim::AimMode;
 use gf_core::damage::DamageType;
-use gf_core::ids::NetId;
+use gf_core::ids::{NetId, SourceId};
 use gf_core::revive::LifeState;
 use gf_core::weapon::FireKind;
 use gf_engine::bevy::animation::{AnimationTargetId, RepeatAnimation, graph::AnimationNodeIndex};
@@ -461,6 +461,31 @@ enum KitMove {
         end: &'static str,
         time: f32,
     },
+    /// An upper-layer cast: the hero keeps moving, shots wait until its arms are free.
+    Upper {
+        clip: &'static str,
+    },
+}
+
+/// How long a hero's ultimate loop lasts.
+#[derive(Clone, Copy, Debug)]
+enum During {
+    /// While this replicated flag is up (Meltdown, Mountainfall: `AVATAR`; Bullet Ballet: `INFINITE_DASH`).
+    Flag(PlayerFlags),
+    /// This long after the ultimate's `GameEvent::Ability` (Heaven's Verdict: the caster wears no flag).
+    Cast(f32),
+}
+
+/// The ultimate's buff on the body: `start` when it begins, `idle` in place of `idle_combat` while it lasts.
+#[derive(Clone, Copy, Debug)]
+struct Avatar {
+    start: &'static str,
+    idle: &'static str,
+    during: During,
+    /// Every shot while it lasts (Bullet Ballet's twin pistols).
+    fire: Option<&'static str>,
+    /// Every dash while it lasts (Bullet Ballet's infinite dash: the Ghost Step).
+    dash: Option<&'static str>,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -468,14 +493,32 @@ struct KitClips {
     moves: [KitMove; 3],
     /// `PlayerFlags::STANCE`: enter, loop (replaces idle and locomotion), exit, per-shot clip.
     stance: Option<[&'static str; 4]>,
-    /// `PlayerFlags::AVATAR` (the ultimate's buff): start, the loop that replaces `idle_combat`.
-    avatar: Option<[&'static str; 2]>,
+    avatar: Option<Avatar>,
     /// A pound layered every `every` s during the avatar, its event `at` s into the clip lining up
     /// with the sim's pulse (first pulse half an interval after the cast).
     pound: Option<(&'static str, f32)>,
+    /// The hero's own rapid chassis (key) shoots this clip instead of `fire_light`.
+    rapid: Option<(&'static str, &'static str)>,
+    /// A dash the passive gave back (a kill in the same snapshot as a charge) plays this instead of `dash`.
+    refund_dash: Option<&'static str>,
+    /// The passive meter reaching this cap plays this upper clip once.
+    meter_full: Option<(&'static str, f32)>,
+}
+
+impl KitClips {
+    const NONE: KitClips = KitClips {
+        moves: [KitMove::None; 3],
+        stance: None,
+        avatar: None,
+        pound: None,
+        rapid: None,
+        refund_dash: None,
+        meter_full: None,
+    };
 }
 
 fn kit_clips(key: &str) -> KitClips {
+    let avatar = |start, idle, during| Some(Avatar { start, idle, during, fire: None, dash: None });
     match key {
         "brax" => KitClips {
             // Cinder Uppercut: Nova on `launch` (f10), the slam's geysers on `slam` (f25).
@@ -484,9 +527,8 @@ fn kit_clips(key: &str) -> KitClips {
                 KitMove::Rush { run: "furnace_rush", end: "furnace_rush_end", time: 0.4 },
                 KitMove::None,
             ],
-            stance: None,
-            avatar: Some(["meltdown_start", "meltdown"]),
-            pound: None,
+            avatar: avatar("meltdown_start", "meltdown", During::Flag(PlayerFlags::AVATAR)),
+            ..KitClips::NONE
         },
         "valdris" => KitClips {
             // Bulwark Slam: the 0.45 s leap runs `launch` (f8) → `land` (f21).
@@ -496,10 +538,47 @@ fn kit_clips(key: &str) -> KitClips {
                 KitMove::None,
             ],
             stance: Some(["siege_stance_enter", "siege_stance", "siege_stance_exit", "siege_fire"]),
-            avatar: Some(["mountainfall_start", "mountainfall"]),
+            avatar: avatar("mountainfall_start", "mountainfall", During::Flag(PlayerFlags::AVATAR)),
             pound: Some(("mountainfall_pound", 1.1)),
+            ..KitClips::NONE
         },
-        _ => KitClips { moves: [KitMove::None; 3], stance: None, avatar: None, pound: None },
+        "kael" => KitClips {
+            // Fan of Blades (the Cone resolves on cast) fires on the move; Shadow Roll's 0.22 s Rush
+            // runs `roll` (f2) → `land` (f10), then he rises into the aim.
+            moves: [
+                KitMove::Upper { clip: "fan_of_blades" },
+                KitMove::Strike { clip: "shadow_roll", from: Some("roll"), cancel: 0.4 },
+                KitMove::None,
+            ],
+            // Bullet Ballet scales nothing (no AVATAR): its 6 s of infinite dash carry the loop, the
+            // twin shots and a Ghost Step on every dash.
+            avatar: Some(Avatar {
+                start: "bullet_ballet_start",
+                idle: "bullet_ballet",
+                during: During::Flag(PlayerFlags::INFINITE_DASH),
+                fire: Some("fire_twin"),
+                dash: Some("ghost_step"),
+            }),
+            rapid: Some(("serpent_smg", "fire_r")),
+            // Ghost Step: a kill may refund a dash charge; that dash is the ghost step.
+            refund_dash: Some("ghost_step"),
+            ..KitClips::NONE
+        },
+        "selene" => KitClips {
+            // Arc Nova chains on cast, on the move; Blink teleports on cast, so she lands (`blink_in`)
+            // where the snapshot already has her.
+            moves: [
+                KitMove::Upper { clip: "arc_nova" },
+                KitMove::Strike { clip: "blink_in", from: None, cancel: 0.2 },
+                KitMove::None,
+            ],
+            // Heaven's Verdict: the storm front lives 8 s (kits.ron); the caster wears no flag.
+            avatar: avatar("heavens_verdict_start", "heavens_verdict", During::Cast(8.0)),
+            // Static Charge full (+60 %, kits.ron `max_bonus`).
+            meter_full: Some(("static_charge", 0.6)),
+            ..KitClips::NONE
+        },
+        _ => KitClips::NONE,
     }
 }
 
@@ -524,8 +603,21 @@ pub struct HeroAnim {
     last_hit: f32,
     last_tick: u32,
     dashing: bool,
+    /// The clip of the dash in progress (`dash`, or a Ghost Step) and when it began.
+    dash_clip: &'static str,
+    dash_start: f32,
+    /// A refunded dash charge waits until then (s) to play its Ghost Step.
+    ghost_ready: f32,
+    dash_charges: u8,
     stance: bool,
     avatar: bool,
+    /// A timed ultimate loop (`During::Cast`) lasts until then (s).
+    avatar_until: f32,
+    /// An upper-layer kit cast holds the arms until then (s): shots wait.
+    upper_until: f32,
+    meter_full: bool,
+    /// This frame's light-shot clip (`fire_light`, or the hero's own rapid chassis clip).
+    fire_light: &'static str,
     next_pound: f32,
     victory: bool,
     /// Melee: the next strike of the predicted swing cadence, and until when it runs.
@@ -558,8 +650,16 @@ impl HeroAnim {
             last_hit: -100.0,
             last_tick: 0,
             dashing: false,
+            dash_clip: "dash",
+            dash_start: 0.0,
+            ghost_ready: -100.0,
+            dash_charges: 0,
             stance: false,
             avatar: false,
+            avatar_until: -100.0,
+            upper_until: -100.0,
+            meter_full: false,
+            fire_light: "fire_light",
             next_pound: f32::INFINITY,
             victory: false,
             swing_next: 0.0,
@@ -660,7 +760,11 @@ fn gallery_step(
     names.sort();
     // Then the layering: upper-body clips over locomotion (`base+upper`).
     for (base, upper) in GALLERY_LAYERED {
-        let upper = if ha.key == "brax" { upper.replace("fire_light", "jab_r") } else { upper.to_string() };
+        let upper = match ha.kit.rapid {
+            _ if ha.key == "brax" => upper.replace("fire_light", "jab_r"),
+            Some((_, rapid)) => upper.replace("fire_light", rapid),
+            None => upper.to_string(),
+        };
         if lib.clips.contains_key(base) && lib.clips.contains_key(&upper) {
             names.push(format!("{base}+{upper}"));
         }
@@ -735,6 +839,10 @@ fn drive_heroes(
         let chassis = cfg.content.chassis.try_get(p.weapon.chassis.0);
         let fire = chassis.map_or(FireKind::Auto, |c| c.stats.fire);
         let fire_rate = chassis.map_or(2.0, |c| c.stats.fire_rate);
+        ha.fire_light = match ha.kit.rapid {
+            Some((key, clip)) if chassis.is_some_and(|c| c.key == key) && an.has(clip) => clip,
+            _ => "fire_light",
+        };
 
         // ── life ──
         let life = Life::of(&p.life);
@@ -804,8 +912,20 @@ fn drive_heroes(
                 }
                 GameEvent::Ability { slot, which, .. } if slot == ha.slot && alive => {
                     ha.last_combat = now;
+                    if which == 2
+                        && let Some(Avatar { during: During::Cast(time), .. }) = ha.kit.avatar
+                    {
+                        ha.avatar_until = now + time;
+                    }
                     match ha.kit.moves.get(which as usize).copied().unwrap_or(KitMove::None) {
                         KitMove::None => {}
+                        KitMove::Upper { clip } => {
+                            an.clear_upper();
+                            if an.play_upper(ap, clip, 1.0) {
+                                ha.upper_until = now + clip_len(an, clip) * 0.8;
+                                ha.log_event(log.0, clip);
+                            }
+                        }
                         KitMove::Strike { clip, from, cancel } => {
                             let seek = from.and_then(|e| an.model.clip(clip)?.meta.event(e)).unwrap_or(0.0);
                             let s = OneShot {
@@ -878,6 +998,26 @@ fn drive_heroes(
             }
         }
         ha.last_tick = world.tick;
+        // The passive gave a dash charge back: a kill of this hero's in the snapshot that raised it.
+        let charges = p.mover.dash_charges;
+        if ha.kit.refund_dash.is_some() && charges > ha.dash_charges {
+            let killed = link.fresh_events.iter().any(
+                |e| matches!(*e, GameEvent::Kill { source, .. } if SourceId(source).owner_slot() == Some(ha.slot)),
+            );
+            if killed {
+                ha.ghost_ready = now + 3.0;
+            }
+        }
+        ha.dash_charges = charges;
+        // The passive meter at its cap (Static Charge): once per fill.
+        if let Some((clip, cap)) = ha.kit.meter_full {
+            let full = p.passive_meter >= cap - 0.005;
+            if full && !ha.meter_full && alive && !ha.exclusive() && an.play_upper(ap, clip, 1.0) {
+                ha.upper_until = now + clip_len(an, clip) * 0.8;
+                ha.log_event(log.0, clip);
+            }
+            ha.meter_full = full;
+        }
         // A charge chassis holds its charge pose; a beam holds the brace while it burns.
         let hold = match fire {
             FireKind::Charge if p.charge > 0.05 => Some("fire_charge"),
@@ -902,12 +1042,16 @@ fn drive_heroes(
                 ha.interrupt(an, s);
             }
         }
-        let avatar = p.flags.contains(PlayerFlags::AVATAR);
+        let avatar = match ha.kit.avatar.map(|a| a.during) {
+            Some(During::Flag(f)) => p.flags.contains(f),
+            Some(During::Cast(_)) => now < ha.avatar_until,
+            None => false,
+        };
         if avatar != ha.avatar {
             ha.avatar = avatar;
             ha.next_pound = f32::INFINITY;
             if avatar && alive {
-                if let Some([start, _]) = ha.kit.avatar {
+                if let Some(Avatar { start, .. }) = ha.kit.avatar {
                     // Held through its payoff (Meltdown's clash, Mountainfall's stomp), then
                     // finished on the upper body if the hero moves on.
                     let payoff =
@@ -953,10 +1097,22 @@ fn drive_heroes(
             if let Some((s, start)) = ha.current.take() {
                 finish_on_upper(an, ap, &s, now - start, log.0, ha);
             }
-            ha.dashing = an.set_base(ap, "dash", 1.0, 0.05, true);
+            // A Ghost Step: every dash of the ultimate that grants it, or the one a kill refunded.
+            let refunded = now < ha.ghost_ready;
+            ha.ghost_ready = -100.0;
+            let ghost =
+                ha.kit.avatar.filter(|_| ha.avatar).and_then(|a| a.dash).or(ha.kit.refund_dash.filter(|_| refunded));
+            ha.dash_clip = ghost.filter(|c| an.has(c)).unwrap_or("dash");
+            ha.dash_start = now;
+            ha.dashing = an.set_base(ap, ha.dash_clip, 1.0, 0.05, true);
         } else if !dashing && ha.dashing {
             ha.dashing = false;
-            if speed < STAND_SPEED * 2.0 {
+            if ha.dash_clip != "dash" {
+                // The Ghost Step outlasts the sim's dash: it lands as a one-shot of the clip already playing.
+                let s = OneShot { cancel_after: Some(0.34), ..shot(an, ha.dash_clip) };
+                ha.queue.clear();
+                ha.current = Some((s, ha.dash_start));
+            } else if speed < STAND_SPEED * 2.0 {
                 let s = shot(an, "dash_recover");
                 ha.interrupt(an, s);
             }
@@ -994,7 +1150,7 @@ fn drive_heroes(
             if mover.dash_dir.length_squared() > 0.0 {
                 facing = mover.dash_dir.y.atan2(mover.dash_dir.x);
             }
-            ("dash", 1.0)
+            (ha.dash_clip, 1.0)
         } else if let Some((s, _)) = &ha.current {
             if s.face_travel && speed > p.move_speed * 1.2 {
                 facing = heading;
@@ -1046,7 +1202,7 @@ fn drive_heroes(
                 ha.idle_since = now;
             }
             match ha.kit.avatar.filter(|_| avatar) {
-                Some([_, loop_clip]) => (loop_clip, 1.0),
+                Some(a) => (a.idle, 1.0),
                 None if combat => ("idle_combat", 1.0),
                 None if now - ha.idle_since > SIGNATURE_AFTER && an.has("idle_signature") => ("idle_signature", 1.0),
                 None => ("idle", 1.0),
@@ -1056,7 +1212,7 @@ fn drive_heroes(
             ha.idle_since = now;
         }
         if ha.current.is_none() && !ha.dashing {
-            let fade = if an.base_name() == "dash" { 0.12 } else { FADE_LOCO };
+            let fade = if an.base_name() == ha.dash_clip { 0.12 } else { FADE_LOCO };
             an.set_base(ap, clip, rate, fade, false);
         }
         if log.0 && ha.logged != an.base_name() {
@@ -1107,9 +1263,16 @@ fn fire_clip(
     now: f32,
     log: bool,
 ) {
+    // An upper-layer kit cast (Fan of Blades, Arc Nova, Static Charge) keeps the arms.
+    if now < ha.upper_until {
+        return;
+    }
     let stance = ha.kit.stance.filter(|_| p.flags.contains(PlayerFlags::STANCE));
+    let twin = ha.kit.avatar.filter(|_| ha.avatar).and_then(|a| a.fire).filter(|c| an.has(c));
     let clip: &str = if let Some([_, _, _, siege]) = stance {
         siege
+    } else if let Some(twin) = twin {
+        twin
     } else if fire == FireKind::Melee && an.has("jab_l") && an.has("jab_r") {
         // A held string: left, right, and every third strike a hook.
         if now - ha.last_strike > 1.0 {
@@ -1127,7 +1290,7 @@ fn fire_clip(
     } else if matches!(fire, FireKind::Charge) || fire_rate < 1.0 {
         "fire_heavy"
     } else {
-        "fire_light"
+        ha.fire_light
     };
     ha.last_strike = now;
     // Fast guns re-fire before the clip ends: let the thrust finish its first half.

@@ -96,6 +96,7 @@ fn follow(
     mut shake: ResMut<Shake>,
     mut cams: Query<(&mut Transform, &mut Projection), With<MainCamera>>,
     mut pinned: Local<Option<Option<Vec2>>>,
+    mut zoom: Local<Option<Option<f32>>>,
 ) {
     let Ok((mut tf, mut projection)) = cams.single_mut() else { return };
     let dt = time.delta_secs();
@@ -143,6 +144,11 @@ fn follow(
     let k = 1.0 - (-8.0 * dt).exp();
     let smoothed = shake.focus + (focus - shake.focus) * k;
     shake.focus = smoothed;
+    // QA: GF_CAM_VIEW=<metres> overrides the view height (close-ups of the heroes in play).
+    if let Some(v) = *zoom.get_or_insert_with(|| std::env::var("GF_CAM_VIEW").ok().and_then(|v| v.trim().parse().ok()))
+    {
+        view_h = v;
+    }
     set_view_height(&mut projection, view_h);
 
     let pitch = cam.pitch_deg.to_radians();

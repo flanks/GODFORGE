@@ -78,6 +78,8 @@ while it flashes.
   start hidden and swap per hand at the frames of the clip in charge of the arms (`ping` opens the right hand).
 * A chassis without a model keeps the rig's greybox gun on the aim pivot. A chassis change swaps the model.
 * Each `GameEvent::Shot` flashes at the weapon's `muzzle` node (`vfx.rs`), or at the greybox gun's muzzle.
+* Kael's `serpent_smg` is one-handed (his left is the ghost hand; Bullet Ballet's twin pistol is VFX). Selene's
+  `thundercoil_launcher` is two-handed: her clips key the left palm onto its `grip_L`, so it needs no engine IK.
 * Not done: the left hand's IK to a two-handed weapon's `grip_L`; recoil and aim offsets (procedural, ARCHITECTURE §9).
 
 ## 6. Animation
@@ -96,15 +98,16 @@ body is the clip's, the legs keep the base (the run, a stance).
 | 45-135° left / right, beyond 135° | `strafe_left` / `strafe_right`, `backpedal` (10° hysteresis, 0.14 s dwell) |
 | standing, an enemy within 13 m or a shot / hit in the last 2.5 s | `idle_combat` (the avatar loop under Meltdown / Mountainfall) |
 | standing, out of combat | `idle`, `idle_signature` after 6 s |
-| `MoverState.dash_left > 0` | `dash` (faces the dash), then `dash_recover` if the hero stops |
-| `GameEvent::Shot` (auto / charge chassis) | `fire_light`, `fire_heavy` (charge, or < 1 shot/s); Valdris in Siege Stance: `siege_fire` |
+| `MoverState.dash_left > 0` | `dash` (faces the dash), then `dash_recover` if the hero stops. Kael: `ghost_step` (it lands as a one-shot) on every dash of Bullet Ballet, and on the next dash after a kill of his that refunded a charge (the passive) |
+| `GameEvent::Shot` (auto / charge chassis) | `fire_light`, `fire_heavy` (charge, or < 1 shot/s); Valdris in Siege Stance: `siege_fire`; Kael with the `serpent_smg`: `fire_r`, in Bullet Ballet `fire_twin` |
 | a melee swing (`PlayerView.firing` on a melee chassis) | Brax: `jab_l`, `jab_r`, every third `hook` |
 | charging (`PlayerView.charge`), a beam burning | `fire_charge@loop` (upper) |
 | `GameEvent::PlayerHurt` | `hit_light` (upper), `hit_heavy` at ≥ 10 % of max HP |
 | `GameEvent::Ping`, `ArmorBreak` | `ping`, `armor_break` (upper) |
-| `GameEvent::Ability` | Brax: `uppercut`; `furnace_rush@loop` for 0.4 s then `furnace_rush_end`. Valdris: `bulwark_slam` from its `launch` event (the sim's leap starts on cast) |
+| Selene's `passive_meter` reaches Static Charge's cap (0.6) | `static_charge` (upper, once per fill) |
+| `GameEvent::Ability` | Brax: `uppercut`; `furnace_rush@loop` for 0.4 s then `furnace_rush_end`. Valdris: `bulwark_slam` from its `launch` event (the sim's leap starts on cast). Kael: `fan_of_blades` (upper, on the move), `shadow_roll` from `roll` (the 0.22 s Rush). Selene: `arc_nova` (upper), `blink_in` (the sim teleports on cast, so she lands where the snapshot has her); an upper kit cast holds the arms (shots wait) |
 | `PlayerFlags::STANCE` rises / falls | `siege_stance_enter`, `siege_stance@loop` (replaces idles and locomotion), `siege_stance_exit` |
-| `PlayerFlags::AVATAR` rises | `meltdown_start` / `mountainfall_start`; Mountainfall layers `mountainfall_pound` every 1.1 s, its `pound` event on the sim's pulse |
+| the ultimate's buff begins | `meltdown_start` / `mountainfall_start` (`AVATAR`), `bullet_ballet_start` (`INFINITE_DASH`), `heavens_verdict_start` (the Ability event: the caster wears no flag, the loop lasts the storm front's 8 s); its loop replaces `idle_combat` while it lasts. Mountainfall layers `mountainfall_pound` every 1.1 s, its `pound` event on the sim's pulse |
 | `LifeState::Downed` begins | `death`, then `downed@loop` with the ghost skin |
 | Downed → Alive, Reforging → Alive | `revive`, `reforge_in` |
 | `GameEvent::PoiStarted` (standing) | `interact` |
@@ -183,4 +186,10 @@ godforge --greybox                                                    # no model
 godforge --autoplay --bots 3 --start-at warlord --anim-log            # The Bellows; --room cinder_throne --seed 3 for the Slag King
 ```
 
-`GF_CAM_AT="x,y"` pins the camera (the enemy gallery), `GODFORGE_ENEMY_LOD=0` turns the animation LOD off.
+```sh
+godforge --autoplay --bots 3 --seed 7 --character kael --anim-log    # Kael (or selene) in play; GF_CAM_VIEW=8 for a close-up
+godforge --autoplay --bots 3 --phase ea --character brax              # all four authored heroes in one party
+```
+
+`GF_CAM_AT="x,y"` pins the camera (the enemy gallery), `GF_CAM_VIEW=<m>` sets the view height (close-ups),
+`GODFORGE_ENEMY_LOD=0` turns the animation LOD off.
