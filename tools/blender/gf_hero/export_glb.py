@@ -396,6 +396,12 @@ def export_hero():
         meta["weapon"]["attach"] = ("weapon scene = identity child of weapon_R (a sleeve weapon: the right forearm lies in "
                                     "its sleeve, the fist on its inner handle); it has no offhand node, the left hand is "
                                     "the hero's own")
+        hold = (status.get("signature_weapon") or {}).get("hold")
+        if hold:
+            # a carried weapon without an offhand node or hand variants (Selene's two-handed thundercoil_launcher): the
+            # hero's status.json says how her hands hold it (optional key, absent for Brax and Valdris: their sidecars
+            # are unchanged)
+            meta["weapon"]["attach"] = "weapon scene = identity child of weapon_R; it has no offhand node. " + hold
     meta_p = os.path.join(out_dir, "%s.meta.json" % KEY)
     rep = V.validate_hero(glb, meta=meta, spec=spec)
     errs = errors + rep["errors"]

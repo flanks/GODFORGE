@@ -416,6 +416,20 @@ the skirt by angle, three `x_loin`, one `x_wisp` chain per ghost-flame tatter on
 with the back vent split; the tatters on the coat above their hem; serpent_smg.glb as a PREVIEW on `weapon_R`). No
 driven helpers and no shared script changed. Results: `art/characters/kael/reports/stage3_5_report.md`.
 
+**Selene (2026-09-27), the sorceress variant.** A slender hm08 body under a painted bodysuit: the shared scripts make the
+skeleton and weight the body unchanged, and Selene files do the rest: `python tools/blender/gf_hero/s3_selene_run.py`
+(landmarks, lm_selene, seed, skin, poses, sheets; about 30 s). `s3_selene_landmarks.py` puts `chest_sigil` on the collar
+gem and adds 32 `x_` extras: `x_crown_01..06` under `head_top` (each pivot on the head's vertical axis at its shard's
+height, so a clip can orbit, bob and spin the six floating shards with rotations only), `x_knee_L/R` (driven, half the
+knee bend) and one cloth chain down the middle of each of her eight stage-2 cloth sheets (capes and drapes on the upper
+arms, hip panels, tabard and back panel on the pelvis), placed by the sheet's own (u, v) grid. `s3_selene_skin.py` is
+the `s3_skin.py` hook (per stage-2 piece: rigid rows, per-vertex body copies for straps, belt, bracers and foot shells,
+the cloth by the sheet's v; the thundercoil_launcher GLB as a PREVIEW on `weapon_R`, named without the `_R` suffix so
+the stage-4 keep-out does not read the carried launcher as a sleeve weapon). The validation poses are posed by the
+stage-4 solver with the cloth hung clear by `selene_cloth.py`; the weapon check is the two-handed hold (the launcher on
+`weapon_R` by the identity attach, the left palm solved onto its `grip_L`: 0.0 mm). One sheet,
+`art/characters/selene/reports/stage3/stage3_rig.png`; report `art/characters/selene/reports/rig_report.md`.
+
 ### Stage 4: animation (implemented; made by AI, 2026-09-25)
 
 No human animator and no Mixamo / ActorCore seeds: the clips are keyed in Python on GF_Hero_v1, Cascadeur-style
@@ -470,6 +484,18 @@ Roll). `s4_kael_cloth.py` is Valdris's cloth pass for a coat that hangs all roun
 tatters solved on the coat's solved chains): `python tools/blender/gf_hero/s4_kael_run.py` (anim, cloth, review, sheet,
 gltf_check; about 5 min). Results: `art/characters/kael/reports/stage3_5_report.md`.
 
+**Selene (2026-09-27), the two-handed launcher.** `s4_selene.shared_clips` re-poses the 24 shared clips (the contract's
+names, loops, layers, events, timing) around her HOLD: the thundercoil_launcher at the right hip on the aim, the body
+bladed 40 deg right, the right forearm along the barrel, and the left palm put on the launcher's `grip_L` frame by
+frame from the solved right-hand grip (`SClip.poses` -> `apply_hold`, weighted by the pose's `hold`, so recoil and bobs
+carry both hands and a clip can let go); the carry (launcher low, left claws free) for idle, walk and interact; her
+light gait at 7.0 m/s on shorter cycles. `unique_clips` adds her 7 kit clips (idle_signature, arc_nova, blink_out /
+blink_in, heavens_verdict_start / @loop, static_charge). `s4_selene_cloth.py` keys her eight cloth chains and the six
+crown shards in every clip with `selene_cloth.py` (hang, travel drag, capped acceleration, a cyclic lag, capsule
+clearing, then the cleared directions smoothed over time; one-shots in the upper layer start and end on idle_combat's
+frame-0 cloth): `python tools/blender/gf_hero/s4_selene_run.py` (anim, cloth, render, sheets, gltf_check; about 2 min).
+One board, `art/characters/selene/reports/anim/anim_board.png`; report `art/characters/selene/reports/anim_report.md`.
+
 ### Stage 5: export & validate (implemented; made by AI, 2026-09-25)
 
 No human step: the export is headless Blender, and the quality gate is the validators and the review renders of the
@@ -504,6 +530,12 @@ python tools/blender/gf_hero/validate_glb.py assets/models/characters/<key>.glb 
 command after the export, `python tools/blender/gf_hero/s5_kael.py --sidecar`: `export_glb.py` words any default weapon
 without an offhand node as a sleeve weapon, and the serpent_smg is a hand-held gun. `kael.glb`: 111 joints, 32 clips,
 0 errors, 0 warnings.
+
+**Selene (2026-09-27).** The shared chain (`run_stage5.py selene --only export`, then `reimport` and `sheet`) with her
+hook `s5_selene.py`. For the same sleeve-weapon wording, `export_glb.py` gained an optional `signature_weapon.hold` text
+in the hero's `status.json` (absent for Brax and Valdris, so their sidecars are unchanged): her sidecar says the clips key
+the left palm onto the launcher's `grip_L`. `selene.glb`: 95 joints (32 extras), 22,356 tris, 31 clips, 11.6 MB, 0 errors,
+0 warnings; re-import 5.3e-6, the launcher on `weapon_R` 2.3e-7. Sheet: `art/characters/selene/reports/stage5/export_review.png`.
 
 **The shipped hero file** (`assets/models/characters/<key>.glb`):
 - glTF binary, +Y up, 1 unit = 1 m, the hero faces +Z, rest pose = the T-pose; uncompressed (§6), PNG textures

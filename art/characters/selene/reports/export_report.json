@@ -1,0 +1,1524 @@
+{
+ "hero": "selene",
+ "stage": "5_export_validate",
+ "updated": "2026-09-27",
+ "hero_export": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "glb": "assets/models/characters/selene.glb",
+  "meta": "assets/models/characters/selene.meta.json",
+  "bytes": 11612224,
+  "sha256": "40b79dd4f35d78ece3247fae9ca9037e93d35bf0f57bf31af4cacc7875a19793",
+  "source_blend": "art/characters/selene/production/selene_anim.blend",
+  "export_settings": {
+   "export_format": "GLB",
+   "use_selection": true,
+   "export_yup": true,
+   "export_apply": false,
+   "export_texcoords": true,
+   "export_normals": true,
+   "export_tangents": true,
+   "export_materials": "EXPORT",
+   "export_image_format": "AUTO",
+   "export_vertex_color": "NONE",
+   "export_all_vertex_colors": false,
+   "export_active_vertex_color_when_no_material": false,
+   "export_attributes": false,
+   "export_cameras": false,
+   "export_lights": false,
+   "export_extras": false,
+   "export_morph": false,
+   "export_draco_mesh_compression_enable": false,
+   "export_meshopt_compression_enable": false,
+   "export_use_gltfpack": false,
+   "export_gpu_instances": false,
+   "export_leaf_bone": false,
+   "export_skins": true,
+   "export_influence_nb": 4,
+   "export_all_influences": false,
+   "export_def_bones": true,
+   "export_rest_position_armature": true,
+   "export_armature_object_remove": false,
+   "export_hierarchy_flatten_bones": false,
+   "export_animations": true,
+   "export_animation_mode": "NLA_TRACKS",
+   "export_force_sampling": true,
+   "export_frame_step": 1,
+   "export_optimize_animation_size": false,
+   "export_anim_single_armature": true,
+   "export_reset_pose_bones": true,
+   "export_anim_slide_to_zero": false,
+   "export_pointer_animation": false
+  },
+  "joined_mesh": {
+   "name": "selene_mesh",
+   "verts": 11344,
+   "tris": 22356,
+   "double_sided": false
+  },
+  "blender_checks": {
+   "hierarchy_problems": [],
+   "parts": {
+    "BODY": {
+     "verts": 3937,
+     "tris": 7862,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "HAIR": {
+     "verts": 851,
+     "tris": 1598,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "CROWN": {
+     "verts": 144,
+     "tris": 264,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "COLLAR": {
+     "verts": 860,
+     "tris": 1672,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "BELT": {
+     "verts": 536,
+     "tris": 1064,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "SHOULDERS": {
+     "verts": 656,
+     "tris": 1296,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "CAPES": {
+     "verts": 988,
+     "tris": 1968,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "MANTLES": {
+     "verts": 308,
+     "tris": 608,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "PANELS": {
+     "verts": 448,
+     "tris": 888,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "TABARD": {
+     "verts": 386,
+     "tris": 764,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "GAUNTLETS": {
+     "verts": 946,
+     "tris": 1844,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "GREAVES": {
+     "verts": 576,
+     "tris": 1128,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    },
+    "SABATONS": {
+     "verts": 708,
+     "tris": 1400,
+     "boundary_edges": 0,
+     "nonmanifold_edges": 0,
+     "uv_layers": [
+      "UVMap"
+     ],
+     "color_attributes": [
+      "gf_mask"
+     ],
+     "non_bone_groups": [],
+     "unweighted": 0,
+     "over_4_influences": 0,
+     "not_normalized": 0,
+     "weight_sum_max_error": 0.0,
+     "on_root_or_socket": 0,
+     "armature_modifier": true,
+     "materials": [
+      "M_selene"
+     ]
+    }
+   },
+   "tris": 22356,
+   "closed": true,
+   "material": {
+    "name": "M_selene",
+    "images": [
+     {
+      "name": "selene_basecolor.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\selene_basecolor.png"
+     },
+     {
+      "name": "selene_emissive.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "sRGB",
+      "file": "//..\\textures\\selene_emissive.png"
+     },
+     {
+      "name": "selene_normal.png",
+      "px": [
+       2048,
+       2048
+      ],
+      "colorspace": "Non-Color",
+      "file": "//..\\textures\\selene_normal.png"
+     }
+    ]
+   },
+   "nla_tracks": {
+    "hero_tracks": 31,
+    "missing_vs_clips_json": [],
+    "missing_vs_required_clips": [],
+    "not_exported": []
+   }
+  },
+  "source_fidelity": {
+   "frames_per_clip": "first, middle, last",
+   "joints": 95,
+   "max_error": 2.673748677770038e-05,
+   "per_clip": {
+    "selene_idle@loop": 1.6798612751667275e-06,
+    "selene_idle_combat@loop": 2.022105178800526e-06,
+    "selene_walk@loop": 1.9388660407182456e-06,
+    "selene_run@loop": 2.4898854221300226e-05,
+    "selene_strafe_left@loop": 2.0973686312708573e-06,
+    "selene_strafe_right@loop": 2.730584970134231e-06,
+    "selene_backpedal@loop": 3.390694126026439e-06,
+    "selene_dash": 2.3234523588815115e-05,
+    "selene_dash_recover": 9.118228784285587e-06,
+    "selene_fire_light": 6.887645493613981e-06,
+    "selene_fire_heavy": 2.0221045475832256e-06,
+    "selene_fire_charge@loop": 1.9089352213674804e-06,
+    "selene_hit_light": 2.0221045475832256e-06,
+    "selene_hit_heavy": 2.082102029010713e-06,
+    "selene_knockdown": 2.748013764097834e-06,
+    "selene_get_up": 2.673748677770038e-05,
+    "selene_death": 2.978511725926225e-06,
+    "selene_downed@loop": 2.8330284699840114e-06,
+    "selene_revive": 1.3968425967569864e-05,
+    "selene_reforge_in": 3.24485769309657e-06,
+    "selene_victory": 2.0221045475832256e-06,
+    "selene_ping": 2.022104547749759e-06,
+    "selene_interact": 1.8218995441188213e-06,
+    "selene_forge_hammer@loop": 2.0046252281191723e-06,
+    "selene_idle_signature@loop": 1.6991583173253666e-06,
+    "selene_arc_nova": 2.022104547749759e-06,
+    "selene_blink_out": 2.7093502172892414e-06,
+    "selene_blink_in": 2.644569740251068e-06,
+    "selene_heavens_verdict_start": 2.0221045475832256e-06,
+    "selene_heavens_verdict@loop": 1.8581819617446982e-06,
+    "selene_static_charge": 2.022104547749759e-06
+   },
+   "ok": true
+  },
+  "validation": {
+   "file": "assets/models/characters/selene.glb",
+   "key": "selene",
+   "bytes": 11612224,
+   "sha256": "40b79dd4f35d78ece3247fae9ca9037e93d35bf0f57bf31af4cacc7875a19793",
+   "generator": "Khronos glTF Blender I/O v5.2.39",
+   "extensions_used": [
+    "KHR_materials_emissive_strength"
+   ],
+   "extensions_required": [],
+   "scene_roots": [
+    "GF_Hero_v1"
+   ],
+   "nodes": 97,
+   "joints": 95,
+   "extra_bones": [
+    "x_cape_L_01",
+    "x_cape_L_02",
+    "x_cape_L_03",
+    "x_cape_L_04",
+    "x_mantle_L_01",
+    "x_mantle_L_02",
+    "x_cape_R_01",
+    "x_cape_R_02",
+    "x_cape_R_03",
+    "x_cape_R_04",
+    "x_mantle_R_01",
+    "x_mantle_R_02",
+    "x_crown_01",
+    "x_crown_02",
+    "x_crown_03",
+    "x_crown_04",
+    "x_crown_05",
+    "x_crown_06",
+    "x_knee_L",
+    "x_knee_R",
+    "x_back_01",
+    "x_back_02",
+    "x_back_03",
+    "x_panel_L_01",
+    "x_panel_L_02",
+    "x_panel_L_03",
+    "x_panel_R_01",
+    "x_panel_R_02",
+    "x_panel_R_03",
+    "x_tabard_01",
+    "x_tabard_02",
+    "x_tabard_03"
+   ],
+   "bind_pose_max_error": 6.518600454681698e-07,
+   "sockets": {
+    "weapon_R": {
+     "parent": "hand_R",
+     "translation": [
+      -0.86429,
+      1.70294,
+      -0.02378
+     ],
+     "forward": [
+      -1.0,
+      -0.0,
+      -0.0
+     ],
+     "up": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "weapon_L": {
+     "parent": "hand_L",
+     "translation": [
+      0.86429,
+      1.70294,
+      -0.02378
+     ],
+     "forward": [
+      1.0,
+      -0.0,
+      -0.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "head_top": {
+     "parent": "head",
+     "translation": [
+      0.0,
+      2.2,
+      0.005
+     ],
+     "forward": [
+      0.0,
+      -0.0,
+      1.0
+     ],
+     "up": [
+      0.0,
+      1.0,
+      0.0
+     ],
+     "vs_landmarks": 0.0
+    },
+    "chest_sigil": {
+     "parent": "spine_03",
+     "translation": [
+      0.0,
+      1.7438,
+      0.09864
+     ],
+     "forward": [
+      -0.0,
+      -0.30937,
+      0.95094
+     ],
+     "up": [
+      0.0,
+      0.95094,
+      0.30937
+     ],
+     "vs_landmarks": 1.6e-06
+    }
+   },
+   "tris": 22356,
+   "skin": {
+    "vertices": 17952,
+    "unweighted": 0,
+    "over_4": 0,
+    "not_normalized": 0,
+    "on_non_weight_bones": 0,
+    "bad_joint_index": 0,
+    "weight_sum_max_error": 1.341104507446289e-07
+   },
+   "bounds_m": {
+    "min": [
+     -1.0016,
+     0,
+     -0.2331
+    ],
+    "max": [
+     1.0016,
+     2.2,
+     0.265
+    ]
+   },
+   "height_m": 2.2,
+   "materials": [
+    {
+     "name": "M_selene",
+     "double_sided": false,
+     "emissive_strength": 2.5,
+     "textures": {
+      "base_color": true,
+      "emissive": true,
+      "normal": true
+     }
+    }
+   ],
+   "textures": [
+    {
+     "name": "selene_emissive",
+     "role": "emissive",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 124396
+    },
+    {
+     "name": "selene_normal",
+     "role": "normal",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 893987
+    },
+    {
+     "name": "selene_basecolor",
+     "role": "base_color",
+     "px": [
+      2048,
+      2048
+     ],
+     "format": "png",
+     "bytes": 3359196
+    }
+   ],
+   "clips": [
+    "selene_idle@loop",
+    "selene_idle_combat@loop",
+    "selene_walk@loop",
+    "selene_run@loop",
+    "selene_strafe_left@loop",
+    "selene_strafe_right@loop",
+    "selene_backpedal@loop",
+    "selene_dash",
+    "selene_dash_recover",
+    "selene_fire_light",
+    "selene_fire_heavy",
+    "selene_fire_charge@loop",
+    "selene_hit_light",
+    "selene_hit_heavy",
+    "selene_knockdown",
+    "selene_get_up",
+    "selene_death",
+    "selene_downed@loop",
+    "selene_revive",
+    "selene_reforge_in",
+    "selene_victory",
+    "selene_ping",
+    "selene_interact",
+    "selene_forge_hammer@loop",
+    "selene_idle_signature@loop",
+    "selene_arc_nova",
+    "selene_blink_out",
+    "selene_blink_in",
+    "selene_heavens_verdict_start",
+    "selene_heavens_verdict@loop",
+    "selene_static_charge"
+   ],
+   "clip_checks": {
+    "selene_idle@loop": {
+     "channels": 285,
+     "duration_s": 3.0,
+     "samples": 91,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_idle_combat@loop": {
+     "channels": 285,
+     "duration_s": 1.06667,
+     "samples": 33,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_walk@loop": {
+     "channels": 285,
+     "duration_s": 0.93333,
+     "samples": 29,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_run@loop": {
+     "channels": 285,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_strafe_left@loop": {
+     "channels": 285,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_strafe_right@loop": {
+     "channels": 285,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_backpedal@loop": {
+     "channels": 285,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_dash": {
+     "channels": 285,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 95
+    },
+    "selene_dash_recover": {
+     "channels": 285,
+     "duration_s": 0.46667,
+     "samples": 15,
+     "animated_joints": 95
+    },
+    "selene_fire_light": {
+     "channels": 285,
+     "duration_s": 0.26667,
+     "samples": 9,
+     "animated_joints": 95
+    },
+    "selene_fire_heavy": {
+     "channels": 285,
+     "duration_s": 0.53333,
+     "samples": 17,
+     "animated_joints": 95
+    },
+    "selene_fire_charge@loop": {
+     "channels": 285,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_hit_light": {
+     "channels": 285,
+     "duration_s": 0.4,
+     "samples": 13,
+     "animated_joints": 95
+    },
+    "selene_hit_heavy": {
+     "channels": 285,
+     "duration_s": 0.86667,
+     "samples": 27,
+     "animated_joints": 95
+    },
+    "selene_knockdown": {
+     "channels": 285,
+     "duration_s": 1.0,
+     "samples": 31,
+     "animated_joints": 95
+    },
+    "selene_get_up": {
+     "channels": 285,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 95
+    },
+    "selene_death": {
+     "channels": 285,
+     "duration_s": 1.6,
+     "samples": 49,
+     "animated_joints": 95
+    },
+    "selene_downed@loop": {
+     "channels": 285,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_revive": {
+     "channels": 285,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 95
+    },
+    "selene_reforge_in": {
+     "channels": 285,
+     "duration_s": 1.5,
+     "samples": 46,
+     "animated_joints": 95
+    },
+    "selene_victory": {
+     "channels": 285,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 95
+    },
+    "selene_ping": {
+     "channels": 285,
+     "duration_s": 0.66667,
+     "samples": 21,
+     "animated_joints": 95
+    },
+    "selene_interact": {
+     "channels": 285,
+     "duration_s": 1.33333,
+     "samples": 41,
+     "animated_joints": 95
+    },
+    "selene_forge_hammer@loop": {
+     "channels": 285,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_idle_signature@loop": {
+     "channels": 285,
+     "duration_s": 3.0,
+     "samples": 91,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_arc_nova": {
+     "channels": 285,
+     "duration_s": 0.6,
+     "samples": 19,
+     "animated_joints": 95
+    },
+    "selene_blink_out": {
+     "channels": 285,
+     "duration_s": 0.33333,
+     "samples": 11,
+     "animated_joints": 95
+    },
+    "selene_blink_in": {
+     "channels": 285,
+     "duration_s": 0.46667,
+     "samples": 15,
+     "animated_joints": 95
+    },
+    "selene_heavens_verdict_start": {
+     "channels": 285,
+     "duration_s": 1.2,
+     "samples": 37,
+     "animated_joints": 95
+    },
+    "selene_heavens_verdict@loop": {
+     "channels": 285,
+     "duration_s": 2.0,
+     "samples": 61,
+     "animated_joints": 95,
+     "loop_first_last_max_diff": 0.0
+    },
+    "selene_static_charge": {
+     "channels": 285,
+     "duration_s": 0.8,
+     "samples": 25,
+     "animated_joints": 95
+    }
+   },
+   "sidecar": "checked",
+   "weapon_attach": {
+    "weapon": "assets/models/weapons/thundercoil_launcher.glb",
+    "meshes": {
+     "thundercoil_launcher_mesh": {
+      "socket": "weapon_R",
+      "encloses": {
+       "wrist": true,
+       "palm": true,
+       "knuckle": true
+      }
+     }
+    }
+   },
+   "errors": [],
+   "warnings": [],
+   "ok": true
+  }
+ },
+ "ok": true,
+ "blender_reimport": {
+  "file": "assets/models/characters/selene.glb",
+  "blender": "5.2.0 LTS",
+  "importer": [
+   "FINISHED"
+  ],
+  "hero_hook": "tools/blender/gf_hero/s5_selene.py",
+  "objects": [
+   "GF_Hero_v1",
+   "selene_mesh"
+  ],
+  "bones": 95,
+  "sockets": {
+   "weapon_R": true,
+   "weapon_L": true,
+   "head_top": true,
+   "chest_sigil": true
+  },
+  "meshes": {
+   "selene_mesh": {
+    "verts": 17952,
+    "skinned": true,
+    "vertex_groups_not_bones": [],
+    "materials": [
+     "M_selene"
+    ],
+    "uv_layers": [
+     "UVMap"
+    ]
+   }
+  },
+  "images": {
+   "selene_basecolor": [
+    2048,
+    2048
+   ],
+   "selene_emissive": [
+    2048,
+    2048
+   ],
+   "selene_normal": [
+    2048,
+    2048
+   ]
+  },
+  "socket_axes_restored_vs_authoring": {
+   "weapon_R": 8.940696716308594e-07,
+   "weapon_L": 8.344650268554688e-07,
+   "head_top": 5.364418029785156e-07,
+   "chest_sigil": 9.5367431640625e-07
+  },
+  "clips_played": 31,
+  "clip_pose_max_error": 5.304813385009766e-06,
+  "clips": {
+   "selene_idle@loop": {
+    "frame": 45,
+    "frame_range": [
+     0.0,
+     90.0
+    ],
+    "max_bone_error": 3.0994415283203125e-06,
+    "mesh": {
+     "min_z": 0.0,
+     "extent": [
+      1.503,
+      0.642,
+      2.186
+     ]
+    }
+   },
+   "selene_idle_combat@loop": {
+    "frame": 16,
+    "frame_range": [
+     0.0,
+     32.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.023,
+      1.247,
+      2.128
+     ]
+    }
+   },
+   "selene_walk@loop": {
+    "frame": 14,
+    "frame_range": [
+     0.0,
+     28.0
+    ],
+    "max_bone_error": 2.9802322387695312e-06,
+    "mesh": {
+     "min_z": 0.0002,
+     "extent": [
+      1.462,
+      1.102,
+      2.124
+     ]
+    }
+   },
+   "selene_run@loop": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 4.649162292480469e-06,
+    "mesh": {
+     "min_z": 0.0575,
+     "extent": [
+      1.059,
+      1.589,
+      2.003
+     ]
+    }
+   },
+   "selene_strafe_left@loop": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 3.2186508178710938e-06,
+    "mesh": {
+     "min_z": 0.0257,
+     "extent": [
+      1.58,
+      1.208,
+      2.003
+     ]
+    }
+   },
+   "selene_strafe_right@loop": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 3.814697265625e-06,
+    "mesh": {
+     "min_z": 0.0257,
+     "extent": [
+      1.357,
+      1.219,
+      2.001
+     ]
+    }
+   },
+   "selene_backpedal@loop": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 4.112720489501953e-06,
+    "mesh": {
+     "min_z": 0.0231,
+     "extent": [
+      0.903,
+      1.526,
+      2.002
+     ]
+    }
+   },
+   "selene_dash": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 4.708766937255859e-06,
+    "mesh": {
+     "min_z": 0.0442,
+     "extent": [
+      1.315,
+      1.318,
+      1.814
+     ]
+    }
+   },
+   "selene_dash_recover": {
+    "frame": 7,
+    "frame_range": [
+     0.0,
+     14.0
+    ],
+    "max_bone_error": 3.933906555175781e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      0.928,
+      1.184,
+      2.027
+     ]
+    }
+   },
+   "selene_fire_light": {
+    "frame": 4,
+    "frame_range": [
+     0.0,
+     8.0
+    ],
+    "max_bone_error": 3.993511199951172e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      0.997,
+      1.221,
+      2.135
+     ]
+    }
+   },
+   "selene_fire_heavy": {
+    "frame": 8,
+    "frame_range": [
+     0.0,
+     16.0
+    ],
+    "max_bone_error": 3.993511199951172e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.018,
+      1.192,
+      2.135
+     ]
+    }
+   },
+   "selene_fire_charge@loop": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.022,
+      1.244,
+      2.09
+     ]
+    }
+   },
+   "selene_hit_light": {
+    "frame": 6,
+    "frame_range": [
+     0.0,
+     12.0
+    ],
+    "max_bone_error": 3.993511199951172e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.027,
+      1.207,
+      2.116
+     ]
+    }
+   },
+   "selene_hit_heavy": {
+    "frame": 13,
+    "frame_range": [
+     0.0,
+     26.0
+    ],
+    "max_bone_error": 3.933906555175781e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      0.915,
+      1.154,
+      1.908
+     ]
+    }
+   },
+   "selene_knockdown": {
+    "frame": 15,
+    "frame_range": [
+     0.0,
+     30.0
+    ],
+    "max_bone_error": 5.304813385009766e-06,
+    "mesh": {
+     "min_z": -0.2198,
+     "extent": [
+      2.906,
+      2.096,
+      0.994
+     ]
+    }
+   },
+   "selene_get_up": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 4.887580871582031e-06,
+    "mesh": {
+     "min_z": -0.1461,
+     "extent": [
+      1.888,
+      0.919,
+      1.555
+     ]
+    }
+   },
+   "selene_death": {
+    "frame": 24,
+    "frame_range": [
+     0.0,
+     48.0
+    ],
+    "max_bone_error": 4.887580871582031e-06,
+    "mesh": {
+     "min_z": -0.0886,
+     "extent": [
+      1.426,
+      0.858,
+      1.502
+     ]
+    }
+   },
+   "selene_downed@loop": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 5.125999450683594e-06,
+    "mesh": {
+     "min_z": 0.0685,
+     "extent": [
+      1.504,
+      1.232,
+      1.481
+     ]
+    }
+   },
+   "selene_revive": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 3.933906555175781e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.03,
+      1.151,
+      1.996
+     ]
+    }
+   },
+   "selene_reforge_in": {
+    "frame": 22,
+    "frame_range": [
+     0.0,
+     45.0
+    ],
+    "max_bone_error": 3.874301910400391e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.027,
+      1.246,
+      2.051
+     ]
+    }
+   },
+   "selene_victory": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 3.993511199951172e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.663,
+      1.316,
+      2.193
+     ]
+    }
+   },
+   "selene_ping": {
+    "frame": 10,
+    "frame_range": [
+     0.0,
+     20.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.093,
+      1.371,
+      2.119
+     ]
+    }
+   },
+   "selene_interact": {
+    "frame": 20,
+    "frame_range": [
+     0.0,
+     40.0
+    ],
+    "max_bone_error": 3.2782554626464844e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.487,
+      0.749,
+      1.891
+     ]
+    }
+   },
+   "selene_forge_hammer@loop": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 3.3974647521972656e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.634,
+      0.792,
+      2.036
+     ]
+    }
+   },
+   "selene_idle_signature@loop": {
+    "frame": 45,
+    "frame_range": [
+     0.0,
+     90.0
+    ],
+    "max_bone_error": 3.039836883544922e-06,
+    "mesh": {
+     "min_z": 0.0014,
+     "extent": [
+      1.462,
+      0.654,
+      2.253
+     ]
+    }
+   },
+   "selene_arc_nova": {
+    "frame": 9,
+    "frame_range": [
+     0.0,
+     18.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.306,
+      1.431,
+      2.09
+     ]
+    }
+   },
+   "selene_blink_out": {
+    "frame": 5,
+    "frame_range": [
+     0.0,
+     10.0
+    ],
+    "max_bone_error": 4.112720489501953e-06,
+    "mesh": {
+     "min_z": 0.0009,
+     "extent": [
+      0.901,
+      1.239,
+      1.887
+     ]
+    }
+   },
+   "selene_blink_in": {
+    "frame": 7,
+    "frame_range": [
+     0.0,
+     14.0
+    ],
+    "max_bone_error": 4.112720489501953e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      0.96,
+      1.201,
+      2.032
+     ]
+    }
+   },
+   "selene_heavens_verdict_start": {
+    "frame": 18,
+    "frame_range": [
+     0.0,
+     36.0
+    ],
+    "max_bone_error": 3.0994415283203125e-06,
+    "mesh": {
+     "min_z": 0.0046,
+     "extent": [
+      2.007,
+      0.664,
+      2.429
+     ]
+    }
+   },
+   "selene_heavens_verdict@loop": {
+    "frame": 30,
+    "frame_range": [
+     0.0,
+     60.0
+    ],
+    "max_bone_error": 2.9802322387695312e-06,
+    "mesh": {
+     "min_z": 0.0019,
+     "extent": [
+      2.045,
+      0.765,
+      2.538
+     ]
+    }
+   },
+   "selene_static_charge": {
+    "frame": 12,
+    "frame_range": [
+     0.0,
+     24.0
+    ],
+    "max_bone_error": 4.0531158447265625e-06,
+    "mesh": {
+     "min_z": -0.0,
+     "extent": [
+      1.097,
+      1.134,
+      2.082
+     ]
+    }
+   }
+  },
+  "weapon": {
+   "file": "assets/models/weapons/thundercoil_launcher.glb",
+   "objects": [
+    "glow_core",
+    "grip_L",
+    "grip_R",
+    "muzzle",
+    "thundercoil_launcher",
+    "thundercoil_launcher_mesh"
+   ],
+   "offhand": false,
+   "root_is_identity": true,
+   "attach_rest_error": 2.2845026137474633e-07,
+   "variants": {
+    "fist": [],
+    "open": []
+   },
+   "fixed": {
+    "R": [
+     "thundercoil_launcher_mesh"
+    ]
+   },
+   "attach_fire_heavy_f7_error": 7.003545761108398e-07
+  },
+  "review_renders": {
+   "dir": "art/characters/selene/work/renders/stage5",
+   "shots": [
+    {
+     "shot": "idle_combat_f000",
+     "clip": "selene_idle_combat@loop",
+     "frame": 0,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "fire_heavy_f007",
+     "clip": "selene_fire_heavy",
+     "frame": 7,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "arc_nova_f006",
+     "clip": "selene_arc_nova",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "run_f006",
+     "clip": "selene_run@loop",
+     "frame": 6,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "blink_in_f003",
+     "clip": "selene_blink_in",
+     "frame": 3,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "heavens_verdict_f015",
+     "clip": "selene_heavens_verdict@loop",
+     "frame": 15,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    },
+    {
+     "shot": "idle_signature_f022",
+     "clip": "selene_idle_signature@loop",
+     "frame": 22,
+     "weapon_shown": {
+      "L": "own hand",
+      "R": "thundercoil_launcher_mesh"
+     }
+    }
+   ]
+  },
+  "errors": [],
+  "warnings": [],
+  "ok": true,
+  "seconds": 5.2
+ }
+}

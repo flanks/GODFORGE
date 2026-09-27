@@ -1,0 +1,422 @@
+{
+ "hero": "selene",
+ "method": "tools/blender/gf_hero/selene_cloth.py (hang + forces + lag + capsule clear)",
+ "chains": {
+  "x_cape_L": [
+   "x_cape_L_01",
+   "x_cape_L_02",
+   "x_cape_L_03",
+   "x_cape_L_04"
+  ],
+  "x_mantle_L": [
+   "x_mantle_L_01",
+   "x_mantle_L_02"
+  ],
+  "x_cape_R": [
+   "x_cape_R_01",
+   "x_cape_R_02",
+   "x_cape_R_03",
+   "x_cape_R_04"
+  ],
+  "x_mantle_R": [
+   "x_mantle_R_01",
+   "x_mantle_R_02"
+  ],
+  "x_panel_L": [
+   "x_panel_L_01",
+   "x_panel_L_02",
+   "x_panel_L_03"
+  ],
+  "x_panel_R": [
+   "x_panel_R_01",
+   "x_panel_R_02",
+   "x_panel_R_03"
+  ],
+  "x_tabard": [
+   "x_tabard_01",
+   "x_tabard_02",
+   "x_tabard_03"
+  ],
+  "x_back": [
+   "x_back_01",
+   "x_back_02",
+   "x_back_03"
+  ]
+ },
+ "crown": [
+  "x_crown_01",
+  "x_crown_02",
+  "x_crown_03",
+  "x_crown_04",
+  "x_crown_05",
+  "x_crown_06"
+ ],
+ "groups": {
+  "cape": {
+   "gravity": 0.92,
+   "tau": [
+    0.07,
+    0.16
+   ],
+   "drag": 1.05,
+   "acc": 0.25,
+   "margin": 0.025,
+   "frame": "spine_03",
+   "cols": [
+    "thigh_L",
+    "thigh_R",
+    "shin_L",
+    "shin_R",
+    "foot_L",
+    "foot_R",
+    "upperarm_L",
+    "upperarm_R",
+    "lowerarm_L",
+    "lowerarm_R",
+    "hand_L",
+    "hand_R",
+    "belly",
+    "waist",
+    "chest",
+    "hips"
+   ]
+  },
+  "mantle": {
+   "gravity": 0.85,
+   "tau": [
+    0.05,
+    0.09
+   ],
+   "drag": 0.6,
+   "acc": 0.3,
+   "margin": 0.02,
+   "frame": "spine_03",
+   "cols": [
+    "upperarm_L",
+    "upperarm_R",
+    "lowerarm_L",
+    "lowerarm_R",
+    "chest",
+    "waist"
+   ]
+  },
+  "panel": {
+   "gravity": 0.88,
+   "tau": [
+    0.05,
+    0.11
+   ],
+   "drag": 0.85,
+   "acc": 0.25,
+   "margin": 0.025,
+   "frame": "pelvis",
+   "cols": [
+    "thigh_L",
+    "thigh_R",
+    "shin_L",
+    "shin_R",
+    "foot_L",
+    "foot_R",
+    "hips",
+    "hand_L",
+    "hand_R",
+    "lowerarm_L",
+    "lowerarm_R"
+   ]
+  },
+  "tabard": {
+   "gravity": 0.9,
+   "tau": [
+    0.05,
+    0.11
+   ],
+   "drag": 0.85,
+   "acc": 0.25,
+   "margin": 0.025,
+   "frame": "pelvis",
+   "cols": [
+    "thigh_L",
+    "thigh_R",
+    "shin_L",
+    "shin_R",
+    "foot_L",
+    "foot_R",
+    "hips",
+    "hand_L",
+    "hand_R"
+   ]
+  },
+  "back": {
+   "gravity": 0.9,
+   "tau": [
+    0.06,
+    0.13
+   ],
+   "drag": 0.95,
+   "acc": 0.25,
+   "margin": 0.025,
+   "frame": "pelvis",
+   "cols": [
+    "thigh_L",
+    "thigh_R",
+    "shin_L",
+    "shin_R",
+    "foot_L",
+    "foot_R",
+    "hips",
+    "belly"
+   ]
+  }
+ },
+ "clips": {
+  "idle_combat": {
+   "frames": 33,
+   "inside_bone_frames": 66,
+   "max_turn_per_frame_deg": 1.0,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.39
+  },
+  "idle": {
+   "frames": 91,
+   "inside_bone_frames": 52,
+   "max_turn_per_frame_deg": 2.9,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 1.07
+  },
+  "walk": {
+   "frames": 29,
+   "inside_bone_frames": 63,
+   "max_turn_per_frame_deg": 13.3,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.39
+  },
+  "run": {
+   "frames": 19,
+   "inside_bone_frames": 27,
+   "max_turn_per_frame_deg": 9.6,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.24
+  },
+  "strafe_left": {
+   "frames": 17,
+   "inside_bone_frames": 59,
+   "max_turn_per_frame_deg": 9.7,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.21
+  },
+  "strafe_right": {
+   "frames": 17,
+   "inside_bone_frames": 39,
+   "max_turn_per_frame_deg": 7.4,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.2
+  },
+  "backpedal": {
+   "frames": 17,
+   "inside_bone_frames": 34,
+   "max_turn_per_frame_deg": 9.3,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.23
+  },
+  "dash": {
+   "frames": 9,
+   "inside_bone_frames": 31,
+   "max_turn_per_frame_deg": 8.9,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.12
+  },
+  "dash_recover": {
+   "frames": 15,
+   "inside_bone_frames": 42,
+   "max_turn_per_frame_deg": 10.9,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.18
+  },
+  "fire_light": {
+   "frames": 9,
+   "inside_bone_frames": 12,
+   "max_turn_per_frame_deg": 4.9,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.11
+  },
+  "fire_heavy": {
+   "frames": 17,
+   "inside_bone_frames": 27,
+   "max_turn_per_frame_deg": 7.3,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.22
+  },
+  "fire_charge": {
+   "frames": 25,
+   "inside_bone_frames": 50,
+   "max_turn_per_frame_deg": 1.8,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.3
+  },
+  "hit_light": {
+   "frames": 13,
+   "inside_bone_frames": 19,
+   "max_turn_per_frame_deg": 8.3,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.16
+  },
+  "hit_heavy": {
+   "frames": 27,
+   "inside_bone_frames": 77,
+   "max_turn_per_frame_deg": 10.7,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.32
+  },
+  "knockdown": {
+   "frames": 31,
+   "inside_bone_frames": 308,
+   "max_turn_per_frame_deg": 32.3,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.53
+  },
+  "get_up": {
+   "frames": 37,
+   "inside_bone_frames": 278,
+   "max_turn_per_frame_deg": 57.2,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.56
+  },
+  "death": {
+   "frames": 49,
+   "inside_bone_frames": 457,
+   "max_turn_per_frame_deg": 46.4,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.79
+  },
+  "downed": {
+   "frames": 61,
+   "inside_bone_frames": 168,
+   "max_turn_per_frame_deg": 10.9,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.89
+  },
+  "revive": {
+   "frames": 41,
+   "inside_bone_frames": 107,
+   "max_turn_per_frame_deg": 10.3,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.51
+  },
+  "reforge_in": {
+   "frames": 46,
+   "inside_bone_frames": 177,
+   "max_turn_per_frame_deg": 17.1,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.61
+  },
+  "victory": {
+   "frames": 61,
+   "inside_bone_frames": 78,
+   "max_turn_per_frame_deg": 11.3,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.69
+  },
+  "ping": {
+   "frames": 21,
+   "inside_bone_frames": 25,
+   "max_turn_per_frame_deg": 6.6,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.25
+  },
+  "interact": {
+   "frames": 41,
+   "inside_bone_frames": 126,
+   "max_turn_per_frame_deg": 12.2,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.51
+  },
+  "forge_hammer": {
+   "frames": 37,
+   "inside_bone_frames": 111,
+   "max_turn_per_frame_deg": 10.0,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.48
+  },
+  "idle_signature": {
+   "frames": 91,
+   "inside_bone_frames": 84,
+   "max_turn_per_frame_deg": 14.0,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 1.17
+  },
+  "arc_nova": {
+   "frames": 19,
+   "inside_bone_frames": 20,
+   "max_turn_per_frame_deg": 6.1,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.23
+  },
+  "blink_out": {
+   "frames": 11,
+   "inside_bone_frames": 34,
+   "max_turn_per_frame_deg": 10.0,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.14
+  },
+  "blink_in": {
+   "frames": 15,
+   "inside_bone_frames": 46,
+   "max_turn_per_frame_deg": 10.4,
+   "reference_start_end": null,
+   "crown_verdict": false,
+   "seconds": 0.18
+  },
+  "heavens_verdict_start": {
+   "frames": 37,
+   "inside_bone_frames": 58,
+   "max_turn_per_frame_deg": 9.7,
+   "reference_start_end": null,
+   "crown_verdict": true,
+   "seconds": 0.42
+  },
+  "heavens_verdict": {
+   "frames": 61,
+   "inside_bone_frames": 45,
+   "max_turn_per_frame_deg": 8.9,
+   "reference_start_end": null,
+   "crown_verdict": true,
+   "seconds": 0.71
+  },
+  "static_charge": {
+   "frames": 25,
+   "inside_bone_frames": 29,
+   "max_turn_per_frame_deg": 6.0,
+   "reference_start_end": "idle_combat frame 0",
+   "crown_verdict": false,
+   "seconds": 0.29
+  }
+ },
+ "seconds": 13.2
+}

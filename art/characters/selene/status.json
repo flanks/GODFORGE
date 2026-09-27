@@ -15,7 +15,8 @@
   "glb": "assets/models/weapons/thundercoil_launcher.glb",
   "meta": "assets/models/weapons/thundercoil_launcher.meta.json",
   "built_by": "the weapon track (already shipped); the hero chain never re-exports it",
-  "sockets": "weapon_R / weapon_L on GF_Hero_v1 (identity child of the socket node, docs/art/WEAPONS.md)"
+  "sockets": "weapon_R / weapon_L on GF_Hero_v1 (identity child of the socket node, docs/art/WEAPONS.md)",
+  "hold": "Two-handed: the right palm holds grip_R (the weapon root on weapon_R) and her clips key the left palm onto its grip_L (tools/blender/gf_hero/s4_selene.py apply_hold); a clip lets go where the pose says so (ping, Arc Nova, Static Charge, the dash and blink lunges, falls, carry and kit poses)"
  },
  "stages": {
   "0_concept_reference": {
@@ -251,22 +252,252 @@
    }
   },
   "3_rig": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "GF_Hero_v1 + x_crown_01..06 shard bones under head_top and cloth chains x_cape_{L,R}_01..04, x_mantle_{L,R}_01..02, x_panel_{L,R}_01..03, x_tabard_01..03, x_back_01..03 (reports/stage2_production_mesh.md section 5; the piece table in reports/stage2/parts.json)."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s3_selene_run.py; no human artist",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes the rig, the clips and the export, the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "skeleton": "GF_Hero_v1 v1 (docs/art/GF_HERO_SKELETON.md, tools/blender/gf_hero/gf_hero_rig.py) + 32 per-hero x_ extras",
+   "outputs": [
+    "art/characters/selene/production/selene_rig.blend (Git LFS)",
+    "art/characters/selene/work/selene_landmarks.json (committed, git add -f)",
+    "art/characters/selene/stage3_skin.json",
+    "art/characters/selene/reports/rig_report.md",
+    "art/characters/selene/reports/stage3/stage3_rig.png",
+    "art/characters/selene/reports/stage3/{landmarks,skin,poses}.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/s3_selene_run.py",
+    "tools/blender/gf_hero/s3_landmarks.py (shared, unchanged)",
+    "tools/blender/gf_hero/s3_selene_landmarks.py",
+    "tools/blender/gf_hero/s3_mh_seed.py (shared, unchanged)",
+    "tools/blender/gf_hero/s3_skin.py (shared, unchanged) + the hook tools/blender/gf_hero/s3_selene_skin.py",
+    "tools/blender/gf_hero/s3_selene_poses.py",
+    "tools/blender/gf_hero/selene_cloth.py",
+    "tools/blender/gf_hero/selene_render.py",
+    "tools/blender/gf_hero/s3_selene_sheets.py",
+    "tools/blender/gf_hero/s4lib.py + s4_selene.py (read: the stage-4 solver poses the validation set)"
+   ],
+   "metrics": {
+    "bones": 95,
+    "bones_by_group": {
+     "core": 23,
+     "twist": 6,
+     "fingers": 30,
+     "sockets": 4,
+     "extras": 32
+    },
+    "extras": {
+     "crown": "x_crown_01..06 under head_top",
+     "driven_helpers": [
+      "x_knee_L/R"
+     ],
+     "cloth_chains": {
+      "x_cape_L/R": 4,
+      "x_mantle_L/R": 2,
+      "x_panel_L/R": 3,
+      "x_tabard": 3,
+      "x_back": 3
+     }
+    },
+    "weighted_objects": 13,
+    "unweighted_vertices": 0,
+    "max_influences": 4,
+    "chest_sigil": "the collar gem's front face (z 1.744)",
+    "weapon_identity_attach_error": {
+     "thundercoil_launcher.glb (shipped file) on weapon_R, rest and every validation pose": 0.0
+    },
+    "hold_grip_L_error_mm": 0.0,
+    "validation_poses": 8
+   },
+   "items": {
+    "rig_and_weights": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/selene/production/selene_rig.blend"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's visual approval of the AI-made rig and weights (reports/stage3/stage3_rig.png, reports/rig_report.md). Record it with approved_by / approved_on on this item."
+    }
+   },
+   "notes": "GF_Hero_v1 on the stage-2 mesh with 32 extras: six crown-shard bones under head_top (pivot on the head's axis, so a clip can orbit, bob and spin each shard), two driven knee helpers (Copy Rotation of the shin at 0.5) and one cloth chain down each of the eight cloth sheets. BODY weighted as Brax / Valdris; every part per stage-2 piece (rigid rows, per-vertex body copies for straps / belt / bracers / foot shells, cloth by the sheet's own v). The thundercoil_launcher GLB rides weapon_R by the identity attach (error 0.0) and the hold pose puts the left palm on its grip_L (0.0 mm). One review sheet; limits in reports/rig_report.md section 5 (the hold needs the bladed chest; cloth posed, not simulated)."
   },
   "4_animation": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "The 24 shared clips re-posed on her proportions + her unique set (brief.md section 8: idle_signature, arc_nova, blink_out / blink_in, heavens_verdict_start / @loop, static_charge, launcher fire poses) + a cloth pass."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the automated Blender 5.2 chain tools/blender/gf_hero/s4_selene_run.py; no animator, no Mixamo / ActorCore seeds",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes the rig, the clips and the export, the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "skeleton": "GF_Hero_v1 v1 + her 32 x_ extras",
+   "outputs": [
+    "art/characters/selene/production/selene_anim.blend (Git LFS)",
+    "art/characters/selene/reports/anim_report.md",
+    "art/characters/selene/reports/anim/anim_board.png",
+    "art/characters/selene/reports/anim/{clips,cloth,render_checks,gltf_check}.json"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/s4_selene_run.py",
+    "tools/blender/gf_hero/s4_anim.py (shared, unchanged)",
+    "tools/blender/gf_hero/s4_selene.py (the shared set re-posed + 7 kit clips; the per-frame two-hand grip)",
+    "tools/blender/gf_hero/s4_selene_cloth.py + selene_cloth.py (cloth and crown pass)",
+    "tools/blender/gf_hero/s4_selene_render.py",
+    "tools/blender/gf_hero/s4_selene_sheets.py",
+    "tools/blender/gf_hero/s4_gltf_check.py (shared, unchanged)",
+    "tools/blender/gf_hero/required_clips.json (the selene block, additive)"
+   ],
+   "metrics": {
+    "clips": 31,
+    "shared_clips": 24,
+    "unique_clips": 7,
+    "loops": 12,
+    "fps": 30,
+    "frames_total": 991,
+    "foot_slide_max_mm": 7.5,
+    "ik_miss_max_mm": 39.4,
+    "elbow_flexion_max_deg": 133.1,
+    "knee_flexion_max_deg": 150.0,
+    "wrist_swing_max_deg": 0.0,
+    "keepout_residual_verts_max": 31,
+    "ground_penetration_min_mm": -6.0,
+    "loop_seams_closed": 12,
+    "solver_vs_blender_max_error": 7.822754829172306e-07,
+    "design_speed_run_mps": 7.0,
+    "design_speed_walk_mps": 1.718,
+    "cloth_and_crown_keyed_bones": 28,
+    "gltf_animations": 31,
+    "gltf_check_ok": true
+   },
+   "items": {
+    "shared_clip_set": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_selene.py (shared_clips)"
+     ],
+     "notes": "the 24 GF_Hero_v1 shared clips (names, loops, layers, events, timing of s4_clips.py) re-posed for her two-handed launcher hold, carry and gait"
+    },
+    "selene_unique_clips": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_selene.py (unique_clips)"
+     ],
+     "notes": "7 clips: idle_signature@loop, arc_nova, blink_out, blink_in, heavens_verdict_start, heavens_verdict@loop, static_charge; her launcher fire poses are the shared fire_light / fire_heavy / fire_charge re-posed"
+    },
+    "cloth_pass": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "tools/blender/gf_hero/s4_selene_cloth.py",
+      "art/characters/selene/reports/anim/cloth.json"
+     ]
+    },
+    "user_visual_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's visual approval of the AI-made clips (reports/anim/anim_board.png, reports/anim_report.md). Record it with approved_by / approved_on on this item."
+    }
+   },
+   "notes": "31 clips (24 shared re-posed + 7 kit), baked on the stage-3 rig with the cloth and crown pass. The left palm is placed on the launcher's grip_L frame by frame from the solved right-hand grip (every frame of idle_combat, run, strafes, backpedal and the fire clips). All numbers inside the check_clips.py gates (slide 7.5 mm, IK miss 39 mm, elbow 133, knee 150, keep-out 31). Limits in reports/anim_report.md section 4."
   },
   "5_export_validate": {
-   "status": "not_started",
+   "status": "done",
    "human_signoff_required": true,
-   "outputs": [],
-   "notes": "assets/models/characters/selene.glb + selene.meta.json through the shared exporter and gate; the user's final approval is the last human gate."
+   "stand_in": false,
+   "produced_by": "AI (Claude) with the shared headless chain tools/blender/gf_hero/run_stage5.py (steps export, reimport, sheet); no human step",
+   "decision": "2026-09-25: no human artist at any stage; the AI makes the rig, the clips and the export, the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+   "outputs": [
+    "assets/models/characters/selene.glb (Git LFS)",
+    "assets/models/characters/selene.meta.json",
+    "art/characters/selene/reports/export_report.json",
+    "art/characters/selene/reports/stage5/export_review.png"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/run_stage5.py (shared, unchanged)",
+    "tools/blender/gf_hero/export_glb.py (shared; gained an optional signature_weapon.hold text for a carried weapon without an offhand node, absent for Brax and Valdris)",
+    "tools/blender/gf_hero/validate_glb.py (shared, unchanged; run inside the export)",
+    "tools/blender/gf_hero/smoke_import.py (shared, unchanged)",
+    "tools/blender/gf_hero/s5_sheets.py (shared, unchanged)",
+    "tools/blender/gf_hero/s5_selene.py (the review-shot hook)",
+    "tools/blender/gf_hero/required_clips.json (the selene block)"
+   ],
+   "metrics": {
+    "glb_bytes": 11612224,
+    "glb_sha256": "40b79dd4f35d78ece3247fae9ca9037e93d35bf0f57bf31af4cacc7875a19793",
+    "tris": 22356,
+    "tris_budget": [
+     15000,
+     25000
+    ],
+    "joints": 95,
+    "extra_bones": 32,
+    "meshes": 1,
+    "materials": 1,
+    "double_sided": false,
+    "textures_px": {
+     "emissive": 2048,
+     "normal": 2048,
+     "base_color": 2048
+    },
+    "clips": 31,
+    "required_clips_missing": 0,
+    "height_m": 2.2,
+    "validation_errors": 0,
+    "validation_warnings": [],
+    "source_fidelity_max_error": 2.673748677770038e-05,
+    "blender_reimport_clips_played": 31,
+    "blender_reimport_clip_pose_max_error": 5.304813385009766e-06,
+    "weapon_attach_rest_error": 2.2845026137474633e-07,
+    "weapon_follow_fire_heavy_f7_error": 7.003545761108398e-07,
+    "weapon_glb": "assets/models/weapons/thundercoil_launcher.glb (weapon track, not re-exported)",
+    "weapon_glb_sha256": "f7ec899d70f704f5a9e235ed6c4c69559efd31ff3124ab074f18319cabca97c7"
+   },
+   "items": {
+    "glb_export": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "assets/models/characters/selene.glb",
+      "assets/models/characters/selene.meta.json"
+     ]
+    },
+    "validation": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/selene/reports/export_report.json"
+     ],
+     "notes": "the export's own gate (validate_glb.validate_hero + source fidelity): 0 errors, 0 warnings"
+    },
+    "blender_reimport": {
+     "status": "done",
+     "human_signoff_required": false,
+     "produced_by": "AI",
+     "outputs": [
+      "art/characters/selene/reports/stage5/export_review.png"
+     ],
+     "notes": "31 clips played one frame each (pose error 5.3e-6); the thundercoil_launcher on the imported weapon_R (2.3e-7) and following it through fire_heavy f7 (7.0e-7)"
+    },
+    "user_final_approval": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "notes": "The user's final visual approval of the shipped files (reports/stage5/export_review.png + the stage 2-4 sheets). Record it with approved_by / approved_on on this item."
+    }
+   },
+   "notes": "selene.glb: glTF binary, +Y up, faces +Z, uncompressed, GF_Hero_v1 (63 contract joints) + 32 x_ extras = 95 joints, ONE skinned mesh selene_mesh (22,356 tris, single-sided M_selene with 2048 base colour / emissive / normal), 31 clips selene_<clip>[@loop] at 30 fps with the knee helpers, cloth and crown baked. The sidecar carries the clip events, design speeds, sockets and status ai_final_pending_user_approval; the thundercoil_launcher (weapon track, no offhand node) is the default weapon, identity child of weapon_R, and weapon.attach says her clips key the left palm onto its grip_L. Export gate 0 errors / 0 warnings; one Blender re-import. Not run by the user's rule: the separate validate step (it repeats the gate + re-import) and a Brax regression."
   }
  },
  "human_gates": [
@@ -290,8 +521,24 @@
    "state": "pending_human"
   },
   {
-   "gate": "stages 2-5: the user's visual approval of the AI-made mesh, rig, clips and shipped file",
-   "state": "pending_human"
+   "gate": "stage 2: the user's visual approval of the AI-made production mesh and textures",
+   "state": "pending_human",
+   "via": "art/characters/selene/reports/stage2/"
+  },
+  {
+   "gate": "stage 3: the user's visual approval of the AI-made rig and weights",
+   "state": "pending_human",
+   "via": "art/characters/selene/reports/stage3/stage3_rig.png + reports/rig_report.md"
+  },
+  {
+   "gate": "stage 4: the user's visual approval of the AI-made clips",
+   "state": "pending_human",
+   "via": "art/characters/selene/reports/anim/anim_board.png + reports/anim_report.md"
+  },
+  {
+   "gate": "stage 5: the user's final visual approval of the shipped files (the Hades-II bar)",
+   "state": "pending_human",
+   "via": "art/characters/selene/reports/stage5/export_review.png + reports/export_report.json (and the stage 2-4 sheets)"
   }
  ]
 }

@@ -1,0 +1,1278 @@
+{
+ "kind": "character",
+ "key": "selene",
+ "name": "Selene, The Stormcaller",
+ "skeleton": "GF_Hero_v1 v1",
+ "armature": "GF_Hero_v1",
+ "joints": 95,
+ "extra_bones": [
+  "x_cape_L_01",
+  "x_cape_L_02",
+  "x_cape_L_03",
+  "x_cape_L_04",
+  "x_mantle_L_01",
+  "x_mantle_L_02",
+  "x_cape_R_01",
+  "x_cape_R_02",
+  "x_cape_R_03",
+  "x_cape_R_04",
+  "x_mantle_R_01",
+  "x_mantle_R_02",
+  "x_crown_01",
+  "x_crown_02",
+  "x_crown_03",
+  "x_crown_04",
+  "x_crown_05",
+  "x_crown_06",
+  "x_knee_L",
+  "x_knee_R",
+  "x_back_01",
+  "x_back_02",
+  "x_back_03",
+  "x_panel_L_01",
+  "x_panel_L_02",
+  "x_panel_L_03",
+  "x_panel_R_01",
+  "x_panel_R_02",
+  "x_panel_R_03",
+  "x_tabard_01",
+  "x_tabard_02",
+  "x_tabard_03"
+ ],
+ "tris": 22356,
+ "tris_budget": [
+  15000,
+  25000
+ ],
+ "textures": [
+  {
+   "name": "selene_emissive",
+   "role": "emissive",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 124396
+  },
+  {
+   "name": "selene_normal",
+   "role": "normal",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 893987
+  },
+  {
+   "name": "selene_basecolor",
+   "role": "base_color",
+   "px": [
+    2048,
+    2048
+   ],
+   "format": "png",
+   "bytes": 3359196
+  }
+ ],
+ "material": {
+  "name": "M_selene",
+  "double_sided": false,
+  "emissive_strength": 2.5,
+  "textures": {
+   "base_color": true,
+   "emissive": true,
+   "normal": true
+  }
+ },
+ "sockets": {
+  "weapon_R": {
+   "parent": "hand_R",
+   "translation": [
+    -0.86429,
+    1.70294,
+    -0.02378
+   ],
+   "forward": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "up": [
+    -0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "weapon_L": {
+   "parent": "hand_L",
+   "translation": [
+    0.86429,
+    1.70294,
+    -0.02378
+   ],
+   "forward": [
+    1.0,
+    -0.0,
+    -0.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "head_top": {
+   "parent": "head",
+   "translation": [
+    0.0,
+    2.2,
+    0.005
+   ],
+   "forward": [
+    0.0,
+    -0.0,
+    1.0
+   ],
+   "up": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "vs_landmarks": 0.0
+  },
+  "chest_sigil": {
+   "parent": "spine_03",
+   "translation": [
+    0.0,
+    1.7438,
+    0.09864
+   ],
+   "forward": [
+    -0.0,
+    -0.30937,
+    0.95094
+   ],
+   "up": [
+    0.0,
+    0.95094,
+    0.30937
+   ],
+   "vs_landmarks": 1.6e-06
+  }
+ },
+ "clips": [
+  "selene_idle@loop",
+  "selene_idle_combat@loop",
+  "selene_walk@loop",
+  "selene_run@loop",
+  "selene_strafe_left@loop",
+  "selene_strafe_right@loop",
+  "selene_backpedal@loop",
+  "selene_dash",
+  "selene_dash_recover",
+  "selene_fire_light",
+  "selene_fire_heavy",
+  "selene_fire_charge@loop",
+  "selene_hit_light",
+  "selene_hit_heavy",
+  "selene_knockdown",
+  "selene_get_up",
+  "selene_death",
+  "selene_downed@loop",
+  "selene_revive",
+  "selene_reforge_in",
+  "selene_victory",
+  "selene_ping",
+  "selene_interact",
+  "selene_forge_hammer@loop",
+  "selene_idle_signature@loop",
+  "selene_arc_nova",
+  "selene_blink_out",
+  "selene_blink_in",
+  "selene_heavens_verdict_start",
+  "selene_heavens_verdict@loop",
+  "selene_static_charge"
+ ],
+ "clip_info": {
+  "selene_idle@loop": {
+   "clip": "idle",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 90,
+   "duration_s": 3.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, out of combat (no enemy near, no attack for 2 s; hub)",
+   "purpose": "relaxed breathing stance, the launcher low in the right hand, the left hand loose, weight drifting",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_idle_combat@loop": {
+   "clip": "idle_combat",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 32,
+   "duration_s": 1.06667,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "alive, not moving, in combat (enemies near or an attack in the last 2 s). Frame 0 is the reference pose of every upper-layer clip",
+   "purpose": "the combat hold: bladed, the launcher at the right hip on the aim, the left hand on the foregrip, a light bounce on the knees",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_walk@loop": {
+   "clip": "walk",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 28,
+   "duration_s": 0.93333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 1.718,
+   "travel_mps": [
+    0.0,
+    -1.7179799936452678
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving at under about 55 % of move speed (stick partly pushed, slows); playback rate = speed / 1.72 m/s",
+   "purpose": "a light, upright walk, hips swaying, the launcher carried low, the left arm swinging",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_run@loop": {
+   "clip": "run",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.0,
+   "travel_mps": [
+    0.0,
+    -7.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving within 45 deg of the aim at move speed; playback rate = speed / 7.0 m/s",
+   "purpose": "a long, light run leaning into the move, the launcher held at the hip on the aim with both hands",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_strafe_left@loop": {
+   "clip": "strafe_left",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.0,
+   "travel_mps": [
+    7.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the left of the aim; playback rate = speed / 7.0 m/s",
+   "purpose": "side run to her left, hips opened toward the travel, the chest and the launcher kept on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_strafe_right@loop": {
+   "clip": "strafe_right",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.0,
+   "travel_mps": [
+    -7.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving 45-135 deg to the right of the aim; playback rate = speed / 7.0 m/s",
+   "purpose": "side run to her right, the hips turned into the travel, the launcher kept on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_backpedal@loop": {
+   "clip": "backpedal",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": 7.0,
+   "travel_mps": [
+    0.0,
+    7.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "moving more than 135 deg away from the aim; playback rate = speed / 7.0 m/s",
+   "purpose": "backpedal on the balls of her feet, the launcher up on the aim",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_dash": {
+   "clip": "dash",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "launch": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the 0.16 s dash (MoverState.dash_left > 0); the client faces the hero along the dash for its duration",
+   "purpose": "the dash burst: a low lunge-glide leaning into the move, the launcher tucked on the aim in the right hand (the left lets go of the foregrip for the lunge), the capes streaming",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_dash_recover": {
+   "clip": "dash_recover",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 14,
+   "duration_s": 0.46667,
+   "fps": 30,
+   "events": {
+    "land": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the first 0.45 s after a dash ends when the hero is not moving on (else blend into locomotion)",
+   "purpose": "landing out of the dash: the lead foot plants, a soft absorb, back into the hold",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_fire_light": {
+   "clip": "fire_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 8,
+   "duration_s": 0.26667,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "each primary shot of a light chassis (fire_rate >= 2/s: the thundercoil_launcher fires 3.5/s)",
+   "purpose": "one orb shot: a snap forward, the launcher kicks up and back, the body rides it (recoil stays procedural)",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_fire_heavy": {
+   "clip": "fire_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 16,
+   "duration_s": 0.53333,
+   "fps": 30,
+   "events": {
+    "shot": {
+     "frame": 7,
+     "time_s": 0.23333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a heavy / charged release (fire_rate < 1/s, charge release, splash chassis)",
+   "purpose": "a charged shot: brace into the aim, release, the launcher bucks up and the body rocks back",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_fire_charge@loop": {
+   "clip": "fire_charge",
+   "family": "shared",
+   "loop": true,
+   "layer": "upper",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "fire held on a Charge chassis (FireKind::Charge) until release (then fire_heavy)",
+   "purpose": "holding a charge: braced low behind the launcher, trembling with the stored storm",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_hit_light": {
+   "clip": "hit_light",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 12,
+   "duration_s": 0.4,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a light hit (damage < 10 % max HP), layered over whatever plays",
+   "purpose": "a flinch: the head snaps, the launcher is knocked up, absorb, recover",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_hit_heavy": {
+   "clip": "hit_heavy",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 26,
+   "duration_s": 0.86667,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "PlayerFlags::HIT on a heavy hit (damage >= 10 % max HP or a stun); interrupts upper-layer clips",
+   "purpose": "a big stagger: blown back, the left hand torn off the foregrip, the lead foot steps back, absorb, step back in",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_knockdown": {
+   "clip": "knockdown",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 30,
+   "duration_s": 1.0,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "ground": {
+     "frame": 14,
+     "time_s": 0.46667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "a knockback / launch strong enough to floor the hero (stun >= 0.8 s); holds its last frame until get_up",
+   "purpose": "blown off her feet: impact, a backward fall, the bounce, lying on her back with the capes spread",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_get_up": {
+   "clip": "get_up",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "stand": {
+     "frame": 30,
+     "time_s": 1.0
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the knockdown's stun ends",
+   "purpose": "from her back: up on the left hand, roll onto one knee with the launcher gathered in, rise into the hold",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_death": {
+   "clip": "death",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 48,
+   "duration_s": 1.6,
+   "fps": 30,
+   "events": {
+    "impact": {
+     "frame": 1,
+     "time_s": 0.03333
+    },
+    "knee": {
+     "frame": 20,
+     "time_s": 0.66667
+    },
+    "ground": {
+     "frame": 36,
+     "time_s": 1.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed begins (GameEvent::Downed); holds its last frame, then downed@loop (wraith look)",
+   "purpose": "the fatal blow: the head snaps back, the launcher sags, the knees buckle, she topples face down",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_downed@loop": {
+   "clip": "downed",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Downed (the Soul-Tether wraith; moves at 45 % speed with no gait, the client adds the ghost material)",
+   "purpose": "the wraith drift: slumped, floating 0.35 m off the ground, the launcher trailing from a limp hand, a slow bob",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_revive": {
+   "clip": "revive",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "jolt": {
+     "frame": 6,
+     "time_s": 0.2
+    },
+    "land": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "an ally completes the Soul-Tether revive (Downed -> Alive)",
+   "purpose": "pulled back into the body: a jolt with the arms flung wide, the feet slam down, crouch, rise into the hold",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_reforge_in": {
+   "clip": "reforge_in",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 45,
+   "duration_s": 1.5,
+   "fps": 30,
+   "events": {
+    "clash": {
+     "frame": 28,
+     "time_s": 0.93333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "LifeState::Reforging ends: the hero reappears next to an ally",
+   "purpose": "forged anew: rises from a one-knee landing (the left claws on the ground), snaps the launcher up, takes the hold",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_victory": {
+   "clip": "victory",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {
+    "roar": {
+     "frame": 17,
+     "time_s": 0.56667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the run is won (GameEvent victory / boss down, results screen); holds its last frame",
+   "purpose": "the storm answers: a crouch, then the launcher thrust to the sky, the left hand open wide; holds the pose",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_ping": {
+   "clip": "ping",
+   "family": "shared",
+   "loop": false,
+   "layer": "upper",
+   "frames": 20,
+   "duration_s": 0.66667,
+   "fps": 30,
+   "events": {
+    "ping": {
+     "frame": 5,
+     "time_s": 0.16667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the ping / marker input (party callout)",
+   "purpose": "a ping: the left hand leaves the foregrip and points along the aim, open, the head follows",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_interact": {
+   "clip": "interact",
+   "family": "shared",
+   "loop": false,
+   "layer": "full",
+   "frames": 40,
+   "duration_s": 1.33333,
+   "fps": 30,
+   "events": {
+    "contact": {
+     "frame": 12,
+     "time_s": 0.4
+    },
+    "release": {
+     "frame": 26,
+     "time_s": 0.86667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the interact input at an anvil / forge / shrine POI (PoiState use); 1.3 s",
+   "purpose": "work the anvil: lean over and press the left claws onto it (the launcher kept low in the right hand), straighten",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_forge_hammer@loop": {
+   "clip": "forge_hammer",
+   "family": "shared",
+   "loop": true,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "hammer_hit": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "the forge / hub anvil upgrade (Forge screen open, hub idle at the anvil)",
+   "purpose": "charging the anvil: the left palm raised, slammed down onto the work in a crackle, again",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_idle_signature@loop": {
+   "clip": "idle_signature",
+   "family": "selene",
+   "loop": true,
+   "layer": "full",
+   "frames": 90,
+   "duration_s": 3.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "standing out of combat for 6 s (then back to idle on any input)",
+   "purpose": "lightning in human shape, barely touching the ground: a slow hover sway a hand's breadth up, the left claws flexing (the crackle; the vein pulse is an emissive VFX), the cloth breathing, the crown bobbing",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_arc_nova": {
+   "clip": "arc_nova",
+   "family": "selene",
+   "loop": false,
+   "layer": "upper",
+   "frames": 18,
+   "duration_s": 0.6,
+   "fps": 30,
+   "events": {
+    "cast": {
+     "frame": 6,
+     "time_s": 0.2
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "active1 Arc Nova cast (chain-lightning burst); upper layer, so she keeps moving",
+   "purpose": "Arc Nova: gather (the left claws clenched at the chest), then both hands snap forward and apart, the claws spread, the launcher thrust out: the chain burst leaves her",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": [
+      1,
+      5
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_blink_out": {
+   "clip": "blink_out",
+   "family": "selene",
+   "loop": false,
+   "layer": "full",
+   "frames": 10,
+   "duration_s": 0.33333,
+   "fps": 30,
+   "events": {
+    "vanish": {
+     "frame": 8,
+     "time_s": 0.26667
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "active2 Blink starts (the 7 m teleport through enemies); the client hides the model at 'vanish'",
+   "purpose": "Blink, out: a crouch and a lean into the move; the model is hidden from the 'vanish' frame (storm trail VFX)",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_blink_in": {
+   "clip": "blink_in",
+   "family": "selene",
+   "loop": false,
+   "layer": "full",
+   "frames": 14,
+   "duration_s": 0.46667,
+   "fps": 30,
+   "events": {
+    "appear": {
+     "frame": 0,
+     "time_s": 0.0
+    },
+    "land": {
+     "frame": 3,
+     "time_s": 0.1
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "active2 Blink ends (the model reappears at the target point)",
+   "purpose": "Blink, in: she arrives leaning out of the jump, lands soft on the lead foot and settles into the hold",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_heavens_verdict_start": {
+   "clip": "heavens_verdict_start",
+   "family": "selene",
+   "loop": false,
+   "layer": "full",
+   "frames": 36,
+   "duration_s": 1.2,
+   "fps": 30,
+   "events": {
+    "call": {
+     "frame": 22,
+     "time_s": 0.73333
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "ultimate Heaven's Verdict cast (the storm front placed at the aim point)",
+   "purpose": "Heaven's Verdict, the call: gather low, sweep both arms up, head back, lifted off the ground as the storm front is called ('call'); ends on the verdict loop's frame 0",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": [
+      2,
+      14
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_heavens_verdict@loop": {
+   "clip": "heavens_verdict",
+   "family": "selene",
+   "loop": true,
+   "layer": "full",
+   "frames": 60,
+   "duration_s": 2.0,
+   "fps": 30,
+   "events": {},
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "while the Heaven's Verdict cast lasts (the client may cut back to locomotion when she moves)",
+   "purpose": "Heaven's Verdict, sustained: hovering with both arms raised to the storm, a slow sway, the crown swaying wide round the head (the shard bones), the cloth lifted",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": []
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  },
+  "selene_static_charge": {
+   "clip": "static_charge",
+   "family": "selene",
+   "loop": false,
+   "layer": "upper",
+   "frames": 24,
+   "duration_s": 0.8,
+   "fps": 30,
+   "events": {
+    "crackle": {
+     "frame": 12,
+     "time_s": 0.4
+    }
+   },
+   "design_speed_mps": null,
+   "travel_mps": [
+    0.0,
+    0.0
+   ],
+   "slide_exempt": false,
+   "weapon_variant": null,
+   "maps_to": "passive Static Charge reaches its cap (+60 %): played once in the upper layer",
+   "purpose": "Static Charge full: the left hand leaves the foregrip and clenches in front of her chest, trembling, a crackle; back to the foregrip",
+   "hand_pose": {
+    "L": {
+     "start": "open",
+     "swap_frames": [
+      1,
+      18
+     ]
+    },
+    "R": {
+     "start": "fist",
+     "swap_frames": []
+    }
+   }
+  }
+ },
+ "playback": {
+  "fps": 30,
+  "naming": "<key>_<clip>, loops <key>_<clip>@loop (docs/art/GF_HERO_SKELETON.md section 8)",
+  "locomotion": "playback rate = ground speed / clip_info.design_speed_mps (walk, run, strafe_*, backpedal)",
+  "upper_layer": "layer 'upper' clips: mask spine_01 and its children over locomotion; their first and last frames are selene_idle_combat@loop frame 0",
+  "events": "glTF has no events: clip_info.<clip>.events gives the frame and time of each (30 fps)",
+  "weapon_variant": "clip_info.<clip>.weapon_variant is null: thundercoil_launcher has no hand variants, so nothing swaps. The fist / open hand poses are the hero's own keyed fingers; clip_info.<clip>.hand_pose lists them per hand for reference",
+  "in_place": "only pelvis translates; the entity moves in the sim"
+ },
+ "weapon": {
+  "default": "thundercoil_launcher",
+  "glb": "assets/models/weapons/thundercoil_launcher.glb",
+  "attach": "weapon scene = identity child of weapon_R; it has no offhand node. Two-handed: the right palm holds grip_R (the weapon root on weapon_R) and her clips key the left palm onto its grip_L (tools/blender/gf_hero/s4_selene.py apply_hold); a clip lets go where the pose says so (ping, Arc Nova, Static Charge, the dash and blink lunges, falls, carry and kit poses)"
+ },
+ "status": "ai_final_pending_user_approval",
+ "axes": "glTF +Y up, 1 unit = 1 m. The hero faces +Z, origin on the ground between the feet, rest pose = T-pose. Socket nodes: -Z = forward (grip +Y), +Y = up, +X = right; a weapon scene attaches as an identity child.",
+ "bounds_m": {
+  "min": [
+   -1.0016,
+   0,
+   -0.2331
+  ],
+  "max": [
+   1.0016,
+   2.2,
+   0.265
+  ]
+ },
+ "height_m": 2.2,
+ "glb": "assets/models/characters/selene.glb",
+ "glb_bytes": 11612224,
+ "glb_sha256": "40b79dd4f35d78ece3247fae9ca9037e93d35bf0f57bf31af4cacc7875a19793",
+ "source_blend": "art/characters/selene/production/selene_anim.blend",
+ "build_script": "tools/blender/gf_hero/export_glb.py",
+ "pipeline": "docs/ART_PIPELINE.md stage 5",
+ "generator": "Blender 5.2.0 LTS",
+ "built": "2026-09-27",
+ "validation": {
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "tool": "tools/blender/gf_hero/validate_glb.py",
+  "source_fidelity_max_error": 2.673748677770038e-05
+ }
+}

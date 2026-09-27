@@ -1,0 +1,559 @@
+{
+ "hero": "selene",
+ "contract": "GF_Hero_v1 v1",
+ "landmarks": "art/characters/selene/work/selene_landmarks.json",
+ "bones": {
+  "total": 95,
+  "core": 23,
+  "twist": 6,
+  "fingers": 30,
+  "sockets": 4,
+  "extras": 32
+ },
+ "hook": {
+  "module": "s3_selene_skin",
+  "after_armature": {
+   "x_knee_L": "Copy Rotation of shin_L (local), influence 0.50",
+   "x_knee_R": "Copy Rotation of shin_R (local), influence 0.50"
+  },
+  "after_bind": {
+   "hook_parts": {
+    "HAIR": {
+     "pieces": 26,
+     "rows": {
+      "HAIR_SHELL": {
+       "head": 1.0
+      },
+      "HAIR_BUN": {
+       "head": 1.0
+      },
+      "HAIR_BAND": {
+       "head": 1.0
+      },
+      "HAIR_LOCK": {
+       "head": 1.0
+      }
+     }
+    },
+    "CROWN": {
+     "pieces": 6,
+     "rows": {
+      "CROWN_SHARD_01": {
+       "x_crown_01": 1.0
+      },
+      "CROWN_SHARD_02": {
+       "x_crown_02": 1.0
+      },
+      "CROWN_SHARD_03": {
+       "x_crown_03": 1.0
+      },
+      "CROWN_SHARD_04": {
+       "x_crown_04": 1.0
+      },
+      "CROWN_SHARD_05": {
+       "x_crown_05": 1.0
+      },
+      "CROWN_SHARD_06": {
+       "x_crown_06": 1.0
+      }
+     }
+    },
+    "COLLAR": {
+     "pieces": 13,
+     "rows": {
+      "COLLAR": {
+       "neck": 0.6,
+       "spine_03": 0.4
+      },
+      "GEM_SETTING": {
+       "spine_03": 1.0
+      },
+      "COLLAR_GEM": {
+       "spine_03": 1.0
+      },
+      "HARNESS_STRAP_1": "copy from the body per vertex",
+      "HARNESS_STRAP_2": "copy from the body per vertex",
+      "NECKLINE_TRIM": "copy from the body per vertex",
+      "WAIST_STRAP_1": "copy from the body per vertex",
+      "WAIST_STRAP_2": "copy from the body per vertex"
+     }
+    },
+    "BELT": {
+     "pieces": 5,
+     "rows": {
+      "BELT": "copy from the body per vertex",
+      "BELT_RING_L": "copy from the body, one rigid row",
+      "HIP_PLATE_L": "copy from the body, one rigid row",
+      "BELT_RING_R": "copy from the body, one rigid row",
+      "HIP_PLATE_R": "copy from the body, one rigid row"
+     }
+    },
+    "SHOULDERS": {
+     "pieces": 8,
+     "rows": {
+      "ARMLET_L": {
+       "upperarm_L": 1.0
+      },
+      "ARMLET_RING_L": {
+       "upperarm_L": 1.0
+      },
+      "ARMLET_BLADE_1_L": {
+       "upperarm_L": 1.0
+      },
+      "ARMLET_BLADE_2_L": {
+       "upperarm_L": 1.0
+      },
+      "ARMLET_R": {
+       "upperarm_R": 1.0
+      },
+      "ARMLET_RING_R": {
+       "upperarm_R": 1.0
+      },
+      "ARMLET_BLADE_1_R": {
+       "upperarm_R": 1.0
+      },
+      "ARMLET_BLADE_2_R": {
+       "upperarm_R": 1.0
+      }
+     }
+    },
+    "CAPES": {
+     "pieces": 2,
+     "rows": {
+      "CAPE_L": "cloth chain x_cape_L_01..04, pinned {'upperarm_<S>': 0.6, 'clavicle_<S>': 0.4}",
+      "CAPE_R": "cloth chain x_cape_R_01..04, pinned {'upperarm_<S>': 0.6, 'clavicle_<S>': 0.4}"
+     }
+    },
+    "MANTLES": {
+     "pieces": 2,
+     "rows": {
+      "MANTLE_L": "cloth chain x_mantle_L_01..02, pinned {'upperarm_<S>': 0.75, 'clavicle_<S>': 0.25}",
+      "MANTLE_R": "cloth chain x_mantle_R_01..02, pinned {'upperarm_<S>': 0.75, 'clavicle_<S>': 0.25}"
+     }
+    },
+    "PANELS": {
+     "pieces": 2,
+     "rows": {
+      "PANEL_L": "cloth chain x_panel_L_01..03, pinned {'pelvis': 1.0}",
+      "PANEL_R": "cloth chain x_panel_R_01..03, pinned {'pelvis': 1.0}"
+     }
+    },
+    "TABARD": {
+     "pieces": 2,
+     "rows": {
+      "TABARD_FRONT": "cloth chain x_tabard_01..03, pinned {'pelvis': 1.0}",
+      "BACK_PANEL": "cloth chain x_back_01..03, pinned {'pelvis': 1.0}"
+     }
+    },
+    "GAUNTLETS": {
+     "pieces": 14,
+     "rows": {
+      "BRACER_L": "copy from the body per vertex",
+      "HAND_PLATE_L": "copy from the body per vertex",
+      "CLAW_THUMB_L": {
+       "thumb_03_L": 1.0
+      },
+      "CLAW_INDEX_L": {
+       "index_03_L": 1.0
+      },
+      "CLAW_MIDDLE_L": {
+       "middle_03_L": 1.0
+      },
+      "CLAW_RING_L": {
+       "ring_03_L": 1.0
+      },
+      "CLAW_PINKY_L": {
+       "pinky_03_L": 1.0
+      },
+      "BRACER_R": "copy from the body per vertex",
+      "HAND_PLATE_R": "copy from the body per vertex",
+      "CLAW_THUMB_R": {
+       "thumb_03_R": 1.0
+      },
+      "CLAW_INDEX_R": {
+       "index_03_R": 1.0
+      },
+      "CLAW_MIDDLE_R": {
+       "middle_03_R": 1.0
+      },
+      "CLAW_RING_R": {
+       "ring_03_R": 1.0
+      },
+      "CLAW_PINKY_R": {
+       "pinky_03_R": 1.0
+      }
+     }
+    },
+    "GREAVES": {
+     "pieces": 6,
+     "rows": {
+      "GREAVE_L": {
+       "shin_L": 1.0
+      },
+      "KNEE_COP_L": {
+       "x_knee_L": 1.0
+      },
+      "KNEE_FIN_L": {
+       "x_knee_L": 1.0
+      },
+      "GREAVE_R": {
+       "shin_R": 1.0
+      },
+      "KNEE_COP_R": {
+       "x_knee_R": 1.0
+      },
+      "KNEE_FIN_R": {
+       "x_knee_R": 1.0
+      }
+     }
+    },
+    "SABATONS": {
+     "pieces": 6,
+     "rows": {
+      "SABATON_SHAFT_L": {
+       "shin_L": 1.0
+      },
+      "SABATON_FOOT_L": "copy from the body per vertex",
+      "SABATON_HEEL_L": {
+       "foot_L": 1.0
+      },
+      "SABATON_SHAFT_R": {
+       "shin_R": 1.0
+      },
+      "SABATON_FOOT_R": "copy from the body per vertex",
+      "SABATON_HEEL_R": {
+       "foot_R": 1.0
+      }
+     }
+    }
+   },
+   "preview_weapon": {
+    "file": "assets/models/weapons/thundercoil_launcher.glb",
+    "object": "PREVIEW_thundercoil_launcher",
+    "vertices": 4363,
+    "glb_root_is_identity_max_abs": 0.0,
+    "rest_attach_vs_grip_frame_max_abs": 0.0,
+    "sockets_in_grip_frame": {
+     "glow_core": {
+      "origin": [
+       0.0,
+       0.27,
+       0.1
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "grip_L": {
+      "origin": [
+       0.0,
+       0.441,
+       0.052
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "grip_R": {
+      "origin": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     },
+     "muzzle": {
+      "origin": [
+       0.0,
+       0.634,
+       0.1
+      ],
+      "y_axis": [
+       0.0,
+       1.0,
+       0.0
+      ],
+      "z_axis": [
+       0.0,
+       0.0,
+       1.0
+      ]
+     }
+    }
+   }
+  }
+ },
+ "rest_relax": [
+  {
+   "name": "extra_loops_onto_the_profile",
+   "vertices_moved": 80,
+   "max_move_m": 0.0143
+  }
+ ],
+ "body_seed": {
+  "base_vertices": 3657,
+  "extra_loop_vertices": 176,
+  "extra_left_unfilled": 0,
+  "separate_pieces_to_head": 104
+ },
+ "body_heat": {
+  "weighted_vertices": 3833,
+  "mix_min": 0.0,
+  "mix_max": 0.5,
+  "seed_filled_by_heat": 0,
+  "mean_abs_diff_seed_vs_heat_per_bone": {
+   "pelvis": 0.174,
+   "spine_01": 0.102,
+   "spine_02": 0.138,
+   "spine_03": 0.222,
+   "neck": 0.254,
+   "head": 0.318,
+   "clavicle_L": 0.297,
+   "upperarm_L": 0.156,
+   "lowerarm_L": 0.126,
+   "hand_L": 0.244,
+   "clavicle_R": 0.296,
+   "upperarm_R": 0.157,
+   "lowerarm_R": 0.125,
+   "hand_R": 0.244,
+   "thigh_L": 0.146,
+   "shin_L": 0.145,
+   "foot_L": 0.247,
+   "toe_L": 0.229,
+   "thigh_R": 0.143,
+   "shin_R": 0.128,
+   "foot_R": 0.251,
+   "toe_R": 0.232
+  }
+ },
+ "body_fixes": {
+  "joint_blend_knee_L": 92,
+  "joint_blend_elbow_L": 106,
+  "joint_blend_knee_R": 92,
+  "joint_blend_elbow_R": 106,
+  "spatial_smooth_neck_jaw_fold": 1163,
+  "spatial_smooth_shoulder_L": 203,
+  "spatial_smooth_shoulder_R": 203,
+  "spatial_smooth_knee_L": 325,
+  "spatial_smooth_knee_R": 325
+ },
+ "objects": {
+  "HAIR": {
+   "mode": "hook",
+   "pieces": 26,
+   "rigid_pieces": 0,
+   "vertices": 851,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 851
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "CROWN": {
+   "mode": "hook",
+   "pieces": 6,
+   "rigid_pieces": 0,
+   "vertices": 144,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 144
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "COLLAR": {
+   "mode": "hook",
+   "pieces": 13,
+   "rigid_pieces": 0,
+   "vertices": 860,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 28,
+    "2": 336,
+    "3": 198,
+    "4": 298
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "BELT": {
+   "mode": "hook",
+   "pieces": 5,
+   "rigid_pieces": 0,
+   "vertices": 536,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 536
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "SHOULDERS": {
+   "mode": "hook",
+   "pieces": 8,
+   "rigid_pieces": 0,
+   "vertices": 656,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 656
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "CAPES": {
+   "mode": "hook",
+   "pieces": 2,
+   "rigid_pieces": 0,
+   "vertices": 988,
+   "unweighted": 0,
+   "max_influences": 3,
+   "influence_histogram": {
+    "0": 0,
+    "1": 156,
+    "2": 728,
+    "3": 104
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "MANTLES": {
+   "mode": "hook",
+   "pieces": 2,
+   "rigid_pieces": 0,
+   "vertices": 308,
+   "unweighted": 0,
+   "max_influences": 3,
+   "influence_histogram": {
+    "0": 0,
+    "1": 84,
+    "2": 168,
+    "3": 56
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "PANELS": {
+   "mode": "hook",
+   "pieces": 2,
+   "rigid_pieces": 0,
+   "vertices": 448,
+   "unweighted": 0,
+   "max_influences": 2,
+   "influence_histogram": {
+    "0": 0,
+    "1": 112,
+    "2": 336
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "TABARD": {
+   "mode": "hook",
+   "pieces": 2,
+   "rigid_pieces": 0,
+   "vertices": 386,
+   "unweighted": 0,
+   "max_influences": 2,
+   "influence_histogram": {
+    "0": 0,
+    "1": 144,
+    "2": 242
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "GAUNTLETS": {
+   "mode": "hook",
+   "pieces": 14,
+   "rigid_pieces": 0,
+   "vertices": 946,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 224,
+    "2": 332,
+    "3": 346,
+    "4": 44
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "GREAVES": {
+   "mode": "hook",
+   "pieces": 6,
+   "rigid_pieces": 0,
+   "vertices": 576,
+   "unweighted": 0,
+   "max_influences": 1,
+   "influence_histogram": {
+    "0": 0,
+    "1": 576
+   },
+   "max_abs_sum_error": 0.0
+  },
+  "SABATONS": {
+   "mode": "hook",
+   "pieces": 6,
+   "rigid_pieces": 0,
+   "vertices": 708,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 523,
+    "2": 141,
+    "3": 30,
+    "4": 14
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  },
+  "BODY": {
+   "mode": "seed+heat+fixes",
+   "vertices": 3937,
+   "unweighted": 0,
+   "max_influences": 4,
+   "influence_histogram": {
+    "0": 0,
+    "1": 477,
+    "2": 2317,
+    "3": 647,
+    "4": 496
+   },
+   "max_abs_sum_error": 2.220446049250313e-16
+  }
+ },
+ "weight_check": {
+  "ok": true,
+  "problems": []
+ },
+ "preview_weapon": null,
+ "seconds": 0.6
+}

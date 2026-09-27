@@ -1,0 +1,441 @@
+{
+ "hero": "selene",
+ "view": "front three-quarter from her right (az -30, el 12), ortho 2.6 m, 220 x 280 px",
+ "renderer": "Cycles CPU emission toon",
+ "clips": {
+  "idle": {
+   "frames_rendered": [
+    0,
+    24,
+    45,
+    68
+   ],
+   "grip_L_error_mm": {
+    "min": 905.4,
+    "max": 914.5,
+    "frames_on_grip": 0,
+    "frames": 91
+   }
+  },
+  "idle_combat": {
+   "frames_rendered": [
+    0,
+    8,
+    16,
+    24
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 33,
+    "frames": 33
+   }
+  },
+  "walk": {
+   "frames_rendered": [
+    0,
+    8,
+    16,
+    24
+   ],
+   "grip_L_error_mm": {
+    "min": 849.2,
+    "max": 967.6,
+    "frames_on_grip": 0,
+    "frames": 29
+   }
+  },
+  "run": {
+   "frames_rendered": [
+    0,
+    6,
+    12,
+    15
+   ],
+   "grip_L_error_mm": {
+    "min": 5.3,
+    "max": 49.3,
+    "frames_on_grip": 19,
+    "frames": 19
+   }
+  },
+  "strafe_left": {
+   "frames_rendered": [
+    0,
+    4,
+    10,
+    14
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 17,
+    "frames": 17
+   }
+  },
+  "strafe_right": {
+   "frames_rendered": [
+    0,
+    4,
+    10,
+    14
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 17,
+    "frames": 17
+   }
+  },
+  "backpedal": {
+   "frames_rendered": [
+    0,
+    4,
+    10,
+    14
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 17,
+    "frames": 17
+   }
+  },
+  "dash": {
+   "frames_rendered": [
+    0,
+    1,
+    2,
+    8
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 557.4,
+    "frames_on_grip": 1,
+    "frames": 9
+   }
+  },
+  "dash_recover": {
+   "frames_rendered": [
+    0,
+    3,
+    10,
+    14
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 557.3,
+    "frames_on_grip": 8,
+    "frames": 15
+   }
+  },
+  "fire_light": {
+   "frames_rendered": [
+    0,
+    1,
+    3,
+    8
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 9,
+    "frames": 9
+   }
+  },
+  "fire_heavy": {
+   "frames_rendered": [
+    0,
+    5,
+    10,
+    16
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 5.4,
+    "frames_on_grip": 17,
+    "frames": 17
+   }
+  },
+  "fire_charge": {
+   "frames_rendered": [
+    0,
+    6,
+    12,
+    18
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 0.0,
+    "frames_on_grip": 25,
+    "frames": 25
+   }
+  },
+  "hit_light": {
+   "frames_rendered": [
+    0,
+    1,
+    5,
+    12
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 103.2,
+    "frames_on_grip": 10,
+    "frames": 13
+   }
+  },
+  "hit_heavy": {
+   "frames_rendered": [
+    0,
+    3,
+    19,
+    26
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 468.9,
+    "frames_on_grip": 11,
+    "frames": 27
+   }
+  },
+  "knockdown": {
+   "frames_rendered": [
+    0,
+    3,
+    14,
+    30
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1658.2,
+    "frames_on_grip": 1,
+    "frames": 31
+   }
+  },
+  "get_up": {
+   "frames_rendered": [
+    0,
+    12,
+    27,
+    36
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1491.5,
+    "frames_on_grip": 9,
+    "frames": 37
+   }
+  },
+  "death": {
+   "frames_rendered": [
+    0,
+    12,
+    31,
+    48
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1726.3,
+    "frames_on_grip": 1,
+    "frames": 49
+   }
+  },
+  "downed": {
+   "frames_rendered": [
+    0,
+    15,
+    30,
+    45
+   ],
+   "grip_L_error_mm": {
+    "min": 813.2,
+    "max": 821.3,
+    "frames_on_grip": 0,
+    "frames": 61
+   }
+  },
+  "revive": {
+   "frames_rendered": [
+    0,
+    12,
+    30,
+    40
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 2040.1,
+    "frames_on_grip": 21,
+    "frames": 41
+   }
+  },
+  "reforge_in": {
+   "frames_rendered": [
+    0,
+    18,
+    28,
+    45
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1599.0,
+    "frames_on_grip": 25,
+    "frames": 46
+   }
+  },
+  "victory": {
+   "frames_rendered": [
+    0,
+    17,
+    42,
+    60
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1692.0,
+    "frames_on_grip": 12,
+    "frames": 61
+   }
+  },
+  "ping": {
+   "frames_rendered": [
+    0,
+    5,
+    17,
+    20
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 423.1,
+    "frames_on_grip": 3,
+    "frames": 21
+   }
+  },
+  "interact": {
+   "frames_rendered": [
+    0,
+    12,
+    26,
+    40
+   ],
+   "grip_L_error_mm": {
+    "min": 884.8,
+    "max": 1101.8,
+    "frames_on_grip": 0,
+    "frames": 41
+   }
+  },
+  "forge_hammer": {
+   "frames_rendered": [
+    0,
+    8,
+    20,
+    30
+   ],
+   "grip_L_error_mm": {
+    "min": 922.2,
+    "max": 1707.0,
+    "frames_on_grip": 0,
+    "frames": 37
+   }
+  },
+  "idle_signature": {
+   "frames_rendered": [
+    0,
+    22,
+    45,
+    68
+   ],
+   "grip_L_error_mm": {
+    "min": 1038.8,
+    "max": 1097.4,
+    "frames_on_grip": 0,
+    "frames": 91
+   }
+  },
+  "arc_nova": {
+   "frames_rendered": [
+    0,
+    6,
+    14,
+    18
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 594.0,
+    "frames_on_grip": 3,
+    "frames": 19
+   }
+  },
+  "blink_out": {
+   "frames_rendered": [
+    0,
+    4,
+    8,
+    10
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 579.5,
+    "frames_on_grip": 2,
+    "frames": 11
+   }
+  },
+  "blink_in": {
+   "frames_rendered": [
+    0,
+    3,
+    8,
+    14
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 416.1,
+    "frames_on_grip": 11,
+    "frames": 15
+   }
+  },
+  "heavens_verdict_start": {
+   "frames_rendered": [
+    0,
+    16,
+    30,
+    36
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 1551.9,
+    "frames_on_grip": 2,
+    "frames": 37
+   }
+  },
+  "heavens_verdict": {
+   "frames_rendered": [
+    0,
+    15,
+    30,
+    45
+   ],
+   "grip_L_error_mm": {
+    "min": 1053.1,
+    "max": 1077.8,
+    "frames_on_grip": 0,
+    "frames": 61
+   }
+  },
+  "static_charge": {
+   "frames_rendered": [
+    0,
+    8,
+    14,
+    24
+   ],
+   "grip_L_error_mm": {
+    "min": 0.0,
+    "max": 371.0,
+    "frames_on_grip": 4,
+    "frames": 25
+   }
+  }
+ }
+}

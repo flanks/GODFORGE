@@ -54,6 +54,15 @@
    {"clip": "mountainfall_pound", "loop": false, "layer": "upper", "kit": "ultimate Mountainfall ground pound every 1.1 s (over mountainfall)"},
    {"clip": "armor_break", "loop": false, "layer": "upper", "kit": "passive Reforged Flesh (Armor breaks: shockwave + taunt)"}
   ],
+  "selene": [
+   {"clip": "idle_signature", "loop": true, "layer": "full", "kit": "signature idle (the hover sway)"},
+   {"clip": "arc_nova", "loop": false, "layer": "upper", "kit": "active1 Arc Nova (chain-lightning burst cast)"},
+   {"clip": "blink_out", "loop": false, "layer": "full", "kit": "active2 Blink (lean in; the model hides at 'vanish')"},
+   {"clip": "blink_in", "loop": false, "layer": "full", "kit": "active2 Blink (arrival and settle)"},
+   {"clip": "heavens_verdict_start", "loop": false, "layer": "full", "kit": "ultimate Heaven's Verdict (the call)"},
+   {"clip": "heavens_verdict", "loop": true, "layer": "full", "kit": "ultimate Heaven's Verdict (hovering while it lasts)"},
+   {"clip": "static_charge", "loop": false, "layer": "upper", "kit": "passive Static Charge at its cap (fist clench, crackle)"}
+  ],
   "kael": [
    {"clip": "idle_signature", "loop": true, "layer": "full", "kit": "signature idle (the gun flourish, the ghost hand)"},
    {"clip": "fan_of_blades", "loop": false, "layer": "upper", "kit": "active1 Fan of Blades (spectral cone burst, Mark)"},

@@ -1,0 +1,359 @@
+{
+ "_doc": "Stage-3 rig and skinning inputs for Selene (tools/blender/gf_hero/s3_selene_run.py). Metres, Blender axes (Z up, faces -Y, +X = her left). Hand-edited; rerun python tools/blender/gf_hero/s3_selene_run.py after a change. body + parts follow the shared s3_skin.py format; every separate part uses mode 'hook', weighted by tools/blender/gf_hero/s3_selene_skin.py from the 'rig' block below.",
+ "hook": {
+  "module": "s3_selene_skin",
+  "_doc": "s3_skin.py (shared) imports this module: after_armature() drives the x_knee helpers, part_weights() weights every part in mode 'hook', after_bind() puts the thundercoil_launcher GLB on weapon_R (PREVIEW, not exported)."
+ },
+ "body": {
+  "_doc": "BODY = the fitted MakeHuman hm08 under-suit (mail, padding, the face and the gauntlet glove). seed = MakeHuman CC0 game_engine weights (exact per vertex, s3_mh_seed.py); heat_mix blends Blender's bone heat into the seed per region (0 = seed only).",
+  "heat_mix": {
+   "_doc": "Torso and limbs half seed, half heat (as Brax). The glove hands keep the seed (heat is unreliable on fingers, and the lames hide them); the head keeps most of the seed (face loops).",
+   "default": 0.5,
+   "regions": [
+    {
+     "bones": [
+      "hand_L",
+      "hand_R"
+     ],
+     "radius": 0.2,
+     "mix": 0.0
+    },
+    {
+     "bones": [
+      "head"
+     ],
+     "radius": 0.16,
+     "mix": 0.2
+    }
+   ]
+  },
+  "twist": {
+   "_doc": "share of a limb class moved onto its twist bone along the bone (t = 0 at the bone head, 1 at the tail).",
+   "upperarm_fade_end": 0.85,
+   "thigh_fade_end": 0.85,
+   "lowerarm_fade_start": 0.15
+  },
+  "joint_blend": [
+   {
+    "name": "knee_L",
+    "parent_class": [
+     "thigh_L",
+     "thigh_twist_L"
+    ],
+    "child_class": [
+     "shin_L"
+    ],
+    "axis_bone": "shin_L",
+    "half_width": 0.07,
+    "offset": 0.0,
+    "radius": 0.22,
+    "outer_dir": [
+     0,
+     -1,
+     0
+    ],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_L",
+    "parent_class": [
+     "upperarm_L",
+     "upperarm_twist_L"
+    ],
+    "child_class": [
+     "lowerarm_L",
+     "lowerarm_twist_L"
+    ],
+    "axis_bone": "lowerarm_L",
+    "half_width": 0.055,
+    "offset": 0.0,
+    "radius": 0.16,
+    "outer_dir": [
+     0,
+     1,
+     0
+    ],
+    "offset_outer": -0.025
+   },
+   {
+    "name": "knee_R",
+    "parent_class": [
+     "thigh_R",
+     "thigh_twist_R"
+    ],
+    "child_class": [
+     "shin_R"
+    ],
+    "axis_bone": "shin_R",
+    "half_width": 0.07,
+    "offset": 0.0,
+    "radius": 0.22,
+    "outer_dir": [
+     0,
+     -1,
+     0
+    ],
+    "offset_outer": 0.04
+   },
+   {
+    "name": "elbow_R",
+    "parent_class": [
+     "upperarm_R",
+     "upperarm_twist_R"
+    ],
+    "child_class": [
+     "lowerarm_R",
+     "lowerarm_twist_R"
+    ],
+    "axis_bone": "lowerarm_R",
+    "half_width": 0.055,
+    "offset": 0.0,
+    "radius": 0.16,
+    "outer_dir": [
+     0,
+     1,
+     0
+    ],
+    "offset_outer": -0.025
+   }
+  ],
+  "smooth": [],
+  "spatial_smooth": [
+   {
+    "name": "neck_jaw_fold",
+    "bone": "neck",
+    "radius": 0.13,
+    "sigma": 0.015,
+    "iters": 2
+   },
+   {
+    "name": "shoulder_L",
+    "bone": "upperarm_twist_L",
+    "radius": 0.2,
+    "sigma": 0.03,
+    "iters": 2
+   },
+   {
+    "name": "shoulder_R",
+    "bone": "upperarm_twist_R",
+    "radius": 0.2,
+    "sigma": 0.03,
+    "iters": 2
+   },
+   {
+    "name": "knee_L",
+    "bone": "shin_L",
+    "radius": 0.18,
+    "sigma": 0.035,
+    "iters": 3
+   },
+   {
+    "name": "knee_R",
+    "bone": "shin_R",
+    "radius": 0.18,
+    "sigma": 0.035,
+    "iters": 3
+   }
+  ],
+  "_doc_fixes": "As Brax (shared s3_skin.py): rest_relax first (positions only), then after the seed / heat mix and the twist split: joint_blend, smooth, spatial_smooth; then 4 influences, normalised.",
+  "rest_relax": [
+   {
+    "name": "extra_loops_onto_the_profile",
+    "mode": "extra_loops_4pt",
+    "_doc": "the stage-2 knee / elbow / wrist loops sit on edge chords; each loop vertex moves onto the 4-point subdivision curve of its edge loop"
+   }
+  ]
+ },
+ "parts": {
+  "_doc": "Every separate part is weighted by the hook (s3_selene_skin.part_weights) from the rig block.",
+  "HAIR": {
+   "mode": "hook"
+  },
+  "CROWN": {
+   "mode": "hook"
+  },
+  "COLLAR": {
+   "mode": "hook"
+  },
+  "BELT": {
+   "mode": "hook"
+  },
+  "SHOULDERS": {
+   "mode": "hook"
+  },
+  "CAPES": {
+   "mode": "hook"
+  },
+  "MANTLES": {
+   "mode": "hook"
+  },
+  "PANELS": {
+   "mode": "hook"
+  },
+  "TABARD": {
+   "mode": "hook"
+  },
+  "GAUNTLETS": {
+   "mode": "hook"
+  },
+  "GREAVES": {
+   "mode": "hook"
+  },
+  "SABATONS": {
+   "mode": "hook"
+  },
+  "hang": {
+   "knee_z": 0.62,
+   "follow_max": 0.85,
+   "side_blend_m": 0.07
+  }
+ },
+ "rig": {
+  "_doc": "Selene's per-hero x_ extras (docs/art/GF_HERO_SKELETON.md section 2): the crown shards (x_crown_01..06 under head_top, one rigid shard each), two DRIVEN knee helpers (x_knee_L/R: Copy Rotation of the shin at `follow`, mixed AFTER, baked by the glTF export like the twist bones) and the CLOTH chains (one chain down the middle of each stage-2 cloth sheet; keyed by her stage-4 cloth pass, never by the shared clips).",
+  "chains": [
+   [
+    "CAPES",
+    "CAPE_L",
+    "x_cape_L",
+    "upperarm_L"
+   ],
+   [
+    "CAPES",
+    "CAPE_R",
+    "x_cape_R",
+    "upperarm_R"
+   ],
+   [
+    "MANTLES",
+    "MANTLE_L",
+    "x_mantle_L",
+    "upperarm_L"
+   ],
+   [
+    "MANTLES",
+    "MANTLE_R",
+    "x_mantle_R",
+    "upperarm_R"
+   ],
+   [
+    "PANELS",
+    "PANEL_L",
+    "x_panel_L",
+    "pelvis"
+   ],
+   [
+    "PANELS",
+    "PANEL_R",
+    "x_panel_R",
+    "pelvis"
+   ],
+   [
+    "TABARD",
+    "TABARD_FRONT",
+    "x_tabard",
+    "pelvis"
+   ],
+   [
+    "TABARD",
+    "BACK_PANEL",
+    "x_back",
+    "pelvis"
+   ]
+  ],
+  "_doc_chains": "[object, stage-2 piece, chain prefix, parent]. The capes and the shoulder drapes hang under the armlets, so their chains root on the upper arm (reports/stage2_production_mesh.md section 5); the cloth pass hangs them by gravity whatever the arm does.",
+  "chain_bones": {
+   "cape": 4,
+   "mantle": 2,
+   "panel": 3,
+   "tabard": 3,
+   "back": 3
+  },
+  "pin": {
+   "_doc": "Cloth weights by the sheet's own v (gf_mask R: 0 at the attachment, 1 at the hem): rows at v <= v_pin ride the pin row; below, hat functions centred on each chain bone's middle blend linearly between neighbours (the last bone takes the hem). The capes and drapes pin to the armlet (upper arm) with some clavicle so the top does not swing the full arm.",
+   "cape": {
+    "v_pin": 0.035,
+    "row": {
+     "upperarm_<S>": 0.6,
+     "clavicle_<S>": 0.4
+    }
+   },
+   "mantle": {
+    "v_pin": 0.06,
+    "row": {
+     "upperarm_<S>": 0.75,
+     "clavicle_<S>": 0.25
+    }
+   },
+   "panel": {
+    "v_pin": 0.04,
+    "row": {
+     "pelvis": 1.0
+    }
+   },
+   "tabard": {
+    "v_pin": 0.03,
+    "row": {
+     "pelvis": 1.0
+    }
+   },
+   "back": {
+    "v_pin": 0.03,
+    "row": {
+     "pelvis": 1.0
+    }
+   }
+  },
+  "helpers": {
+   "knee": {
+    "_doc": "x_knee_L/R, parent thigh, the shin's rest orientation, head at the knee joint: the pointed knee cop and the knee fin turn `follow` of the knee bend (as Valdris's poleyn).",
+    "length": 0.1,
+    "follow": 0.5
+   }
+  },
+  "pieces": {
+   "_doc": "Stage-2 piece name (gf_piece -> reports/stage2/parts.json piece_table) -> a bone, {bone: share} (a blended rigid row), 'copy' (each vertex copies the body's weights at its closest body point: tight straps, trims, bracers, the belt band) or 'copy_rigid' (one row for the piece: the mean of those copies). <S> = L or R. Pieces not listed keep the stage-2 suggestion (MakeHuman names mapped to GF_Hero_v1).",
+   "HAIR_SHELL": "head",
+   "HAIR_BUN": "head",
+   "HAIR_BAND": "head",
+   "HAIR_LOCK": "head",
+   "CROWN_SHARD_01": "x_crown_01",
+   "CROWN_SHARD_02": "x_crown_02",
+   "CROWN_SHARD_03": "x_crown_03",
+   "CROWN_SHARD_04": "x_crown_04",
+   "CROWN_SHARD_05": "x_crown_05",
+   "CROWN_SHARD_06": "x_crown_06",
+   "COLLAR": {
+    "neck": 0.6,
+    "spine_03": 0.4
+   },
+   "GEM_SETTING": "spine_03",
+   "COLLAR_GEM": "spine_03",
+   "HARNESS_STRAP_1": "copy",
+   "HARNESS_STRAP_2": "copy",
+   "NECKLINE_TRIM": "copy",
+   "WAIST_STRAP_1": "copy",
+   "WAIST_STRAP_2": "copy",
+   "BELT": "copy",
+   "BELT_RING_<S>": "copy_rigid",
+   "HIP_PLATE_<S>": "copy_rigid",
+   "ARMLET_<S>": "upperarm_<S>",
+   "ARMLET_RING_<S>": "upperarm_<S>",
+   "ARMLET_BLADE_1_<S>": "upperarm_<S>",
+   "ARMLET_BLADE_2_<S>": "upperarm_<S>",
+   "BRACER_<S>": "copy",
+   "HAND_PLATE_<S>": "copy",
+   "CLAW_THUMB_<S>": "thumb_03_<S>",
+   "CLAW_INDEX_<S>": "index_03_<S>",
+   "CLAW_MIDDLE_<S>": "middle_03_<S>",
+   "CLAW_RING_<S>": "ring_03_<S>",
+   "CLAW_PINKY_<S>": "pinky_03_<S>",
+   "GREAVE_<S>": "shin_<S>",
+   "KNEE_COP_<S>": "x_knee_<S>",
+   "KNEE_FIN_<S>": "x_knee_<S>",
+   "SABATON_SHAFT_<S>": "shin_<S>",
+   "SABATON_FOOT_<S>": "copy",
+   "SABATON_HEEL_<S>": "foot_<S>",
+   "_doc_sabaton": "The shaft stands above the ankle joint (0.13-0.29 m against the ankle at 0.14) and sits inside the greave's flare, so it rides the shin (Valdris's cuff rule); the foot shell copies the body foot's foot / toe weights vertex by vertex (it bends at the ball with the toes); the heel block is rigid on the foot."
+  }
+ }
+}

@@ -1,0 +1,359 @@
+{
+ "hero": "selene",
+ "file": "art/characters/selene/work/gltf_check/selene_anim.glb (local scratch)",
+ "bytes": 11628276,
+ "extensionsRequired": [],
+ "animations": 31,
+ "clips": {
+  "selene_arc_nova": {
+   "channels": 285,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_backpedal@loop": {
+   "channels": 285,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_blink_in": {
+   "channels": 285,
+   "duration_s": 0.46667,
+   "samples": 15,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_blink_out": {
+   "channels": 285,
+   "duration_s": 0.33333,
+   "samples": 11,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_dash": {
+   "channels": 285,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_dash_recover": {
+   "channels": 285,
+   "duration_s": 0.46667,
+   "samples": 15,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_death": {
+   "channels": 285,
+   "duration_s": 1.6,
+   "samples": 49,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_downed@loop": {
+   "channels": 285,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_fire_charge@loop": {
+   "channels": 285,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_fire_heavy": {
+   "channels": 285,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_fire_light": {
+   "channels": 285,
+   "duration_s": 0.26667,
+   "samples": 9,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "selene_forge_hammer@loop": {
+   "channels": 285,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_get_up": {
+   "channels": 285,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_heavens_verdict@loop": {
+   "channels": 285,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_heavens_verdict_start": {
+   "channels": 285,
+   "duration_s": 1.2,
+   "samples": 37,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_hit_heavy": {
+   "channels": 285,
+   "duration_s": 0.86667,
+   "samples": 27,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_hit_light": {
+   "channels": 285,
+   "duration_s": 0.4,
+   "samples": 13,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "selene_idle@loop": {
+   "channels": 285,
+   "duration_s": 3.0,
+   "samples": 91,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_idle_combat@loop": {
+   "channels": 285,
+   "duration_s": 1.06667,
+   "samples": 33,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_idle_signature@loop": {
+   "channels": 285,
+   "duration_s": 3.0,
+   "samples": 91,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_interact": {
+   "channels": 285,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_knockdown": {
+   "channels": 285,
+   "duration_s": 1.0,
+   "samples": 31,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_ping": {
+   "channels": 285,
+   "duration_s": 0.66667,
+   "samples": 21,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [],
+   "twist_bones_move": true
+  },
+  "selene_reforge_in": {
+   "channels": 285,
+   "duration_s": 1.5,
+   "samples": 46,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_revive": {
+   "channels": 285,
+   "duration_s": 1.33333,
+   "samples": 41,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_run@loop": {
+   "channels": 285,
+   "duration_s": 0.6,
+   "samples": 19,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_static_charge": {
+   "channels": 285,
+   "duration_s": 0.8,
+   "samples": 25,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_strafe_left@loop": {
+   "channels": 285,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_strafe_right@loop": {
+   "channels": 285,
+   "duration_s": 0.53333,
+   "samples": 17,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  },
+  "selene_victory": {
+   "channels": 285,
+   "duration_s": 2.0,
+   "samples": 61,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true
+  },
+  "selene_walk@loop": {
+   "channels": 285,
+   "duration_s": 0.93333,
+   "samples": 29,
+   "root_moves": false,
+   "sockets_move": [],
+   "translating_nodes": [
+    "pelvis"
+   ],
+   "twist_bones_move": true,
+   "loop_first_last_max_diff": 0.0
+  }
+ },
+ "missing": [],
+ "unexpected": [],
+ "twist_bones_animated_in": 31,
+ "failures": [],
+ "ok": true
+}
