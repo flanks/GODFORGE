@@ -1,0 +1,88 @@
+{
+ "asset": "selene",
+ "name": "Selene",
+ "use": "Stage-1 review views for tools/comfy/render_blockout_parts.py (Blender close-ups + region metrics) and tools/comfy/blockout_sheets.py --views (sheet rows). SCULPT REFERENCE review only.",
+ "coords": "Hero normalised as in tools/blender/gf_hero/render_blockout.py: feet on z=0, bbox centred in x/y, facing Blender -Y, her right = -X. Boxes are fractions of the bbox: x and y relative to the centre in units of span / depth (-0.5..0.5), z from the feet in units of height (0..1). Views: az 0 = front, 90 = her left side, 180 = back, 270 = her right side; el = elevation in degrees; dir = explicit camera direction. clip = core renders only what lies behind the nearest point of the part's core box; section_z cuts the mesh at that fraction (camera looking at the cut face). Top-down views use dir [0, -0.02, 1] so the front is at the bottom of the image and her right on the left.",
+ "height_m": 2.2,
+ "concept_crop": [260, 10, 1276, 1026],
+ "concept_label": "approved concept (the coils are cut from the TRELLIS input)",
+ "closeup_groups": [["head", "hands", "torso"], ["overview", "cape", "legs"]],
+ "parts": {
+  "overview": {
+   "label": "whole",
+   "box": {"x": [-0.5, 0.5], "z": [0.0, 1.0]},
+   "views": [
+    {"name": "top", "dir": [0.0, -0.02, 1.0]},
+    {"name": "game55", "az": 0, "el": 55},
+    {"name": "game55_34", "az": 35, "el": 55}
+   ]
+  },
+  "head": {
+   "label": "head, bun + crown shards",
+   "box": {"x": [-0.11, 0.11], "z": [0.80, 1.0]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34L", "az": 35, "el": 8},
+    {"name": "side", "az": 90, "el": 5, "clip": "core", "core": {"x": [-0.05, 0.05], "z": [0.82, 1.0]}},
+    {"name": "top", "dir": [0.0, -0.35, 1.0]}
+   ]
+  },
+  "hands": {
+   "label": "right forearm, gauntlet + claws",
+   "box": {"x": [-0.5, -0.26], "z": [0.72, 0.86]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34", "az": -40, "el": 12},
+    {"name": "top", "dir": [0.0, -0.1, 1.0]}
+   ]
+  },
+  "torso": {
+   "label": "collar, gem, bust, belt rings",
+   "box": {"x": [-0.13, 0.13], "z": [0.52, 0.86]},
+   "views": [
+    {"name": "front", "az": 0, "el": 5},
+    {"name": "34L", "az": 35, "el": 10},
+    {"name": "back", "az": 180, "el": 5}
+   ]
+  },
+  "cape": {
+   "label": "capes + panels",
+   "box": {"x": [-0.5, 0.5], "z": [0.15, 0.82]},
+   "views": [
+    {"name": "back", "az": 180, "el": 5},
+    {"name": "back34L", "az": 135, "el": 5},
+    {"name": "sideR", "az": 270, "el": 5}
+   ]
+  },
+  "legs": {
+   "label": "legs, greaves + sabatons",
+   "box": {"x": [-0.16, 0.16], "z": [0.0, 0.46]},
+   "views": [
+    {"name": "front", "az": 0, "el": 8},
+    {"name": "34L", "az": 35, "el": 8},
+    {"name": "sideR", "az": 270, "el": 5},
+    {"name": "cutKnee", "dir": [0.0, -0.02, 1.0], "section_z": 0.33}
+   ]
+  }
+ },
+ "regions": [
+  {"name": "arm R", "x": [-0.5, -0.14], "z": [0.72, 0.87]},
+  {"name": "arm L", "x": [0.14, 0.5], "z": [0.72, 0.87]},
+  {"name": "head/crown", "x": [-0.12, 0.12], "z": [0.85, 1.0]},
+  {"name": "torso", "x": [-0.14, 0.14], "z": [0.52, 0.85]},
+  {"name": "capes/panels", "x": [-0.5, 0.5], "z": [0.16, 0.85]},
+  {"name": "legs/hems", "x": [-0.5, 0.5], "z": [0.05, 0.16]},
+  {"name": "feet", "x": [-0.5, 0.5], "z": [0.0, 0.05]},
+  {"name": "other", "x": [-0.5, 0.5], "z": [0.0, 1.0]}
+ ],
+ "selected_tiles": [
+  ["tex_front", "lit front"],
+  ["tex_front34L", "lit 3/4"],
+  ["tex_back34R", "lit back 3/4 (capes)"],
+  ["clay_front34L", "clay 3/4"],
+  ["close_head_34L", "head, bun + crown 3/4"],
+  ["closeclay_head_top", "clay crown from above"],
+  ["close_cape_sideR", "capes from her right"],
+  ["closeclay_legs_cutKnee", "clay cut at the knee: legs vs cloth"]
+ ]
+}

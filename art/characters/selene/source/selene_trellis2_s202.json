@@ -1,0 +1,77 @@
+{
+ "asset": "selene",
+ "stage": "1-blockout",
+ "use": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/",
+ "tool": "tools/comfy/run_trellis.py",
+ "model": "TRELLIS.2 (trellis_2_int8_convrot, trellis_2 shape/texture VAEs bf16), DINOv3-L conditioning, birefnet background removal; Pixal3D branch pruned (licence not cleared)",
+ "licence": "TRELLIS.2 code + weights MIT, run locally. The graph's DINOv3-L conditioning encoder is under Meta's DINOv3 licence (not MIT, not yet read for GODFORGE: pending_human gate in status.json); BiRefNet MIT per its repository. Pixal3D pruned.",
+ "comfyui": {
+  "url": "http://127.0.0.1:8188",
+  "version": "0.37.0",
+  "prompt_id": "0f4db6d4-44c1-4935-a56b-fd538a3c50bc",
+  "output": "3d/GF_selene_s202_00001.glb",
+  "attempts": 1
+ },
+ "input_image": {
+  "path": "art/characters/selene/references/selene_concept_front_input.png",
+  "sha256": "f8ee0514292bfafa4ce2d7f2d0798fb323014b4b4a3a40cb9fe013c5ff1bff25",
+  "uploaded_as": "selene_concept_front_input.png"
+ },
+ "graph": {
+  "template": "tools/comfy/trellis2_character_api.json",
+  "template_sha256": "8471ef6d3b29a4c702aa95a6ad3781a562d6219d8b4e9075ec31f42504bb133c",
+  "submitted_sha256": "a0686303548eb1f3c889dda89d9641ed10170f361ae0dab85a46174f5aa8d51b",
+  "patched_inputs": {
+   "122.image": "selene_concept_front_input.png",
+   "316.value": true,
+   "pruned_pixal3d_nodes": [
+    "319",
+    "298",
+    "242",
+    "56",
+    "55"
+   ],
+   "248.switch": false,
+   "901 (added InvertMask)": "LoadImage alpha",
+   "312.background": "#808080",
+   "322.filename_prefix": "3d/GF_selene_s202",
+   "3.seed": 205,
+   "18.seed": 220,
+   "23.seed": 225,
+   "12.seed": 214,
+   "186.target_face_count": 700000,
+   "288.value": 4096,
+   "224.resolution": 2048
+  }
+ },
+ "seed": 202,
+ "node_seeds": {
+  "3": 205,
+  "18": 220,
+  "23": 225,
+  "12": 214
+ },
+ "settings": {
+  "target_faces": 700000,
+  "texture_px": 4096,
+  "background": "#808080",
+  "mask_source": "PNG alpha (InvertMask)"
+ },
+ "timings": {
+  "execution_start_ms": 1790470466463,
+  "execution_end_ms": 1790470757596,
+  "execution_seconds": 291.1,
+  "wall_seconds": 295.4,
+  "generated": "2026-09-27T02:59:21"
+ },
+ "high_poly_info": "Vertices:   4,936,945 (4.94M); Faces:      9,975,330 (9.98M); Attributes: none",
+ "output": {
+  "path": "art/characters/selene/source/selene_trellis2_s202.glb",
+  "bytes": 65826100,
+  "sha256": "c98355b319772d56ce1ddd6c5b901bb677c0de0f8af17483248d4cd1ddd07b15"
+ },
+ "previews": {
+  "cond": "art/characters/selene/source/selene_trellis2_s202_cond.png",
+  "mask": "art/characters/selene/source/selene_trellis2_s202_mask.png"
+ }
+}

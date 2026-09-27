@@ -242,6 +242,13 @@ cut, `tools/blender/gf_hero/kael_stage1_input.py`, run with `--own-mask`); three
 hands right, solid coat back, cleanest surface). His review renders use Cycles-CPU copies of the renderers
 (`kael_render_blockout*.py`). Report: `art/characters/kael/reports/blockout_report.md`.
 
+Result for Selene (2026-09-27): a first run on her plain front made the two floating coils (weapon / VFX) ~1 m barrels
+in depth and fused the ground birefnet keeps round her head with the six crown shards into a second hair mass, so the
+input is the front with a verified alpha (coils cut, head ground keyed out: `art/characters/selene/stage1_input.py`,
+`--own-mask`); three seeds at 2.2 m, **s303** picked (the concept's face, silver hair and deep storm-blue cloth). Her
+review renders run the shared renderers through `tools/blender/gf_hero/selene_blockout_render.py`, which swaps their
+EEVEE line for Cycles on the CPU. Report: `art/characters/selene/reports/blockout_report.md`.
+
 ## 5. Stages 2-5 (implemented)
 
 ### Stage 2: production mesh (implemented; made by AI, 2026-09-25)

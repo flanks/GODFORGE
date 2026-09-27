@@ -1,0 +1,4 @@
+# Stage 1: the SELECTED TRELLIS.2 seed's raw GLB is committed through Git LFS (.gitattributes: *.glb),
+# so a fresh clone has the sculpt reference that stage 2 builds from. art/.gitignore keeps every
+# other raw output under source/ local (unselected seeds, ComfyUI previews); manifest.json records them.
+!source/selene_trellis2_s303.glb

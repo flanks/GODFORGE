@@ -1,0 +1,129 @@
+{
+ "about": "Input for tools/comfy/palette_extract.py: where each material is sampled on the approved front concept. Boxes are [x0, y0, x1, y1] in concept pixels (1536x1024, origin top-left, x1/y1 exclusive); hue in degrees, sat/val in 0-1 (HSV). The concept's ground is a flat dark navy (RGB ~22,32,43) that sits within a few units of her black bodysuit, so the graph's birefnet figure mask (mask; from run_trellis.py --mask-only) replaces the flat-background test. tones = CIELAB L* percentiles reported as shadow/base/highlight (emissive: rim/hot/core). Edit a box, re-run the tool, look at reports/stage0_palette_samples.png.",
+ "character": "selene",
+ "concept": "art/characters/selene/references/SELENE_front_approved.png",
+ "mask": "art/characters/selene/references/selene_concept_front_mask.png",
+ "content_color": "#6FE3FF",
+ "title": "SELENE",
+ "subtitle": "The Stormcaller  -  colour callouts",
+ "title_rgb": "#6FE3FF",
+ "header_note": "Measured from the approved T-pose front (references/SELENE_front_approved.png) inside the birefnet figure mask. Derived data, not new design. The two floating coils are weapon/VFX, not body: not sampled.",
+ "value_note": "Selene is a DARK slender core (black bodysuit, leggings, sabatons, gauntlets: L* 8-20) inside a LIGHT-MID fan of storm-blue cloth (panels and cape: a gradient from deep blue to pale storm-cloud). Skin and silver hair are the light accents at the top; thin gold trim is the MID accent; the ice-blue glow (eyes, collar gem, arm veins, greave glows) sits above everything and is kept small, so the P2 player cyan never becomes a large area.",
+ "outputs": {
+  "palette": "art/characters/selene/palette.json",
+  "color_script": "art/characters/selene/color_script.png",
+  "overlay": "art/characters/selene/reports/stage0_palette_samples.png"
+ },
+ "swatches": [
+  {
+   "key": "skin", "label": "Skin",
+   "note": "pale cool skin: face, shoulders, bare arms (the veins are painted on top)",
+   "boxes": [[744, 138, 760, 160], [778, 138, 794, 160], [755, 102, 785, 114], [690, 205, 722, 222], [816, 205, 848, 222], [525, 226, 575, 238], [961, 226, 1011, 238], [752, 234, 784, 250]],
+   "hue": [0, 45], "sat": [0.08, 0.65], "val": [0.35, 1.0]
+  },
+  {
+   "key": "hair", "label": "Silver-white hair",
+   "note": "high bun and swept strands; the lightest non-glowing value on her",
+   "boxes": [[735, 55, 800, 95], [745, 25, 790, 50]],
+   "sat": [0.0, 0.28], "val": [0.50, 1.0]
+  },
+  {
+   "key": "eye_glow", "label": "Eye glow", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [25, 60, 95],
+   "note": "ice-blue eyes; 1-2 px at game scale, the face reads as a pale oval with two points",
+   "boxes": [[752, 120, 796, 132]],
+   "hue": [170, 215], "sat": [0.25, 1.0], "val": [0.75, 1.0]
+  },
+  {
+   "key": "collar_gem", "label": "Collar gem", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [15, 55, 95],
+   "note": "the blue diamond at the high collar: her centre mark from the 55-degree camera",
+   "boxes": [[752, 198, 780, 226]],
+   "hue": [180, 220], "sat": [0.30, 1.0], "val": [0.70, 1.0]
+  },
+  {
+   "key": "lightning_veins", "label": "Lightning veins", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [15, 55, 97],
+   "note": "tattoo veins on both bare arms; thin emissive lines, Static Charge can scale them",
+   "boxes": [[470, 222, 640, 252], [896, 222, 1066, 252]],
+   "hue": [180, 215], "sat": [0.35, 1.0], "val": [0.72, 1.0]
+  },
+  {
+   "key": "bodysuit", "label": "Black bodysuit",
+   "note": "high-collared sleeveless suit: near-black with a navy cast; lit faces lift to the highlight tone",
+   "boxes": [[705, 245, 745, 285], [790, 245, 830, 285], [735, 298, 800, 322], [752, 180, 784, 196]],
+   "val": [0.0, 0.40]
+  },
+  {
+   "key": "leggings", "label": "Leggings",
+   "note": "black leggings under the panels, fine gold seams",
+   "boxes": [[703, 420, 738, 540], [800, 420, 835, 540]],
+   "val": [0.0, 0.40]
+  },
+  {
+   "key": "gold_trim", "label": "Gold filigree trim",
+   "note": "collar straps, belt rings, hip plates, knee and greave edges: thin rims only",
+   "boxes": [[718, 322, 747, 362], [788, 322, 817, 362], [665, 380, 705, 430], [830, 380, 870, 430], [705, 625, 732, 690], [782, 625, 817, 690], [700, 190, 740, 215], [796, 190, 836, 215]],
+   "hue": [22, 58], "sat": [0.22, 0.92], "val": [0.30, 1.0]
+  },
+  {
+   "key": "gauntlets", "label": "Fingerless gauntlets",
+   "note": "dark leather-and-plate gauntlets from mid-forearm to the knuckles",
+   "boxes": [[372, 228, 470, 252], [1066, 228, 1164, 252]],
+   "val": [0.0, 0.40]
+  },
+  {
+   "key": "tabard", "label": "Tabard centre panel",
+   "note": "the long pale storm-blue front panel between the legs, gold-veined",
+   "boxes": [[748, 380, 790, 620], [752, 640, 786, 800]],
+   "hue": [185, 240], "sat": [0.05, 0.60], "val": [0.35, 1.0]
+  },
+  {
+   "key": "panel_blue", "label": "Side panels (storm blue)",
+   "note": "the long hip panels: cyan-blue at the top fading down to pale storm-cloud",
+   "boxes": [[615, 500, 675, 620], [860, 500, 920, 620], [612, 290, 650, 400], [886, 290, 924, 400]],
+   "hue": [185, 240], "sat": [0.20, 1.0], "val": [0.25, 1.0]
+  },
+  {
+   "key": "cape_deep", "label": "Cape (deep storm blue)",
+   "note": "the outer shoulder capes: saturated deep blue, the largest colour area",
+   "boxes": [[425, 480, 550, 590], [1010, 560, 1110, 660]],
+   "hue": [200, 245], "sat": [0.35, 1.0], "val": [0.20, 0.85]
+  },
+  {
+   "key": "cape_pale", "label": "Cape (storm-cloud edge)",
+   "note": "the ragged pale grey-blue fade at the cape and panel edges",
+   "boxes": [[500, 620, 580, 690], [910, 345, 970, 460]],
+   "hue": [195, 245], "sat": [0.05, 0.40], "val": [0.50, 1.0]
+  },
+  {
+   "key": "sabatons", "label": "Greaves & sabatons",
+   "note": "dark navy armour plates with gold edges, pointed toes",
+   "boxes": [[725, 850, 765, 965], [770, 850, 805, 965], [708, 700, 740, 760], [790, 700, 822, 760]],
+   "val": [0.0, 0.40]
+  },
+  {
+   "key": "armour_glow", "label": "Greave glow", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [15, 55, 95],
+   "note": "cyan V-glows on the greaves and sabaton edges",
+   "boxes": [[778, 740, 800, 780], [735, 900, 810, 990]],
+   "hue": [180, 215], "sat": [0.40, 1.0], "val": [0.70, 1.0]
+  }
+ ],
+ "checks": {
+  "pairs": [
+   ["bodysuit", "leggings", "one black suit material for torso and legs"],
+   ["bodysuit", "sabatons", "the armour is the same dark navy family, a touch bluer"],
+   ["tabard", "cape_pale", "the tabard is the middle of the storm gradient, the ragged edges its pale end"],
+   ["eye_glow", "lightning_veins", "one ice-blue glow"]
+  ],
+  "content_vs": "lightning_veins",
+  "content_vs_tone": "hot",
+  "content_note": "the kit colour is her lightning glow",
+  "probe": ["bodysuit", "skin", "gold_trim", "cape_deep", "lightning_veins"],
+  "probe_labels": {"bodysuit": "suit", "skin": "skin", "gold_trim": "gold", "cape_deep": "cape", "lightning_veins": "veins"},
+  "emissive_vs_biome": "lightning_veins",
+  "bg_probe": "bodysuit",
+  "bg_note": "the black suit sits on the dark navy ground by value alone; skin, hair, the blue cloth fan and the glows carry the silhouette"
+ }
+}

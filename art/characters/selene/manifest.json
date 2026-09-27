@@ -1,0 +1,114 @@
+{
+ "asset": "selene",
+ "references": [
+  {
+   "path": "art/characters/selene/references/SELENE_front_approved.png",
+   "bytes": 1862611,
+   "sha256": "a75de8288d302c4d62e7c00355ffa5905c0ef9aaa211eac094cea7caf038f6e0",
+   "role": "approved front concept (stage 0, approved by the user)",
+   "in_git": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-27"
+  },
+  {
+   "path": "art/characters/selene/references/selene_concept_front_mask.png",
+   "bytes": 159160,
+   "sha256": "6eb85a6729b8c5755af9b40341a90fe2dc75332d1b1746d484db76c21d504b2c",
+   "role": "the TRELLIS.2 graph's birefnet mask of the front (run_trellis.py --mask-only, node 192)",
+   "in_git": true
+  },
+  {
+   "path": "art/characters/selene/references/selene_concept_front_mask_nocoils.png",
+   "bytes": 63931,
+   "sha256": "0064db776340d2669dda5a1d1d0e5f7b47eb9cd11c3b03c63ff7518bd42bd616",
+   "role": "the birefnet mask without the two floating coils (readability sheet, blockout silhouette IoU)",
+   "in_git": true
+  },
+  {
+   "path": "art/characters/selene/references/selene_concept_front_input.png",
+   "bytes": 1783642,
+   "sha256": "f8ee0514292bfafa4ce2d7f2d0798fb323014b4b4a3a40cb9fe013c5ff1bff25",
+   "role": "the stage-1 TRELLIS.2 input: the front's RGB + a verified alpha (art/characters/selene/stage1_input.py; run_trellis.py --own-mask)",
+   "in_git": true
+  },
+  {
+   "path": "docs/media/playable_characters/selene.png",
+   "bytes": 1862611,
+   "sha256": "a75de8288d302c4d62e7c00355ffa5905c0ef9aaa211eac094cea7caf038f6e0",
+   "role": "the user's original of the approved front, outside the art tree; byte-identical to references/SELENE_front_approved.png",
+   "in_git": false,
+   "note": "untracked in the user's working tree (not committed by the art track); the verbatim copy under references/ is the committed one"
+  }
+ ],
+ "references_note": "Stage-0 sheets: add an entry here when a sheet is approved (path, bytes, sha256, approved_by). The files list below is written by tools/comfy/art_manifest.py (raw output that stays local).",
+ "policy": "files listed with in_git=false stay local (art/.gitignore); verify a copy by sha256",
+ "note": "Stage-1 TRELLIS.2 blockouts are SCULPT REFERENCES ONLY (never shipped). Picked seed s303, see reports/blockout_report.md.",
+ "updated": "2026-09-27T03:09:01",
+ "files": [
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s101.glb",
+   "bytes": 63971944,
+   "sha256": "f7f77b5ad597883a22deb0d743f11753bc05fa2e78c869c5091e14990b3866f3",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s101_cond.png",
+   "bytes": 768776,
+   "sha256": "e1b1b88f12ff25d707bb38b4b56ad48d6f98ccb2cfce93c02d600555571df57a",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s101_mask.png",
+   "bytes": 181365,
+   "sha256": "b34bc59f521c2f3aa2730b832cc8a9c25c5c751ae0616de15a984ef30475c266",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s202.glb",
+   "bytes": 65826100,
+   "sha256": "c98355b319772d56ce1ddd6c5b901bb677c0de0f8af17483248d4cd1ddd07b15",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s202_cond.png",
+   "bytes": 768776,
+   "sha256": "e1b1b88f12ff25d707bb38b4b56ad48d6f98ccb2cfce93c02d600555571df57a",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s202_mask.png",
+   "bytes": 181365,
+   "sha256": "b34bc59f521c2f3aa2730b832cc8a9c25c5c751ae0616de15a984ef30475c266",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s303.glb",
+   "bytes": 64280388,
+   "sha256": "3c7c70f829f718bce232f09f6ac9d207a7ce0e41e8f368451ecfa213d855454d",
+   "in_git": true,
+   "lfs": true,
+   "provenance": "art/characters/selene/source/selene_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s303_cond.png",
+   "bytes": 768776,
+   "sha256": "e1b1b88f12ff25d707bb38b4b56ad48d6f98ccb2cfce93c02d600555571df57a",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/selene/source/selene_trellis2_s303_mask.png",
+   "bytes": 181365,
+   "sha256": "b34bc59f521c2f3aa2730b832cc8a9c25c5c751ae0616de15a984ef30475c266",
+   "in_git": false,
+   "provenance": "art/characters/selene/source/selene_trellis2_s303.json"
+  }
+ ],
+ "selected_sculpt_reference": "art/characters/selene/source/selene_trellis2_s303.glb"
+}

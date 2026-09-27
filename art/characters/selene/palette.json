@@ -1,0 +1,470 @@
+{
+ "character": "selene",
+ "generated_by": "tools/comfy/palette_extract.py",
+ "spec": "art/characters/selene/palette_spec.json",
+ "source": {
+  "path": "art/characters/selene/references/SELENE_front_approved.png",
+  "sha256": "a75de8288d302c4d62e7c00355ffa5905c0ef9aaa211eac094cea7caf038f6e0",
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "generated": "2026-09-27",
+ "kind": "measured from approved art (stage 0 derived data, not a new design)",
+ "method": "per swatch: pixels in the sample boxes passing the HSV filter, background removed by the figure mask; tones = median colour of the pixels within +-5 percentile of the named CIELAB L* percentile",
+ "sheet_background": "#17202A",
+ "content_color": "#6FE3FF",
+ "swatches": [
+  {
+   "n": 1,
+   "key": "skin",
+   "label": "Skin",
+   "emissive": false,
+   "tones": {
+    "shadow": "#B2958F",
+    "base": "#C6ABA1",
+    "highlight": "#CCB6AE"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    72.0,
+    8.2,
+    8.8
+   ],
+   "pixels_sampled": 2133,
+   "note": "pale cool skin: face, shoulders, bare arms (the veins are painted on top)",
+   "silhouette_share": 0.035
+  },
+  {
+   "n": 2,
+   "key": "hair",
+   "label": "Silver-white hair",
+   "emissive": false,
+   "tones": {
+    "shadow": "#8B91A1",
+    "base": "#ADB1BD",
+    "highlight": "#DDEAF3"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    72.2,
+    1.0,
+    -6.6
+   ],
+   "pixels_sampled": 2455,
+   "note": "high bun and swept strands; the lightest non-glowing value on her",
+   "silhouette_share": 0.0381
+  },
+  {
+   "n": 3,
+   "key": "eye_glow",
+   "label": "Eye glow",
+   "emissive": true,
+   "tones": {
+    "rim": "#90B6D6",
+    "hot": "#A6CAE2",
+    "core": "#A9F0FC"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 25,
+    "hot": 60,
+    "core": 95
+   },
+   "base_lab": [
+    79.6,
+    -6.4,
+    -15.8
+   ],
+   "pixels_sampled": 85,
+   "note": "ice-blue eyes; 1-2 px at game scale, the face reads as a pale oval with two points",
+   "silhouette_share": 0.022
+  },
+  {
+   "n": 4,
+   "key": "collar_gem",
+   "label": "Collar gem",
+   "emissive": true,
+   "tones": {
+    "rim": "#1F86C1",
+    "hot": "#5BD4F4",
+    "core": "#A4EFFA"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 15,
+    "hot": 55,
+    "core": 95
+   },
+   "base_lab": [
+    79.5,
+    -24.4,
+    -25.8
+   ],
+   "pixels_sampled": 110,
+   "note": "the blue diamond at the high collar: her centre mark from the 55-degree camera",
+   "silhouette_share": 0.0063
+  },
+  {
+   "n": 5,
+   "key": "lightning_veins",
+   "label": "Lightning veins",
+   "emissive": true,
+   "tones": {
+    "rim": "#3887CE",
+    "hot": "#6BB9EB",
+    "core": "#98E8FC"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 15,
+    "hot": 55,
+    "core": 97
+   },
+   "base_lab": [
+    72.1,
+    -10.1,
+    -32.3
+   ],
+   "pixels_sampled": 1140,
+   "note": "tattoo veins on both bare arms; thin emissive lines, Static Charge can scale them",
+   "silhouette_share": 0.0099
+  },
+  {
+   "n": 6,
+   "key": "bodysuit",
+   "label": "Black bodysuit",
+   "emissive": false,
+   "tones": {
+    "shadow": "#0D1219",
+    "base": "#1E252B",
+    "highlight": "#36435B"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    14.2,
+    -1.6,
+    -5.1
+   ],
+   "pixels_sampled": 3460,
+   "note": "high-collared sleeveless suit: near-black with a navy cast; lit faces lift to the highlight tone",
+   "silhouette_share": 0.0636
+  },
+  {
+   "n": 7,
+   "key": "leggings",
+   "label": "Leggings",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1D2536",
+    "base": "#222C3F",
+    "highlight": "#313D55"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    17.9,
+    1.6,
+    -13.4
+   ],
+   "pixels_sampled": 5550,
+   "note": "black leggings under the panels, fine gold seams",
+   "silhouette_share": 0.1118
+  },
+  {
+   "n": 8,
+   "key": "gold_trim",
+   "label": "Gold filigree trim",
+   "emissive": false,
+   "tones": {
+    "shadow": "#51453C",
+    "base": "#635346",
+    "highlight": "#8F7D68"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    36.5,
+    4.4,
+    10.1
+   ],
+   "pixels_sampled": 686,
+   "note": "collar straps, belt rings, hip plates, knee and greave edges: thin rims only",
+   "silhouette_share": 0.055
+  },
+  {
+   "n": 9,
+   "key": "gauntlets",
+   "label": "Fingerless gauntlets",
+   "emissive": false,
+   "tones": {
+    "shadow": "#16171B",
+    "base": "#303540",
+    "highlight": "#555153"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    22.1,
+    0.8,
+    -7.6
+   ],
+   "pixels_sampled": 2119,
+   "note": "dark leather-and-plate gauntlets from mid-forearm to the knuckles",
+   "silhouette_share": 0.0517
+  },
+  {
+   "n": 10,
+   "key": "tabard",
+   "label": "Tabard centre panel",
+   "emissive": false,
+   "tones": {
+    "shadow": "#395379",
+    "base": "#3F5D8D",
+    "highlight": "#7B8BA1"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    39.3,
+    3.8,
+    -29.9
+   ],
+   "pixels_sampled": 9687,
+   "note": "the long pale storm-blue front panel between the legs, gold-veined",
+   "silhouette_share": 0.0977
+  },
+  {
+   "n": 11,
+   "key": "panel_blue",
+   "label": "Side panels (storm blue)",
+   "emissive": false,
+   "tones": {
+    "shadow": "#1C3A57",
+    "base": "#40648D",
+    "highlight": "#6C87A9"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    41.4,
+    -0.3,
+    -26.5
+   ],
+   "pixels_sampled": 13876,
+   "note": "the long hip panels: cyan-blue at the top fading down to pale storm-cloud",
+   "silhouette_share": 0.1334
+  },
+  {
+   "n": 12,
+   "key": "cape_deep",
+   "label": "Cape (deep storm blue)",
+   "emissive": false,
+   "tones": {
+    "shadow": "#192F54",
+    "base": "#213F6F",
+    "highlight": "#355B8E"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    26.8,
+    6.2,
+    -31.1
+   ],
+   "pixels_sampled": 13565,
+   "note": "the outer shoulder capes: saturated deep blue, the largest colour area",
+   "silhouette_share": 0.123
+  },
+  {
+   "n": 13,
+   "key": "cape_pale",
+   "label": "Cape (storm-cloud edge)",
+   "emissive": false,
+   "tones": {
+    "shadow": "#647597",
+    "base": "#7788A8",
+    "highlight": "#91A1BA"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    56.4,
+    1.5,
+    -18.9
+   ],
+   "pixels_sampled": 6136,
+   "note": "the ragged pale grey-blue fade at the cape and panel edges",
+   "silhouette_share": 0.1091
+  },
+  {
+   "n": 14,
+   "key": "sabatons",
+   "label": "Greaves & sabatons",
+   "emissive": false,
+   "tones": {
+    "shadow": "#121721",
+    "base": "#2C303B",
+    "highlight": "#49484D"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    19.9,
+    1.2,
+    -7.5
+   ],
+   "pixels_sampled": 6385,
+   "note": "dark navy armour plates with gold edges, pointed toes",
+   "silhouette_share": 0.0635
+  },
+  {
+   "n": 15,
+   "key": "armour_glow",
+   "label": "Greave glow",
+   "emissive": true,
+   "tones": {
+    "rim": "#3E90C1",
+    "hot": "#5CC1E9",
+    "core": "#83EAFA"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 15,
+    "hot": 55,
+    "core": 95
+   },
+   "base_lab": [
+    73.7,
+    -17.9,
+    -28.7
+   ],
+   "pixels_sampled": 610,
+   "note": "cyan V-glows on the greaves and sabaton edges",
+   "silhouette_share": 0.0196
+  }
+ ],
+ "ink_and_deep_shadow_share": 0.0604,
+ "checks": {
+  "notes": "dE = CIELAB dE76 between base tones; dL = difference in L* (value), the part a toon ramp and a small screen keep.",
+  "dE_bodysuit_vs_leggings": 9.6,
+  "dE_bodysuit_vs_sabatons": 6.8,
+  "dE_tabard_vs_cape_pale": 20.5,
+  "dE_eye_glow_vs_lightning_veins": 18.5,
+  "dE_content_color_vs_lightning_veins": 21.5,
+  "dL_vs_sheet_background": {
+   "skin": 60.2,
+   "hair": 60.4,
+   "eye_glow": 67.8,
+   "collar_gem": 67.7,
+   "lightning_veins": 60.3,
+   "bodysuit": 2.4,
+   "leggings": 6.1,
+   "gold_trim": 24.7,
+   "gauntlets": 10.3,
+   "tabard": 27.5,
+   "panel_blue": 29.6,
+   "cape_deep": 15.0,
+   "cape_pale": 44.6,
+   "sabatons": 8.1,
+   "armour_glow": 61.9
+  },
+  "biomes": [
+   {
+    "biome": "cinder_wastes",
+    "name": "Cinder Wastes",
+    "ground": "#2B1B15",
+    "accent": "#FF8A2A",
+    "dL_vs_ground": {
+     "bodysuit": 2.6,
+     "skin": 60.4,
+     "gold_trim": 24.9,
+     "cape_deep": 15.2,
+     "lightning_veins": 60.5
+    },
+    "dE_lightning_veins_vs_biome_accent": 109.8
+   },
+   {
+    "biome": "verdant_ruin",
+    "name": "Verdant Ruin",
+    "ground": "#1C2A21",
+    "accent": "#5CF2B0",
+    "dL_vs_ground": {
+     "bodysuit": -1.4,
+     "skin": 56.4,
+     "gold_trim": 20.9,
+     "cape_deep": 11.2,
+     "lightning_veins": 56.5
+    },
+    "dE_lightning_veins_vs_biome_accent": 70.5
+   },
+   {
+    "biome": "hollow_spire",
+    "name": "The Hollow Spire",
+    "ground": "#1B1D36",
+    "accent": "#A9C8FF",
+    "dL_vs_ground": {
+     "bodysuit": 2.4,
+     "skin": 60.2,
+     "gold_trim": 24.7,
+     "cape_deep": 15.0,
+     "lightning_veins": 60.3
+    },
+    "dE_lightning_veins_vs_biome_accent": 14.9
+   },
+   {
+    "biome": "the_unmaking",
+    "name": "The Unmaking",
+    "ground": "#140B1F",
+    "accent": "#E24BFF",
+    "dL_vs_ground": {
+     "bodysuit": 9.8,
+     "skin": 67.6,
+     "gold_trim": 32.1,
+     "cape_deep": 22.4,
+     "lightning_veins": 67.7
+    },
+    "dE_lightning_veins_vs_biome_accent": 95.4
+   }
+  ],
+  "biomes_note": "ground = the biome's albedo tint from biomes.ron (unlit); the lit floor in game is lighter. Treat these as worst-case value contrast, not a render."
+ },
+ "mask": {
+  "path": "art/characters/selene/references/selene_concept_front_mask.png",
+  "sha256": "6eb85a6729b8c5755af9b40341a90fe2dc75332d1b1746d484db76c21d504b2c",
+  "use": "figure mask for the silhouette shares; every concept sample is limited to it"
+ }
+}

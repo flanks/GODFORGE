@@ -1,0 +1,209 @@
+{
+ "asset": "selene",
+ "name": "Selene, The Stormcaller",
+ "pipeline": "docs/ART_PIPELINE.md",
+ "updated": "2026-09-27",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "decisions": [
+  "2026-09-25: no human artist at any stage; the AI makes every stage and the user gives the final visual approval (the user's decision, relayed by the workflow coordinator).",
+  "2026-09-25: weapons are separate models attached to hand sockets, never part of a hero body (the user's decision, relayed by the workflow coordinator). Selene gets empty hands and forearms; her signature chassis, the thundercoil_launcher (assets/models/weapons/thundercoil_launcher.glb, two-handed), attaches at weapon_R (and weapon_L). The two floating coil devices the concept draws beside her hands are weapon / VFX, not body: they are cut from the stage-1 input and never modelled on the body (they could become a Thundercoil skin variant later).",
+  "2026-09-27: the stage-1 input is the approved front with a verified alpha (references/selene_concept_front_input.png, art/characters/selene/stage1_input.py): the coils cut, and the dark navy ground that birefnet keeps between the hair, the wisps and the crown shards removed by a colour key. A first run on the plain concept (seed 101, kept local in work/first_input/) made the coils ~1 m barrels in depth crossing the cape and fused the crown shards and that ground into a second hair mass (reports/blockout_report.md section 2)."
+ ],
+ "signature_weapon": {
+  "chassis": "thundercoil_launcher",
+  "glb": "assets/models/weapons/thundercoil_launcher.glb",
+  "meta": "assets/models/weapons/thundercoil_launcher.meta.json",
+  "built_by": "the weapon track (already shipped); the hero chain never re-exports it",
+  "sockets": "weapon_R / weapon_L on GF_Hero_v1 (identity child of the socket node, docs/art/WEAPONS.md)"
+ },
+ "stages": {
+  "0_concept_reference": {
+   "status": "done",
+   "human_signoff_required": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-27",
+   "outputs": [
+    "art/characters/selene/references/SELENE_front_approved.png",
+    "art/characters/selene/references/selene_concept_front_mask.png",
+    "art/characters/selene/references/selene_concept_front_mask_nocoils.png",
+    "art/characters/selene/brief.md",
+    "art/characters/selene/turnaround_prompts.md",
+    "art/characters/selene/palette_spec.json",
+    "art/characters/selene/palette.json",
+    "art/characters/selene/color_script.png",
+    "art/characters/selene/reports/stage0_palette_samples.png",
+    "art/characters/selene/reports/stage0_readability.png"
+   ],
+   "notes": "Done 2026-09-27 with the user's approved T-pose front (docs/media/playable_characters/selene.png, 1536x1024 on flat dark navy), copied verbatim. Brief, measured palette (15 swatches inside the birefnet mask: the ground is within 2.4 L* of her black bodysuit), readability sheet (the coils masked out) and prompts for the four missing sheets. Side, back, 3/4 and expression are optional and do not block stage 1 or 2 (proposals in brief.md section 7.2; prompts in turnaround_prompts.md).",
+   "items": {
+    "front": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-27",
+     "source": "docs/media/playable_characters/selene.png",
+     "sha256": "a75de8288d302c4d62e7c00355ffa5905c0ef9aaa211eac094cea7caf038f6e0",
+     "outputs": [
+      "art/characters/selene/references/SELENE_front_approved.png"
+     ],
+     "notes": "The user-approved front concept (1536x1024 T-pose on flat dark navy #17202A), copied verbatim: a tall slender sorceress, silver-white hair in a high bun with six storm-crystal shards floating round the head, glowing ice-blue eyes, a black high-collared sleeveless bodysuit with gold filigree and a blue diamond gem at the collar, bare arms with lightning-vein tattoos, dark fingerless gauntlets with ice-blue claws, two long outer capes, two hip panels and a pale centre tabard in storm-blue gradients with ragged storm-cloud edges, black leggings, gold-trimmed greaves with cyan glows and pointed sabatons; two floating coil devices beside the hands (weapon / VFX, not body: decisions)."
+    },
+    "side": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/selene/turnaround_prompts.md#1-side-view-right-profile",
+     "notes": "Optional. Not supplied; stage 2 takes the depth from the stage-1 blockout and brief.md section 7.2 (capes from the shoulder bows, flat sabaton sole)."
+    },
+    "back": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/selene/turnaround_prompts.md#2-back-view",
+     "notes": "Optional. Not supplied; proposal: the suit closed at the back with a gold filigree spine line, a wrapped bun, the capes over the back of the legs (brief.md section 7.2 Q4)."
+    },
+    "three_quarter": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/selene/turnaround_prompts.md#3-front-three-quarter-view",
+     "notes": "Optional."
+    },
+    "expression": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "outputs": [],
+     "optional": true,
+     "prompt": "art/characters/selene/turnaround_prompts.md#4-expression-sheet",
+     "notes": "Optional. The face is 1-2 px of eye glow at game scale; expressions matter for portraits and the codex only."
+    },
+    "palette": {
+     "status": "stand_in",
+     "stand_in": true,
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/selene/palette.json",
+      "art/characters/selene/color_script.png",
+      "art/characters/selene/reports/stage0_palette_samples.png"
+     ],
+     "tool": "tools/comfy/palette_extract.py art/characters/selene/palette_spec.json",
+     "notes": "Automated measurement of the approved front (15 swatches, shadow/base/highlight; rim/hot/core for the four emissives) inside the birefnet figure mask. A STAND-IN for a painted colour script with lighting and kit states (Static Charge, Heaven's Verdict)."
+    },
+    "brief": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/selene/brief.md"
+     ],
+     "notes": "Kit, silhouette pillars, proportions at 2.2 m, materials, readability incl. a 400-enemy horde and the P2-ring clash, toon-shader rules, how the kit should read and open questions (six crown shards as drawn, stand vs hover, cape attachment), notes for stages 1-4 incl. the proposed unique clip set."
+    },
+    "turnaround_prompts": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/selene/turnaround_prompts.md"
+     ],
+     "notes": "Prompts for the four optional sheets (side, back, 3/4, expression), each with the approved front attached and the coils left out, plus the acceptance checklist."
+    },
+    "readability_check": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/selene/reports/stage0_readability.png"
+     ],
+     "tool": "tools/comfy/readability_sheet.py selene art/characters/selene/references/SELENE_front_approved.png --height-m 2.2 --radius-m 0.42 --mask art/characters/selene/references/selene_concept_front_mask_nocoils.png --horde 400 --ring --note \"T-pose plate, the two floating coils (weapon/VFX) masked out\" --note \"in play the arms come down and the capes close in: about a third narrower\"",
+     "notes": "2D approximation: the front (coils masked out) at 65/86 px, on the biome grounds, in a client frame and inside 400 swarm enemies per biome. Findings in brief.md section 5 (the Hollow Spire is her worst biome; the P2 ring #3FD8FF is dE 5-8 from her cyan)."
+    }
+   }
+  },
+  "1_blockout": {
+   "status": "done",
+   "stand_in": false,
+   "sculpt_reference_only": true,
+   "shipped": false,
+   "human_signoff_required": false,
+   "selected": "art/characters/selene/source/selene_trellis2_s303.glb",
+   "selected_sha256": "3c7c70f829f718bce232f09f6ac9d207a7ce0e41e8f368451ecfa213d855454d",
+   "selected_in_git": "Git LFS (re-included by art/characters/selene/.gitignore); s101/s202 and the ComfyUI previews stay local (manifest.json)",
+   "height_m": 2.2,
+   "input": "art/characters/selene/references/selene_concept_front_input.png (the approved front RGB + a verified alpha: the coils cut, the ground around the crown removed; art/characters/selene/stage1_input.py, run_trellis.py --own-mask)",
+   "outputs": [
+    "art/characters/selene/reports/blockout_report.md",
+    "art/characters/selene/reports/blockout/blockout_selected.png",
+    "art/characters/selene/reports/blockout/blockout_compare.png",
+    "art/characters/selene/reports/blockout/input_maskcheck.png",
+    "art/characters/selene/reports/blockout/selene_trellis2_s{101,202,303}_{turnaround,closeups,closeups2,ingame,silhouette}.png",
+    "art/characters/selene/blockout_views.json",
+    "art/characters/selene/references/selene_concept_front_input.png",
+    "art/characters/selene/source/selene_trellis2_s{101,202,303}.json",
+    "art/characters/selene/source/selene_trellis2_s303.glb (Git LFS)",
+    "art/characters/selene/source/selene_trellis2_s{101,202}.glb (local only, gitignored; sha256 in manifest.json)"
+   ],
+   "tools": [
+    "tools/comfy/run_trellis.py",
+    "tools/comfy/trellis2_character_api.json",
+    "tools/comfy/maskcheck_sheet.py",
+    "art/characters/selene/stage1_input.py",
+    "tools/blender/gf_hero/render_blockout.py",
+    "tools/comfy/render_blockout_parts.py",
+    "tools/blender/gf_hero/selene_blockout_render.py (Cycles CPU instead of EEVEE for the lit views)",
+    "tools/comfy/blockout_sheets.py",
+    "tools/comfy/art_manifest.py"
+   ],
+   "notes": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. The birefnet mask keeps the whole figure (nothing lost beyond 9 px), but a first run on the plain concept (s101, local in work/first_input/) made the two floating coils ~1 m barrels in depth and fused the ground around the head with the crown shards into a second hair mass, so the input is the front with a verified alpha (coils cut, head ground keyed out). TRELLIS.2 (Pixal3D pruned), 3 seeds (101/202/303) at the user character settings (700k faces, 4096 px), 291-308 s each. s303 picked: the only slim female face with pale skin and eyes and silver-white hair, the concept deep storm-blue cloth (s101/s202 went teal-cyan, the P2-ring colour), five clean clawed fingers, two legs with the tabard and panels free at the knee, span/height 0.961 (concept 0.932), no hole over 1.6 cm. Known defects (reports/blockout_report.md section 6): the bun is a separate mass ~0.2 m behind the head with a hair tail (all seeds), the six crown shards are fused into the hair as side prongs, thick partly fused cloth, no emissive, baked lighting. The seed pick is an engineering judgement; the user visual approval comes at stage 2."
+  },
+  "2_production_mesh": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "Made by AI (no human artist), a Selene variant of the stage-2 chain (tools/blender/gf_hero/s2_selene_*.py): MakeHuman hm08 body fit, capes / panels / tabard as cloth parts, crown shards as separate rigid pieces, empty hands. The user's visual approval stays pending_human."
+  },
+  "3_rig": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "GF_Hero_v1 + x_crown_* shard bones under head_top and cloth chains for the capes, panels and tabard (brief.md section 8)."
+  },
+  "4_animation": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The 24 shared clips re-posed on her proportions + her unique set (brief.md section 8: idle_signature, arc_nova, blink_out / blink_in, heavens_verdict_start / @loop, static_charge, launcher fire poses) + a cloth pass."
+  },
+  "5_export_validate": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "assets/models/characters/selene.glb + selene.meta.json through the shared exporter and gate; the user's final approval is the last human gate."
+  }
+ },
+ "human_gates": [
+  {
+   "gate": "stage 0: approve the front concept",
+   "state": "done",
+   "approved_by": "user",
+   "approved_on": "2026-09-27",
+   "via": "references/SELENE_front_approved.png"
+  },
+  {
+   "gate": "stage 0 (optional): side, back, 3/4 and expression sheets (prompts in turnaround_prompts.md)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "design questions: six crown shards as drawn (the stage brief said five), stand vs hover, cape attachment (brief.md section 7.2)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "stages 2-5: the user's visual approval of the AI-made mesh, rig, clips and shipped file",
+   "state": "pending_human"
+  }
+ ]
+}
