@@ -1,0 +1,109 @@
+{
+ "asset": "kael",
+ "references": [
+  {
+   "path": "art/characters/kael/references/KAEL_front_approved.png",
+   "bytes": 1783491,
+   "sha256": "237a81870102eb94167c63cf9d554844c928526c1ec7c0c5cc8ec40a16c4dce6",
+   "role": "approved hero front (stage 0, the user's approval): T-pose, 1536x1024, flat navy; shows two serpent revolvers (weapons, not part of the body)",
+   "in_git": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-27"
+  },
+  {
+   "path": "art/characters/kael/references/kael_concept_front_nogun.png",
+   "bytes": 1799838,
+   "sha256": "c3e0d7d0e9ac5da62d9d391d18b80238e4496ee712845c1341a82f8e24b455aa",
+   "role": "derived stage-1 TRELLIS.2 input: the approved front's own RGB with an edited alpha (the birefnet mask minus the two revolvers and the diffuse ghost smoke), made by tools/blender/gf_hero/kael_stage1_input.py and fed with run_trellis.py --own-mask (status.json decisions[stage1_input_cut]); not separately approved",
+   "in_git": true,
+   "derived_from": "art/characters/kael/references/KAEL_front_approved.png",
+   "verified": "its RGB channels equal the decoded pixels of KAEL_front_approved.png exactly; only the alpha is new"
+  },
+  {
+   "path": "art/characters/kael/references/kael_concept_front_nogun_mask.png",
+   "bytes": 27199,
+   "sha256": "0ad83614fb44865755155a4f838f9fef35a30a182ccd472369ab41f8592ea662",
+   "role": "derived: the alpha of kael_concept_front_nogun.png as an L mask (> 127 = figure). Used by readability_sheet.py and blockout_sheets.py (concept IoU)",
+   "in_git": true,
+   "derived_from": "art/characters/kael/references/kael_concept_front_nogun.png"
+  },
+  {
+   "path": "docs/media/playable_characters/KAEL, THE WRAITHSHOT.png",
+   "bytes": 1783491,
+   "sha256": "237a81870102eb94167c63cf9d554844c928526c1ec7c0c5cc8ec40a16c4dce6",
+   "role": "the user's original of the approved front, outside the art tree",
+   "in_git": false,
+   "note": "untracked in git at the time of stage 0 (the user's file, left as it is); byte-identical to references/KAEL_front_approved.png"
+  }
+ ],
+ "references_note": "Stage-0 sheets: tools/comfy/approve_sheet.py adds an entry here when a sheet is approved (path, bytes, sha256, approver, date).",
+ "policy": "files listed with in_git=false stay local (art/.gitignore); verify a copy by sha256",
+ "updated": "2026-09-27T02:55:08",
+ "files": [
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s101.glb",
+   "bytes": 68062216,
+   "sha256": "cba5f8b8621331e539c41154cb6c4cb19b6f31509b3eba09d241044ac859f43b",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s101_cond.png",
+   "bytes": 707099,
+   "sha256": "34890cda179a2406e769e4c4e0719ae8ab99e5fcc6e54bc81c6ad9f467831c25",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s101_mask.png",
+   "bytes": 91683,
+   "sha256": "e57c91f25d556ad3b37286cdd7e25c8eb6dd7d384a44e3f059fe2492e87cb8b0",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s101.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s202.glb",
+   "bytes": 63502248,
+   "sha256": "5ca75c6cb3bbb2ec667b66956e915a5455f3c32417b936a4d38c3a7bb1dfaab5",
+   "in_git": true,
+   "lfs": true,
+   "provenance": "art/characters/kael/source/kael_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s202_cond.png",
+   "bytes": 707099,
+   "sha256": "34890cda179a2406e769e4c4e0719ae8ab99e5fcc6e54bc81c6ad9f467831c25",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s202_mask.png",
+   "bytes": 91683,
+   "sha256": "e57c91f25d556ad3b37286cdd7e25c8eb6dd7d384a44e3f059fe2492e87cb8b0",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s202.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s303.glb",
+   "bytes": 66048464,
+   "sha256": "8929a9c25aa9b1cbffdb5af777a7344bfd592a1b18e0e85d6f8ecf46326949d9",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s303_cond.png",
+   "bytes": 707099,
+   "sha256": "34890cda179a2406e769e4c4e0719ae8ab99e5fcc6e54bc81c6ad9f467831c25",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s303.json"
+  },
+  {
+   "path": "art/characters/kael/source/kael_trellis2_s303_mask.png",
+   "bytes": 91683,
+   "sha256": "e57c91f25d556ad3b37286cdd7e25c8eb6dd7d384a44e3f059fe2492e87cb8b0",
+   "in_git": false,
+   "provenance": "art/characters/kael/source/kael_trellis2_s303.json"
+  }
+ ],
+ "selected_sculpt_reference": "art/characters/kael/source/kael_trellis2_s202.glb"
+}

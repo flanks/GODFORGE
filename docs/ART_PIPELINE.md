@@ -236,6 +236,12 @@ which has PIL and numpy. The other art tools use only the standard library.
 Result for Brax (2026-09-25): three seeds; **s202** picked (faceted gauntlet plates, head/beard,
 colour blocking). Known defects are listed in `art/characters/brax/reports/blockout_report.md` §6.
 
+Result for Kael (2026-09-27): his approved front holds two revolvers collinear with the arms and a translucent ghost
+smoke round the coat, both inside birefnet's mask, so the input is the concept with an edited alpha (guns and smoke
+cut, `tools/blender/gf_hero/kael_stage1_input.py`, run with `--own-mask`); three seeds at 2.1 m, **s202** picked (both
+hands right, solid coat back, cleanest surface). His review renders use Cycles-CPU copies of the renderers
+(`kael_render_blockout*.py`). Report: `art/characters/kael/reports/blockout_report.md`.
+
 ## 5. Stages 2-5 (implemented)
 
 ### Stage 2: production mesh (implemented; made by AI, 2026-09-25)

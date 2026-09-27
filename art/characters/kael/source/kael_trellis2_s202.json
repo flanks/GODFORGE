@@ -1,0 +1,77 @@
+{
+ "asset": "kael",
+ "stage": "1-blockout",
+ "use": "SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/",
+ "tool": "tools/comfy/run_trellis.py",
+ "model": "TRELLIS.2 (trellis_2_int8_convrot, trellis_2 shape/texture VAEs bf16), DINOv3-L conditioning, birefnet background removal; Pixal3D branch pruned (licence not cleared)",
+ "licence": "TRELLIS.2 code + weights MIT, run locally. The graph's DINOv3-L conditioning encoder is under Meta's DINOv3 licence (not MIT, not yet read for GODFORGE: pending_human gate in status.json); BiRefNet MIT per its repository. Pixal3D pruned.",
+ "comfyui": {
+  "url": "http://127.0.0.1:8188",
+  "version": "0.37.0",
+  "prompt_id": "43a5af1f-9de4-4223-b5b3-f1e42e00b894",
+  "output": "3d/GF_kael_s202_00001.glb",
+  "attempts": 1
+ },
+ "input_image": {
+  "path": "art/characters/kael/references/kael_concept_front_nogun.png",
+  "sha256": "c3e0d7d0e9ac5da62d9d391d18b80238e4496ee712845c1341a82f8e24b455aa",
+  "uploaded_as": "kael_concept_front_nogun.png"
+ },
+ "graph": {
+  "template": "tools/comfy/trellis2_character_api.json",
+  "template_sha256": "8471ef6d3b29a4c702aa95a6ad3781a562d6219d8b4e9075ec31f42504bb133c",
+  "submitted_sha256": "f7b7250b9074d961d38487a2cb3fc8e9573fbdaa79f5e768a644662ea47cc7c7",
+  "patched_inputs": {
+   "122.image": "kael_concept_front_nogun.png",
+   "316.value": true,
+   "pruned_pixal3d_nodes": [
+    "319",
+    "298",
+    "242",
+    "56",
+    "55"
+   ],
+   "248.switch": false,
+   "901 (added InvertMask)": "LoadImage alpha",
+   "312.background": "#808080",
+   "322.filename_prefix": "3d/GF_kael_s202",
+   "3.seed": 205,
+   "18.seed": 220,
+   "23.seed": 225,
+   "12.seed": 214,
+   "186.target_face_count": 700000,
+   "288.value": 4096,
+   "224.resolution": 2048
+  }
+ },
+ "seed": 202,
+ "node_seeds": {
+  "3": 205,
+  "18": 220,
+  "23": 225,
+  "12": 214
+ },
+ "settings": {
+  "target_faces": 700000,
+  "texture_px": 4096,
+  "background": "#808080",
+  "mask_source": "PNG alpha (InvertMask)"
+ },
+ "timings": {
+  "execution_start_ms": 1790469413055,
+  "execution_end_ms": 1790469811053,
+  "execution_seconds": 398.0,
+  "wall_seconds": 401.0,
+  "generated": "2026-09-27T02:43:34"
+ },
+ "high_poly_info": "Vertices:   7,629,529 (7.63M); Faces:      15,335,452 (15.34M); Attributes: none",
+ "output": {
+  "path": "art/characters/kael/source/kael_trellis2_s202.glb",
+  "bytes": 63502248,
+  "sha256": "5ca75c6cb3bbb2ec667b66956e915a5455f3c32417b936a4d38c3a7bb1dfaab5"
+ },
+ "previews": {
+  "cond": "art/characters/kael/source/kael_trellis2_s202_cond.png",
+  "mask": "art/characters/kael/source/kael_trellis2_s202_mask.png"
+ }
+}

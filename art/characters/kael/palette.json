@@ -1,0 +1,385 @@
+{
+ "character": "kael",
+ "generated_by": "tools/comfy/palette_extract.py",
+ "spec": "art/characters/kael/palette_spec.json",
+ "source": {
+  "path": "art/characters/kael/references/KAEL_front_approved.png",
+  "sha256": "237a81870102eb94167c63cf9d554844c928526c1ec7c0c5cc8ec40a16c4dce6",
+  "size": [
+   1536,
+   1024
+  ]
+ },
+ "generated": "2026-09-27",
+ "kind": "measured from approved art (stage 0 derived data, not a new design)",
+ "method": "per swatch: pixels in the sample boxes passing the HSV filter, flat background removed; tones = median colour of the pixels within +-5 percentile of the named CIELAB L* percentile",
+ "sheet_background": "#141E27",
+ "content_color": "#9A7CFF",
+ "swatches": [
+  {
+   "n": 1,
+   "key": "coat_violet",
+   "label": "Violet duster coat",
+   "emissive": false,
+   "tones": {
+    "shadow": "#131118",
+    "base": "#241B24",
+    "highlight": "#332930"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    11.2,
+    6.5,
+    -4.5
+   ],
+   "pixels_sampled": 13531,
+   "note": "the long tattered duster, collar and cuffs: dark violet-black; lit faces lift toward the highlight tone",
+   "silhouette_share": 0.0937
+  },
+  {
+   "n": 2,
+   "key": "tabard_maroon",
+   "label": "Maroon loin cloth",
+   "emissive": false,
+   "tones": {
+    "shadow": "#271B26",
+    "base": "#36242F",
+    "highlight": "#422D36"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    16.8,
+    10.7,
+    -3.8
+   ],
+   "pixels_sampled": 7333,
+   "note": "the torn cloth hanging from the belt between the legs; same family as the coat, a touch redder",
+   "silhouette_share": 0.04
+  },
+  {
+   "n": 3,
+   "key": "black_cloth",
+   "label": "Black shirt & trousers",
+   "emissive": false,
+   "tones": {
+    "shadow": "#0F1016",
+    "base": "#242328",
+    "highlight": "#302E32"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    14.0,
+    1.7,
+    -3.2
+   ],
+   "pixels_sampled": 6889,
+   "note": "shirt, scarf, trousers and the fingerless glove: near-black, slightly cool",
+   "silhouette_share": 0.2073
+  },
+  {
+   "n": 4,
+   "key": "leather",
+   "label": "Worn brown leather",
+   "emissive": false,
+   "tones": {
+    "shadow": "#352320",
+    "base": "#402A25",
+    "highlight": "#5D4235"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    19.6,
+    9.5,
+    7.4
+   ],
+   "pixels_sampled": 3668,
+   "note": "belts, holster, thigh straps, bracers and the boot cuffs",
+   "silhouette_share": 0.0232
+  },
+  {
+   "n": 5,
+   "key": "boot_leather",
+   "label": "Boots",
+   "emissive": false,
+   "tones": {
+    "shadow": "#312322",
+    "base": "#43322F",
+    "highlight": "#5B463E"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    22.6,
+    7.2,
+    4.9
+   ],
+   "pixels_sampled": 5046,
+   "note": "buckled dark-brown boots with strap plates; darker than the belts",
+   "silhouette_share": 0.0498
+  },
+  {
+   "n": 6,
+   "key": "bronze",
+   "label": "Bronze buckles & cartridges",
+   "emissive": false,
+   "tones": {
+    "shadow": "#6D5644",
+    "base": "#886F59",
+    "highlight": "#BA9979"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    48.7,
+    6.5,
+    16.0
+   ],
+   "pixels_sampled": 415,
+   "note": "belt buckle ring, strap buckles, cartridge caps, the coat's worn edge trim",
+   "silhouette_share": 0.0216
+  },
+  {
+   "n": 7,
+   "key": "skin",
+   "label": "Skin",
+   "emissive": false,
+   "tones": {
+    "shadow": "#59413B",
+    "base": "#937160",
+    "highlight": "#BD9680"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    50.5,
+    10.9,
+    14.6
+   ],
+   "pixels_sampled": 1389,
+   "note": "tanned face, neck and his right (gloved) hand's fingers; tiny at game scale",
+   "silhouette_share": 0.0141
+  },
+  {
+   "n": 8,
+   "key": "hair",
+   "label": "Hair & stubble",
+   "emissive": false,
+   "tones": {
+    "shadow": "#0A0A0D",
+    "base": "#211D1D",
+    "highlight": "#3F3935"
+   },
+   "tone_percentiles_Lstar": {
+    "shadow": 15,
+    "base": 50,
+    "highlight": 90
+   },
+   "base_lab": [
+    11.2,
+    1.9,
+    0.7
+   ],
+   "pixels_sampled": 1570,
+   "note": "dark swept hair, a lighter streak over the glowing side; short beard and stubble",
+   "silhouette_share": 0.0666
+  },
+  {
+   "n": 9,
+   "key": "ghost_arm",
+   "label": "Spectral arm",
+   "emissive": true,
+   "tones": {
+    "rim": "#517B65",
+    "hot": "#80B290",
+    "core": "#B1DEBA"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 15,
+    "hot": 55,
+    "core": 95
+   },
+   "base_lab": [
+    68.3,
+    -23.7,
+    12.1
+   ],
+   "pixels_sampled": 10283,
+   "note": "his LEFT arm below the sleeve (image right) and the ghost hand: translucent ghost flesh, emissive, unlit in the shader",
+   "silhouette_share": 0.0365
+  },
+  {
+   "n": 10,
+   "key": "eye_glow",
+   "label": "Eye & face glow",
+   "emissive": true,
+   "tones": {
+    "rim": "#538A6D",
+    "hot": "#75AA88",
+    "core": "#9CD0AE"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 25,
+    "hot": 60,
+    "core": 97
+   },
+   "base_lab": [
+    65.2,
+    -24.8,
+    12.0
+   ],
+   "pixels_sampled": 366,
+   "note": "the glowing left eye and the green creeping over the left side of the face",
+   "silhouette_share": 0.0243
+  },
+  {
+   "n": 11,
+   "key": "gem_buckle",
+   "label": "Ghost gem buckle",
+   "emissive": true,
+   "tones": {
+    "rim": "#62866E",
+    "hot": "#7BAB8E",
+    "core": "#A6D8C0"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 15,
+    "hot": 50,
+    "core": 95
+   },
+   "base_lab": [
+    66.0,
+    -22.2,
+    9.8
+   ],
+   "pixels_sampled": 217,
+   "note": "the green gem in the belt buckle and the collar pin: a small bright centre mark",
+   "silhouette_share": 0.0293
+  },
+  {
+   "n": 12,
+   "key": "ghost_flame",
+   "label": "Ghost-flame wisps",
+   "emissive": true,
+   "tones": {
+    "rim": "#37524D",
+    "hot": "#476F61",
+    "core": "#659E85"
+   },
+   "tone_percentiles_Lstar": {
+    "rim": 10,
+    "hot": 50,
+    "core": 95
+   },
+   "base_lab": [
+    43.6,
+    -17.5,
+    3.4
+   ],
+   "pixels_sampled": 15462,
+   "note": "the spectral flame rising off the coat hem; built as a few chunky emissive tatters, not particles",
+   "silhouette_share": 0.1573
+  }
+ ],
+ "ink_and_deep_shadow_share": 0.2365,
+ "checks": {
+  "notes": "dE = CIELAB dE76 between base tones; dL = difference in L* (value), the part a toon ramp and a small screen keep.",
+  "dE_coat_violet_vs_tabard_maroon": 7.0,
+  "dE_leather_vs_boot_leather": 4.5,
+  "dE_ghost_arm_vs_ghost_flame": 26.9,
+  "dE_content_color_vs_coat_violet": 80.4,
+  "dL_vs_sheet_background": {
+   "coat_violet": 0.5,
+   "tabard_maroon": 6.1,
+   "black_cloth": 3.3,
+   "leather": 8.9,
+   "boot_leather": 11.9,
+   "bronze": 38.0,
+   "skin": 39.8,
+   "hair": 0.5,
+   "ghost_arm": 57.6,
+   "eye_glow": 54.5,
+   "gem_buckle": 55.3,
+   "ghost_flame": 32.9
+  },
+  "biomes": [
+   {
+    "biome": "cinder_wastes",
+    "name": "Cinder Wastes",
+    "ground": "#2B1B15",
+    "accent": "#FF8A2A",
+    "dL_vs_ground": {
+     "coat_violet": -0.4,
+     "black_cloth": 2.4,
+     "leather": 8.0,
+     "ghost_arm": 56.7
+    },
+    "dE_ghost_arm_vs_biome_accent": 82.4
+   },
+   {
+    "biome": "verdant_ruin",
+    "name": "Verdant Ruin",
+    "ground": "#1C2A21",
+    "accent": "#5CF2B0",
+    "dL_vs_ground": {
+     "coat_violet": -4.4,
+     "black_cloth": -1.6,
+     "leather": 4.0,
+     "ghost_arm": 52.7
+    },
+    "dE_ghost_arm_vs_biome_accent": 37.0
+   },
+   {
+    "biome": "hollow_spire",
+    "name": "The Hollow Spire",
+    "ground": "#1B1D36",
+    "accent": "#A9C8FF",
+    "dL_vs_ground": {
+     "coat_violet": -0.6,
+     "black_cloth": 2.2,
+     "leather": 7.8,
+     "ghost_arm": 56.5
+    },
+    "dE_ghost_arm_vs_biome_accent": 51.2
+   },
+   {
+    "biome": "the_unmaking",
+    "name": "The Unmaking",
+    "ground": "#140B1F",
+    "accent": "#E24BFF",
+    "dL_vs_ground": {
+     "coat_violet": 6.8,
+     "black_cloth": 9.6,
+     "leather": 15.2,
+     "ghost_arm": 63.9
+    },
+    "dE_ghost_arm_vs_biome_accent": 127.2
+   }
+  ],
+  "biomes_note": "ground = the biome's albedo tint from biomes.ron (unlit); the lit floor in game is lighter. Treat these as worst-case value contrast, not a render."
+ }
+}

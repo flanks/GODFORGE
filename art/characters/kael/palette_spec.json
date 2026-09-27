@@ -1,0 +1,109 @@
+{
+ "about": "Input for tools/comfy/palette_extract.py: where each material is sampled on the approved front concept. Boxes are [x0, y0, x1, y1] in concept pixels (1536x1024, origin top-left, x1/y1 exclusive); hue in degrees, sat/val in 0-1 (HSV), applied inside the boxes after the flat navy background is removed. tones = CIELAB L* percentiles reported as shadow/base/highlight (emissive: rim/hot/core). The concept is the verbatim approved front (with the two revolvers, which are weapons and are not sampled). Edit a box, re-run the tool, look at reports/stage0_palette_samples.png.",
+ "character": "kael",
+ "concept": "art/characters/kael/references/KAEL_front_approved.png",
+ "content_color": "#9A7CFF",
+ "title": "KAEL",
+ "subtitle": "The Wraithshot  -  colour callouts",
+ "title_rgb": "#9A7CFF",
+ "header_note": "Measured from the approved front concept (references/KAEL_front_approved.png). Derived data, not new design. The serpent revolvers in his hands are weapons (separate models) and are not sampled.",
+ "value_note": "Kael is one DARK block (violet-black coat, black shirt and trousers, L* 8-20) cut by two warm mid accents (worn brown leather and bronze buckles) and ONE cool light: the spectral ghost-green (his left arm, the left eye and face glow, the gem buckle, the coat's ghost-flame tatters). The ghost green is emissive and sits above everything; it must stay teal-mint, clear of the P4 player ring green #5BE37D. At game scale he reads as a dark, flared coat with a glowing arm.",
+ "outputs": {
+  "palette": "art/characters/kael/palette.json",
+  "color_script": "art/characters/kael/color_script.png",
+  "overlay": "art/characters/kael/reports/stage0_palette_samples.png"
+ },
+ "swatches": [
+  {
+   "key": "coat_violet", "label": "Violet duster coat",
+   "note": "the long tattered duster, collar and cuffs: dark violet-black; lit faces lift toward the highlight tone",
+   "boxes": [[608, 172, 690, 300], [838, 240, 882, 330], [545, 490, 600, 690], [920, 480, 975, 640], [440, 175, 540, 235]],
+   "hue": [240, 355], "sat": [0.05, 0.75], "val": [0.06, 0.60]
+  },
+  {
+   "key": "tabard_maroon", "label": "Maroon loin cloth",
+   "note": "the torn cloth hanging from the belt between the legs; same family as the coat, a touch redder",
+   "boxes": [[722, 440, 762, 740]],
+   "hue": [280, 360], "sat": [0.15, 0.80], "val": [0.10, 0.60]
+  },
+  {
+   "key": "black_cloth", "label": "Black shirt & trousers",
+   "note": "shirt, scarf, trousers and the fingerless glove: near-black, slightly cool",
+   "boxes": [[712, 305, 762, 342], [652, 590, 692, 690], [820, 600, 862, 690], [700, 160, 780, 190]],
+   "sat": [0.0, 0.40], "val": [0.0, 0.30]
+  },
+  {
+   "key": "leather", "label": "Worn brown leather",
+   "note": "belts, holster, thigh straps, bracers and the boot cuffs",
+   "boxes": [[615, 470, 645, 600], [710, 382, 820, 400], [610, 712, 675, 770], [455, 190, 470, 240], [360, 185, 400, 240]],
+   "hue": [5, 40], "sat": [0.30, 0.85], "val": [0.18, 0.75]
+  },
+  {
+   "key": "boot_leather", "label": "Boots",
+   "note": "buckled dark-brown boots with strap plates; darker than the belts",
+   "boxes": [[560, 930, 645, 995], [840, 930, 930, 995], [600, 830, 650, 900], [845, 830, 895, 900]],
+   "hue": [0, 45], "sat": [0.15, 0.80], "val": [0.08, 0.60]
+  },
+  {
+   "key": "bronze", "label": "Bronze buckles & cartridges",
+   "note": "belt buckle ring, strap buckles, cartridge caps, the coat's worn edge trim",
+   "boxes": [[727, 352, 782, 382], [805, 540, 838, 566], [905, 190, 930, 220], [455, 195, 470, 222], [700, 220, 810, 300]],
+   "hue": [22, 55], "sat": [0.30, 1.0], "val": [0.40, 1.0], "drop_hot": true
+  },
+  {
+   "key": "skin", "label": "Skin",
+   "note": "tanned face, neck and his right (gloved) hand's fingers; tiny at game scale",
+   "boxes": [[728, 100, 758, 128], [732, 136, 760, 160], [302, 222, 326, 250]],
+   "hue": [5, 40], "sat": [0.20, 0.70], "val": [0.30, 0.95], "drop_hot": true
+  },
+  {
+   "key": "hair", "label": "Hair & stubble",
+   "note": "dark swept hair, a lighter streak over the glowing side; short beard and stubble",
+   "boxes": [[700, 35, 750, 80], [738, 120, 762, 138]],
+   "sat": [0.0, 0.55], "val": [0.0, 0.32]
+  },
+  {
+   "key": "ghost_arm", "label": "Spectral arm", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [15, 55, 95],
+   "note": "his LEFT arm below the sleeve (image right) and the ghost hand: translucent ghost flesh, emissive, unlit in the shader",
+   "boxes": [[940, 185, 1140, 232], [1150, 190, 1240, 250]],
+   "hue": [110, 185], "sat": [0.15, 1.0], "val": [0.35, 1.0]
+  },
+  {
+   "key": "eye_glow", "label": "Eye & face glow", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [25, 60, 97],
+   "note": "the glowing left eye and the green creeping over the left side of the face",
+   "boxes": [[762, 88, 800, 142]],
+   "hue": [100, 185], "sat": [0.20, 1.0], "val": [0.45, 1.0]
+  },
+  {
+   "key": "gem_buckle", "label": "Ghost gem buckle", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [15, 50, 95],
+   "note": "the green gem in the belt buckle and the collar pin: a small bright centre mark",
+   "boxes": [[742, 356, 768, 378], [825, 200, 850, 222]],
+   "hue": [110, 185], "sat": [0.20, 1.0], "val": [0.45, 1.0]
+  },
+  {
+   "key": "ghost_flame", "label": "Ghost-flame wisps", "emissive": true,
+   "tone_names": ["rim", "hot", "core"], "tones": [10, 50, 95],
+   "note": "the spectral flame rising off the coat hem; built as a few chunky emissive tatters, not particles",
+   "boxes": [[260, 540, 420, 700], [1060, 600, 1180, 760], [955, 700, 1010, 880]],
+   "hue": [120, 185], "sat": [0.20, 1.0], "val": [0.30, 1.0]
+  }
+ ],
+ "checks": {
+  "pairs": [
+   ["coat_violet", "tabard_maroon", "one violet cloth family; the loin cloth a touch redder"],
+   ["leather", "boot_leather", "the boots are the darker leather"],
+   ["ghost_arm", "ghost_flame", "the wisps are the same green, translucent over the navy: build them from the arm's tones"]
+  ],
+  "content_vs": "coat_violet",
+  "content_vs_tone": "highlight",
+  "content_note": "the UI lilac is far lighter than the coat: the violet reads through lit coat faces and the UI only",
+  "probe": ["coat_violet", "black_cloth", "leather", "ghost_arm"],
+  "probe_labels": {"coat_violet": "coat", "black_cloth": "black", "leather": "leather", "ghost_arm": "ghost arm"},
+  "emissive_vs_biome": "ghost_arm",
+  "bg_probe": "coat_violet",
+  "bg_note": "the coat sits on the concept's navy by value; the ghost arm, the leather and the outline carry the silhouette"
+ }
+}

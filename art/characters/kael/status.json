@@ -1,0 +1,272 @@
+{
+ "asset": "kael",
+ "name": "Kael, The Wraithshot",
+ "pipeline": "docs/ART_PIPELINE.md",
+ "updated": "2026-09-27",
+ "status_values": "not_started | in_progress | done | stand_in | pending_human | blocked",
+ "final": false,
+ "decisions": [
+  {
+   "id": "ghost_arm_side",
+   "state": "orchestrator_default",
+   "decided_on": "2026-09-27",
+   "by": "stage 0-1 agent default; the user may override",
+   "decision": "The spectral ghost arm is his LEFT arm (image right in the approved front), exactly as the concept paints it; the glowing eye and the face glow are on the same side. The concept is fed to TRELLIS.2 as painted, NOT mirrored.",
+   "why": "The workflow's task text says 'his RIGHT arm' and 'the right side of the face'; both describe the picture as seen (image right). The approved front is the design authority and is internally consistent: his right hand (black fingerless glove, the long holster on his right thigh) is the gun hand, the ghost hand the off hand. serpent_smg is one-handed and rides weapon_R; the Bullet Ballet twin pistol is a VFX copy on weapon_L.",
+   "consequence": "Stage 2 paints the ghost-arm emissive zone on the body's LEFT forearm and hand (+X in Blender, the hero facing -Y). If the user wants the ghost arm on his right, stage 1 is re-run on a horizontally mirrored input (one PIL ImageOps.mirror), which also moves the holster, the face glow, the hair streak and the scar."
+  },
+  {
+   "id": "stage1_input_cut",
+   "state": "done",
+   "decided_on": "2026-09-27",
+   "by": "stage 0-1 agent (weapons decision of 2026-09-25: weapons are separate models; the task's instruction to remove the weapons from the image when they would fuse into the hands)",
+   "decision": "The TRELLIS.2 input is the verbatim approved front with an edited alpha: the two serpent revolvers and the diffuse translucent ghost smoke are cut out of the birefnet mask (the fists and the coat's ragged hem stay). No pixel is repainted.",
+   "why": "The barrels are collinear with the arms and the grips sit inside the fists, so TRELLIS.2 would grow one arm-gun tube per arm; the smoke (with the navy background showing through its holes) is in birefnet's mask and would become wide opaque fins round the coat.",
+   "consequence": "references/kael_concept_front_nogun.png (+ _mask.png), made by tools/blender/gf_hero/kael_stage1_input.py, fed with run_trellis.py --own-mask. Record: reports/blockout/input_edit.png."
+  }
+ ],
+ "signature_weapon": {
+  "chassis": "serpent_smg",
+  "path": "assets/models/weapons/serpent_smg.glb",
+  "status": "built by the weapon track (assets/models/weapons/serpent_smg.meta.json: one_handed, 2,330 tris, status ai_final_pending_user_approval)",
+  "sockets": "weapon_R on GF_Hero_v1 (stage 3); the Bullet Ballet twin is a VFX copy on weapon_L. The body keeps empty hands (the concept's two revolvers are removed)."
+ },
+ "stages": {
+  "0_concept_reference": {
+   "status": "done",
+   "human_signoff_required": true,
+   "approved_by": "user",
+   "approved_on": "2026-09-27",
+   "outputs": [
+    "art/characters/kael/references/KAEL_front_approved.png",
+    "art/characters/kael/brief.md",
+    "art/characters/kael/turnaround_prompts.md",
+    "art/characters/kael/palette_spec.json",
+    "art/characters/kael/palette.json",
+    "art/characters/kael/color_script.png",
+    "art/characters/kael/reports/stage0_palette_samples.png",
+    "art/characters/kael/reports/stage0_readability.png"
+   ],
+   "notes": "Done 2026-09-27. The user supplied the approved T-pose front (1536x1024, flat dark navy; docs/media/playable_characters/KAEL, THE WRAITHSHOT.png, copied verbatim). It is the TRELLIS reference and the proportion reference. The side, 3/4, back, expression and colour-script sheets are optional and not blocking (Brax and Valdris ran stages 1-5 from their fronts plus the blockout); their prompts are in turnaround_prompts.md and each stays pending_human until the user approves a sheet. No weapon sheet: serpent_smg is already built.",
+   "items": {
+    "front": {
+     "status": "done",
+     "human_signoff_required": true,
+     "approved_by": "user",
+     "approved_on": "2026-09-27",
+     "source": "docs/media/playable_characters/KAEL, THE WRAITHSHOT.png",
+     "sha256": "237a81870102eb94167c63cf9d554844c928526c1ec7c0c5cc8ec40a16c4dce6",
+     "outputs": [
+      "art/characters/kael/references/KAEL_front_approved.png"
+     ],
+     "notes": "The user supplied it as the approved front concept (1536x1024, T-pose, flat navy background #141E27), relayed by the workflow as 'user-approved front'. It shows two serpent revolvers in his hands: those are weapons (separate models) and are cut out of the stage-1 input (decisions[stage1_input_cut])."
+    },
+    "side": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "optional": true,
+     "outputs": [],
+     "prompt": "art/characters/kael/turnaround_prompts.md#1-side-view-left-profile",
+     "notes": "Optional. The stage-1 blockout's side views stand in until a sheet is approved."
+    },
+    "three_quarter": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "optional": true,
+     "outputs": [],
+     "prompt": "art/characters/kael/turnaround_prompts.md#2-front-three-quarter-view",
+     "notes": "Optional."
+    },
+    "back": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "optional": true,
+     "outputs": [],
+     "prompt": "art/characters/kael/turnaround_prompts.md#3-back-view",
+     "notes": "Optional. The coat's back is what the 55-degree camera sees most; brief.md section 7 has the proposal (one violet panel, a centre vent, torn hem with two ghost-flame tatters, no emblem) that stage 2 builds unless a sheet is approved first."
+    },
+    "expression": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "optional": true,
+     "outputs": [],
+     "prompt": "art/characters/kael/turnaround_prompts.md#4-expression-sheet",
+     "notes": "Optional (portraits / codex); the face is 1-2 px in gameplay."
+    },
+    "color_script": {
+     "status": "pending_human",
+     "human_signoff_required": true,
+     "optional": true,
+     "outputs": [],
+     "prompt": "art/characters/kael/turnaround_prompts.md#5-colour-script",
+     "notes": "Optional. Game light, Ghost Step and Bullet Ballet looks for the shader and VFX pass."
+    },
+    "palette": {
+     "status": "stand_in",
+     "stand_in": true,
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/kael/palette.json",
+      "art/characters/kael/color_script.png",
+      "art/characters/kael/reports/stage0_palette_samples.png"
+     ],
+     "tool": "tools/comfy/palette_extract.py art/characters/kael/palette_spec.json",
+     "notes": "Automated measurement of the approved front (12 swatches: shadow/base/highlight, emissive rim/hot/core). Exact for the front plate, usable now for shader and UI colours; a STAND-IN for a painted colour script (no lighting, Ghost Step or Bullet Ballet states). The ghost green measures a desaturated sage-mint (#80B290), dE 46 from the P4 ring green #5BE37D; the emissive map may push it brighter toward teal-mint (brief.md section 4)."
+    },
+    "brief": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/kael/brief.md"
+     ],
+     "notes": "Built from the content rows (characters.csv, kits.ron, chassis.csv, serpent_smg.meta.json), the approved front and measurements."
+    },
+    "turnaround_prompts": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/kael/turnaround_prompts.md"
+     ]
+    },
+    "readability_check": {
+     "status": "done",
+     "human_signoff_required": false,
+     "outputs": [
+      "art/characters/kael/reports/stage0_readability.png"
+     ],
+     "tool": "tools/comfy/readability_sheet.py kael art/characters/kael/references/KAEL_front_approved.png --height-m 2.1 --radius-m 0.44 --mask art/characters/kael/references/kael_concept_front_nogun_mask.png --horde 400 --ring",
+     "notes": "2D approximation on the stage-1 cut-out (no revolvers, no diffuse smoke). Findings in brief.md section 5: the dark coat sinks into three of four biome grounds, the ghost arm carries him in the horde. The real check through the 55-degree camera is the stage-1 in-game render."
+    }
+   }
+  },
+  "1_blockout": {
+   "status": "done",
+   "stand_in": false,
+   "sculpt_reference_only": true,
+   "shipped": false,
+   "human_signoff_required": false,
+   "selected": "art/characters/kael/source/kael_trellis2_s202.glb",
+   "selected_sha256": "5ca75c6cb3bbb2ec667b66956e915a5455f3c32417b936a4d38c3a7bb1dfaab5",
+   "input": "art/characters/kael/references/kael_concept_front_nogun.png (the approved front's RGB, alpha = birefnet minus the revolvers and the diffuse smoke; --own-mask)",
+   "outputs": [
+    "art/characters/kael/reports/blockout_report.md",
+    "art/characters/kael/reports/blockout/blockout_selected.png",
+    "art/characters/kael/reports/blockout/blockout_compare.png",
+    "art/characters/kael/reports/blockout/input_maskcheck.png",
+    "art/characters/kael/reports/blockout/input_edit.png",
+    "art/characters/kael/reports/blockout/kael_trellis2_s{101,202,303}_{turnaround,closeups,closeups2,ingame,silhouette}.png",
+    "art/characters/kael/references/kael_concept_front_nogun.png",
+    "art/characters/kael/references/kael_concept_front_nogun_mask.png",
+    "art/characters/kael/blockout_views.json",
+    "art/characters/kael/source/kael_trellis2_s{101,202,303}.json",
+    "art/characters/kael/source/kael_trellis2_s202.glb (Git LFS)",
+    "art/characters/kael/source/kael_trellis2_s{101,303}.glb (local only, gitignored; sha256 in manifest.json)"
+   ],
+   "tools": [
+    "tools/blender/gf_hero/kael_stage1_input.py",
+    "tools/comfy/run_trellis.py",
+    "tools/comfy/trellis2_character_api.json",
+    "tools/comfy/maskcheck_sheet.py",
+    "tools/blender/gf_hero/kael_render_blockout.py",
+    "tools/blender/gf_hero/kael_render_blockout_parts.py",
+    "tools/comfy/blockout_sheets.py",
+    "tools/comfy/art_manifest.py"
+   ],
+   "metrics": {
+    "height_m": 2.1,
+    "seeds": {
+     "s101": {
+      "gpu_s": 432,
+      "tris": 693031,
+      "front_iou": 0.856,
+      "span_over_height": 0.991,
+      "components": 32,
+      "nonmanifold_edges": 10167,
+      "largest_hole_verts": 119
+     },
+     "s202": {
+      "gpu_s": 401,
+      "tris": 691752,
+      "front_iou": 0.833,
+      "span_over_height": 0.999,
+      "components": 67,
+      "nonmanifold_edges": 6589,
+      "largest_hole_verts": 72
+     },
+     "s303": {
+      "gpu_s": 351,
+      "tris": 693913,
+      "front_iou": 0.825,
+      "span_over_height": 1.003,
+      "components": 46,
+      "nonmanifold_edges": 7451,
+      "largest_hole_verts": 69
+     }
+    },
+    "ingame_px_s202": {
+     "22m": [
+      70,
+      102
+     ],
+     "28m": [
+      55,
+      80
+     ],
+     "note": "[tall, wide] at true 1080p pixels, arms-out T-pose"
+    }
+   },
+   "notes": "Done 2026-09-27. SCULPT REFERENCE ONLY - never shipped, never copied to assets/models/, never rigged. TRELLIS.2 (Pixal3D pruned) at the user's character settings (700k faces, 4096 px), 3 seeds (101/202/303). Input: the approved front with the two revolvers and the diffuse ghost smoke cut out of birefnet's mask (decisions[stage1_input_cut]); birefnet itself kept the whole dark-on-dark figure (reports/blockout/input_maskcheck.png). s202 picked: the only seed with both hands right (gloved right fist with skin fingers, ghost left fist; s101 swaps the hand textures, s303 gloves the ghost hand and keeps a grip tunnel through the right fist), a solid violet-navy coat back torn into long points and clear of the legs, one main shell and the fewest non-manifold edges. Its face glow is baked as a pale patch: use the concept and s303's head for the face. Known defects (thick fused coat flaring wider than the concept, no emissive or ghost-flame tatters - authored in stage 2 -, soft face, baked lighting) in reports/blockout_report.md section 6. Review renders: Cycles CPU + Workbench (kael copies of the shared renderers; never EEVEE)."
+  },
+  "2_production_mesh": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "No human artist (user decision 2026-09-25): the AI chain makes it; the user's visual approval stays the gate."
+  },
+  "3_rig": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "GF_Hero_v1 + x_ chains for the coat, the loin cloth and the ghost-flame tatters."
+  },
+  "4_animation": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "The 24 shared clips + his unique set (brief.md section 8)."
+  },
+  "5_export_validate": {
+   "status": "not_started",
+   "human_signoff_required": true,
+   "outputs": [],
+   "notes": "assets/models/characters/kael.glb + kael.meta.json."
+  }
+ },
+ "human_gates": [
+  {
+   "gate": "stage 0: the approved front",
+   "state": "done",
+   "approved_by": "user",
+   "approved_on": "2026-09-27",
+   "via": "references/KAEL_front_approved.png"
+  },
+  {
+   "gate": "stage 0 (optional): side, 3/4, back, expression and colour-script sheets",
+   "state": "pending_human",
+   "via": "turnaround_prompts.md"
+  },
+  {
+   "gate": "decision: the ghost arm on his LEFT arm, as the concept paints it (decisions[ghost_arm_side])",
+   "state": "pending_human",
+   "via": "brief.md section 7"
+  },
+  {
+   "gate": "licensing: read the DINOv3 licence (conditioning encoder inside the TRELLIS.2 graph; not MIT)",
+   "state": "pending_human"
+  },
+  {
+   "gate": "the user's final visual approval of the AI-made hero (stages 2-5, the Hades-II bar)",
+   "state": "pending_human"
+  }
+ ]
+}
