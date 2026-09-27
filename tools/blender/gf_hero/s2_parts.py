@@ -30,8 +30,8 @@ from mathutils import Vector  # noqa: E402
 from mathutils.bvhtree import BVHTree  # noqa: E402
 
 import s2_geom as G  # noqa: E402
-from s2lib import (connected_parts, get_co, get_collection, hex_rgb, log, mesh_stats, opt, read_json, save_blend,  # noqa: E402
-                   script_args, srgb_to_linear, write_json)
+from s2lib import (canonical_edge_verts, connected_parts, get_co, get_collection, hex_rgb, log, mesh_stats, opt,  # noqa: E402
+                   read_json, save_blend, script_args, sort_new_edges, sort_new_faces, srgb_to_linear, write_json)
 
 argv = script_args(__doc__)
 if len(argv) < 4:
@@ -229,10 +229,12 @@ closed_loop(bm, outer + inner, "sash")
 kn = sc["knot"]
 kt = math.radians(kn["theta_deg"])
 kc = P(kt, kn["z"], R(kt, kn["z"]) + kn["standoff"])
+nf0, ne0 = len(bm.faces), len(bm.edges)
 geom = bmesh.ops.create_uvsphere(bm, u_segments=10, v_segments=6, radius=1.0)
 for v in geom["verts"]:
     v.co = Vector((v.co.x * kn["size"][0] + kc[0], v.co.y * kn["size"][1] + kc[1], v.co.z * kn["size"][2] + kc[2]))
 G.tag(G.faces_of(geom["verts"]), "sash")
+sort_new_faces(bm, nf0)            # create_uvsphere orders its faces and edges by memory address (s2lib)
 
 
 def tail(bm, spec):
@@ -278,7 +280,8 @@ def tail(bm, spec):
 
 for tspec in sc["tails"]:
     tail(bm, tspec)
-finish(bm, "SASH")
+sort_new_edges(bm, ne0)            # the tails refill edge slots the knot's weld freed
+canonical_edge_verts(finish(bm, "SASH").data, ne0)
 
 # ---- SKIRT CLOTH ---------------------------------------------------------------------------------------
 cc = cfg["skirt_cloth"]
