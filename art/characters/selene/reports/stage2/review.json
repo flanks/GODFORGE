@@ -1,0 +1,80 @@
+{
+ "source": "selene_stage2.blend",
+ "bounds_m": {
+  "min": [
+   -1.0016,
+   -0.265,
+   0.0
+  ],
+  "max": [
+   1.0016,
+   0.2331,
+   2.2
+  ]
+ },
+ "height_m": 2.2,
+ "span_m": 2.0032,
+ "launcher": {
+  "glb": "thundercoil_launcher.glb",
+  "attached_at": "hand_frames.R (identity)",
+  "frame": {
+   "origin": [
+    -0.86429,
+    0.02378,
+    1.70294
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.79,
+   "knuckle_abs_x": 0.8971,
+   "hand_verts": 174
+  }
+ },
+ "ingame_px_bare_tpose": {
+  "22": {
+   "tall_px": 74.1,
+   "wide_px": 98.3
+  },
+  "28": {
+   "tall_px": 58.2,
+   "wide_px": 77.3
+  }
+ },
+ "ingame_px_armed_tpose": {
+  "22": {
+   "tall_px": 74.1,
+   "wide_px": 131.0
+  },
+  "28": {
+   "tall_px": 58.2,
+   "wide_px": 102.9
+  }
+ },
+ "ingame": {
+  "pitch_deg": 55.0,
+  "view_heights_m": [
+   22.0,
+   28.0
+  ],
+  "screen_px": 1080,
+  "renderer": "Cycles CPU emission toon"
+ },
+ "front_iou_vs_concept_bare_tpose": 0.6043,
+ "aspect_mesh_bare_tpose": 0.91,
+ "front_iou_vs_concept_armed_tpose": 0.3736,
+ "aspect_mesh_armed_tpose": 1.2123,
+ "aspect_concept": 0.9315
+}

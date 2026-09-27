@@ -1,0 +1,18 @@
+{
+ "glb": "selene.glb",
+ "bytes": 5549976,
+ "materials": [
+  {
+   "name": "M_selene",
+   "baseColorTexture": true,
+   "emissiveTexture": true,
+   "normalTexture": true,
+   "emissiveStrength": 2.5
+  }
+ ],
+ "primitives": 13,
+ "missing_tangents": 0,
+ "extensionsRequired": [],
+ "images": 3,
+ "ok": true
+}

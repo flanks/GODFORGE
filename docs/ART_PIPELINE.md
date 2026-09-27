@@ -319,6 +319,19 @@ python tools/blender/gf_hero/s2_kael_run.py              # [--from <step>] [--on
 
 Results and the stage-3 plan: `art/characters/kael/reports/stage2_production_mesh.md`.
 
+**Selene (2026-09-27), the sorceress variant of the chain.** Her body is a slender woman (the hm08 base, gender 0) under a
+painted bodysuit and leggings, so the shared steps run unchanged (every fit band at weight 0) and Selene steps build the
+rest: `python tools/blender/gf_hero/s2_selene_run.py` (about 2.5 min, CPU only). `s2_selene_recentre.py` puts the
+blockout's body on the origin (its capes and hair tail trail behind it); `s2_selene_parts.py` sets the leg girth and
+builds closed parts: the swept-up hair with the high bun, **six** crown shards (one rigid piece each for `x_crown_01..06`,
+as the concept draws them), the high collar with the gem, harness and trims, the belt with rings, the armlets, two outer
+capes, two shoulder drapes, two hip panels, a front tabard and a back panel (regular cloth grids for x_ chains), bracers,
+hand plates and claws, greaves, heeled pointed sabatons; `s2_selene_paint.py` is the painter behind the shared
+`s2_texture.py` (storm-blue cloth gradients by the cloth's own v, emissive lightning veins, greave slots, crystals);
+`s2_selene_review.py` / `s2_selene_sheets.py` are copies of the Valdris pair (the thundercoil_launcher GLB on the right
+hand frame). 22,356 tris. No shared script was changed. Results and the stage-3 bone plan:
+`art/characters/selene/reports/stage2_production_mesh.md`.
+
 ### Weapons (chassis models, user decision 2026-09-25)
 
 Weapons are **not part of hero bodies**. Every chassis has its own model, attached to hand sockets, so any

@@ -1,0 +1,185 @@
+{
+ "base": "selene_s2_body_base.blend",
+ "reference": "selene_retopo_start.blend",
+ "tps": {
+  "landmarks": 37,
+  "residual_max_m": 3.272661479591932e-07,
+  "global_scale": 0.8763
+ },
+ "head_dark_threshold": 0.4025,
+ "mirror_pairs_missing": 0,
+ "fit": {
+  "iterations": 34,
+  "free_form_fitted_verts": 0,
+  "mean_abs_dist_m": 0.0,
+  "p95_abs_dist_m": 0.0,
+  "max_abs_dist_m": 0.0,
+  "rigid_regions": {}
+ },
+ "grin": {
+  "lip_verts": 103,
+  "slit_z": 1.8753,
+  "mouth_half_width": 0.028
+ },
+ "extra_loops": [
+  {
+   "z": 0.63,
+   "edges_split": 20
+  },
+  {
+   "z": 0.59,
+   "edges_split": 24
+  },
+  {
+   "z": 0.67,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.52,
+   "edges_split": 24
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.49,
+   "edges_split": 24
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.55,
+   "edges_split": 24
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.79,
+   "edges_split": 20
+  },
+  {
+   "axis": "x",
+   "abs_x": 0.765,
+   "edges_split": 20
+  }
+ ],
+ "limb_radial": {
+  "verts": 1250,
+  "slab_scale_min_max": [
+   1.0,
+   1.626
+  ],
+  "radius_before_m": [
+   0.0422,
+   0.0349,
+   0.0293,
+   0.0283,
+   0.0273,
+   0.0283,
+   0.028,
+   0.0268,
+   0.025,
+   0.0241,
+   0.0204,
+   0.0226
+  ],
+  "radius_target_m": [
+   0.047,
+   0.0466,
+   0.0446,
+   0.0425,
+   0.04,
+   0.0375,
+   0.0362,
+   0.0369,
+   0.0354,
+   0.0334,
+   0.0308,
+   0.028
+  ]
+ },
+ "hand_frames": {
+  "L": {
+   "origin": [
+    0.86429,
+    0.02378,
+    1.70294
+   ],
+   "x_axis": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "y_axis": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.79,
+   "knuckle_abs_x": 0.8971,
+   "hand_verts": 174
+  },
+  "R": {
+   "origin": [
+    -0.86429,
+    0.02378,
+    1.70294
+   ],
+   "x_axis": [
+    0.0,
+    1.0,
+    -0.0
+   ],
+   "y_axis": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "z_axis": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "wrist_abs_x": 0.79,
+   "knuckle_abs_x": 0.8971,
+   "hand_verts": 174
+  }
+ },
+ "eyes": {
+  "centres": [
+   [
+    0.036,
+    -0.082,
+    1.945
+   ],
+   [
+    -0.036,
+    -0.082,
+    1.945
+   ]
+  ],
+  "radius_m": 0.0107
+ },
+ "stats": {
+  "name": "BODY",
+  "vertices": 3937,
+  "faces": 4191,
+  "triangles": 7862,
+  "quads": 3671,
+  "tri_faces": 520,
+  "ngons": 0,
+  "quad_ratio": 0.876,
+  "boundary_edges": 0,
+  "nonmanifold_edges": 0,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 3,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": []
+ }
+}

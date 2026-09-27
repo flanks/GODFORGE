@@ -1,0 +1,1033 @@
+{
+ "hero": "selene",
+ "_doc": "Stage-2 parts for tools/blender/gf_hero/s2_selene_parts.py. Metres, Blender axes (Z up, faces -Y, +X = her LEFT). Every piece is given for her left side and built mirrored unless it is on the centre line. Sources: the approved front (references/SELENE_front_approved.png, 2.285 mm/px, centre x 761 px, sabaton tips y 987 px) for outlines and heights, the recentred stage-1 blockout s303 for depths and attachment points, brief.md for construction. Cloth pieces are regular grids (u across, v down) so stage 3 can hang x_ chains on their rows; gf_mask R = v (0 at the attachment, 1 at the hem), G = u.",
+ "seed": 23,
+ "body": {
+  "_doc": "the body under-layer: leg girth (the landmark-warped MakeHuman legs are a model's; the concept's leggings and greaves need fuller thighs and calves): per 1 cm slab and side, the cross-section is scaled about its centre to the target mean radius (z, r), blended in over the ankle and out over the hip",
+  "leg_radius": [
+   [
+    0.18,
+    0.039
+   ],
+   [
+    0.3,
+    0.046
+   ],
+   [
+    0.42,
+    0.055
+   ],
+   [
+    0.55,
+    0.052
+   ],
+   [
+    0.63,
+    0.051
+   ],
+   [
+    0.75,
+    0.06
+   ],
+   [
+    0.9,
+    0.071
+   ],
+   [
+    1.04,
+    0.08
+   ],
+   [
+    1.12,
+    0.084
+   ]
+  ],
+  "leg_blend_bottom": [
+   0.14,
+   0.2
+  ],
+  "leg_blend_top": [
+   1.1,
+   1.19
+  ],
+  "zones": {
+   "_doc": "face material index of the body: eyeballs = eye; z > head_z (|x| < 0.13) = skin; the arms (|x| > arm_x, z > 1.5) = skin, the glove from glove_x to the knuckles (glove_end_x) = glove; the torso = suit, the legs below leg_z = legging. The painter blends skin / suit and suit / legging by smooth analytic lines (neckline, armholes, hip line), so these face zones only pick the painter.",
+   "head_z": 1.8,
+   "arm_x": 0.205,
+   "glove_x": 0.6,
+   "glove_end_x": 0.905,
+   "leg_z": 1.14
+  }
+ },
+ "hair": {
+  "_doc": "the swept-up silver hair: a shell over the scalp (the body's own head faces pushed out: thickness from the rim to the crown), hairline as z by azimuth around the head centre (0 = the face, 180 = the nape), the ears left out; the high bun on the crown (a twisted lofted knot, the concept's bun; the stage-1 blockout put it 0.2 m behind the head: defect 1), a glowing band at its base, locks: two long strands framing the face each side and swept clumps rising from the nape and the sides to the bun",
+  "centre": [
+   0.0,
+   0.01,
+   1.95
+  ],
+  "hairline_az": [
+   0,
+   35,
+   70,
+   100,
+   140,
+   180
+  ],
+  "hairline_z": [
+   1.992,
+   1.98,
+   1.957,
+   1.926,
+   1.895,
+   1.878
+  ],
+  "thick_rim": 0.005,
+  "thick_crown": 0.014,
+  "thick_back": 0.012,
+  "inner": 0.003,
+  "bun": {
+   "centre": [
+    0.0,
+    0.022,
+    2.145
+   ],
+   "z": [
+    2.075,
+    2.2
+   ],
+   "radius": [
+    [
+     0.0,
+     0.028
+    ],
+    [
+     0.15,
+     0.04
+    ],
+    [
+     0.45,
+     0.047
+    ],
+    [
+     0.75,
+     0.042
+    ],
+    [
+     0.93,
+     0.026
+    ],
+    [
+     1.0,
+     0.005
+    ]
+   ],
+   "lobes": 3,
+   "lobe_amp": 0.14,
+   "twist_turns": 0.8,
+   "rings": 10,
+   "sides": 14,
+   "band_z": 2.098,
+   "band_h": 0.012,
+   "band_r": 0.04
+  },
+  "locks": [
+   {
+    "_doc": "long face-framing strand in front of the ear, to the collar (the concept's two strands)",
+    "root": [
+     0.064,
+     -0.052,
+     1.985
+    ],
+    "dir": [
+     0.12,
+     -0.25,
+     -1.0
+    ],
+    "bend": [
+     0.0,
+     -0.1,
+     -1.0
+    ],
+    "len": 0.2,
+    "w": 0.0264,
+    "t": 0.009
+   },
+   {
+    "root": [
+     0.076,
+     -0.025,
+     1.97
+    ],
+    "dir": [
+     0.15,
+     -0.1,
+     -1.0
+    ],
+    "bend": [
+     0.05,
+     0.0,
+     -1.0
+    ],
+    "len": 0.16,
+    "w": 0.0204,
+    "t": 0.008
+   },
+   {
+    "_doc": "a thin wisp off the temple",
+    "root": [
+     0.052,
+     -0.072,
+     1.99
+    ],
+    "dir": [
+     0.25,
+     -0.3,
+     -1.0
+    ],
+    "bend": [
+     0.2,
+     -0.2,
+     -1.0
+    ],
+    "len": 0.1,
+    "w": 0.011,
+    "t": 0.006
+   },
+   {
+    "_doc": "swept clumps rising to the bun (sides and back)",
+    "root": [
+     0.082,
+     0.015,
+     1.955
+    ],
+    "to": [
+     0.03,
+     0.02,
+     2.115
+    ],
+    "len": 0.19,
+    "w": 0.036,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.06,
+     0.085,
+     1.915
+    ],
+    "to": [
+     0.022,
+     0.04,
+     2.105
+    ],
+    "len": 0.22,
+    "w": 0.04,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.0,
+     0.1,
+     1.9
+    ],
+    "to": [
+     0.0,
+     0.05,
+     2.1
+    ],
+    "len": 0.23,
+    "w": 0.045,
+    "t": 0.016,
+    "sweep": true,
+    "centre": true
+   },
+   {
+    "root": [
+     0.035,
+     -0.07,
+     2.005
+    ],
+    "to": [
+     0.01,
+     -0.01,
+     2.11
+    ],
+    "len": 0.15,
+    "w": 0.034,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "_doc": "swept strands from the temples and the sides up to the bun (break the shell into locks)",
+    "root": [
+     0.028,
+     -0.078,
+     1.998
+    ],
+    "to": [
+     0.004,
+     -0.005,
+     2.115
+    ],
+    "len": 0.15,
+    "w": 0.028,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.058,
+     -0.058,
+     1.985
+    ],
+    "to": [
+     0.018,
+     0.0,
+     2.112
+    ],
+    "len": 0.17,
+    "w": 0.03,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.086,
+     -0.02,
+     1.945
+    ],
+    "to": [
+     0.03,
+     0.01,
+     2.11
+    ],
+    "len": 0.2,
+    "w": 0.032,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.08,
+     0.05,
+     1.925
+    ],
+    "to": [
+     0.03,
+     0.03,
+     2.108
+    ],
+    "len": 0.21,
+    "w": 0.034,
+    "t": 0.016,
+    "sweep": true
+   },
+   {
+    "root": [
+     0.035,
+     0.098,
+     1.905
+    ],
+    "to": [
+     0.012,
+     0.045,
+     2.1
+    ],
+    "len": 0.22,
+    "w": 0.034,
+    "t": 0.016,
+    "sweep": true
+   }
+  ]
+ },
+ "crown": {
+  "_doc": "SIX storm-crystal shards floating round the head, three per side as the approved concept draws them (the stage brief said five; the concept wins, brief section 7.2 Q1, pending the user). Each is a separate rigid piece (a gold-rimmed crystal: an elongated hexagon, chamfered, the faces set in) on its own bone x_crown_01..06 under head_top. Positions from the concept relative to the eyes (upper 0.178 m, middle 0.105, lower 0.025 above them), |x| scaled 0.9 to the model's narrower head; [x, y, z, length, width, lean_deg (+ = top leans in toward the head)]",
+  "shards": [
+   [
+    0.115,
+    0.0,
+    2.123,
+    0.07,
+    0.024,
+    27
+   ],
+   [
+    0.172,
+    0.025,
+    2.05,
+    0.088,
+    0.028,
+    4
+   ],
+   [
+    0.132,
+    -0.015,
+    1.972,
+    0.048,
+    0.018,
+    12
+   ]
+  ],
+  "depth": 0.011,
+  "chamfer": 0.0035,
+  "face_front": 0.75
+ },
+ "collar": {
+  "_doc": "the high collar (black, gold rims) round the neck from the shoulder line to under the jaw, lower at the front with a small V; the collar gem (a faceted diamond in a gold setting) at its base; the harness straps and the gold neckline trim over the bust; the gold waist straps",
+  "z_bottom_front": 1.738,
+  "z_bottom_back": 1.775,
+  "z_top_front": 1.822,
+  "z_top_side": 1.852,
+  "z_top_back": 1.875,
+  "gap": 0.006,
+  "flare": 0.01,
+  "thick": 0.007,
+  "gem": {
+   "z": 1.745,
+   "len": 0.052,
+   "w": 0.036,
+   "depth": 0.016,
+   "setting_len": 0.07,
+   "setting_w": 0.05
+  },
+  "neckline": [
+   [
+    0.158,
+    1.635
+   ],
+   [
+    0.14,
+    1.662
+   ],
+   [
+    0.105,
+    1.676
+   ],
+   [
+    0.07,
+    1.668
+   ],
+   [
+    0.035,
+    1.648
+   ],
+   [
+    0.0,
+    1.625
+   ]
+  ],
+  "straps": [
+   [
+    [
+     0.05,
+     1.765
+    ],
+    [
+     0.085,
+     1.72
+    ],
+    [
+     0.112,
+     1.676
+    ]
+   ],
+   [
+    [
+     0.012,
+     1.722
+    ],
+    [
+     0.03,
+     1.68
+    ],
+    [
+     0.045,
+     1.652
+    ]
+   ]
+  ],
+  "waist_straps": [
+   [
+    [
+     0.118,
+     1.598
+    ],
+    [
+     0.06,
+     1.568
+    ],
+    [
+     0.0,
+     1.545
+    ]
+   ],
+   [
+    [
+     0.1,
+     1.462
+    ],
+    [
+     0.05,
+     1.492
+    ],
+    [
+     0.0,
+     1.515
+    ]
+   ]
+  ],
+  "strap_w": 0.012,
+  "trim_w": 0.011,
+  "ribbon_th": 0.004,
+  "ribbon_off": 0.0015
+ },
+ "belt": {
+  "_doc": "the belt at the hips (black leather, gold rims), dipping to a V at the front; two big gold rings at the front (the hip panels hang from them); a gold-rimmed dark plate on each hip",
+  "z_front": 1.37,
+  "z_side": 1.41,
+  "z_back": 1.405,
+  "h": 0.034,
+  "rim": 0.005,
+  "gap": 0.006,
+  "thick": 0.01,
+  "ring_x": 0.085,
+  "ring_z": 1.378,
+  "ring_R": 0.028,
+  "ring_r": 0.0055,
+  "hip_plate": {
+   "x": 0.15,
+   "z": 1.335,
+   "w": 0.075,
+   "h": 0.13,
+   "depth": 0.012,
+   "chamfer": 0.005
+  }
+ },
+ "shoulders": {
+  "_doc": "the shoulder ornament on each upper arm: an armlet band (dark plate, gold rims) whose lower half hides the tops of the cape and the mantle, a gold ring on its front, two pointed gold-rimmed blades (the concept's bow points: up-and-out and down-and-back)",
+  "x": [
+   0.232,
+   0.312
+  ],
+  "gap": 0.01,
+  "bulge": 0.012,
+  "thick": 0.008,
+  "ring_R": 0.02,
+  "ring_r": 0.0045,
+  "blades": [
+   {
+    "at": [
+     0.28,
+     -0.035,
+     1.765
+    ],
+    "dir": [
+     0.55,
+     -0.2,
+     1.0
+    ],
+    "len": 0.075,
+    "w": 0.03
+   },
+   {
+    "at": [
+     0.25,
+     0.05,
+     1.755
+    ],
+    "dir": [
+     -0.2,
+     0.8,
+     0.9
+    ],
+    "len": 0.06,
+    "w": 0.026
+   }
+  ]
+ },
+ "cloth": {
+  "_doc": "cloth sheets (thick 0.008 m, closed): profiles by v (0 = attachment, 1 = hem): z, inner / outer edge x, depth y; hem_z(u) is added over the last rows (tatters); folds are sine waves across u growing with v. chain = the suggested stage-3 helper chain (one link per v range)",
+  "thick": 0.008,
+  "cape": {
+   "nu": 13,
+   "nv": 19,
+   "v": [
+    0.0,
+    0.06,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0
+   ],
+   "z": [
+    1.668,
+    1.6,
+    1.42,
+    1.16,
+    0.9,
+    0.68,
+    0.5
+   ],
+   "x_in": [
+    0.245,
+    0.255,
+    0.29,
+    0.35,
+    0.41,
+    0.47,
+    0.52
+   ],
+   "x_out": [
+    0.3,
+    0.36,
+    0.48,
+    0.62,
+    0.75,
+    0.85,
+    0.93
+   ],
+   "y": [
+    0.045,
+    0.085,
+    0.115,
+    0.135,
+    0.15,
+    0.16,
+    0.17
+   ],
+   "tatters": [
+    [
+     0.0,
+     0.02
+    ],
+    [
+     0.1,
+     -0.07
+    ],
+    [
+     0.22,
+     0.04
+    ],
+    [
+     0.36,
+     -0.09
+    ],
+    [
+     0.5,
+     0.03
+    ],
+    [
+     0.63,
+     -0.06
+    ],
+    [
+     0.77,
+     0.05
+    ],
+    [
+     0.88,
+     -0.02
+    ],
+    [
+     1.0,
+     0.13
+    ]
+   ],
+   "curl_x": 0.06,
+   "edge_jag": 0.022,
+   "fold_amp": 0.016,
+   "fold_waves": 2.5,
+   "bulge": 0.05,
+   "chain": [
+    "x_cape_{S}_01",
+    "x_cape_{S}_02",
+    "x_cape_{S}_03",
+    "x_cape_{S}_04"
+   ]
+  },
+  "mantle": {
+   "nu": 7,
+   "nv": 11,
+   "v": [
+    0.0,
+    0.2,
+    0.45,
+    0.7,
+    1.0
+   ],
+   "z": [
+    1.668,
+    1.575,
+    1.46,
+    1.36,
+    1.27
+   ],
+   "x_in": [
+    0.236,
+    0.25,
+    0.285,
+    0.33,
+    0.38
+   ],
+   "x_out": [
+    0.304,
+    0.37,
+    0.45,
+    0.52,
+    0.575
+   ],
+   "y": [
+    -0.012,
+    -0.02,
+    -0.012,
+    0.0,
+    0.012
+   ],
+   "tatters": [
+    [
+     0.0,
+     0.07
+    ],
+    [
+     0.35,
+     0.03
+    ],
+    [
+     0.6,
+     0.01
+    ],
+    [
+     0.85,
+     -0.03
+    ],
+    [
+     1.0,
+     -0.07
+    ]
+   ],
+   "curl_x": 0.0,
+   "edge_jag": 0.008,
+   "fold_amp": 0.008,
+   "fold_waves": 1.5,
+   "bulge": -0.015,
+   "chain": [
+    "x_mantle_{S}_01",
+    "x_mantle_{S}_02"
+   ]
+  },
+  "panel": {
+   "nu": 7,
+   "nv": 16,
+   "v": [
+    0.0,
+    0.15,
+    0.35,
+    0.55,
+    0.75,
+    1.0
+   ],
+   "z": [
+    1.372,
+    1.22,
+    1.02,
+    0.82,
+    0.62,
+    0.36
+   ],
+   "x_in": [
+    0.052,
+    0.068,
+    0.095,
+    0.125,
+    0.155,
+    0.19
+   ],
+   "x_out": [
+    0.162,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4
+   ],
+   "clear": [
+    0.006,
+    0.028,
+    0.034,
+    0.036,
+    0.04,
+    0.045
+   ],
+   "wrap": 0.35,
+   "tatters": [
+    [
+     0.0,
+     0.04
+    ],
+    [
+     0.2,
+     -0.05
+    ],
+    [
+     0.45,
+     0.03
+    ],
+    [
+     0.7,
+     -0.07
+    ],
+    [
+     0.88,
+     0.02
+    ],
+    [
+     1.0,
+     -0.03
+    ]
+   ],
+   "fold_amp": 0.008,
+   "fold_waves": 1.5,
+   "chain": [
+    "x_panel_{S}_01",
+    "x_panel_{S}_02",
+    "x_panel_{S}_03"
+   ]
+  },
+  "tabard": {
+   "nu": 6,
+   "nv": 17,
+   "v": [
+    0.0,
+    0.3,
+    0.65,
+    1.0
+   ],
+   "z": [
+    1.36,
+    1.05,
+    0.7,
+    0.34
+   ],
+   "half_w": [
+    0.05,
+    0.052,
+    0.055,
+    0.058
+   ],
+   "clear": [
+    0.006,
+    0.03,
+    0.052,
+    0.05
+   ],
+   "hem_point": 0.07,
+   "chain": [
+    "x_tabard_01",
+    "x_tabard_02",
+    "x_tabard_03"
+   ],
+   "_doc": "the pale front tabard between the legs (narrow: the black leggings and the knee plates show between it and the hip panels, as drawn)"
+  },
+  "back": {
+   "nu": 7,
+   "nv": 13,
+   "v": [
+    0.0,
+    0.4,
+    1.0
+   ],
+   "z": [
+    1.4,
+    1.02,
+    0.5
+   ],
+   "half_w": [
+    0.105,
+    0.13,
+    0.16
+   ],
+   "clear": [
+    0.006,
+    0.03,
+    0.035
+   ],
+   "tatters": [
+    [
+     0.0,
+     0.03
+    ],
+    [
+     0.18,
+     -0.05
+    ],
+    [
+     0.4,
+     0.04
+    ],
+    [
+     0.5,
+     -0.07
+    ],
+    [
+     0.6,
+     0.04
+    ],
+    [
+     0.82,
+     -0.05
+    ],
+    [
+     1.0,
+     0.03
+    ]
+   ],
+   "chain": [
+    "x_back_01",
+    "x_back_02",
+    "x_back_03"
+   ]
+  }
+ },
+ "gauntlets": {
+  "_doc": "dark fingerless gauntlets: a bracer from the pointed top edge (mid-forearm, the point on the top) to past the wrist, gold rims; a plate over the back of the hand to the knuckles; ice-blue claw caps on all ten fingertips (rigid, skinned to the last phalanx)",
+  "bracer_x": [
+   0.605,
+   0.8
+  ],
+  "bracer_point": 0.045,
+  "gap": 0.005,
+  "thick": 0.006,
+  "hand_plate_x": [
+   0.8,
+   0.892
+  ],
+  "hand_plate_deg": 62,
+  "claw": {
+   "len": 0.024,
+   "r": 0.0062,
+   "sink": 0.012,
+   "curl": 0.35
+  }
+ },
+ "legs": {
+  "_doc": "greaves (dark navy plate, gold rims) over the front 250 degrees of the shin with a point up at the front; a pointed knee cop; a leaf blade on the outside of each knee (the concept's knee fins); the glowing V slots are painted",
+  "greave_z": [
+   0.255,
+   0.585
+  ],
+  "greave_deg": 125,
+  "greave_point": 0.05,
+  "gap": 0.008,
+  "thick": 0.007,
+  "knee": {
+   "z": [
+    0.55,
+    0.78
+   ],
+   "w": 0.085,
+   "depth": 0.018,
+   "chamfer": 0.005
+  },
+  "fin": {
+   "z": [
+    0.6,
+    0.82
+   ],
+   "w": 0.042,
+   "depth": 0.01,
+   "out": 0.012
+  }
+ },
+ "sabatons": {
+  "_doc": "pointed heeled sabatons round the heeled foot: a shaft round the ankle (flared top under the greave), a foot shell lofted from the heel to a long pointed toe (sections across the foot, never thinner than the foot inside + gap), a heel block to the ground; gold rims and painted lames",
+  "shaft_z": [
+   0.13,
+   0.29
+  ],
+  "shaft_gap": 0.01,
+  "shaft_flare": 0.012,
+  "thick": 0.007,
+  "heel_y": 0.1,
+  "toe_y": -0.265,
+  "toe_x_in": 0.012,
+  "gap": 0.008,
+  "stations": [
+   [
+    0.1,
+    0.07,
+    0.19,
+    0.038
+   ],
+   [
+    0.06,
+    0.066,
+    0.19,
+    0.042
+   ],
+   [
+    0.02,
+    0.056,
+    0.17,
+    0.043
+   ],
+   [
+    -0.03,
+    0.036,
+    0.15,
+    0.044
+   ],
+   [
+    -0.08,
+    0.014,
+    0.12,
+    0.044
+   ],
+   [
+    -0.12,
+    0.004,
+    0.09,
+    0.042
+   ],
+   [
+    -0.16,
+    0.002,
+    0.066,
+    0.035
+   ],
+   [
+    -0.2,
+    0.002,
+    0.045,
+    0.025
+   ],
+   [
+    -0.235,
+    0.002,
+    0.027,
+    0.014
+   ],
+   [
+    -0.265,
+    0.003,
+    0.012,
+    0.003
+   ]
+  ],
+  "_doc_stations": "[y, z_sole, z_top, half_width] from the heel to the toe tip",
+  "heel": {
+   "y": [
+    0.035,
+    0.095
+   ],
+   "y_ground": [
+    0.05,
+    0.082
+   ],
+   "half_w": 0.017
+  }
+ }
+}

@@ -1,0 +1,1316 @@
+{
+ "parts": {
+  "HAIR": {
+   "name": "HAIR",
+   "vertices": 851,
+   "faces": 946,
+   "triangles": 1598,
+   "quads": 652,
+   "tri_faces": 294,
+   "ngons": 0,
+   "quad_ratio": 0.689,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 26,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "CROWN": {
+   "name": "CROWN",
+   "vertices": 144,
+   "faces": 156,
+   "triangles": 264,
+   "quads": 108,
+   "tri_faces": 48,
+   "ngons": 0,
+   "quad_ratio": 0.692,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "COLLAR": {
+   "name": "COLLAR",
+   "vertices": 860,
+   "faces": 836,
+   "triangles": 1672,
+   "quads": 836,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 13,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "BELT": {
+   "name": "BELT",
+   "vertices": 536,
+   "faces": 532,
+   "triangles": 1064,
+   "quads": 532,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 5,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "SHOULDERS": {
+   "name": "SHOULDERS",
+   "vertices": 656,
+   "faces": 648,
+   "triangles": 1296,
+   "quads": 648,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 8,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "CAPES": {
+   "name": "CAPES",
+   "vertices": 988,
+   "faces": 984,
+   "triangles": 1968,
+   "quads": 984,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "MANTLES": {
+   "name": "MANTLES",
+   "vertices": 308,
+   "faces": 304,
+   "triangles": 608,
+   "quads": 304,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "PANELS": {
+   "name": "PANELS",
+   "vertices": 448,
+   "faces": 444,
+   "triangles": 888,
+   "quads": 444,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "TABARD": {
+   "name": "TABARD",
+   "vertices": 386,
+   "faces": 382,
+   "triangles": 764,
+   "quads": 382,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "GAUNTLETS": {
+   "name": "GAUNTLETS",
+   "vertices": 946,
+   "faces": 972,
+   "triangles": 1844,
+   "quads": 872,
+   "tri_faces": 100,
+   "ngons": 0,
+   "quad_ratio": 0.897,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 14,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "GREAVES": {
+   "name": "GREAVES",
+   "vertices": 576,
+   "faces": 576,
+   "triangles": 1128,
+   "quads": 552,
+   "tri_faces": 24,
+   "ngons": 0,
+   "quad_ratio": 0.958,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "SABATONS": {
+   "name": "SABATONS",
+   "vertices": 708,
+   "faces": 724,
+   "triangles": 1400,
+   "quads": 676,
+   "tri_faces": 48,
+   "ngons": 0,
+   "quad_ratio": 0.934,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  },
+  "BODY": {
+   "name": "BODY",
+   "vertices": 3937,
+   "faces": 4191,
+   "triangles": 7862,
+   "quads": 3671,
+   "tri_faces": 520,
+   "ngons": 0,
+   "quad_ratio": 0.876,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 3,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "Z_skin",
+    "Z_hair",
+    "Z_eye",
+    "Z_suit",
+    "Z_legging",
+    "Z_glove",
+    "Z_gold",
+    "Z_plate",
+    "Z_cape",
+    "Z_panel",
+    "Z_tabard",
+    "Z_gem",
+    "Z_crystal",
+    "Z_claw"
+   ]
+  }
+ },
+ "pieces": {
+  "HAIR": [
+   "HAIR_BAND -> head",
+   "HAIR_BUN -> head",
+   "HAIR_LOCK -> head",
+   "HAIR_SHELL -> head"
+  ],
+  "CROWN": [
+   "CROWN_SHARD_01 -> x_crown_01",
+   "CROWN_SHARD_02 -> x_crown_02",
+   "CROWN_SHARD_03 -> x_crown_03",
+   "CROWN_SHARD_04 -> x_crown_04",
+   "CROWN_SHARD_05 -> x_crown_05",
+   "CROWN_SHARD_06 -> x_crown_06"
+  ],
+  "COLLAR": [
+   "COLLAR -> neck_01",
+   "COLLAR_GEM -> spine_03",
+   "GEM_SETTING -> spine_03",
+   "HARNESS_STRAP_1 -> spine_03",
+   "HARNESS_STRAP_2 -> spine_03",
+   "NECKLINE_TRIM -> spine_03",
+   "WAIST_STRAP_1 -> spine_02",
+   "WAIST_STRAP_2 -> spine_02"
+  ],
+  "BELT": [
+   "BELT -> pelvis",
+   "BELT_RING_L -> pelvis",
+   "BELT_RING_R -> pelvis",
+   "HIP_PLATE_L -> pelvis",
+   "HIP_PLATE_R -> pelvis"
+  ],
+  "SHOULDERS": [
+   "ARMLET_BLADE_1_L -> upperarm_l",
+   "ARMLET_BLADE_1_R -> upperarm_r",
+   "ARMLET_BLADE_2_L -> upperarm_l",
+   "ARMLET_BLADE_2_R -> upperarm_r",
+   "ARMLET_L -> upperarm_l",
+   "ARMLET_R -> upperarm_r",
+   "ARMLET_RING_L -> upperarm_l",
+   "ARMLET_RING_R -> upperarm_r"
+  ],
+  "CAPES": [
+   "CAPE_L -> x_cape_L_01",
+   "CAPE_R -> x_cape_R_01"
+  ],
+  "MANTLES": [
+   "MANTLE_L -> x_mantle_L_01",
+   "MANTLE_R -> x_mantle_R_01"
+  ],
+  "PANELS": [
+   "PANEL_L -> x_panel_L_01",
+   "PANEL_R -> x_panel_R_01"
+  ],
+  "TABARD": [
+   "BACK_PANEL -> x_back_01",
+   "TABARD_FRONT -> x_tabard_01"
+  ],
+  "GAUNTLETS": [
+   "BRACER_L -> lowerarm_l",
+   "BRACER_R -> lowerarm_r",
+   "CLAW_INDEX_L -> index_03_l",
+   "CLAW_INDEX_R -> index_03_r",
+   "CLAW_MIDDLE_L -> middle_03_l",
+   "CLAW_MIDDLE_R -> middle_03_r",
+   "CLAW_PINKY_L -> pinky_03_l",
+   "CLAW_PINKY_R -> pinky_03_r",
+   "CLAW_RING_L -> ring_03_l",
+   "CLAW_RING_R -> ring_03_r",
+   "CLAW_THUMB_L -> thumb_03_l",
+   "CLAW_THUMB_R -> thumb_03_r",
+   "HAND_PLATE_L -> hand_l",
+   "HAND_PLATE_R -> hand_r"
+  ],
+  "GREAVES": [
+   "GREAVE_L -> calf_l",
+   "GREAVE_R -> calf_r",
+   "KNEE_COP_L -> calf_l",
+   "KNEE_COP_R -> calf_r",
+   "KNEE_FIN_L -> thigh_l",
+   "KNEE_FIN_R -> thigh_r"
+  ],
+  "SABATONS": [
+   "SABATON_FOOT_L -> foot_l",
+   "SABATON_FOOT_R -> foot_r",
+   "SABATON_HEEL_L -> foot_l",
+   "SABATON_HEEL_R -> foot_r",
+   "SABATON_SHAFT_L -> foot_l",
+   "SABATON_SHAFT_R -> foot_r"
+  ]
+ },
+ "zones": [
+  "skin",
+  "hair",
+  "eye",
+  "suit",
+  "legging",
+  "glove",
+  "gold",
+  "plate",
+  "cape",
+  "panel",
+  "tabard",
+  "gem",
+  "crystal",
+  "claw"
+ ],
+ "leg_girth": {
+  "z_r_before_target_scale": [
+   [
+    0.6,
+    0.0489,
+    0.0514,
+    1.05
+   ]
+  ]
+ },
+ "hair_shell": {
+  "faces": 85,
+  "top_z": 2.0787,
+  "rim_verts": 40
+ },
+ "hair_locks": 23,
+ "cloth": {
+  "cape_L": {
+   "root": "upperarm_l",
+   "chain": [
+    "x_cape_L_01",
+    "x_cape_L_02",
+    "x_cape_L_03",
+    "x_cape_L_04"
+   ],
+   "grid_u_v": [
+    13,
+    19
+   ],
+   "hem_z_min": 0.435,
+   "x_max": 0.974
+  },
+  "cape_R": {
+   "root": "upperarm_r",
+   "chain": [
+    "x_cape_R_01",
+    "x_cape_R_02",
+    "x_cape_R_03",
+    "x_cape_R_04"
+   ],
+   "grid_u_v": [
+    13,
+    19
+   ],
+   "hem_z_min": 0.435,
+   "x_max": 0.974
+  },
+  "mantle_L": {
+   "root": "upperarm_l",
+   "chain": [
+    "x_mantle_L_01",
+    "x_mantle_L_02"
+   ],
+   "grid_u_v": [
+    7,
+    11
+   ],
+   "hem_z_min": 1.2,
+   "x_max": 0.569
+  },
+  "mantle_R": {
+   "root": "upperarm_r",
+   "chain": [
+    "x_mantle_R_01",
+    "x_mantle_R_02"
+   ],
+   "grid_u_v": [
+    7,
+    11
+   ],
+   "hem_z_min": 1.2,
+   "x_max": 0.569
+  },
+  "panel_L": {
+   "root": "pelvis",
+   "chain": [
+    "x_panel_L_01",
+    "x_panel_L_02",
+    "x_panel_L_03"
+   ],
+   "grid_u_v": [
+    7,
+    16
+   ],
+   "hem_z_min": 0.303,
+   "x_max": 0.4
+  },
+  "panel_R": {
+   "root": "pelvis",
+   "chain": [
+    "x_panel_R_01",
+    "x_panel_R_02",
+    "x_panel_R_03"
+   ],
+   "grid_u_v": [
+    7,
+    16
+   ],
+   "hem_z_min": 0.303,
+   "x_max": 0.4
+  },
+  "tabard": {
+   "root": "pelvis",
+   "chain": [
+    "x_tabard_01",
+    "x_tabard_02",
+    "x_tabard_03"
+   ],
+   "hem_z_min": 0.354
+  },
+  "back_panel": {
+   "root": "pelvis",
+   "chain": [
+    "x_back_01",
+    "x_back_02",
+    "x_back_03"
+   ],
+   "hem_z_min": 0.43
+  }
+ },
+ "claws_L": [
+  {
+   "finger": "thumb",
+   "tip": [
+    0.9066,
+    -0.0483,
+    1.6366
+   ]
+  },
+  {
+   "finger": "index",
+   "tip": [
+    0.991,
+    0.0018,
+    1.7055
+   ]
+  },
+  {
+   "finger": "middle",
+   "tip": [
+    1.0016,
+    0.0294,
+    1.7111
+   ]
+  },
+  {
+   "finger": "ring",
+   "tip": [
+    0.9854,
+    0.0513,
+    1.714
+   ]
+  },
+  {
+   "finger": "pinky",
+   "tip": [
+    0.948,
+    0.0727,
+    1.7121
+   ]
+  }
+ ],
+ "sabatons_L": {
+  "foot_centre_x": 0.0672,
+  "toe_tip": [
+   0.0552,
+   -0.265,
+   0.0076
+  ]
+ },
+ "body_zone_faces": {
+  "skin": 1978,
+  "glove": 574,
+  "legging": 1069,
+  "suit": 450,
+  "eye": 120
+ },
+ "triangles_total": 22356,
+ "piece_table": [
+  {
+   "id": 0,
+   "name": "HAIR_SHELL",
+   "bone": "head"
+  },
+  {
+   "id": 1,
+   "name": "HAIR_BUN",
+   "bone": "head"
+  },
+  {
+   "id": 2,
+   "name": "HAIR_BAND",
+   "bone": "head"
+  },
+  {
+   "id": 3,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 4,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 5,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 6,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 7,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 8,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 9,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 10,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 11,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 12,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 13,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 14,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 15,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 16,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 17,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 18,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 19,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 20,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 21,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 22,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 23,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 24,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 25,
+   "name": "HAIR_LOCK",
+   "bone": "head"
+  },
+  {
+   "id": 26,
+   "name": "CROWN_SHARD_01",
+   "bone": "x_crown_01",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    0.115,
+    0.0,
+    2.123
+   ]
+  },
+  {
+   "id": 27,
+   "name": "CROWN_SHARD_02",
+   "bone": "x_crown_02",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    0.172,
+    0.025,
+    2.05
+   ]
+  },
+  {
+   "id": 28,
+   "name": "CROWN_SHARD_03",
+   "bone": "x_crown_03",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    0.132,
+    -0.015,
+    1.972
+   ]
+  },
+  {
+   "id": 29,
+   "name": "CROWN_SHARD_04",
+   "bone": "x_crown_04",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    -0.115,
+    0.0,
+    2.123
+   ]
+  },
+  {
+   "id": 30,
+   "name": "CROWN_SHARD_05",
+   "bone": "x_crown_05",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    -0.172,
+    0.025,
+    2.05
+   ]
+  },
+  {
+   "id": 31,
+   "name": "CROWN_SHARD_06",
+   "bone": "x_crown_06",
+   "parent": "head_top",
+   "rigid": true,
+   "centre": [
+    -0.132,
+    -0.015,
+    1.972
+   ]
+  },
+  {
+   "id": 32,
+   "name": "COLLAR",
+   "bone": "neck_01"
+  },
+  {
+   "id": 33,
+   "name": "GEM_SETTING",
+   "bone": "spine_03"
+  },
+  {
+   "id": 34,
+   "name": "COLLAR_GEM",
+   "bone": "spine_03"
+  },
+  {
+   "id": 35,
+   "name": "HARNESS_STRAP_1",
+   "bone": "spine_03"
+  },
+  {
+   "id": 36,
+   "name": "HARNESS_STRAP_2",
+   "bone": "spine_03"
+  },
+  {
+   "id": 37,
+   "name": "NECKLINE_TRIM",
+   "bone": "spine_03"
+  },
+  {
+   "id": 38,
+   "name": "WAIST_STRAP_1",
+   "bone": "spine_02"
+  },
+  {
+   "id": 39,
+   "name": "WAIST_STRAP_2",
+   "bone": "spine_02"
+  },
+  {
+   "id": 40,
+   "name": "HARNESS_STRAP_1",
+   "bone": "spine_03"
+  },
+  {
+   "id": 41,
+   "name": "HARNESS_STRAP_2",
+   "bone": "spine_03"
+  },
+  {
+   "id": 42,
+   "name": "NECKLINE_TRIM",
+   "bone": "spine_03"
+  },
+  {
+   "id": 43,
+   "name": "WAIST_STRAP_1",
+   "bone": "spine_02"
+  },
+  {
+   "id": 44,
+   "name": "WAIST_STRAP_2",
+   "bone": "spine_02"
+  },
+  {
+   "id": 45,
+   "name": "BELT",
+   "bone": "pelvis"
+  },
+  {
+   "id": 46,
+   "name": "BELT_RING_L",
+   "bone": "pelvis"
+  },
+  {
+   "id": 47,
+   "name": "HIP_PLATE_L",
+   "bone": "pelvis"
+  },
+  {
+   "id": 48,
+   "name": "BELT_RING_R",
+   "bone": "pelvis"
+  },
+  {
+   "id": 49,
+   "name": "HIP_PLATE_R",
+   "bone": "pelvis"
+  },
+  {
+   "id": 50,
+   "name": "ARMLET_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 51,
+   "name": "ARMLET_RING_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 52,
+   "name": "ARMLET_BLADE_1_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 53,
+   "name": "ARMLET_BLADE_2_L",
+   "bone": "upperarm_l"
+  },
+  {
+   "id": 54,
+   "name": "ARMLET_R",
+   "bone": "upperarm_r"
+  },
+  {
+   "id": 55,
+   "name": "ARMLET_RING_R",
+   "bone": "upperarm_r"
+  },
+  {
+   "id": 56,
+   "name": "ARMLET_BLADE_1_R",
+   "bone": "upperarm_r"
+  },
+  {
+   "id": 57,
+   "name": "ARMLET_BLADE_2_R",
+   "bone": "upperarm_r"
+  },
+  {
+   "id": 58,
+   "name": "CAPE_L",
+   "bone": "x_cape_L_01",
+   "root": "upperarm_l",
+   "chain": [
+    "x_cape_L_01",
+    "x_cape_L_02",
+    "x_cape_L_03",
+    "x_cape_L_04"
+   ],
+   "cloth": true,
+   "grid": [
+    13,
+    19
+   ]
+  },
+  {
+   "id": 59,
+   "name": "CAPE_R",
+   "bone": "x_cape_R_01",
+   "root": "upperarm_r",
+   "chain": [
+    "x_cape_R_01",
+    "x_cape_R_02",
+    "x_cape_R_03",
+    "x_cape_R_04"
+   ],
+   "cloth": true,
+   "grid": [
+    13,
+    19
+   ]
+  },
+  {
+   "id": 60,
+   "name": "MANTLE_L",
+   "bone": "x_mantle_L_01",
+   "root": "upperarm_l",
+   "chain": [
+    "x_mantle_L_01",
+    "x_mantle_L_02"
+   ],
+   "cloth": true,
+   "grid": [
+    7,
+    11
+   ]
+  },
+  {
+   "id": 61,
+   "name": "MANTLE_R",
+   "bone": "x_mantle_R_01",
+   "root": "upperarm_r",
+   "chain": [
+    "x_mantle_R_01",
+    "x_mantle_R_02"
+   ],
+   "cloth": true,
+   "grid": [
+    7,
+    11
+   ]
+  },
+  {
+   "id": 62,
+   "name": "PANEL_L",
+   "bone": "x_panel_L_01",
+   "root": "pelvis",
+   "chain": [
+    "x_panel_L_01",
+    "x_panel_L_02",
+    "x_panel_L_03"
+   ],
+   "cloth": true,
+   "grid": [
+    7,
+    16
+   ]
+  },
+  {
+   "id": 63,
+   "name": "PANEL_R",
+   "bone": "x_panel_R_01",
+   "root": "pelvis",
+   "chain": [
+    "x_panel_R_01",
+    "x_panel_R_02",
+    "x_panel_R_03"
+   ],
+   "cloth": true,
+   "grid": [
+    7,
+    16
+   ]
+  },
+  {
+   "id": 64,
+   "name": "TABARD_FRONT",
+   "bone": "x_tabard_01",
+   "root": "pelvis",
+   "chain": [
+    "x_tabard_01",
+    "x_tabard_02",
+    "x_tabard_03"
+   ],
+   "cloth": true
+  },
+  {
+   "id": 65,
+   "name": "BACK_PANEL",
+   "bone": "x_back_01",
+   "root": "pelvis",
+   "chain": [
+    "x_back_01",
+    "x_back_02",
+    "x_back_03"
+   ],
+   "cloth": true
+  },
+  {
+   "id": 66,
+   "name": "BRACER_L",
+   "bone": "lowerarm_l"
+  },
+  {
+   "id": 67,
+   "name": "HAND_PLATE_L",
+   "bone": "hand_l"
+  },
+  {
+   "id": 68,
+   "name": "CLAW_THUMB_L",
+   "bone": "thumb_03_l",
+   "rigid": true
+  },
+  {
+   "id": 69,
+   "name": "CLAW_INDEX_L",
+   "bone": "index_03_l",
+   "rigid": true
+  },
+  {
+   "id": 70,
+   "name": "CLAW_MIDDLE_L",
+   "bone": "middle_03_l",
+   "rigid": true
+  },
+  {
+   "id": 71,
+   "name": "CLAW_RING_L",
+   "bone": "ring_03_l",
+   "rigid": true
+  },
+  {
+   "id": 72,
+   "name": "CLAW_PINKY_L",
+   "bone": "pinky_03_l",
+   "rigid": true
+  },
+  {
+   "id": 73,
+   "name": "BRACER_R",
+   "bone": "lowerarm_r"
+  },
+  {
+   "id": 74,
+   "name": "HAND_PLATE_R",
+   "bone": "hand_r"
+  },
+  {
+   "id": 75,
+   "name": "CLAW_THUMB_R",
+   "bone": "thumb_03_r",
+   "rigid": true
+  },
+  {
+   "id": 76,
+   "name": "CLAW_INDEX_R",
+   "bone": "index_03_r",
+   "rigid": true
+  },
+  {
+   "id": 77,
+   "name": "CLAW_MIDDLE_R",
+   "bone": "middle_03_r",
+   "rigid": true
+  },
+  {
+   "id": 78,
+   "name": "CLAW_RING_R",
+   "bone": "ring_03_r",
+   "rigid": true
+  },
+  {
+   "id": 79,
+   "name": "CLAW_PINKY_R",
+   "bone": "pinky_03_r",
+   "rigid": true
+  },
+  {
+   "id": 80,
+   "name": "GREAVE_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 81,
+   "name": "KNEE_COP_L",
+   "bone": "calf_l"
+  },
+  {
+   "id": 82,
+   "name": "KNEE_FIN_L",
+   "bone": "thigh_l"
+  },
+  {
+   "id": 83,
+   "name": "GREAVE_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 84,
+   "name": "KNEE_COP_R",
+   "bone": "calf_r"
+  },
+  {
+   "id": 85,
+   "name": "KNEE_FIN_R",
+   "bone": "thigh_r"
+  },
+  {
+   "id": 86,
+   "name": "SABATON_SHAFT_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 87,
+   "name": "SABATON_FOOT_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 88,
+   "name": "SABATON_HEEL_L",
+   "bone": "foot_l"
+  },
+  {
+   "id": 89,
+   "name": "SABATON_SHAFT_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 90,
+   "name": "SABATON_FOOT_R",
+   "bone": "foot_r"
+  },
+  {
+   "id": 91,
+   "name": "SABATON_HEEL_R",
+   "bone": "foot_r"
+  }
+ ],
+ "rigid_pieces": 84,
+ "cloth_pieces": 8
+}

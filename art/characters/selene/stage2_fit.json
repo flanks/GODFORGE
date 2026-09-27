@@ -1,0 +1,307 @@
+{
+ "hero": "selene",
+ "height_m": 2.2,
+ "height_rationale": "The brief (section 3) proposes 2.2 m to the top of the bun, inside the roster range 2.0-2.3 m (Brax 2.2, Valdris 2.3, Kael 2.1); the stage-1 blockout s303 is normalised to 2.2 m. She is as tall as Brax but half as wide: the thin dark core of a glass cannon. Collision radius 0.42.",
+ "units": "metres, Blender axes: Z up, hero faces -Y, +X = her left, feet on z = 0",
+ "source": "measured on art/characters/selene/work/selene_retopo_start.blend (REF_blockout = TRELLIS s303 at 2.2 m, moved by s2_selene_recentre.py by (-0.034, +0.15, 0) so the body's centre line is on the origin: horizontal, sagittal and arm sections, front and side renders with a 2 cm grid) and the approved front references/SELENE_front_approved.png (bun top y=24 px, sabaton tips y=987 px, centre x=761 px; 2.285 mm/px). Heights (the head, the arm line, the waist, the knee) come from the blockout, which stands on its sabatons; the arm segment lengths from the concept (shoulder |x| 0.20, elbow 0.52, the gauntlet from 0.61, wrist 0.79, claw tips 0.99); the posture is upright (the blockout leans its hips 12 cm forward of its ankles, the concept's floating pose).",
+ "concept_fig_px": [
+  24,
+  987,
+  761
+ ],
+ "recentre_offset_m": [
+  -0.034,
+  0.15,
+  0.0
+ ],
+ "landmarks": {
+  "_doc": "MakeHuman (MPFB game_engine rig, T-posed) landmark -> Selene position; _l entries are mirrored to _r. Head from the blockout (eyes 1.945 at |x| 0.036, nose 1.905, chin 1.842, skull under the swept hair 2.07; the bun rises to 2.2 and is a separate part), a long neck (neck base 1.80) into the high collar, the arm line at z 1.72 (brief: 1.72 m), a narrow waist at 1.49 (blockout: the narrowest section 0.227 m at 1.48-1.51), hips at 1.17, knee 0.63 (the greave top at ~0.74), legs together (ankles |x| 0.055, the sabatons 0.19 m across both, as drawn). The feet stand on heeled sabatons (the blockout's heel spike and the brief's 'heels slightly raised by the sabaton shape'): ankle 0.14, heel 0.075, ball 0.03; the pointed toe is part of the sabaton.",
+  "skull_top": [
+   0.0,
+   0.005,
+   2.07
+  ],
+  "eye_l": [
+   0.036,
+   -0.082,
+   1.945
+  ],
+  "nose_tip": [
+   0.0,
+   -0.118,
+   1.905
+  ],
+  "ear_l": [
+   0.077,
+   0.0,
+   1.93
+  ],
+  "skull_back": [
+   0.0,
+   0.098,
+   1.96
+  ],
+  "chin": [
+   0.0,
+   -0.092,
+   1.842
+  ],
+  "head.head": [
+   0.0,
+   -0.005,
+   1.9
+  ],
+  "neck_01.head": [
+   0.0,
+   0.012,
+   1.8
+  ],
+  "spine_03.tail": [
+   0.0,
+   0.035,
+   1.705
+  ],
+  "spine_03.head": [
+   0.0,
+   0.03,
+   1.49
+  ],
+  "spine_02.head": [
+   0.0,
+   0.02,
+   1.4
+  ],
+  "spine_01.head": [
+   0.0,
+   0.025,
+   1.305
+  ],
+  "pelvis.head": [
+   0.0,
+   0.0,
+   1.21
+  ],
+  "clavicle_l.head": [
+   0.025,
+   -0.012,
+   1.75
+  ],
+  "upperarm_l.head": [
+   0.2,
+   0.03,
+   1.72
+  ],
+  "lowerarm_l.head": [
+   0.52,
+   0.03,
+   1.72
+  ],
+  "hand_l.head": [
+   0.79,
+   0.03,
+   1.72
+  ],
+  "middle_03_l.tail": [
+   0.99,
+   0.03,
+   1.72
+  ],
+  "thigh_l.head": [
+   0.098,
+   0.005,
+   1.17
+  ],
+  "calf_l.head": [
+   0.072,
+   -0.012,
+   0.63
+  ],
+  "foot_l.head": [
+   0.055,
+   0.03,
+   0.14
+  ],
+  "ball_l.head": [
+   0.05,
+   -0.115,
+   0.03
+  ],
+  "toe_l": [
+   0.048,
+   -0.205,
+   0.015
+  ],
+  "heel_l": [
+   0.056,
+   0.075,
+   0.075
+  ]
+ },
+ "fit": {
+  "_doc": "Surface fit to REF_blockout (shared s2_body_fit.py): every band at weight 0, as for Valdris and Kael. Selene's body is the under-layer: the bodysuit, the leggings and the fingerless glove are painted on it; the collar, the harness, the belt, the capes and panels, the gauntlet bracers, the greaves, the sabatons and the hair are separate meshes built around it. The blockout's torso carries fused capes, straps and the belt rings, its legs the fused tabard, its head a soft shell with the hair tail: the slender MakeHuman shape stays, set by the macros and the landmark warp.",
+  "arm_fit_max_abs_x": 0.2,
+  "arm_cut_abs_x": null,
+  "bands": [
+   {
+    "name": "body",
+    "z": [
+     0.0,
+     1.84
+    ],
+    "weight": 0.0
+   },
+   {
+    "name": "head",
+    "z": [
+     1.84,
+     2.3
+    ],
+    "weight": 0.0
+   }
+  ],
+  "rigid": {
+   "head": {
+    "z_min": 1.86,
+    "ramp": 0.04,
+    "mode": "landmarks_only",
+    "contain": 0.02,
+    "face_front_y": -0.04,
+    "keep_weight": 0.3
+   },
+   "feet": {
+    "z_max": 0.16,
+    "ramp": 0.04,
+    "inset": 0.004,
+    "mode": "landmarks_only"
+   }
+  },
+  "extra_loops": [
+   {
+    "_doc": "knee: one loop through the joint (calf head z 0.63) and one each side",
+    "z": 0.63,
+    "abs_x_min": 0.004
+   },
+   {
+    "z": 0.59,
+    "abs_x_min": 0.004
+   },
+   {
+    "z": 0.67,
+    "abs_x_min": 0.004
+   },
+   {
+    "_doc": "elbow: a loop through the joint (lowerarm head |x| 0.52) and one each side",
+    "axis": "x",
+    "abs_x": 0.52,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.49,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.55,
+    "z_min": 1.5
+   },
+   {
+    "_doc": "wrist: a loop through the joint (hand head |x| 0.79) and one just before it",
+    "axis": "x",
+    "abs_x": 0.79,
+    "z_min": 1.5
+   },
+   {
+    "axis": "x",
+    "abs_x": 0.765,
+    "z_min": 1.5
+   }
+  ],
+  "limb_radial": {
+   "_doc": "Slender bare arms (the concept's sorceress: no muscle mass; the veins are painted): the mean radius about the arm axis goes from 0.047 m at the upper arm to 0.036 at the elbow, 0.037 over the forearm muscle and 0.028 at the wrist; the hands are scaled x1.08 (long elegant fingers for the claw tips).",
+   "axis_y": 0.03,
+   "axis_z": 1.72,
+   "abs_x": [
+    0.28,
+    0.38,
+    0.52,
+    0.6,
+    0.7,
+    0.79
+   ],
+   "radius_m": [
+    0.047,
+    0.043,
+    0.036,
+    0.037,
+    0.033,
+    0.028
+   ],
+   "blend_from_abs_x": 0.24,
+   "hand_from_abs_x": 0.8,
+   "hand_scale": 1.08,
+   "smooth": {
+    "abs_x": [
+     0.26,
+     0.795
+    ],
+    "iters": 6,
+    "amount": 0.5
+   }
+  },
+  "hand_frame": {
+   "_doc": "weapon attach frame per hand (stage 3 adds weapon_L / weapon_R sockets here): origin = palm centre (mean of the hand vertices between the wrist joint and the knuckle line), +Y along the fingers, +Z out of the back of the hand, +X = Y x Z. The thundercoil_launcher (two-handed) rides weapon_R with its grip_L for the left hand.",
+   "wrist_joint": "hand_l.head",
+   "knuckle_joint": "middle_01_l.head"
+  },
+  "grin": {
+   "_doc": "the concept's cold, stern mouth: lips closed, the corners a touch down",
+   "open": 0.0,
+   "smile": -0.0015,
+   "widen": 0.0
+  }
+ },
+ "base": {
+  "_doc": "MPFB (tool only) macro sliders and CC0 MakeHuman targets applied before baking. Selene: a tall, slender young woman (not muscular; low weight), an hourglass torso under the bodysuit; the face toward the concept's cold sorceress: an oval face with high cheekbones and hollow cheeks, a narrow chin, lifted outer eye corners (the cat-eye glare), a narrow straight nose, fuller lips with the corners a touch down, a slim neck.",
+  "macro": {
+   "gender": 0.0,
+   "age": 0.45,
+   "muscle": 0.55,
+   "weight": 0.42,
+   "proportions": 1.0,
+   "height": 1.0,
+   "cupsize": 0.9,
+   "firmness": 0.85,
+   "race": {
+    "asian": 0.2,
+    "caucasian": 0.7,
+    "african": 0.1
+   }
+  },
+  "targets": {
+   "head-oval": 0.6,
+   "head-fat-decr": 0.5,
+   "chin-width-decr": 0.4,
+   "chin-prominent-incr": 0.25,
+   "l-cheek-bones-incr": 0.6,
+   "r-cheek-bones-incr": 0.6,
+   "l-cheek-volume-decr": 0.5,
+   "r-cheek-volume-decr": 0.5,
+   "l-eye-scale-incr": 0.2,
+   "r-eye-scale-incr": 0.2,
+   "l-eye-corner2-up": 0.5,
+   "r-eye-corner2-up": 0.5,
+   "nose-scale-horiz-decr": 0.3,
+   "nose-point-width-decr": 0.3,
+   "mouth-lowerlip-volume-incr": 0.3,
+   "mouth-angles-down": 0.25,
+   "neck-scale-horiz-decr": 0.3,
+   "measure-waist-circ-decr": 0.6,
+   "measure-hips-circ-incr": 0.35,
+   "measure-upperarm-circ-decr": 0.4,
+   "buttocks-volume-incr": 0.3
+  }
+ },
+ "signature_weapon": "thundercoil_launcher",
+ "_doc_signature_weapon": "built by the weapon track (assets/models/weapons/thundercoil_launcher.glb, two-handed); the stage-2 chain only attaches the GLB at hand_frames.R for the review renders"
+}

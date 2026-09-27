@@ -1,0 +1,88 @@
+{
+ "source": "art/characters/selene/source/selene_trellis2_s303.glb",
+ "height_m": 2.2,
+ "raw": {
+  "vertices_split": 468420,
+  "triangles": 693781
+ },
+ "scale_factor": 2.20609,
+ "weld": {
+  "verts_before": 468420,
+  "verts_after": 338405
+ },
+ "parts_kept": [
+  265071,
+  13125,
+  11787,
+  11680,
+  11158,
+  10506,
+  7429,
+  7250
+ ],
+ "parts_dropped": {
+  "count": 14,
+  "verts": 399,
+  "largest": 111
+ },
+ "bounds_m": {
+  "min": [
+   -1.0567,
+   -0.3569,
+   0.0
+  ],
+  "max": [
+   1.0567,
+   0.3569,
+   2.2
+  ]
+ },
+ "span_over_height": 0.9606,
+ "stats": {
+  "name": "REF_blockout",
+  "vertices": 338006,
+  "faces": 693037,
+  "triangles": 693037,
+  "quads": 0,
+  "tri_faces": 693037,
+  "ngons": 0,
+  "quad_ratio": 0.0,
+  "boundary_edges": 204,
+  "nonmanifold_edges": 5656,
+  "wire_edges": 0,
+  "loose_verts": 0,
+  "degenerate_faces": 0,
+  "parts": 8,
+  "uv_layers": [
+   "UVMap"
+  ],
+  "materials": [
+   "MAT_REF_blockout_trellis"
+  ]
+ },
+ "concept": {
+  "path": "art/characters/selene/references/SELENE_front_approved.png",
+  "m_per_px": 0.002285
+ },
+ "out": "art/characters/selene/work/selene_retopo_start.blend",
+ "recentre": {
+  "offset_m": [
+   -0.034,
+   0.15,
+   0.0
+  ],
+  "why": "body centre line on the origin (s2_selene_recentre.py)",
+  "bounds_m": {
+   "min": [
+    -1.0907,
+    -0.2069,
+    0.0
+   ],
+   "max": [
+    1.0227,
+    0.5069,
+    2.2
+   ]
+  }
+ }
+}

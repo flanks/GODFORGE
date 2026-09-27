@@ -1,0 +1,448 @@
+{
+ "size": 2048,
+ "uv_body_regions": {
+  "head": 1050,
+  "handpalm_L": 221,
+  "foot_L": 317,
+  "foot_R": 317,
+  "leg_L": 190,
+  "ear_R": 78,
+  "handpalm_R": 221,
+  "torso": 456,
+  "arm_L": 196,
+  "sole_L": 29,
+  "leg_R": 191,
+  "ear_L": 78,
+  "handtop_L": 251,
+  "sole_R": 29,
+  "arm_R": 196,
+  "handtop_R": 251,
+  "eye_R": 60,
+  "eye_L": 60
+ },
+ "uv_body_cuts": {
+  "head": 10,
+  "torso": 19,
+  "arm_L": 20,
+  "leg_L": 21,
+  "foot_L": 1,
+  "arm_R": 20,
+  "leg_R": 20,
+  "foot_R": 1
+ },
+ "uv_copied": {},
+ "uv_hidden_faces_packed_small": 2707,
+ "texel_density_px_per_m": {
+  "BODY": {
+   "median": 545.5,
+   "p10": 39.1,
+   "p90": 653.9
+  },
+  "HAIR": {
+   "median": 535.3,
+   "p10": 173.4,
+   "p90": 620.2
+  },
+  "CROWN": {
+   "median": 591.0,
+   "p10": 537.7,
+   "p90": 644.6
+  },
+  "COLLAR": {
+   "median": 587.7,
+   "p10": 177.6,
+   "p90": 611.3
+  },
+  "BELT": {
+   "median": 551.0,
+   "p10": 165.1,
+   "p90": 625.1
+  },
+  "SHOULDERS": {
+   "median": 572.0,
+   "p10": 173.6,
+   "p90": 626.8
+  },
+  "CAPES": {
+   "median": 594.2,
+   "p10": 548.9,
+   "p90": 617.2
+  },
+  "MANTLES": {
+   "median": 595.8,
+   "p10": 540.4,
+   "p90": 606.2
+  },
+  "PANELS": {
+   "median": 594.0,
+   "p10": 547.2,
+   "p90": 608.9
+  },
+  "TABARD": {
+   "median": 594.0,
+   "p10": 577.4,
+   "p90": 597.4
+  },
+  "GAUNTLETS": {
+   "median": 552.8,
+   "p10": 174.1,
+   "p90": 617.5
+  },
+  "GREAVES": {
+   "median": 555.5,
+   "p10": 172.3,
+   "p90": 611.2
+  },
+  "SABATONS": {
+   "median": 589.6,
+   "p10": 179.7,
+   "p90": 615.3
+  },
+  "_all": {
+   "median": 574.1,
+   "p10": 172.8,
+   "p90": 620.9
+  }
+ },
+ "uv_zero_area_faces": {
+  "BODY": {
+   "count": 158,
+   "first": [
+    [
+     -0.043,
+     -0.045,
+     0.105
+    ],
+    [
+     0.086,
+     -0.148,
+     0.031
+    ],
+    [
+     -0.048,
+     0.008,
+     0.165
+    ],
+    [
+     0.087,
+     -0.143,
+     0.034
+    ],
+    [
+     0.085,
+     -0.158,
+     0.021
+    ]
+   ]
+  }
+ },
+ "bake_device": "CPU",
+ "normal_tilt_filter": {
+  "deg": [
+   30,
+   50
+  ],
+  "texels_faded": 41139
+ },
+ "normal_bake": {
+  "texels_with_detail": 436059,
+  "valid_fraction_of_target_zones": 0.1977,
+  "blur_px": 1.5
+ },
+ "atlas_coverage": 0.5491,
+ "textures": {
+  "base_color": "art/characters/selene/textures/selene_basecolor.png",
+  "emissive": "art/characters/selene/textures/selene_emissive.png",
+  "normal": "art/characters/selene/textures/selene_normal.png"
+ },
+ "stats": {
+  "BODY": {
+   "name": "BODY",
+   "vertices": 3937,
+   "faces": 4191,
+   "triangles": 7862,
+   "quads": 3671,
+   "tri_faces": 520,
+   "ngons": 0,
+   "quad_ratio": 0.876,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 3,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "HAIR": {
+   "name": "HAIR",
+   "vertices": 851,
+   "faces": 946,
+   "triangles": 1598,
+   "quads": 652,
+   "tri_faces": 294,
+   "ngons": 0,
+   "quad_ratio": 0.689,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 26,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "CROWN": {
+   "name": "CROWN",
+   "vertices": 144,
+   "faces": 156,
+   "triangles": 264,
+   "quads": 108,
+   "tri_faces": 48,
+   "ngons": 0,
+   "quad_ratio": 0.692,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "COLLAR": {
+   "name": "COLLAR",
+   "vertices": 860,
+   "faces": 836,
+   "triangles": 1672,
+   "quads": 836,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 13,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "BELT": {
+   "name": "BELT",
+   "vertices": 536,
+   "faces": 532,
+   "triangles": 1064,
+   "quads": 532,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 5,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "SHOULDERS": {
+   "name": "SHOULDERS",
+   "vertices": 656,
+   "faces": 648,
+   "triangles": 1296,
+   "quads": 648,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 8,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "CAPES": {
+   "name": "CAPES",
+   "vertices": 988,
+   "faces": 984,
+   "triangles": 1968,
+   "quads": 984,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "MANTLES": {
+   "name": "MANTLES",
+   "vertices": 308,
+   "faces": 304,
+   "triangles": 608,
+   "quads": 304,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "PANELS": {
+   "name": "PANELS",
+   "vertices": 448,
+   "faces": 444,
+   "triangles": 888,
+   "quads": 444,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "TABARD": {
+   "name": "TABARD",
+   "vertices": 386,
+   "faces": 382,
+   "triangles": 764,
+   "quads": 382,
+   "tri_faces": 0,
+   "ngons": 0,
+   "quad_ratio": 1.0,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 2,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "GAUNTLETS": {
+   "name": "GAUNTLETS",
+   "vertices": 946,
+   "faces": 972,
+   "triangles": 1844,
+   "quads": 872,
+   "tri_faces": 100,
+   "ngons": 0,
+   "quad_ratio": 0.897,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 14,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "GREAVES": {
+   "name": "GREAVES",
+   "vertices": 576,
+   "faces": 576,
+   "triangles": 1128,
+   "quads": 552,
+   "tri_faces": 24,
+   "ngons": 0,
+   "quad_ratio": 0.958,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  },
+  "SABATONS": {
+   "name": "SABATONS",
+   "vertices": 708,
+   "faces": 724,
+   "triangles": 1400,
+   "quads": 676,
+   "tri_faces": 48,
+   "ngons": 0,
+   "quad_ratio": 0.934,
+   "boundary_edges": 0,
+   "nonmanifold_edges": 0,
+   "wire_edges": 0,
+   "loose_verts": 0,
+   "degenerate_faces": 0,
+   "parts": 6,
+   "uv_layers": [
+    "UVMap"
+   ],
+   "materials": [
+    "M_selene"
+   ]
+  }
+ },
+ "triangles_total": 22356,
+ "triangles_variants": {}
+}
