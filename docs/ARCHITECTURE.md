@@ -197,6 +197,41 @@ as the fallback. The colour and readability rules are final:
   place. The Forge previews run `gf_core::forge::apply_action` on a copy of the build, so the DPS
   delta it shows is what the host will apply. An open panel eases the camera aside
   (`PanelFraming`) so the hero stays in view.
+* Combat VFX (spec `docs/art/VFX_STYLE.md`): painted, shape-first effects on one batched engine,
+  in three modules.
+  - `gf_client::fx` is the engine. One shader (`fx/fx.wesl`: shape edge, colour ramp, erosion,
+    ink band, additive hot band) draws the painted flipbooks and strips in `assets/vfx` (mips
+    built on load). It has camera-facing, floor and velocity-stretched particles, ribbons (entity
+    trails, lobbed flights, beams, tethers), smears and slashes, broken rings, 256 floor decals,
+    a pool of 8 point lights and Blender mesh bodies. There is one dynamic mesh per (sheet,
+    layer), so a full fight is 6-20 draws. Recipes hang off the `Fx` system param (`impact`,
+    `burst`, `muzzle`, `bolt`, `smear`, `ring`, `beam`, `decal`, `light`, ...). The
+    `FxSprite` / `FxTrail` / `FxRing` / `FxBody` components dress scene entities.
+  - `gf_client::arms` draws the weapons:
+    - a painted body and trail for all 14 projectile styles, and a muzzle flash for each of the
+      24 chassis;
+    - charge gauges, beams, and melee smears with a finisher on every third strike;
+    - hit marks per element and per weapon;
+    - ricochet, fork, homing and chain looks, and explosions traced back to their shot.
+    Enemy shots are magenta teardrops on the danger layer.
+  - `gf_client::vfx` routes the events. Its set pieces (`vfx/kit.rs`, `vfx/live.rs`) cover:
+    - all 24 kit abilities and the 12 synergies;
+    - faction deaths, pickups and the revive tether;
+    - the Forge, anvil and boss-phase moments.
+    It also owns the damage numbers. `vfx/zone.rs` with `zone.wesl` paints every hazard, field
+    and telegraph with one shader. A set piece claims its own Explosion and Arc events in
+    `vfx::EventClaims`, and `arms::events`, which runs after the router, skips them, so nothing
+    draws twice.
+  - Readability: layers composite in a fixed order: floor paint, then shadows, then effects,
+    then enemy shots on the danger layer, then telegraphs on top (`fx::TELEGRAPH_BIAS`). Effect
+    paint in front of a hero thins to 30 % around the torso. Every spawn names an owner (Mine,
+    Ally, Enemy or World) and a class. Allies draw at `ally_effect_alpha`, and the tier drops
+    secondary effects first.
+  - QA flags: `--vfx-gallery`, `--weapon-gallery`,
+    `--vfx-kit abilities|synergies|zones|moments` and `--vfx-bench [scale]`. Environment
+    variables: `GF_VFX_FREEZE`, `GF_VFX_ZOOM` and `GF_VFX_CELL` for the galleries,
+    `GF_KIT_FREEZE`, `GF_KIT_VIEW` and `GF_KIT_CELL` for the kit pages, and `GF_VFX_ZONES=0` to
+    turn off zones and auras for A/B tests.
 
 ## 8. Performance and LOD budgets
 
@@ -205,7 +240,11 @@ as the fallback. The colour and readability rules are final:
 | Host tick | `--stress` CI gate | p99 < 16.67 ms (measured 0.97 ms @ 400 enemies) |
 | Snapshot size | `RunReport.max_snapshot_bytes` | delta + motion descriptors; printed per run |
 | VFX tier thresholds | `game.ron: vfx.reduced_at / silhouette_at` | 450 / 900 live effects |
+| VFX tier load | `vfx::choose_tier` | replicated effects + legacy entities + fx store (a ribbon or arc counts 1, a particle ¼); steps up at once, steps down after 0.5 s at 15 % under |
 | Particles per tier | `vfx.particles` | 1600 / 700 / 200 |
+| fx engine capacity | `fx` | 6,000 particles, 640 ribbons, 512 arcs, 256 decals, 8 lights; one draw per (sheet, layer) |
+| fx engine cost | `--vfx-bench 1` | 2,000 particles + 200 trails + 50 smears: 6-12 draws, ~14k vertices, 0.6-1.2 ms CPU, 0.08 ms GPU |
+| Set pieces and zones | `--fps` log line `vfx lane A` | ~0.7-1.3 ms CPU per frame at 400 enemies (router, zones, auras) |
 | Damage numbers | `vfx.rs` | own damage only, aggregated per target, ≤ 40 alive |
 | Ally effect alpha | `vfx.ally_effect_alpha` | 0.55 |
 

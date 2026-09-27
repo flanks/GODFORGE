@@ -56,6 +56,11 @@ CLIENT OPTIONS
                                2.4 s (env GF_VFX_FREEZE=<s>, GF_VFX_ZOOM=<view height>, GF_VFX_CELL=<i>)
   --vfx-bench [scale]          QA: hold 2000 particles, 200 trails and 50 smears (x scale) and log
                                their CPU build time and GPU pass times once a second
+  --weapon-gallery             QA: every chassis fires, charges, burns or swings in a labelled grid
+                               (same GF_VFX_* env as --vfx-gallery)
+  --vfx-kit abilities|synergies|zones|moments
+                               QA: the ability, synergy, zone and moment set pieces in a labelled
+                               grid (env GF_KIT_FREEZE=<s>, GF_KIT_VIEW=<view height>, GF_KIT_CELL=<i>)
 
 HEADLESS OPTIONS
   --bots <n>  --rtt <ms>  --loss <0..1>

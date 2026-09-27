@@ -222,6 +222,30 @@ To do:
     own their tints) out of faded groups.
   - Set `hud::HudFocus { forge_drawer, boon_spread }` from the panels so the tracker, the Arsenal
     and the boon chip step aside; `InputState.forge_open` already counts as the drawer.
+* **Combat VFX** (merged 2026-09-27; ARCHITECTURE §7 "Combat VFX", spec `docs/art/VFX_STYLE.md`):
+  - Three modules share one batched engine:
+    - `fx`: the engine and generic recipes.
+    - `arms`: projectile bodies and trails, muzzle flashes, charge, beams, melee smears, hit
+      marks, plain explosions and chain hops.
+    - `vfx`: the event router, ability and synergy set pieces, painted zones and telegraphs,
+      deaths, moments and damage numbers.
+  - The router claims the Explosion and Arc events it draws as set pieces
+    (`vfx::EventClaims`), and `arms::events` runs after it and skips them. A new set piece that
+    replaces a blast or a hop must claim it the same way.
+  - Telegraphs are drawn by `vfx::zone::dress` at `fx::TELEGRAPH_BIAS`. The old
+    `lift_telegraphs` stopgap is gone.
+  - Galleries: `--vfx-gallery`, `--weapon-gallery` (freeze a frame with `GF_VFX_FREEZE=0.45`)
+    and `--vfx-kit abilities|synergies|zones|moments` (`GF_KIT_FREEZE=0.3`). Captures from a
+    game window often come back 1×1 (72 bytes) while another app holds the GPU or the window is
+    not presenting. Retry until the PNG is larger than 5 KB, one instance at a time.
+  - Still open:
+    - Explosion and Arc events carry no source, so allies' plain blasts and hops are attributed
+      by guesswork in `arms::attribute`. A source field in `gf_net` would make the 0.55 ally
+      alpha exact.
+    - Recipe numbers live in `fx/api.rs`, `arms/recipes.rs`, `arms/shots.rs` and
+      `vfx/kit.rs`, not in `assets/content/vfx.ron`.
+    - The tier thresholds need a tuning pass at `--horde 400 --bots 3`.
+    - No tests cover `fx`, `arms` or `vfx/*` (tests were on hold).
 * **Lights:** `DirectionalLight.shadow_maps_enabled` (not `shadows_enabled`), `bevy::light::{NotShadowCaster, CascadeShadowConfigBuilder}`.
 * **Pick one aim abstraction.** Never branch weapon code per aim mode. Content is data (CSV →
   `gf-content import` → RON). No stats in code.
